@@ -1,0 +1,30 @@
+<!-- Template: CustomerTypeEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="customerType" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="customerType[1][customerTypeID]"
+			value="{customerTypeID}"
+		>
+		<tr> 
+			<td width="115" class="promptText">Description</td>
+			<td width="575" class="fieldText"> <input
+					name="customerType[1][description]"
+					type="text" value="{description}"
+					size="50"
+					maxlength="50"
+				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: CustomerTypeEdit.inc.html -->

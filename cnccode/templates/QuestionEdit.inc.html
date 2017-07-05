@@ -1,0 +1,66 @@
+<!-- Template: questionEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="question" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="question[1][questionID]"
+			value="{questionID}"
+		>
+    <input
+      type="hidden"
+      name="question[1][questionnaireID]"
+      value="{questionnaireID}"
+    >
+		<tr> 
+			<td width="115" class="promptText">Description</td>
+			<td width="575" class="fieldText"> <input
+					name="question[1][description]"
+					type="text" value="{description}"
+					size="100"
+					maxlength="130"
+				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
+		</tr>
+    <tr> 
+      <td width="115" class="promptText" valign="top">Answer Type</td>
+      <td width="575" class="fieldText">
+        <select
+          name="question[1][answerTypeID]">
+          <option value="">Please Select</option>
+          <!-- BEGIN answerTypeBlock -->
+          <option {answerTypeSelected} value="{answerTypeID}">{answerTypeDescription}</option>
+          <!-- END answerTypeBlock -->
+        </select>
+        
+        <span class="formErrorMessage">{answerTypeMessage}</span>
+      </td>
+    </tr>
+    <tr> 
+      <td class="promptText">Required Answer</td>
+      <td class="field"> <input type="checkbox" name="question[1][requiredFlag]" value="Y" {requiredFlagChecked}></td>
+    </tr>
+    <tr> 
+      <td class="promptText">Active</td>
+      <td class="field"> <input type="checkbox" name="question[1][activeFlag]" value="Y" {activeFlagChecked}></td>
+    </tr>
+    <tr> 
+      <td width="115" class="promptText">Weighting</td>
+      <td width="575" class="fieldText"> <input
+          name="question[1][weight]"
+          type="text" value="{weight}"
+          size="3"
+          maxlength="3"
+        > <span class="formErrorMessage">{weightMessage}</span> </td>
+    </tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: questionEdit.inc.html -->

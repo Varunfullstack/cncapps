@@ -1,0 +1,20 @@
+<!-- Template: CustomerSelectNone.inc.html -->
+<html>
+<head>
+</head>
+<body>
+{customerString} not found, please try again
+<script type="text/javascript">
+if ((opener) && (!opener.closed)) {
+	if(opener.document.getElementById("{parentIDField}")){
+		opener.document.getElementById("{parentIDField}").value='';
+	}
+	if(opener.document.getElementById("{parentDescField}")){
+		opener.document.getElementById("{parentDescField}").value='';
+		opener.document.getElementById("{parentDescField}").setFocus;
+	}
+}
+</script>
+</body>
+</html>
+<!-- End Template: CustomerSelectNone.inc.html -->

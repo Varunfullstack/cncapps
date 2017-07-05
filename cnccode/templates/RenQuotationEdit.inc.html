@@ -1,0 +1,235 @@
+<!-- Template: RenQuotationEdit.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'>
+function checkFunctionKey(field){
+  if (event.keyCode == 120){      // F9 - edit
+    switch (field.id){
+      case "itemDescription":
+        if (document.getElementById("itemID").value != "0"){
+          window.open(
+            '{urlItemEdit}&itemID=' +
+            escape(document.getElementById("itemID").value) +
+            '&parentIDField=itemID' +
+            '&parentDescField=itemDescription',
+            'item',
+            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+          );
+        }
+        break;
+    }
+   }
+   return;
+}
+function validateItemDescription(){
+  if (Trim(document.getElementById("itemDescription").value) != ""){
+    window.open('{urlItemPopup}&itemDescription=' +
+    escape(document.getElementById("itemDescription").value) +
+    '&parentIDField=itemID' +
+    '&parentSlaResponseHoursField=slaResponseHours' +
+    '&parentDescField=itemDescription',
+    'items','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+  }
+}
+</script>
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="renQuotation" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+    <input
+      type="hidden"
+      name="renQuotation[1][customerItemID]"
+      value="{customerItemID}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][customerID]"
+      value="{customerID}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][customerName]"
+      value="{customerName}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][siteName]"
+      value="{siteName}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][siteNo]"
+      value="{siteNo}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][curUnitSale]"
+      value="{curUnitSale}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][curUnitCost]"
+      value="{curUnitCost}"
+    >
+    <input
+      type="hidden"
+      name="renQuotation[1][renQuotationTypeID]"
+      value="{renQuotationTypeID}"
+    >
+		<tr> 
+			<td width="167" class="promptText" align="right">Customer</td>
+			<td width="523" class="fieldText">{customerName}</td>
+		</tr>
+    <tr>
+      <td class="promptText">Item</td>
+      <td class="field"> <input
+        type="hidden"
+        name="renQuotation[1][itemID]"
+        id="itemID"
+        value="{itemID}"
+      > <input
+        type="text"
+        {readonly}
+        name="renQuotation[1][itemDescription]"
+        id="itemDescription"
+        value="{itemDescription}"
+        onChange="javascript:validateItemDescription()"
+        onKeydown="javascript:checkFunctionKey(itemDescription)"
+        size="50"
+        maxlength="50"
+      > <font class="formErrorMessage">{itemDescriptionMessage}</font> </td>
+    </tr>
+		<tr>
+				<td class="promptText">Start Date</td>
+				<td class="fieldText"><input
+					name="renQuotation[1][startDate]"
+					type="text" value="{startDate}"
+					{readonly}
+					size="10"
+					maxlength="10">
+				<span class="formErrorMessage">{startDateMessage}</span> </td>
+		</tr>
+		<tr>
+			<td class="promptText">Type</td>
+			<td>
+				<select
+					id="action"
+					name="renQuotation[1][renQuotationTypeID]"
+					{disabled}
+				>
+					<!-- BEGIN typeBlock -->
+					<option {typeSelected} value="{renQuotationTypeID}">{typeDescription}</option>
+					<!-- END typeBlock -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+				<td class="promptText">Cost Price</td>
+				<td class="fieldText"><input
+					name="renQuotation[1][costPrice]"
+					type="text" value="{costPrice}"
+					{readonly}
+					size="50"
+					maxlength="50">
+					<span class="formErrorMessage">{costPriceMessage}</span>
+				</td>
+		</tr>
+		<tr>
+				<td class="promptText">Sale Price</td>
+				<td class="fieldText"><input
+					name="renQuotation[1][salePrice]"
+					type="text" value="{salePrice}"
+					{readonly}
+					size="50"
+					maxlength="50">
+					<span class="formErrorMessage">{salesPriceMessage}</span>
+				</td>
+		</tr>
+    <tr>
+        <td class="promptText">Quantity</td>
+        <td class="fieldText"><input
+          name="renQuotation[1][qty]"
+          type="text" value="{qty}"
+          {readonly}
+          size="4"
+          maxlength="6">
+          <span class="formErrorMessage">{quantityMessage}</span>
+        </td>
+    </tr>
+    <tr>
+      <td valign="top" class="promptText">Internal Notes</td>
+      <td colspan="2">
+        <textarea cols="80" rows="10" name="renQuotation[1][internalNotes]">{internalNotes}</textarea>
+      </td>
+    </tr>
+    <!--
+		<tr>
+				<td class="promptText">Quantity</td>
+				<td class="fieldText"><input
+					name="renQuotation[1][qty]"
+					type="text" value="{qty}"
+					{readonly}
+					size="10"
+					maxlength="10">
+					<span class="formErrorMessage">{qtyMessage}</span>
+				</td>
+		</tr>
+    -->
+    <tr>
+        <td class="promptText">Serial No</td>
+        <td class="fieldText"><input
+          name="renQuotation[1][serialNo]"
+          type="text" value="{serialNo}"
+          size="10"
+          maxlength="10">
+          <span class="formErrorMessage">{serialNoMessage}</span>
+        </td>
+    </tr>
+    <tr>
+        <td class="promptText">Details</td>
+        <td class="fieldText"><input
+          name="renQuotation[1][grantNumber]"
+          type="text" value="{grantNumber}"
+          {disabled}
+          size="50"
+          maxlength="50">
+          <span class="formErrorMessage">{grantNumberMessage}</span>
+        </td>
+    </tr>    
+		<tr>
+				<td class="promptText">Declined</td>
+				<td class="fieldText">
+				<input
+					name="renQuotation[1][declinedFlag]" 
+					{readonly}
+					type="checkbox"
+					value="Y"
+					{declinedFlagChecked}
+				/></td>
+		</tr>
+    <tr>
+        <td class="promptText">Date Generated</td>
+        <td class="fieldText">
+        <input
+          type="text"
+          name="renQuotation[1][dateGenerated]"
+          value="{dateGenerated}"
+          {readonly}
+          size="10"
+          maxlength="10">
+        <span class="formErrorMessage">{dateGeneratedMessage}</span>
+    </td>
+    </tr>    
+		<tr>
+				<td>&nbsp;</td>
+				<td class="formErrorMessage">&nbsp;</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: RenQuotationEdit.inc.html -->

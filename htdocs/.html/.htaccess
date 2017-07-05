@@ -1,0 +1,3 @@
+<Limit GET POST PUT>
+deny from all
+</Limit>

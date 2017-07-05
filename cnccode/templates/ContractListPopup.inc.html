@@ -1,0 +1,30 @@
+<html>
+<head>
+<SCRIPT TYPE="text/javascript"> 
+<!--
+function popup(mylink, windowname)
+{
+if (! window.focus)return true;
+var href;
+if (typeof(mylink) == 'string')
+   href=mylink;
+else
+   href=mylink.href;
+window.open(href, windowname, 'width=400,height=400,scrollbars=yes, resizable=yes');
+//return false;
+}
+//--> 
+</script> 
+</head>
+<body>
+<H3>Contracts</H3>
+<table border="0" cellspacing="0" cellpadding="1">
+    <!-- BEGIN contractBlock -->
+    <tr class="singleBorder">
+      <td><a href="javascript:popup('{urlRenewalContract}')">{contractItemDescription}</a></td>
+      <td>{serialNo}</td>
+    </tr>
+    <!-- END contractBlock -->
+</table>
+</body>
+</html>

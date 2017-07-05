@@ -1,0 +1,64 @@
+<!-- Template: arecordEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="arecord" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="arecord[1][customerItemID]"
+			value="{customerItemID}"
+		>
+    <input
+      type="hidden"
+      name="arecord[1][arecordID]"
+      value="{arecordID}"
+    >
+		<tr>
+				<td class="promptText">Type</td>
+				<td class="fieldText"><input
+					name="arecord[1][type]"
+					type="text" value="{type}"
+					title="e.g. A, MX, CNAME"
+					size="20"
+					maxlength="20">
+					<span class="formErrorMessage">{typeMessage}</span> </td>
+		</tr>
+    <tr>
+        <td class="promptText">Name</td>
+        <td class="fieldText"><input
+          name="arecord[1][name]"
+          type="text" value="{name}"
+          title="e.g. www.domain.com"
+          size="60"
+          maxlength="60">
+          <span class="formErrorMessage">{nameMessage}</span> </td>
+    </tr>
+    <tr>
+        <td class="promptText">Desination IP</td>
+        <td class="fieldText"><input
+          name="arecord[1][destinationIp]"
+          type="text" value="{destinationIp}"
+          title="e.g. x.x.x.x"
+          size="60"
+          maxlength="60">
+          <span class="formErrorMessage">{destinationIpMessage}</span> </td>
+    </tr>
+    <tr>
+        <td class="promptText">Function</td>
+        <td class="fieldText"><input
+          name="arecord[1][function]"
+          type="text" value="{function}"
+          title="e.g. Web site"
+          size="60"
+          maxlength="60">
+          <span class="formErrorMessage">{functionMessage}</span> </td>
+    </tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>

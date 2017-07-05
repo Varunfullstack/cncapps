@@ -1,0 +1,16 @@
+<!-- Template: managerCommentPopup.inc.html -->
+
+<form name="form" method="post" action="{urlSubmit}">
+
+	<input type="hidden" name="problemID" value="{problemID}">
+  <input type="hidden" name="managerCommentID" value="{managerCommentID}">
+
+  <textarea
+    class="customer"
+		name="details"
+    cols="110"
+    rows="30">{details}</textarea>
+
+  <input type="submit" name="submit" value="Save">
+
+</form>

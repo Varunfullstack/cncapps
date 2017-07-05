@@ -1,0 +1,20 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(siteNo, siteDesc) {
+	if ((opener) && (!opener.closed)) {
+		opener.document.getElementById("{parentIDField}").value=siteNo;
+		opener.document.getElementById("{parentDescField}").value=siteDesc;
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<!-- BEGIN siteBlock -->
+<script type="text/javascript">
+submitItem({siteNo}, '{siteDesc}');
+</script>
+<!-- END siteBlock -->
+</body>
+</html>

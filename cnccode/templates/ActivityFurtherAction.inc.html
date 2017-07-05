@@ -1,0 +1,21 @@
+<!-- Template: ActvityFurtherAction.inc.html -->
+<form action="{urlNext}" method="post">
+<input type="hidden" name="callActivityID" value="{callActivityID}" />
+<table class="content" border="0" cellpadding="2" cellspacing="2">
+  <TR>
+    <td class="content" colspan="2" valign="top" align="left">
+    <input type="radio" name="serviceStatus" value="CANNOT_RESOLVE">Cannot resolve<br>
+    <input type="radio" name="serviceStatus" value="FIXED">Fixed<br>
+    <input type="radio" name="serviceStatus" value="WAITING_FOR_CUSTOMER">Waiting for customer<br>
+    </td>
+  </TR>
+	<TR>
+		<td colspan ="2" class="content"><input {readonly} name="workCarriedOutFlag" type="checkbox" value="1" {workCarriedOutFlagChecked} />Work was carried out</td>
+	</TR>
+	<TR>
+		<TD>
+			<input name="Next" type="submit" id="Next" value="Next" />
+		</TD>
+	</TR>
+</table>
+</form>

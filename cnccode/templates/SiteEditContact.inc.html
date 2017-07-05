@@ -1,0 +1,46 @@
+<!-- Template: SiteEditContact.inc.html -->
+		<tr> 
+			<td width="10%" class="promptText">Invoice Contact</td>
+			<td class="field">
+				<input
+					type="hidden"
+					name="site[1][invContactID]"
+					id="invContactID"
+					value="{invContactID}"
+				>
+				<input
+					type="text"
+					name="site[1][invContactName]"
+					id="invContactName"
+					value="{invContactName}"
+					onChange="javascript:validateInvContactName()"
+					onKeydown="javascript:checkFunctionKey(invContactName)"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{invContactNameMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td width="10%" class="promptText">Delivery Contact</td>
+			<td class="field">
+				<input
+					type="hidden"
+					name="site[1][delContactID]"
+					id="delContactID"
+					value="{delContactID}"
+				>
+				<input
+					type="text"
+					name="site[1][delContactName]"
+					id="delContactName"
+					value="{delContactName}"
+					onChange="javascript:validateDelContactName()"
+					onKeydown="javascript:checkFunctionKey(delContactName)"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{delContactNameMessage}</font>
+			</td>
+		</tr>
+<!-- End Template: SiteEditContact.inc.html -->

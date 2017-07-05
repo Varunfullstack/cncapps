@@ -1,0 +1,26 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(contactID, contactName) {
+	if ((opener) && (!opener.closed)) {
+    if ( '{parentDescField}' != 'none'  ){
+      parentDescField = opener.document.getElementById("{parentDescField}");
+      parentDescField.value=contactName;
+      opener.document.getElementById("{parentIDField}").value=contactID;
+    }
+    else{
+      opener.location.reload(true); // reload if we haven't changed the parent form
+    }
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<!-- BEGIN contactBlock -->
+<script type="text/javascript">
+submitItem({contactID}, '{submitName}');
+</script>
+<!-- END contactBlock -->
+</body>
+</html>

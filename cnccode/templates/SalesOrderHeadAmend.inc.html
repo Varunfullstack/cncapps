@@ -1,0 +1,33 @@
+<!-- Template: SalesOrderHeadAmend.inc.html -->
+<form name="ordhead" method="POST" action="{urlUpdateHeader}">
+<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+<INPUT type="hidden" name="form[ordheadID]" value={ordheadID}>
+	<table class="singleBorder" width="350px" border="0">
+		<tr> 
+			<td class="promptText" width="120px">Customer P/Order Ref</td>
+			<td class="field"> <INPUT {readOnly} type="text" name="form[custPORef]" value="{custPORef}" maxlength="23" size="23"></td>
+		</tr>
+		<tr> 
+			<td class="promptText">Allow Part Invoice?</td>
+			<td class="mainHeadText"> <INPUT name="form[partInvoice]" {readOnly} type="checkbox" value="Y" {partInvoiceChecked}></td>
+		</tr>
+		<tr> 
+			<td class="promptText">Payment Method</td>
+			<td class="mainHeadText"><SELECT name="form[paymentTermsID]" {readOnly}>
+					<!-- BEGIN payMethodBlock -->
+					<OPTION {payMethodSelected} value="{paymentTermsID}">{payMethodDesc}</OPTION>
+					<!-- END payMethodBlock -->
+				</SELECT></td>
+		</tr>
+		<tr> 
+			<td class="promptText">Add Customer Item?</td>
+			<td class="mainHeadText"> <INPUT name="form[addItem]" {readOnly} type="checkbox" value="Y" {addItemChecked}> 
+			</td>
+		</tr>
+		<tr> 
+			<td colspan="2" align="right"> <INPUT {readOnly} type="submit" name="submit" value="Update"> 
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: SalesOrderHeadAmend.inc.html -->

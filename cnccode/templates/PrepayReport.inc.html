@@ -1,0 +1,150 @@
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style>
+body {
+	font-family: Arial, Helvetica, sans-serif;
+
+	font-size: 10pt;
+}
+
+td {
+	font-family: Arial, Helvetica, sans-serif;
+}
+td.valueRight {
+  text-align : right;
+	white-space: nowrap;
+}
+td.labelLeft {
+	text-align : left;
+	font-weight: bold;
+	white-space: nowrap;
+	font-size: 10pt;
+}
+th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+table {
+	width: 100%;
+}
+table.information {
+
+	WIDTH: 100%;
+	border: 1pt solid #666666;
+}
+H1 {
+	font-size: 10pt;
+}
+P.addressLine {
+	margin-top :0.1em;
+	margin-bottom :0.1em;
+	font-size: 10pt;
+}
+@page {
+  size: landscape;
+}
+.transaction {
+	font-size: 10pt;
+	border-bottom: black;
+}
+.transactionTotalLabels {
+	font-weight: bold;
+}
+.valueLeft {
+	font-size: 10pt;
+	text-align: left;
+}
+.valueRight {
+  font-size: 10pt;
+  text-align: right;
+}
+.valueCentre {
+  font-size: 10pt;
+  text-align:center;
+}
+.labelLeft {
+  font-size: 10pt;
+  font-weight: bold;
+  text-align: left;
+}
+.labelRight {
+	font-size: 10pt;
+	font-weight: bold;
+	text-align: right;
+}
+</style>
+</head>
+<body>
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+	<tr> 
+		<td width="28%" valign="bottom">
+			<div align="center">
+				<h1 align="left"><img src="https://www.cnc-ltd.co.uk/_images/cnc_logo_200.gif" width="100"></h1>
+		</div>		</td>
+    <td width="28%" valign="bottom">CNC Pre-Pay Statement {statementDate}</td>
+    <!--		<td width="44%" align="right" valign="top"><div align="right"><img src="https://www.cnc-ltd.co.uk/sites/all/themes/cnc/images/logo-white.gif" alt="CNC Logo" width="421" height="157" align="top"></div></td>-->
+	</tr>
+</table>
+<BR/>
+<table width="100%" class="information">
+	<tr> 
+		<td width="15%" class="labelRight">Company Name:</td>
+		<td width="28%" class="valueLeft">{companyName}</td>
+		<td width="13%" class="labelRight">CNC Ref:</td>
+		<td colspan="3" class="valueLeft">{customerRef}</td>
+	</tr>
+	<tr> 
+		<td valign="top" class="labelRight">Address:</td>
+		<td valign="top" class="addressLine"> <P class="addressLine">{add1}</P>
+			<P class="addressLine">{add2}</P>
+			<P class="addressLine">{add3}</P>
+			<P class="addressLine">{town}</P>
+			<P class="addressLine">{county}</P>
+			<P class="addressLine">{postcode}</P></td>
+	</tr>
+</table>
+<BR/>
+<table width="100%" class="information">
+  <tr class="transaction">
+    <td colspan="4">&nbsp;</td>
+    <td class="labelRight">Previous balance:</td>
+    <td nowrap class="labelRight">&pound;{previousBalance}</td>
+  </tr>
+	
+  <tr class="transaction">
+		<td colspan=6><HR/></td>
+	</tr>	
+	<tr class="transactionHead"> 
+		<td width="5%" nowrap class="labelLeft">Date</td>
+		<td width="5%" nowrap class="labelLeft">Service Request</td>
+    <td width="5%" nowrap class="labelLeft">Details</td>
+		<td width="5%" nowrap class="labelRight">Total Hours</td>
+    <td width="5%" nowrap class="labelLeft">Contact Name</td>
+		<td width="5%" nowrap class="labelRight">Cost(&pound;)</td>
+	</tr>
+	<!-- BEGIN lineBlock -->
+	<tr class="transaction"> 
+		<td valign="top" nowrap class="valueLeft">{requestDate}</td>
+		<td valign="top" nowrap class="valueLeft">{requestRef}</td>
+		<td valign="top" nowrap="nowrap" class="valueLeft">{requestDetails}</td>
+		<td width="9%" valign="top" nowrap class="valueRight">{requestHours}</td>
+    <td width="9%" valign="top" nowrap class="valueLeft">{requestCustomerContact}</td>
+		<td valign="top" nowrap  class="valueRight">{requestValue}</td>
+	</tr>
+	<!-- END lineBlock -->
+	
+  <tr class="transaction">
+		<td colspan=6><HR/></td>
+	</tr>	
+	<tr class="transaction">
+		<td colspan="4">&nbsp;</td>
+		<td class="labelRight">Remaining balance:</td>
+		<td nowrap class="labelRight">&pound;{remainingBalance}</td>
+	</tr>
+</table>
+<p>{cnc_name}, {cnc_add1}, {cnc_add2}, {cnc_add3}, {cnc_town}, {cnc_county},
+{cnc_postcode}, Tel. {cnc_phone} </p>
+<p>All amounts are exclusive of VAT. </p>
+</body>
+</html>

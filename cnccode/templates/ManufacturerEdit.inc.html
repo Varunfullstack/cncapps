@@ -1,0 +1,27 @@
+<!-- Template: ManufacturerEdit.inc.html -->
+<form name="manufacturerForm" method="post" action="{urlUpdate}" AUTOCOMPLETE = "off">
+	<input type="hidden" name="manufacturer[1][manufacturerID]" value="{manufacturerID}">
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="12%" class="promptText">ID</td>
+			<td class="displayfield">
+			{manufacturerID}			</td>
+		</tr>
+		<tr> 
+			<td width="12%" class="promptText">Name</td>
+			<td class="field"> <input
+					type="text"
+					name="manufacturer[1][name]"
+					id="name"
+					value="{name}"
+					size="50"
+					maxlength="50"
+				> <font class="formErrorMessage">{nameMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td> <input type="submit" name="Submit" value="Submit"> </td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: ManufacturerEdit.inc.html -->

@@ -1,0 +1,35 @@
+<!-- Template: ActvitySalesRequest.inc.html -->
+  <form name="action_date" action="{urlNext}" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="problemResolvedFlag" value="{problemResolvedFlag}" />
+  <input type="hidden" name="input[1][callActivityID]" value="{callActivityID}" />
+  <table border="0">                                                                                     
+    <tr>
+      <td valign="top" class="promptText">Message to Sales</td>
+      <td class="fieldText">
+        <textarea
+          name="input[1][emailBody]" 
+          id="emailBody"
+          cols="130" rows="20">{emailBody}</textarea>
+      </td>
+    </TR>
+    <tr>
+      <td class="promptText">Root Cause</td>
+      <td class="fieldText">
+        <select
+          name="input[1][rootCauseID]"
+        >
+          <option value="">Please Select</option>
+          <!-- BEGIN rootCauseBlock -->
+          <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+          <!-- END rootCauseBlock -->
+        </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
+      </td>
+    </TR>
+		<TR>
+		  <td class="fieldText"><span class="promptText">
+      <input type="submit" name="Submit" value="Finished"/>
+      </span></td>
+	  </TR>
+	</form>
+</table>
+<!-- End Template: ActvitySalesRequest.inc.html -->

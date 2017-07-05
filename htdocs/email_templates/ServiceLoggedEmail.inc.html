@@ -1,0 +1,39 @@
+<html>
+  <head>
+  <style type="text/css">
+  <!--
+  BODY, P, TD, TH {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+  }
+  h2{
+    font-size: 11pt;
+    font-weight: bold;
+    
+  }
+  a{
+    font-weight: bold;
+  }
+  .singleBorder {
+    border: #e1e1f0 2px solid;
+  }
+  TABLE {
+    border-spacing: 1px;
+  }
+  -->
+  </style>
+  </head>
+  <body>
+    <p>{contactFirstName},</span></p>
+    <p>A {CONFIG_SERVICE_REQUEST_DESC} has been logged on our system under reference <a href="http://www.cnc-ltd.co.uk/portal/request/{activityRef}/view">{activityRef}</a>.  This number will appear on all correspondence relating to this request and it will help if you could please refer to it in all related communications with us.
+</p>
+    <h2>Details</h2>
+    <p class="singleBorder">{reason}</p>
+    <h2>Priority</h2>
+    <P>{priority}</P>
+    <h2>Status</h2>
+    <p>This request has been submitted to our {submittedTo} who will contact you to arrange any further action, {responseDetails}</p>
+    <p><strong>Did you know you can track your service requests, update your contact details and see other information via our customer portal? Please visit our website at www.cnc-ltd.co.uk and click on the Portal Login link and request a password.</strong></p>
+  </body>
+</html>
+

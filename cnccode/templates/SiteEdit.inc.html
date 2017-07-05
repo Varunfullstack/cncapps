@@ -1,0 +1,143 @@
+<!-- Template: SiteEdit.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+{siteEditJS}
+<form name="site" method="post" action="{urlSubmit}" AUTOCOMPLETE = "off">
+	<input type="hidden" name="site[1][customerID]" id="customerID" value="{customerID}">
+	<input type="hidden" name="site[1][siteNo]" id="siteNo" value="{siteNo}">
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="20%" class="promptText">Address</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][add1]"
+					id="add1"
+					value="{add1}"
+					size="50"
+					maxlength="50"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{add1Message}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][add2]"
+					id="add2"
+					value="{add2}"
+					size="50"
+					maxlength="50"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{add2Message}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][add3]"
+					id="add3"
+					value="{add3}"
+					size="50"
+					maxlength="50"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{add3Message}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Town</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][town]"
+					id="town"
+					value="{town}"
+					size="50"
+					maxlength="50"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{townMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">County</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][county]"
+					id="town"
+					value="{county}"
+					size="50"
+					maxlength="50"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{countyMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Postcode</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][postcode]"
+					id="postcode"
+					value="{postcode}"
+					size="20"
+					maxlength="20"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{postcodeMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Phone</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][phone]"
+					id="phone"
+					value="{phone}"
+					size="20"
+					maxlength="20"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{phoneMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Sage Ref</td>
+			<td class="field">
+				{sageRef}
+			</td>
+		</tr>
+		{siteEditContact}
+		<tr> 
+			<td class="promptText">Debtor Code</td>
+			<td class="field">
+				<input
+					type="text"
+					name="site[1][debtorCode]"
+					id="debtorCode"
+					value="{debtorCode}"
+					size="20"
+					onKeypress="javascript:submitOnReturn()"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{debtorCodeMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="button" name="Submit" value="Submit" onClick="submit();">
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: SiteEdit.inc.html -->

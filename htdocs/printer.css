@@ -1,0 +1,58 @@
+BODY {
+	background-color : White;
+	font-family : Arial, Tahoma, Helvetica, sans-serif;
+	font-size : medium;
+	margin-left : 1em;
+	margin-right : 0;
+	color : black;
+}
+H1 {
+	font-size : 150%;
+}
+H2 {
+	font-size : 100%;
+}
+H3 {
+	margin-top :1em;
+}
+H4 {
+	padding-bottom : 2px;
+	padding-top : 2px;
+	padding-left : 2px;
+}
+
+H5 {
+	font-size : small;
+	font-weight : 900;
+	margin-bottom : -1em;
+}
+
+H6 {
+	font-size : small;
+	font-weight : 800;
+	margin-bottom : -1em;
+}
+
+BLOCKQUOTE {
+	margin-left : 0;
+}
+
+CAPTION {
+	font-weight : 800;
+}
+TABLE {
+ 	BORDER: 0;
+ 	CELLPADDING: 0;
+ 	CELLSPACING: 0
+}
+TH {
+	font-size: small;
+	text-align: left;
+}
+TD {
+   font-size: small
+}
+P {
+    text-align : left;
+    font-size: medium;
+}

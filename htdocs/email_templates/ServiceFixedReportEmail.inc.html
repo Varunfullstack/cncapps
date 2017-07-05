@@ -1,0 +1,49 @@
+<html>
+<!-- Service requests fixed the previous day -->
+  <head>
+  <style type="text/css">
+  <!--
+  BODY, P, TD, TH {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+  }
+  .singleBorder {
+    border: #e1e1f0 2px solid;
+  }
+  TABLE {
+    border-spacing: 1px;
+  }
+  -->
+  </style>
+  </head>
+  <body>
+    <h1>Service requests fixed yesterday</h1>
+    <table>
+      <tr>
+        <th>Customer</th>
+        <th>Incident No</th>
+        <th>Details</th>
+        <th>Fixed By</th>
+        <th>Duration(hours open)</th>
+        <th>Time Spent</th>
+        <th>Response Time</th>
+        <th>Fix Time</th>
+        <th>Contract</th>
+      </tr>
+<!-- BEGIN requestBlock -->
+      <tr>
+        <td>{customer}</td>
+        <td><a href="{urlRequest}">{serviceRequestID}</a></td>
+        <td>{description}</td>
+        <td>{fixedBy}</td>
+        <td>{durationHours}</td>
+        <td>{timeSpentHours}</td>
+        <td>{responseTimeHours}</td>
+        <td>{fixTimeHours}</td>
+        <td>{contract}</td>
+      </tr>
+<!-- END requestBlock -->
+    </table>
+  </body>
+</html>
+

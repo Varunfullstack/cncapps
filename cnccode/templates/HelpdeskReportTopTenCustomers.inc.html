@@ -1,0 +1,24 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<!-- Template: HelpdeskReportTopTenCustomers.inc.html -->
+<link href="maxchart/style/style.css" rel="stylesheet" type="text/css" />
+<H2>Top Ten Help Desk Customers - {periodDescription}</H2>
+<table class="singleBorder" width="600px" border="0" cellspacing="1" cellpadding="1">
+	<tr>
+			<td nowrap="nowrap"><strong>Customer</strong></td>
+			<td><strong>Activities</strong></td>
+			<td><strong>Hours</strong></td>
+	</tr>
+	<!-- BEGIN customerBlock -->
+	<tr>
+			<td width="400px" nowrap="nowrap">{customer}</td>
+			<td width="100px">{activities}</td>
+			<td width="100px">{hours}</td>
+	</tr>
+	<!-- END customerBlock -->
+	<tr>
+		<td colspan="3">
+			<img src="{urlCustomerChart}"/>
+		</td>
+	</tr> 
+</table>
+

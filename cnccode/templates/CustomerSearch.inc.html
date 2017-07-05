@@ -1,0 +1,89 @@
+<!-- Template: Customer.inc.html -->
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<form name="form" method="post" action="{submitURL}">
+	<table border="0" cellspacing="0" cellpadding="1">
+		<tr>
+			<td class="promptText">Contact (first or last name)</td>
+			<td><input	type="text"	name="form[contactString]"	value="{contactString}"> 
+			</td>
+		</tr>
+		<tr>
+			<td class="promptText">Phone No</td>
+			<td><input	type="text"	name="form[phoneString]"	value="{phoneString}"> 
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Customer Name</td>
+			<td> <input	type="text"	name="form[customerString]"	value="{customerString}"> 
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Address</td>
+			<td><input	type="text"	name="form[address]"	value="{address}"></td>
+		</tr>
+    <tr> 
+      <td class="promptText"><div align="right">New Between</div></td>
+      <td> <input
+          type="text"
+          name="form[newCustomerFromDate]"
+          id="newCustomerFromDate"
+          value="{newCustomerFromDate}"
+          size="10"
+          maxlength="10"
+          onKeypress="javascript:submitOnReturn()"
+        >
+        <a href="javascript:;" onClick="popUpCalendar(this, newCustomerFromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+        <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
+and <input
+          type="text"
+          name="form[newCustomerToDate]"
+          id="newCustomerToDate"
+          value="{newCustomerToDate}"
+          size="10"
+          maxlength="10"
+          onKeypress="javascript:submitOnReturn()"
+      >
+        <a href="javascript:;" onClick="popUpCalendar(this, newCustomerToDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+        <font class="formErrorMessage">{newCustomerToDateMessage}</font> </td>
+    </tr>
+    <tr> 
+      <td class="promptText"><div align="right">Lost Between</div></td>
+      <td> <input
+          type="text"
+          name="form[droppedCustomerFromDate]"
+          id="droppedCustomerFromDate"
+          value="{droppedCustomerFromDate}"
+          size="10"
+          maxlength="10"
+          onKeypress="javascript:submitOnReturn()"
+        >
+        <a href="javascript:;" onClick="popUpCalendar(this, droppedCustomerFromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+        <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
+and <input
+          type="text"
+          name="form[droppedCustomerToDate]"
+          id="droppedCustomerToDate"
+          value="{droppedCustomerToDate}"
+          size="10"
+          maxlength="10"
+          onKeypress="javascript:submitOnReturn()"
+      >
+        <a href="javascript:;" onClick="popUpCalendar(this, droppedCustomerToDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+        <font class="formErrorMessage">{droppedCustomerToDateMessage}</font> </td>
+    </tr>
+    <tr> 
+      <td valign="top">&nbsp;</td>
+      <td> <input type="submit" name="Go" value="Search"> <input name="Button" type="button" value="New" onClick="document.location='{createURL}';"> 
+        <font class="formErrorMessage">{customerStringMessage}</font> </td>
+    </tr>
+    
+	</table>
+</form>
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+	<!-- BEGIN customerBlock -->
+	<tr> 
+		<td><A HREF="{customerURL}">{customerName}</A></td>
+	</tr>
+	<!-- END customerBlock -->
+</table>
+<!-- End Template: Customer.inc.html -->

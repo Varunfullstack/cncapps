@@ -1,0 +1,100 @@
+<!-- Template: CurrentActivityReportEngineer.inc.html -->
+<!-- <META HTTP-EQUIV=REFRESH CONTENT=240> -->
+{currentActivityReportCritical}
+<table class="content" width="100%">
+  <tr valign="top">
+    <td class="listHeadText" colspan="6"><div align="left"><strong>Awaiting Response {awaitingResponseCount}</strong></div></td>
+    <td class="listHeadText" ><div align="left">Updated</div></td>
+    <td class="listHeadText" nowrap><div align="left">Priority</div></td>
+    <td class="listHeadText" nowrap>Hours to SLA</td>
+   </tr>
+  <!-- BEGIN awaitingResponseBlock -->
+  <form name="userForm">
+    <tr valign="top" bgcolor="{aBgColour}">
+    <tr valign="center">
+      <td  bgcolor="{aBgColour}" valign="center" nowrap="nowrap" class="listItemText">{aProblemID}</td>
+      <td  width="40" class="content" >{aStartButton}</td>
+      <td  width="40" class="content" align="center">{aRejectButton}</td>
+      <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aEngineerName}</td>
+      <td  class="{aCustomerNameDisplayClass}"><A href="{aUrlCustomer}" target="_blank">{aCustomerName}</a></td>
+      <td  class="content" valign="top" nowrap="nowrap" class="listItemText">
+        <A
+          href="#"
+          onClick= "window.open(
+          '{aUrlProblemHistoryPopup}',
+          'reason',
+          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')">{aReason}
+        </A>
+      </td>
+      <td  class="content" nowrap="nowrap">{aDate} {aTime}</td>
+      <td  class="content"><div align="center">{aPriority}</div></td>
+      <td  class="content"><div align="right">{aHoursUntilSla}</td>
+    </tr>
+  </form>
+  <!-- END awaitingResponseBlock -->
+</table>
+<BR/>
+<table class="content" width="100%">
+  <tr valign="centre">
+    <td class="listHeadText" colspan="4"><div align="left"><strong>In Progress {inProgressCount}</strong> </div></td>
+    <td class="listHeadText" ><div align="left">Updated</div></td>
+    <td class="listHeadText" nowrap><div align="left">Hours</div></td>
+    <td class="listHeadText" nowrap><div align="left">Alarm</div></td>
+    <td class="listHeadText" nowrap><div align="left">Priority</div></td>
+  </tr>
+  <!-- BEGIN inProgressBlock -->
+  <form name="userForm">
+    <tr valign="centre">
+      <td bgcolor="{pBgColor}"><A href={pUrlViewActivity} target="_blank"  title="Green = Being Worked On Now">{pProblemID}</A></td>
+      <td  class="content" nowrap="nowrap">{pEngineerName}</td>
+      <td  class="{pCustomerNameDisplayClass}"><A href="{pUrlCustomer}" target="_blank">{pCustomerName}</a></td>
+      <td  class="content" nowrap="nowrap" class="listItemText">
+        <A
+          href="#"
+          onClick= "window.open(
+          '{pUrlProblemHistoryPopup}',
+          'reason',
+          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')">{pReason}
+        </A>
+      </td>
+      <td  bgcolor="{pUpdatedBgColor}" title="Purple = Updated by another user">{pDate} {pTime}</td>
+      <td  bgcolor="{pWorkingHoursBgColor}" title="Green = Awaiting Customer Blue = CNC">{pWorkingHours}</td>
+      <td  nowrap="nowrap" bgcolor="{pAlarmBgColor}" title="Red = Overdue">{pAlarmDateTime}</td>
+      <td class="content" nowrap="nowrap"><div align="center">{pPriority}</div></td>
+    </tr>
+  </form>
+  <!-- END inProgressBlock -->
+</table>
+<BR/>
+<table class="content" width="100%">
+  <tr valign="centre">
+    <td class="listHeadText" colspan="4"><div align="left"><strong>Future {futureCount}</strong> </div></td>
+    <td class="listHeadText" ><div align="left">Updated</div></td>
+    <td class="listHeadText" nowrap><div align="left">Hours</div></td>
+    <td class="listHeadText" nowrap><div align="left">Alarm</div></td>
+    <td class="listHeadText" nowrap><div align="left">Priority</div></td>
+  </tr>
+  <!-- BEGIN futureBlock -->
+  <form name="userForm">
+    <tr valign="centre" bgcolor="{fBgColour}">
+      <td  valign="middle" bgcolor="{fBgColor}"><A href={fUrlViewActivity} target="_blank">{fProblemID}</A></td>
+      <td  class="content" nowrap="nowrap">{fEngineerName}</td>
+      <td  class="{fCustomerNameDisplayClass}"><A href="{fUrlCustomer}" target="_blank">{fCustomerName}</a></td>
+      <td  class="content" nowrap="nowrap">
+        <A
+          href="#"
+          onClick= "window.open(
+          '{fUrlProblemHistoryPopup}',
+          'reason',
+          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')">{fReason}
+        </A>
+      </td>
+      <td class="content" nowrap="nowrap" bgcolor="{fUpdatedBgColor}">{fDate} {fTime}</td>
+      <td  bgcolor="{fWorkingHoursBgColor}" title="Green = Awaiting Customer Blue = CNC">{fWorkingHours}</td>
+      <td nowrap="nowrap" class="content">{fAlarmDateTime}</td>
+      <td  class="content" nowrap="nowrap" class="listItemText"><div align="center">{fPriority}</div></td>
+    </tr>
+  </form>
+  <!-- END futureBlock -->
+</table>
+<!-- End Template: CurrentActivityReportEngineer.inc.html -->

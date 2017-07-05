@@ -1,0 +1,43 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(contactID,contactName) {
+  if ((opener) && (!opener.closed)) {
+    if ( '{parentDescField}' != 'none'  ){
+      parentDescField = opener.document.getElementById("{parentDescField}");
+      parentDescField.value=contactName;
+      opener.document.getElementById("{parentIDField}").value=contactID;
+    }
+    else{
+      opener.location.reload(true); // reload if we haven't changed the parent form
+    }
+    window.close();
+  }
+}
+</script>
+</head>
+<body>
+<table>
+	<TR>
+		<TD>
+			<INPUT type="button" name="create" value="Create New" onclick="document.location='{urlContactCreate}';">
+		</TD>
+		<TD>
+			<INPUT type="button" name="close" value="Close" onclick="window.close();">
+		</TD>
+	<TR/>
+</table>
+<table>
+<!-- BEGIN contactBlock -->
+<tr>
+<td class="listItemText">
+	<a href="javascript:submitItem({contactID}, '{submitName}')">{contactName}</a>
+</td>
+<td class="listItemText">
+	{partNo}
+</td>
+</tr>
+<!-- END contactBlock -->
+</table>
+</body>
+</html>

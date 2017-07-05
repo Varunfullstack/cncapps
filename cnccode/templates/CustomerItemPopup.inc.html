@@ -1,0 +1,34 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(customerItemID, itemDesc) {
+	if ((opener) && (!opener.closed)) {
+		opener.document.getElementById("{parentIDField}").value=customerItemID;
+		opener.document.getElementById("{parentDescField}").value=itemDesc;
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<table>
+	<TR>
+		<TD>
+			<INPUT type="button" name="create" value="Create New" onclick="document.location='{urlSiteCreate}';">
+		</TD>
+		<TD>
+			<INPUT type="button" name="close" value="Close" onclick="window.close();">
+		</TD>
+	<TR/>
+</table>
+<table>
+<!-- BEGIN itemBlock -->
+<tr>
+	<td class="listItemText">
+		<a href="javascript:submitItem({customerItemID}, '{itemDesc}')">{itemDesc}</a>
+	</td>
+</tr>
+<!-- END itemBlock -->
+</table>
+</body>
+</html>

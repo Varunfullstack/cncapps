@@ -1,0 +1,21 @@
+<!-- Template: ActivityCreate10.inc.html -->
+<H2>{customerName}</H2>
+<form name="form" method="post" action="{submitURL}">
+	<table border="0" cellspacing="0" cellpadding="1">
+			<tr class="singleBorder">
+					<td width="69" class="promptText">End Time</td>
+					<td width="438" class="fieldText"><input
+					type="text"
+					name="endTime"
+					value="{endTime}"
+					size="5"
+					maxlength="5"
+					/>
+									<span class="formErrorMessage">{endTimeMessage}</span> </td>
+			</tr>
+		<tr> 
+			<td colspan="2" valign="top"><input name="Back" type="button" value="Back" onclick="document.location='{backURL}';"> <input name="Next" type="submit" id="Next" value="Next">		</td>
+			</tr>
+	</table>
+</form>
+<!-- End Template: ActivityCreate10.inc.html -->

@@ -1,0 +1,38 @@
+<!-- Template: BatchCallResolve.inc.html -->
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<form name="expenseExportForm" method="post" action="{urlSubmit}">
+  <P>Resolve calls in the given date range</P>
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="20%" class="promptText">Start Date</td>
+			<td class="field"> <input
+					type="text"
+					name="callResolve[1][startDate]"
+					id="startDate"
+					value="{startDate}"
+					size="10"
+					maxlength="10"
+				>
+				<a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
+				<font class="formErrorMessage">{startDateMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td width="20%" class="promptText">End Date</td>
+			<td class="field"> <input
+					type="text"
+					name="callResolve[1][endDate]"
+					id="endDate"
+					value="{endDate}"
+					size="10"
+					maxlength="10"
+				>
+				<a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
+				<font class="formErrorMessage">{endDateMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td> <input type="submit" name="Resolve" value="Resolve"> </td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: BatchCallResolve.inc.html -->

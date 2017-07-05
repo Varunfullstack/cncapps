@@ -1,0 +1,15 @@
+<!-- Template: CustomerItemSelectNone.inc.html -->
+<html>
+<head>
+</head>
+<body>
+{customerString} not found, please try again
+<script type="text/javascript">
+if ((opener) && (!opener.closed)) {
+	opener.document.getElementById("{parentIDField}").value="";
+	opener.document.getElementById("{parentDescField}").value="";
+}
+</script>
+</body>
+</html>
+<!-- End Template: CustomerItemSelectNone.inc.html -->

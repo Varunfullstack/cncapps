@@ -1,0 +1,35 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitSupplier(supplierID, supplierName) {
+	if ((opener) && (!opener.closed)) {
+		opener.document.getElementById("{parentIDField}").value=supplierID;
+		opener.document.getElementById("{parentDescField}").value=supplierName;
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<table>
+	<TR>
+		<TD>
+<!--DISABLED FOR NOW			<INPUT type="button" name="create" value="Create New" onclick="document.location='{urlSupplierCreate}';">-->
+		</TD>
+		<TD>
+			<INPUT type="button" name="close" value="Close" onclick="window.close();">
+		</TD>
+	<TR/>
+</table>
+<table>
+<!-- BEGIN supplierBlock -->
+<tr>
+<td class="listSupplierText">
+	<input type="hidden" value="1">
+	<a href="javascript:submitSupplier({supplierID}, '{submitName}')">{supplierName}</a>
+</td>
+</tr>
+<!-- END supplierBlock -->
+</table>
+</body>
+</html>

@@ -1,0 +1,1 @@
+ALTER TABLE `password` CHANGE `pas_username` `pas_username` CHAR(100) CHARSET latin1 COLLATE latin1_swedish_ci NULL; 

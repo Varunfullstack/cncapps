@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+    <style type="text/css">
+      BODY, P, TD, TH {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+      }
+      table
+      {
+        border-collapse:collapse;
+      }
+      table,th, td
+      {
+        border: 1px solid black;   
+      }
+      td{
+        padding: 5px;
+      }
+      h1{
+        font-size: 10pt;
+      }
+      td.data{
+        text-align: center;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <H3>Questionnaire Report {period} - {questionnaireDescription}</strong></h3>
+      <hr/>
+      <!-- BEGIN ratingsBlock -->
+        <p><strong>{questionDescription} ({ratingTotal} responses)</strong><p/>
+        <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{rating1Percent},{rating2Percent},{rating3Percent},{rating4Percent},{rating5Percent}&chdl=1 {rating1Description}|2|3|4|5 {rating5Description}&chs=400x200&chco=FF0000,FFFF10"/>
+        <hr/>
+      <!-- END ratingsBlock -->
+    <BR/>
+      <!-- BEGIN yesNoBlock -->
+        <p><strong>{questionDescription} ({ynTotal} responses)</strong><p/>
+        <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{yesPercent},{noPercent}&chdl=Yes|No&chs=400x200&chco=FFFF10,FF0000"/>
+        <hr/>
+      <!-- END yesNoBlock -->
+      <BR/>
+    <table width="100%">
+      <tr>
+        <td><strong>Question</strong></td>
+        <td><strong>Name</strong></td>
+        <td><strong>Date</strong></td>
+        <td><strong>Answer</strong></td>
+      </tr>
+      <!-- BEGIN textBlock -->
+      <tr>
+        <td nowrap="nowrap"><strong>{freeTextQuestion}</strong></td>
+        <td nowrap="nowrap">{freeTextName} {freeTextCustomer}</td>
+        <td>{freeTextDate}</td>
+        <td>{freeTextAnswer}</td>
+      </tr>
+      <!-- END textBlock -->
+    </table>
+  </body>
+</html>

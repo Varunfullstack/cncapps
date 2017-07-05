@@ -1,0 +1,118 @@
+<!-- Template: SalesOrderDisplayNewLine.inc.html -->
+<form name="ordline" method="post" action="{urlSubmit}">
+	<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+	<input
+		type="hidden"
+		name="ordline[1][ordheadID]"
+		value="{ordheadID}"
+	>
+	<input
+		type="hidden"
+		name="ordline[1][itemID]"
+		id="itemID"
+		value="{itemID}"
+	>
+	<input
+		type="hidden"
+		name="ordline[1][sequenceNo]"
+		value="{sequenceNo}"
+	>
+	<input
+		type="hidden"
+		name="ordline[1][supplierID]"
+		id="supplierID"
+		value="{supplierID}"
+	>
+<table class="singleBorder" width="700px" border="0" cellspacing="1" cellpadding="1">
+	<tr> 
+		<td width="108" class="listHeadText">Type</td>
+		<td width="175" class="listHeadText">Description</td>
+		<td width="242" class="listHeadText">Supplier</td>
+		<td width="106" class="listHeadText"><DIV align="right">Qty</DIV></td>
+		<td width="109" class="listHeadText"><DIV align="right">Cost(&pound;)</DIV></td>
+		<td width="107" class="listHeadText"><DIV align="right">Sale(&pound;)</DIV></td>
+	</tr>
+	<tr>
+	<td class="field">
+		<select
+			type="text"
+			id="lineType"
+			name="ordline[1][lineType]"
+		>
+			<!-- BEGIN lineTypeBlock -->
+			<option {lineTypeSelected} value="{lineType}">{lineTypeDesc}</option>
+			<!-- END lineTypeBlock -->
+		</select>
+	</td>
+	<td>
+		<input
+			type="text"
+			name="ordline[1][description]"
+			id="itemDescription"
+			value="{description}"
+			onChange="javascript:validateItemDescription()"
+			onKeydown="javascript:checkFunctionKey(itemDescription)"
+			size="35"
+			maxlength="50"
+		>
+		<font class="formErrorMessage">{descriptionMessage}</font>
+	</td>
+	<td class="field">
+		<input
+			type="text"
+			name="ordline[1][supplierName]"
+			id="supplierName"
+			value="{supplierName}"
+			onChange="javascript:validateSupplierName()"
+			onKeydown="javascript:checkFunctionKey(supplierName)"
+			size="35"
+			maxlength="50"
+		>
+		<font class="formErrorMessage">{supplierNameMessage}</font>
+	</td>
+	<td class="fieldRight" align="right">
+		<input
+			type="text"
+			id="qtyOrdered"
+			name="ordline[1][qtyOrdered]"
+			value="{qtyOrdered}"
+			onKeypress="javascript:submitOnReturn()"
+			size="4"
+			align="right"
+			maxlength="10"
+		>
+		<font class="formErrorMessage">{qtyOrderedMessage}</font>
+	</td>
+	<td class="fieldRight">
+		<input
+			type="text"
+			name="ordline[1][curUnitCost]"
+			id="curUnitCost"
+			value="{curUnitCost}"
+			onKeypress="javascript:submitOnReturn()"
+			align="right"
+			size="4"
+			maxlength="10"
+		>
+		<font class="formErrorMessage">{curUnitCostMessage}</font>
+	</td>
+	<td class="fieldRight">
+		<input
+			type="text"
+			name="ordline[1][curUnitSale]"
+			id="curUnitSale"
+			value="{curUnitSale}"
+			onKeypress="javascript:submitOnReturn()"
+			align="right"
+			size="4"
+			maxlength="10"
+		>
+		<font class="formErrorMessage">{curUnitSaleMessage}</font>
+	</td>
+	<td width="35">
+		<input type="button" name="Submit" value="Add To End" onClick="form.submit();">
+	</td>
+	<td width="62">&nbsp;</td>
+</table>
+</form>
+<!-- End Template: SalesOrderDisplayNewLine.inc.html -->

@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+<TITLE>ieSpell Sample Test Page</TITLE>
+
+<STYLE>
+.clsDiv{
+    BORDER-RIGHT: #ffdead inset;
+    BORDER-TOP: #ffdead inset;
+    FONT-SIZE: 10pt;
+    BORDER-LEFT: #ffdead inset;
+    WIDTH: 550px;
+    COLOR: black;
+    BORDER-BOTTOM: #ffdead inset;
+    FONT-FAMILY: Verdana;
+    HEIGHT: 150px;
+    BACKGROUND-COLOR: white;
+    WORD-WRAP: BREAK-WORD;
+ }
+ </STYLE>
+
+<!-- ieSpell BEGIN --->
+<script language="JavaScript" src="./ieSpell.js"></script>
+
+<script language="JavaScript">
+//if necessary, you can choose to setup the ieSpell custom attribute here
+function insertIeSpellCustomAttributes()
+{
+	document.all("ztext2").setAttribute("ieSpell_ignored", "true");
+}
+</script>
+<!-- ieSpell END -->
+
+</HEAD>
+<BODY onload="insertIeSpellCustomAttributes();">
+<font color="green"><pre>
+/**
+ *
+ * ieSpell Sample Test Page
+ * Copyright (C) 2002-2004 Red Egg Software. 
+ * All rights reserved. 
+ *
+ * @author Sidney Chong
+ * @version $Revision: 1.2 $ $Date: 2004/11/19 16:15:55 $
+ * @srcpath $Source: e:/coderepo/iespell/src/app/api/sample.htm,v $
+ *
+ **/
+</pre></font>
+ <HR>
+ <BR>
+ <FORM name="zForm"  onsubmit="checkdocspelling();return false;">
+  <INPUT type="hidden" name="zhidden1" value="hidden1">
+  <TABLE>
+   <TBODY>
+    <TR><TD>Textbox 1</TD><TD><INPUT type="text" name="ztext1" size=50 value="This is a normal1 text boxx"></TD></TR>
+    <TR><TD>Textbox 2</TD><TD><INPUT type="text" name="ztext2" size=50 value="This taxt box is ieSpell ignored dynamically"></TD></TR>
+    <TR><TD>Textbox 3</TD><TD><INPUT type="text" name="ztext3" size=50 DISABLED value="This is a disabled text boxx"></TD></TR>
+    <TR><TD>Password</TD><TD><INPUT type="password" size=20 name="zpass1" value="password">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Checkbox 1<INPUT type="checkbox" name="zcheck1" value="checkbox1"></TD></TR>
+    <TR><TD>message</TD><TD><TEXTAREA name="zTextarea" ROWS="6" COLS="55">
+    This is the fiRSt line. 
+    IBMers is café the worng, se5co2nd line. 
+    This is 2 sentences. on the Loung same WESFRTWE.
+    This is a sentance with 123.56 in it.
+    This is a sentence without a period
+    Thsi is  a line with 2 spaces.
+    this,is.dwa;line:with "many" punctionan.</TEXTAREA></TD></TR>
+    <TR><TD>&nbsp;</TD><TD>
+    <!-- ieSpell BEGIN --->
+      <script language="JavaScript" type="text/javascript">
+        spellcheckbutton();
+      </script>
+    <!-- ieSpell END --->
+    </TD></TR>
+   </TBODY>
+  </TABLE>
+ </FORM>
+ <HR>
+ <BR>
+ Rich Text Editor
+ 	<DIV id="zDiv1" CONTENTEDITABLE ALIGN=left class="clsDiv" style="height:100px;">
+ 	  <b>This</b> is a <font color="red">rich</font> tedt box!
+ 	  <p><font color="blue">This is the fiRSt line.</font>
+    This is 2 sentences. on the Loung same WESFRTWE.
+    This is a sentance with 123.56 in it.
+    This is a sentence without a period
+    Thsi is  a line with 2 spaces.
+    this,is.dwa;line:with "many" punctionan.</p>
+ 	</DIV>
+ 	<BR>
+<input type='button' name='btnSpell1' value='Check Spelling of Rich Text Editor only (using new ieSpell interface!)' onclick='if (!checknodespelling2(zDiv1)) alert("User clicked cancel!");'>
+
+<BR><BR><HR><BR>
+ 	<DIV id="zDiv2" ALIGN=left class="clsDiv" style="height:100px;">
+ 	  <b>This</b> is a <font color="red">normal</font> DIV area!
+ 	  <p><font color="blue">This is the fiRSt line.</font>
+    This is 2 sentences. on the Loung same WESFRTWE.
+    This is a sentance with 123.56 in it.
+    This is a sentence without a period
+    Thsi is  a line with 2 spaces.
+    this,is.dwa;line:with "many" punctionan.</p>
+ 	</DIV>
+
+</BODY>
+</HTML>

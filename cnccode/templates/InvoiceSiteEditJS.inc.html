@@ -1,0 +1,26 @@
+<script language='JavaScript'>
+function validateSiteDesc(){
+	if (Trim(document.getElementById("siteDesc").value) != ""){
+		window.open(
+			'{urlSitePopup}&customerID={customerID}'+
+			'&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+			'&parentIDField=siteNo' +
+			'&parentDescField=siteDesc',
+			'address',
+			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+		)
+	}
+}
+function validateContactName(){
+	if (Trim(document.getElementById("contactName").value) != ""){
+		window.open(
+			'{urlContactPopup}&contactName=' + escape(document.getElementById("contactName").value)+
+			'&siteNo=' +escape(document.getElementById("siteNo").value) +
+			'&parentIDField=contactID' +
+			'&parentDescField=contactName',
+			'contact',
+			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+		)
+	}
+}
+</script>

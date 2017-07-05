@@ -1,0 +1,33 @@
+<BR>
+<h2>Before creating a new Service Request, establish whether it is related to an existing one below.</h2>
+<BR>
+<table width="1000" border="0" cellpadding="1" cellspacing="1" class="singleBorder">
+	<tr>
+		<td class="listHeadText">ID</td>
+    <td class="listHeadText">Raised</td>
+    <td class="listHeadText">Reason</td>
+		<td class="listHeadText">Allocated To</td>
+    <td class="listHeadText">&nbsp;</td>
+	</tr>
+
+	<!-- BEGIN problemBlock -->
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+    <td class="listItemText">{problemID}</td>
+    <td class="listItemText">{dateRaised}</td>
+		<td class="listItemText">
+      <A
+        href="#"
+        onClick= "window.open(
+        '{urlProblemHistoryPopup}',
+        'reason',
+        'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')">{reason}
+      </A>
+    </td>
+		<td>{engineerName}</td>
+    <td><a href="{urlCreateFollowOn}">Log activity</a></td>
+	</tr>
+	<!-- END problemBlock -->
+</table>
+<br/>
+<br/>
+<p><a href="{urlCreateNewSr}">Log a new Service Request</a></p>

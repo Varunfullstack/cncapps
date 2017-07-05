@@ -1,0 +1,20 @@
+<!-- Template: HelpdeskReportTopTenProblems.inc.html -->
+<link href="maxchart/style/style.css" rel="stylesheet" type="text/css" />
+<H2>Top Ten Help Desk Problems - {periodDescription}</H2>
+<table class="singleBorder" width="600px" border="0" cellspacing="1" cellpadding="1">
+		<tr>
+				<td nowrap="nowrap"><strong>Category</strong></td>
+				<td><strong>Hours</strong></td>
+		</tr>
+		<!-- BEGIN problemBlock -->
+		<tr>
+				<td width="500px" nowrap="nowrap">{category}</td>
+				<td width="100px">{hours}</td>
+		</tr>
+		<!-- END problemBlock -->
+	<tr>
+		<td colspan="2">
+			<img src="{urlProblemChart}"/>
+		</td>
+	</tr> 
+</table>

@@ -1,0 +1,71 @@
+<strong>Summary</strong>
+<BR/></BR>
+<table width="300px" class="singleBorder" border="0" cellspacing="1" cellpadding="1">
+		<tr>
+				<td width="250px" scope="col"><div align="left">ServiceDesk activities logged:</div></td>
+				<td width="50px" scope="col"><div align="left">{totalActivityCount}</div></td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left">ServerGuard Alerts:</div></td>
+				<td>{serverGuardActivityCount}</td>
+		</tr>
+		<tr>
+				<td colspan="2"></td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left" colspan="2"><STRONG>Outstanding</STRONG></div></td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left">Service Desk</div></td>
+				<td>{helpDeskOSServiceDeskCount}</td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left">ServerCare</div></td>
+				<td>{helpDeskOSServerCareCount}</td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left">PrePay</div></td>
+				<td>{helpDeskOSPrePayCount}</td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left">Awaiting Escalation</div></td>
+				<td>{helpDeskOSEscalationCount}</td>
+		</tr>
+		<tr>
+				<td scope="row"><div align="left">Awaiting Customer Response</div></td>
+				<td>{helpDeskOSCustResponseCount}</td>
+		</tr>
+</table>
+<BR/>
+<strong>Problems:</strong><BR/><BR/>
+{helpDeskProblems}<BR/><BR/>
+<strong>Staff Availablility:</strong><BR/><BR/>
+<table width="300px" class="singleBorder"  border="0" cellspacing="1" cellpadding="1">
+		<tr>
+				<td scope="col"><div align="left"></div></td>
+				<td width="23%" scope="col"><div align="center"><STRONG>AM</STRONG></div></td>
+				<td width="27%" scope="col"><div align="center"><STRONG>PM</STRONG></div></td>
+		</tr>
+		<!-- BEGIN availablityBlock -->
+		<tr>
+				<td scope="col"><div align="left">{engineer}</div></td>
+				<td scope="col"><div align="center">
+						<input name="" type="checkbox" value="radiobutton" {amChecked} />
+				</div></td>
+				<td scope="col"><div align="center">
+						<input name="" type="checkbox" value="radiobutton" {pmChecked}/>
+				</div></td>
+		</tr>
+		<!-- END availablityBlock -->
+</table>
+<BR/><BR/><strong>Visits</strong><BR/><BR/>
+<table width="500px" class="singleBorder" border="0" cellspacing="1" cellpadding="1">
+		<!-- BEGIN visitBlock -->
+		<tr>
+				<td width="150px">{visitEngineer}</td>
+				<td width="250px">{visitCustomer}</td>
+				<td width="50px">{visitDate}</td>
+				<td width="50px">{visitTimeOfDay}</td>
+		</tr>
+		<!-- END visitBlock -->
+</table>

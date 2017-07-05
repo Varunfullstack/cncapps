@@ -1,0 +1,128 @@
+<!-- Template: ServiceRequestFixedEdit.inc.html -->
+<script src="CommonJS.js"></script>
+
+<script src="ckeditor/ckeditor.js"></script>
+
+<script src="ckfinder/ckfinder.js"></script>
+
+<script>
+  var formChanged = false;
+  function proceedWithCancel(form){
+    if (formChanged == true){
+      return confirm('Are you sure that you want to cancel without saving your changes?');
+    }
+    else{
+      return true;
+    }
+  }
+  function setFormChanged(){
+    formChanged = true;
+  }
+  function strpad(val){
+    return (!isNaN(val) && val.toString().length==1)?"0"+val:val;
+  }
+</script>
+
+<table width="100%">
+  <tr>
+    <td>{activityWizardHeader} {contractListPopupLink} {historyLink}</td>
+    <td align="right" id="autoUpdateLabel"></td>
+  </tr>
+</table>
+<FORM  method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE = "off">
+  <input type="hidden" name="problemID"  value="{problemID}">
+  <input type="hidden" name="customerID"  value="{customerID}">
+
+  <table class="singleBorder" width="900" border="0">
+    <tr>
+      <td class="promptText">ID</td>
+      <td colspan="3" class="mainHeadText">{customerID}_{callActivityID}</td>
+    </tr>
+    <tr>
+      <td class="promptText">Customer</td>
+      <td class="mainHeadText">{customerName}</td>
+    </tr>
+    {contractDropdown}
+    <tr>
+      <td class="promptText">Root Cause</td>
+      <td>
+        <select
+          name="rootCauseID" 
+        >
+          <option value="">Not known</option>
+          <!-- BEGIN rootCauseBlock -->
+          <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+          <!-- END rootCauseBlock -->
+        </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="promptText">Flag For Management Review</td>
+      <td>
+        <input
+          type=checkbox
+          name="managementReviewFlag" 
+          {managementReviewFlagChecked}
+          value="Y"
+        >
+      </td>
+    </tr>
+    <tr>
+      <span class="formErrorMessage">{resolutionSummaryMessage}</span>
+      <td colspan="2"><textarea name="resolutionSummary">{resolutionSummary}</textarea>
+        <script	type="text/javascript">
+          reason = CKEDITOR.replace( 'resolutionSummary', { customConfig : '/ckeditor_config.js' } );
+          reason.addCss( 'body { font-size: 10pt; }' );
+        </script>
+      </td>
+    </tr>
+     <tr>
+      <td colspan="2">
+          <input type="submit" name="Submit" value="Save">
+       </td>
+    </tr>
+  </table>
+</FORM>
+<h3>Message to Sales</h3>
+  <input type="hidden" name="callActivityID" value="{callActivityID}" />
+  <table>
+    <tr>
+      <td colspan="4" class="promptTextLeft" valign="top">Parts Used / Message to Sales/</td>
+    </tr>
+    <tr>
+      <td colspan="4"><textarea name="message" id="message" cols="110" rows="20"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4"><input type="button" name="messageToSales" id="messageToSales" value="Send"></td>
+    </tr>
+  </table>
+</form>
+<script>
+
+$(document).ready(function() {
+  /*
+  Create ajax submit function for message to sales
+  */
+  $( 'input#messageToSales' ).click( function(){
+
+    $.ajax({
+      url: 'Activity.php', 
+      data: {
+          action:         "messageToSales",
+          callActivityID: {callActivityID},
+          message:        $( "TEXTAREA#message" ).val()
+      }
+    })
+      .done( function () {
+        alert( "Message sent to Sales");
+        $( "TEXTAREA#message" ).val("");
+        
+      });
+  })
+});
+    
+</script>
+
+
+<!-- End Template: ServiceRequestFixedEdit.inc.html -->

@@ -1,0 +1,65 @@
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<!-- Template: FurtherActionEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="standardText" AUTOCOMPLETE="OFF">
+	<table border="0">
+		<input
+			type="hidden"
+			name="standardText[1][stt_standardtextno]"
+			value="{stt_standardtextno}"
+		>
+		<tr> 
+			<td class="promptText">Sort Order (integer)</td>
+			<td class="fieldText"> <input
+					name="standardText[1][stt_sort_order]"
+					type="text" value="{stt_sort_order}"
+					size="4"
+					maxlength="3"
+				> <span class="formErrorMessage">{stt_sort_orderMessage}</span> </td>
+		</tr>
+        <tr> 
+      <td class="promptText">Type</td>
+      <td class="fieldText"><select name="standardText[1][stt_standardtexttypeno]">
+          <option value="">Please select</option>
+          <!-- BEGIN typeBlock -->
+          <option {typeSelected} value="{stt_standardtexttypeno}">{typeDescription}</option>
+          <!-- END typeBlock -->
+        </select>
+    <tr> 
+      <td class="promptText">Description</td>
+      <td class="fieldText"> <input
+          name="standardText[1][stt_desc]"
+          type="text" value="{stt_desc}"
+          size="50"
+          maxlength="50"
+        > <span class="formErrorMessage">{descriptionMessage}</span> </td>
+    </tr>
+		<tr> 
+			<td valign="top" class="promptText">Content</td>
+			<td class="fieldText">
+				<textarea
+					name="standardText[1][stt_text]"
+          id="stt_text"
+          cols="100"
+          rows="10"
+				>{stt_text}</textarea>
+        <script  type="text/javascript">
+          reason = CKEDITOR.replace( 'standardText[1][stt_text]', { customConfig : '/ckeditor_config.js' } );
+          reason.addCss( 'body { font-size: 10pt; }' );
+          reason.addCss( 'P { margin-top: 10px; margin-bottom: 10px; }' );
+        </script>
+
+				<span class="formErrorMessage">{stt_textMessage}</span> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: FurtherActionEdit.inc.html -->

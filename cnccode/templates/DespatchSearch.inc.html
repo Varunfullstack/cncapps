@@ -1,0 +1,77 @@
+<!-- Template: DespatchSearch.inc.html -->
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'>
+var savedCustomerString
+function validateCustomerString(){
+	if (document.searchForm.customerString.value != ""){
+		window.open('{urlCustomerPopup}&customerString=' + escape(document.searchForm.customerString.value),'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+	}
+	else{
+		document.searchForm.customerID.value = "";
+	}
+}
+function submitOnReturn() {
+   if (event.keyCode == 13) {
+			document.searchForm.submit();
+   }
+}
+function validateCustomerStringOnReturn() {
+   if (event.keyCode == 13) {
+			validateCustomerString();
+   }
+}
+</script>
+<form name="searchForm" method="post" action="{submitURL}">
+  <table width="500px" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="100px" class="promptText"><div align="right">Customer</div></td>
+			<td> <input
+					type="hidden"
+					name="customerID"
+					value="{customerID}"
+				> <input
+					type="text"
+					name="customerString"
+					value="{customerString}"
+					onChange="javascript:validateCustomerString()"
+					onKeypress="javascript:validateCustomerStringOnReturn()"
+					size="50"
+					maxlength="50"
+				> <font class="formErrorMessage"> {customerStringMessage} </font> </td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">Order Number</div></td>
+			<td> <input
+					type="text"
+					onKeypress="javascript:submitOnReturn()"
+					name="ordheadID"
+					value="{ordheadID}"
+				> <font class="formErrorMessage"> {ordheadIDMessage} </font> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="button" name="Search" value="Search" onClick="submit();">
+				<input type="button" name="Clear" value="Clear" onClick="document.location='{clearURL}'"></td>
+		</tr>
+	</table>
+</form>
+<table class="singleBorder" width="700px" border="0" cellspacing="1" cellpadding="1">
+	<tr> 
+		<td width="245px" class="listHeadText">Customer</td>
+		<td width="50px" class="listHeadText">Order No</td>
+		<td width="50px" class="listHeadText">Type</td>
+		<td width="50px" class="listHeadText">Date</td>
+		<td width="250px" class="listHeadText">Cust PO Ref</td>
+	</tr>
+	<!-- BEGIN orderBlock -->
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td width="250px" class="listItemText">{listCustomerName}</td>
+		<td width="50px" class="listItemText"><A HREF="{listOrderURL}">{listOrdheadID}</A></td>
+		<td width="50px"  class="listItemText">{listOrderType}</td>
+		<td width="50px" class="listItemText">{listOrderDate}</td>
+		<td width="250px" class="listItemText">{listCustPORef}</td>
+	</tr>
+	<!-- END orderBlock -->
+</table>
+<!-- End Template: DespatchSearch.inc.html -->

@@ -1,0 +1,133 @@
+<!-- Template: searchSearch.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'>
+var state='none'; // display status
+var savedCustomerString
+function saveCustomerString(){
+	savedCustomerString = document.getElementById("customerString").value
+}
+function validateCustomerString(){
+	if (Trim(document.getElementById("customerString").value) != ""){
+		if (document.getElementById("customerString").value != savedCustomerString){
+			window.open('{urlCustomerPopup}&customerString=' +
+			escape(document.getElementById("customerString").value) +
+			'&parentIDField=customerID' +
+			'&parentDescField=customerString',
+			'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+		}
+	}
+	else{
+		document.searchForm.customerID.value = "";
+	}
+}
+function createsearch(){
+	if (document.searchForm.customerID.value != ""){
+			document.location='{urlCreatesearch}&customerID=' + escape(document.searchForm.customerID.value)
+	}
+}
+function submitOnReturn() {
+   if (event.keyCode == 13) {
+			document.searchForm.submit();
+   }
+}
+function validateCustomerStringOnReturn() {
+   if (event.keyCode == 13) {
+			validateCustomerString();
+   }
+}
+function checkAll() { 
+	for (var i=0;i<document.searchForm.elements.length;i++) { 
+		var e = document.searchForm.elements[i]; 
+		e.checked = document.searchForm.checkAllBox.checked;
+	} 
+} 
+</script>
+<P class="formErrorMessage">{formError}</P>
+<form name="searchForm" method="POST" action="{urlSubmit}">
+  <table width="300px" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="100" class="promptText"><div align="right">Customer</div></td>
+			<td>
+			<input
+					type="hidden"
+					name="action"
+					value="search"
+				> 
+				<input
+					type="hidden"
+					name="search[1][customerID]"
+					id="customerID"
+					value="{customerID}"
+				> <input
+					type="text"
+					id="customerString"
+					name="customerString"
+					value="{customerString}"
+					onFocus="javascript:saveCustomerString()"
+					onBlur="javascript:validateCustomerString()"
+					onKeypress="javascript:validateCustomerStringOnReturn()"
+					size="50"
+					maxlength="50"
+				> <font class="formErrorMessage"> {customerStringMessage} </font> </td>
+		</tr>
+		<tr>
+				<td class="promptText">&nbsp;</td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr>
+				<td class="promptText"><div align="right">Raised from </div></td>
+				<td><input
+					type="text"
+					name="search[1][fromDate]"
+					id="fromDate"
+					value="{fromDate}"
+					size="10"
+					maxlength="10"
+					onkeypress="javascript:submitOnReturn()">
+								<a href="javascript:;" onclick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <font class="formErrorMessage">{fromDateMessage}</font> </td>
+		</tr>
+		<tr>
+				<td class="promptText"><div align="right">to</div></td>
+				<td><input
+					type="text"
+					name="search[1][toDate]"
+					id="toDate"
+					value="{toDate}"
+					size="10"
+					maxlength="10"
+					onkeypress="javascript:submitOnReturn()">
+								<a href="javascript:;" onclick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <font class="formErrorMessage">{toDateMessage}</font> </td>
+		</tr>
+		
+		
+		
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+			<input type="submit" name="Search" value="Search">
+		</tr>
+	</table>
+	<p>&nbsp;</p>
+	
+</form>
+<table width="600px" border="0" cellspacing="1" cellpadding="1">
+		<tr>
+				<th align="left">Year</th>
+				<th align="left">Month</th>
+        <th align="right">Quotes</th>
+				<th align="right">Conversions</th>
+        <th align="right">Percentage</th>
+		</tr>
+		<!-- BEGIN rowBlock -->
+		<tr>
+				<td>{year}</td>
+        <td>{month}</td>
+        <td align="right">{quoteCount}</td>
+				<td align="right">{conversionCount}</td>
+        <td align="right">{conversionPercentage}</td>
+		</tr>
+    <!-- END rowBlock -->
+</table>
+<p><img src="{urlChart}"/></p>
+

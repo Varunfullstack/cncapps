@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>CNC</title>
+  <link rel="stylesheet" href="/screen_customer.css" />
+  <link href="/login-box.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div style="padding: 100px 0 0 250px;">
+    <div id="login-box">
+      <img src="images/cncscreenlogo_small.gif" border="0" width="150" />
+      <br />
+      <br />
+      <form name="login" method="post" action="<?php print $this->url() ?>">
+        <div id="login-box-name" style="margin-top:20px;">Username:</div><div id="login-box-field" style="margin-top:20px;"><input name="username" class="form-login" title="Username" value="<?php if (isset($this->auth["uname"])) print htmlentities($this->auth["uname"]) ?>" size="30" maxlength="2048" /></div>
+        <div id="login-box-name">Password:</div><div id="login-box-field"><input name="password" type="password" class="form-login" title="Password" value="" size="30" maxlength="2048" /></div>
+        <br />
+        <span class="error"><?php if (isset($GLOBALS['loginMessage'])) print htmlentities($GLOBALS['loginMessage']);?></span>
+        <br />
+        <br />
+        <input type="submit" name="Submit" value="Login">
+      </form>
+    </div>
+  </div>
+</body>
+</html>

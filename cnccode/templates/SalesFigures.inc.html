@@ -1,0 +1,34 @@
+<!-- Template: SalesFigures.inc.html -->
+<H2>Sales Figures</H2>
+<table class='singleBorder' width="700" border="0" cellspacing="1" cellpadding="2">
+	<tr> 
+		<td width="40" class="tableHeader">&nbsp;</td>
+		
+    <td width="119" class="listHeadTextRight">Invoiced This Month</td>
+		<td width="125" class="listHeadTextRight">Invoices Waiting</td>
+		
+    <td width="128" class="listHeadTextRight"> Sales Orders</td>
+		<td width="89" class="listHeadTextRight">Total</td>
+	</tr>
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td class="tableHeader">Cost</td>
+		<td class="displayfield"><div align="right">{invPrintedCost}</div></td>
+		<td class="displayfield"><div align="right">{invUnprintedCost}</div></td>
+		<td class="displayfield"><div align="right">{soCost}</div></td>
+		<td class="displayfield"><div align="right">{costTotal}</div></td>
+	</tr>
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td class="tableHeader">Sale</td>
+		<td class="displayfield"><div align="right">{invPrintedSale}</div></td>
+		<td class="displayfield"><div align="right">{invUnprintedSale}</div></td>
+		<td class="displayfield"><div align="right">{soSale}</div></td>
+		<td class="displayfield"><div align="right">{saleTotal}</div></td>
+	</tr>
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td class="tableHeader">Profit</td>
+		<td class="displayfield"><div align="right">{invPrintedProfit}</div></td>
+		<td class="displayfield"><div align="right">{invUnprintedProfit}</div></td>
+		<td class="displayfield"><div align="right">{soProfit}</div></td>
+		<td class="displayfield"><div align="right">{profitTotal}</div></td>
+	</tr>
+</table>

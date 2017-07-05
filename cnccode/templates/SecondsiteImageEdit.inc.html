@@ -1,0 +1,47 @@
+<!-- Template: SecondsiteImageEdit.inc.html -->
+<p><a href="{urlDisplayCustomerItem}">Back to customer item</a></p>
+<FORM  method="post" action="{urlUpdate}" name="secondsiteImage" AUTOCOMPLETE="OFF">
+	<table border="0">
+		<input
+			type="hidden"
+			name="secondsiteImage[1][secondsiteImageID]"
+			value="{secondsiteImageID}"
+		>
+		<input
+			type="hidden"
+			name="secondsiteImage[1][customerItemID]"
+			value="{customerItemID}"
+		>
+    <input
+      type="hidden"
+      name="secondsiteImage[1][status]"
+      value="{status}"
+    >
+    <input
+      type="hidden"
+      name="secondsiteImage[1][imageTime]"
+      value="{imageTime}"
+    >
+    <input
+      type="hidden"
+      name="secondsiteImage[1][imagePath]"
+      value="{imagePath}"
+    >
+		<tr> 
+			<td class="promptText">Image Name (e.g. C)</td>
+			<td class="fieldText">
+        <input
+					name="secondsiteImage[1][imageName]"
+					type="text" value="{imageName}"
+					size="50"
+					maxlength="50"
+				><span class="formErrorMessage">{imageNameMessage}</span> </td>
+		</tr>
+
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: ProjectEdit.inc.html -->

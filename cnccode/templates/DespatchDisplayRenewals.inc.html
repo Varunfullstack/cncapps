@@ -1,0 +1,73 @@
+<!-- Template: DespatchDisplayRenewals.inc.html -->
+<script language='JavaScript' src='CommonJS.js'></script>
+<TABLE width="100px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlSalesOrder}">Sales Order</a> 
+		</TD>
+	</TR>
+</TABLE>
+<br/>
+<P class="formErrorMessage">{poNotRecd}</P>
+<form name="renewalsForm" method="POST" enctype="multipart/form-data" action="{urlDespatch}">
+<TABLE border="0">
+	<TR>
+		<TD>
+			<table width="200px" border="0" cellspacing="0" cellpadding="1">
+				<tr> 
+					<td width="60px" class="promptText">Deliver By</td>
+					<td class="field">
+						<select
+							type="text"
+							id="deliveryMethodID"
+							name="deliveryMethodID"
+						>
+							<option value="">Please Select</option>
+							<!-- BEGIN deliveryMethodBlock -->
+							<option {deliveryMethodSelected} value="{deliveryMethodID}">{deliveryMethodDescription}</option>
+							<!-- END deliveryMethodBlock -->
+						</select>
+					</td>
+				</tr>
+			</table>
+			<BR/>
+		</TD>
+		<TD>&nbsp;
+			
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<table class="singleBorder" width="740px" border="0" cellspacing="2" cellpadding="1">
+				<tr> 
+					<td width="350px" class="listHeadText">Description</td>
+					<td width="57px" class="listHeadText">Part No</td>
+					<td width="50px" class="listHeadText">Ordered</td>
+					<td width="50px" class="listHeadText">Outstanding</td>
+					<td width="140px" class="listHeadText">Despatch (F5 toggle)</td>
+					<td width="140px" class="listHeadText">Renewal Type</td>
+				</tr>
+				<!-- BEGIN orderLineBlock -->
+				<input type="hidden" id="sequenceNo" name="despatch[{sequenceNo}][sequenceNo]" value={sequenceNo}>
+				<input type="hidden" id="qtyOutstandingHide" value="{qtyOutstandingHide}">
+				<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+					<td class="{orderLineClass}"><DIV align="left">{description}</DIV></td>
+					<td class="{orderLineClass}"><DIV align="left">{partNo}</DIV></td>
+					<td class="{orderLineClass}">{qtyOrdered}</td>
+					<td class="{orderLineClass}">{qtyOutstanding}</td>
+					<td class="{orderLineClass}"><DIV align="right"><input type="text" id="qtyToDespatch" name="despatch[{sequenceNo}][qtyToDespatch]" value="{qtyToDespatch}" maxlength="5"></DIV></td>
+					<td class="{orderLineClass}"><DIV align="right">{renewalSelector}
+					</DIV></td>
+				</tr>
+				<!-- END orderLineBlock -->
+				<tr>
+					  <td colspan="5"><input type="submit" name="Submit" value="Despatch">{renewalsButton}</td> 
+				</tr>
+			</table>
+		</TD>
+		<TD valign="top">
+			{despatchDisplayNotes}
+		</TD>
+	</TR>
+</TABLE>
+</form>
+<!-- End Template: DespatchDisplay.inc.html -->

@@ -1,0 +1,24 @@
+<!-- Template: ActvityRejectAllocation.inc.html -->
+  <P class="formError">{formError}</P>
+  <form name="rejectAllocation" action="{urlSubmit}" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="problemID" value="{problemID}" />
+  <table border="0">                                                                                     
+   <TR>
+      <td valign="top" class="content">Please explain why you are rejecting this request</td>
+    </tr>
+    <tr>
+      <td class="fieldText">
+        <textarea
+          name="rejectReason" 
+          id="emailBody"
+          cols="130" rows="20">{rejectReason}</textarea>
+      </td>
+    </TR>
+		<TR>
+		  <td class="fieldText"><span class="promptText">
+      <input type="submit" name="Submit" value="Reject"/>
+      </span></td>
+	  </TR>
+	</form>
+</table>
+<!-- End Template: ActvityRejectAllocation.inc.html -->

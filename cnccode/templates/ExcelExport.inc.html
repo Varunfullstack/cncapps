@@ -1,0 +1,39 @@
+<!-- Template: ExcelExport.inc.html -->
+<form name="sage" method="post" action="{urlSubmit}">
+<P>
+	Creates a CSV file of sales figures for the given month to the exports directory
+</P>
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="20%" class="promptText">Month</td>
+			<td class="field">
+				<input
+					type="text"
+					name="month"
+					value="{month}"
+					size="2"
+					maxlength="2"
+				>
+			</td>
+		</tr>
+		<tr> 
+			<td width="20%" class="promptText">Year</td>
+			<td class="field">
+				<input
+					type="text"
+					name="year"
+					value="{year}"
+					size="4"
+					maxlength="4"
+				>
+			</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="submit" name="Generate" value="Generate">
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: ExcelExport.inc.html -->

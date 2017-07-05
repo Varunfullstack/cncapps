@@ -1,0 +1,20 @@
+<!-- Template: ActvityDisplayLinkToThread.inc.html -->
+	
+	<form name="linkToTProblem" value"Activity" method="POST" action="{urlLinkToProblem}">		
+		Link this activity to
+		<input
+			type="text"
+			name="toCallActivityID"
+			value="{toCallActivityID}"
+		/>
+	  <input name="linkWholeProblem" 
+			value="Activity" 
+			title="Link Just This Activity to the new problem" 
+			type="submit"
+			onClick="if(!confirm('Are you sure you want to link just this activity to the new activity's problem?' ) ) return(false)"
+			
+		/>
+	  <input name="linkThisActivity" type="submit" value="Problem" title="Link all activities in this problem to the new problem" 
+					onClick="if(!confirm('Are you sure you want to link all the activities in this problem to the new activity's problem?' ) ) return(false)"
+/>
+	</form>

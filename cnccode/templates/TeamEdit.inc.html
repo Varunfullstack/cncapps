@@ -1,0 +1,54 @@
+<!-- Template: TeamEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="team" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="team[1][teamID]"
+			value="{teamID}"
+		>
+		<tr> 
+			<td class="promptText">Name</td>
+			<td class="fieldText"> <input
+					name="team[1][name]"
+					type="text" value="{name}"
+					size="50"
+					maxlength="50"
+				> <span class="formErrorMessage">{nameMessage}</span> </td>
+		</tr>
+    
+    <tr>
+      <td class="promptText">Role</td>
+      <td>
+        <select id="tablefields" name="reasonText">
+          <!-- BEGIN teamRoleBlock -->
+          <option value="{teamRoleID}" title="" {teamRoleSelected}>{teamRoleName}</option>
+          <!-- END teamRoleBlock -->
+        </select> <span class="formErrorMessage">{teamRoleMessage}</span>
+      </td>
+    </tr>
+    
+    <tr> 
+      <td class="promptText">Level</td>
+      <td class="fieldText"> <input
+          name="team[1][level]"
+          type="text" value="{level}"
+          size="3"
+          maxlength="3"
+        > <span class="formErrorMessage">{levelMessage}</span> </td>
+    </tr>
+    <tr> 
+      <td class="promptText">Active</td>
+      <td class="fieldText"><input type="checkbox" name="team[1][activeFlag]" value="Y" {activeFlagChecked} title="Active"></td>
+    </tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: TeamEdit.inc.html -->

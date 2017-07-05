@@ -1,0 +1,43 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+
+td {
+	font-family: Arial, Helvetica, sans-serif;
+}
+td.label {
+  text-align : right;
+	font-weight: bold;
+	white-space: nowrap;
+}
+td.labelLeft {
+  text-align : left;
+	font-weight: bold;
+	white-space: nowrap;
+}
+th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+table {
+	width: 100%;
+}
+table.headings {
+}
+table.information {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 1px; BORDER-TOP: 0px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px; MARGIN: 0px; BORDER-LEFT: 0px; WIDTH: 100%; PADDING-TOP: 1px; BORDER-BOTTOM: 0px; BORDER-COLLAPSE: collapse
+}
+H1 {
+	font-size: 18pt;
+}
+P.addressLine {
+	margin-top :0.1em;
+	margin-bottom :0.1em;
+}
+@page {
+  size: landscape;
+}
+P.pageBreak{
+	page-break-before: always
+}

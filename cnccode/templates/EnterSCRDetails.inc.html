@@ -1,0 +1,35 @@
+<!-- Template: EnterSCRDetails.inc.html -->
+<H2>{customerName}</H2>
+<script language='JavaScript' src='iespell/iespell.js'></script>
+<form name="detailsForm" method="post" action="{urlNextStep}">
+	<table border="0" cellspacing="0" cellpadding="1">
+		<tr>
+				<td>New Equipment Installed And Parts Used </td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr>
+				<td colspan="2"><textarea name="newSerialNumbers" cols="90" rows="30">{newSerialNumbers}</textarea></td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr> 
+			<td colspan="2"><legend>System Documentation</legend>
+					<table width="450" border="0" cellspacing="1" cellpadding="1">
+							<tr>
+									<td>Are Changes Required? </td>
+									<td><input type="checkbox" name="areDocumentChangesRequired" value="Yes" /></td>
+							</tr>
+							<tr>
+									<td width="154">Are they completed? </td>
+									<td width="289"><input type="checkbox" name="areDocumentChangesCompleted" value="Yes" /></td>
+							</tr>
+					</table></td>
+			<td width="3">&nbsp;</td>
+		</tr>
+		<tr> 
+			<td colspan="2" valign="top"><input name="Back" type="button" value="Back" onclick="document.location='{urlBack}';">
+					<input name="Next" type="submit" id="Next" value="Next" onClick="if(!confirm('If there is a Servercare agreement your visit will be completed now and a confirmation email send directly to the customer' ) ) return(false)"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: EnterSCRDetails.inc.html -->

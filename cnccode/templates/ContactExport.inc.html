@@ -1,0 +1,384 @@
+<!-- Template: ActivitySearch.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script language='JavaScript' src='jquery/jquery.min.js'></script>
+<script type="text/javascript">
+  /**
+  * Inserts fields.
+  *
+  */
+  function insertValueQuery( myListBox, myQuery) {
+    
+    listBox = document.getElementById( myListBox );
+    
+    oEditor = eval( 'CKEDITOR.instances.' + myQuery  );
+
+    if( listBox.options.length > 0) {
+      var chaineAj = "";
+      var NbSelect = 0;
+      for(var i=0; i<listBox.options.length; i++) {
+        if (listBox.options[i].selected){
+          NbSelect++;
+          if (NbSelect > 1)
+            chaineAj += ", ";
+          chaineAj += listBox.options[i].value;
+        }
+      }
+
+      oEditor.insertHtml( chaineAj );
+
+    }
+  }
+
+  var state='none'; // display status
+  var savedCustomerString
+  function saveCustomerString(){
+    savedCustomerString = document.getElementById("customerString").value
+  }
+  function validateCustomerString(){
+    if (Trim(document.getElementById("customerString").value) != ""){
+      if (document.getElementById("customerString").value != savedCustomerString){
+        window.open('{urlCustomerPopup}&customerString=' +
+        escape(document.getElementById("customerString").value) +
+        '&parentIDField=customerID' +
+        '&parentDescField=customerString',
+        'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+      }
+    }
+    else{
+      document.searchForm.customerID.value = "";
+    }
+  }
+  function submitOnReturn() {
+     if (event.keyCode == 13) {
+        document.searchForm.submit();
+     }
+  }
+  function validateCustomerStringOnReturn() {
+     if (event.keyCode == 13) {
+        validateCustomerString();
+     }
+  }
+</script>
+<P class="formErrorMessage">{formError}</P>
+<form name="searchForm" method="post" action="{urlSubmit}">
+  <table width="100%" border="0" cellspacing="0" cellpadding="1">
+    <tr valign="top">
+      <td>
+        <table>
+          <tr> 
+            <td class="promptText">Customer</td>
+            <td>
+              <input
+                type="hidden"
+                name="searchForm[1][customerID]"
+                id="customerID"
+                value="{customerID}"
+              > <input
+                type="text"
+                id="customerString"
+                name="customerString"
+                value="{customerString}"
+                onFocus="javascript:saveCustomerString()"
+                onBlur="javascript:validateCustomerString()"
+                onKeypress="javascript:validateCustomerStringOnReturn()"
+                size="50"
+                maxlength="50"
+              > <font class="formErrorMessage"> {customerStringMessage} </font> </td>
+          </tr>
+        
+          <tr>
+            <td class="promptText">
+              Type
+            </td>
+            <td>
+              <select id="prospectFlag" name="searchForm[1][prospectFlag]" >
+                <option {prospectFlagBothSelected} value="" title="Include Prospects and Customers">All</option>
+                <option {prospectFlagProspectSelected} value="Y" title="Include Prospects Only">Prospects</option>
+                <option {prospectFlagCustomerSelected} value="N" title="Include Customers Only">Customers</option>
+              </select>            
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              No of PCs
+            </td>
+            <td>
+              <input type="text" size="5" maxlength="10" name="searchForm[1][noOfPCs]" value="{noOfPCs}">
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              No of Servers
+            </td>
+            <td>
+              <input type="text" size="5" maxlength="10" name="searchForm[1][noOfServers]" value="{noOfServers}">
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              Send Mailshot
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][sendMailshotFlag]" value="Y" {sendMailshotFlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              {mailshot1FlagDesc}
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot1Flag]" value="Y" {mailshot1FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              {mailshot2FlagDesc}
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot2Flag]" value="Y" {mailshot2FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              {mailshot3FlagDesc}
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot3Flag]" value="Y" {mailshot3FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              {mailshot4FlagDesc}
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot2Flag]" value="Y" {mailshot4FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              {mailshot5FlagDesc}
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot5Flag]" value="Y" {mailshot5FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              <div align="right">{mailshot6FlagDesc}</div>
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot2Flag]" value="Y" {mailshot6FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              <div align="right">{mailshot7FlagDesc}</div>
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot7Flag]" value="Y" {mailshot7FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              <div align="right">{mailshot8FlagDesc}</div>
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot8Flag]" value="Y" {mailshot8FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              <div align="right">{mailshot9FlagDesc}</div>
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot9Flag]" value="Y" {mailshot9FlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              <div align="right">{mailshot10FlagDesc}</div>
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][mailshot10Flag]" value="Y" {mailshot10FlagChecked}>
+            </td>
+          </tr>
+          <tr> 
+            <td class="promptText">New Between</td>
+            <td> <input
+                type="text"
+                name="form[newCustomerFromDate]"
+                id="newCustomerFromDate"
+                value="{newCustomerFromDate}"
+                size="10"
+                maxlength="10"
+                >
+              <a href="javascript:;" onClick="popUpCalendar(this, newCustomerFromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+              <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
+              and <input
+                type="text"
+                name="form[newCustomerToDate]"
+                id="newCustomerToDate"
+                value="{newCustomerToDate}"
+                size="10"
+                maxlength="10"
+                >
+              <a href="javascript:;" onClick="popUpCalendar(this, newCustomerToDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+            <font class="formErrorMessage">{newCustomerToDateMessage}</font> </td>
+          </tr>
+          <tr> 
+            <td class="promptText">Lost Between</td>
+            <td> <input
+                type="text"
+                name="form[droppedCustomerFromDate]"
+                id="droppedCustomerFromDate"
+                value="{droppedCustomerFromDate}"
+                size="10"
+                maxlength="10"
+                >
+              <a href="javascript:;" onClick="popUpCalendar(this, droppedCustomerFromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+              <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
+              and <input
+                type="text"
+                name="form[droppedCustomerToDate]"
+                id="droppedCustomerToDate"
+                value="{droppedCustomerToDate}"
+                size="10"
+                maxlength="10"
+                >
+              <a href="javascript:;" onClick="popUpCalendar(this, droppedCustomerToDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+            <font class="formErrorMessage">{droppedCustomerToDateMessage}</font> </td>
+          </tr>          
+          <tr>
+            <td class="promptText">
+              Export Email Only
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][exportEmailOnlyFlag]" value="Y" {exportEmailOnlyFlagChecked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">
+              <div align="right">Broadband Renewal</div>
+            </td>
+            <td>
+              <input type="checkbox" name="searchForm[1][broadbandRenewalFlag]" value="Y" {broadbandRenewalFlagChecked}>
+              ISP <input type="text" maxlength="10" size="5" name="searchForm[1][broadbandIsp]" value="{broadbandIsp}">
+            </td>
+
+          </tr>
+          <tr>
+            <td class="promptText">From Email Address</td>
+            <td>
+              <input type="text" id="fromEmailAddress" name="searchForm[1][fromEmailAddress]" value="{fromEmailAddress}" size="60"><font class="formErrorMessage">{fromEmailAddressMessage}</font>
+            </td>
+          </tr>
+          <tr>
+            <td class="promptText">Email Subject</td>
+            <td>
+              <input type="text" id="emailSubject" name="searchForm[1][emailSubject]" value="{emailSubject}" size="60"><font class="formErrorMessage">{emailSubjectMessage}</font>
+            </td>
+          </tr>
+          <tr>
+            <td  valign="top" class="promptText">Insert template</td>
+            <td>
+              <select id="standardText" name="standardText" >
+              <!-- BEGIN standardTextBlock -->
+              <option value="{standardTextContent}" title="">{standardTextDescription}</option>
+              <!-- END standardTextBlock -->
+              </select><input type="button" name="insert" value="Insert" onclick="insertValueQuery( 'standardText', 'emailBody' )" title="Insert" />
+            </td>
+          </tr>
+          <tr>
+            <td  valign="top" class="promptText">Email Body</td>
+            <td>
+              <textarea id="emailBody" name="searchForm[1][emailBody]" cols="30" rows="20">{emailBody}</textarea>
+              <script  type="text/javascript">
+/*
+                reason = CKEDITOR.replace( 'searchForm[1][emailBody]', { customConfig : '/ckeditor_config.js' } );
+                reason.addCss( 'body { font-size: 10pt; }' );
+               reason.addCss( 'P { margin-top: 10px; margin-bottom: 10px; }' );
+                reason = CKEDITOR.replace( 'searchForm[1][emailBody]' );
+*/
+              </script>
+            </td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>
+              <input type="submit" name="SendEmail" value="Send Email" onclick="if(!confirm('Are you sure you want to send these emails?')) return(false)">
+              <input type="submit" name="Export" value="Export CSV">
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td valign="top">
+        <table>
+          <tr valign="top">
+            <td class="listHeadText">
+              Contract Renewal
+            </td>
+            <td class="listHeadText">
+              <input type="checkbox" class="contractRenewalFlag" name="searchForm[1][contractRenewalFlag]" value="Y" {contractRenewalFlagChecked}>
+            </td>
+          </tr>
+          <!-- BEGIN contractItemBlock -->
+          <tr>
+            <td class="promptText">{contractItemDescription}</td>              
+            <td>
+              <input class="contractItem" type="checkbox" name="contractItemIDs[]" value="{contractItemID}" {contractItemIDChecked}>
+            </td>
+            <!-- END contractItemBlock -->
+          </tr>
+        </table>
+      </td>
+      <td valign="top">
+        <table>
+          <tr valign="top">
+            <td class="listHeadText">
+              Quotation Renewal
+            </td>
+            <td class="listHeadText">
+              <input type="checkbox" class="quotationRenewalFlag" name="searchForm[1][quotationRenewalFlag]" value="Y" {quotationRenewalFlagChecked}>
+            </td>
+          </tr>
+          <!-- BEGIN quotationItemBlock -->
+          <tr>
+            <td class="promptText">{quotationItemDescription}</td>              
+            <td>
+              <input type="checkbox" class="quotationItem" name="quotationItemIDs[]" value="{quotationItemID}" {quotationItemIDChecked}>
+            </td>
+            <!-- END quotationItemBlock -->
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+  </table>
+</form>
+<script>
+/*
+Handler for change of a quotation item checkbox: set the main quotation item check box on
+*/
+$('.quotationItem').change(function() {
+
+  if ( $( this ).attr('checked')  ){
+  
+    $('.quotationRenewalFlag').attr('checked', true);
+  
+  }    
+});
+/*
+Handler for change of a contract item checkbox: set the main contract item check box on
+*/
+$('.contractItem').change(function() {
+
+  if ( $( this ).attr('checked')  ){
+  
+    $('.contractRenewalFlag').attr('checked', true);
+  
+  }    
+});
+</script>
+<!-- End Template: ActivitySearch.inc.html -->

@@ -1,0 +1,58 @@
+<!-- Template: ActivityTypeList.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<A href="{urlCreate}">[create new type]</A> 
+<table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
+	<tr> 
+		<td width="265" class="listHeadText">Activity Type</td>
+		<td width="265" class="listHeadText">Active</td>
+		<td width="265" class="listHeadText">Value</td>
+		<td width="265" class="listHeadText">Multiplier</td>
+		<td width="265" class="listHeadText">Min Hours</td>
+		<td width="265" class="listHeadText">Max Hours</td>
+		<td width="265" class="listHeadText">Send Emails</td>
+    <td width="141" class="listHeadText">Portal</td>
+		<td width="265" class="listHeadText">Allow SCR Printing</td>
+		<td width="265" class="listHeadText">Requires Checking</td>
+		<td width="265" class="listHeadText">Allow Expenses</td>
+		<td width="265" class="listHeadText">Allow Reason</td>
+		<td width="141" class="listHeadText">Allow Action</td>
+		<td width="141" class="listHeadText">Allow Final</td>
+		<td width="141" class="listHeadText">Require Reason</td>
+		<td width="141" class="listHeadText">Require Action</td>
+		<td width="141" class="listHeadText">Require Final</td>
+		<td width="141" class="listHeadText">Travel</td>
+		<td width="141" class="listHeadText">Show No Charge</td>
+		<td width="141" class="listHeadText">Engineer Overtime</td>
+    <td width="141" class="listHeadText">On-site</td>
+		<td class="listHeadText">&nbsp;</td>
+	</tr>
+	<!-- BEGIN typeBlock -->
+	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
+		<td class="orderLineItem"><DIV align="left">{description}</div></td>
+		<td class="orderLineItem">{activeFlag}</td>
+		<td class="orderLineItem">{curValueFlag}</td>
+		<td class="orderLineItem">{oohMultiplier}</td>
+		<td class="orderLineItem">{minHours}</td>
+		<td class="orderLineItem">{maxHours}</td>
+		<td class="orderLineItem">{customerEmailFlag}</td>
+    <td class="orderLineItem">{portalDisplayFlag}</td>
+		<td class="orderLineItem">{allowSCRFlag}</td>
+		<td class="orderLineItem">{requireCheckFlag}</td>
+		<td class="orderLineItem">{allowExpensesFlag}</td>
+		<td class="orderLineItem">{allowReasonFlag}</td>
+		<td class="orderLineItem">{allowActionFlag}</td>
+		<td class="orderLineItem">{allowFinalStatusFlag}</td>
+		<td class="orderLineItem">{reqReasonFlag}</td>
+		<td class="orderLineItem">{reqActionFlag}</td>
+		<td class="orderLineItem">{reqFinalStatusFlag}</td>
+		<td class="orderLineItem">{travelFlag}</td>
+		<td class="orderLineItem">{showNotChargeableFlag}</td>
+		<td class="orderLineItem">{engineerOvertimeFlag}</td>
+    <td class="orderLineItem">{onSiteFlag}</td>
+		<td class="orderLineItem">&nbsp;</td>
+		<td class="orderLineItem"><DIV align="left"> <A href="{urlEdit}" title="Edit activity type details">{txtEdit}</a> 
+				<A href="{urlDelete}"  title="Delete this type" onClick="if(!confirm('Are you sure you want to remove this type?')) return(false)">{txtDelete}</A>			</DIV></td>
+	</tr>
+	<!-- END typeBlock -->
+</table>
+<!-- End Template: ActivityTypeList.inc.html -->

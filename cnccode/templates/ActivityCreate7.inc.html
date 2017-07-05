@@ -1,0 +1,20 @@
+<!-- Template: ActivityCreate7.inc.html -->
+<H2>{customerName}</H2>
+<script language='JavaScript' src='iespell/iespell.js'></script>
+<form name="form" method="post" action="{submitURL}">
+	<table border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td ><span class="formErrorMessage">{actionTakenMessage}</span></td>
+			</tr>
+		<tr> 
+			<td>
+				<textarea
+					onChange="checknodespelling2(this);"
+					name="actionTaken" cols="130" rows="20">{actionTaken}</textarea>			</td>
+		</tr>
+		<tr> 
+			<td valign="top"><input name="Back" type="button" value="Back" onclick="document.location='{backURL}';">
+			<input name="Next" type="submit" id="Next" value="Next"></td>		</tr>
+	</table>
+</form>
+<!-- End Template: ActivityCreate7.inc.html -->

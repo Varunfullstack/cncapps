@@ -1,0 +1,27 @@
+<!-- Template: ActivityCreate4.inc.html -->
+{activityWizardHeader}
+<form name="form" method="post" action="{submitURL}">
+	<table border="0" cellspacing="0" cellpadding="1">
+		<tr class="singleBorder">
+				<td class="promptText">User</td>
+				<td class="fieldText"><select
+				type="text"
+				name="userID"
+			>
+								<option value="0">Unallocated</option>
+								<!-- BEGIN userBlock -->
+								<option {userSelected} value="{userID}">{userName}</option>
+								<!-- END userBlock -->
+						</select>
+								<span class="formErrorMessage">{userNameMessage}</span></td>
+		</tr>
+		<tr>
+				<td valign="top">&nbsp;</td>
+				<td>		
+		</tr>
+		<tr> 
+			<td valign="top"><input name="Back" type="button" value="Back" onclick="document.location='{backURL}';"></td>
+			<td> <input name="Next" type="submit" id="Next" value="Next">		</tr>
+	</table>
+</form>
+<!-- End Template: ActivityCreate4.inc.html -->

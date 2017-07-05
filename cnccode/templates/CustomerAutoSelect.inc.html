@@ -1,0 +1,27 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitCustomer(customerID, customerName) {
+	if ((opener) && (!opener.closed)) {
+		opener.document.searchForm.customerID.value=customerID;
+		opener.document.searchForm.customerString.value=customerName;
+		window.close();
+	}
+}
+</script>
+</head>
+<body onBlur="self.focus();">
+<form name="customer">
+<table>
+<!-- BEGIN customerBlock -->
+<tr>
+<td class="listItemText">
+	<input type="hidden" value="1">
+	<a href="javascript:submitCustomer({customerID}, '{customerName}')">{customerName}</a>
+</td>
+</tr>
+<!-- END customerBlock -->
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!-- Template: ServiceRequestFixedEdit.inc.html -->
+<p>Why does this SR require review by management?</p>
+<table width="100%">
+  <tr>
+    <td>{historyLink}</td>
+  </tr>
+</table>
+<FORM  method="post" action="{submitURL}" name="managementReview" AUTOCOMPLETE = "off">
+  <input type="hidden" name="problemID"  value="{problemID}">
+
+  <table class="singleBorder" width="900" border="0">
+    <tr>
+      <td><span class="formErrorMessage">{managementReviewDetailsMessage}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <textarea cols="150" rows="20" name="managementReviewDetails">{managementReviewDetails}</textarea>
+      </td>
+    </tr>
+     <tr>
+      <td>
+          <input type="submit" name="Submit" value="Save">
+      </td>
+    </tr>
+  </table>
+</FORM>

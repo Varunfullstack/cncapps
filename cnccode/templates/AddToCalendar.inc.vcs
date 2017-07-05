@@ -1,0 +1,12 @@
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY;CHARSET=ISO-8859-1;ENCODING=quoted-printable:{customerName} {add1} {add2} {add3} {town} {county} {postcode} {contactName} DDI: {contactPhone} Call {scrRef}
+
+DESCRIPTION;CHARSET=ISO-8859-1;ENCODING=quoted-printable:{reason} 
+LOCATION:
+ATTENDEE:
+DTSTART:{dateYYYYMMDD}T{startHHMM}21Z
+DTEND:{dateYYYYMMDD}T{endHHMM}21Z
+CATEGORIES:BUSINESS
+END:VEVENT
+END:VCALENDAR

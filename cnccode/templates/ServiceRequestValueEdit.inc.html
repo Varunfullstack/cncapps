@@ -1,0 +1,40 @@
+<!-- Template: ActivityCreate5.inc.html -->
+<H2>{customerName}</H2>
+{currentDocumentsLink}<BR/><BR/>
+<form name="form" method="post" action="{submitURL}">
+	<table border="0" cellspacing="0" cellpadding="1">
+			<tr class="singleBorder">
+					<td class="promptText">Value</td>
+					<td><input
+					type="text"
+					name="curValue"
+					value="{curValue}"
+					size="10"
+					maxlength="10"
+					 />
+				<span class="formErrorMessage">{curValueMessage}</span></td>
+		</tr>
+		<tr> 
+			<td class="promptText">Contract</td>
+			<td class="mainHeadText">
+				<select
+					name="contractCustomerItemID"
+					type="text"
+				>
+							<option {tandMSelected} value="">Please Select</option>
+							<!-- BEGIN contractBlock -->
+							<option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
+							<!-- END contractBlock -->
+				</select>
+				<font class="formErrorMessage">{contractCustomerItemIDMessage}</font>			</td>
+		</tr>
+		<tr>
+				<td valign="top">&nbsp;</td>
+				<td>		
+		</tr>
+		<tr> 
+			<td valign="top"><input name="Back" type="button" value="Back" onclick="document.location='{backURL}';"></td>
+			<td> <input name="Next" type="submit" id="Next" value="Next">		</tr>
+	</table>
+</form>
+<!-- End Template: ActivityCreate5.inc.html -->

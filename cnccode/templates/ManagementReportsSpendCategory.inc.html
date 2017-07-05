@@ -1,0 +1,48 @@
+<FORM  method="post" action="{urlGenerateReport}" name="report" >
+	Year<select
+	name="year"
+	type="text"
+	onChange="form.submit()"
+>
+	<!-- BEGIN yearBlock -->
+	<option {yearSelected} value="{year}">{year}</option>
+	<!-- END yearBlock -->
+</select>
+</FORM>
+<table border="1" cellspacing="1" cellpadding="1">
+		<tr>
+				<td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Category</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>Year</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>1 </strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>2</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>3</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>4</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>5</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>6</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>7</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>8</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>9</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>10</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>11</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>12</strong></td>
+		</tr>
+		<!-- BEGIN resultsBlock -->
+		<tr>
+				<td nowrap="nowrap" bgcolor="#E1E1E1">{category}</td>
+				<td width="50" align="right" nowrap="nowrap">{total}</td>
+				<td width="50" align="right" nowrap="nowrap">{month1}</td>
+				<td width="50" align="right" nowrap="nowrap">{month2}</td>
+				<td width="50" align="right" nowrap="nowrap">{month3}</td>
+				<td width="50" align="right" nowrap="nowrap">{month4}</td>
+				<td width="50" align="right" nowrap="nowrap">{month5}</td>
+				<td width="50" align="right" nowrap="nowrap">{month6}</td>
+				<td width="50" align="right" nowrap="nowrap">{month7}</td>
+				<td width="50" align="right" nowrap="nowrap">{month8}</td>
+				<td width="50" align="right" nowrap="nowrap">{month9}</td>
+				<td width="50" align="right" nowrap="nowrap">{month10}</td>
+				<td width="50" align="right" nowrap="nowrap">{month11}</td>
+				<td width="50" align="right" nowrap="nowrap">{month12}</td>
+		</tr>
+		<!-- END resultsBlock -->
+</table>
+<!--  <img src="{urlTheChart}" /> -->

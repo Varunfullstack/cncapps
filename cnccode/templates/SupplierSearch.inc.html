@@ -1,0 +1,32 @@
+<!-- Template: SupplierSearch.inc.html -->
+<form name="form" method="post" action="{submitURL}" AUTOCOMPLETE = "off">
+  <table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td valign="top" width="50px" class="promptText">Name</td>
+			<td class="field"> <input
+					name="supplierString"
+					type="text"
+					value="{supplierString}" size="35" maxlength="35"
+				>
+			</td>
+		</tr>
+		<tr> 
+			<td valign="top" class="promptText">Address</td>
+			<td class="field"> <input name="address" type="text" id="address" value="{address}" size="35" maxlength="35"> 
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">&nbsp;</td>
+			<td><input type="submit" name="Go" value="Search"> <input name="Button" type="button" value="New" onClick="document.location='{createURL}';"> 
+				<font class="formErrorMessage">{supplierStringMessage}</font></td>
+		</tr>
+	</table>
+</form>
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+	<!-- BEGIN supplierBlock -->
+	<tr> 
+		<td><A HREF="{supplierURL}">{supplierName}</A></td>
+	</tr>
+	<!-- END supplierBlock -->
+</table>
+<!-- End Template: SupplierSearch.inc.html -->

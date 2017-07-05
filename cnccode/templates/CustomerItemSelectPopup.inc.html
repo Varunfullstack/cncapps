@@ -1,0 +1,44 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(customerItemID, warrantyID, itemDescription) {
+	if ((opener) && (!opener.closed)) {
+		if(opener.document.getElementById("{parentIDField}")){
+			opener.document.getElementById("{parentIDField}").value=customerItemID;
+		}
+		if(opener.document.getElementById("{parentWarrantyIDField}")){
+			opener.document.getElementById("{parentWarrantyIDField}").value=warrantyID;
+		}
+		if(opener.document.getElementById("{parentDescField}")){
+			opener.document.getElementById("{parentDescField}").value=itemDescription;
+		}
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<table>
+	<TR>
+		<TD>
+			<INPUT type="button" name="close" value="Close" onclick="window.close();">
+		</TD>
+	<TR/>
+</table>
+<table>
+<!-- BEGIN itemBlock -->
+<tr>
+<td class="listItemText">
+	<a href="javascript:submitItem({customerItemID}, {warrantyID}, '{submitDescription}')">{itemDescription}</a>
+</td>
+<td class="listItemText">
+	{serialNo}
+</td>
+<td class="listItemText">
+	{purchaseDate}
+</td>
+</tr>
+<!-- END itemBlock -->
+</table>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<?
+/**
+* Call further action business class
+*
+* @access public
+* @authors Karim Ahmed - Sweet Code Limited
+*/
+require_once($cfg["path_gc"]."/Business.inc.php");
+require_once($cfg["path_dbe"]."/DBESector.inc.php");
+require_once($cfg["path_dbe"]."/DBECustomer.inc.php");
+require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+
+class BUSector extends Business{
+	var $dbeSector="";
+	/**
+	* Constructor
+	* @access Public
+	*/
+	function BUSector(&$owner){
+		$this->constructor($owner);
+	}
+	function constructor(&$owner){
+		parent::constructor($owner);
+		$this->dbeSector=new DBESector($this);
+	}
+	function updateSector(&$dsData){
+		$this->setMethodName('updateSector');
+		$this->updateDataaccessObject($dsData, $this->dbeSector);
+		return TRUE;
+	}
+	function getSectorByID($ID, &$dsResults)
+	{
+		$this->dbeSector->setPKValue($ID);
+		$this->dbeSector->getRow();
+		return ($this->getData($this->dbeSector, $dsResults));
+	}
+	function getAll(&$dsResults)
+	{
+		$this->dbeSector->getRows( 'description' );
+		
+		return ($this->getData($this->dbeSector, $dsResults));
+	}
+	function deleteSector($ID){
+		$this->setMethodName('deleteSector');
+		if ( $this->canDelete($ID) ){
+			return $this->dbeSector->deleteRow($ID);
+		}
+		else{
+			return FALSE;
+		}
+	}
+	/**
+	*	canDeleteSector
+	* Only allowed if this further actionhas no future action rows at the moment
+	*/
+	function canDelete($ID){
+		$dbeCustomer = new DBECustomer($this);
+		// validate no activities of this type
+		$dbeCustomer->setValue('sectorID', $ID);
+		if ( $dbeCustomer->countRowsByColumn('sectorID') < 1 ){
+			return TRUE;
+		}
+		else{
+			return FALSE;
+		}
+	}
+  function getCustomerWithoutSector()
+  {
+    $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+    $sql =
+      "SELECT
+        cus_custno
+      FROM
+        customer
+      WHERE
+        ( cus_sectorno IS NULL OR cus_sectorno = 0 )
+        AND ( cus_mailshot = 'Y' OR cus_referred = 'Y' OR cus_pcx = 'Y' )
+      ORDER BY
+        RAND()
+      LIMIT 1,1
+        ";
+        
+    return $db->query( $sql )->fetch_object()->cus_custno;
+  
+  }
+}// End of class
+?>

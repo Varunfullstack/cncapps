@@ -1,0 +1,36 @@
+<!-- Template: ActivitySearch.inc.html -->
+<H2>{customerName} for the period {fromDate} to {toDate}</H2>
+<table border="0" cellpadding="2" cellspacing="1" class="singleBorder">
+		<tr valign="top">
+				<td nowrap="nowrap" class="listHeadText"><div align="center">Item</div></td>
+				<td align="center" nowrap="nowrap" class="listHeadText">Turnover</td>
+				<td align="center" nowrap="nowrap" class="listHeadText">Profit</td>
+		</tr>
+		
+		<!-- BEGIN resultBlock -->
+		<tr valign="top" onmouseover="this.bgColor='#FFFFCC';" onmouseout="this.bgColor='';">
+	
+				<td nowrap="nowrap" class="listItemText">Product Sales </td>
+				<td nowrap="nowrap" class="orderLineItem">{ProductSalesTurnover}</td>
+				<td nowrap="nowrap" class="orderLineItem">{ProductSalesProfit}</td>
+		</tr>
+		<!-- END resultBlock -->
+		<tr valign="top">
+				<td nowrap="nowrap" class="listItemText">Internet Revenue</td>
+				<td nowrap="nowrap" class="orderLineItem">{InternetRevenueTurnover}</td>
+				<td nowrap="nowrap" class="orderLineItem">{InternetRevenueProfit}</td>
+		</tr>
+		<tr valign="top">
+	
+				<td nowrap="nowrap" class="listItemText">Managed Service Revenue </td>
+				<td nowrap="nowrap" class="orderLineItem">{ManagedServiceRevenueTurnover}</td>
+				<td nowrap="nowrap" class="orderLineItem">{ManagedServiceRevenueProfit}</td>
+		</tr>
+		<tr valign="top">
+	
+				<td nowrap="nowrap" class="listItemText">Maintenance and Gen Support</td>
+				<td nowrap="nowrap" class="orderLineItem">{MaintAndGenSupportTurnover}</td>
+				<td nowrap="nowrap" class="orderLineItem">{MaintAndGenSupportProfit}</td>
+		</tr>
+</table>
+<!-- End Template: ActivitySearch.inc.html -->

@@ -1,0 +1,153 @@
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style>
+body {
+	font-family: Arial, Helvetica, sans-serif;
+
+	font-size: 10pt;
+}
+
+td {
+	font-family: Arial, Helvetica, sans-serif;
+}
+td.valueRight {
+  text-align : right;
+	white-space: nowrap;
+}
+td.labelLeft {
+	text-align : left;
+	font-weight: bold;
+	white-space: nowrap;
+	font-size: 12px;
+}
+th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+table {
+	width: 100%;
+}
+table.information {
+
+	WIDTH: 100%;
+	border: 1px solid #666666;
+}
+H1 {
+	font-size: 12pt;
+}
+P.addressLine {
+	margin-top :0.1em;
+	margin-bottom :0.1em;
+	font-size: 12px;
+}
+@page {
+  size: landscape;
+}
+.transaction {
+	font-size: 10px;
+	border-bottom: black;
+}
+.transactionTotalLabels {
+	font-weight: bold;
+}
+.valueLeft {
+	font-size: 12px;
+	text-align: left;
+}
+.labelRight {
+	font-size: 12px;
+	font-weight: bold;
+	text-align: right;
+}
+</style>
+</head>
+<body>
+<table width="100%" border="0" cellspacing="0" cellpadding="1">
+	<tr> 
+		<td width="28%" valign="bottom">
+			<div align="center">
+				<h1 align="left"><img src="http://www.cnc-ltd.co.uk/_images/cnc_logo_200.gif" width="100"></h1>
+		</div>		</td>
+    <td width="28%" valign="bottom">CNC Pre-Pay Statement {statementDate}</td>
+    <!--		<td width="44%" align="right" valign="top"><div align="right"><img src=htdocs/cnc/images/cnclogo.jpeg" alt="CNC Logo" width="421" height="157" align="top"></div></td>-->
+	</tr>
+</table>
+<BR/>
+<table width="100%" class="information">
+	<tr> 
+		<td width="15%" class="labelRight">Company Name:</td>
+		<td width="28%" class="valueLeft">{companyName}</td>
+		<td width="13%" class="labelRight">CNC Ref:</td>
+		<td colspan="3" class="valueLeft">{customerRef}</td>
+	</tr>
+	<tr> 
+		<td valign="top" class="labelRight">Address:</td>
+		<td valign="top" class="addressLine"> <P class="addressLine">{add1}</P>
+			<P class="addressLine">{add2}</P>
+			<P class="addressLine">{add3}</P>
+			<P class="addressLine">{town}</P>
+			<P class="addressLine">{county}</P>
+			<P class="addressLine">{postcode}</P></td>
+		<td valign="top" class="labelRight">Contract Start: </td>
+		<td width="8%" valign="top" class="valueLeft">{startDate}</td>
+		<td width="4%" valign="top" class="labelRight">End:</td>
+		<td width="32%" valign="top" class="valueLeft">{endDate}</td>
+	</tr>
+</table>
+<BR/>
+<table width="100%" class="information">
+  <tr class="transaction">
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td colspan="2" class="labelRight">Previous balance:</td>
+    <td nowrap class="labelRight">&pound;{previousBalance}</td>
+  </tr>
+	
+  <tr class="transaction">
+		<td colspan=8><HR/></td>
+	</tr>	
+	<tr class="transactionHead"> 
+		<td width="5%" nowrap class="labelLeft">Date</td>
+		<td width="10%" nowrap class="labelLeft">Site</td>
+		<td width="5%" nowrap class="labelLeft">Ref</td>
+		<td width="45%" class="labelLeft">Details</td>
+		<td width="10%" nowrap class="labelLeft">CNC/Customer Contact</td>
+		<td width="15%" nowrap class="labelLeft">Type</td>
+		<td width="5%" nowrap class="labelLeft">Hours</td>
+		<td width="5%" nowrap class="labelRight">Cost(&pound;)</td>
+	</tr>
+	<!-- BEGIN lineBlock -->
+	<tr class="transaction"> 
+		<td valign="top" nowrap>{activityDate}</td>
+		<td valign="top" nowrap>{activityPostcode}</td>
+		<td valign="top" nowrap>{activityRef}</td>
+		<td valign="top" nowrap="nowrap">{activityDetails}</td>
+		<td valign="top" nowrap>{activityContact}</td>
+		<td valign="top" nowrap>{activityType}</td>
+		<td width="9%" valign="top" nowrap>{activityHours}</td>
+		<td valign="top" nowrap class="valueRight">{activityCost}</td>
+	</tr>
+	<!-- END lineBlock -->
+	
+  <tr class="transaction">
+		<td colspan=8><HR/></td>
+	</tr>	
+	<tr class="transaction">
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td colspan="2" class="labelRight">Remaining balance:</td>
+		<td nowrap class="labelRight">&pound;{remainingBalance}</td>
+	</tr>
+</table>
+<p>{cnc_name}, {cnc_add1}, {cnc_add2}, {cnc_add3}, {cnc_town}, {cnc_county},
+{cnc_postcode}, Tel. {cnc_phone} </p>
+<p>All amounts are exclusive of VAT. </p>
+</body>
+</html>

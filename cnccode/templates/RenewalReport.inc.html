@@ -1,0 +1,41 @@
+<!-- Template: RenewalReport.inc.html -->
+<H2>{customerName}</H2>
+<form name="domain" action="{urlCreateQuote}" method="post">
+  <table class="content" border="0" cellpadding="2" cellspacing="1" width="100%">
+    <tr> 
+	    <td colspan="3">&nbsp;</td>
+	    <td>Expires</td>
+      <td>Quantity</td>
+	    <td>Cost(&pound;)</td>
+	    <td>Sale(&pound;)</td>
+      <td width="2%">&nbsp;</td>
+    </tr>
+    <!-- BEGIN itemBlock -->
+    {itemTypeHeader}
+    <tr class="{itemClass}"> 
+      <td colspan="2" class="content"><A HREF="{linkURL}">{description}</a></td>
+	    <td class="content">{notes}{coveredItemsString}</td>
+	    <td class="content">{expiryDate}</td>
+      <td class="contentRightAlign">1</td>
+	    <td class="contentRightAlign">{costPrice}</td>
+	    <td class="contentRightAlign">{salePrice}</td>
+      <td class="contentRightAlign"><input type="checkbox" name="selectedRenewal[domain][]" value="{customerItemID}"></td>
+    </tr>
+    <!-- END itemBlock -->
+    <tr> 
+      <td colspan="5" class="contentRightAlign">&nbsp;</td>
+      <td colspan="2" class="content"><A HREF="{addExternalItemURL}">[add new external item]</A></td>
+      <td colspan="1" class="contentRightAlign">{buttonCreateQuote}</td>
+    </tr>
+    <tr> 
+	    <td colspan="5">Total</td>
+    </tr>
+    <tr> 
+	    <td colspan="5" class="contentRightAlign">&nbsp</td>
+	    <td class="contentRightAlign">{totalCostPrice}</td>
+	    <td class="contentRightAlign">{totalSalePrice}</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+</form>
+<!-- End Template: RenContractList.inc.html -->

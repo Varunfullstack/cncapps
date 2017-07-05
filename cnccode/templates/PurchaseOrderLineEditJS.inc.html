@@ -1,0 +1,16 @@
+<script language='JavaScript'>
+function validateItemDescription(){
+	if (Trim(document.getElementById("itemDescription").value) != ""){
+		window.open('{urlItemPopup}&itemDescription=' +
+		escape(document.getElementById("itemDescription").value) +
+		'&parentIDField=itemID' +
+		'&parentDescField=itemDescription',
+		'items','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+	}
+}
+function submitOnReturn() {
+	if (event.keyCode == 13) {
+			document.porline.submit();
+   }
+}
+</script>

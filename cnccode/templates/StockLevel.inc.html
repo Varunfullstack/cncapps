@@ -1,0 +1,56 @@
+<!-- Template: StockLevel.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'>
+function setItemChecked( itemID )
+{
+  var sa=false;
+  if(checkedOn)
+    sa=true;
+		numberOfElements = getElementCount("orderLine");
+	  for (var i=0 ; i < numberOfElements ; i++)
+	{
+		var e = document.all("orderLine", i);
+		if(sa && !e.disabled)
+			e.checked=true;
+		else
+			e.checked=false;
+	}
+}
+</SCRIPT>
+
+<P class="formErrorMessage">{formError}</P>
+<form name="searchForm" method="post" action="{urlSearch}">
+  <table width="500px" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="100" class="promptText"><div align="right">Item</div></td>
+			<td><input name="itemText" type="text" value="{itemText}" size="50" maxlength="50"></td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td> <input type="button" name="Search" value="Search" onClick="submit();"></tr>
+	</table>
+</form>
+<table class="singleBorder" width="500" border="0" cellspacing="1" cellpadding="1">
+	<tr> 
+		<td width="155" class="listHeadText">Item</td>
+		<td width="25" nowrap class="listHeadText">Sales Stock</td>
+		<td width="73" class="listHeadText">Maintanance Stock</td>
+		</tr>
+	<form name="itemForm" method="post" action="{urlUpdate}">
+	<!-- BEGIN itemBlock -->
+	<tr valign="top" onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td align="top" nowrap class="listItemText">{itemDescription}</td>
+		<td align="top" nowrap class="listItemText">
+			<input name="salesStockQty[{itemID}]" value="{salesStockQty}" size="5" maxlength="5" onchange="setCheckbox({itemID})"/>		</td>
+		<td align="top" nowrap class="listItemText">
+			<input name="maintStockQty[{itemID}]" value="{maintStockQty}" size="5" maxlength="5" onchange="setCheckbox({itemID})"/>		</td>
+		</tr>
+	<!-- END itemBlock -->
+	<tr valign="top" onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+			<td align="top" nowrap class="listItemText">&nbsp;</td>
+			<td align="top" nowrap class="listItemText"><input type="submit" name="Submit" value="Update" /></td>
+			<td align="top" nowrap class="listItemText">&nbsp;</td>
+			</tr>
+	</form>
+</table>
+<!-- End Template: StockLevel.inc.html -->

@@ -1,0 +1,75 @@
+<!-- Template: GSCExport.inc.html -->
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+  <P>Export General Support Contract activities up to the date entered. </P>
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<form name="gscPreviewForm" method="post" action="{urlPreview}">
+		<tr>
+			<td width="12%" class="promptText">End Date</td>
+			<td width="40%" class="field">
+				<input
+					type="text"
+					name="gscExport[1][endDate]"
+					id="endDate"
+					value="{endDate}"
+					size="10"
+					maxlength="10"
+				>
+				<a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+				<font class="formErrorMessage">{endDateMessage}</font>
+				<input
+					name="Preview"
+					value="Balances"
+					type="submit"
+					id="Preview"
+				 />
+			</td>
+		</tr>
+		</form>
+	</table>
+	<table width="100%" class="singleBorder">
+			<tr>
+					<td class="listHeadText">Customer</td>
+					<td class="listHeadText">Contract</td>
+					<td class="listHeadText">Expiry date </td>
+					<td class="listHeadText">Balance </td>
+					<td class="listHeadText">Top-up Due</td>
+					<td class="listHeadText">Statement</td>
+				</tr>
+	<!-- BEGIN resultBlock -->
+			<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+					<td>{customerName}</td>
+					<td>{contractType}</td>
+					<td>{expiryDate}</td>
+					<td>{currentBalance}</td>
+					<td>{topUp}</td>
+					<td><A href="{webFileLink}" target="_blank">Statement</A></td>
+			</tr>
+	<!-- END resultBlock -->
+	</table>
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<form name="gscPreviewForm" method="post" action="{urlExport}">
+		<tr>
+			<td width="12%" class="promptText">End Date</td>
+			<td width="40%" class="field">
+				<input
+					type="text"
+					name="gscExport[1][endDate]"
+					id="endDate"
+					value="{endDate}"
+					size="10"
+					maxlength="10"
+				>
+				<a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+				<font class="formErrorMessage">{endDateMessage}</font>
+				<input
+					name="Export"
+					value="Export"
+					type="submit"
+					id="Export"
+					onClick="if(!confirm('Are you sure you want to generate the statements?')) return(false)"
+				 />
+			</td>
+		</tr>
+		</form>
+	</table>
+<!-- End Template: GSCExport.inc.html -->

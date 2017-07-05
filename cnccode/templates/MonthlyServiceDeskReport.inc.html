@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+    <style type="text/css">
+      BODY, P, TD, TH {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+      }
+      table
+      {
+        border-collapse:collapse;
+      }
+      table,th, td
+      {
+        border: 1px solid black;
+      }
+      td{
+        padding: 5px;
+      }
+      h1{
+        font-size: 10pt;
+      }
+    </style>
+  </head>
+  <body>
+    <H1>Service Desk Report {period} - {customerName}</H1>
+    <table width="250">
+      <tr>
+        <td width="200" nowrap="nowrap">&nbsp;</td>
+        <td width="50" nowrap="nowrap">ServerCare</td>
+        <td width="50" nowrap="nowrap">ServiceDesk</td>
+        <td width="50" nowrap="nowrap">Pre-Pay</td>
+        <td width="50" nowrap="nowrap">T&amp;M</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Total Number of Incidents</td>
+        <td width="50" nowrap="nowrap">{totalServerCare}</td>
+        <td width="50" nowrap="nowrap">{totalServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{totalPrePay}</td>
+        <td width="50" nowrap="nowrap">{totalTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Total Requiring SLA</td>
+        <td width="50" nowrap="nowrap">{totalSlaServerCare}</td>
+        <td width="50" nowrap="nowrap">{totalSlaServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{totalSlaPrePay}</td>
+        <td width="50" nowrap="nowrap">{totalSlaTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Total Not Requiring SLA</td>
+        <td width="50" nowrap="nowrap">{totalNonSlaServerCare}</td>
+        <td width="50" nowrap="nowrap">{totalNonSlaServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{totalNonSlaPrePay}</td>
+        <td width="50" nowrap="nowrap">{totalNonSlaTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Total Resolved</td>
+        <td width="50" nowrap="nowrap">{totalResolvedServerCare}</td>
+        <td width="50" nowrap="nowrap">{totalResolvedServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{totalResolvedPrePay}</td>
+        <td width="50" nowrap="nowrap">{totalResolvedTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Total Responded Within SLA</td>
+        <td width="50" nowrap="nowrap">{totalWithinSlaServerCare}</td>
+        <td width="50" nowrap="nowrap">{totalWithinSlaServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{totalWithinSlaPrePay}</td>
+        <td width="50" nowrap="nowrap">{totalWithinSlaTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Total Missing SLA</td>
+        <td width="50" nowrap="nowrap">{totalMissingSlaServerCare}</td>
+        <td width="50" nowrap="nowrap">{totalMissingSlaServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{totalMissingSlaPrePay}</td>
+        <td width="50" nowrap="nowrap">{totalMissingSlaTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Average Response Time</td>
+        <td width="50" nowrap="nowrap">{averageResponseServerCare}</td>
+        <td width="50" nowrap="nowrap">{averageResponseServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{averageResponsePrePay}</td>
+        <td width="50" nowrap="nowrap">{averageResponseTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Average Fix Time</td>
+        <td width="50" nowrap="nowrap">{averageFixServerCare}</td>
+        <td width="50" nowrap="nowrap">{averageFixServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{averageFixPrePay}</td>
+        <td width="50" nowrap="nowrap">{averageFixTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">First Time Fix</td>
+        <td width="50" nowrap="nowrap">{firstTimeFixServerCare}</td>
+        <td width="50" nowrap="nowrap">{firstTimeFixServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{firstTimeFixPrePay}</td>
+        <td width="50" nowrap="nowrap">{firstTimeFixTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Number of Escalations</td>
+        <td width="50" nowrap="nowrap">{escalationsServerCare}</td>
+        <td width="50" nowrap="nowrap">{escalationsServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{escalationsPrePay}</td>
+        <td width="50" nowrap="nowrap">{escalationsTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Number Reopened</td>
+        <td width="50" nowrap="nowrap">{reopenedServerCare}</td>
+        <td width="50" nowrap="nowrap">{reopenedServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{reopenedPrePay}</td>
+        <td width="50" nowrap="nowrap">{reopenedTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Severity One</td>
+        <td width="50" nowrap="nowrap">{severityOneServerCare}</td>
+        <td width="50" nowrap="nowrap">{severityOneServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{severityOnePrePay}</td>
+        <td width="50" nowrap="nowrap">{severityOneTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Severity Two</td>
+        <td width="50" nowrap="nowrap">{severityTwoServerCare}</td>
+        <td width="50" nowrap="nowrap">{severityTwoServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{severityTwoPrePay}</td>
+        <td width="50" nowrap="nowrap">{severityTwoTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Severity Three</td>
+        <td width="50" nowrap="nowrap">{severityThreeServerCare}</td>
+        <td width="50" nowrap="nowrap">{severityThreeServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{severityThreePrePay}</td>
+        <td width="50" nowrap="nowrap">{severityThreeTAmdM}</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Severity Four</td>
+        <td width="50" nowrap="nowrap">{severityFourServerCare}</td>
+        <td width="50" nowrap="nowrap">{severityFourServiceDesk}</td>
+        <td width="50" nowrap="nowrap">{severityFourPrePay}</td>
+        <td width="50" nowrap="nowrap">{severityFourTAmdM}</td>
+      </tr>
+      <tr>
+        <td colspan="5" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="200" nowrap="nowrap">Incident Stats By team Member</td>
+        <td width="50" nowrap="nowrap">Resolved</td>
+        <td width="50" nowrap="nowrap">Rejected</td>
+        <td width="50" nowrap="nowrap">Time Logged</td>
+        <td width="50" nowrap="nowrap">&nbsp;</td>
+      </tr>
+<!-- START user -->
+      <tr>
+        <td width="200" nowrap="nowrap">{userName}</td>
+        <td width="50" nowrap="nowrap">{userResolvedCount}</td>
+        <td width="50" nowrap="nowrap">{userRejectedCount}</td>
+        <td width="50" nowrap="nowrap">{userHoursLogged}</td>
+        <td width="50" nowrap="nowrap">&nbsp;</td>
+      </tr>
+<!-- END user -->
+    </table>
+  </body>
+</html>
