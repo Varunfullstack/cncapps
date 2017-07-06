@@ -1,0 +1,3 @@
+"CustomerName","ServerName","Period","Errors"<!-- BEGIN rowsBlock -->
+"{customerName}","{serverName}","{period}",{errors}
+<!-- END rowsBlock -->

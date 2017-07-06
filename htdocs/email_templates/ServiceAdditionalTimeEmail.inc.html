@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+    <style type="text/css">
+    <!--
+    BODY, P, TD, TH {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9pt;
+    }
+    .singleBorder {
+      border: #e1e1f0 2px solid;
+    }
+    TABLE {
+      border-spacing: 1px;
+    }
+    -->
+    </style>
+  </head>
+  <body>
+   <p>{allocatedUserName} {requestedReason}. Please <A href="{urlAllocateAdditionalTime}">review and consider allocating more time</A></p>
+   
+   <p>Chargeable Hours: {chargableActivityDurationHours}</p>
+
+   <p>Total Hours: {totalActivityDurationHours}</p>
+  
+   <p><A href="{urlLastActivity}">View last activity</A></p>
+
+  <table width="100%">
+    <!-- BEGIN activityBlock -->
+    <tr>
+      <td bgcolor="#cccccc" align="left">{date} {startTime} - {endTime} ({duration}) 
+      {activityType} - {contactName} - {userName}</td>
+    </tr>
+      <tr>
+      <td>{reason}</td>
+    </tr>
+    <!-- END activityBlock -->
+    <tr>
+      <td bgcolor="#cccccc" align="left">Internal Notes</td>
+    </tr>
+    <tr>
+      <td>{internalNotes}</td>
+    </tr>
+  </table>
+  </body>
+</html>

@@ -1,0 +1,190 @@
+<!-- Template: PurchaseOrderSearch.inc.html -->
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'>
+function validateSupplierName(){
+	if (document.getElementById("supplierName").value != ""){
+		window.open(
+			'{urlSupplierPopup}&supplierName=' +
+			escape(document.getElementById("supplierName").value) +
+			'&parentIDField=supplierID' +
+			'&parentDescField=supplierName',
+			'items',
+			'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
+		)
+	}
+	else{
+		document.getElementById("supplierID").value = '';
+	}
+}
+function checkFunctionKey(field){
+ 	if (event.keyCode == 120){			// F9 - edit
+		switch (field.id){
+			case "supplierName": 
+				if (document.getElementById("supplierID").value != ""){
+					window.open(
+						'{urlSupplierEdit}&supplierID=' +
+						escape(document.getElementById("supplierID").value) +
+						'&parentIDField=supplierID' +
+						'&parentDescField=supplierName',
+						'supplier',
+						'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+					);
+				}
+				break;
+		}		
+ 	}
+ 	return;
+}		
+function submitOnReturn() {
+	if (event.keyCode == 13) {
+			document.searchForm.submit();
+   }
+}
+function createOrder(){
+	if (
+		(document.searchForm.supplierID.value != "") &&
+		(document.searchForm.ordheadID.value != "")
+	){
+			document.location=
+				'{urlCreateOrder}&supplierID=' + escape(document.searchForm.supplierID.value) +
+				'&ordheadID=' + escape(document.searchForm.ordheadID.value)
+	}
+}
+</script>
+<form name="searchForm" method="post" action="{submitURL}" AUTOCOMPLETE = "off">
+  <table width="500px" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="100px" class="promptText"><div align="right">Supplier</div></td>
+			<td>
+				<input
+					type="hidden"
+					name="supplierID"
+					id="supplierID"
+					value="{supplierID}"
+				>
+				<input
+					type="text"
+					name="supplierName"
+					id="supplierName"
+					value="{supplierName}"
+					onChange="javascript:validateSupplierName()"
+					onKeydown="javascript:checkFunctionKey(supplierName)"
+					size="50"
+					maxlength="50"
+				>		</td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">Purchase Order No</div></td>
+			<td> <input
+					type="text"
+					onKeypress="javascript:submitOnReturn()"
+					name="porheadID"
+					value="{porheadID}"
+				>		</td>
+		<tr> 
+			<td class="promptText"><div align="right">Sales Order No</div></td>
+			<td> <input
+					type="text"
+					onKeypress="javascript:submitOnReturn()"
+					name="ordheadID"
+					value="{ordheadID}"
+				>		</td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">Status</div></td>
+			<td>
+				<select name="orderType">
+					<option value=""></option>
+					<!-- BEGIN orderTypeBlock -->
+					<option {orderTypeSelected} value="{orderType}">{orderTypeDescription}</option>
+					<!-- END orderTypeBlock -->
+		  	</select>		  </td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">Supplier Ref</div></td>
+			<td> <input
+					type="text"
+					name="supplierRef"
+					id="supplierRef"
+					value="{supplierRef}"
+					size="30"
+					maxlength="30"
+					onKeypress="javascript:submitOnReturn()"
+				> </td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">Search</div></td>
+			<td> <input
+				type="text"
+				name="lineText"
+				value="{lineText}"
+				size="50"
+				maxlength="50"
+				onKeypress="javascript:submitOnReturn()"
+			> </td>
+		</tr>
+		<tr>
+				<td class="promptText"><div align="right">Start Date</div></td>
+				<td><input
+					type="text"
+					name="fromDate"
+					id="fromDate"
+					value="{fromDate}"
+					size="10"
+					maxlength="10"
+					onkeypress="javascript:submitOnReturn()">
+								<a href="javascript:;" onclick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="to date" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <font class="formErrorMessage">{fromDateMessage}</font> </td>
+		</tr>
+		<tr>
+				<td class="promptText"><div align="right">End Date</div></td>
+				<td><input
+					type="text"
+					name="toDate"
+					id="toDate"
+					value="{toDate}"
+					size="10"
+					maxlength="10"
+					onkeypress="javascript:submitOnReturn()">
+								<a href="javascript:;" onclick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="from date" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <font class="formErrorMessage">{toDateMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">Part No</div></td>
+			<td> <input
+				type="text"
+				name="partNo"
+				value="{partNo}"
+				size="20"
+				maxlength="20"
+				onKeypress="javascript:submitOnReturn()"
+			> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="button" name="Search" value="Search" onClick="submit();">
+				<input type="button" name="CreateOrder" value="New Order" onClick="createOrder();">
+				<input type="button" name="Clear" value="Clear" onClick="document.location='{clearURL}'"></td>
+		</tr>
+	</table>
+</form>
+<table class="singleBorder" width="890px" border="0" cellspacing="1" cellpadding="1">
+	<tr> 
+		<td width="240px" class="listHeadText">Supplier</td>
+		<td width="50px" class="listHeadText">Order No</td>
+		<td width="70px" class="listHeadText">Status</td>
+		<td width="250px" class="listHeadText">Supplier Ref</td>
+		<td width="245px" class="listHeadText">Sold To</td>
+		<td width="50px" class="listHeadText">&nbsp;</td>
+	</tr>
+	<!-- BEGIN orderBlock -->
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td class="listItemText">{listSupplierName}</td>
+		<td class="listItemText"><A HREF="{listOrderURL}">{listPorheadID}</A></td>
+		<td class="listItemText">{listOrderType}</td>
+		<td class="listItemText">{listSupplierRef}</td>
+		<td class="listItemText">{listCustomerName}</td>
+		<td class="listItemText">{listOrderDelete}</td>
+	</tr>
+	<!-- END orderBlock -->
+</table>
+<!-- End Template: PurchaseOrderSearch.inc.html -->

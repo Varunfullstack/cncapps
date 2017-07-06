@@ -1,0 +1,48 @@
+<!-- Template: SecurityAppEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="securityApp" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="securityApp[1][securityAppID]"
+			value="{securityAppID}"
+		>
+		<tr> 
+			<td width="115" class="promptText">Application</td>
+			<td width="575" class="fieldText"> <input
+					name="securityApp[1][description]"
+					type="text" value="{description}"
+					size="50"
+					maxlength="50"
+				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
+		</tr>
+		<tr> 
+			<td class="promptText">Backup</td>
+			<td class="fieldText"> <INPUT name="securityApp[1][backupFlag]" type="checkbox" value="Y" {backupFlagChecked}></td>
+		</tr>
+		<tr> 
+			<td class="promptText">Email AV</td>
+			<td class="fieldText"> <INPUT name="securityApp[1][emailAVFlag]" type="checkbox" value="Y" {emailAVFlagChecked}>
+				</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Server AV</td>
+			<td class="fieldText"> <INPUT name="securityApp[1][serverAVFlag]" type="checkbox" value="Y" {serverAVFlagChecked}>
+				</td>
+		</tr>
+		<tr>
+		  <td>&nbsp;</td>
+		  <td class="formErrorMessage">&nbsp;</td>
+	  </tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: SecurityAppEdit.inc.html -->

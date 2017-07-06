@@ -1,0 +1,81 @@
+<!-- Template: ServiceRequestsByCustomerReport.inc.html -->
+<P class="formErrorMessage">{formError}</P>
+<form name="searchForm" method="get" action="{urlSubmit}">
+
+  <table width="500px" border="0" cellspacing="0" cellpadding="1">
+
+    <tr> 
+      <td width="100" class="promptText"><div align="right">Number of Days</div></td>
+      <td>
+        <input
+          type="text"
+          name="searchForm[1][days]"
+          value="{days}"
+          placeholder="days"
+          size="10"
+          maxlength="7"
+        > <font class="formErrorMessage">{daysMessage} </font> </td>
+    </tr>
+
+    <tr> 
+      <td width="100" class="promptText"><div align="right">Start Date</div></td>
+      <td>
+        <input
+          type="text"
+          name="searchForm[1][fromDate]"
+          value="{fromDate}"
+          placeholder="d/m/y"
+          size="9"
+          maxlength="10"
+        > <font class="formErrorMessage">{fromDateMessage} </font> </td>
+    </tr>
+
+    <tr> 
+      <td width="100" class="promptText"><div align="right">End Date</div></td>
+      <td>
+        <input
+          type="text"
+          name="searchForm[1][toDate]"
+          value="{toDate}"
+          placeholder="d/m/y"
+          size="9"
+          maxlength="10"
+        > <font class="formErrorMessage">{toDateMessage} </font> </td>
+    </tr>
+
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+			<input type="submit" name="Search" value="Run" onClick="submit();">
+			<input type="reset" name="Clear" value="Clear"></td>
+		</tr>
+	</table>
+	<p>&nbsp;</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th align="right">Count</th>
+        <th align="right">Hours</th>
+        <th align="right">%</th>
+      </tr>
+    </thead>
+    <tbody>
+<!-- BEGIN customersBlock -->
+      <tr>
+        <td>{customerName}</td>
+        <td align="right">{srCount}</td>
+        <td align="right">{hours}</td>
+        <td align="right">{percentage}</td>
+      </tr>
+<!-- END customersBlock -->
+      <tr>
+        <td>TOTALS</td>
+        <td align="right">{totalSrCount}</td>
+        <td align="right">{totalHours}</td>
+        <td align="right">{totalPercentage}</td>
+      </tr>
+    </tbody>    
+  </table>  
+</form>
+<!-- End Template: ServiceRequestsByCustomerReport.inc.html -->

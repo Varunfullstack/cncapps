@@ -1,0 +1,39 @@
+<html>
+  <head>
+  <style type="text/css">
+  <!--
+  BODY, P, TD, TH {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+  }
+  h2{
+    font-size: 11pt;
+    font-weight: bold;
+    
+  }
+  a{
+    font-weight: bold;
+  }
+  
+  .singleBorder {
+    border: #e1e1f0 2px solid;
+  }
+  TABLE {
+    border-spacing: 1px;
+  }
+  -->
+  </style>
+  </head>
+  <body>
+    <p>{contactFirstName},</p>
+    <p><a href="http://www.cnc-ltd.co.uk/portal/request/{activityRef}/view">{CONFIG_SERVICE_REQUEST_DESC} {activityRef}</a> will be marked complete on our system on {completeDate}, after which NO further action can be taken against it.  If you wish to re-open the call or confirm it is closed before this date, please advise us at the earliest opportunity quoting reference {activityRef}.</p>
+    <h2>Original Request:</h2>
+    <p class="singleBorder">{reason}</p>
+    <h2>Resolution Summary:</h2>
+    <p class="singleBorder">{lastActivityReason}</p>
+    <h2>Root Cause:</h2>
+    <p class="singleBorder">{rootCause}</p>
+    <p>Resolved by {resolvedEngineerName}</p>
+  </body>
+</html>
+

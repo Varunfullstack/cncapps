@@ -1,0 +1,24 @@
+<!-- Template: SupplierEditContact.inc.html -->
+	<tr> 
+			<td width="10%" class="promptText">Contact</td>
+			<td class="field">
+				<input
+					type="hidden"
+					name="supplier[1][contactID]"
+					id="contactID"
+					value="{contactID}"
+				>
+				<input
+					type="text"
+					name="supplier[1][contactName]"
+					id="contactName"
+					value="{contactName}"
+					onChange="javascript:validateContactName()"
+					onKeydown="javascript:checkFunctionKey(contactName)"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{contactNameMessage}</font>
+			</td>
+		</tr>
+<!-- End Template: SupplierEditContact.inc.html -->

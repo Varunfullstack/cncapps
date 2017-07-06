@@ -1,0 +1,155 @@
+<?
+/**
+* Base business class
+* Must be extended to be useful
+* @access virtual
+* @author Karim Ahmed
+*/
+require_once($cfg["path_gc"]."/BaseObject.inc.php");
+require_once($cfg["path_gc"]."/DataSet.inc.php");
+
+define("BUSINESS_FK_ERR", "_fk_error");	// ext for fk ref integrity error columns in datasets
+define("BUSINESS_NT_PSD", "not passed");	// ext for fk ref integrity error columns in datasets
+
+class Business extends BaseObject{
+	
+	function Business(&$owner){
+		$this->constructor($owner);
+	}
+	function constructor(&$owner){
+		$this->BaseObject($owner);
+		$this->setMethodName("unsetMethodName");
+	}
+	/**
+	* Insert/update one or more rows from a source DataSet into a destination DBObject
+	* @param DataSet &$Source Set of data
+	* @param DBObject &$Destinantion DataAccess object
+	* @return bool
+	* @access private
+	*/
+	function updateDataaccessObject(&$dsSource, &$dbDestination){
+		$this->setMethodName("updateDataaccessObject");
+		if (!is_object($dsSource)){
+			$this->raiseError("dsSource is not initialised");
+		}
+		if (
+			(!is_subclass_of($dsSource, DA_CLASSNAME_DATASET))&
+			($dsSource->getClassname() !=DA_CLASSNAME_DATASET)
+		){
+			$this->raiseError("dsSource must be subclass or class of ".DA_CLASSNAME_DATASET);
+		}
+		if (!is_object($dbDestination)){
+			$this->raiseError("dbDestination is not initialised");
+		}
+		if (!is_subclass_of($dbDestination, DA_CLASSNAME_DBENTITY)){
+			$this->raiseError("dbDestination must be subclass of ".
+				DA_CLASSNAME_DBENTITY);
+		}
+		if ($dsSource->columnExists($dbDestination->getPKName())==DA_PK_NOT_SET){
+			$this->raiseError("No Primary key column in dsSource");
+		}
+		return($dbDestination->replicate($dsSource));
+	}
+	/**
+	* Get all rows from a data access object into a dataset
+	* @param Database &$Source Data access object
+	* @param DataSet &$Destinantion Set of data
+	* @return bool
+	* @access private
+	*/
+	function getData(&$dbSource, &$dsDestination){
+		if (!is_object($dsDestination)){
+			$dsDestination=new Dataset($this);
+		}
+		else{
+			if (
+				($dsDestination->getClassname()!=DA_CLASSNAME_DATASET)&
+				(!is_subclass_of($dsDestination, DA_CLASSNAME_DATASET))
+			){
+				$this->raiseError("dsDestination must be subclass or class of ".
+					DA_CLASSNAME_DATASET);
+			}
+		}
+		if (gettype($dbSource)!="object")
+			$this->raiseError("dbSource is not initialised");
+		if (!is_subclass_of($dbSource, DA_CLASSNAME_DBENTITY))
+			$this->raiseError("dbSource must be subclass of ".DA_CLASSNAME_DBENTITY);
+		return($dsDestination->replicate($dbSource));
+	}
+	/**
+	* Check referential integrity of a column on the dataset we are about to post to a data access
+	* If it fails then an error message is posted to the dataset and affected row is not posted
+	* @param object Dataset Source Dataset
+	* @param object DBObject Target DataAccess(the one we are updating) 
+	* @param object DBObject Parent Dataaccess (the one with a PK of $columnName)
+	* @return bool
+	* @access private
+	*/
+	function validateFK($columnName, &$dsSource, &$dbTarget, &$dbParent){
+		$this->setMethodName("validateFK");
+		if (
+			($dsSource->getClassname() !=DA_CLASSNAME_DATASET)&
+			(!is_subclass_of($dsSource, DA_CLASSNAME_DATASET))
+		){
+			$this->raiseError("dsSource must be subclass or class of ".DA_CLASSNAME_DATASET);
+		}
+		if (!is_subclass_of($dbTarget, DA_CLASSNAME_DBENTITY)){
+			$this->raiseError("dbTarget must be subclass of ".DA_CLASSNAME_DBENTITY);
+		}
+		if (!is_subclass_of($dbParent, DA_CLASSNAME_DBENTITY)){
+			$this->raiseError("dbParent must be subclass of ".DA_CLASSNAME_DBENTITY);
+		}
+		if( // FK may be null
+				($dbTarget->getNull($columnName)==DA_ALLOW_NULL)&
+				($dsSource->getValue($columnName)==0)
+			){
+			$ret = TRUE;
+		}
+		else{
+			$dbParent->setPKValue($dsSource->getValue($columnName));
+			/*
+			If the FK does not exist on the parent table then add an error column and cancel post()
+			operation
+			*/
+			if(!$dbParent->getRow()){
+				$dsSource->addColumn($columnName.BUSINESS_FK_ERR, DA_STRING, DA_ALLOW_NULL);
+				$dsSource->setUpdateModeUpdate();
+				$dsSource->setValue(
+					$columnName.BUSINESS_FK_ERR,
+					"Not found on ".$dbParent->getTableName()." table"
+				);
+				$dsSource->post();
+				$dbTarget->setPostRowOff();
+				$ret=FALSE;
+			}
+			else{
+				$ret = TRUE;
+			}
+		}
+		return $ret;
+	}
+	/**
+	* Check referential integrity of a column on the dataset we are about to post to a data access
+	* If it fails then an error message is posted to the dataset and affected row is not posted
+	* @param object Dataset Source Dataset
+	* @param object DBObject Target DataAccess(the one we are updating) 
+	* @param object DBObject Parent Dataaccess (the one with a PK of $columnName)
+	* @return bool
+	* @access private
+	*/
+	function getDatasetByPK($pK, &$dbSource, &$dsResult){
+		$this->setMethodName("getDatasetByPK");
+		if ($pK==''){
+			$this->raiseError($dbSource->getPKName().' '.BUSINESS_NT_PSD);
+		}
+		$dbSource->setPKValue($pK);
+		if (!$dbSource->getRow()){
+			$ret=FALSE;
+		}
+		else{
+			$ret=($this->getData($dbSource, $dsResult));
+		}
+		return $ret;
+	}
+}// End of class
+?>

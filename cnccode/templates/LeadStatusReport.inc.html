@@ -1,0 +1,71 @@
+<table width="1000">
+<tr>
+<td valign="top">
+<table width="200">
+  <tr>
+    <td class="listHeadText" colspan="3">Customers</td>
+  </tr>
+  <tr>
+    <td  class="listHeadText" width="100">Year</td>
+    <td  class="listHeadText" width="50" nowrap="nowrap">New</td>
+    <td class="listHeadText" width="50" nowrap="nowrap">Lost</td>
+  </tr>
+  <!-- BEGIN countBlock -->
+  <tr>
+    <td>{year}</td>
+    <td nowrap="nowrap">{becameCount}</td>
+    <td nowrap="nowrap">{droppedCount}</td>
+  </tr>
+  <!-- END countBlock -->
+</table>
+</td>
+<td valign="top">
+<table width="200">
+  <tr>
+    <td class="hotLeadHeading"><a href="{urlReport}?orderHotAlpha=1">Hot</a></td>
+  </tr>
+  <!-- BEGIN hotBlock -->
+  <tr>
+    <td><A href="{urlHot}" target="_blank">{hotName}</a></td>
+  </tr>
+  <!-- END hotBlock -->
+</table>
+</td>
+<td valign="top">
+<table width="200">
+  <tr>
+    <td class="warmLeadHeading"><a href="{urlReport}?orderWarmAlpha=1">Warm</a></td>
+  </tr>
+  <!-- BEGIN warmBlock -->
+  <tr>
+    <td><A href="{urlWarm}" target="_blank">{warmName}</a></td>
+  </tr>
+  <!-- END warmBlock -->
+</table>
+</td>
+<td valign="top">
+<table width="200">
+  <tr>
+    <td class="coldLeadHeading"><a href="{urlReport}?orderColdAlpha=1">Cold</a></td>
+  </tr>
+  <!-- BEGIN coldBlock -->
+  <tr>
+    <td><A href="{urlCold}" target="_blank">{coldName}</a></td>
+  </tr>
+  <!-- END coldBlock -->
+</table>
+</td>
+<td valign="top">
+<table width="200">
+  <tr>
+    <td class="deadLeadHeading"><a href="{urlReport}?orderDeadAlpha=1">Dead</a></td>
+  </tr>
+  <!-- BEGIN deadBlock -->
+  <tr>
+    <td><A href="{urlDead}" target="_blank">{deadName}</a></td>
+  </tr>
+  <!-- END deadBlock -->
+</table>
+</td>
+</tr>
+</table>

@@ -1,0 +1,3 @@
+"Contract","Sales(GBP)","Cost(GBP)","Labour(GBP)","Labour(Hours)"<!-- BEGIN contractsBlock -->
+"{contract}",{sales},{cost},{labour},{labourHours}
+<!-- END contractsBlock -->

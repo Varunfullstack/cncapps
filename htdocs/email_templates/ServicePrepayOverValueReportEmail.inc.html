@@ -1,0 +1,44 @@
+<html>
+<!-- FOC activities logged the previous day -->
+  <head>
+  <style type="text/css">
+  <!--
+  BODY, P, TD, TH {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+  }
+  TH {
+    text-align: left;
+  }
+  .singleBorder {
+    border: #e1e1f0 2px solid;
+  }
+  TABLE {
+    border-spacing: 1px;
+  }
+  -->
+  </style>
+  </head>
+  <body>
+    <h1>Pre-pay activities logged yesterday over £100 in value</h1>
+    <table>
+      <tr>
+        <th>Customer</th>
+        <th>Activity No</th>
+        <th>Incident No</th>
+        <th>Technician</th>
+        <th>Value</th>
+      </tr>
+<!-- BEGIN activityBlock -->
+      <tr>
+        <td>{customer}</td>
+        <td><a href="{urlActivity}">{activityID}</a></td>
+        <td><a href="{urlRequest}">{serviceRequestID}</a></td>
+        <td>{technician}</td>
+        <td>{value}</td>
+      </tr>
+<!-- END activityBlock -->
+    </table>
+  </body>
+</html>
+

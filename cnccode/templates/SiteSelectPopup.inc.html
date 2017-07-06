@@ -1,0 +1,37 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(siteNo, siteDesc) {
+	if ((opener) && (!opener.closed)) {
+		opener.document.getElementById("{parentIDField}").value=siteNo;
+		opener.document.getElementById("{parentDescField}").value=siteDesc;
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<table>
+	<TR>
+		<TD>
+			<INPUT type="button" name="create" value="Create New" onclick="document.location='{urlSiteCreate}';">
+		</TD>
+		<TD>
+			<INPUT type="button" name="close" value="Close" onclick="window.close();">
+		</TD>
+	<TR/>
+</table>
+<table>
+<!-- BEGIN siteBlock -->
+<tr>
+<td class="listItemText">
+	<a href="javascript:submitItem({siteNo}, '{siteDesc}')">{siteDesc}</a>
+</td>
+<td class="listItemText">
+	{partNo}
+</td>
+</tr>
+<!-- END siteBlock -->
+</table>
+</body>
+</html>

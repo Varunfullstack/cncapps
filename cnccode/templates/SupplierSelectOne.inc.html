@@ -1,0 +1,20 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitItem(supplierID, supplierName) {
+	if ((opener) && (!opener.closed)) {
+		opener.document.getElementById("{parentIDField}").value=supplierID;
+		opener.document.getElementById("{parentDescField}").value=supplierName;
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<!-- BEGIN supplierBlock -->
+<script type="text/javascript">
+submitItem({supplierID}, '{submitName}');
+</script>
+<!-- END supplierBlock -->
+</body>
+</html>

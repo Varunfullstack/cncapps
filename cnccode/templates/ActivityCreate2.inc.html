@@ -1,0 +1,34 @@
+<!-- Template: ActivityCreate2.inc.html -->
+{activityWizardHeader}
+<BR>
+<H3>Existing SRs</H3>
+<p>Either select from an existing SR or continue with creating a new SR</p>
+<FORM name="form" action="{submitURL}" method="post">
+<input name="Back" type="button" value="Back" onclick="document.location='{backURL}';">
+<input name="Create" type="submit" id="Next" value="New {CONFIG_SERVICE_REQUEST_DESC}">
+</FORM>
+<BR>
+<P>Before creating a new request, try to establish whether it is related to an existing one below.</P>
+<BR>
+<table width="794" border="0" cellpadding="1" cellspacing="1" class="singleBorder">
+  <tr>
+    <td width="20" nowrap class="listHeadText">ID</td>
+    <td width="20" nowrap class="listHeadText">&nbsp;</td>
+    <td width="67" class="listHeadText">Raised</td>
+    <td width="260" class="listHeadText">Description</td>
+    <td width="68" class="listHeadText">Allocated</td>
+    <td width="68" class="listHeadText">Status</td>
+  </tr>
+
+  <!-- BEGIN problemBlock -->
+  <tr valign="top" onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+    <td align="top" nowrap class="listItemText">{problemID}</td>
+    <td align="top" nowrap class="listItemText">{historyLink}</td>
+    <td align="top" nowrap class="listItemText">{date}</td>
+    <td align="top">{recentReason}</td>
+    <td align="top" nowrap>{engineerName}</td>
+    <td align="top" nowrap>{status}</td>
+  </tr>
+  <!-- END problemBlock -->
+</table>
+<!-- End Template: ActivityCreate2.inc.html -->

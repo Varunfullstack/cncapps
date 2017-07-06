@@ -1,0 +1,38 @@
+<html>
+<head>
+<script type="text/javascript">
+function submitManufacturer(manufacturerID, manufacturerName) {
+	if ((opener) && (!opener.closed)) {
+		if(opener.document.getElementById("{parentIDField}")){
+			opener.document.getElementById("{parentIDField}").value=manufacturerID;
+		}
+		if(opener.document.getElementById("{parentDescField}")){
+			opener.document.getElementById("{parentDescField}").value=manufacturerName;
+		}
+		window.close();
+	}
+}
+</script>
+</head>
+<body>
+<table>
+	<TR>
+		<TD>
+			<INPUT type="button" name="create" value="Create New" onclick="document.location='{urlManufacturerCreate}';">
+		</TD>
+		<TD>
+			<INPUT type="button" name="close" value="Close" onclick="window.close();">
+		</TD>
+	<TR/>
+</table>
+<table>
+<!-- BEGIN manufacturerBlock -->
+<tr>
+<td class="listManufacturerText">
+	<a href="javascript:submitManufacturer({manufacturerID}, '{submitDescription}')">{manufacturerName}</a>
+</td>
+</tr>
+<!-- END manufacturerBlock -->
+</table>
+</body>
+</html>

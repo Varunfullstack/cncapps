@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Lang" content="en">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <title>Customer Products and Services Checklist</title>
+  </head>
+  <body>
+    <h1>Customer Products and Services Checklist</h1>
+    <table id="customer_details">
+      <tr>
+        <th>
+          Customer Name
+        </th>
+        <td>
+          {customerName}
+        </td>
+      </tr>
+    </table>
+    <table id="services">
+      <tr>
+        <th>
+          Service
+        </th>
+        <th>
+          Current Solution
+        </th>
+        <th>
+          Notes
+        </th>
+        <th>
+          Licence Renewal
+        </th>
+      </tr>
+      <!-- BEGIN serviceBlock -->
+      <tr>
+        <td>
+          {itemType}
+        </td>
+        <td>
+          {description}
+        </td>
+        <td>
+          {notes}
+        </td>
+        <td>
+          {licenceRenewalDate}
+        </td>
+      </tr>
+      <!-- END serviceBlock -->
+    </table>
+  </body>
+</html>

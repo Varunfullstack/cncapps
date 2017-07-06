@@ -1,0 +1,31 @@
+<!-- Template: SalesOrderVisitEmail.inc.html -->
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<form name="inputForm" method="post" action="{urlSubmit}">
+<table>
+
+  <tr>
+    <td>ETA Date</td>
+    <td><input type="text" name="inputForm[etaDate]" id="etaDate" value="{etaDate}"><a href="javascript:;" onclick="popUpCalendar(this, etaDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a></td>
+  </tr>
+  <tr>
+    <td  colspan="2"><fieldset><legend>Billing</legend>
+    Pre-pay<input type="radio" name="inputForm[billing]" value="PP">
+    Sales Order<input type="radio" name="inputForm[billing]" value="SO">
+    T & M<input type="radio" name="inputForm[billing]" value="TM">
+    </fieldset>
+    </td>
+  </tr>
+  <tr>
+    <td  colspan="2">Notes</td>
+  </tr>
+  <tr>
+    <td  colspan="2"><textarea rows="20" cols="60" name="inputForm[text]"></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td  colspan="2"><input type="submit" name="Submit" value="Send" />
+</td>
+  </tr>
+</table>
+</form>
+<!-- End Template: SalesOrderVisitEmail.inc.html -->

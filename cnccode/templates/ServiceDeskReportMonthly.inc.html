@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+    <style type="text/css">
+      BODY, P, TD, TH {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+      }
+      table
+      {
+        border-collapse:collapse;
+      }
+      table,th, td
+      {
+        border: 1px solid black;
+      }
+      td{
+        padding: 5px;
+      }
+      h1{
+        font-size: 10pt;
+      }
+    </style>
+  </head>
+  <body>
+    <P><strong>Service Desk Report - {month} {year}</strong></p>
+    <table width="100%">
+      <tr>
+        <td width="30%" nowrap="nowrap">&nbsp;</td>
+        <td nowrap="nowrap"><strong>This Month</strong></td>
+        <td nowrap="nowrap"><strong>YTD</strong></td>
+      </tr>
+      <tr>
+        <td colspan="3" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Total Incidents Logged</strong></td>
+        <td nowrap="nowrap">{totalIncidents}</td>
+        <td nowrap="nowrap">{totalIncidentsYtd}</td>
+      </tr>
+      <tr>
+        <td colspan="3" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Requiring SLA</strong></td>
+        <td nowrap="nowrap">{totalIncidentsSla}</td>
+        <td nowrap="nowrap">{totalIncidentsSlaYtd}</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Not Requiring SLA</strong></td>
+        <td nowrap="nowrap">{totalIncidentsNonSla}</td>
+        <td nowrap="nowrap">{totalIncidentsNonSlaYtd}</td>
+      </tr>
+      <tr>
+        <td colspan="3" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Total Resolved</strong></td>
+        <td nowrap="nowrap">{totalIncidentsResolved}</td>
+        <td nowrap="nowrap">{totalIncidentsResolvedYtd}</td>
+      </tr>
+      <tr>
+        <td colspan="3" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Responded Within SLA</strong></td>
+        <td nowrap="nowrap">{totalIncidentsWithinSla} ({percentIncidentsWithinSla}%)</td>
+        <td nowrap="nowrap">{totalIncidentsWithinSlaYtd} ({percentIncidentsWithinSlaYtd}%)</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Missing SLA</strong></td>
+        <td nowrap="nowrap">{totalIncidentsMissedSla} ({percentIncidentsMissedSla}%)</td>
+        <td nowrap="nowrap">{totalIncidentsMissedSlaYtd} ({percentIncidentsMissedSlaYtd}%)</td>
+      </tr>
+      <tr>
+        <td colspan="3" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Average Response Time SLA</strong></td>
+        <td nowrap="nowrap">{aveResponseHours}</td>
+        <td nowrap="nowrap">{aveResponseHoursYtd}</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Average Fix Time SLA</strong></td>
+        <td nowrap="nowrap">{aveFixHours}</td>
+        <td nowrap="nowrap">{aveFixHoursYtd}</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>First Time Fix</strong></td>
+        <td nowrap="nowrap">{firstTimeFix} ({percentFirstTimeFix}%)</td>
+        <td nowrap="nowrap">{firstTimeFixYtd} ({percentFirstTimeFixYtd}%)</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Escalations</strong></td>
+        <td nowrap="nowrap">{escalations} ({percentEscalations}%)</td>
+        <td nowrap="nowrap">{escalationsYtd} ({percentEscalationsYtd}%)</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Reopened</strong></td>
+        <td nowrap="nowrap">{reopened} ({percentReopened}%)</td>
+        <td nowrap="nowrap">{reopenedYtd} ({percentReopenedYtd}%)</td>
+      </tr>
+      <tr>
+        <td colspan="3" nowrap="nowrap">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Severity One</strong></td>
+        <td nowrap="nowrap">{severityOne} ({percentSeverityOne}%)</td>
+        <td nowrap="nowrap">{severityOneYtd} ({percentSeverityOneYtd}%)</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Severity Two</strong></td>
+        <td nowrap="nowrap">{severityTwo} ({percentSeverityTwo}%)</td>
+        <td nowrap="nowrap">{severityTwoYtd} ({percentSeverityTwoYtd}%)</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Severity Three</strong></td>
+        <td nowrap="nowrap">{severityThree} ({percentSeverityThree}%)</td>
+        <td nowrap="nowrap">{severityThreeYtd} ({percentSeverityThreeYtd}%)</td>
+      </tr>
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Severity Four</strong></td>
+        <td nowrap="nowrap">{severityFour} ({percentSeverityFour}%)</td>
+        <td nowrap="nowrap">{severityFourYtd} ({percentSeverityFourYtd}%)</td>
+      </tr>
+
+    </table>
+    <br/>
+    <table width="100%">
+      <tr>
+        <td width="30%" nowrap="nowrap"><strong>Incident Stats By Team Member</strong></td>
+        <td nowrap="nowrap"><strong>Resolved</strong></td>
+        <td nowrap="nowrap"><strong>Rejected</strong></td>
+        <td nowrap="nowrap"><strong>Hours Logged</strong></td>
+      </tr>
+<!-- BEGIN teamMemberBlock -->
+      <tr>
+        <td width="30%" nowrap="nowrap">{teamMemberName}</td>
+        <td nowrap="nowrap">{teamMemberResolved}</td>
+        <td nowrap="nowrap">{teamMemberRejected}</td>
+        <td nowrap="nowrap">{teamMemberHours}</td>
+      </tr>
+<!-- END teamMemberBlock -->
+    </table>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+<!-- Template: DeshboardProjectList.inc.html -->
+<H2>Current Projects</H2>
+<table class="singleBorder" width="700" border="0" cellspacing="1" cellpadding="2">
+	<tr> 
+		<td class="listHeadText">Project</td>
+    <td class="listHeadText">Customer</td>
+    <td class="listHeadText">Start</td>
+    <td class="listHeadText">Expires</td>
+		<td class="listHeadText">&nbsp;</td>
+	</tr>
+	<!-- BEGIN projectBlock -->
+	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
+		<td class="orderLineItem"><DIV align="left">{description}</div></td>
+    <td class="orderLineItem"><DIV align="left">{customerName}</div></td>
+    <td class="orderLineItem"><DIV align="left">{startDate}</div></td>
+		<td class="orderLineItem"><DIV align="left">{expiryDate}</div></td>
+	</tr>
+	<!-- END projectBlock -->
+</table>
+<!-- End Template: DeshboardProjectList.inc.html -->

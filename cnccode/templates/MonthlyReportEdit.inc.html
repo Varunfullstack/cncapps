@@ -1,0 +1,263 @@
+<!-- Template: MonthlyReportEdit.inc.html -->
+<FORM  method="post" action="{urlUpdate}" name="serviceDeskReport" AUTOCOMPLETE="OFF">
+<H3>Phone call statistics</h3>
+<table class="content" width="250px" border="0">
+	<input
+		type="hidden"
+		name="serviceDeskReport[1][serviceDeskReportID]"
+		value="{serviceDeskReportID}"
+	>
+  <input
+    type="hidden"
+    name="serviceDeskReport[1][yearMonth]"
+    value="{yearMonth}"
+  >
+	<tr> 
+		<td>Received</td>
+		<td class="content"> <input
+        {readonly}
+				name="serviceDeskReport[1][callsReceived]"
+				type="text" value="{callsReceived}"
+				size="5"
+				maxlength="5"
+			> <span class="formErrorMessage">{callsReceivedMessage}</span> </td>
+	</tr>
+  <tr> 
+    <td>Overflowed</td>
+    <td class="content"> <input
+        {readonly}
+        name="serviceDeskReport[1][callsOverflowed]"
+        type="text" value="{callsOverflowed}"
+        size="5"
+        maxlength="5"
+      > <span class="formErrorMessage">{callsOverflowedMessage}</span> </td>
+  </tr>
+  <tr> 
+    <td>Helpdesk</td>
+    <td class="content"> <input
+        {readonly}
+        name="serviceDeskReport[1][callsHelpdesk]"
+        type="text" value="{callsHelpdesk}"
+        size="5"
+        maxlength="5"
+      > <span class="formErrorMessage">{callsHelpdeskMessage}</span> </td>
+  </tr>
+  <tr> 
+    <td >Answered Seconds</td>
+    <td class="content"> <input
+        {readonly}
+        name="serviceDeskReport[1][callsAnswerSeconds]"
+        type="text" value="{callsAnswerSeconds}"
+        size="5"
+        maxlength="5"
+      > <span class="formErrorMessage">{callsAnswerSecondsMessage}</span> </td>
+  </tr>
+  <tr> 
+    <td>Abandoned</td>
+    <td class="content"> <input
+        {readonly}
+        name="serviceDeskReport[1][callsAbandoned]"
+        type="text" value="{callsAbandoned}"
+        size="5"
+        maxlength="5"
+      > <span class="formErrorMessage">{callsAbandonedMessage}</span> </td>
+  </tr>
+</table>
+<H3>OLA Performance</h3>
+<H4>This Month</h4>
+<table  class="content" width="400px" border="0">
+  <tr> 
+    <td>&nbsp;</td>
+    <td>Total</td>
+    <td>Response</td>
+    <td>%</td>
+    <td>Fix</td>
+    <td>%</td>
+  </tr>
+  <tr> 
+    <td>Sev 1</td>
+    <td class="content">{monthSev1Total}</td>
+    <td class="content">{monthSev1Resp}</td>
+    <td class="content">{monthSev1RespPerc}</td>
+    <td class="content">{monthSev1Fix}</td>
+    <td class="content">{monthSev1FixPerc}</td>
+  </tr>
+  <tr> 
+    <td>Sev 2</td>
+    <td class="content">{monthSev2Total}</td>
+    <td class="content">{monthSev2Resp}</td>
+    <td class="content">{monthSev2RespPerc}</td>
+    <td class="content">{monthSev2Fix}</td>
+    <td class="content">{monthSev2FixPerc}</td>
+  </tr>
+  <tr> 
+    <td>Sev 3</strong></td>
+    <td class="content">{monthSev3Total}</td>
+    <td class="content">{monthSev3Resp}</td>
+    <td class="content">{monthSev3RespPerc}</td>
+    <td class="content">{monthSev3Fix}</td>
+    <td class="content">{monthSev3FixPerc}</td>
+  </tr>
+  <tr> 
+    <td>Sev 4</strong></td>
+    <td class="content">{monthSev4Total}</td>
+    <td class="content">&nbsp;</td>
+    <td class="content">&nbsp;</td>
+    <td class="content">&nbsp;</td>
+    <td class="content">&nbsp;</td>
+  </tr>
+</table>
+<H4>Quarter {quarterStartDate} to {quarterEndDate}</h4>
+<table  class="content" width="400px" border="0">
+  <tr> 
+    <td>&nbsp;</td>
+    <td>Total</td>
+    <td>Response</td>
+    <td>%</td>
+    <td>Fix</td>
+    <td>%</td>
+  </tr>
+  <tr> 
+    <td>Sev 1</td>
+    <td class="content">{lastQuarterSev1Total}</td>
+    <td class="content">{lastQuarterSev1Resp}</td>
+    <td class="content">{lastQuarterSev1RespPerc}</td>
+    <td class="content">{lastQuarterSev1Fix}</td>
+    <td class="content">{lastQuarterSev1FixPerc}</td>
+  </tr>
+  <tr> 
+    <td>Sev 2</td>
+    <td class="content">{lastQuarterSev2Total}</td>
+    <td class="content">{lastQuarterSev2Resp}</td>
+    <td class="content">{lastQuarterSev2RespPerc}</td>
+    <td class="content">{lastQuarterSev2Fix}</td>
+    <td class="content">{lastQuarterSev2FixPerc}</td>
+  </tr>
+  <tr> 
+    <td>Sev 3</td>
+    <td class="content">{lastQuarterSev3Total}</td>
+    <td class="content">{lastQuarterSev3Resp}</td>
+    <td class="content">{lastQuarterSev3RespPerc}</td>
+    <td class="content">{lastQuarterSev3Fix}</td>
+    <td class="content">{lastQuarterSev3FixPerc}</td>
+  </tr>
+  <tr> 
+    <td>Sev 4</strong></td>
+    <td class="content">{lastQuarterSev4Total}</td>
+    <td class="content">&nbsp;</td>
+    <td class="content">&nbsp;</td>
+    <td class="content">&nbsp;</td>
+    <td class="content">&nbsp;</td>
+  </tr>
+</table>
+<h3>Breach Exception Reports</h3>
+<!-- BEGIN breachBlock -->
+<table class="content">
+  <tr> 
+    <td valign="top">{breachProblemID}, {breachCustomer}</td>
+  </tr>
+  <tr class="content">
+    <td valign="top">
+      <hidden name="breach[{breachProblemID}][problemID]" value="{breachProblemID}">
+      <textarea
+      {readonly}
+      rows="8"
+      cols="120"
+      name="breach[{breachProblemID}][comment]">{breachComment}</textarea>
+    </td>
+  </tr>
+ </table>
+<!-- END breachBlock -->
+<h3>Manager Comments</h3>
+<!-- BEGIN managerCommentBlock -->
+<table class="content"  width="400px">
+  <tr> 
+    <td valign="top">{commentProblemID}, {commentCustomer}</td>
+  </tr>
+  <tr>
+    <td class="content" style="white-space: nowrap;">
+{commentComment}
+    </td>
+  </tr>
+ </table>
+<!-- END managerCommentBlock -->
+<h3>Incident Causes</h3>
+<table class="content" width="300px" border="0">
+  <!-- BEGIN rootCauseBlock -->
+  <tr> 
+    <td>{rootCauseDescription}</td>
+    <td class="content">{rootCauseCount}</td>
+  </tr>
+  <!-- END rootCauseBlock -->
+ </table>
+<h3>Monthly One-to-one Meetings</h3>
+<table width="700px" border="0">
+  <tr> 
+    <td>
+    <textarea
+      {readonly}
+      rows="10"
+      cols="150"
+      name="serviceDeskReport[1][meetingResults]"
+    >{meetingResults}</textarea>
+    </td>
+  </tr>
+ </table>
+<h3>Staffing Issues</h3>
+<table width="700px" border="0">
+  <tr> 
+    <td colspan="2">
+    <textarea
+      {readonly}
+    rows="10" cols="150" name="serviceDeskReport[1][staffIssues]">{staffIssues}</textarea>
+    </td>
+  </tr>
+</table>
+<BR>
+<table class="content">
+  <tr>
+    <td>Holidays</td>
+      <td  class="content" > <input
+        {readonly}
+          name="serviceDeskReport[1][staffHolidayDays]"
+          type="text" value="{staffHolidayDays}"
+          size="5"
+          maxlength="5"
+        > <span class="formErrorMessage">{staffHolidayDaysMessage}</span>
+    </td>
+  </tr>
+  <tr>
+    <td>Sick Days</td>
+      <td  class="content" > <input
+          {readonly}
+          name="serviceDeskReport[1][staffSickDays]"
+          type="text" value="{staffSickDays}"
+          size="5"
+          maxlength="5"
+        > <span class="formErrorMessage">{staffSickDaysMessage}</span>
+    </td>
+  </tr>
+ </table>
+<h3>Training</h3>
+<table width="700px" border="0">
+  <tr> 
+    <td>
+    <textarea
+    {readonly}
+    rows="10" cols="150" name="serviceDeskReport[1][training]">{training}</textarea>
+    </td>
+  </tr>
+ </table>
+<h3>Any Other Business</h3>
+<table width="700px" border="0">
+  <tr> 
+    <td>
+    <textarea
+    {readonly}
+    rows="10" cols="150" name="serviceDeskReport[1][anyOtherBusiness]">{anyOtherBusiness}</textarea>
+    </td>
+  </tr>
+ </table>
+ <input {readonly} type="submit" name="save" value="Save">
+ </form>
+<!-- End Template: MonthlyReportEdit.inc.html -->

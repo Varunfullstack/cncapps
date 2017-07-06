@@ -1,0 +1,129 @@
+<!-- Template: PurchaseOrderHeadDisplay.inc.html -->
+<script language='JavaScript'>
+function validateContactName(){
+	if (Trim(document.getElementById("contactName").value) != ""){
+		window.open(
+			'{urlContactPopup}&contactName=' +
+			escape(document.getElementById("contactName").value) +
+			'&supplierID=' + escape(document.getElementById("supplierID").value) +
+			'&parentIDField=contactID' +
+			'&parentDescField=contactName',
+			'contacts','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+	}
+}
+function validateSupplierName(){
+	if (Trim(document.getElementById("supplierName").value) != ""){
+		window.open(
+			'{urlSupplierPopup}&supplierName=' +
+			escape(document.getElementById("supplierName").value) +
+			'&parentIDField=supplierID' +
+			'&parentDescField=supplierName',
+			'suppliers','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+	}
+}
+</script>
+<form name="porhead" method="POST" action="{urlUpdateHeader}">
+<INPUT type="hidden" name="porhead[1][porheadID]" value={porheadID}>
+<INPUT type="hidden" name="porhead[1][type]" value={type}>
+<INPUT type="hidden" name="porhead[1][date]" value={date}>
+<INPUT type="hidden" name="porhead[1][printedFlag]" value={printedFlag}>
+<INPUT type="hidden" name="porhead[1][userID]" value={userID}>
+<INPUT type="hidden" name="porhead[1][vatCode]" value={vatCode}>
+<INPUT type="hidden" name="porhead[1][vatRate]" value={vatRate}>
+<INPUT type="hidden" name="porhead[1][orderUserID]" value={orderUserID}>
+<INPUT type="hidden" name="porhead[1][orderDate]" value={orderDate}>
+<INPUT type="hidden" name="porhead[1][ordheadID]" value="{ordheadID}">
+  <table width="700px" border="0">
+    <tr> 
+      <td class="promptText">Supplier</td>
+      <td class="field"> <INPUT type="hidden" id="supplierID" name="porhead[1][supplierID]" value="{supplierID}"> 
+        <INPUT
+				{DISABLED}
+				type="text"
+				name="porhead[1][supplierName]"
+				value="{supplierName}"
+				id="supplierName"
+				onChange="javascript:validateSupplierName()"
+				onKeydown="javascript:checkFunctionKey(supplierName)"
+				maxlength="50"
+				size="30"
+			>
+        {supplierLink} </td>
+    </tr>
+    <tr> 
+      <td class="promptText">Contact</td>
+      <td class="field"> <INPUT type="hidden" id="contactID" name="porhead[1][contactID]" value="{contactID}"> 
+        <INPUT
+				{DISABLED}
+				type="text"
+				name="porhead[1][contactName]"
+				value="{contactName}"
+				id="contactName"
+				onChange="javascript:validateContactName()"
+				onKeydown="javascript:checkFunctionKey(contactName)"
+				maxlength="30"
+				size="30"
+			>
+        <a href="tel:{contactPhone}">{contactPhone}</a> {emailLink}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Order No</td>
+      <td class="mainHeadText">{porheadID}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Raised By</td>
+      <td class="mainHeadText">{raisedByName} - {date}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Ordered By</td>
+      <td class="mainHeadText">{orderedByName} - {orderDate}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Supplier Ref</td>
+      <td class="field"> <INPUT {DISABLED} type="text" name="porhead[1][supplierRef]" value="{supplierRef}" maxlength="30" size="30"> 
+      </td>
+    </tr>
+    <tr> 
+      <td class="promptText">Customer Ref</td>
+      <td class="mainHeadText">{custPORef}</td>
+    </tr>
+    <tr>
+      <td class="promptText">Customer Contact</td>
+      <td class="mainHeadText">{salesOrderContact}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Sales Order</td>
+      <td class="mainHeadText">{ordheadID}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Payment Method</td>
+      <td class="field"> <select
+				{DISABLED}
+				type="text"
+				id="payMethodID"
+				name="porhead[1][payMethodID]"
+			>
+          <!-- BEGIN payMethodBlock -->
+          <option {payMethodSelected} value="{payMethodID}">{payMethodDescription}</option>
+          <!-- END payMethodBlock -->
+        </select> </td>
+    </tr>
+    <tr> 
+      <td class="promptText">VAT</td>
+      <td class="mainHeadText">{vatCode} {vatRate}</td>
+    </tr>
+    <tr> 
+      <td class="promptText">Direct Delivery</td>
+      <td class="mainHeadText"> <INPUT name="porhead[1][directDeliveryFlag]" {DISABLED} type="checkbox" value="Y" {directDeliveryFlagChecked}>
+        {customerName} {delAdd1} {delAdd2} {delAdd3} {delTown} {delCounty} {delPostcode} 
+      </td>
+    </tr>
+    <tr> 
+      <td align="right">&nbsp; </td>
+      <td align="right"><div align="left"> 
+          <INPUT {DISABLED} type="submit" name="submit" value="Update">
+        </div></td>
+    </tr>
+  </table>
+</form>
+<!-- End Template: PurchaseOrderHeadDisplay.inc.html -->

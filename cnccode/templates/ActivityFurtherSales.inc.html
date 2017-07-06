@@ -1,0 +1,25 @@
+<!-- Template: ActvityFurtherSales.inc.html -->
+<table border="0">
+	<form name="action_date" action="{urlFurtherActionProcess}" method="post" enctype="multipart/form-data">
+	<input type="hidden" name="input[1][callActivityID]" value="{callActivityID}" />
+	<input type="hidden" name="input[1][furtherActionID]" value="{furtherActionID}" />
+
+		<TR>
+			<td valign="top" class="promptText">{label}</td>
+			<td class="fieldText">
+				<textarea
+					name="input[1][emailBody]" 
+					id="emailBody"
+					cols="130" rows="20">{emailBody}</textarea>
+			</td>
+			<td class="fieldText">&nbsp;</td>
+		</TR>
+		<TR>
+		  <td class="promptText">&nbsp;</td>
+		  <td class="fieldText"><span class="promptText">
+      <input type="submit" name="Submit" value="Next"/>
+      </span></td>
+		  <td class="fieldText">&nbsp;</td>
+	  </TR>
+	</form>
+</table>

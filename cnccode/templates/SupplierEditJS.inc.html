@@ -1,0 +1,29 @@
+<script language='JavaScript'>
+function checkFunctionKey(field){
+ 	if (event.keyCode == 120){			// F9 - edit
+		switch (field.id){
+			case "contactName": 
+				if (document.getElementById("contactID").value != ""){
+					window.open(
+						'{urlContactEdit}&contactID=' +
+						escape(document.getElementById("contactID").value)+
+						'&parentIDField=contactID' +
+						'&parentDescField=contactName',
+						'contacts','scrollbars=yes,resizable=yes,width=450,height=600,copyhistory=no, menubar=0');
+				}
+				break;
+		}		
+ 	}
+ 	return;
+}		
+function validateContactName(){
+	if (Trim(document.getElementById("contactName").value) != ""){
+		window.open(
+			'{urlContactPopup}&contactName=' +
+			escape(document.getElementById("contactName").value) +
+			'&parentIDField=contactID' +
+			'&parentDescField=contactName',
+			'contacts','scrollbars=yes,resizable=yes,width=450,height=600,copyhistory=no, menubar=0')
+	}
+}
+</script>

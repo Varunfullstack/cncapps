@@ -1,0 +1,39 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+td {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	color: #00a0af;
+	
+}
+.error {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FF0000;
+	
+}
+.listHeadText {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	font-weight: bold;
+	background-color: #00a0af;
+	height: 25px;
+	
+}input.search {
+	width: 200px;
+}
+select {
+	width: 200px;
+}

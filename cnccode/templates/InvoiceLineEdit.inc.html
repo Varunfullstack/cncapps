@@ -1,0 +1,124 @@
+<!-- Template: InvoiceLineEdit.inc.html -->
+{invoiceHeadDisplay}
+<table width="910px" border="0">
+	<tr> 
+		<td colspan="2" valign="top" class="listHeadText"><div align="center">Invoice Line</td>
+	</tr>
+</table>
+<form name="invline" method="post" action="{urlSubmit}" AUTOCOMPLETE = "off">
+	<input
+		type="hidden"
+		name="invline[1][invheadID]"
+		value="{invheadID}"
+	>
+	<input
+		type="hidden"
+		name="invline[1][itemID]"
+		id="itemID"
+		value="{itemID}"
+	>
+	<input
+		type="hidden"
+		name="invline[1][sequenceNo]"
+		value="{sequenceNo}"
+	>
+	<table width="500px" border="0" cellspacing="0" cellpadding="3">
+		<tr> 
+			<td class="promptText">Line Type</td>
+			<td class="field">
+				<select
+					{lineTypeReadOnly}"
+					type="text"
+					id="lineType"
+					name="invline[1][lineType]"
+				>
+					<!-- BEGIN lineTypeBlock -->
+					<option {lineTypeSelected} value="{lineType}">{lineTypeDesc}</option>
+					<!-- END lineTypeBlock -->
+				</select>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Stock Category</td>
+			<td class="field">
+				<select
+					{lineTypeReadOnly}"
+					type="text"
+					id="lineType"
+					name="invline[1][stockcat]"
+				>
+					<!-- BEGIN stockcatBlock -->
+					<option {stockcatSelected} value="{stockcat}">{stockcatDesc}</option>
+					<!-- END stockcatBlock -->
+				</select>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Item</td>
+			<td class="field">
+				<input
+					type="text"
+					name="invline[1][description]"
+					id="description"
+					value="{description}"
+					size="50"
+					maxlength="50"
+				>
+				<font class="formErrorMessage">{descriptionMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Quantity</td>
+			<td class="field">
+				<input
+					type="text"
+					name="invline[1][qty]"
+					value="{qty}"
+					align="right"
+					size="10"
+					maxlength="10"
+				>
+				<font class="formErrorMessage">{qtyMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Cost Price</td>
+			<td class="field">
+				<input
+					type="text"
+					name="invline[1][curUnitCost]"
+					id="curUnitCost"
+					value="{curUnitCost}"
+					size="10"
+					align="right"
+					maxlength="10"
+				>
+				<font class="formErrorMessage">{curUnitCostMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Sale Price</td>
+			<td class="field">
+				<input
+					type="text"
+					name="invline[1][curUnitSale]"
+					id="curUnitSale"
+					value="{curUnitSale}"
+					align="right"
+					size="10"
+					maxlength="10"
+				>
+				<font class="formErrorMessage">{curUnitSaleMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="submit" name="Submit" value="Submit">
+				<input type="button" name="Cancel" value="Cancel" onClick="document.location='{urlCancel}';">
+				<input type="reset" name="Reset" value="Reset">
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: InvoiceLineEdit.inc.html -->

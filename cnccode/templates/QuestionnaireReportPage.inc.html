@@ -1,0 +1,56 @@
+<!-- Template: QuestionnaireReportPage.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<form name="searchForm" method="get" action="{urlSubmit}">
+  <table width="500px" border="0" cellspacing="0" cellpadding="1">
+		<tr>
+				<td class="promptText">Questionnaire</td>
+				<td><select
+          name="searchForm[1][questionnaireID]"
+        >
+          <option value="">Please Select</option>
+          <!-- BEGIN questionnaireBlock -->
+          <option {questionnaireSelected} value="{questionnaireID}">{questionnaireDescription}</option>
+          <!-- END questionnaireBlock -->
+        </select><font class="formErrorMessage">{questionnaireIDMessage}</font>
+      </td>                      
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">from </div></td>
+			<td>
+        <input
+					type="text"
+					name="searchForm[1][fromDate]"
+					id="fromDate"
+					value="{fromDate}"
+					size="10"
+					maxlength="10"
+					onKeypress="javascript:submitOnReturn()"
+				> <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
+				<font class="formErrorMessage">{fromDateMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td class="promptText"><div align="right">to</div></td>
+			<td> <input
+					type="text"
+					name="searchForm[1][toDate]"
+					id="toDate"
+					value="{toDate}"
+					size="10"
+					maxlength="10"
+					onKeypress="javascript:submitOnReturn()"
+			> <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
+				<font class="formErrorMessage">{toDateMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+			<input type="submit" name="Search" value="Generate"><input type="submit" name="CSV" value="CSV">
+      </td>
+		</tr>
+	</table>
+	<p>&nbsp;</p>
+	
+</form>
+{report}
+<!-- End Template: QuestionnaireReportPage.inc.html -->

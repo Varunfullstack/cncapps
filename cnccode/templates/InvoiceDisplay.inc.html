@@ -1,0 +1,184 @@
+<!-- Template: InvoiceDisplay.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+{invoiceSiteEditJS}
+<script language='JavaScript'>
+function checkFunctionKey(field){
+ 	if (event.keyCode == 120){			// F9 - edit
+		switch (field.id){
+			case "siteDesc": 
+				if (document.getElementById("siteNo").value != ""){
+					window.open(
+						'{urlSiteEdit}&customerID={customerID}' +
+						'&siteNo=' + escape(document.getElementById("siteNo").value) +
+						'&parentIDField=siteNo' +
+						'&parentDescField=siteDesc',
+						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+					);
+				}
+				break;
+			case "contactName": 
+				if (document.getElementById("contactID").value != ""){
+					window.open(
+						'{urlContactEdit}'+
+						'&contactID=' + escape(document.getElementById("contactID").value) +
+						'&parentIDField=contactID' +
+						'&parentDescField=contactName',
+						'contact','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+				}
+				break;
+		}		
+ 	}
+ 	return;
+}		
+</SCRIPT>
+<TABLE width="600px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="150px" class="navigateLink" valign="top"> <a href="{urlDeleteInvoice}"  onClick="if(!confirm('Are you sure you want to remove this invoice?')) return(false)">{txtDeleteInvoice}</a> </TD>
+		<TD width="150px" class="navigateLink" valign="top"> <a href="{urlSalesOrder}">{txtSalesOrder}</a> </TD>
+		<TD width="150px" class="navigateLink" valign="top"> <a href="{urlPrint}">{txtPrint}</a> </TD>
+    <TD width="150px" class="navigateLink" valign="top"> <a href="{urlRegeneratePdf}">{txtRegeneratePdf}</a> </TD>
+	</TR>
+</table>
+<p>{invoiceHeadDisplay}</p>
+<table class="singleBorder" width="660" border="0" cellspacing="1" cellpadding="2">
+	<tr> 
+		<td width="260px" class="listHeadText">Description</td>
+		<td width="60px" class="listHeadNumber">Quantity</td>
+		<td width="60px" class="listHeadNumber">Cost(&pound;)</td>
+		<td width="60px" class="listHeadNumber">Total(&pound;)</td>
+		<td width="60px" class="listHeadNumber">Sale(&pound;)</td>
+		<td width="60px" class="listHeadNumber">Total(&pound;)</td>
+		<td width="100px" class="listHeadText">&nbsp;</td>
+	</tr>
+	<!-- BEGIN invoiceLineBlock -->
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td class="{orderLineClass}">{lineDescription}</td>
+		<td class="{orderLineClass}"><DIV align="right">{qty}</DIV></td>
+		<td class="{orderLineClass}"><DIV align="right">{curUnitCost}</DIV></td>
+		<td class="{orderLineClass}"><DIV align="right">{curCostTotal}</DIV></td>
+		<td class="{orderLineClass}"><DIV align="right">{curUnitSale}</DIV></td>
+		<td class="{orderLineClass}"><DIV align="right">{curSaleTotal}</DIV></td>
+		<td class="{orderLineClass}"><DIV align="left">{salesOrderLineIcons}</DIV></td>
+	</tr>
+	<!-- END invoiceLineBlock -->
+	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
+		<td class="orderTotalItem"><DIV align="left">Totals</DIV></td>
+		<td class="orderTotalItem">&nbsp;</td>
+		<td class="orderTotalItem">&nbsp;</td>
+		<td class="orderTotalItem"><DIV align="right">{curCostGrandTotal}</DIV></td>
+		<td class="orderTotalItem">&nbsp;</td>
+		<td class="orderTotalItem"><DIV align="right">{curSaleGrandTotal}</DIV></td>
+		<td class="orderTotalItem">&nbsp;</td>
+	</tr>
+</table>
+<BR>
+<table class="singleBorder" width="350px" border="0" cellspacing="1" cellpadding="2">
+	<tr> 
+		<td valign="top" class="listHeadText"><div align="center">Address</div></td>
+	</tr>
+	<tr> 
+		<td valign="top" class="mainHeadText"> <P class="addressLine">{add1}</P>
+			<P class="addressLine">{add2}</P>
+			<P class="addressLine">{add3}</P>
+			<P class="addressLine">{town}</P>
+			<P class="addressLine">{county}</P>
+			<P class="addressLine">{postcode}</P></td>
+	</tr>
+	<tr> 
+		<form name="invheadSite" method="post" action="{urlUpdateAddress}">
+		<td class="mainHeadText">
+			<input type="hidden" name="invheadID" id="invheadID" value="{invheadID}"> 
+			<input type="hidden" name="siteNo" id="siteNo" value="{siteNo}"> 
+			<input
+				type="text"
+				name ="siteDesc"
+				id="siteDesc"
+				value="{siteDesc}"
+				onKeydown="javascript:checkFunctionKey(siteDesc)"
+				onChange="javascript:validateSiteDesc()"
+				{DISABLED}
+				size="50"
+				maxlength="50"
+			> <input
+				type="text"
+				name = "blah"
+				style = "display:none"
+			> <input
+				type="button"
+				name="SubmitAdd"
+				{DISABLED}
+				value="Select"
+				onClick="form.submit();"
+			>
+		</td>
+	</tr>
+	</form>
+</table>
+<BR>
+<table class="singleBorder" width="350px" border="0" cellspacing="1" cellpadding="2">
+<tr> 
+	<td colspan="2" valign="top" class="listHeadText"><div align="center">Contact</div></td>
+</tr>
+<tr> 
+	<form name="invcon" method="post" action="{urlUpdateContact}">
+	<td colspan="2" class="mainHeadText">
+		<input type="hidden" name="invheadID" id="invheadID" value="{invheadID}"> 
+		<input type="hidden" name="contactID" id="contactID" value="{contactID}"> 
+		<input
+			type="text"
+			name ="contactName"
+			id="contactName"
+			value="{contactName}"
+			onKeydown="javascript:checkFunctionKey(contactName)"
+			onChange="javascript:validateContactName()"
+			{DISABLED}
+			size="50"
+			maxlength="50"
+		> <input
+			type="text"
+			name = "blah"
+			style = "display:none"
+		> <input type="button" name="SubmitContact" value="Select" onClick="form.submit();" {DISABLED}> 
+	</td>
+	</tr>
+</table>
+</form>
+<form name="invhead" method="POST" action="{urlUpdateHeader}">
+<INPUT type="hidden" name="invheadID" value={invheadID}>
+	<table class="singleBorder" width="350px" border="0">
+		<tr> 
+			<td colspan="2" valign="top" class="listHeadText"><div align="center">Other</div></td>
+		</tr>
+		<tr> 
+			<td class="promptText" width="120px">Customer P/Order Ref</td>
+			<td class="field">
+				<INPUT {DISABLED}
+					type="text"
+					name="custPORef"
+					value="{custPORef}"
+					maxlength="23"
+					size="23"
+				>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Payment Method</td>
+			<td class="mainHeadText"><SELECT name="paymentTermsID" {DISABLED}>
+					<!-- BEGIN payMethodBlock -->
+					<OPTION {payMethodSelected} value="{paymentTermsID}">{payMethodDesc}</OPTION>
+					<!-- END payMethodBlock -->
+				</SELECT></td>
+		</tr>
+		<tr> 
+			<td colspan="2" align="right">
+				<INPUT
+					{DISABLED}
+					type="submit"
+					name="submit"
+					value="Update"
+				> 
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: InvoiceDisplay.inc.html -->

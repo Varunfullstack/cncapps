@@ -1,0 +1,3 @@
+"Customer","Sales(GBP)","Cost(GBP)","Labour(GBP)","Profit(GBP)","Profit(Percent)","Labour(Hours)"<!-- BEGIN customersBlock -->
+"{customerName}",{sales},{cost},{labourCost},{profit},{profitPercent},{labourHours}
+<!-- END customersBlock -->

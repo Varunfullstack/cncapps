@@ -1,0 +1,4 @@
+Customer,IncidentNo,Details,AssignedTo,Team,OpenDays,TimeSpentHours,Priority,LastUpdated
+<!-- BEGIN requestBlock -->
+{customer},{serviceRequestID},{description},{assignedTo},{teamName},{durationHours},{timeSpentHours},{priority},{lastUpdatedDate}
+<!-- END requestBlock -->

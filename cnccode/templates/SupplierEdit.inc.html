@@ -1,0 +1,170 @@
+<!-- Template: SupplierEdit.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+{supplierEditJS}
+<form name="supplier" method="post" action="{urlSubmit}" AUTOCOMPLETE = "off">
+	<input type="hidden" name="supplier[1][supplierID]" id="supplierID" value="{supplierID}">
+	<table width="100%" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="15%" class="promptText">Name</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][name]"
+					id="name"
+					value="{name}"
+					size="50"
+					maxlength="50"
+				>
+				<font class="formErrorMessage">{nameMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Address</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][add1]"
+					id="add1"
+					value="{add1}"
+					size="50"
+					maxlength="50"
+				>
+				<font class="formErrorMessage">{add1Message}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][add2]"
+					id="add2"
+					value="{add2}"
+					size="50"
+					maxlength="50"
+					onKeypress="javascript:submitOnReturn()"
+				>
+				<font class="formErrorMessage">{add2Message}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Town</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][town]"
+					id="town"
+					value="{town}"
+					size="50"
+					maxlength="50"
+				>
+				<font class="formErrorMessage">{townMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">County</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][county]"
+					id="town"
+					value="{county}"
+					size="50"
+					maxlength="50"
+				>
+				<font class="formErrorMessage">{countyMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Postcode</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][postcode]"
+					id="postcode"
+					value="{postcode}"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{postcodeMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Phone</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][phone]"
+					id="phone"
+					value="{phone}"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{phoneMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Fax</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][fax]"
+					id="fax"
+					value="{fax}"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{faxMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">CNC Account No</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][cncAccountNo]"
+					id="cncAccountNo"
+					value="{cncAccountNo}"
+					size="20"
+					maxlength="20"
+				>
+				<font class="formErrorMessage">{cncAccountNoMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Web Site (include http://)</td>
+			<td class="field">
+				<input
+					type="text"
+					name="supplier[1][webSiteURL]"
+					value="{webSiteURL}"
+					size="50"
+					maxlength="80"
+				>
+				<font class="formErrorMessage">{webSiteURLMessage}</font>
+			</td>
+		</tr>
+		<tr> 
+			<td class="promptText">Payment Method</td>
+			<td class="field">
+				<select
+					type="text"
+					id="payMethodID"
+					name="supplier[1][payMethodID]"
+				>
+					<!-- BEGIN payMethodBlock -->
+					<option {payMethodSelected} value="{payMethodID}">{payMethodDescription}</option>
+					<!-- END payMethodBlock -->
+				</select>
+			</td>
+		</tr>
+		{supplierEditContact}
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="button" name="Submit" value="Submit" onClick="submit();">
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: SupplierEdit.inc.html -->

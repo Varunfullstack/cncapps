@@ -1,0 +1,18 @@
+    <tr>
+      <td  class="promptText">Contract</td>
+      <td class="mainHeadText"><select
+          name="contractCustomerItemID"
+          type="text"
+          >
+          <option value="99" {noContractSelected} >Please select</option>
+          <option value="" {tandMSelected}>T &amp; M</option>
+          <!-- BEGIN contractBlock -->
+          {optGroupClose}
+          {optGroupOpen}
+          <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
+          <!-- END contractBlock -->
+          </optgroup>
+        </select>
+        <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
+      </td>
+    </tr>

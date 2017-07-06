@@ -1,0 +1,52 @@
+<script language='JavaScript'>
+function checkFunctionKey(field){
+ 	if (event.keyCode == 120){			// F9 - edit
+		switch (field.id){
+			case "delContactName": 
+				if (document.getElementById("delContactID").value != ""){
+					window.open(
+						'{urlContactEdit}&contactID=' +
+						escape(document.getElementById("delContactID").value) +
+						'&parentIDField=delContactID' +
+						'&parentDescField=delContactName',
+						'contact',
+						'scrollbars=no,resizable=yes,width=450,height=400,copyhistory=no, menubar=0');
+				}
+				break;
+			case "invContactName": 
+				if (document.getElementById("invContactID").value != ""){
+					window.open('{urlContactEdit}&contactID=' +
+					escape(document.getElementById("invContactID").value)+
+					'&parentIDField=invContactID' +
+					'&parentDescField=invContactName',
+					'contact',
+					'scrollbars=no,resizable=yes,width=450,height=400,copyhistory=no, menubar=0');
+				}
+				break;
+		}		
+ 	}
+ 	return;
+}		
+function validateInvContactName(){
+	if (Trim(document.getElementById("invContactName").value) != ""){
+		window.open(
+			'{urlContactPopup}&contactName=' + escape(document.getElementById("invContactName").value)+
+			'&parentIDField=invContactID' +
+			'&parentDescField=invContactName',
+			'contact',
+			'scrollbars=no,resizable=yes,width=450,height=400,copyhistory=no, menubar=0'
+		)
+	}
+}
+function validateDelContactName(){
+	if (Trim(document.getElementById("delContactName").value) != ""){
+		window.open(
+			'{urlContactPopup}&contactName=' + escape(document.getElementById("delContactName").value)+
+			'&parentIDField=delContactID' +
+			'&parentDescField=delContactName',
+			'contact',
+			'scrollbars=no,resizable=yes,width=450,height=400,copyhistory=no, menubar=0'
+		)
+	}
+}
+</script>

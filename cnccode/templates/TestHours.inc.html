@@ -1,0 +1,89 @@
+<!-- Template: CurrentActivityReport.inc.html -->
+<table class="content" width="600"> 
+    <tr valign="top">
+				<td class="listHeadText" colspan="7"><div align="center">Awaiting Response</div></td>
+		</tr>
+		<!-- BEGIN awaitingResponseBlock -->
+    <form name="userForm">
+		<tr valign="top" bgcolor="{aBgColour}">
+				<td  class="content" bgcolor="{aBgColour}">
+          <INPUT
+            type="button"
+            value="Start"
+            onClick="if(confirm('You are about to commence work and an email will be sent to the customer?')) document.location='{aUrlCreateFollowon}'"
+          >
+        </td>
+        <td  class="content" align="center">
+          <INPUT
+            type="button"
+            value="Reject"
+            onClick="if(confirm('Are you sure you can not deal with this service request?')) document.location='{aUrlRejectAllocation}'"
+          >
+          
+        </td>
+        <td  class="content" align="center"><select name="userID" onchange="javascript:allocateUser( this.form )">{aEngineerDropDown}</select></td>
+				<td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aCustomerName}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">
+          <A
+            href="#"
+            onClick= "window.open(
+            '{aUrlReasonPopup}',
+            'reason',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')">{aReason}
+          </A>
+        </td>
+				<td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aTime}</td>
+				<td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aDate}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aHoursElapsed}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aMinResponseHours}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aElapsedHours}</td>
+		</tr>
+    </form>
+		<!-- END awaitingResponseBlock -->
+</table>
+<BR/>
+<table class="content" width="600">
+    <tr valign="top">
+        <td class="listHeadText" colspan="6"><div align="center">In Progress</div></td>
+    </tr>
+    <!-- BEGIN inProgressBlock -->
+    <form name="userForm">
+    <tr valign="top" bgcolor="{bgColour}">
+        <td class="content"><A href={pUrlViewActivity} target="_blank">{pProblemID}</A></td>
+        <td class="content"><select name="userID" onchange="javascript:allocateUser( this.form )">{pEngineerDropDown}</select></td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{pCustomerName}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">
+        <A
+            href="#"
+            onClick= "window.open(
+            '{pUrlReasonPopup}',
+            'reason',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0')">{pReason}
+          </A>
+        </td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{pTime}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{pDate}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{pElapsedHours}</td>
+    </tr>
+    </form>
+    <!-- END inProgressBlock -->
+</table>
+<BR/>
+<table class="content" width="600">
+    <tr valign="top">
+        <td class="listHeadText" colspan="6"><div align="center">Fixed Awaiting Customer Confirmation</div></td>
+    </tr>
+    <!-- BEGIN completedBlock -->
+    <form name="userForm">
+    <tr valign="top" bgcolor="{bgColour}">
+        <td class="content"><A href={cUrlViewActivity} target="_blank">{cProblemID}</A></td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{cCustomerName}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{cReason}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{cTime}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{cDate}</td>
+        <td  class="content" valign="top" nowrap="nowrap" class="listItemText">{aElapsedHours}</td>
+    </tr>
+    </form>
+    <!-- END completedBlock -->
+</table>
+<!-- End Template: CurrentActivityReport.inc.html -->

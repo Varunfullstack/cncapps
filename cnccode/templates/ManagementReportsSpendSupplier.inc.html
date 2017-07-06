@@ -1,0 +1,102 @@
+<script language='JavaScript'>
+function validateSupplierName(){
+	if (document.getElementById("supplierName").value != ""){
+		window.open(
+			'{urlSupplierPopup}&supplierName=' +
+			escape(document.getElementById("supplierName").value) +
+			'&parentIDField=supplierID' +
+			'&parentDescField=supplierName',
+			'items',
+			'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
+		)
+	}
+	else{
+		document.getElementById("supplierID").value = '';
+	}
+}
+function checkFunctionKey(field){
+ 	if (event.keyCode == 120){			// F9 - edit
+		switch (field.id){
+			case "supplierName": 
+				if (document.getElementById("supplierID").value != ""){
+					window.open(
+						'{urlSupplierEdit}&supplierID=' +
+						escape(document.getElementById("supplierID").value) +
+						'&parentIDField=supplierID' +
+						'&parentDescField=supplierName',
+						'supplier',
+						'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+					);
+				}
+				break;
+		}		
+ 	}
+ 	return;
+}		
+</script>
+<link href="maxchart/style/style.css" rel="stylesheet" type="text/css" />
+<FORM  method="post" action="{urlGenerateReport}" name="report" >
+Supplier				<input
+					type="hidden"
+					name="supplierID"
+					id="supplierID"
+					value="{supplierID}"
+				>
+				<input
+					type="text"
+					name="supplierName"
+					id="supplierName"
+					value="{supplierName}"
+					onChange="javascript:validateSupplierName()"
+					onKeydown="javascript:checkFunctionKey(supplierName)"
+					size="50"
+					maxlength="50"
+				>
+				Year<select
+	name="year"
+	type="text"
+	onChange="form.submit()"
+>
+	<!-- BEGIN yearBlock -->
+	<option {yearSelected} value="{year}">{year}</option>
+	<!-- END yearBlock -->
+</select>
+<input type="submit" value="Search" name="Submit">
+</FORM>
+<table border="1" cellspacing="1" cellpadding="1">
+		<tr>
+				<td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Supplier</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>Year</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>1 </strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>2</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>3</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>4</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>5</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>6</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>7</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>8</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>9</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>10</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>11</strong></td>
+				<td align="center" bgcolor="#F3F3F3"><strong>12</strong></td>
+		</tr>
+		<!-- BEGIN resultsBlock -->
+		<tr>
+				<td nowrap="nowrap" bgcolor="#E1E1E1">{supplier}</td>
+				<td width="50" align="right" nowrap="nowrap">{total}</td>
+				<td width="50" align="right" nowrap="nowrap">{month1}</td>
+				<td width="50" align="right" nowrap="nowrap">{month2}</td>
+				<td width="50" align="right" nowrap="nowrap">{month3}</td>
+				<td width="50" align="right" nowrap="nowrap">{month4}</td>
+				<td width="50" align="right" nowrap="nowrap">{month5}</td>
+				<td width="50" align="right" nowrap="nowrap">{month6}</td>
+				<td width="50" align="right" nowrap="nowrap">{month7}</td>
+				<td width="50" align="right" nowrap="nowrap">{month8}</td>
+				<td width="50" align="right" nowrap="nowrap">{month9}</td>
+				<td width="50" align="right" nowrap="nowrap">{month10}</td>
+				<td width="50" align="right" nowrap="nowrap">{month11}</td>
+				<td width="50" align="right" nowrap="nowrap">{month12}</td>
+		</tr>
+		<!-- END resultsBlock -->
+</table>
+<!--  <img src="{urlTheChart}" /> -->

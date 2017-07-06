@@ -1,0 +1,17 @@
+<!-- Template: CustomerNotePopup.inc.html -->
+
+<form name="form" method="post" action="{urlSubmit}">
+
+	<input type="hidden" name="customerID" value="{customerID}">
+  <input type="hidden" name="ordheadID" value="{ordheadID}">
+  <input type="hidden" name="customerNoteID" value="{customerNoteID}">
+
+  <textarea
+    class="customer"
+		name="details"
+    cols="110"
+    rows="30">{details}</textarea>
+
+  <input type="submit" name="submit" value="Save">
+
+</form>

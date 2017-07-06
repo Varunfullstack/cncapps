@@ -1,0 +1,66 @@
+<script language='JavaScript'>
+function validateItemDescription(){
+	if (document.getElementById("lineType").value == "I"){
+		if (Trim(document.getElementById("itemDescription").value) != ""){
+			window.open('{urlItemPopup}&itemDescription=' +
+			escape(encodeURIComponent(document.getElementById("itemDescription").value)) +
+			'&parentIDField=itemID' +
+			'&parentDescField=itemDescription',
+			'items','scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
+		}
+	}
+}
+function validateSupplierName(){
+	if (document.getElementById("supplierName").value != ""){
+		window.open(
+			'{urlSupplierPopup}&supplierName=' +
+			escape(document.getElementById("supplierName").value) +
+			'&parentIDField=supplierID' +
+			'&parentDescField=supplierName',
+			'suppliers',
+			'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
+		)
+	}
+}
+
+function validateUpdateSupplierName(){
+  if (document.getElementById("updateSupplierName").value != ""){
+    window.open(
+      '{urlSupplierPopup}&supplierName=' +
+      escape(document.getElementById("updateSupplierName").value) +
+      '&parentIDField=updateSupplierID' +
+      '&parentDescField=updateSupplierName',
+      'suppliers',
+      'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
+    )
+  }
+}
+function bulkUpdateClick()
+{
+  var ret = false;
+  var seletedOptionText = document.getElementById('action').options[document.getElementById('action').selectedIndex].text;
+  
+  if ( seletedOptionText == 'change supplier' ){
+    /*
+    We use the value in SupplierID field of ""add line"
+    */
+    if ( document.getElementById("updateSupplierID").value == 0 ){
+      alert( 'Please select a Supplier' );
+      return false;
+    }
+  }
+
+  if(
+    confirm('Are you sure you want to ' + seletedOptionText )
+  ){
+    ret = true;
+  }
+  return ret;
+}
+
+function submitOnReturn() {
+	if (event.keyCode == 13) {
+			document.ordline.submit();
+   }
+}
+</script>

@@ -1,0 +1,19 @@
+<!-- Template: ActivtyEditInternalNotes.inc.html -->
+    <tr>
+      <td colspan="4"><span class="formErrorMessage">{internalNotesMessage}</span></td>
+    </tr>
+    <tr>
+      <td colspan="4" class="promptTextLeft" valign="top">Internal Notes</td>
+    </tr>
+    <tr>
+      <td colspan="4"><textarea name="internalNotes">{internalNotes}</textarea>
+        <script
+          type="text/javascript">
+          internalNotes = CKEDITOR.replace( 'internalNotes',
+          {
+            customConfig : '/ckeditor_config.js'
+          }
+          );
+        </script></td>
+    </tr>
+<!-- End Template: ActivityEditInternalNotes.inc.html -->

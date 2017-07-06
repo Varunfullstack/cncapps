@@ -1,0 +1,3 @@
+"customer","incident","details","fixed by","duration","time spent","response time","fix time hours","contract"<!-- BEGIN requestBlock -->
+"{customer}","{serviceRequestID}","{description}","{fixedBy}","{durationHours}","{timeSpentHours}","{responseTimeHours}","{fixTimeHours}","{contract}"
+<!-- END requestBlock -->

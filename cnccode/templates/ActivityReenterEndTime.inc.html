@@ -1,0 +1,27 @@
+<!-- Template: ActivityReenterEndTime.inc.html -->
+{activityWizardHeader}
+<form name="form" method="post" action="{submitURL}">
+	<input type="hidden" name="callActivityID" value="{callActivityID}" />
+	<table border="0" cellspacing="0" cellpadding="1">
+			<tr class="singleBorder">
+					<td class="promptText">End Time</td>
+					<td class="fieldText"><input
+					type="text"
+					name="endTime"
+					value="{endTime}"
+					size="5"
+					maxlength="5"
+					/>
+									<span class="formErrorMessage">{endTimeMessage}</span> </td>
+			</tr>
+			{activityReenterEndTimeCreateTravel}
+			<tr>
+					<td valign="top">&nbsp;</td>
+					<td>			
+			</tr>
+			<tr> 
+			<td colspan="2" valign="top"><input name="Next" type="submit" id="Next" value="Next">		</td>
+			</tr>
+	</table>
+</form>
+<!-- End Template: ActivityReenterEndTime.inc.html -->

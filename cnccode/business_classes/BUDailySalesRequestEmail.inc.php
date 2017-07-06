@@ -1,0 +1,109 @@
+<?php	
+  /**
+  * Sales Service Request Alert Emails
+  *
+  * @access public
+  * @authors Karim Ahmed - Sweet Code Limited
+  */
+  require_once ($cfg ["path_gc"] . "/Business.inc.php");
+  require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+  require_once ($cfg ["path_bu"] . "/BUMail.inc.php");
+
+  class BUDailySalesRequestEmail extends Business {
+
+    private $db; // database connection
+    /**
+    * Constructor
+    * @access Public
+    */
+    function BUDailySalesRequestEmail(&$owner) {
+      $this->constructor ( $owner );
+    }
+    function constructor(&$owner) {
+      parent::constructor ( $owner );
+
+      $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
+
+    function getRequests()
+    {
+
+      $sql =
+        "SELECT
+          cus_name,
+          odh_ordno
+        FROM
+          ordhead
+          JOIN customer ON cus_custno = odh_custno
+        WHERE
+          odh_service_request_text > ''";
+
+      return $this->db->query( $sql );
+
+    }
+    function sendEmail()
+    {
+      global $cfg;
+      
+      $buMail = new BUMail( $this );
+      
+      $senderEmail = CONFIG_SALES_EMAIL;
+      $senderName = 'CNC Sales Department';
+
+      $toEmail = CONFIG_SALES_EMAIL; 
+      
+      $results = $this->getRequests();
+
+      if ( $row = $results->fetch_object() ){
+
+        $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
+        
+        $template->set_file ( 'page', 'DailySalesRequestEmail.inc.html' );
+
+        $template->set_block( 'page', 'requestBlock', 'requests');
+
+        do{
+
+          $urlOrder = 'http://' . $_SERVER ['HTTP_HOST'] . '/SalesOrder.php?action=displaySalesOrder&ordheadID=' . $row->odh_ordno;
+          
+          $template->set_var(
+            array(
+              'customer'        => $row->cus_name,
+              'ordheadID'         => $row->odh_ordno,
+              'urlOrder'        => $urlOrder
+            )
+          );
+          
+          $template->parse ( 'requests', 'requestBlock', true );
+        
+        } while ( $row = $results->fetch_object() );
+      
+
+        $template->parse ( 'output', 'page', true );
+
+        $body =  $template->get_var ( 'output' );
+
+        $hdrs = array (
+          'From' => $senderEmail,
+          'To' => $toEmail,
+          'Subject' => 'Daily Sales Request Report',
+          'Date' => date ( "r" )
+          );
+
+        echo $body;
+        $buMail->mime->setHTMLBody( $body );
+        
+        $body = $buMail->mime->get();
+
+        $hdrs = $buMail->mime->headers( $hdrs );
+        
+        $buMail->putInQueue(
+          $senderEmail,
+          $toEmail,
+          $hdrs,
+          $body
+        );
+      } // end if
+    }
+  } // End of class
+?>

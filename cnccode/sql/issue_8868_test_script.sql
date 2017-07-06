@@ -1,0 +1,2 @@
+/*[17:08:52][0 ms]*/ UPDATE `automated_request` SET `importedFlag` = 'N' WHERE `automatedRequestID` = '117604'; 
+/*[17:08:55][0 ms]*/ UPDATE `automated_request` SET `importedFlag` = 'N' WHERE `automatedRequestID` = '117605'; 

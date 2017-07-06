@@ -1,0 +1,41 @@
+<!-- Template: SupportContactNomination.inc.html -->
+<FORM  method="post" action="{urlSend}" name="support">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="support[1][customerID]"
+			value="{customerID}"
+		>
+<!-- send dummy email address so that validation in CT class doesn't break -->
+		<input
+			type="hidden"
+			name="support[1][emailAddress]"
+			value="dummy"
+		>
+		<tr> 
+			<td width="115" class="promptText">Contact Name</td>
+			<td width="575" class="fieldText"> <input
+					name="support[1][name]"
+					type="text" value="{name}"
+					size="50"
+					maxlength="50"
+				> <span class="formErrorMessage">{nameMessage}</span> </td>
+		</tr>
+<!--
+		<tr> 
+			<td width="115" class="promptText">Email</td>
+			<td width="575" class="fieldText"> <input
+					name="support[1][emailAddress]"
+					type="text" value="{emailAddress}"
+					size="50"
+					maxlength="50"
+				> <span class="formErrorMessage">{emailAddressMessage}</span> </td>
+		</tr>
+-->
+		<tr> 
+			<td>&nbsp;</td>
+			<td><input type="submit" name="Submit" value="Create RTF File"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: SupportContactNomination.inc.html -->

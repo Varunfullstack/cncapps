@@ -1,0 +1,29 @@
+<!-- Template: NewsletterHitReport.inc.html -->
+<form
+	name="pureFile"
+	method="post"
+	action="{urlSubmit}"
+	enctype="multipart/form-data"
+>
+		<table width="500px" border="0" cellspacing="0" cellpadding="1">
+		<tr> 
+			<td width="100" class="promptText">Pure upload file
+					<div align="right"></div></td>
+			<td>
+				<input
+					type="file"
+					name="pureFile"
+					size="50"
+					maxlength="50"
+			> 
+				<font class="formErrorMessage">{pureFileMessage}</font> </td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td>
+				<input type="submit" name="File" value="Upload"> 
+			</td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: NewsletterHitReport.inc.html -->

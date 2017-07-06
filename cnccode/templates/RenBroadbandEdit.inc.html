@@ -1,0 +1,480 @@
+<!-- Template: BroadbandServiceEdit.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'>
+function checkFunctionKey(field){
+  if (event.keyCode == 120){      // F9 - edit
+    switch (field.id){
+      case "itemDescription":
+        if (document.getElementById("itemID").value != "0"){
+          window.open(
+            '{urlItemEdit}&itemID=' +
+            escape(document.getElementById("itemID").value) +
+            '&parentIDField=itemID' +
+            '&parentDescField=itemDescription',
+            'item',
+            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+          );
+        }
+        break;
+      case "siteDesc":
+        if (document.getElementById("siteNo").value != ""){
+          window.open(
+            '{urlSiteEdit}&customerID={customerID}' +
+            '&siteNo=' + escape(document.getElementById("siteNo").value) +
+            '&parentIDField=siteNo' +
+            '&parentDescField=siteDesc',
+            'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+          );
+        }
+        break;
+    }
+   }
+   return;
+}
+function validateItemDescription(){
+  if (Trim(document.getElementById("itemDescription").value) != ""){
+    window.open('{urlItemPopup}&itemDescription=' +
+    escape(document.getElementById("itemDescription").value) +
+    '&parentIDField=itemID' +
+    '&parentSlaResponseHoursField=slaResponseHours' +
+    '&parentDescField=itemDescription',
+    'items','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+  }
+}
+function validatesiteDesc(){
+  if (Trim(document.getElementById("siteDesc").value) != ""){
+    window.open(
+      '{urlSitePopup}&customerID={customerID}'+
+      '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+      '&parentIDField=siteNo' +
+      '&parentDescField=siteDesc',
+      'address',
+      'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+    )
+  }
+}
+
+</script>
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="renBroadband" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+    <input
+      type="hidden"
+      name="renBroadband[1][customerItemID]"
+      value="{customerItemID}"
+    >
+    <input
+      type="hidden"
+      name="renBroadband[1][customerID]"
+      id="customerID"
+      value="{customerID}"
+    >
+    <input
+      type="hidden"
+      name="renBroadband[1][customerName]"
+      value="{customerName}"
+    >
+    <input
+      type="hidden"
+      name="renBroadband[1][siteNo]"
+      id="siteNo"
+      value="{siteNo}"
+    >
+    <input
+      name="renBroadband[1][salePricePerMonth]"
+      type="hidden" value="{salePricePerMonth}"
+      value="{salePricePerMonth}"
+    >
+    <input
+      name="renBroadband[1][costPricePerMonth]"
+      type="hidden" value="{costPricePerMonth}"
+      value="{costPricePerMonth}"
+    >
+		<tr> 
+			<td width="167" class="promptText" align="right">Customer</td>
+			<td width="523" class="fieldText">{customerName}</td>
+		</tr>
+    <TR>
+      <TD class="promptText">Site</TD>
+      <TD class="displayfield">
+        <input
+          type="text"
+          name ="renBroadband[1][siteDesc]"
+          id="siteDesc"
+          value="{siteDesc}"
+          onKeydown="javascript:checkFunctionKey(siteDesc)"
+          onChange="javascript:validatesiteDesc()"
+          {DISABLED}
+          size="50"
+          maxlength="50"
+        >
+      </TD>
+    </TR>
+    <tr>
+      <td class="promptText">Item</td>
+      <td class="field"> <input
+        type="hidden"
+        name="renBroadband[1][itemID]"
+        id="itemID"
+        value="{itemID}"
+      > <input
+        type="text"
+        {readonly}
+        name="renBroadband[1][itemDescription]"
+        id="itemDescription"
+        value="{itemDescription}"
+        onChange="javascript:validateItemDescription()"
+        onKeydown="javascript:checkFunctionKey(itemDescription)"
+        size="50"
+        maxlength="50"
+      > <font class="formErrorMessage">{itemDescriptionMessage}</font> </td>
+    </tr>
+		<tr>
+				<td class="promptText">Duration of Contract(months)</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][months]"
+					type="text" value="{months}"
+					{readonly}
+					size="10"
+					maxlength="10">
+								<span class="formErrorMessage">{monthsMessage}</span> </td>
+		</tr>
+    {pricePerMonth}
+		<tr>
+				<td class="promptText">Installation Date</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][installationDate]"
+					type="text" value="{installationDate}"
+					{readonly}
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{installationDateMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Total Invoiced (months)</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][totalInvoiceMonths]"
+					type="text" value="{totalInvoiceMonths}"
+					{readonly}
+					size="10"
+					maxlength="10">
+								<span class="formErrorMessage">{totalInvoiceMonthsMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Invoice Interval	(months)</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][invoicePeriodMonths]"
+					type="text" value="{invoicePeriodMonths}"
+					{readonly}
+					size="10"
+					maxlength="10">
+								<span class="formErrorMessage">{invoicePeriodMonthsMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Next Invoice Period</td>
+				<td class="fieldText">{invoiceFromDate} to {invoiceToDate}</td>
+		</tr>
+		<tr>
+				<td class="promptText">ispID</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][ispID]"
+					type="text" value="{ispID}"
+					size="10"
+					maxlength="10">
+								<span class="formErrorMessage">{ispIDMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">ADSL Phone</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][adslPhone]"
+					type="text" value="{adslPhone}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{adslPhoneMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Firewall Interface </td>
+				<td class="fieldText"><input
+					name="renBroadband[1][macCode]"
+					type="text" value="{macCode}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{macCodeMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Reference</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][reference]"
+					type="text" value="{reference}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{referenceMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Firewall IP</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][defaultGateway]"
+					type="text" value="{defaultGateway}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{defaultGatewayMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Network Address</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][networkAddress]"
+					type="text" value="{networkAddress}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{networkAddressMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Subnet Mask</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][subnetMask]"
+					type="text" value="{subnetMask}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{subnetMaskMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText" valign="top">IP Address</td>
+				<td class="fieldText">
+				<textarea
+					rows="3"
+					cols="46" 
+					name="renBroadband[1][routerIPAddress]"
+				>{routerIPAddress}</textarea>
+				<span class="formErrorMessage">{routerIPAddressMessage}</span>			</td>
+		</tr>
+		<tr>
+				<td class="promptText">User Name</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][userName]"
+					type="text" value="{userName}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{userNameMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Password</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][password]"
+					type="text" value="{password}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{passwordMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">eta Date</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][etaDate]"
+					type="text" value="{etaDate}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{etaDateMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Dual Broadband</td>
+				<td class="fieldText"><input name="renBroadband[1][dualBroadbandFlag]" type="checkbox" value="Y" {dualBroadbandFlagChecked}/></td>
+		</tr>
+    <tr>
+        <td class="promptText">Initial Speed Test</td>
+        <td class="fieldText"><input
+          name="renBroadband[1][initialSpeedTest]"
+          type="text" value="{initialSpeedTest}"
+          size="50"
+          maxlength="50">
+                <span class="formErrorMessage">{initialSpeedTestMessage}</span> </td>
+    </tr>
+    
+    <tr>
+        <td class="promptText">Bandwidth Allowance(GB)</td>
+        <td class="fieldText"><input
+          name="renBroadband[1][bandwidthAllowance]"
+          type="text" value="{bandwidthAllowance}"
+          size="10"
+          maxlength="10">
+                <span class="formErrorMessage">{bandwidthAllowanceMessage}</span> </td>
+    </tr>
+    <!--
+		<tr>
+				<td class="promptText">DNS Company</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][dnsCompany]"
+					type="text" value="{dnsCompany}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{dnsCompanyMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">IP Current Number</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][ipCurrentNo]"
+					type="text" value="{ipCurrentNo}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{ipCurrentNoMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">MX</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][mx]"
+					type="text" value="{mx}"
+					size="30"
+					maxlength="30">
+								<span class="formErrorMessage">{mxMessage}</span> </td>
+		</tr>
+		
+		<tr>
+				<td class="promptText">Secure Server (ssl)</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][secureServer]"
+					type="text" value="{secureServer}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{secureServerMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">VPNs</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][vpns]"
+					type="text" value="{vpns}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{vpnsMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">OWA</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][owa]"
+					type="text" value="{owa}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{owaMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">OMA</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][oma]"
+					type="text" value="{oma}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{omaMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">Remote Portal</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][remotePortal]"
+					type="text" value="{remotePortal}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{remotePortalMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">smartHost</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][smartHost]"
+					type="text" value="{smartHost}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{smartHostMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">preparation Records</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][preparationRecords]"
+					type="text" value="{preparationRecords}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{preparationRecordsMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">assigned To</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][assignedTo]"
+					type="text" value="{assignedTo}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{assignedToMessage}</span> </td>
+		</tr>
+		<tr>
+				<td class="promptText">initial Speed Test</td>
+				<td class="fieldText"><input
+					name="renBroadband[1][initialSpeedTest]"
+					type="text" value="{initialSpeedTest}"
+					size="50"
+					maxlength="50">
+								<span class="formErrorMessage">{initialSpeedTestMessage}</span> </td>
+		</tr>
+		<tr>
+				<td valign="top" class="promptText">Pre-migration Notes</td>
+				<td class="fieldText">
+				<textarea
+					rows="10"
+					cols="76" 
+					name="renBroadband[1][preMigrationNotes]"
+				>{preMigrationNotes}</textarea></td>
+		</tr>
+		<tr>
+				<td valign="top" class="promptText">Post-migration Notes</td>
+				<td class="fieldText">
+				<textarea
+					rows="10"
+					cols="76" 
+					name="renBroadband[1][postMigrationNotes]"
+				>{postMigrationNotes}</textarea>				</td>
+		</tr>
+		<tr>
+			<td class="promptText">Docs Updated And Checks Completed</td>
+			<td class="fieldText"><input
+					name="renBroadband[1][docsUpdatedAndChecksCompleted]"
+					type="text" value="{docsUpdatedAndChecksCompleted}"
+					size="50"
+					maxlength="50">			</td>
+		</tr>
+    -->
+		<tr>
+				<td class="promptText">Declined</td>
+				<td class="fieldText">
+				<input
+					name="renBroadband[1][declinedFlag]" 
+					{readonly}
+					type="checkbox"
+					value="Y"
+					{declinedFlagChecked}
+				/></td>
+		</tr>
+    <tr>
+      <td valign="top" class="promptText">Internal Notes</td>
+      <td colspan="2">
+        <textarea cols="80" rows="10" name="renBroadband[1][internalNotes]">{internalNotes}</textarea>
+      </td>
+    </tr>
+    
+		<tr>
+				<td>&nbsp;</td>
+				<td class="formErrorMessage">&nbsp;</td>
+		</tr>
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage">
+        <input type="submit" name="Submit" value="Update">
+        <a href="{urlPrintContract}"  title="Print Support Contract">{txtPrintContract}</a>
+      </td>
+		</tr>
+	</table>
+</form>
+<FORM  method="post" action="{urlEmailTo}" name="email">
+	<TABLE name="email">
+		<TR>
+			<TD><input type="text" name="emailAddress"></TD>
+			<TD><input type="submit" name="Submit" {readonly} value="Email"></TD>
+		</TR>
+	</table>
+</FORM>
+<!-- End Template: BroadbandS	erviceEdit.inc.html -->

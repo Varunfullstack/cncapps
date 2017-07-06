@@ -1,0 +1,262 @@
+<!-- Template: EnterSCRDetailsSystemChecks.inc.html -->
+<H2>{customerName}</H2>
+<script language='JavaScript' src='iespell/iespell.js'></script>
+<form name="detailsForm" method="post" action="{urlFinalStep}">
+	<input type="hidden" name="newSerialNumbers" value="{newSerialNumbers}">
+	<input type="hidden" name="areDocumentChangesRequired" value="{areDocumentChangesRequired}" />
+	<input type="hidden" name="areDocumentChangesCompleted" value="{areDocumentChangesCompleted}" />
+	<input type="hidden" name="callActivityID" value="{callActivityID}" />
+	<table border="0" cellspacing="0" cellpadding="1">
+	<!-- BEGIN serverBlock -->
+		<tr>
+				<td>
+					<strong>Server Name</strong>
+				</td>
+				<td>
+					<input type="text" name="serverName[{serverNo}]" value="{serverName}" />
+				</td>
+		</tr>
+		<tr>
+				<td colspan="2">
+				<fieldset>
+				<legend>Disk Space</legend>
+<table width="334" border="0" cellspacing="1" cellpadding="1">
+						<tr>
+								<td width="35"><strong>Disk</strong></td>
+								<td width="129"><strong>Total Space </strong></td>
+								<td width="160"><strong>Free Space </strong></td>
+						</tr>
+						<tr>
+								<td>
+									<select name="disk1Name[{serverNo}]">
+											<option selected value="C">C</option>
+											<option value="D">D</option>
+											<option value="E">E</option>
+											<option value="F">F</option>
+											<option value="G">G</option>
+											<option value="H">H</option>
+											<option value="I">I</option>
+											<option value="J">J</option>
+											<option value="K">K</option>
+											<option value="L">L</option>
+											<option value="M">M</option>
+											<option value="N">N</option>
+											<option value="O">O</option>
+											<option value="P">P</option>
+											<option value="Q">Q</option>
+											<option value="R">R</option>
+											<option value="S">S</option>
+											<option value="T">T</option>
+											<option value="U">U</option>
+											<option value="V">V</option>
+											<option value="W">W</option>
+											<option value="X">X</option>
+											<option value="Y">Y</option>
+											<option value="Z">Z</option>
+									</select>
+								</td>
+								<td><input type="text" name="disk1Total[{serverNo}]" /></td>
+								<td><input type="text" name="disk1Free[{serverNo}]" /></td>
+						</tr>
+						<tr>
+								<td>
+									<select name="disk2Name[{serverNo}]">
+											<option value="C">C</option>
+											<option value="D">D</option>
+											<option selected value="E">E</option>
+											<option value="F">F</option>
+											<option value="G">G</option>
+											<option value="H">H</option>
+											<option value="I">I</option>
+											<option value="J">J</option>
+											<option value="K">K</option>
+											<option value="L">L</option>
+											<option value="M">M</option>
+											<option value="N">N</option>
+											<option value="O">O</option>
+											<option value="P">P</option>
+											<option value="Q">Q</option>
+											<option value="R">R</option>
+											<option value="S">S</option>
+											<option value="T">T</option>
+											<option value="U">U</option>
+											<option value="V">V</option>
+											<option value="W">W</option>
+											<option value="X">X</option>
+											<option value="Y">Y</option>
+											<option value="Z">Z</option>
+									</select>
+								</td>
+								<td><input type="text" name="disk2Total[{serverNo}]" /></td>
+								<td><input type="text" name="disk2Free[{serverNo}]" /></td>
+						</tr>
+						<tr>
+								<td>
+									<select name="disk3Name[{serverNo}]">
+											<option value=""></option>
+											<option value="C">C</option>
+											<option value="D">D</option>
+											<option value="E">E</option>
+											<option selected value="F">F</option>
+											<option value="G">G</option>
+											<option value="H">H</option>
+											<option value="I">I</option>
+											<option value="J">J</option>
+											<option value="K">K</option>
+											<option value="L">L</option>
+											<option value="M">M</option>
+											<option value="N">N</option>
+											<option value="O">O</option>
+											<option value="P">P</option>
+											<option value="Q">Q</option>
+											<option value="R">R</option>
+											<option value="S">S</option>
+											<option value="T">T</option>
+											<option value="U">U</option>
+											<option value="V">V</option>
+											<option value="W">W</option>
+											<option value="X">X</option>
+											<option value="Y">Y</option>
+											<option value="Z">Z</option>
+									</select>
+								</td>
+								<td><input type="text" name="disk3Total[{serverNo}]" /></td>
+								<td><input type="text" name="disk3Free[{serverNo}]" /></td>
+						</tr>
+						<tr>
+								<td>
+									<select name="disk4Name[{serverNo}]">
+											<option selected value=""></option>
+											<option value="C">C</option>
+											<option value="D">D</option>
+											<option value="E">E</option>
+											<option value="F">F</option>
+											<option value="G">G</option>
+											<option value="H">H</option>
+											<option value="I">I</option>
+											<option value="J">J</option>
+											<option value="K">K</option>
+											<option value="L">L</option>
+											<option value="M">M</option>
+											<option value="N">N</option>
+											<option value="O">O</option>
+											<option value="P">P</option>
+											<option value="Q">Q</option>
+											<option value="R">R</option>
+											<option value="S">S</option>
+											<option value="T">T</option>
+											<option value="U">U</option>
+											<option value="V">V</option>
+											<option value="W">W</option>
+											<option value="X">X</option>
+											<option value="Y">Y</option>
+											<option value="Z">Z</option>
+									</select>
+								</td>
+								<td><input type="text" name="disk3Total[{serverNo}]" /></td>
+								<td><input type="text" name="disk3Free[{serverNo}]" /></td>
+						</tr>
+				</table>
+				</fieldset>
+				</td>
+				<td>&nbsp;</td>
+		</tr>
+		
+		<tr>
+				<td colspan="2">
+				<fieldset>
+				<legend>Anti-virus Server</legend>
+				<table width="430" border="0" cellspacing="1" cellpadding="1">
+						<tr>
+								<td width="123">Application</td>
+								<td width="300">
+									<select name="antiVirusServerApp[{serverNo}]"/>
+									{htmlServerAVString}
+									</select>
+								</td>
+						</tr>
+						<tr>
+								<td>Current DAT </td>
+								<td><input name="antiVirusServerDAT[{serverNo}]" type="text" size="50" /></td>
+						</tr>
+						<tr>
+								<td>Current Engine </td>
+								<td><input name="antiVirusServerEng[{serverNo}]" type="text" size="50" /></td>
+						</tr>
+				</table>
+				</fieldset>				</td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr>
+				<td colspan="2">
+				<fieldset>
+				<legend>Anti-virus Email</legend>
+				<table width="430" border="0" cellspacing="1" cellpadding="1">
+						<tr>
+								<td width="123">Application</td>
+								<td width="300">
+									<select name="antiVirusEmailApp[{serverNo}]"/>
+									{htmlEmailAVString}
+									</select>
+								</td>
+						</tr>
+						<tr>
+								<td>Current DAT </td>
+								<td><input name="antiVirusEmailDAT[{serverNo}]" type="text" size="50" /></td>
+						</tr>
+						<tr>
+								<td>Current Engine </td>
+								<td><input name="antiVirusEmailEng[{serverNo}]" type="text" size="50" /></td>
+						</tr>
+				</table>
+				</fieldset>				</td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr>
+				<td colspan="2"><fieldset>
+					<legend>Backup</legend>
+						<table width="430" border="0" cellspacing="1" cellpadding="1">
+								<tr>
+									<td width="123">Application</td>
+									<td>
+										<select name="backupApp[{serverNo}]"/>
+										{htmlBackupString}
+										</select>
+									</td>
+								</tr>
+								<tr>
+										<td>Last Result </td>
+										<td>
+										<select name="backupLastResult[{serverNo}]" type="text"/>
+												<option value="Completed Successfully" selected="selected">Completed Successfully</option>
+												<option value="Completed with Exceptions">Completed with Exceptions</option>
+												<option value="Failed">Failed</option>
+										</select>
+										</td>
+								</tr>
+						</table>
+						</fieldset>
+					</td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr>
+				<td><input type="checkbox" name="isRaidArrayHealthy[{serverNo}]" value="Yes" />Raid Array Healthy</td>
+				<td></td>
+				<td>&nbsp;</td>
+		</tr>
+		<tr>
+				<td><input type="checkbox" name="isUPSOnline[{serverNo}]" value="Yes" />UPS On-line</td>
+				<td></td>
+				<td>&nbsp;</td>
+		</tr>
+	</fieldset>
+
+
+	<!-- END serverBlock -->
+		<tr> 
+			<td colspan="2" valign="top"><input name="Back" type="button" value="Back" onclick="document.location='{urlBack}';">
+					<input name="Next" type="submit" id="Next" value="Next" onClick="if(!confirm('Your visit will be completed and a confirmation email will be send directly to the customer' ) ) return(false)"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: EnterSCRDetailsSystemChecks.inc.html -->

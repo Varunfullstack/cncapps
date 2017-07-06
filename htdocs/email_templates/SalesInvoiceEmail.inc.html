@@ -1,0 +1,38 @@
+<html>
+  <head>
+  <style type="text/css">
+  <!--
+  BODY, P, TD, TH {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+  }
+  .singleBorder {
+    border: #e1e1f0 2px solid;
+  }
+  TABLE {
+    border-spacing: 1px;
+  }
+  -->
+  </style>
+  </head>
+  <body>
+    <p>Please find attached the following invoice(s). Thank you.</p>
+    <table>
+      <tr>
+        <th align="left" width="50%"><strong>Invoice</strong></th>  
+        <th align="right"><strong>Amount £(ex VAT)</strong></th>  
+      </tr>
+      <!-- BEGIN invoiceBlock -->
+      <tr>
+        <td>{invheadID}</td>  
+        <td align="right">{value}</td>  
+      </tr>
+      <!-- END invoiceBlock -->
+      <tr>
+        <td align="left"><strong>Total</strong></td>  
+        <td align="right"><strong>{totalValue}</strong></td>  
+      </tr>
+    </table>
+  </body>
+</html>
+

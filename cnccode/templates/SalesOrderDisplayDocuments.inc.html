@@ -1,0 +1,22 @@
+<!-- Template: SalesOrderDisplayDocuments.inc.html -->
+<div style="height: 100%;">
+  <table style="height: 100%;" class="singleBorder" width="100%">
+    <tr> 
+      <td class="listHeadText">Document</td>
+      <td class="listHeadText">Date</td>
+      <td class="listHeadText" colspan="2">&nbsp;</td>
+    </tr>
+    <!-- BEGIN salesOrderDocumentBlock -->
+    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
+      <td class="content" nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" >{description}</A></td>
+      <td class="content" nowrap="nowrap">{createdDate}</td>
+      <td class="content"><A href="{urlEditDocument}">edit</A></td>
+      <td class="content">
+        <A href="{urlDeleteDocument}" title="Delete attached document" onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">delete</A> 
+      </td>
+    </tr>
+    <!-- END salesOrderDocumentBlock -->
+  </table>
+  <a href="{urlAddDocument}">{txtAddDocument}</a>
+</div>
+<!-- End Template: SalesOrderDisplayDocuments.inc.html -->
