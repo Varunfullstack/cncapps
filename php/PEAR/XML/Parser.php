@@ -364,7 +364,7 @@ class XML_Parser extends PEAR
             }
             $this->parser = $xp;
             $result       = $this->_initHandlers($this->mode);
-            if ($this->isError($result)) {
+            if ($this::isError($result)) {
                 return $result;
             }
             xml_parser_set_option($xp, XML_OPTION_CASE_FOLDING, $this->folding);
@@ -393,7 +393,7 @@ class XML_Parser extends PEAR
     function reset()
     {
         $result = $this->_create();
-        if ($this->isError($result)) {
+        if ($this::isError($result)) {
             return $result;
         }
         return true;
@@ -505,7 +505,7 @@ class XML_Parser extends PEAR
          * reset the parser
          */
         $result = $this->reset();
-        if ($this->isError($result)) {
+        if ($this::isError($result)) {
             return $result;
         }
         // if $this->fp was fopened previously
