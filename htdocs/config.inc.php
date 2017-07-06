@@ -103,7 +103,7 @@ switch ($server_type) {
 //            define('CONFIG_PUBLIC_DOMAIN', 'devtest.pavilionweb.com');
             define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmail@cnc-ltd.co.uk');
             define("DB_HOST", "188.39.98.130");
-            error_reporting(E_ALL | E_STRICT );
+            error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
             ini_set('display_errors', 'on');
 
             $GLOBALS['mail_options'] =
