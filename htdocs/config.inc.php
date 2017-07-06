@@ -37,7 +37,7 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
-set_time_limit(8*60);
+set_time_limit(8 * 60);
 // if magic_quotes_gpc is set then strip all backslashes from GPC arrays first
 // absolute path to root application directory
 
@@ -48,159 +48,157 @@ define('MAIN_CONFIG_SERVER_TYPE_REPLICATED', 'replicated'); // replicated server
 
 $onSweetcodeServer = false;
 
-if (isset($_SERVER['HTTP_HOST'])){				// not set for command line calls
+if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
 
-	switch ( $_SERVER['HTTP_HOST'] ){
+    switch ($_SERVER['HTTP_HOST']) {
 
-		case 'cncapps':
-    case 'cncapps.cncltd.local':
+        case 'cncapps':
+        case 'cncapps.cncltd.local':
 
-			$server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
+            $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
 
-		break;
+            break;
 
-		case 'cncappsdev':
-    case 'cncappsdev.cncltd.local':
+        case 'cncappsdev':
+        case 'cncappsdev.cncltd.local':
 
-			$server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
+            $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
 
-		break;
+            break;
 
-    case 'cnc.local':
+        case 'cnc.local':
 
-      $onSweetcodeServer = true;
-      $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
+            $onSweetcodeServer = true;
+            $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
 
-    break;
-  
-  }
+            break;
 
-	$GLOBALS['isRunningFromCommandLine'] = false;
+    }
+
+    $GLOBALS['isRunningFromCommandLine'] = false;
+
+} else {                // command line call so assume live and force HTTP_HOST value
+    $script_path = strtolower($argv[0]);
+
+    $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
+    $GLOBALS['isRunningFromCommandLine'] = true;
+    $_SERVER['HTTP_HOST'] = 'cncapps';
 
 }
-else{				// command line call so assume live and force HTTP_HOST value
-	$script_path = strtolower($argv[0]);
 
-	$server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
-	$GLOBALS['isRunningFromCommandLine'] = true;
-	$_SERVER['HTTP_HOST'] = 'cncapps';
+switch ($server_type) {
 
-}
+    case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
 
-switch ($server_type){
+        if ($onSweetcodeServer) {
+            define("BASE_DRIVE", "E:\\Sites\\CNC");
+            define("SCR_DIR", "\\Sites\\CNC\\Company\\scr");
+            define("CUSTOMER_DIR_FROM_BROWSER", "//Sites/CNC/customer");
+            define("CUSTOMER_DIR", "\\Sites\\CNC\\Customer");
+            define('CONFIG_PUBLIC_DOMAIN', 'sweetcode.co.uk');
+            define('CONFIG_CATCHALL_EMAIL', 'karim@sweetcode.co.uk');
+            define("DB_NAME", "cncdev");
+            error_reporting(E_ALL & ~E_WARNING);
+            ini_set('display_errors', 'off');
 
-	case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
-  
-    if ( $onSweetcodeServer ){
-      define("BASE_DRIVE", "E:\\Sites\\CNC");
-      define("SCR_DIR", "\\Sites\\CNC\\Company\\scr");
-      define("CUSTOMER_DIR_FROM_BROWSER", "//Sites/CNC/customer");
-      define("CUSTOMER_DIR", "\\Sites\\CNC\\Customer");
-      define('CONFIG_PUBLIC_DOMAIN', 'sweetcode.co.uk');
-      define( 'CONFIG_CATCHALL_EMAIL', 'karim@sweetcode.co.uk' );
-      define("DB_NAME", "cncdev");
-      error_reporting( E_ALL & ~E_WARNING );
-      ini_set('display_errors', 'off');
+            $GLOBALS['mail_options'] =
+                array(
+                    'driver' => 'smtp',
+                    'host' => 'smtp.gmail.com',
+                    'port' => 465,
+                    'ssl' => 'SSL',
+                    'auth' => 'Login',
+                    'username' => 'sweetcode.test@gmail.com',
+                    'password' => 'sweettester'
+                );
+        } else {
+            define("BASE_DRIVE", "C:\\Sites\cncappsdev");
+            define("DB_NAME", "cncappsdev");
+            define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
+            define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
+            define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
+            define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
+            define('CONFIG_CATCHALL_EMAIL',
+                'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', karim@sweetcode.co.uk'
+            );
+            error_reporting(E_ALL);
+            ini_set('display_errors', 'on');
 
-      $GLOBALS['mail_options'] =
-        array(
-          'driver'    => 'smtp',
-          'host'      => 'smtp.gmail.com',
-          'port'      => 465,
-          'ssl'       => 'SSL',
-          'auth'      => 'Login',
-          'username'  => 'sweetcode.test@gmail.com',
-          'password'  => 'sweettester'
-        );      
-    }
-    else{
-      define("BASE_DRIVE", "C:\\Sites\cncappsdev");
-      define("DB_NAME", "cncappsdev");
-		  define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
-      define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
-      define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
-      define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
-      define('CONFIG_CATCHALL_EMAIL',
-        'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', karim@sweetcode.co.uk'
-      );
-      error_reporting(E_ALL);
-      ini_set('display_errors', 'on');
-
-      $GLOBALS['mail_options'] =
-        array(
-          'driver'    => 'smtp',
-          'host'      => 'cncltd-co-uk0i.mail.protection.outlook.com',
-          'port'      => 25,
-          'auth'      => false
-        );      
-    }
-    
-
-		define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
-		define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
-		define('CONFIG_SALES_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
-    define('CONFIG_SUPPORT_EMAIL', 'support@cnc-ltd.co.uk');
-    define('CONFIG_CUSTOMER_SERVICE_EMAIL', ' customerservice@' . CONFIG_PUBLIC_DOMAIN);
-		define('CONFIG_SUPPORT_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
-		define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', CONFIG_CATCHALL_EMAIL);
-    define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN );
+            $GLOBALS['mail_options'] =
+                array(
+                    'driver' => 'smtp',
+                    'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                    'port' => 25,
+                    'auth' => false
+                );
+        }
 
 
-    $GLOBALS['request_mail_options'] =
-      array(
-        'host'     => 'cncmx01',
-        'port'     => 143,
-        'user'     => 'devasr',
-        'password' => 'Unread01$'
-      );
-		break;
+        define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SALES_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SUPPORT_EMAIL', 'support@cnc-ltd.co.uk');
+        define('CONFIG_CUSTOMER_SERVICE_EMAIL', ' customerservice@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SUPPORT_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
 
-	case MAIN_CONFIG_SERVER_TYPE_LIVE:
-		// email addresses
-    define('CONFIG_CATCHALL_EMAIL',
-        'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', karim@sweetcode.co.uk'
-      );
 
-		define("BASE_DRIVE", "C:\\Sites\cncapps");
-		define("SCR_DIR", "\\\\cncltd\\cnc\\Customer\\scr");
-    define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer");
-    define("COMPANY_DIR_FROM_BROWSER", "//cncltd/cnc/Company");
-    define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer");
-		define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
-		define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
-		define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
-		define('CONFIG_SALES_MANAGER_EMAIL', 'garyj@' . CONFIG_PUBLIC_DOMAIN);
-		define('CONFIG_SUPPORT_EMAIL', 'support@' . CONFIG_PUBLIC_DOMAIN);
-    define("DB_NAME", "cncapps");
-    define('CONFIG_CUSTOMER_SERVICE_EMAIL', ' customerservice@' . CONFIG_PUBLIC_DOMAIN);
-		define('CONFIG_SUPPORT_MANAGER_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
-		define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN );
-		define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN );
-		error_reporting( E_ALL & ~E_WARNING );
-		ini_set('display_errors', 'off');
+        $GLOBALS['request_mail_options'] =
+            array(
+                'host' => 'cncmx01',
+                'port' => 143,
+                'user' => 'devasr',
+                'password' => 'Unread01$'
+            );
+        break;
 
-    $GLOBALS['request_mail_options'] =
-      array(
-        'host'     => 'cncmx01',
-        'port'     => 143,
-        'user'     => 'asr',
-        'password' => 'Unread01$'
-      );
-      
-    $GLOBALS['mail_options'] =
-      array(
-        'driver'    => 'smtp',
-        'host'      => 'cncltd-co-uk0i.mail.protection.outlook.com',
-        'port'      => 25,
-        'auth'      => false
-      );      
-		break;
+    case MAIN_CONFIG_SERVER_TYPE_LIVE:
+        // email addresses
+        define('CONFIG_CATCHALL_EMAIL',
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', karim@sweetcode.co.uk'
+        );
+
+        define("BASE_DRIVE", "C:\\Sites\cncapps");
+        define("SCR_DIR", "\\\\cncltd\\cnc\\Customer\\scr");
+        define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer");
+        define("COMPANY_DIR_FROM_BROWSER", "//cncltd/cnc/Company");
+        define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer");
+        define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
+        define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SALES_MANAGER_EMAIL', 'garyj@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SUPPORT_EMAIL', 'support@' . CONFIG_PUBLIC_DOMAIN);
+        define("DB_NAME", "cncapps");
+        define('CONFIG_CUSTOMER_SERVICE_EMAIL', ' customerservice@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SUPPORT_MANAGER_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
+        error_reporting(E_ALL & ~E_WARNING);
+        ini_set('display_errors', 'off');
+
+        $GLOBALS['request_mail_options'] =
+            array(
+                'host' => 'cncmx01',
+                'port' => 143,
+                'user' => 'asr',
+                'password' => 'Unread01$'
+            );
+
+        $GLOBALS['mail_options'] =
+            array(
+                'driver' => 'smtp',
+                'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                'port' => 25,
+                'auth' => false
+            );
+        break;
 
 
 } // end switch
 
-define( 'CONFIG_LDAP_DOMAINCONTROLLER', 'cncdc01');
-define( 'CONFIG_LDAP_DOMAIN', 'cncltd');
+define('CONFIG_LDAP_DOMAINCONTROLLER', 'cncdc01');
+define('CONFIG_LDAP_DOMAIN', 'cncltd');
 
 define("APPLICATION_DIR", BASE_DRIVE . "/cnccode");
 define("SWEETCODE_DIR", BASE_DRIVE . "/sweetcode");
@@ -218,11 +216,11 @@ $cfg['quote_path'] = BASE_DRIVE . "/htdocs/quotes";
 define("PHPLIB_SESSIONS_DIR", BASE_DRIVE . "/sessions/");
 
 $GLOBALS['db_options'] =
-	array(
-		'type'	=> 'db',
-		'dsn'	=> 'mysql://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST .'/' . DB_NAME,
-		'mail_table' => 'mail_queue'
-	);
+    array(
+        'type' => 'db',
+        'dsn' => 'mysql://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST . '/' . DB_NAME,
+        'mail_table' => 'mail_queue'
+    );
 
 
 require BASE_DRIVE . '/vendor/autoload.php';
@@ -245,31 +243,31 @@ define("USER_SYSTEM", 67);
 /*
 List of userIDs that can add managers comments to service requests
 */
-$GLOBALS['can_add_manager_comment'] = 
-  array( USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA  );
+$GLOBALS['can_add_manager_comment'] =
+    array(USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA);
 
 /* 
 When automated emails coming in from unrecognised email addresses with these domains,
 do not attempt to match a customer whos contacts have the domain
 */
-$GLOBALS['exclude_sr_email_domains'] = 
-  array( 'gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.co.uk', 'theaccessgroup.com' );
+$GLOBALS['exclude_sr_email_domains'] =
+    array('gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.co.uk', 'theaccessgroup.com');
 
 define('CONFIG_SERVICE_REQUEST_DESC', 'Service Request');  // Description used in system
 
-define("PDF_DIR", APPLICATION_DIR.'/fpdf');
+define("PDF_DIR", APPLICATION_DIR . '/fpdf');
 $cfg["path"] = APPLICATION_DIR;
 
-define("SHOW_TIMINGS", FALSE);			// Causes CTController to display script and page execute times
-define("CONFIG_IDIOT_GUARD_ON", FALSE);			// Causes random string to all urls generated
-																		// by Controller::buildLink() to avoid caching
+define("SHOW_TIMINGS", FALSE);            // Causes CTController to display script and page execute times
+define("CONFIG_IDIOT_GUARD_ON", FALSE);            // Causes random string to all urls generated
+// by Controller::buildLink() to avoid caching
 // --------------------------------------------------------------------------
 define("MAX_PAGE_TITLE", 95);        // For browser page title-bar
 
 // I want to start using constants for global app settings
 // defaults
-define('CONFIG_DEF_ITEMTYPEID', 1);					// default item type when creating new items
-define('CONFIG_SERVER_ITEMTYPEID', 16);				// Server item type
+define('CONFIG_DEF_ITEMTYPEID', 1);                    // default item type when creating new items
+define('CONFIG_SERVER_ITEMTYPEID', 16);                // Server item type
 
 define('CONFIG_SERVERCARE_ITEMTYPEID', 55);
 define('CONFIG_SERVICEDESK_ITEMTYPEID', 56);
@@ -278,17 +276,17 @@ define('CONFIG_PREPAY_ITEMTYPEID', 57);
 define('CONFIG_2NDSITE_LOCAL_ITEMTYPEID', 58);
 define('CONFIG_2NDSITE_CNC_ITEMTYPEID', 59);
 
-define('CONFIG_DEF_PREPAY_ITEMID', 4111);				// general support contract
-define('CONFIG_DEF_PREPAY_TOPUP_ITEMID', 6448);	// general support contract topup
+define('CONFIG_DEF_PREPAY_ITEMID', 4111);                // general support contract
+define('CONFIG_DEF_PREPAY_TOPUP_ITEMID', 6448);    // general support contract topup
 
-define('CONFIG_DEF_SERVERGUARD_ANNUAL_CHARGE_ITEMID', 12182);		// CNC Server Guard Annual Charge
+define('CONFIG_DEF_SERVERGUARD_ANNUAL_CHARGE_ITEMID', 12182);        // CNC Server Guard Annual Charge
 
 define('CONFIG_INSTALLATION_ITEMID', 9251);
 
-define('CONFIG_SERVICEDESK_ITEMID', 6915);	// service desk renewal item
+define('CONFIG_SERVICEDESK_ITEMID', 6915);    // service desk renewal item
 
 define('CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID', 1502);
-define('CONFIG_CONSULTANCY_OUT_OF_HOURS_LABOUR_ITEMID', 1503 );
+define('CONFIG_CONSULTANCY_OUT_OF_HOURS_LABOUR_ITEMID', 1503);
 
 
 define('CONFIG_SALES_STOCK_CUSTOMERID', 2511);
@@ -312,7 +310,7 @@ define('CONFIG_CONTRACT_RENEWAL_TYPE_ID', 2);
 define('CONFIG_QUOTATION_RENEWAL_TYPE_ID', 3);
 define('CONFIG_DOMAIN_RENEWAL_TYPE_ID', 4);
 define('CONFIG_HOSTING_RENEWAL_TYPE_ID', 5);
-define('CONFIG_CONTRACT_RENEWAL_SERVICEDESK', 'CNC ServiceDesk Contract' );
+define('CONFIG_CONTRACT_RENEWAL_SERVICEDESK', 'CNC ServiceDesk Contract');
 
 define('CONFIG_TOPUP_ACTIVITY_TYPE_ID', 37); // for use on the client information form (Graham)
 define('CONFIG_RESOLVED_ACTIVITY_TYPE_ID', 35); // for resolved call activity type
@@ -324,25 +322,25 @@ define('CONFIG_SERVER_HEALTH_CHECK_CHECKLIST_ACTIVITY_TYPE_ID', 48);
 define('CONFIG_SERVER_HEALTH_CHECK_OFF_SITE_ACTIVITY_TYPE_ID', 12);
 define('CONFIG_SERVER_HEALTH_CHECK_ON_SITE_ACTIVITY_TYPE_ID', 50);
 define('CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID', 55);
-define('CONFIG_2NDSITE_BACKUP_ACTIVITY_TYPE_ID', 49 );
+define('CONFIG_2NDSITE_BACKUP_ACTIVITY_TYPE_ID', 49);
 
-define('CONFIG_CONTRACT_ADJUSTMENT_ACTIVITY_TYPE_ID', 39 );          // used when auto generating travel
-define('CONFIG_TRAVEL_ACTIVITY_TYPE_ID', 6 );					// used when auto generating travel
-define('CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID', 22 );		// used in prepay statements
-define('CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID', 36 );	//  "    "   "
-define('CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID', 11 );
-define('CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID', 8 );
-define('CONFIG_INITIAL_ACTIVITY_TYPE_ID', 51 ); // Initial problem activity
-define('CONFIG_VISIT_REQUEST_ACTIVITY_TYPE_ID', 21 );
+define('CONFIG_CONTRACT_ADJUSTMENT_ACTIVITY_TYPE_ID', 39);          // used when auto generating travel
+define('CONFIG_TRAVEL_ACTIVITY_TYPE_ID', 6);                    // used when auto generating travel
+define('CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID', 22);        // used in prepay statements
+define('CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID', 36);    //  "    "   "
+define('CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID', 11);
+define('CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID', 8);
+define('CONFIG_INITIAL_ACTIVITY_TYPE_ID', 51); // Initial problem activity
+define('CONFIG_VISIT_REQUEST_ACTIVITY_TYPE_ID', 21);
 
 define('CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID', 59);
 
-define('CONFIG_2NDSITE_BACKUP_ACTIVITY_CATEGORY_ID', 55 );
-define('CONFIG_TRAVEL_ACTIVITY_CATEGORY_ID', 30 );
-define('CONFIG_UNKNOWN_ACTIVITY_CATEGORY_ID', 59 );
-define('CONFIG_LOGGED_FOR_INFO_ACTIVITY_CATEGORY_ID', 9 );
+define('CONFIG_2NDSITE_BACKUP_ACTIVITY_CATEGORY_ID', 55);
+define('CONFIG_TRAVEL_ACTIVITY_CATEGORY_ID', 30);
+define('CONFIG_UNKNOWN_ACTIVITY_CATEGORY_ID', 59);
+define('CONFIG_LOGGED_FOR_INFO_ACTIVITY_CATEGORY_ID', 9);
 
-define('CONFIG_NOTHING_FOUND_ROOT_CAUSE_ID', 54 );
+define('CONFIG_NOTHING_FOUND_ROOT_CAUSE_ID', 54);
 
 define('CONFIG_CONTRACT_RENEWAL_DAYS', 45);
 
@@ -358,9 +356,9 @@ Amount of prepay activity for a service request above which a warning email is s
 */
 define('CONFIG_PREPAY_ALERT_LIMIT', 100);
 
-define('CONFIG_HEADER_GSC_STATEMENT_FLAG', 'mailshot8Flag');	// GSC statement contact flag column
+define('CONFIG_HEADER_GSC_STATEMENT_FLAG', 'mailshot8Flag');    // GSC statement contact flag column
 
-define('CONFIG_HEADER_MAIN_CONTACT_FLAG', 'mailshot10Flag');	// Main contact flag column
+define('CONFIG_HEADER_MAIN_CONTACT_FLAG', 'mailshot10Flag');    // Main contact flag column
 
 define('CONFIG_HEADER_SUPPORT_CONTACT_FLAG', 'mailshot5Flag');
 
@@ -373,7 +371,7 @@ define('CONFIG_PHONE_SYSTEM_SUPPORT_PHONE', '0845 070 0583');
 
 define('CONFIG_MYSQL_DATE', 'Y-m-d');
 define('CONFIG_MYSQL_TIME', 'H:i:s');
-define('CONFIG_MYSQL_DATETIME', CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME );
+define('CONFIG_MYSQL_DATETIME', CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME);
 
 $cfg["postToSco"] = FALSE;
 $cfg["txt_chevron"] = "&gt;";
@@ -385,30 +383,30 @@ $cfg["cncaddress_path"] = IMAGES_DIR . '\cncaddress.gif';
 $cfg["php_extension"] = ".php";
 $cfg["html_extension"] = ".html";
 $cfg["home"] = "index.php";
-$cfg["path_templates"] = APPLICATION_DIR."/templates";
-$cfg["path_test_templates"] = APPLICATION_DIR."/test_templates";
-$cfg["path_lib"] = APPLICATION_DIR."/lib";
-$cfg["path_lang_strings"] = APPLICATION_DIR."/localise_english.inc.php";
-$cfg["path_test_strings"] = APPLICATION_DIR."/localise_test.inc.php";
-$cfg["path_dbe"] = APPLICATION_DIR."/data_classes";
-$cfg["path_bu"] = APPLICATION_DIR."/business_classes";
-$cfg["path_ct"] = APPLICATION_DIR."/controller_classes";
-$cfg["path_gc"] = SWEETCODE_DIR."/generic_classes";
-$cfg["path_func"] = APPLICATION_DIR."/functions";
+$cfg["path_templates"] = APPLICATION_DIR . "/templates";
+$cfg["path_test_templates"] = APPLICATION_DIR . "/test_templates";
+$cfg["path_lib"] = APPLICATION_DIR . "/lib";
+$cfg["path_lang_strings"] = APPLICATION_DIR . "/localise_english.inc.php";
+$cfg["path_test_strings"] = APPLICATION_DIR . "/localise_test.inc.php";
+$cfg["path_dbe"] = APPLICATION_DIR . "/data_classes";
+$cfg["path_bu"] = APPLICATION_DIR . "/business_classes";
+$cfg["path_ct"] = APPLICATION_DIR . "/controller_classes";
+$cfg["path_gc"] = SWEETCODE_DIR . "/generic_classes";
+$cfg["path_func"] = APPLICATION_DIR . "/functions";
 $cfg["path_db_backup"] = "\\\\cncnas2\\DATA\\CNCAPPS_Raw_Backup";
-$cfg["path_uc"] = APPLICATION_DIR."/utility_classes";
-$cfg["path_phplib_classes"] = APPLICATION_DIR."/lib";
-$cfg["path_phpunit_classes"] = APPLICATION_DIR."/phpunit_classes";
+$cfg["path_uc"] = APPLICATION_DIR . "/utility_classes";
+$cfg["path_phplib_classes"] = APPLICATION_DIR . "/lib";
+$cfg["path_phpunit_classes"] = APPLICATION_DIR . "/phpunit_classes";
 // --------------------------------------------------------------------------
 
-$path = BASE_DRIVE ."/php/PEAR";          // this is our own modified pear lib
+$path = BASE_DRIVE . "/php/PEAR";          // this is our own modified pear lib
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-require_once(BASE_DRIVE ."/phplib4/prepend.php"); // need to do this on live site
+require_once(BASE_DRIVE . "/phplib4/prepend.php"); // need to do this on live site
 
-require_once($cfg["path_phplib_classes"].DIRECTORY_SEPARATOR."local4.inc.php");
-$db= new dbSweetcode;
+require_once($cfg["path_phplib_classes"] . DIRECTORY_SEPARATOR . "local4.inc.php");
+$db = new dbSweetcode;
 
-$db->query( "SET sql_mode = ''" );    // strict mode off
+$db->query("SET sql_mode = ''");    // strict mode off
 //$pkdb= new dbSweetcode;
 //$db->Debug = DEBUG;        // Turn this on if database debug output needed
 ?>
