@@ -1,7 +1,8 @@
 <?php
+echo 'yay';
+return;
 require_once("config.inc.php");
 require_once($cfg["path_ct"]."/CTHome.inc.php");
-echo 'yay';
 /*
 if ( $_REQUEST[ 'action' ] == 'logout' ){
   $sessionClass = PHPLIB_CLASSNAME_SESSION;
