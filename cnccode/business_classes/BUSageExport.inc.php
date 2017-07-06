@@ -7,7 +7,7 @@
 */
 require_once($cfg["path_dbe"]."/DBEPurchaseInv.inc.php");
 require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_func"]."/common.inc.php");
+require_once($cfg["path_func"]."/Common.inc.php");
 class BUSageExport extends Business{
 	var $salesHandle="";
 	var $transHandle="";

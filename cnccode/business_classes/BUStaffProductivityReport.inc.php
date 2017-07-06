@@ -8,7 +8,7 @@
 require_once($cfg["path_gc"]."/Business.inc.php");
 require_once($cfg["path_gc"]."/Controller.inc.php");
 require_once($cfg["path_func"]."/activity.inc.php");
-require_once($cfg["path_func"]."/common.inc.php");
+require_once($cfg["path_func"]."/Common.inc.php");
 require_once($cfg["path_bu"]."/BUHeader.inc.php");
 require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
 

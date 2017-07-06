@@ -19,7 +19,7 @@ require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'].'/BUExternalItem.inc.php');
 require_once($cfg ['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_bu'].'/BURenewal.inc.php');
-require_once($cfg['path_func'].'/common.inc.php');
+require_once($cfg['path_func'].'/Common.inc.php');
 require_once($cfg ['path_bu'] . '/BUSalesOrder.inc.php');
 
 class CTRenewalReport extends CTCNC {

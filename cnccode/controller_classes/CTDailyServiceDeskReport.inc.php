@@ -8,7 +8,7 @@
 */
 require_once($cfg['path_ct'].'/CTCNC.inc.php');
 require_once($cfg['path_bu'].'/BUDailyServiceDeskReport.inc.php');
-require_once($cfg['path_func'].'/common.inc.php');
+require_once($cfg['path_func'].'/Common.inc.php');
 require_once("Mail.php");
 require_once("Mail/mime.php");
 

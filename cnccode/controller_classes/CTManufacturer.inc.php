@@ -9,7 +9,7 @@
 require_once($cfg['path_bu'].'/BUManufacturer.inc.php');
 require_once($cfg['path_ct'].'/CTCNC.inc.php');
 require_once($cfg['path_dbe'].'/DSForm.inc.php');
-require_once($cfg['path_func'].'/common.inc.php');
+require_once($cfg['path_func'].'/Common.inc.php');
 // Messages
 define('CTMANUFACTURER_MSG_NONE_FND', 'No manufacturers found');
 define('CTMANUFACTURER_MSG_MANUFACTURER_NOT_FND', 'Manufacturer not found');
