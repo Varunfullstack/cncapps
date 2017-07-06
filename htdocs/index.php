@@ -1,6 +1,4 @@
 <?php
-echo 'yay';
-return;
 require_once("config.inc.php");
 require_once($cfg["path_ct"]."/CTHome.inc.php");
 /*
