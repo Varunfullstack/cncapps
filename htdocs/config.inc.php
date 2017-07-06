@@ -96,7 +96,7 @@ switch ($server_type) {
         define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
 
         if ($onPavilionWebServer) {
-            define("BASE_DRIVE", "/home/pavilionweb/devtest.pavilionweb.com/");
+            define("BASE_DRIVE", "/home/pavilionweb/devtest.pavilionweb.com");
             define("SCR_DIR", "/home/pavilionweb/devtest.pavilionweb.com/Company/scr");
             define("CUSTOMER_DIR_FROM_BROWSER", "/home/pavilionweb/devtest.pavilionweb.com/Customer");
             define("CUSTOMER_DIR", "/home/pavilionweb/devtest.pavilionweb.com/Customer");
