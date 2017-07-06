@@ -46,7 +46,7 @@ define('MAIN_CONFIG_SERVER_TYPE_LIVE', 'live');
 define('MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT', 'development');
 define('MAIN_CONFIG_SERVER_TYPE_REPLICATED', 'replicated'); // replicated server
 
-$onSweetcodeServer = false;
+$onPavilionWebServer = false;
 
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
 
@@ -66,9 +66,9 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 
             break;
 
-        case 'cnc.local':
+        case 'devtest.pavilionweb.com':
 
-            $onSweetcodeServer = true;
+            $onPavilionWebServer = true;
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
 
             break;
@@ -88,39 +88,38 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 
 switch ($server_type) {
 
+
     case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
 
-        if ($onSweetcodeServer) {
-            define("BASE_DRIVE", "E:\\Sites\\CNC");
-            define("SCR_DIR", "\\Sites\\CNC\\Company\\scr");
-            define("CUSTOMER_DIR_FROM_BROWSER", "//Sites/CNC/customer");
-            define("CUSTOMER_DIR", "\\Sites\\CNC\\Customer");
-            define('CONFIG_PUBLIC_DOMAIN', 'sweetcode.co.uk');
-            define('CONFIG_CATCHALL_EMAIL', 'karim@sweetcode.co.uk');
-            define("DB_NAME", "cncdev");
+
+        define("DB_NAME", "cncappsdev");
+
+        if ($onPavilionWebServer) {
+            define("BASE_DRIVE", "/home/pavilionweb/devtest.pavilionweb.com/");
+            define("SCR_DIR", "/home/pavilionweb/devtest.pavilionweb.com/Company/scr");
+            define("CUSTOMER_DIR_FROM_BROWSER", "/home/pavilionweb/devtest.pavilionweb.com/Customer");
+            define("CUSTOMER_DIR", "/home/pavilionweb/devtest.pavilionweb.com/Customer");
+//            define('CONFIG_PUBLIC_DOMAIN', 'devtest.pavilionweb.com');
+            define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmail@cnc-ltd.co.uk');
+            define("DB_HOST", "188.39.98.130");
             error_reporting(E_ALL & ~E_WARNING);
-            ini_set('display_errors', 'off');
+            ini_set('display_errors', 'on');
 
             $GLOBALS['mail_options'] =
                 array(
                     'driver' => 'smtp',
-                    'host' => 'smtp.gmail.com',
-                    'port' => 465,
-                    'ssl' => 'SSL',
-                    'auth' => 'Login',
-                    'username' => 'sweetcode.test@gmail.com',
-                    'password' => 'sweettester'
+                    'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                    'port' => 25,
+                    'auth' => false
                 );
         } else {
             define("BASE_DRIVE", "C:\\Sites\cncappsdev");
-            define("DB_NAME", "cncappsdev");
+            define("DB_HOST", "localhost");
             define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
             define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
             define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
             define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
-            define('CONFIG_CATCHALL_EMAIL',
-                'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', karim@sweetcode.co.uk'
-            );
+            define('CONFIG_CATCHALL_EMAIL','HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
             error_reporting(E_ALL);
             ini_set('display_errors', 'on');
 
@@ -156,7 +155,7 @@ switch ($server_type) {
     case MAIN_CONFIG_SERVER_TYPE_LIVE:
         // email addresses
         define('CONFIG_CATCHALL_EMAIL',
-            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', karim@sweetcode.co.uk'
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 
         define("BASE_DRIVE", "C:\\Sites\cncapps");
@@ -208,7 +207,6 @@ define("DELIVERY_NOTES_DIR", BASE_DRIVE . "/htdocs/delivery_notes");
 define("LETTER_TEMPLATE_DIR", BASE_DRIVE . "/htdocs/letter_templates");
 define("EMAIL_TEMPLATE_DIR", BASE_DRIVE . "/htdocs/email_templates");
 define("SAGE_EXPORT_DIR", BASE_DRIVE . "/htdocs/export");
-define("DB_HOST", "localhost");
 define("DB_USER", "webuser");
 define("DB_PASSWORD", "CnC1988");
 define("CONFIG_SQL_LOG", BASE_DRIVE . "/htdocs/log_file/sql_log.html");
