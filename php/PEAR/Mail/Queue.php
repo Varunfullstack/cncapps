@@ -622,11 +622,12 @@ class Mail_Queue extends PEAR
     /**
      * Tell whether a result code from a Mail_Queue method is an error
      *
-     * @param   int       $value  result code
-     * @return  boolean   whether $value is an MAILQUEUE_ERROR
+     * @param   int $value result code
+     * @param null $code
+     * @return bool whether $value is an MAILQUEUE_ERROR
      * @access public
      */
-    function isError($value)
+    function isError($value, $code= null)
     {
         return (is_object($value) && is_a($value, 'pear_error'));
     }
