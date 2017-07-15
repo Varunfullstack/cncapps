@@ -1,5 +1,7 @@
 <?php
 date_default_timezone_set('Europe/London');
+
+ini_set('memory_limit', '2048M');
 /**
  * Configuration settings.
  *
@@ -104,7 +106,7 @@ switch ($server_type) {
             define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmail@cnc-ltd.co.uk');
             define("DB_HOST", "188.39.98.130");
             error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
-            ini_set('display_errors', 'on');
+            ini_set('display_errors', 'off');
 
             $GLOBALS['mail_options'] =
                 array(
@@ -120,8 +122,8 @@ switch ($server_type) {
             define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
             define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
             define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
-            error_reporting(E_ALL);
-            ini_set('display_errors', 'on');
+            error_reporting(E_ALL & ~E_STRICT);
+            ini_set('display_errors', 'off');
 
             $GLOBALS['mail_options'] =
                 array(
@@ -173,7 +175,7 @@ switch ($server_type) {
         define('CONFIG_SUPPORT_MANAGER_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
         define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
         define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_STRICT);
         ini_set('display_errors', 'off');
 
         $GLOBALS['request_mail_options'] =
