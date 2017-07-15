@@ -312,7 +312,7 @@ class CTPurchaseOrder extends CTCNC {
 			$printedCol = $this->dsPorhead->columnExists('printed');
 			$ordheadIDCol = $this->dsPorhead->columnExists('ordheadID');
 			while ($this->dsPorhead->fetchNext()){
-				$orderURL = 
+				$orderURL =
 					$this->buildLink(
 						$_SERVER['PHP_SELF'],
 						array(
@@ -467,11 +467,11 @@ class CTPurchaseOrder extends CTCNC {
 					CTCNC_PAGE_GOODSIN,
 					array(
 						'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
-						'porheadID' => $porheadID		
+						'porheadID' => $porheadID
 					)
 				);
 			$txtGoodsIn = 'Goods In';
-		}		
+		}
 
 		$this->setPageTitle($title);
 		$this->setTemplateFiles	(
@@ -493,7 +493,7 @@ class CTPurchaseOrder extends CTCNC {
 					CTCNC_PAGE_SALESORDER,
 					array(
 						'action' => CTCNC_ACT_DISP_SALESORDER,
-						'ordheadID' => $dsPorhead->getValue('ordheadID')		
+						'ordheadID' => $dsPorhead->getValue('ordheadID')
 					)
 				);
 			$txtSalesOrder = 'Sales Order';
@@ -514,7 +514,7 @@ class CTPurchaseOrder extends CTCNC {
 		// get sales order delivery contact
 		$dbeContact = new DBEContact($this);
 		$dbeContact->getRow($dbeOrdhead->getValue('delContactID'));
-		
+
 		// if there are lines then allow print of purchase order
 		if ($dsPorline->rowCount() > 0){
 			$urlGeneratePDF =
@@ -636,7 +636,7 @@ class CTPurchaseOrder extends CTCNC {
 						'qtyReceived' => number_format($dsPorline->getValue('qtyReceived'), 2, '.', ''),
 						'curUnitCost' => number_format($dsPorline->getValue('curUnitCost'), 2, '.', ''),
 						'curTotalCost' => number_format($curTotalCost, 2, '.', ''),
-						'expectedDate' => $expectedDate 
+						'expectedDate' => $expectedDate
 					)
 				);
 				if ($disabled != CTCNC_HTML_DISABLED){		// enabled so allow/show editing options
@@ -735,7 +735,7 @@ class CTPurchaseOrder extends CTCNC {
 		if ($this->dsPorhead->getValue('type') != 'I'){
 			$this->displayFatalError(CTPURCHASEORDER_MSG_MUST_BE_INITIAL);
 			return;
-		} 
+		}
 		if ($_REQUEST['sequenceNo']==''){
 			$this->displayFatalError(CTPURCHASEORDER_MSG_SEQNO_NOT_PASSED);
 			return;
@@ -800,7 +800,7 @@ class CTPurchaseOrder extends CTCNC {
 					)
 				);
 		}
-		$urlCancel = 
+		$urlCancel =
 			$this->buildLink($_SERVER['PHP_SELF'],
 				array(
 					'porheadID' => $this->dsPorhead->getValue('porheadID'),
@@ -833,7 +833,7 @@ class CTPurchaseOrder extends CTCNC {
 				'urlCancel' => $urlCancel
 			)
 		);
-	}// end function orderLineForm()	
+	}// end function orderLineForm()
 	/**
 	* Update/Insert order line
 	*
@@ -889,7 +889,7 @@ class CTPurchaseOrder extends CTCNC {
 			);
 		header('Location: ' . $urlNext);
 	}
-	/**	
+	/**
 	* Move order line down
 	*
 	* @access private
@@ -907,7 +907,7 @@ class CTPurchaseOrder extends CTCNC {
 			);
 		header('Location: ' . $urlNext);
 	}
-	/**	
+	/**
 	* Delete order line
 	*
 	* @access private
@@ -925,8 +925,8 @@ class CTPurchaseOrder extends CTCNC {
 			);
 		header('Location: ' . $urlNext);
 	}
-	/**	
-	* Delete order 
+	/**
+	* Delete order
 	*
 	* @access private
 	* @authors Karim Ahmed - Sweet Code Limited
@@ -942,7 +942,7 @@ class CTPurchaseOrder extends CTCNC {
 			return;
 		}
 		$this->buPurchaseOrder->deleteOrder($_REQUEST['porheadID']);
-		
+
 		$urlNext =						// default action
 			$this->buildLink($_SERVER['PHP_SELF'],
 				array(

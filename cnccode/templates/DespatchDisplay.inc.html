@@ -1,113 +1,126 @@
 <!-- Template: DespatchDisplay.inc.html -->
 <script language='JavaScript' src='CommonJS.js'></script>
 <SCRIPT language="JavaScript">
-var qtySetZero = true; // initialise flag to indicate current toggle state 
-document.onkeydown = function () {
-  if (event.keyCode == 116) { // F5 toggle
-		event.keyCode = 0;
-		event.returnValue = false;
-		event.cancelBubble = true;
-		numberOfElements = getElementCount("qtyToDespatch");
-	  for (var i=0 ; i < numberOfElements ; i++)
-		{
-			var qtyToDespatch = document.all("qtyToDespatch", i);
-			var qtyOS = document.all("qtyOutstandingHide", i);
-			if(qtySetZero && !qtyToDespatch.disabled){
-				qtyToDespatch.value = qtyOS.value;
-			}
-			else{
-				qtyToDespatch.value=0;
-			}
-		}
-		// toggle global flag
-		if(qtySetZero){
-			qtySetZero = false;
-		}
-		else{
-			qtySetZero = true;
-		}
-  }
-}
+    var qtySetZero = true; // initialise flag to indicate current toggle state
+    $(function () {
+        document.onkeydown = function () {
+            if (event.keyCode == 116) { // F5 toggle
+                event.preventDefault();
+                event.stopPropagation();
+                event.keyCode = 0;
+                event.returnValue = false;
+                event.cancelBubble = true;
+
+                var qtyToDespatchElements = $('.qtyToDespatch');
+                var qtyOSElements = $('.qtyOutstandingHide');
+                qtyToDespatchElements.each(function (index, item, array) {
+                    var qtyToDespatch = qtyToDespatchElements[index];
+                    var qtyOS = qtyOSElements[index];
+                    if (qtySetZero && !qtyToDespatch.disabled) {
+                        qtyToDespatch.value = qtyOS.value;
+                    }
+                    else {
+                        qtyToDespatch.value = 0;
+                    }
+                });
+                // toggle global flag
+                qtySetZero = !qtySetZero;
+            }
+        }
+    })
+
 </SCRIPT>
 <TABLE width="100px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlSalesOrder}">Sales Order</a> 
-		</TD>
-	</TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlSalesOrder}">Sales Order</a>
+        </TD>
+    </TR>
 </TABLE>
 <br/>
 <P class="formErrorMessage">{poNotRecd}</P>
 <form name="despatchForm" method="POST" enctype="multipart/form-data" action="{urlDespatch}">
-<TABLE border="0">
-	<TR>
-		<TD>
-			<table width="200px" border="0" cellspacing="0" cellpadding="1">
-				<tr> 
-					<td width="60px" class="promptText">Deliver By</td>
-					<td class="field">
-						<select
-							type="text"
-							id="deliveryMethodID"
-							name="deliveryMethodID"
-						>
-							<option value="">Please Select</option>
-							<!-- BEGIN deliveryMethodBlock -->
-							<option {deliveryMethodSelected} value="{deliveryMethodID}">{deliveryMethodDescription}</option>
-							<!-- END deliveryMethodBlock -->
-						</select>
-					</td>
-				</tr>
-        <tr> 
-          <td width="60px" class="promptText">Only Create Delivery Note</td>
-          <td class="field">
-            <input
-              type="checkbox"
-              id="onlyCreateDespatchNote"
-              name="onlyCreateDespatchNote"
-              value="1"
-            >
-          </td>
-        </tr>
-			</table>
-			<BR/>
-		</TD>
-		<TD>&nbsp;
-			
-		</TD>
-	</TR>
-	<TR>
-		<TD>
-			<table class="singleBorder" width="740px" border="0" cellspacing="2" cellpadding="1">
-				<tr> 
-					<td width="350px" class="listHeadText">Description</td>
-					<td width="57px" class="listHeadText">Part No</td>
-					<td width="50px" class="listHeadText">Ordered</td>
-					<td width="50px" class="listHeadText">Outstanding</td>
-					<td width="140px" class="listHeadText">Despatch (F5 toggle)</td>
-					<td width="10px" class="listHeadText">&nbsp;</td>
-				</tr>
-				<!-- BEGIN orderLineBlock -->
-				<input type="hidden" id="sequenceNo" name="despatch[{sequenceNo}][sequenceNo]" value={sequenceNo}>
-				<input type="hidden" id="qtyOutstandingHide" value="{qtyOutstandingHide}">
-				<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
-					<td class="{orderLineClass}"><DIV align="left">{description}</DIV></td>
-					<td class="{orderLineClass}"><DIV align="left">{partNo}</DIV></td>
-					<td class="{orderLineClass}">{qtyOrdered}</td>
-					<td class="{orderLineClass}">{qtyOutstanding}</td>
-					<td class="{orderLineClass}"><DIV align="right"><input type="text" id="qtyToDespatch" name="despatch[{sequenceNo}][qtyToDespatch]" value="{qtyToDespatch}" maxlength="5"></DIV></td>
-					<td class="{orderLineClass}"><DIV align="right">{renewalLink}
-					</DIV></td>
-				</tr>
-				<!-- END orderLineBlock -->
-				<tr>
-					  <td colspan="5"><input type="submit" name="Submit" value="Despatch">{renewalsButton}</td> 
-				</tr>
-			</table>
-		</TD>
-		<TD valign="top">
-			{despatchDisplayNotes}
-		</TD>
-	</TR>
-</TABLE>
+    <TABLE border="0">
+        <TR>
+            <TD>
+                <table width="200px" border="0" cellspacing="0" cellpadding="1">
+                    <tr>
+                        <td width="60px" class="promptText">Deliver By</td>
+                        <td class="field">
+                            <select
+                                    type="text"
+                                    id="deliveryMethodID"
+                                    name="deliveryMethodID"
+                            >
+                                <option value="">Please Select</option>
+                                <!-- BEGIN deliveryMethodBlock -->
+                                <option {deliveryMethodSelected} value="{deliveryMethodID}">
+                                    {deliveryMethodDescription}
+                                </option>
+                                <!-- END deliveryMethodBlock -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="60px" class="promptText">Only Create Delivery Note</td>
+                        <td class="field">
+                            <input
+                                    type="checkbox"
+                                    id="onlyCreateDespatchNote"
+                                    name="onlyCreateDespatchNote"
+                                    value="1"
+                            >
+                        </td>
+                    </tr>
+                </table>
+                <BR/>
+            </TD>
+            <TD>&nbsp;
+
+            </TD>
+        </TR>
+        <TR>
+            <TD>
+                <table class="singleBorder" width="740px" border="0" cellspacing="2" cellpadding="1">
+                    <tr>
+                        <td width="350px" class="listHeadText">Description</td>
+                        <td width="57px" class="listHeadText">Part No</td>
+                        <td width="50px" class="listHeadText">Ordered</td>
+                        <td width="50px" class="listHeadText">Outstanding</td>
+                        <td width="140px" class="listHeadText">Despatch (F5 toggle)</td>
+                        <td width="10px" class="listHeadText">&nbsp;</td>
+                    </tr>
+                    <!-- BEGIN orderLineBlock -->
+                    <input type="hidden" id="sequenceNo" name="despatch[{sequenceNo}][sequenceNo]" value={sequenceNo}>
+                    <input type="hidden" class="qtyOutstandingHide" value="{qtyOutstandingHide}">
+                    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+                        <td class="{orderLineClass}">
+                            <DIV align="left">{description}</DIV>
+                        </td>
+                        <td class="{orderLineClass}">
+                            <DIV align="left">{partNo}</DIV>
+                        </td>
+                        <td class="{orderLineClass}">{qtyOrdered}</td>
+                        <td class="{orderLineClass}">{qtyOutstanding}</td>
+                        <td class="{orderLineClass}">
+                            <DIV align="right"><input type="text" class="qtyToDespatch"
+                                                      name="despatch[{sequenceNo}][qtyToDespatch]"
+                                                      value="{qtyToDespatch}" maxlength="5"></DIV>
+                        </td>
+                        <td class="{orderLineClass}">
+                            <DIV align="right">{renewalLink}
+                            </DIV>
+                        </td>
+                    </tr>
+                    <!-- END orderLineBlock -->
+                    <tr>
+                        <td colspan="5"><input type="submit" name="Submit" value="Despatch">{renewalsButton}</td>
+                    </tr>
+                </table>
+            </TD>
+            <TD valign="top">
+                {despatchDisplayNotes}
+            </TD>
+        </TR>
+    </TABLE>
 </form>
 <!-- End Template: DespatchDisplay.inc.html -->

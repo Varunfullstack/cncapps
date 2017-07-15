@@ -18,7 +18,7 @@
   }
 </script>
 <script language='JavaScript' src="CommonJS.js"></script>
-{salesOrderLineEditJS} {salesOrderSiteEditJS} 
+{salesOrderLineEditJS} {salesOrderSiteEditJS}
 <script language='JavaScript'>
 function customerNotePopup(){
     window.open(
@@ -26,7 +26,7 @@ function customerNotePopup(){
       'item',
       'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
     );
-  
+
 }
 function serviceRequestPopup(){
     window.open(
@@ -34,13 +34,13 @@ function serviceRequestPopup(){
       'item',
       'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
     );
-  
+
 }
 function checkFunctionKey(field){
 
  	if (event.keyCode == 120){			// F9 - edit
 		switch (field.id){
-			case "itemDescription": 
+			case "itemDescription":
 				if (document.getElementById("itemID").value != "0"){
 					window.open(
 						'{urlItemEdit}&itemID=' +
@@ -52,7 +52,7 @@ function checkFunctionKey(field){
 					);
 				}
 				break;
-			case "supplierName": 
+			case "supplierName":
 				if (document.getElementById("supplierID").value != "0"){
 					window.open(
 						'{urlSupplierEdit}&supplierID=' +
@@ -65,7 +65,7 @@ function checkFunctionKey(field){
 				}
 				break;
 
-      case "updateSupplierName": 
+      case "updateSupplierName":
         if (document.getElementById("updateSupplierID").value != "0"){
           window.open(
             '{urlSupplierEdit}&supplierID=' +
@@ -77,7 +77,7 @@ function checkFunctionKey(field){
           );
         }
         break;
-			case "invSiteDesc": 
+			case "invSiteDesc":
 				if (document.getElementById("invSiteNo").value != ""){
 					window.open(
 						'{urlSiteEdit}&customerID={customerID}' +
@@ -88,7 +88,7 @@ function checkFunctionKey(field){
 					);
 				}
 				break;
-			case "delSiteDesc": 
+			case "delSiteDesc":
 				if (document.getElementById("delSiteNo").value != ""){
 					window.open(
 						'{urlSiteEdit}&customerID={customerID}' +
@@ -98,7 +98,7 @@ function checkFunctionKey(field){
 						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
 				}
 				break;
-			case "invContactName": 
+			case "invContactName":
 				if (document.getElementById("invContactID").value != ""){
 					window.open(
 						'{urlContactEdit}'+
@@ -108,7 +108,7 @@ function checkFunctionKey(field){
 						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
 				}
 				break;
-			case "delContactName": 
+			case "delContactName":
 				if (document.getElementById("delContactID").value != ""){
 					window.open(
 						'{urlContactEdit}'+
@@ -118,40 +118,43 @@ function checkFunctionKey(field){
 						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
 				}
 				break;
-		}		
+		}
  	}
  	return;
-}		
+}
 function ToggleSelectedLines(checkedOn)
 {
   var sa=false;
   if(checkedOn)
     sa=true;
-		numberOfElements = getElementCount("orderLine");
+		var numberOfElements = getElementCount("orderLine");
 	  for (var i=0 ; i < numberOfElements ; i++)
 	{
 		var e = document.all("orderLine", i);
-		if(sa && !e.readOnly)
-			e.checked=true;
-		else
-			e.checked=false;
+		if(sa && !e.readOnly){
+		    $(e).attr('checked', 'checked')
+		}
+		else{
+		    $(e).removeAttr('checked')
+		}
+
 	}
 }
 </script>
 <TABLE width="1000px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlDeleteOrder}"  onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)">{txtDeleteOrder}</a> 
+	<TR>
+		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlDeleteOrder}"  onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)">{txtDeleteOrder}</a>
 		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a> 
+		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
 		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlInvoices}">{txtInvoices}</a> 
+		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlInvoices}">{txtInvoices}</a>
 		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlDespatch}">{txtDespatch}</a> 
+		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlDespatch}">{txtDespatch}</a>
 		</TD>
     </TD>
     <TD width="100px" class="navigateLink" valign="top"> {linkServiceRequest}
     </TD>
-    <TD width="100px" class="navigateLink" valign="top"> <a href="{urlRenewalReport}" target="_blank">{txtRenewalReport}</a> 
+    <TD width="100px" class="navigateLink" valign="top"> <a href="{urlRenewalReport}" target="_blank">{txtRenewalReport}</a>
     </TD>
     <TD width="100px" class="navigateLink" valign="top"> <a href="#" onclick="customerNotePopup()">{txtCustomerNote}</a></TD>
     <TD width="100px" class="navigateLink" valign="top">{currentDocumentsLink}
@@ -160,7 +163,7 @@ function ToggleSelectedLines(checkedOn)
 	</TR>
 </table>
 <br/>
-{salesOrderHeadDisplay} {salesOrderDisplayNewLine} 
+{salesOrderHeadDisplay} {salesOrderDisplayNewLine}
 <form name="quickQuoteForm" method="POST" enctype="multipart/form-data" action="{urlSubmitOrderLines}">
 	<input type="hidden" name="form[ordheadID]" value="{ordheadID}">
   <input type="hidden" name="form[serviceRequestCustomerItemID]" value="{serviceRequestCustomerItemID}">
@@ -169,7 +172,7 @@ function ToggleSelectedLines(checkedOn)
 	<INPUT type="hidden" id="ordheadID" name="ordheadID" value="{ordheadID}">
 	<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
 	<table class="singleBorder" width="970" border="0" cellspacing="1" cellpadding="1">
-		<tr> 
+		<tr>
 			<td width="16px" class="listHeadText"> <input type="checkbox" name="Toggle" onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)"></td>
 			<td width="10px" class="listHeadText">&nbsp;</td>
 			<td width="242px" class="listHeadText">Description</td>
@@ -191,7 +194,7 @@ function ToggleSelectedLines(checkedOn)
 		<INPUT type="hidden" id="supplierName" name="ordline[{sequenceNo}][supplierName]" value="{supplierName}">
 		{salesOrderLine}
 		<!-- END orderLineBlock -->
-		<tr> 
+		<tr>
 			<td>&nbsp;</td>
 			<td class="orderTotalItem">&nbsp;</td>
 			<td class="orderTotalItem"> <DIV align="left"> Totals </DIV></td>
@@ -259,19 +262,19 @@ function ToggleSelectedLines(checkedOn)
 					<font class="formErrorMessage">{linesMessage}</font>
       </td>
 		</table>
-	{salesOrderGenerateQuotes} 
+	{salesOrderGenerateQuotes}
 </form>
-{salesOrderDisplayQuotes} 
+{salesOrderDisplayQuotes}
 <table width="700px" border="0" cellspacing="0" cellpadding="1">
-	<tr> 
+	<tr>
 		<form name="ordheadinv" method="post" action="{urlUpdateInvAddress}">
 			<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
 			<td valign="top" class="mainHeadText"> <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-					<tr> 
-						<td valign="top" class="listHeadText"><div align="center">Invoice 
+					<tr>
+						<td valign="top" class="listHeadText"><div align="center">Invoice
 								Address</div></td>
 					</tr>
-					<tr> 
+					<tr>
 						<td valign="top" class="mainHeadText"> <P class="addressLine">{invAdd1}</P>
 							<P class="addressLine">{invAdd2}</P>
 							<P class="addressLine">{invAdd3}</P>
@@ -279,9 +282,9 @@ function ToggleSelectedLines(checkedOn)
 							<P class="addressLine">{invCounty}</P>
 							<P class="addressLine">{invPostcode}</P></td>
 					</tr>
-					<tr> 
-						<td class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}"> 
-							<input type="hidden" name="form[siteNo]" id="invSiteNo" value="{invSiteNo}"> 
+					<tr>
+						<td class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}">
+							<input type="hidden" name="form[siteNo]" id="invSiteNo" value="{invSiteNo}">
 							<input
 								type="text"
 								name ="form[invSiteDesc]"
@@ -309,11 +312,11 @@ function ToggleSelectedLines(checkedOn)
 		<form name="ordheaddel" method="post" action="{urlUpdateDelAddress}">
 			<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
 			<td valign="top"> <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-					<tr> 
-						<td valign="top" class="listHeadText"><div align="center">Delivery 
+					<tr>
+						<td valign="top" class="listHeadText"><div align="center">Delivery
 								Address</div></td>
 					</tr>
-					<tr> 
+					<tr>
 						<td valign="top" class="mainHeadText"> <P class="addressLine">{delAdd1}</P>
 							<P class="addressLine">{delAdd2}</P>
 							<P class="addressLine">{delAdd3}</P>
@@ -321,9 +324,9 @@ function ToggleSelectedLines(checkedOn)
 							<P class="addressLine">{delCounty}</P>
 							<P class="addressLine">{delPostcode}</P></td>
 					</tr>
-					<tr> 
-						<td class="mainHeadText"> <input type="hidden" name="form[ordheadID]" value="{ordheadID}"> 
-							<input type="hidden" name="form[siteNo]"  id="delSiteNo" value="{delSiteNo}"> 
+					<tr>
+						<td class="mainHeadText"> <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
+							<input type="hidden" name="form[siteNo]"  id="delSiteNo" value="{delSiteNo}">
 							<input
 					type="text"
 					name ="form[delSiteDesc]"
@@ -338,7 +341,7 @@ function ToggleSelectedLines(checkedOn)
 					type="text"
 					name = "blah"
 					style = "display:none"
-				> <input type="button" name="SubmitDelAdd" value="Select" onClick="form.submit();" {readOnly}> 
+				> <input type="button" name="SubmitDelAdd" value="Select" onClick="form.submit();" {readOnly}>
 						</td>
 					</tr>
 				</table></td>
@@ -346,37 +349,37 @@ function ToggleSelectedLines(checkedOn)
 	</tr>
 </table>
 <table width="700px" border="0" cellspacing="0" cellpadding="1">
-	<tr> 
+	<tr>
 		<td width="50%" class="mainHeadText"> <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-			<tr> 
-				<td colspan="2" valign="top" class="listHeadText"><div align="center">Invoice 
+			<tr>
+				<td colspan="2" valign="top" class="listHeadText"><div align="center">Invoice
 						Contact</div></td>
 			</tr>
-			<tr> 
+			<tr>
 				<td width="60px" class="promptText">Contact</td>
 				<td width="400px" class="mainHeadText">{invContact}</td>
 			</tr>
-			<tr> 
+			<tr>
 				<td width="60px" class="promptText">Email</td>
 				<td class="mainHeadText"><a href="mailto:{invContactEmail}">{invContactEmail}</a></td>
 			</tr>
-			<tr> 
+			<tr>
 				<td width="60px" class="promptText">DDI</td>
 				<td class="mainHeadText"><a href="tel:{invContactPhone}">{invContactPhone}</a></td>
 			</tr>
-			<tr> 
+			<tr>
 				<td width="60px" class="promptText">Switchboard</td>
 				<td class="mainHeadText"><a href="tel:{invSitePhone}">{invSitePhone}</a></td>
 			</tr>
-			<tr> 
+			<tr>
 				<td width="60px" class="promptText">Fax</td>
 				<td class="mainHeadText">{invContactFax}</td>
 			</tr>
-			<tr> 
+			<tr>
 				<form name="invcon" method="post" action="{urlUpdateInvContact}">
 					<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-					<td colspan="2" class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}"> 
-						<input type="hidden" name="form[contactID]" id="invContactID" value="{invContactID}"> 
+					<td colspan="2" class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}">
+						<input type="hidden" name="form[contactID]" id="invContactID" value="{invContactID}">
 						<input
 							type="text"
 							name ="form[invContactName]"
@@ -391,7 +394,7 @@ function ToggleSelectedLines(checkedOn)
 							type="text"
 							name = "blah"
 							style = "display:none"
-						> <input type="button" name="SubmitInvContact" value="Select" onClick="form.submit();" {readOnly}> 
+						> <input type="button" name="SubmitInvContact" value="Select" onClick="form.submit();" {readOnly}>
 					</td>
 					</form>
 				</tr>
@@ -399,34 +402,34 @@ function ToggleSelectedLines(checkedOn)
 		</TD>
 		<td width="50%" class="mainHeadText">
 			<table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-				<tr> 
+				<tr>
 					<td colspan="2" valign="top" class="listHeadText"><div align="center">Delivery Contact</div></td>
 				</tr>
-				<tr> 
+				<tr>
 					<td width="60px" class="promptText">Contact</td>
 					<td width="400px" class="mainHeadText">{delContact}</td>
 				</tr>
-				<tr> 
+				<tr>
 					<td width="60px" class="promptText">Email</td>
 					<td class="mainHeadText"><a href="mailto:{delContactEmail}">{delContactEmail}</a></td>
 				</tr>
-				<tr> 
+				<tr>
 					<td width="60px" class="promptText">DDI</td>
 					<td class="mainHeadText"><a href="tel:{delContactPhone}">{delContactPhone}</a></td>
 				</tr>
-				<tr> 
+				<tr>
 					<td width="60px" class="promptText">Switchboard</td>
 					<td class="mainHeadText"><a href="tel:{delSitePhone}">{delSitePhone}</a></td>
 				</tr>
-				<tr> 
+				<tr>
 					<td width="60px" class="promptText">Fax</td>
 					<td class="mainHeadText">{delContactFax}</td>
 				</tr>
-				<tr> 
+				<tr>
 					<form name="delcon" method="post" action="{urlUpdateDelContact}">
 						<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-						<td colspan="2" class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}"> 
-							<input type="hidden" name="form[contactID]" id="delContactID" value="{delContactID}"> 
+						<td colspan="2" class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}">
+							<input type="hidden" name="form[contactID]" id="delContactID" value="{delContactID}">
 							<input
 								type="text"
 								name ="form[delContactName]"
@@ -441,7 +444,7 @@ function ToggleSelectedLines(checkedOn)
 								type="text"
 								name = "blah"
 								style = "display:none"
-							> <input type="button" name="SubmitDelContact" value="Select" onClick="form.submit();" {readOnly}> 
+							> <input type="button" name="SubmitDelContact" value="Select" onClick="form.submit();" {readOnly}>
 						</td>
 					</form>
 				</tr>
