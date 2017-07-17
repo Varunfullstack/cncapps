@@ -1,70 +1,77 @@
 <!-- Template: ExternalItemEdit.inc.html -->
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script type="application/javascript">
+    $(function () {
+        window.licenceRenewalDate = $('#licenceRenewalDate').get(0);
+    });
+</script>
 <TABLE border="0" cellpadding="2" cellspacing="1">
-  <TR> 
-    <TD class="navigateLink" valign="top"><a href="{urlDisplayCustomer}">Back to renewals</a></TD>
-    <TD class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-  </TR>
-</table>
-<FORM  method="post" action="{urlUpdate}" name="externalItem" AUTOCOMPLETE="OFF">
-  <table border="0">
-    <input
-      type="hidden"
-      name="externalItem[1][externalItemID]"
-      value="{externalItemID}"
-    >
-    <input
-      type="hidden"
-      name="externalItem[1][customerID]"
-      value="{customerID}"
-    >
-    <tr>
-      <td class="promptText">Type</td>
-      <td valign="top" class="mainHeadText">
-        <select
-          name="externalItem[1][itemTypeID]"
-          >
-          <option value="">Please select</option>
-          <!-- BEGIN itemTypeBlock -->
-          <option {itemTypeSelected} value="{itemTypeID}">{itemTypeDescription}</option>
-          <!-- END itemTypeBlock -->
-        </select>
-      <font class="formErrorMessage">{itemTypeIDMessage}</font>        </td>
-    </tr>
-    
-    <tr> 
-      <td class="promptText">Description</td>
-      <td class="fieldText"> <input
-          name="externalItem[1][description]"
-          type="text" value="{description}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{descriptionMessage}</span> </td>
-    </tr>
-
-    <tr> 
-      <td class="promptText" valign="top">Notes</td>
-      <td class="fieldText">
-        <textarea cols="100" rows="15" name="externalItem[1][notes]">{notes}</textarea><span class="formErrorMessage">{notesMessage}</span> </td>
-    </tr>
-
-    <TR> 
-      <TD class="promptText">Licence Expiry Date</TD>
-      <TD class="field"> <input 
-          type="text"
-          id="licenceRenewalDate"
-          name="externalItem[1][licenceRenewalDate]"
-          value="{licenceRenewalDate}"
-          size="10"
-          maxlength="10"
-        > <a href="javascript:;" onClick="popUpCalendar(this, licenceRenewalDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-        <font class="formErrorMessage">{licenceRenewalDateMessage}</font> </TD>
+    <TR>
+        <TD class="navigateLink" valign="top"><a href="{urlDisplayCustomer}">Back to renewals</a></TD>
+        <TD class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
     </TR>
+</table>
+<FORM method="post" action="{urlUpdate}" name="externalItem" AUTOCOMPLETE="OFF">
+    <table border="0">
+        <input
+                type="hidden"
+                name="externalItem[1][externalItemID]"
+                value="{externalItemID}"
+        >
+        <input
+                type="hidden"
+                name="externalItem[1][customerID]"
+                value="{customerID}"
+        >
+        <tr>
+            <td class="promptText">Type</td>
+            <td valign="top" class="mainHeadText">
+                <select
+                        name="externalItem[1][itemTypeID]"
+                >
+                    <option value="">Please select</option>
+                    <!-- BEGIN itemTypeBlock -->
+                    <option {itemTypeSelected} value="{itemTypeID}">{itemTypeDescription}</option>
+                    <!-- END itemTypeBlock -->
+                </select>
+                <font class="formErrorMessage">{itemTypeIDMessage}</font></td>
+        </tr>
 
-    <tr> 
-      <td>&nbsp;</td>
-      <td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-    </tr>
-  </table>
+        <tr>
+            <td class="promptText">Description</td>
+            <td class="fieldText"><input
+                    name="externalItem[1][description]"
+                    type="text" value="{description}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{descriptionMessage}</span></td>
+        </tr>
+
+        <tr>
+            <td class="promptText" valign="top">Notes</td>
+            <td class="fieldText">
+                <textarea cols="100" rows="15" name="externalItem[1][notes]">{notes}</textarea><span
+                    class="formErrorMessage">{notesMessage}</span></td>
+        </tr>
+
+        <TR>
+            <TD class="promptText">Licence Expiry Date</TD>
+            <TD class="field"><input
+                    type="text"
+                    id="licenceRenewalDate"
+                    name="externalItem[1][licenceRenewalDate]"
+                    value="{licenceRenewalDate}"
+                    size="10"
+                    maxlength="10"
+            > <a href="javascript:;" onClick="popUpCalendar(this, licenceRenewalDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+                <font class="formErrorMessage">{licenceRenewalDateMessage}</font></TD>
+        </TR>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: ExternalItemEdit.inc.html -->

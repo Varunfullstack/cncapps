@@ -4,146 +4,162 @@
 <script language="JavaScript" src="ckeditor/ckeditor.js"></script>
 <script language="Javascript" src="ckfinder/ckfinder.js"></script>
 <script language="Javascript">
-/**
- * Inserts multiple fields.
- *
- */
-function insertValueQuery( myListBox, myQuery) {
+    $(function () {
+        window.date = $('#date').get(0);
+    });
+    /**
+     * Inserts multiple fields.
+     *
+     */
+    function insertValueQuery(myListBox, myQuery) {
 
-  oEditor = eval( 'CKEDITOR.instances.' + myQuery  );
+        oEditor = eval('CKEDITOR.instances.' + myQuery);
 
-  if(myListBox.options.length > 0) {
-       var chaineAj = "";
-       var NbSelect = 0;
-       for(var i=0; i<myListBox.options.length; i++) {
-           if (myListBox.options[i].selected){
-               NbSelect++;
-               if (NbSelect > 1)
-                   chaineAj += ", ";
-               chaineAj += myListBox.options[i].value;
-           }
-       }
+        if (myListBox.options.length > 0) {
+            var chaineAj = "";
+            var NbSelect = 0;
+            for (var i = 0; i < myListBox.options.length; i++) {
+                if (myListBox.options[i].selected) {
+                    NbSelect++;
+                    if (NbSelect > 1)
+                        chaineAj += ", ";
+                    chaineAj += myListBox.options[i].value;
+                }
+            }
 
-       oEditor.insertHtml( chaineAj );
-       
-   }
-}
-</SCRIPT>
+            oEditor.insertHtml(chaineAj);
+
+        }
+    }
+</script>
 <form name="form" method="post" action="{submitURL}">
-  <input type="hidden" name="callActivityID" id="callActivityID" value="{callActivityID}" />
-	<table border="0" cellspacing="0" cellpadding="1">
-		<tr class="singleBorder">
-				<td class="promptText">Priority</td>
-				<td class="fieldText">
-        <select
-					id="priority"
-					name="priority"
-        >
-						<option value="">Please Select</option>
-						<!-- BEGIN priorityBlock -->
-						<option {prioritySelected} value="{priority}">{priorityDesc}</option>
-						<!-- END priorityBlock -->
-						</select>
-								<span class="formErrorMessage">{priorityMessage}</span>
-        </td>
-			</tr>
-			<tr class="singleBorder">
-					<td class="promptText">Date</td>
-					<td class="fieldText"><input
-					type="text"
-					name="date"
-					id="date"
-					value="{date}"
-					size="10"
-					maxlength="10"
-					onchange="setFormChanged();" />
-									<a href="javascript:;" onclick="popUpCalendar(this, date, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <span class="formErrorMessage">{dateMessage}</span> </td>
-			</tr>
-			<tr class="singleBorder">
-					<td class="promptText">Time</td>
-					<td class="fieldText"><input
-					type="text"
-					name="startTime"
-					value="{startTime}"
-					size="5"
-					maxlength="5"
-					/>
-									<span class="formErrorMessage">{startTimeMessage}</span> </td>
-			</tr>
-		
-		
-      <tr class="singleBorder">
-        <td class="promptText">User</td>
-        <td class="fieldText">
-          <select
-            name="userID"
-          >
-            <option value="0">Unallocated</option>
-            <!-- BEGIN userBlock -->
-            <option {userSelected} value="{userID}">{userName}</option>
-            <!-- END userBlock -->
-          </select>
-          <span class="formErrorMessage">{userNameMessage}</span>
-        </td>
-      </tr>      
-      <tr>
-        <td><span class="formErrorMessage">{reasonMessage}</span></td>
-      </tr>
-      <tr>
-        <td valign="top"><div id="phraseinsertlabel">
-                <label>Standard Text </label>
-            </div>
-                <select id="tablefields" name="dummy" size="5" multiple="multiple" ondblclick="insertValueQuery( this, reason )">
-                    <option value="Server Guard reporting backup failure." title="">Server Guard reporting backup failure.</option>
+    <input type="hidden" name="callActivityID" id="callActivityID" value="{callActivityID}"/>
+    <table border="0" cellspacing="0" cellpadding="1">
+        <tr class="singleBorder">
+            <td class="promptText">Priority</td>
+            <td class="fieldText">
+                <select
+                        id="priority"
+                        name="priority"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN priorityBlock -->
+                    <option {prioritySelected} value="{priority}">{priorityDesc}</option>
+                    <!-- END priorityBlock -->
+                </select>
+                <span class="formErrorMessage">{priorityMessage}</span>
+            </td>
+        </tr>
+        <tr class="singleBorder">
+            <td class="promptText">Date</td>
+            <td class="fieldText"><input
+                    type="text"
+                    name="date"
+                    id="date"
+                    value="{date}"
+                    size="10"
+                    maxlength="10"
+                    onchange="setFormChanged();"/>
+                <a href="javascript:;" onclick="popUpCalendar(this, date, 'dd/mm/yyyy')"><img src="images/calendar.gif"
+                                                                                              alt="Calendar" width="24"
+                                                                                              height="22" hspace="0"
+                                                                                              vspace="0" border="0"
+                                                                                              align="absmiddle"/></a>
+                <span class="formErrorMessage">{dateMessage}</span></td>
+        </tr>
+        <tr class="singleBorder">
+            <td class="promptText">Time</td>
+            <td class="fieldText"><input
+                    type="text"
+                    name="startTime"
+                    value="{startTime}"
+                    size="5"
+                    maxlength="5"
+            />
+                <span class="formErrorMessage">{startTimeMessage}</span></td>
+        </tr>
+
+
+        <tr class="singleBorder">
+            <td class="promptText">User</td>
+            <td class="fieldText">
+                <select
+                        name="userID"
+                >
+                    <option value="0">Unallocated</option>
+                    <!-- BEGIN userBlock -->
+                    <option {userSelected} value="{userID}">{userName}</option>
+                    <!-- END userBlock -->
+                </select>
+                <span class="formErrorMessage">{userNameMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td><span class="formErrorMessage">{reasonMessage}</span></td>
+        </tr>
+        <tr>
+            <td valign="top">
+                <div id="phraseinsertlabel">
+                    <label>Standard Text </label>
+                </div>
+                <select id="tablefields" name="dummy" size="5" multiple="multiple"
+                        ondblclick="insertValueQuery( this, reason )">
+                    <option value="Server Guard reporting backup failure." title="">Server Guard reporting backup
+                        failure.
+                    </option>
                     <option value="Anti Virus out of date." title="">Anti Virus out of date.</option>
-                    <option value="Cannot access e-mail at the moment." title="">Cannot access e-mail at the moment.</option>
-                    <option value="No Internet connection at the moment." title="">No Internet connection at the moment.</option>
+                    <option value="Cannot access e-mail at the moment." title="">Cannot access e-mail at the moment.
+                    </option>
+                    <option value="No Internet connection at the moment." title="">No Internet connection at the
+                        moment.
+                    </option>
 
                 </select>
                 <div id="phraseinsertbuttoncontainer">
-                    <input type="button" name="insert" value="Insert" onclick="insertValueQuery( dummy, 'reason' )" title="Insert" />
+                    <input type="button" name="insert" value="Insert" onclick="insertValueQuery( dummy, 'reason' )"
+                           title="Insert"/>
                 </div>
-        </td>
-      </tr>    
-      <tr>
-        <td>Details</td>
-      </tr>
-      <tr>
-        <td>
-          <textarea rows="10" cols="10" name="reason">{reason}</textarea>
-          <script type="text/javascript">
-          reason = CKEDITOR.replace( 'reason', { customConfig : '/ckeditor_config.js' } );
-          reason.addCss( 'body { font-size: 10pt; }' );
-          </script>
-        </td>
-      </tr>
-      <tr>
-          <td colspan="3"><span class="formErrorMessage">{internalNotesMessage}</span></td>
-      </tr>
-      <tr>
-        <td>Internal Notes</td>
-      </tr>
-      <tr>
-          <td>
-          <textarea rows="10" cols="10" name="internalNotes">{internalNotes}</textarea>
-          <script type="text/javascript">
-          internalNotes = CKEDITOR.replace( 'internalNotes',
-              {
-                customConfig : '/ckeditor_config.js',
-                toolbar : 'CNCToolbarImage'
-              }
-          );
-          CKFinder.SetupCKEditor( internalNotes );
-          internalNotes.addCss( 'body { font-size: 10pt; }' );
-          </script>
-          </td>
-      </tr>
-      <tr>
-          <td colspan="3" valign="top">&nbsp;</td>
-      </tr>
-      <tr> 
-        <td> <input name="Next" type="submit" id="Next" value="Update"></td>
-      </tr>
+            </td>
+        </tr>
+        <tr>
+            <td>Details</td>
+        </tr>
+        <tr>
+            <td>
+                <textarea rows="10" cols="10" name="reason">{reason}</textarea>
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
+                    reason.addCss('body { font-size: 10pt; }');
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3"><span class="formErrorMessage">{internalNotesMessage}</span></td>
+        </tr>
+        <tr>
+            <td>Internal Notes</td>
+        </tr>
+        <tr>
+            <td>
+                <textarea rows="10" cols="10" name="internalNotes">{internalNotes}</textarea>
+                <script type="text/javascript">
+                    internalNotes = CKEDITOR.replace('internalNotes',
+                        {
+                            customConfig: '/ckeditor_config.js',
+                            toolbar: 'CNCToolbarImage'
+                        }
+                    );
+                    CKFinder.SetupCKEditor(internalNotes);
+                    internalNotes.addCss('body { font-size: 10pt; }');
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" valign="top">&nbsp;</td>
+        </tr>
+        <tr>
+            <td><input name="Next" type="submit" id="Next" value="Update"></td>
+        </tr>
     </table>
 </form>
 <!-- End Template: ActivityProblemEdit.inc.html -->

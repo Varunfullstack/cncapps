@@ -2,48 +2,60 @@
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript'>
-function submitOnReturn() {
-   if (event.keyCode == 13) {
-			document.searchForm.submit();
-   }
-}
-function validateCustomerStringOnReturn() {
-   if (event.keyCode == 13) {
-			validateCustomerString();
-   }
-}
+    $(function () {
+        window.startDate = $('#startDate').get(0);
+        window.endDate = $('#endDate').get(0);
+    });
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
 </script>
 <form name="searchForm" method="POST" action="{urlSubmit}">
-  <table width="300px" border="0" cellspacing="0" cellpadding="1">
-		<tr>
-				<td class="promptText"><div align="right">Start Date</div></td>
-				<td><input
-					type="text"
-					name="searchForm[1][startDate]"
-					id="startDate"
-					value="{startDate}"
-					size="10"
-					maxlength="10"
-					onkeypress="javascript:submitOnReturn()">
-								<a href="javascript:;" onclick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <font class="formErrorMessage">{startDateMessage}</font> </td>
-		</tr>
-		<tr>
-				<td class="promptText"><div align="right">End Date</div></td>
-				<td><input
-					type="text"
-					name="searchForm[1][endDate]"
-					id="endDate"
-					value="{endDate}"
-					size="10"
-					maxlength="10"
-					onkeypress="javascript:submitOnReturn()">
-								<a href="javascript:;" onclick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a> <font class="formErrorMessage">{endDateMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-			<input type="submit" name="Search" value="Search">
-			<input type="button" name="Clear" value="Clear" onClick="document.location='Activity.php'"/></td>
-		</tr>
-	</table>
+    <table width="300px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td class="promptText">
+                <div align="right">Start Date</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="searchForm[1][startDate]"
+                    id="startDate"
+                    value="{startDate}"
+                    size="10"
+                    maxlength="10"
+                    onkeypress="javascript:submitOnReturn()">
+                <a href="javascript:;" onclick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img
+                        src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0"
+                        align="absmiddle"/></a> <font class="formErrorMessage">{startDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">End Date</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="searchForm[1][endDate]"
+                    id="endDate"
+                    value="{endDate}"
+                    size="10"
+                    maxlength="10"
+                    onkeypress="javascript:submitOnReturn()">
+                <a href="javascript:;" onclick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img
+                        src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0"
+                        align="absmiddle"/></a> <font class="formErrorMessage">{endDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" name="Search" value="Search">
+                <input type="button" name="Clear" value="Clear" onClick="document.location='Activity.php'"/></td>
+        </tr>
+    </table>
 </form>

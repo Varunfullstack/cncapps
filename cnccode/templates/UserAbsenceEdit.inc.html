@@ -1,47 +1,54 @@
 <!-- Template: UserAbsenceEdit.inc.html -->
 <h2>{userName}</h2>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script type="application/javascript">
+    $(function () {
+        window.startDate = $('#startDate').get(0);
+    });
+</script>
 
 <TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
 
-<FORM  method="post" action="{urlUpdate}" name="absence-form" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="absence[1][userID]"
-			value="{userID}"
-		>
-		<tr> 
-			<td class="promptText">Start Date</td>
-			<td class="fieldText">
-        <input
-					name="absence[1][startDate]"
-          id="startDate"
-					type="text"
-          value="{startDate}"
-					size="10"
-					maxlength="10"
-				>
-        <a href="javascript:;" onclick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>
-         <span class="formErrorMessage">{startDateMessage}</span>
-      </td>
-		</tr>
+    <FORM method="post" action="{urlUpdate}" name="absence-form" AUTOCOMPLETE="OFF">
+        <table width="700px" border="0">
+            <input
+                    type="hidden"
+                    name="absence[1][userID]"
+                    value="{userID}"
+            >
+            <tr>
+                <td class="promptText">Start Date</td>
+                <td class="fieldText">
+                    <input
+                            name="absence[1][startDate]"
+                            id="startDate"
+                            type="text"
+                            value="{startDate}"
+                            size="10"
+                            maxlength="10"
+                    >
+                    <a href="javascript:;" onclick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img
+                            src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0"
+                            border="0" align="absmiddle"/></a>
+                    <span class="formErrorMessage">{startDateMessage}</span>
+                </td>
+            </tr>
 
-		<tr> 
-			<td class="promptText">Absence Days(exclude holidays and weekends)</td>
-			<td class="fieldText">
-        <select name="absence[1][days]">
-          <!-- BEGIN daysBlock -->
-          <option value="{days}" {daySelected}>{days}</option>
-          <!-- END daysBlock -->
-        </select>
-				<span class="formErrorMessage">{daysMessage}</span> </td>
-		</tr>
+            <tr>
+                <td class="promptText">Absence Days(exclude holidays and weekends)</td>
+                <td class="fieldText">
+                    <select name="absence[1][days]">
+                        <!-- BEGIN daysBlock -->
+                        <option value="{days}" {daySelected}>{days}</option>
+                        <!-- END daysBlock -->
+                    </select>
+                    <span class="formErrorMessage">{daysMessage}</span></td>
+            </tr>
 
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
-</form>
-<!-- End Template: UserEdit.inc.html -->
+            <tr>
+                <td>&nbsp;</td>
+                <td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+            </tr>
+        </table>
+    </form>
+    <!-- End Template: UserEdit.inc.html -->

@@ -5,612 +5,631 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script language='JavaScript'>
-  var formChanged = false;
-  function proceedWithCancel(form){
-    if (formChanged == true){
-      return confirm('Are you sure that you want to cancel without saving your changes?');
+    $(function () {
+        window.alarmDate = $('#alarmDate').get(0);
+    })
+    var formChanged = false;
+    function proceedWithCancel(form) {
+        if (formChanged == true) {
+            return confirm('Are you sure that you want to cancel without saving your changes?');
+        }
+        else {
+            return true;
+        }
     }
-    else{
-      return true;
+    function setFormChanged() {
+        formChanged = true;
     }
-  }
-  function setFormChanged(){
-    formChanged = true;
-  }
-  function strpad(val){
-    return (!isNaN(val) && val.toString().length==1)?"0"+val:val;
-  }
-  function checkFunctionKey(field){
-    if (event.keyCode == 120){			// F9 - edit
+    function strpad(val) {
+        return (!isNaN(val) && val.toString().length == 1) ? "0" + val : val;
     }
-    return;
-  }
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {			// F9 - edit
+        }
+        return;
+    }
 </script>
 <table width="100%">
-  <tr>
-    <td>{activityWizardHeader} {contractListPopupLink}</td>
-    <td align="right" id="autoUpdateLabel"></td>
-  </tr>
+    <tr>
+        <td>{activityWizardHeader} {contractListPopupLink}</td>
+        <td align="right" id="autoUpdateLabel"></td>
+    </tr>
 </table>
 <P><span class="formErrorMessage">{problemStatusMessage}</span></P>
-<FORM  method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE = "off">
-  <input type="hidden" name="userWarned"  value="{userWarned}">
+<FORM method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off">
+    <input type="hidden" name="userWarned" value="{userWarned}">
 
-  <input type="hidden" id="callActivityID" name="callActivity[1][callActivityID]"  value="{callActivityID}">
-  <input type="hidden" name="callActivity[1][customerID]"  value="{customerID}">
-  <input type="hidden" id="problemID" name="callActivity[1][problemID]"  value="{problemID}">
-  <input type="hidden" name="callActivity[1][problemStatus]"  value="{problemStatus}">
-  <input type="hidden" name="callActivity[1][status]"  value="{status}">
-  <input type="hidden" name="callActivity[1][siteDesc]"  value="{siteDesc}">
-  <input type="hidden" name="callActivity[1][date]"  value="{date}">
-  <input type="hidden" name="callActivity[1][startTime]"  value="{startTime}">
-  <input type="hidden" name="callActivity[1][endTime]"  value="{endTime}">
+    <input type="hidden" id="callActivityID" name="callActivity[1][callActivityID]" value="{callActivityID}">
+    <input type="hidden" name="callActivity[1][customerID]" value="{customerID}">
+    <input type="hidden" id="problemID" name="callActivity[1][problemID]" value="{problemID}">
+    <input type="hidden" name="callActivity[1][problemStatus]" value="{problemStatus}">
+    <input type="hidden" name="callActivity[1][status]" value="{status}">
+    <input type="hidden" name="callActivity[1][siteDesc]" value="{siteDesc}">
+    <input type="hidden" name="callActivity[1][date]" value="{date}">
+    <input type="hidden" name="callActivity[1][startTime]" value="{startTime}">
+    <input type="hidden" name="callActivity[1][endTime]" value="{endTime}">
 
-  <input type="hidden" name="callActivity[1][onSiteFlag]"  value="{onSiteFlag}">
-  <input type="hidden" name="callActivity[1][allocatedUserID]"  value="{allocatedUserID}">
-  <input type="hidden" name="callActivity[1][hdPauseCount]"  value="{hdPauseCount}">
-  
-  <input type="hidden" name="callActivity[1][rootCauseID]" value="{rootCauseID}">  
+    <input type="hidden" name="callActivity[1][onSiteFlag]" value="{onSiteFlag}">
+    <input type="hidden" name="callActivity[1][allocatedUserID]" value="{allocatedUserID}">
+    <input type="hidden" name="callActivity[1][hdPauseCount]" value="{hdPauseCount}">
 
-  <input type="hidden" name="callActivity[1][customerName]" value="{customerName}">
-  <input type="hidden" name="callActivity[1][authorisedFlag]" value="{authorisedFlag}">
-  <input type="hidden" name="callActivity[1][priority]" value="{hiddenPriority}">
-  <input type="hidden" name="callActivity[1][contractCustomerItemID]" value="{hiddenContractCustomerItemID}">
-  <input type="hidden" name="callActivity[1][hideFromCustomerFlag]" value="{hideFromCustomerFlag}">
-  <input type="hidden" name="callActivity[1][callActTypeID]" value="{hiddenCallActTypeID}">
-  <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
-  <table class="singleBorder" width="1000" border="0">
-     <tr>
-      <td colspan="4"> <div align="left">
-        <input type="submit" name="Fixed" value="Fixed" onClick="return confirm('Are you sure this SR is fixed?')">
-        <input type="submit" name="CustomerAction" value="Customer Action">
-        <input type="submit" name="CncAction" value="CNC Action">
-        Future Action
-        <input
-        type="text"
-        name="callActivity[1][alarmDate]"
-        id="alarmDate"
-        title="Date when this request needs to be re-activated"
-        value="{alarmDate}"
-        placeholder="dd/mm/yyyy"
-        size="10"
-        maxlength="10"
-        onchange="setFormChanged();" />
-        <a href="javascript:;" onclick="popUpCalendar(this, alarmDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a><span class="formErrorMessage">{alarmDateMessage}</span>
-        <input
-          type="text"
-          title="Time to re-activate this request"
-          name="callActivity[1][alarmTime]"
-          id="alarmTime"
-          value="{alarmTime}"
-          size="5"
-          maxlength="5"
-          placeholder="HH:MM"
-          onchange="setFormChanged();" />
-          <span class="formErrorMessage">{alarmTimeMessage}</span>
+    <input type="hidden" name="callActivity[1][rootCauseID]" value="{rootCauseID}">
 
-          <input type="submit" name="Escalate" value="Escalate" onClick="return (confirm('Are you sure you want to escalate this SR?') )">
+    <input type="hidden" name="callActivity[1][customerName]" value="{customerName}">
+    <input type="hidden" name="callActivity[1][authorisedFlag]" value="{authorisedFlag}">
+    <input type="hidden" name="callActivity[1][priority]" value="{hiddenPriority}">
+    <input type="hidden" name="callActivity[1][contractCustomerItemID]" value="{hiddenContractCustomerItemID}">
+    <input type="hidden" name="callActivity[1][hideFromCustomerFlag]" value="{hideFromCustomerFlag}">
+    <input type="hidden" name="callActivity[1][callActTypeID]" value="{hiddenCallActTypeID}">
+    <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
+    <table class="singleBorder" width="1000" border="0">
+        <tr>
+            <td colspan="4">
+                <div align="left">
+                    <input type="submit" name="Fixed" value="Fixed"
+                           onClick="return confirm('Are you sure this SR is fixed?')">
+                    <input type="submit" name="CustomerAction" value="Customer Action">
+                    <input type="submit" name="CncAction" value="CNC Action">
+                    Future Action
+                    <input
+                            type="text"
+                            name="callActivity[1][alarmDate]"
+                            id="alarmDate"
+                            title="Date when this request needs to be re-activated"
+                            value="{alarmDate}"
+                            placeholder="dd/mm/yyyy"
+                            size="10"
+                            maxlength="10"
+                            onchange="setFormChanged();"/>
+                    <a href="javascript:;" onclick="popUpCalendar(this, alarmDate, 'dd/mm/yyyy')"><img
+                            src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0"
+                            border="0" align="absmiddle"/></a><span class="formErrorMessage">{alarmDateMessage}</span>
+                    <input
+                            type="text"
+                            title="Time to re-activate this request"
+                            name="callActivity[1][alarmTime]"
+                            id="alarmTime"
+                            value="{alarmTime}"
+                            size="5"
+                            maxlength="5"
+                            placeholder="HH:MM"
+                            onchange="setFormChanged();"/>
+                    <span class="formErrorMessage">{alarmTimeMessage}</span>
 
-          <input type="submit" name="Update" value="Update">
+                    <input type="submit" name="Escalate" value="Escalate"
+                           onClick="return (confirm('Are you sure you want to escalate this SR?') )">
 
-          <input name="Cancel" type="button" value="Cancel" onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';" />
+                    <input type="submit" name="Update" value="Update">
 
-        </div>
-        
-        
-      </td>
-    </tr>
+                    <input name="Cancel" type="button" value="Cancel"
+                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"/>
 
-    <tr>
-      <td class="promptText">ID</td>
-      <td class="mainHeadText">{customerID}_{callActivityID}</td>
-      <td></td>
-      <td></td>
-      <td class="promptText">Type</td>
-      <td class="fieldText"><select
-          {INITIAL_DISABLED}
-          onchange="setFormChanged();"
-          id="contractID"
-          name="callActivity[1][callActTypeID]"
-          >
-          <option value="">Please Select</option>
-          <!-- BEGIN activityTypeBlock -->
-          <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
-          <!-- END activityTypeBlock -->
-        </select>
-      <span class="formErrorMessage">{callActTypeIDMessage}</span>
-    </td>
-      
-    </tr>
-    <tr>
-      <td class="promptText">Customer</td>
-      <td class="mainHeadText">{customerName}</td>
-      <td></td>
-      <td></td>
-      <td class="promptText">Value</td>
-      <td class="fieldText"><input
-          {DISABLED}
-          type="text"
-          name="callActivity[1][curValue]"
-          value="{curValue}"
-          size="10"
-          maxlength="10"
-          onchange="setFormChanged();" />
-        <span class="formErrorMessage">{curValueMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td  class="promptText">Contact</td>
-      <td class="mainHeadText"><select
-          name="callActivity[1][contactID]"
-          >
-          
-          <option value="">Please Select</option>
-          <!-- BEGIN contactBlock -->
-          {optGroupOpen}
-          <option {contactSelected} value="{contactID}">{startMainContactStyle} {contactName} {endMainContactStyle}</option>
-          {optGroupClose}
-          <!-- END contactBlock -->
-        </select>
-      {contactPhone}<span class="formErrorMessage">{contactIDMessage}</span>
-      </td>
-      <td colspan="2" style="color: red;">
-        <span id="hdRemainMinutes">HD:{hdRemainMinutes}</span>
-        <span id="esRemainMinutes">ES:{esRemainMinutes}</span>
-        <span id="imRemainMinutes">IM:{imRemainMinutes}</span>
-      </td>
-      <td class="promptText">Date</td>
-      <td class="fieldText"><input
-          type="text"
-          name="callActivity[1][date]"
-          id="date"
-          value="{date}"
-          {DISABLED}
-          {INITIAL_DISABLED}
-          size="10"
-          maxlength="10"
-          onchange="setFormChanged();" />
-      {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
-      </td>
-    </tr>
+                </div>
 
-    <tr>
-      <td  class="promptText">Site</td>
-      <td class="fieldText">
-        <select
-          name="callActivity[1][siteNo]">
-          <option value="">Please Select</option>
-          <!-- BEGIN siteBlock -->
-          <option {siteSelected} value="{siteNo}">{siteDesc}</option>
-          <!-- END siteBlock -->
-        </select>
-        <span class="formErrorMessage">{siteNoMessage}</span>
-      </td>
 
-      <td colspan="2">
-        <input type="button" id="pauseTimer" value="Pause Timer" title="Pause timer whilst on the phone">
-      </td>
-      
-      <td class="promptText">Time from</td>
-      <td class="fieldText"><input
-          type="text"
-          {DISABLED}
-          {INITIAL_DISABLED}
-          name="callActivity[1][startTime]"
-          value="{startTime}"
-          size="5"
-          maxlength="8"
-          placeholder="HH:MM"
-          onchange="setFormChanged();" />
-          <span class="formErrorMessage">{startTimeMessage}</span>
-          to <input
-          {DISABLED}
-          {INITIAL_DISABLED}
-          type="text"
-          name="callActivity[1][endTime]"
-          id="endTime"
-          value="{endTime}"
-          size="5"
-          placeholder="HH:MM"
-          maxlength="8"
-          onchange="setFormChanged();" />
-        {setTimeNowLink}<span class="formErrorMessage">{endTimeMessage}</span>          
-      </td>
-    </tr>
-
-    <tr>
-      <td class="promptText">Priority</td>
-      <td><select
-          {DISABLED}
-          {PRIORITY_DISABLED}
-          id="priority"
-          name="callActivity[1][priority]"
-        >
-          <option value="">Please Select</option>
-          <!-- BEGIN priorityBlock -->
-          <option {prioritySelected} value="{priority}">{priorityDesc}</option>
-          <!-- END priorityBlock -->
-        </select>
-      </td>                      
-      <td colspan="2">
-        <input type="button" id="requestAdditionalTime" value="Request More Time" title="Request more time for this SR">
-      </td>
-      <td class="promptText">User</td>
-      <td> 
-        <select
-          name="callActivity[1][userID]"
-          onchange="setFormChanged();"
-        >
-          <option value="">Please Select</option>
-          <!-- BEGIN userBlock -->
-            <option {userSelected} value="{userID}">{userName}</option>
-          <!-- END userBlock -->
-        </select>
-        <span class="formErrorMessage">{userIDMessage}</span>
-      </td>
-    </tr>
-
-    <tr>
-      <td  class="promptText">Contract</td>
-      <td class="mainHeadText">
-        <select
-          {CONTRACT_DISABLED}
-          name="callActivity[1][contractCustomerItemID]"
-          type="text"
-          >
-          <option value="99" {noContractSelected} >Please select</option>
-          <option value="" {tandMSelected}>T &amp; M</option>
-          <!-- BEGIN contractBlock -->
-          {optGroupClose}
-          {optGroupOpen}
-          <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
-          <!-- END contractBlock -->
-          </optgroup>
-        </select>
-        <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
-      </td>    
-      <td></td>
-      <td></td>
-      <td class="promptText">Root Cause</td>
-      <td>
-        <select
-          {DISABLED}
-          {PRIORITY_DISABLED}
-          name="callActivity[1][rootCauseID]" 
-        >
-          <option value="">Not known</option>
-          <!-- BEGIN rootCauseBlock -->
-          <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
-          <!-- END rootCauseBlock -->
-        </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
-      </td>
-    </tr>
-    
-    <tr>                       
-      <td class="promptText">Contact Notes</td>
-      <td class="contactNotes">
-        <input
-          type="text"
-          title="Contact Notes"
-          name="callActivity[1][contactNotes]"
-          id="contactNotes"
-          value="{contactNotes}"
-          {DISABLED}
-          size="100"
-          maxlength="200"
-          onchange="setFormChanged();" />
-          <span class="formErrorMessage">{contactNotesMessage}</span>
-      </td>
-      <td></td>
-      <td></td>
-
-      <td class="promptText">Complete On</td>
-      <td class="fieldText"><input
-          type="text"
-          title="Date when this request should be set to completed"
-          name="callActivity[1][completeDate]"
-          id="completeDate"
-          value="{completeDate}"
-          {DISABLED}
-          {COMPLETE_DISABLED}
-          size="10"
-          maxlength="10"
-          onchange="setFormChanged();" />
-      {calendarLinkCompleteDate}<span class="formErrorMessage">{completeDateMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">Customer Notes</td>
-      <td class="contactNotes">
-        <input
-          type="text"
-          title="Customer Notes"
-          name="callActivity[1][techNotes]"
-          id="techNotes"
-          value="{techNotes}"
-          {DISABLED}
-          size="100"
-          maxlength="200"
-          onchange="setFormChanged();" />
-          <span class="formErrorMessage">{techNotesMessage}</span>
-      </td>
-      <td></td>
-      <td></td>
-      <td class="promptText">Hide From Customer</td>
-      <td>
-        <input
-        {hideFromCustomerDisabled}
-        type="checkbox"
-        name="callActivity[1][hideFromCustomerFlag]"
-        value="Y" {hideFromCustomerFlagChecked}
-        title="Hide this SR from customer">
-      </td>
-    </tr>
-    <tr>
-      <td colspan="6"><H2>{customerDetails}</H2></td>
-    </tr>
-    <tr>
-      <td colspan="6" class="notesAlert">{contactNotes}</td>
-    </tr>
-    <tr>
-      <td colspan="6" class="notesAlert">{techNotes}</td>
-    </tr>
-</table>
-  <table class="singleBorder" width="900" border="0">
-    <tr>
-      <td colspan="4"><span class="formErrorMessage">{reasonMessage}</span></td>
-    </tr>
-    <tr>
-      <td colspan="4">&nbsp;</td>
-    </tr>
-    <tr>
-      <td colspan="4" class="promptTextLeft" valign="top">Activity Notes</td>
-    </tr>
-    <tr>
-      <td colspan="4"><textarea name="reason">{reason}</textarea>
-        <script	type="text/javascript">
-          reason = CKEDITOR.replace( 'reason', {
-            customConfig : '/ckeditor_config.js' }
-          );
-        </script>
-      </td>
-    </tr>
-    {htmlInternalNotes}
-     <tr>
-      <td colspan="4">
-        <div align="left">
-          <input type="submit" name="Fixed" value="Fixed" onClick="return confirm('Are you sure this SR is fixed?')">
-          <input type="submit" name="CustomerAction" value="Customer Action">
-          <input type="submit" name="CncAction" value="CNC Action">
-
-          <input type="submit" name="Escalate" value="Escalate" onClick="return (confirm('Are you sure you want to escalate this SR?') )">
-
-          <input type="submit" name="Update" value="Update">
-
-          <input name="Cancel" type="button" value="Cancel" onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';" />
-        </div>
-      </td>
-    </tr>
-  </table>
-<table class="singleBorder" width="900" border="0">
-  <tr> 
-    <td class="listHead">Documents</td>
-  </tr>
-  <tr> 
-    <td>
-      <table class="singleBorder" width="100%">
-        <tr> 
-          <td width="29%" class="listHeadText">Description</td>
-          <td width="28%" class="listHeadText">File</td>
-          <td width="18%" class="listHeadText">Date</td>
-          <td width="14%" class="listHeadText">User</td>
-          <td width="14%" class="listHeadText">&nbsp;</td>
+            </td>
         </tr>
-        <!-- BEGIN documentBlock -->
-        <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-          <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A></td>
-          <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A></td>
-          <td nowrap="nowrap">{createDate}</td>
-          <td nowrap="nowrap">{createUserName}</td>
-          <td><A href="{urlDeleteFile}" title="Delete attached document" onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A> 
-          </td>
+
+        <tr>
+            <td class="promptText">ID</td>
+            <td class="mainHeadText">{customerID}_{callActivityID}</td>
+            <td></td>
+            <td></td>
+            <td class="promptText">Type</td>
+            <td class="fieldText"><select
+                    {INITIAL_DISABLED}
+                    onchange="setFormChanged();"
+                    id="contractID"
+                    name="callActivity[1][callActTypeID]"
+            >
+                <option value="">Please Select</option>
+                <!-- BEGIN activityTypeBlock -->
+                <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
+                <!-- END activityTypeBlock -->
+            </select>
+                <span class="formErrorMessage">{callActTypeIDMessage}</span>
+            </td>
+
         </tr>
-        <!-- END documentBlock -->
-      </table>
-    </td>
-  </tr>
-</table>
+        <tr>
+            <td class="promptText">Customer</td>
+            <td class="mainHeadText">{customerName}</td>
+            <td></td>
+            <td></td>
+            <td class="promptText">Value</td>
+            <td class="fieldText"><input
+                    {DISABLED}
+                    type="text"
+                    name="callActivity[1][curValue]"
+                    value="{curValue}"
+                    size="10"
+                    maxlength="10"
+                    onchange="setFormChanged();"/>
+                <span class="formErrorMessage">{curValueMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Contact</td>
+            <td class="mainHeadText"><select
+                    name="callActivity[1][contactID]"
+            >
+
+                <option value="">Please Select</option>
+                <!-- BEGIN contactBlock -->
+                {optGroupOpen}
+                <option {contactSelected} value="{contactID}">{startMainContactStyle} {contactName}
+                    {endMainContactStyle}
+                </option>
+                {optGroupClose}
+                <!-- END contactBlock -->
+            </select>
+                {contactPhone}<span class="formErrorMessage">{contactIDMessage}</span>
+            </td>
+            <td colspan="2" style="color: red;">
+                <span id="hdRemainMinutes">HD:{hdRemainMinutes}</span>
+                <span id="esRemainMinutes">ES:{esRemainMinutes}</span>
+                <span id="imRemainMinutes">IM:{imRemainMinutes}</span>
+            </td>
+            <td class="promptText">Date</td>
+            <td class="fieldText"><input
+                    type="text"
+                    name="callActivity[1][date]"
+                    id="date"
+                    value="{date}"
+                    {DISABLED}
+                    {INITIAL_DISABLED}
+                    size="10"
+                    maxlength="10"
+                    onchange="setFormChanged();"/>
+                {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Site</td>
+            <td class="fieldText">
+                <select
+                        name="callActivity[1][siteNo]">
+                    <option value="">Please Select</option>
+                    <!-- BEGIN siteBlock -->
+                    <option {siteSelected} value="{siteNo}">{siteDesc}</option>
+                    <!-- END siteBlock -->
+                </select>
+                <span class="formErrorMessage">{siteNoMessage}</span>
+            </td>
+
+            <td colspan="2">
+                <input type="button" id="pauseTimer" value="Pause Timer" title="Pause timer whilst on the phone">
+            </td>
+
+            <td class="promptText">Time from</td>
+            <td class="fieldText"><input
+                    type="text"
+                    {DISABLED}
+                    {INITIAL_DISABLED}
+                    name="callActivity[1][startTime]"
+                    value="{startTime}"
+                    size="5"
+                    maxlength="8"
+                    placeholder="HH:MM"
+                    onchange="setFormChanged();"/>
+                <span class="formErrorMessage">{startTimeMessage}</span>
+                to <input
+                        {DISABLED}
+                        {INITIAL_DISABLED}
+                        type="text"
+                        name="callActivity[1][endTime]"
+                        id="endTime"
+                        value="{endTime}"
+                        size="5"
+                        placeholder="HH:MM"
+                        maxlength="8"
+                        onchange="setFormChanged();"/>
+                {setTimeNowLink}<span class="formErrorMessage">{endTimeMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Priority</td>
+            <td><select
+                    {DISABLED}
+                    {PRIORITY_DISABLED}
+                    id="priority"
+                    name="callActivity[1][priority]"
+            >
+                <option value="">Please Select</option>
+                <!-- BEGIN priorityBlock -->
+                <option {prioritySelected} value="{priority}">{priorityDesc}</option>
+                <!-- END priorityBlock -->
+            </select>
+            </td>
+            <td colspan="2">
+                <input type="button" id="requestAdditionalTime" value="Request More Time"
+                       title="Request more time for this SR">
+            </td>
+            <td class="promptText">User</td>
+            <td>
+                <select
+                        name="callActivity[1][userID]"
+                        onchange="setFormChanged();"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN userBlock -->
+                    <option {userSelected} value="{userID}">{userName}</option>
+                    <!-- END userBlock -->
+                </select>
+                <span class="formErrorMessage">{userIDMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Contract</td>
+            <td class="mainHeadText">
+                <select
+                        {CONTRACT_DISABLED}
+                        name="callActivity[1][contractCustomerItemID]"
+                        type="text"
+                >
+                    <option value="99" {noContractSelected}>Please select</option>
+                    <option value="" {tandMSelected}>T &amp; M</option>
+                    <!-- BEGIN contractBlock -->
+                    {optGroupClose}
+                    {optGroupOpen}
+                    <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
+                    <!-- END contractBlock -->
+                    </optgroup>
+                </select>
+                <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td class="promptText">Root Cause</td>
+            <td>
+                <select
+                        {DISABLED}
+                        {PRIORITY_DISABLED}
+                        name="callActivity[1][rootCauseID]"
+                >
+                    <option value="">Not known</option>
+                    <!-- BEGIN rootCauseBlock -->
+                    <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+                    <!-- END rootCauseBlock -->
+                </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Contact Notes</td>
+            <td class="contactNotes">
+                <input
+                        type="text"
+                        title="Contact Notes"
+                        name="callActivity[1][contactNotes]"
+                        id="contactNotes"
+                        value="{contactNotes}"
+                        {DISABLED}
+                        size="100"
+                        maxlength="200"
+                        onchange="setFormChanged();"/>
+                <span class="formErrorMessage">{contactNotesMessage}</span>
+            </td>
+            <td></td>
+            <td></td>
+
+            <td class="promptText">Complete On</td>
+            <td class="fieldText"><input
+                    type="text"
+                    title="Date when this request should be set to completed"
+                    name="callActivity[1][completeDate]"
+                    id="completeDate"
+                    value="{completeDate}"
+                    {DISABLED}
+                    {COMPLETE_DISABLED}
+                    size="10"
+                    maxlength="10"
+                    onchange="setFormChanged();"/>
+                {calendarLinkCompleteDate}<span class="formErrorMessage">{completeDateMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Customer Notes</td>
+            <td class="contactNotes">
+                <input
+                        type="text"
+                        title="Customer Notes"
+                        name="callActivity[1][techNotes]"
+                        id="techNotes"
+                        value="{techNotes}"
+                        {DISABLED}
+                        size="100"
+                        maxlength="200"
+                        onchange="setFormChanged();"/>
+                <span class="formErrorMessage">{techNotesMessage}</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td class="promptText">Hide From Customer</td>
+            <td>
+                <input
+                        {hideFromCustomerDisabled}
+                        type="checkbox"
+                        name="callActivity[1][hideFromCustomerFlag]"
+                        value="Y" {hideFromCustomerFlagChecked}
+                        title="Hide this SR from customer">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6"><H2>{customerDetails}</H2></td>
+        </tr>
+        <tr>
+            <td colspan="6" class="notesAlert">{contactNotes}</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="notesAlert">{techNotes}</td>
+        </tr>
+    </table>
+    <table class="singleBorder" width="900" border="0">
+        <tr>
+            <td colspan="4"><span class="formErrorMessage">{reasonMessage}</span></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="promptTextLeft" valign="top">Activity Notes</td>
+        </tr>
+        <tr>
+            <td colspan="4"><textarea name="reason">{reason}</textarea>
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace('reason', {
+                            customConfig: '/ckeditor_config.js'
+                        }
+                    );
+                </script>
+            </td>
+        </tr>
+        {htmlInternalNotes}
+        <tr>
+            <td colspan="4">
+                <div align="left">
+                    <input type="submit" name="Fixed" value="Fixed"
+                           onClick="return confirm('Are you sure this SR is fixed?')">
+                    <input type="submit" name="CustomerAction" value="Customer Action">
+                    <input type="submit" name="CncAction" value="CNC Action">
+
+                    <input type="submit" name="Escalate" value="Escalate"
+                           onClick="return (confirm('Are you sure you want to escalate this SR?') )">
+
+                    <input type="submit" name="Update" value="Update">
+
+                    <input name="Cancel" type="button" value="Cancel"
+                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"/>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table class="singleBorder" width="900" border="0">
+        <tr>
+            <td class="listHead">Documents</td>
+        </tr>
+        <tr>
+            <td>
+                <table class="singleBorder" width="100%">
+                    <tr>
+                        <td width="29%" class="listHeadText">Description</td>
+                        <td width="28%" class="listHeadText">File</td>
+                        <td width="18%" class="listHeadText">Date</td>
+                        <td width="14%" class="listHeadText">User</td>
+                        <td width="14%" class="listHeadText">&nbsp;</td>
+                    </tr>
+                    <!-- BEGIN documentBlock -->
+                    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
+                        </td>
+                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
+                        </td>
+                        <td nowrap="nowrap">{createDate}</td>
+                        <td nowrap="nowrap">{createUserName}</td>
+                        <td><A href="{urlDeleteFile}" title="Delete attached document"
+                               onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                        </td>
+                    </tr>
+                    <!-- END documentBlock -->
+                </table>
+            </td>
+        </tr>
+    </table>
 </FORM>
 <div id="dialog" title="Alert"><p></p></div>
 <script>
-var pauseCount = {hdPauseCount}; // number of times count-down timer paused for this SR
+    var pauseCount = {hdPauseCount}; // number of times count-down timer paused for this SR
 
-var timeout;              // timer
+    var timeout;              // timer
 
-function lPad(number,length) {
-    var str = '' + number;
-    while (str.length < length)
-        str = '0' + str;
-    return str;
-}
-
-function setServerTime( field ){
-  $.ajax({
-    url: 'Activity.php', 
-    data: {
-        action: "getServerTime"
-    },              
-
-    success: function(data) {
-
-      document.getElementById( field.id ).value = strpad( data );
+    function lPad(number, length) {
+        var str = '' + number;
+        while (str.length < length)
+            str = '0' + str;
+        return str;
     }
 
-  });
-}
+    function setServerTime(field) {
+        $.ajax({
+            url: 'Activity.php',
+            data: {
+                action: "getServerTime"
+            },
 
-function autoSave() {
-  /*
-  Autosave contents of text fields every 10 seconds
-  */
-  
-  $.ajax({
-    url: 'Activity.php', 
-    data: {
-        action:         "autoUpdate",
-        callActivityID: $( "INPUT#callActivityID" ).val(),
-        reason:         CKEDITOR.instances.reason.getData(),
-        internalNotes:  CKEDITOR.instances.internalNotes.getData()
-        
-    },  
-    
-    dataType: "json",
-                
-    success: function(data) {
+            success: function (data) {
 
-      var tDate = new Date();
+                document.getElementById(field.id).value = strpad(data);
+            }
 
-      $('td#autoUpdateLabel').html(
-        "Autosaved at " + lPad( tDate.getHours(), 2) +  ":" + lPad( tDate.getMinutes(), 2 ) + ":" + lPad( tDate.getSeconds(), 2)
-      );
+        });
+    }
 
-      /*
-      is there an alert to display
-      */
-      if (
-        {hiddenPriority} < 5 &
-        (
-          '{problemStatus}' == 'I' |
-          '{problemStatus}' == 'P'
-        )
-      ){ // exclude fixed and completed
-       
-        $('span#hdRemainMinutes').html( 'HD:' + data[ 'hdRemainMinutes' ] );
-        $('span#esRemainMinutes').html( 'ES:' + data[ 'esRemainMinutes' ] );
-        $('span#imRemainMinutes').html( 'IM:' + data[ 'imRemainMinutes' ] );
-
-        $( 'input#requestAdditionalTime' ).prop('hidden', false);        
-        $( 'input#requestAdditionalTime' ).prop("style").display="inline";        
-
-        if ( data[ 'timeAlert' ] ){      
-          $( 'div#dialog p' ).html( data[ 'timeAlert' ] );
-          
-          $(function() {
-            $( "div#dialog" ).dialog();
-          });
-        }
-        
+    function autoSave() {
         /*
-        If in team level 1 and exceded max pause count do not enable button again
-        */
-        if ( {level} == 1 && pauseCount < {hdTeamMaxPauseCount} ){
-          $( 'input#pauseTimer' ).prop('hidden', false ); 
-          $( 'input#pauseTimer' ).prop("style").display="inline";        
-          $( 'input#pauseTimer' ).prop('disabled', false ); // enable pause button unless clicked twice already
-        }
-      }
-      
-    },
-
-    complete: function() {
-      // Schedule the next request when the current one's complete
-      timeout = setTimeout(autoSave, 10000 );
-    }
-  });
-}
-
-
-$(document).ready(function() {
-  // run the first time; all subsequent calls will take care of themselves
-  timeout = setTimeout(autoSave, 10000 ); // 10 seconds
-  
-  /*
-  No timer for priority 5
-  */
-  if(
-    ( '{problemStatus}' == 'I' | '{problemStatus}' == 'P' ) &
-    
-    {hiddenPriority} < 5 &
-        
-    '{onSiteFlag}' != 'Y'
-  ){
-    
-    $( 'div#dialog' ).hide(); // default
-    /*
-    Only display pause timer button if assigned user in team level 1
-    */
-    if ( {level} == 1 ){
-
-      /*
-      Have already exceeded count for this SR previously
-      */
-      if ( pauseCount >= {hdTeamMaxPauseCount} ){
-        
-        $( 'input#pauseTimer' ).prop('disabled', true);        
-      }
-
-
-      $( 'input#pauseTimer' ).click( function(){
-
-        pauseCount++;
+         Autosave contents of text fields every 10 seconds
+         */
 
         $.ajax({
-          url: 'Activity.php', 
-          data: {
-              action:         "incrementPauseCounter",
-              problemID:      $( "INPUT#problemID" ).val()
-          }
+            url: 'Activity.php',
+            data: {
+                action: "autoUpdate",
+                callActivityID: $("INPUT#callActivityID").val(),
+                reason: CKEDITOR.instances.reason.getData(),
+                internalNotes: CKEDITOR.instances.internalNotes.getData()
+
+            },
+
+            dataType: "json",
+
+            success: function (data) {
+
+                var tDate = new Date();
+
+                $('td#autoUpdateLabel').html(
+                    "Autosaved at " + lPad(tDate.getHours(), 2) + ":" + lPad(tDate.getMinutes(), 2) + ":" + lPad(tDate.getSeconds(), 2)
+                );
+
+                /*
+                 is there an alert to display
+                 */
+                if (
+                    {hiddenPriority} < 5 &
+                    (
+                        '{problemStatus}' == 'I' |
+                        '{problemStatus}' == 'P'
+                    )
+                ) { // exclude fixed and completed
+
+                    $('span#hdRemainMinutes').html('HD:' + data['hdRemainMinutes']);
+                    $('span#esRemainMinutes').html('ES:' + data['esRemainMinutes']);
+                    $('span#imRemainMinutes').html('IM:' + data['imRemainMinutes']);
+
+                    $('input#requestAdditionalTime').prop('hidden', false);
+                    $('input#requestAdditionalTime').prop("style").display = "inline";
+
+                    if (data['timeAlert']) {
+                        $('div#dialog p').html(data['timeAlert']);
+
+                        $(function () {
+                            $("div#dialog").dialog();
+                        });
+                    }
+
+                    /*
+                     If in team level 1 and exceded max pause count do not enable button again
+                     */
+                    if ({level} == 1 && pauseCount < {hdTeamMaxPauseCount}) {
+                        $('input#pauseTimer').prop('hidden', false);
+                        $('input#pauseTimer').prop("style").display = "inline";
+                        $('input#pauseTimer').prop('disabled', false); // enable pause button unless clicked twice already
+                    }
+                }
+
+            },
+
+            complete: function () {
+                // Schedule the next request when the current one's complete
+                timeout = setTimeout(autoSave, 10000);
+            }
         });
-
-        $( this ).prop('disabled', true); // disable button for duration of pause
-        
-        clearTimeout(timeout);
-
-        timeout = setTimeout(autoSave, {hdTeamPauseSeconds} * 1000 ); // seconds to pause for
-      }); // end of click function
     }
-    else{
-      $( 'input#pauseTimer' ).prop( 'hidden', true );
-      
-    }
-    $( 'input#requestAdditionalTime' ).prop('disabled', false);        
-    $( 'input#requestAdditionalTime' ).prop("style").display="none";        
 
-    $( 'input#requestAdditionalTime' ).click( function(){
 
-      if ( !confirm('Are you sure you want to request more time to work on this SR?') ){
-        return;
-      }
-      
-      $.ajax({
-        url: 'Activity.php', 
-        data: {
-            action:         "requestAdditionalTime",
-            problemID:      $( "INPUT#problemID" ).val()
+    $(document).ready(function () {
+        // run the first time; all subsequent calls will take care of themselves
+        timeout = setTimeout(autoSave, 10000); // 10 seconds
+
+        /*
+         No timer for priority 5
+         */
+        if (
+            ( '{problemStatus}' == 'I' | '{problemStatus}' == 'P' ) &
+
+            {hiddenPriority} < 5 &
+
+            '{onSiteFlag}' != 'Y'
+        ) {
+
+            $('div#dialog').hide(); // default
+            /*
+             Only display pause timer button if assigned user in team level 1
+             */
+            if ({level} == 1) {
+
+                /*
+                 Have already exceeded count for this SR previously
+                 */
+                if (pauseCount >= {hdTeamMaxPauseCount}) {
+
+                    $('input#pauseTimer').prop('disabled', true);
+                }
+
+
+                $('input#pauseTimer').click(function () {
+
+                    pauseCount++;
+
+                    $.ajax({
+                        url: 'Activity.php',
+                        data: {
+                            action: "incrementPauseCounter",
+                            problemID: $("INPUT#problemID").val()
+                        }
+                    });
+
+                    $(this).prop('disabled', true); // disable button for duration of pause
+
+                    clearTimeout(timeout);
+
+                    timeout = setTimeout(autoSave, {hdTeamPauseSeconds} * 1000); // seconds to pause for
+                }); // end of click function
+            }
+            else {
+                $('input#pauseTimer').prop('hidden', true);
+
+            }
+            $('input#requestAdditionalTime').prop('disabled', false);
+            $('input#requestAdditionalTime').prop("style").display = "none";
+
+            $('input#requestAdditionalTime').click(function () {
+
+                if (!confirm('Are you sure you want to request more time to work on this SR?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: 'Activity.php',
+                    data: {
+                        action: "requestAdditionalTime",
+                        problemID: $("INPUT#problemID").val()
+                    }
+                });
+
+                alert('Additional time has been requested');
+
+            }); // end of click function
+        } // end if( {status} == 'I' | {status} == 'P' ) & {hiddenPriority} < 5 & '{onSiteFlag}' != 'Y'
+        else {
+
+            $('input#pauseTimer').prop('hidden', true);
+            $('input#pauseTimer').prop("style").display = "none";
+
+            $('input#requestAdditionalTime').prop('hidden', true);
+            $('input#requestAdditionalTime').prop("style").display = "none";
+
+            $('span#hdRemainMinutes').prop('hidden', true);
+            $('span#hdRemainMinutes').prop("style").display = "none";
+
+            $('span#esRemainMinutes').prop('hidden', true);
+            $('span#esRemainMinutes').prop("style").display = "none";
+
+            $('span#imRemainMinutes').prop('hidden', true);
+            $('span#imRemainMinutes').prop("style").display = "none";
         }
-      });
-      
-      alert( 'Additional time has been requested');
-
-    }); // end of click function
-  } // end if( {status} == 'I' | {status} == 'P' ) & {hiddenPriority} < 5 & '{onSiteFlag}' != 'Y' 
-  else{
-    
-    $( 'input#pauseTimer' ).prop( 'hidden', true );
-    $( 'input#pauseTimer' ).prop("style").display="none";        
-
-    $( 'input#requestAdditionalTime' ).prop( 'hidden', true );
-    $( 'input#requestAdditionalTime' ).prop("style").display="none";        
-
-    $( 'span#hdRemainMinutes' ).prop( 'hidden', true );
-    $( 'span#hdRemainMinutes' ).prop("style").display="none";        
-
-    $( 'span#esRemainMinutes' ).prop( 'hidden', true );
-    $( 'span#esRemainMinutes' ).prop("style").display="none";        
-    
-    $( 'span#imRemainMinutes' ).prop( 'hidden', true );
-    $( 'span#imRemainMinutes' ).prop("style").display="none";        
-  }
-});
+    });
 </script>
 <!-- End Template: ActivityEdit.inc.html -->

@@ -1,125 +1,134 @@
 <!-- Template: GoodsInDisplay.inc.html -->
 <script language='JavaScript' src='CommonJS.js'></script>
 <SCRIPT language="JavaScript">
-var qtySetZero = true; // initialise flag to indicate current toggle state 
-document.onkeydown = function () {
-  var numberOfElements = 0;
-  if (event.keyCode == 116) { // F5 toggle
-    event.keyCode = 0;
-    event.returnValue = false;
-    event.cancelBubble = true;
-    numberOfElements = getElementCount("qtyToReceive");
-    for (var i=0 ; i < numberOfElements ; i++)
-    {
-      var qtyToReceive = document.all("qtyToReceive", i);
-      var qtyOS = document.all("qtyOS", i);
-      if(qtySetZero && !qtyToReceive.disabled){
-        qtyToReceive.value = qtyOS.value;
-      }
-      else{
-        qtyToReceive.value=0;
-      }
+    var qtySetZero = true; // initialise flag to indicate current toggle state
+    document.onkeydown = function () {
+        var numberOfElements = 0;
+        if (event.keyCode == 116) { // F5 toggle
+            event.keyCode = 0;
+            event.returnValue = false;
+            event.cancelBubble = true;
+            event.preventDefault();
+            event.stopPropagation();
+            numberOfElements = getElementCount("qtyToReceive");
+            for (var i = 0; i < numberOfElements; i++) {
+                var qtyToReceive = document.all("qtyToReceive", i);
+                var qtyOS = document.all("qtyOS", i);
+                if (qtySetZero && !qtyToReceive.disabled) {
+                    qtyToReceive.value = qtyOS.value;
+                }
+                else {
+                    qtyToReceive.value = 0;
+                }
+            }
+            // toggle global flag
+            if (qtySetZero) {
+                qtySetZero = false;
+            }
+            else {
+                qtySetZero = true;
+            }
+        }
     }
-    // toggle global flag
-    if(qtySetZero){
-      qtySetZero = false;
-    }
-    else{
-      qtySetZero = true;
-    }
-  }
-}
 </SCRIPT>
 <TABLE width="100px" border="0" cellpadding="2" cellspacing="1">
-  <TR> 
-    <TD width="100px" class="navigateLink" valign="top"> <a href="{urlPurchaseOrder}">Purchase Order</a> 
-    </TD>
-  </TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlPurchaseOrder}">Purchase Order</a>
+        </TD>
+    </TR>
 </TABLE>
 <br/>
 <TABLE width="300px" border="0" cellpadding="2" cellspacing="1">
-  <TR> 
-    <TD width="120px" class="promptText" valign="top">Supplier</a></TD>
-    <TD class="displayfield" valign="top">{supplierName}</a> 
-    </TD>
-  </TR>
-  <TR> 
-    <TD class="promptText" valign="top">Purchase Order</a></TD>
-    <TD class="displayfield" valign="top">{porheadID}</a> 
-    </TD>
-  </TR>
-  <TR> 
-    <TD width="120px" class="promptText" valign="top">Customer</a></TD>
-    <TD class="displayfield" valign="top">{customerName}</a> 
-    </TD>
-  </TR>
-  <TR> 
-    <TD class="promptText" valign="top">Sales Order</a></TD>
-    <TD class="displayfield" valign="top">{customerID}/{ordheadID}</a> 
-    </TD>
-  </TR>
+    <TR>
+        <TD width="120px" class="promptText" valign="top">Supplier</a></TD>
+        <TD class="displayfield" valign="top">{supplierName}</a>
+        </TD>
+    </TR>
+    <TR>
+        <TD class="promptText" valign="top">Purchase Order</a></TD>
+        <TD class="displayfield" valign="top">{porheadID}</a>
+        </TD>
+    </TR>
+    <TR>
+        <TD width="120px" class="promptText" valign="top">Customer</a></TD>
+        <TD class="displayfield" valign="top">{customerName}</a>
+        </TD>
+    </TR>
+    <TR>
+        <TD class="promptText" valign="top">Sales Order</a></TD>
+        <TD class="displayfield" valign="top">{customerID}/{ordheadID}</a>
+        </TD>
+    </TR>
 </TABLE>
 <form name="goodsInForm" method="POST" enctype="multipart/form-data" action="{urlReceive}">
-  <table class="singleBorder" width="900" border="0" cellspacing="2" cellpadding="1">
-    <tr> 
-      <td width="35%" class="listHeadText">Description</td>
-      <td width="20%" class="listHeadText">Part No</td>
-      <td width="3%" class="listHeadText">Ordered</td>
-      <td width="3%" class="listHeadText">Outstanding</td>
-      <td width="3%" class="listHeadText">Receive</td>
-      <td width="10%" class="listHeadText">Serial No</td>
-      <td width="20%" class="listHeadText">Warranty</td>
-      <td width="6%" class="listHeadText">Renew</td>
-    </tr>
-    <!-- BEGIN orderLineBlock -->
-    <input type="hidden" id="description" name="receive[{sequenceNo}][description]" value="{description}">
-    <input type="hidden" id="sequenceNo" name="receive[{sequenceNo}][sequenceNo]" value="{sequenceNo}">
-    <input type="hidden" id="orderSequenceNo" name="receive[{sequenceNo}][orderSequenceNo]" value="{orderSequenceNo}">
-    <input type="hidden" id="qtyOS" name="receive[{sequenceNo}][qtyOS]" value="{qtyOS}">
-    <input type="hidden" id="qtyOrdered" name="receive[{sequenceNo}][qtyOrdered]" value="{qtyOrdered}">
-    <input type="hidden" id="itemID" name="receive[{sequenceNo}][itemID]" value="{itemID}">
-    <input type="hidden" id="requireSerialNo" name="receive[{sequenceNo}][requireSerialNo]" value="{requireSerialNo}">
-    <input type="hidden" id="allowReceive" name="receive[{sequenceNo}][allowReceive]" value="{allowReceive}">
-    <input type="hidden" id="customerItemID" name="receive[{sequenceNo}][customerItemID]" value="{customerItemID}">
-    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
-      <td class="orderLineClass"> <DIV align="left">{description}</DIV></td>
-      <td class="orderLineClass"> <DIV align="left">{partNo}</DIV></td>
-      <td class="orderLineClass">{qtyOrdered}</td>
-      <td class="orderLineClass">{qtyOS}</td>
-      <td class="orderLineClass"> <input {lineDisabled} type="text" id="qtyToReceive" name="receive[{sequenceNo}][qtyToReceive]" value="{qtyToReceive}" maxlength="5" size="5"> 
-      </td>
-      <td class="orderLineClass"> <input
-        {DISABLED}
-        {lineDisabled}
-        type="text"
-        id="serialNo"
-        name="receive[{sequenceNo}][serialNo]"
-        value="{serialNo}"
-        maxlength="30"
-        size="25"
-      > </td>
-      <td class="orderLineClass"> <select
-        type="text"
-        id="warrantyID"
-        name="receive[{sequenceNo}][warrantyID]"
-        {DISABLED}
-        {lineDisabled}
-      >
-          <option value="">N/A</option>
-          <!-- BEGIN warrantyBlock -->
-          <option {warrantySelected} value="{warrantyID}">{warrantyDescription}</option>
-          <!-- END warrantyBlock -->
-        </select>
-      </td>
-      <td class="orderLineClass">
-        <INPUT {DISABLED} name="receive[{sequenceNo}][renew]" type="checkbox" value="1" {renew}>
-      </td>
-    </tr>
-    <!-- END orderLineBlock -->
-    <tr> 
-      <td colspan="5"> <input type="button" name="Submit" value="Receive" onClick="submit();"> 
-      </td>
-    </tr>
-  </table>
+    <table class="singleBorder" width="900" border="0" cellspacing="2" cellpadding="1">
+        <tr>
+            <td width="35%" class="listHeadText">Description</td>
+            <td width="20%" class="listHeadText">Part No</td>
+            <td width="3%" class="listHeadText">Ordered</td>
+            <td width="3%" class="listHeadText">Outstanding</td>
+            <td width="3%" class="listHeadText">Receive</td>
+            <td width="10%" class="listHeadText">Serial No</td>
+            <td width="20%" class="listHeadText">Warranty</td>
+            <td width="6%" class="listHeadText">Renew</td>
+        </tr>
+        <!-- BEGIN orderLineBlock -->
+        <input type="hidden" id="description" name="receive[{sequenceNo}][description]" value="{description}">
+        <input type="hidden" id="sequenceNo" name="receive[{sequenceNo}][sequenceNo]" value="{sequenceNo}">
+        <input type="hidden" id="orderSequenceNo" name="receive[{sequenceNo}][orderSequenceNo]"
+               value="{orderSequenceNo}">
+        <input type="hidden" id="qtyOS" name="receive[{sequenceNo}][qtyOS]" value="{qtyOS}">
+        <input type="hidden" id="qtyOrdered" name="receive[{sequenceNo}][qtyOrdered]" value="{qtyOrdered}">
+        <input type="hidden" id="itemID" name="receive[{sequenceNo}][itemID]" value="{itemID}">
+        <input type="hidden" id="requireSerialNo" name="receive[{sequenceNo}][requireSerialNo]"
+               value="{requireSerialNo}">
+        <input type="hidden" id="allowReceive" name="receive[{sequenceNo}][allowReceive]" value="{allowReceive}">
+        <input type="hidden" id="customerItemID" name="receive[{sequenceNo}][customerItemID]" value="{customerItemID}">
+        <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+            <td class="orderLineClass">
+                <DIV align="left">{description}</DIV>
+            </td>
+            <td class="orderLineClass">
+                <DIV align="left">{partNo}</DIV>
+            </td>
+            <td class="orderLineClass">{qtyOrdered}</td>
+            <td class="orderLineClass">{qtyOS}</td>
+            <td class="orderLineClass"><input {lineDisabled} type="text" id="qtyToReceive"
+                                              name="receive[{sequenceNo}][qtyToReceive]" value="{qtyToReceive}"
+                                              maxlength="5" size="5">
+            </td>
+            <td class="orderLineClass"><input
+                    {DISABLED}
+                    {lineDisabled}
+                    type="text"
+                    id="serialNo"
+                    name="receive[{sequenceNo}][serialNo]"
+                    value="{serialNo}"
+                    maxlength="30"
+                    size="25"
+            ></td>
+            <td class="orderLineClass"><select
+                    type="text"
+                    id="warrantyID"
+                    name="receive[{sequenceNo}][warrantyID]"
+                    {DISABLED}
+                    {lineDisabled}
+            >
+                <option value="">N/A</option>
+                <!-- BEGIN warrantyBlock -->
+                <option {warrantySelected} value="{warrantyID}">{warrantyDescription}</option>
+                <!-- END warrantyBlock -->
+            </select>
+            </td>
+            <td class="orderLineClass">
+                <INPUT {DISABLED} name="receive[{sequenceNo}][renew]" type="checkbox" value="1" {renew}>
+            </td>
+        </tr>
+        <!-- END orderLineBlock -->
+        <tr>
+            <td colspan="5"><input type="button" name="Submit" value="Receive" onClick="submit();">
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: GoodsInDisplay.inc.html -->

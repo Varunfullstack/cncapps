@@ -2,69 +2,76 @@
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript'>
-  function validateCustomerName(){
-    if (Trim(document.getElementById("customerName").value) != ""){
-      window.open('{urlCustomerPopup}&customerString=' +
-      escape(document.getElementById("customerName").value) +
-      '&parentIDField=customerID' +
-      '&parentDescField=customerName',
-      'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+    $(function () {
+        window.date = $('#date').get(0);
+    });
+    function validateCustomerName() {
+        if (Trim(document.getElementById("customerName").value) != "") {
+            window.open('{urlCustomerPopup}&customerString=' +
+                escape(document.getElementById("customerName").value) +
+                '&parentIDField=customerID' +
+                '&parentDescField=customerName',
+                'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+        }
     }
-  }
-</SCRIPT>
+</script>
 <form name="customerItem" method="post" action="{urlSubmit}">
-  <TABLE width="600" border="0" cellpadding="1" cellspacing="1">
-    <TR> 
-      <td class="promptText">Customer</td>
-      <td><input
-          type="hidden"
-          name="callActivity[1][customerID]"
-          id="customerID"
-          value="{customerID}" />
-        <input
-          type="text"
-          name="customerName"
-          id="customerName"
-          value="{customerName}"
-          onChange="javascript:validateCustomerName()"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{customerIDMessage}</span> </td>
-    </TR>
-    <TR> 
-      <TD class="promptText">Value</TD>
-      <TD class="field"><input
-          {DISABLED}
-          type="text"
-          name="callActivity[1][curValue]"
-          value="{curValue}"
-          size="8"
-          maxlength="8"
-          />
-        <span class="formErrorMessage">{curValueMessage}</span>
-      </TD>
-    </TR>
-    <TR> 
-      <TD class="promptText">Date</TD>
-      <TD class="field"> <input 
-          type="text"
-          id="date"
-          size="10"
-          maxlength="10"
-          name="callActivity[1][date]"
-          value="{date}"
-          ><a href="javascript:;" onclick="popUpCalendar(this, date, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>
-      <span class="formErrorMessage">{dateMessage}</span> </TD>
-    </TR>
-    <tr>
-      <td valign="top" class="promptText">&nbsp;</td>
-      <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr> 
-      <td>&nbsp; </td>
-      <td colspan="2">
-        <input type="submit" name="Update" value="Save"></td>
-    </tr>
-  </table>
+    <TABLE width="600" border="0" cellpadding="1" cellspacing="1">
+        <TR>
+            <td class="promptText">Customer</td>
+            <td><input
+                    type="hidden"
+                    name="callActivity[1][customerID]"
+                    id="customerID"
+                    value="{customerID}"/>
+                <input
+                        type="text"
+                        name="customerName"
+                        id="customerName"
+                        value="{customerName}"
+                        onChange="javascript:validateCustomerName()"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{customerIDMessage}</span></td>
+        </TR>
+        <TR>
+            <TD class="promptText">Value</TD>
+            <TD class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="callActivity[1][curValue]"
+                    value="{curValue}"
+                    size="8"
+                    maxlength="8"
+            />
+                <span class="formErrorMessage">{curValueMessage}</span>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Date</TD>
+            <TD class="field"><input
+                    type="text"
+                    id="date"
+                    size="10"
+                    maxlength="10"
+                    name="callActivity[1][date]"
+                    value="{date}"
+            ><a href="javascript:;" onclick="popUpCalendar(this, date, 'dd/mm/yyyy')"><img src="images/calendar.gif"
+                                                                                           alt="Calendar" width="24"
+                                                                                           height="22" hspace="0"
+                                                                                           vspace="0" border="0"
+                                                                                           align="absmiddle"/></a>
+                <span class="formErrorMessage">{dateMessage}</span></TD>
+        </TR>
+        <tr>
+            <td valign="top" class="promptText">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">
+                <input type="submit" name="Update" value="Save"></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: PrepayAdjustment.inc.html -->

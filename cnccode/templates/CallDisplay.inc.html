@@ -2,216 +2,252 @@
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript'>
-var state='none'; // display status
-function checkFunctionKey(field){
- 	if (event.keyCode == 120){			// F9 - edit
- 	}
- 	return;
-}
-function validateItemDescription(){
-	if (Trim(document.getElementById("itemDescription").value) != ""){
-		window.open(
-			'{urlItemPopup}&itemDescription=' + escape(document.getElementById("itemDescription").value)+
-			'&parentIDField=customerItemID' +
-			'&parentWarrantyIDField=warrantyID' +
-			'&parentDescField=itemDescription',
-			'customerItem',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}		
+    $(function () {
+        window.dateClosed = $('#dateClosed').get(0);
+    });
+    var state = 'none'; // display status
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {			// F9 - edit
+        }
+        return;
+    }
+    function validateItemDescription() {
+        if (Trim(document.getElementById("itemDescription").value) != "") {
+            window.open(
+                '{urlItemPopup}&itemDescription=' + escape(document.getElementById("itemDescription").value) +
+                '&parentIDField=customerItemID' +
+                '&parentWarrantyIDField=warrantyID' +
+                '&parentDescField=itemDescription',
+                'customerItem',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
 </SCRIPT>
 <TABLE width="400px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" height="14pt" class="navigateLink" valign="top"> <a href="{urlDeleteCall}"  onClick="if(!confirm('Are you sure you want to remove this Call?')) return(false)">{txtDeleteCall}</a> 
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlPrint}">{txtPrint}</a> 
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlCreateSalesOrder}" target="_blank">{txtCreateSalesOrder}</a> 
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlSkipSalesOrder}">{txtSkipSalesOrder}</a> 
-		</TD>
-	</TR>
+    <TR>
+        <TD width="100px" height="14pt" class="navigateLink" valign="top"><a href="{urlDeleteCall}"
+                                                                             onClick="if(!confirm('Are you sure you want to remove this Call?')) return(false)">{txtDeleteCall}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlPrint}">{txtPrint}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlCreateSalesOrder}" target="_blank">{txtCreateSalesOrder}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlSkipSalesOrder}">{txtSkipSalesOrder}</a>
+        </TD>
+    </TR>
 </table>
-<form name="call" action="{urlUpdateCall}" method="post" AUTOCOMPLETE = "off">
-  <table class="singleBorder" width="800" border="0">
-		<input type="hidden" name="call[1][callID]" value="{callID}">
-		<input type="hidden" name="call[1][ordheadID]" value="{ordheadID}">
-		<input type="hidden" name="call[1][time]" value="{time}">
-		<input type="hidden" name="call[1][customerID]" value="{customerID}">
-		<input type="hidden" name="call[1][customerName]" value="{customerName}">
-		<input type="hidden" name="call[1][contractDescription]" value="{contractDescription}">
-		<input type="hidden" name="call[1][itemDescription]" value="{itemDescription}">
-		<input type="hidden" name="call[1][underContractFlag]" value="{underContractFlag}">
-		<input type="hidden" name="call[1][authorisedFlag]" value="{authorisedFlag}">
-		<input type="hidden" name="call[1][date]" value="{date}">
-		<tr> 
-			<td height="22" class="promptText">Call ID</td>
-			<td class="mainHeadText">{customerID}_{callID}</td>
-			<td width="94" class="promptText">Raised</td>
-			<td width="322" class="mainHeadText">{date}</td>
-		</tr>
-		<tr> 
-			<td width = "66" class="promptText">Customer</td>
-			<td width = "300" class="mainHeadText">{customerName}</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Item</td>
-			<td class="mainHeadText"> <input type="hidden" name="call[1][customerItemID]" id="customerItemID" value="{customerItemID}"> 
-				<input
-					type="text"
-					name ="itemDescription"
-					id="itemDescription"
-					value="{itemDescription}"
-					onKeydown="javascript:checkFunctionKey(itemDescription)"
-					onChange="javascript:validateItemDescription()"
-					{DISABLED}
-					size="50"
-					maxlength="50"
-				> </td>
-			<td class="promptText">Contract</td>
-			<td class="mainHeadText"> <select
-					{DISABLED}
-					type="text"
-					name="call[1][contractCustomerItemID]"
-				>
-					<option value="">T &amp; M</option>
-					<!-- BEGIN contractBlock -->
-					<option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
-					<!-- END contractBlock -->
-				</select> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="{warrantyExpireClass}">{warrantyDescription}</td>
-			<td class="promptText">Resolved On</td>
-			<td class="mainHeadText"> <input
-					{DISABLED}
-					type="text"
-					name="call[1][dateClosed]"
-					id="dateClosed"
-					value="{dateClosed}"
-					size="10"
-					maxlength="10"
-				> <a href="javascript:;" onClick="popUpCalendar(this, dateClosed, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-				<span class="formErrorMessage">{dateClosedMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText"><a href="file://f:/scr/{customerID}_{callID}.pdf" target="_blank" title="View Service Call Report">Open 
-				SCR</A></td>
-			<td class="field">&nbsp;</td>
-			<td class="promptText">&nbsp;</td>
-			<td class="mainHeadText"> <div align="right"> 
-					<input {DISABLED} type="submit" name="Submit" value="Update">
-				</div></td>
-		</tr>
-	</table>
+<form name="call" action="{urlUpdateCall}" method="post" AUTOCOMPLETE="off">
+    <table class="singleBorder" width="800" border="0">
+        <input type="hidden" name="call[1][callID]" value="{callID}">
+        <input type="hidden" name="call[1][ordheadID]" value="{ordheadID}">
+        <input type="hidden" name="call[1][time]" value="{time}">
+        <input type="hidden" name="call[1][customerID]" value="{customerID}">
+        <input type="hidden" name="call[1][customerName]" value="{customerName}">
+        <input type="hidden" name="call[1][contractDescription]" value="{contractDescription}">
+        <input type="hidden" name="call[1][itemDescription]" value="{itemDescription}">
+        <input type="hidden" name="call[1][underContractFlag]" value="{underContractFlag}">
+        <input type="hidden" name="call[1][authorisedFlag]" value="{authorisedFlag}">
+        <input type="hidden" name="call[1][date]" value="{date}">
+        <tr>
+            <td height="22" class="promptText">Call ID</td>
+            <td class="mainHeadText">{customerID}_{callID}</td>
+            <td width="94" class="promptText">Raised</td>
+            <td width="322" class="mainHeadText">{date}</td>
+        </tr>
+        <tr>
+            <td width="66" class="promptText">Customer</td>
+            <td width="300" class="mainHeadText">{customerName}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="promptText">Item</td>
+            <td class="mainHeadText"><input type="hidden" name="call[1][customerItemID]" id="customerItemID"
+                                            value="{customerItemID}">
+                <input
+                        type="text"
+                        name="itemDescription"
+                        id="itemDescription"
+                        value="{itemDescription}"
+                        onKeydown="javascript:checkFunctionKey(itemDescription)"
+                        onChange="javascript:validateItemDescription()"
+                        {DISABLED}
+                        size="50"
+                        maxlength="50"
+                ></td>
+            <td class="promptText">Contract</td>
+            <td class="mainHeadText"><select
+                    {DISABLED}
+                    type="text"
+                    name="call[1][contractCustomerItemID]"
+            >
+                <option value="">T &amp; M</option>
+                <!-- BEGIN contractBlock -->
+                <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
+                <!-- END contractBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="{warrantyExpireClass}">{warrantyDescription}</td>
+            <td class="promptText">Resolved On</td>
+            <td class="mainHeadText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="call[1][dateClosed]"
+                        id="dateClosed"
+                        value="{dateClosed}"
+                        size="10"
+                        maxlength="10"
+                >
+                <a href="javascript:;" onClick="popUpCalendar(this, dateClosed, 'dd/mm/yyyy')"><img
+                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
+                        align="absmiddle"></a>
+                <span class="formErrorMessage">{dateClosedMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText"><a href="file://f:/scr/{customerID}_{callID}.pdf" target="_blank"
+                                      title="View Service Call Report">Open
+                SCR</A></td>
+            <td class="field">&nbsp;</td>
+            <td class="promptText">&nbsp;</td>
+            <td class="mainHeadText">
+                <div align="right">
+                    <input {DISABLED} type="submit" name="Submit" value="Update">
+                </div>
+            </td>
+        </tr>
+    </table>
 </form>
 <table class="singleBorder" width="800px" border="0">
-	<tr> 
-		<td> {reason} </td>
-	</tr>
+    <tr>
+        <td> {reason}</td>
+    </tr>
 </table>
 <BR>
-<A href="#" onClick="javascript:SC_toggleDisplayAll();return false;">[show/hide all actvity]</A> <A href="{urlCreateActivity}">{txtCreateActivity}</A> 
+<A href="#" onClick="javascript:SC_toggleDisplayAll();return false;">[show/hide all actvity]</A> <A
+        href="{urlCreateActivity}">{txtCreateActivity}</A>
 <table class="singleBorder" width="800px" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td width="10" class="listHeadText">&nbsp;</td>
-		<td width="20" class="listHeadText">Date</td>
-		<td width="325" class="listHeadText">Type</td>
-		<td width="200" class="listHeadText">User</td>
-		<td width="50"class="listHeadText">Start</td>
-		<td width="50" class="listHeadText">End</td>
-		<td width="50" class="listHeadText">Status</td>
-		<td class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN activityBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td width="10" align="right"><span style="cursor:hand" onclick="SC_toggleDisplay({callActivityID});return false;"><img src="/images/icon_plus.gif" name="displayIcon{callActivityID}" width="9" height="9" hspace="3" vspace="3" border="0" id="displayIcon{callActivityID}" /></span></td>
-		<td class="orderLineItem"><DIV align="left">{activityDate}</div></td>
-		<td class="orderLineItem"><DIV align="left">{activityType}</div></td>
-		<td class="orderLineItem"><DIV align="left">{actUserName}</div></td>
-		<td class="orderLineItem"><DIV align="left">{startTime}</div></td>
-		<td class="orderLineItem"><DIV align="left">{endTime}</div></td>
-		<td class="orderLineItem"><DIV align="left">{status}</div></td>
-		<td nowrap class="orderLineItem">
-			<A href="{urlViewExpenses}" title="View/Edit Expenses" >{txtViewExpenses}</A> 
-			<A href="{urlEditActivity}" title="Edit activity details">{txtEditActivity}</A> 
-			<A href="{urlDeleteActivity}"  title="Delete activity" onClick="if(!confirm('Are you sure you want to remove this activity?')) return(false)">{txtDeleteActivity}</A> 
-			<A href="{urlCheckActivity}" title="Check activity ready for export">{txtCheckActivity}</A>
-			<A href="{urlReport}" title="Produce Service Call Report" target="_blank">{txtReport}</A>
-			<A href="{urlAddToCalendar}" title="Add to calendar">{txtAddToCalendar}</A>
-			<A href="{urlSendVistEmail}" title="Send client a visit confirmation email" onClick="if(!confirm('Are you sure you want send the client a confirmation email?')) return(false)">{txtSendVisitEmail}</A>
-		</td>
-	</tr>
-	<tr> 
-		<td class="{hidden}" id="displayText{callActivityID}" colspan="8">
-			<table width="100%" >
-				<tr>
-					<td>
-						<P><span class="activityReason">{listReason}</span></P>
-						<P><span class="activityAction">{listAction}</span></P>
-						<P><span class="activityFinalStatus">{listFinalStatus}</span></P>
-						<HR>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<!-- END activityBlock -->
-	<tr> 
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">Total</td>
-		<td  class="listHeadText">{totalDuration}</td>
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">&nbsp;</td>
-	</tr>
+    <tr>
+        <td width="10" class="listHeadText">&nbsp;</td>
+        <td width="20" class="listHeadText">Date</td>
+        <td width="325" class="listHeadText">Type</td>
+        <td width="200" class="listHeadText">User</td>
+        <td width="50" class="listHeadText">Start</td>
+        <td width="50" class="listHeadText">End</td>
+        <td width="50" class="listHeadText">Status</td>
+        <td class="listHeadText">&nbsp;</td>
+    </tr>
+    <!-- BEGIN activityBlock -->
+    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+        <td width="10" align="right"><span style="cursor:hand"
+                                           onclick="SC_toggleDisplay({callActivityID});return false;"><img
+                src="/images/icon_plus.gif" name="displayIcon{callActivityID}" width="9" height="9" hspace="3"
+                vspace="3" border="0" id="displayIcon{callActivityID}"/></span></td>
+        <td class="orderLineItem">
+            <DIV align="left">{activityDate}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{activityType}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{actUserName}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{startTime}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{endTime}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{status}</div>
+        </td>
+        <td nowrap class="orderLineItem">
+            <A href="{urlViewExpenses}" title="View/Edit Expenses">{txtViewExpenses}</A>
+            <A href="{urlEditActivity}" title="Edit activity details">{txtEditActivity}</A>
+            <A href="{urlDeleteActivity}" title="Delete activity"
+               onClick="if(!confirm('Are you sure you want to remove this activity?')) return(false)">{txtDeleteActivity}</A>
+            <A href="{urlCheckActivity}" title="Check activity ready for export">{txtCheckActivity}</A>
+            <A href="{urlReport}" title="Produce Service Call Report" target="_blank">{txtReport}</A>
+            <A href="{urlAddToCalendar}" title="Add to calendar">{txtAddToCalendar}</A>
+            <A href="{urlSendVistEmail}" title="Send client a visit confirmation email"
+               onClick="if(!confirm('Are you sure you want send the client a confirmation email?')) return(false)">{txtSendVisitEmail}</A>
+        </td>
+    </tr>
+    <tr>
+        <td class="{hidden}" id="displayText{callActivityID}" colspan="8">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <P><span class="activityReason">{listReason}</span></P>
+                        <P><span class="activityAction">{listAction}</span></P>
+                        <P><span class="activityFinalStatus">{listFinalStatus}</span></P>
+                        <HR>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <!-- END activityBlock -->
+    <tr>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">Total</td>
+        <td class="listHeadText">{totalDuration}</td>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">&nbsp;</td>
+    </tr>
 </table>
 <!-- End Template: CallDisplay.inc.html -->
-<p>&nbsp;</p><table class="singleBorder" width="800px" border="0">
-	<tr> 
-		<td class="listHead"> Documents</td></tr>
-	<tr> 
-		<td> <table class="singleBorder" width="100%">
-				<tr> 
-					<td width="29%" class="listHeadText">Description</td>
-					<td width="28%" class="listHeadText">File</td>
-					<td width="18%" class="listHeadText">Date</td>
-					<td width="14%" class="listHeadText">User</td>
-					<td width="11%" class="">&nbsp;</td>
-				</tr>
-				<!-- BEGIN documentBlock -->
-				<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-					<td><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A></td>
-					<td><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A></td>
-					<td>{createDate}</td>
-					<td>{createUserName}</td>
-					<td><A href="{urlDeleteFile}" title="Delete attached document" onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A> 
-					</td>
-				</tr>
-				<!-- END documentBlock -->
-				<form name="uploadFile" action="{urlUploadFile}" method="post" enctype="multipart/form-data">
-					<input type="hidden" name="MAX_FILE_SIZE" value="6291456">
-					<!-- max 6 mbyte -->
-					<input type="hidden" name="callID" value="{callID}">
-					<tr> 
-						<td class=""> <input name="uploadDescription" type="text" size="45" maxlength="50" value="{uploadDescription}"> 
-						</td>
-						<td> <input
-							name="userfile"
-							type="file"
-							value="{userfile}"
-							size="30"> </td>
-						<td colspan="2"><input type="submit" name="Submit2" value="Upload"></td>
-						<td>&nbsp;</td>
-					</tr>
-				</form>
-			</table></td>
-	</tr>
+<p>&nbsp;</p>
+<table class="singleBorder" width="800px" border="0">
+    <tr>
+        <td class="listHead"> Documents</td>
+    </tr>
+    <tr>
+        <td>
+            <table class="singleBorder" width="100%">
+                <tr>
+                    <td width="29%" class="listHeadText">Description</td>
+                    <td width="28%" class="listHeadText">File</td>
+                    <td width="18%" class="listHeadText">Date</td>
+                    <td width="14%" class="listHeadText">User</td>
+                    <td width="11%" class="">&nbsp;</td>
+                </tr>
+                <!-- BEGIN documentBlock -->
+                <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+                    <td><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A></td>
+                    <td><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A></td>
+                    <td>{createDate}</td>
+                    <td>{createUserName}</td>
+                    <td><A href="{urlDeleteFile}" title="Delete attached document"
+                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                    </td>
+                </tr>
+                <!-- END documentBlock -->
+                <form name="uploadFile" action="{urlUploadFile}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
+                    <!-- max 6 mbyte -->
+                    <input type="hidden" name="callID" value="{callID}">
+                    <tr>
+                        <td class=""><input name="uploadDescription" type="text" size="45" maxlength="50"
+                                            value="{uploadDescription}">
+                        </td>
+                        <td><input
+                                name="userfile"
+                                type="file"
+                                value="{userfile}"
+                                size="30"></td>
+                        <td colspan="2"><input type="submit" name="Submit2" value="Upload"></td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </form>
+            </table>
+        </td>
+    </tr>
 </table>
 <p>&nbsp;</p>

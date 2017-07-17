@@ -1,287 +1,300 @@
+<script src="popcalendar/popcalendar.js"></script>
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript'>
-function checkFunctionKey(field){
-  if (event.keyCode == 120){      // F9 - edit
-    switch (field.id){
-      case "itemDescription":
-        if (document.getElementById("itemID").value != "0"){
-          window.open(
-            '{urlItemEdit}&itemID=' +
-            escape(document.getElementById("itemID").value) +
-            '&parentIDField=itemID' +
-            '&parentDescField=itemDescription',
-            'item',
-            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-          );
+    $(function () {
+        window.despatchDate = $('#despatchDate').get(0);
+        window.expiryDate = $('#expiryDate').get(0);
+    });
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {      // F9 - edit
+            switch (field.id) {
+                case "itemDescription":
+                    if (document.getElementById("itemID").value != "0") {
+                        window.open(
+                            '{urlItemEdit}&itemID=' +
+                            escape(document.getElementById("itemID").value) +
+                            '&parentIDField=itemID' +
+                            '&parentDescField=itemDescription',
+                            'item',
+                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "siteDesc":
+                    if (document.getElementById("siteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("siteNo").value) +
+                            '&parentIDField=siteNo' +
+                            '&parentDescField=siteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+            }
         }
-        break;
-      case "siteDesc":
-        if (document.getElementById("siteNo").value != ""){
-          window.open(
-            '{urlSiteEdit}&customerID={customerID}' +
-            '&siteNo=' + escape(document.getElementById("siteNo").value) +
-            '&parentIDField=siteNo' +
-            '&parentDescField=siteDesc',
-            'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-          );
-        }
-        break;
+        return;
     }
-   }
-   return;
-}
-function validateItemDescription(){
-  if (Trim(document.getElementById("itemDescription").value) != ""){
-    window.open('{urlItemPopup}&itemDescription=' +
-    escape(document.getElementById("itemDescription").value) +
-    '&parentIDField=itemID' +
-    '&parentSlaResponseHoursField=slaResponseHours' +
-    '&parentDescField=itemDescription',
-    'items','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
-  }
-}
-function validateSiteDesc(){
-  if (Trim(document.getElementById("siteDesc").value) != ""){
-    window.open(
-      '{urlSitePopup}&customerID={customerID}'+
-      '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
-      '&parentIDField=siteNo' +
-      '&parentDescField=siteDesc',
-      'address',
-      'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-    )
-  }
-}
+    function validateItemDescription() {
+        if (Trim(document.getElementById("itemDescription").value) != "") {
+            window.open('{urlItemPopup}&itemDescription=' +
+                escape(document.getElementById("itemDescription").value) +
+                '&parentIDField=itemID' +
+                '&parentSlaResponseHoursField=slaResponseHours' +
+                '&parentDescField=itemDescription',
+                'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+        }
+    }
+    function validateSiteDesc() {
+        if (Trim(document.getElementById("siteDesc").value) != "") {
+            window.open(
+                '{urlSitePopup}&customerID={customerID}' +
+                '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+                '&parentIDField=siteNo' +
+                '&parentDescField=siteDesc',
+                'address',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
 
 </script>
 <!-- Template: RenContractEdit.inc.html -->
 <TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+    </TR>
 </table>
-<FORM  method="post" action="{urlUpdate}" name="renContract" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="renContract[1][customerItemID]"
-			value="{customerItemID}"
-		>
-    <input
-      type="hidden"
-      name="renContract[1][customerID]"
-      id="customerID"
-      value="{customerID}"
-    >
-    <input
-      type="hidden"
-      name="renContract[1][customerName]"
-      value="{customerName}"
-    >
-    <input
-      type="hidden"
-      name="renContract[1][siteNo]"
-      id="siteNo"
-      value="{siteNo}"
-    >
-    <input
-      type="hidden"
-      name="renContract[1][curUnitSale]"
-      value="{curUnitSale}"
-    >
-    <input
-      type="hidden"
-      name="renContract[1][curUnitCost]"
-      value="{curUnitCost}"
-    >
-    <input
-      type="hidden"
-      name="renContract[1][invoiceFromDate]"
-      value="{invoiceFromDate}"
-    >
-    <input
-      type="hidden"
-      name="renContract[1][invoiceToDate]"
-      value="{invoiceToDate}"
-    >
-		<tr> 
-			<td width="167" class="promptText" align="right">Customer</td>
-			<td width="523" class="fieldText">{customerName}</td>
-		</tr>
-    <TR>
-      <TD class="promptText">Site</TD>
-      <TD class="displayfield">
+<FORM method="post" action="{urlUpdate}" name="renContract" AUTOCOMPLETE="OFF">
+    <table width="700px" border="0">
         <input
-          type="text"
-          name ="renContract[1][siteDesc]"
-          id="siteDesc"
-          value="{siteDesc}"
-          onKeydown="javascript:checkFunctionKey(siteDesc)"
-          onChange="javascript:validateSiteDesc()"
-          {DISABLED}
-          size="50"
-          maxlength="50"
+                type="hidden"
+                name="renContract[1][customerItemID]"
+                value="{customerItemID}"
         >
-      </TD>
-    </TR>
-    <tr>
-      <td class="promptText">Item</td>
-      <td class="field"> <input
-        type="hidden"
-        name="renContract[1][itemID]"
-        id="itemID"
-        value="{itemID}"
-      > <input
-        type="text"
-        {readonly}
-        name="renContract[1][itemDescription]"
-        id="itemDescription"
-        value="{itemDescription}"
-        onChange="javascript:validateItemDescription()"
-        onKeydown="javascript:checkFunctionKey(itemDescription)"
-        size="50"
-        maxlength="50"
-      > <font class="formErrorMessage">{itemDescriptionMessage}</font> </td>
-    </tr>
-    {prices}
-		<tr>
-				<td class="promptText">Installation Date</td>
-				<td class="fieldText"><input
-					name="renContract[1][installationDate]"
-					type="text" value="{installationDate}"
-					{readonly}
-					size="40"
-					maxlength="50">
-								<span class="formErrorMessage">{installationDateMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Total Invoiced (months)</td>
-				<td class="fieldText"><input
-					name="renContract[1][totalInvoiceMonths]"
-					type="text" value="{totalInvoiceMonths}"
-					{readonly}
-					size="10"
-					maxlength="10">
-								<span class="formErrorMessage">{totalInvoiceMonthsMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Invoice Interval	(months)</td>
-				<td class="fieldText"><input
-					name="renContract[1][invoicePeriodMonths]"
-					{readonly}
-					type="text" value="{invoicePeriodMonths}"
-					size="10"
-					maxlength="10">
-								<span class="formErrorMessage">{invoicePeriodMonthsMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Next Invoice Period</td>
-				<td class="fieldText">{invoiceFromDate} to {invoiceToDate}</td>
-		</tr>
-    <tr>
-      <td class="promptText">Sales Order Comment</td>
-      <td class="fieldText">
-      <input
-        name="renContract[1][notes]"
-        type="text" value="{notes}"
-        title="Appears as a comment line on the generated sales order before the item line"
-        {readonly}
-        size="45"
-        maxlength="45"
-      >
-      <span class="formErrorMessage">{notesMessage}</span> </td>
-    </tr>  
-    <tr>
-        <td class="promptText">Number of Users</td>
-        <td class="fieldText"><input
-          name="renContract[1][users]"
-          type="text" value="{users}"
-          title="Users"
-          size="10"
-          maxlength="10">
-          <span class="formErrorMessage">{usersMessage}</span> </td>
-    </tr>
-    {declined}
-    <tr>
-      <td class="promptText">Part No</td>
-      <td class="field">{itemID}</td>
-    </tr>
-    <TR>
-      <TD class="promptText">Printed Contract Start Date</TD>
-      <TD class="field"> <input
-        type="text"
-        id="despatchDate"
-        name="renContract[1][despatchDate]"
-        size="10"
-        maxlength="10"
-        {readonly}
-        value="{despatchDate}"
-        > <a href="javascript:;" onClick="popUpCalendar(this, despatchDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-        <font class="formErrorMessage">{despatchDateMessage}</font> </TD>
-    </TR>
-    {renContractPrePayFields}
-    <TR>
-      <TD class="promptText">Contract Expiry</TD>
-      <TD class="field"> <input
-        type="text"
-        id="expiryDate"
-        {readonly}
-        name="renContract[1][expiryDate]"
-        size="10"
-        maxlength="10"
-        value="{expiryDate}"
-        > <a href="javascript:;" onClick="popUpCalendar(this, expiryDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-        <font class="formErrorMessage">{expiryDateMessage}</font> </TD>
-    </TR>
-    
-    <tr>
-      <td class="promptText"><div align="right">Renewal Status</div></td>
-      <td> <select
-        {disabled}
-            name="renContract[1][renewalStatus]"
-          >
-          <option value=""></option>
-          <!-- BEGIN renewalStatusBlock -->
-          <option {renewalStatusSelected} value="{renewalStatus}">{renewalStatusDescription}</option>
-          <!-- END renewalStatusBlock -->
-        </select> </td>
-    </tr>
-    <tr>
-      <td valign="top" class="promptText">Contract Details</td>
-      <td colspan="2">
-        <textarea {readonly} cols="80" rows="10" name="renContract[1][customerItemNotes]" title="Appears on printed contract">{customerItemNotes}</textarea>
-      </td>
-    </tr>
-    <tr>
-      <td valign="top" class="promptText">Internal Notes</td>
-      <td colspan="2">
-        <textarea cols="80" rows="10" name="renContract[1][internalNotes]">{internalNotes}</textarea>
-      </td>
-    </tr>
+        <input
+                type="hidden"
+                name="renContract[1][customerID]"
+                id="customerID"
+                value="{customerID}"
+        >
+        <input
+                type="hidden"
+                name="renContract[1][customerName]"
+                value="{customerName}"
+        >
+        <input
+                type="hidden"
+                name="renContract[1][siteNo]"
+                id="siteNo"
+                value="{siteNo}"
+        >
+        <input
+                type="hidden"
+                name="renContract[1][curUnitSale]"
+                value="{curUnitSale}"
+        >
+        <input
+                type="hidden"
+                name="renContract[1][curUnitCost]"
+                value="{curUnitCost}"
+        >
+        <input
+                type="hidden"
+                name="renContract[1][invoiceFromDate]"
+                value="{invoiceFromDate}"
+        >
+        <input
+                type="hidden"
+                name="renContract[1][invoiceToDate]"
+                value="{invoiceToDate}"
+        >
+        <tr>
+            <td width="167" class="promptText" align="right">Customer</td>
+            <td width="523" class="fieldText">{customerName}</td>
+        </tr>
+        <TR>
+            <TD class="promptText">Site</TD>
+            <TD class="displayfield">
+                <input
+                        type="text"
+                        name="renContract[1][siteDesc]"
+                        id="siteDesc"
+                        value="{siteDesc}"
+                        onKeydown="javascript:checkFunctionKey(siteDesc)"
+                        onChange="javascript:validateSiteDesc()"
+                        {DISABLED}
+                        size="50"
+                        maxlength="50"
+                >
+            </TD>
+        </TR>
+        <tr>
+            <td class="promptText">Item</td>
+            <td class="field"><input
+                    type="hidden"
+                    name="renContract[1][itemID]"
+                    id="itemID"
+                    value="{itemID}"
+            > <input
+                    type="text"
+                    {readonly}
+                    name="renContract[1][itemDescription]"
+                    id="itemDescription"
+                    value="{itemDescription}"
+                    onChange="javascript:validateItemDescription()"
+                    onKeydown="javascript:checkFunctionKey(itemDescription)"
+                    size="50"
+                    maxlength="50"
+            > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
+        </tr>
+        {prices}
+        <tr>
+            <td class="promptText">Installation Date</td>
+            <td class="fieldText"><input
+                    name="renContract[1][installationDate]"
+                    type="text" value="{installationDate}"
+                    {readonly}
+                    size="40"
+                    maxlength="50">
+                <span class="formErrorMessage">{installationDateMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Total Invoiced (months)</td>
+            <td class="fieldText"><input
+                    name="renContract[1][totalInvoiceMonths]"
+                    type="text" value="{totalInvoiceMonths}"
+                    {readonly}
+                    size="10"
+                    maxlength="10">
+                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Invoice Interval (months)</td>
+            <td class="fieldText"><input
+                    name="renContract[1][invoicePeriodMonths]"
+                    {readonly}
+                    type="text" value="{invoicePeriodMonths}"
+                    size="10"
+                    maxlength="10">
+                <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Next Invoice Period</td>
+            <td class="fieldText">{invoiceFromDate} to {invoiceToDate}</td>
+        </tr>
+        <tr>
+            <td class="promptText">Sales Order Comment</td>
+            <td class="fieldText">
+                <input
+                        name="renContract[1][notes]"
+                        type="text" value="{notes}"
+                        title="Appears as a comment line on the generated sales order before the item line"
+                        {readonly}
+                        size="45"
+                        maxlength="45"
+                >
+                <span class="formErrorMessage">{notesMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Number of Users</td>
+            <td class="fieldText"><input
+                    name="renContract[1][users]"
+                    type="text" value="{users}"
+                    title="Users"
+                    size="10"
+                    maxlength="10">
+                <span class="formErrorMessage">{usersMessage}</span></td>
+        </tr>
+        {declined}
+        <tr>
+            <td class="promptText">Part No</td>
+            <td class="field">{itemID}</td>
+        </tr>
+        <TR>
+            <TD class="promptText">Printed Contract Start Date</TD>
+            <TD class="field"><input
+                    type="text"
+                    id="despatchDate"
+                    name="renContract[1][despatchDate]"
+                    size="10"
+                    maxlength="10"
+                    {readonly}
+                    value="{despatchDate}"
+            > <a href="javascript:;" onClick="popUpCalendar(this, despatchDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+                <font class="formErrorMessage">{despatchDateMessage}</font></TD>
+        </TR>
+        {renContractPrePayFields}
+        <TR>
+            <TD class="promptText">Contract Expiry</TD>
+            <TD class="field"><input
+                    type="text"
+                    id="expiryDate"
+                    {readonly}
+                    name="renContract[1][expiryDate]"
+                    size="10"
+                    maxlength="10"
+                    value="{expiryDate}"
+            > <a href="javascript:;" onClick="popUpCalendar(this, expiryDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+                <font class="formErrorMessage">{expiryDateMessage}</font></TD>
+        </TR>
 
-    <tr>
-      <td valign="top" class="promptText">Auto-generate Sales Invoice</td>
-      <td colspan="2">
-        <input type="checkbox" name="renContract[1][autoGenerateContractInvoice]" value="Y" {autoGenerateContractInvoiceChecked} title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created">
-      </td>
-    </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Renewal Status</div>
+            </td>
+            <td><select
+                    {disabled}
+                    name="renContract[1][renewalStatus]"
+            >
+                <option value=""></option>
+                <!-- BEGIN renewalStatusBlock -->
+                <option {renewalStatusSelected} value="{renewalStatus}">{renewalStatusDescription}</option>
+                <!-- END renewalStatusBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td valign="top" class="promptText">Contract Details</td>
+            <td colspan="2">
+                <textarea {readonly} cols="80" rows="10" name="renContract[1][customerItemNotes]"
+                          title="Appears on printed contract">{customerItemNotes}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" class="promptText">Internal Notes</td>
+            <td colspan="2">
+                <textarea cols="80" rows="10" name="renContract[1][internalNotes]">{internalNotes}</textarea>
+            </td>
+        </tr>
 
-    <tr>
-      <td>&nbsp; </td>
-      <td colspan="2">
-        <input type="submit" name="Update" value="Save">
-        <a href="{urlDelete}"  title="Delete customer item" onClick="if(!confirm('Are you sure you want to delete this record?')) return(false)">{txtDelete}</a>
-        <a href="{urlPrintContract}"  title="Print Support Contract">{txtPrintContract}</a>
-      </td>
-    </tr>
-  </table>
+        <tr>
+            <td valign="top" class="promptText">Auto-generate Sales Invoice</td>
+            <td colspan="2">
+                <input type="checkbox" name="renContract[1][autoGenerateContractInvoice]" value="Y"
+                       {autoGenerateContractInvoiceChecked}
+                       title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created">
+            </td>
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">
+                <input type="submit" name="Update" value="Save">
+                <a href="{urlDelete}" title="Delete customer item"
+                   onClick="if(!confirm('Are you sure you want to delete this record?')) return(false)">{txtDelete}</a>
+                <a href="{urlPrintContract}" title="Print Support Contract">{txtPrintContract}</a>
+            </td>
+        </tr>
+    </table>
 </form>
 <H3>Covered Items</H3>
 <table class="singleBorder">
     <!-- BEGIN coveredItemsBlock -->
     <tr class="singleBorder">
-      <td><a href="{coveredItemUrl}" target="_blank">{coveredItemDescription}</a></td>
-      <td>{coveredItemSerialNo}</td>
+        <td><a href="{coveredItemUrl}" target="_blank">{coveredItemDescription}</a></td>
+        <td>{coveredItemSerialNo}</td>
     </tr>
     <!-- END coveredItemsBlock -->
 </table>

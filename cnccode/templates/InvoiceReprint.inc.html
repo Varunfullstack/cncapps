@@ -2,118 +2,129 @@
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript'>
-var savedCustomerString
-function saveCustomerString(){
-  savedCustomerString = document.invoice.customerString.value
-}
-function validateCustomerString(){
-  if (Trim(document.getElementById("customerString").value) != ""){
-    if (document.getElementById("customerString").value != savedCustomerString){
-      window.open('{urlCustomerPopup}&customerString=' +
-      escape(document.getElementById("customerString").value) +
-      '&parentIDField=customerID' +
-      '&parentDescField=customerString',
-      'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+    $(function () {
+        window.startDate = $('#startDate').get(0);
+        window.endDate = $('#endDate').get(0);
+    });
+    var savedCustomerString
+    function saveCustomerString() {
+        savedCustomerString = document.invoice.customerString.value
     }
-  }
-  else{
-    document.invoice.customerID.value = "";
-  }
-}
-function validateCustomerStringOnReturn() {
-   if (event.keyCode == 13) {
-      validateCustomerString();
-   }
-}
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{urlCustomerPopup}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.invoice.customerID.value = "";
+        }
+    }
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
 </script>
 <form name="invoice" method="post" action="{urlSubmit}">
-<P>
-	Reprint invoices by either Printed Date or Invoice Number range. Only invoices that have been previously printed will be included.
-</P>
-	<table width="100%" border="0" cellspacing="0" cellpadding="1">
-    <tr> 
-      <td width="100px" class="promptText"><div align="right">Customer</div></td>
-      <td> <input
-          type="hidden"
-          name="invoice[1][customerID]"
-          id="customerID"
-          value="{customerID}"
-        > <input
-          type="text"
-          id="customerString"
-          name="customerString"
-          value="{customerString}"
-          onFocus="javascript:saveCustomerString()"
-          onBlur="javascript:validateCustomerString()"
-          onKeypress="javascript:validateCustomerStringOnReturn()"
-          size="50"
-          maxlength="50"
-        > <font class="formErrorMessage"> {customerStringMessage} </font> </td>
-    </tr>
-		<tr> 
-			<td width="20%" class="promptText">Start Date</td>
-			<td class="field">
-				<input
-					type="text"
-					name="invoice[1][startDate]"
-					id="startDate"
-					value="{startDate}"
-					size="10"
-					maxlength="10"
-				>
-				<a href="javascript:;" onClick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-				<font class="formErrorMessage">{startDateMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td width="20%" class="promptText">End Date</td>
-			<td class="field">
-				<input
-					type="text"
-					name="invoice[1][endDate]"
-					id="endDate"
-					value="{endDate}"
-					size="10"
-					maxlength="10"
-				>
-				<a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-				<font class="formErrorMessage">{endDateMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td width="20%" class="promptText">Start Invoice No</td>
-			<td class="field">
-				<input
-					type="text"
-					name="invoice[1][startInvheadID]"
-					id="startInvheadID"
-					value="{startInvheadID}"
-					size="10"
-					maxlength="10"
-				>
-				<font class="formErrorMessage">{startInvheadIDMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td width="20%" class="promptText">End Invoice No</td>
-			<td class="field">
-				<input
-					type="text"
-					name="invoice[1][endInvheadID]"
-					id="endInvheadID"
-					value="{endInvheadID}"
-					size="10"
-					maxlength="10"
-				>
-				<font class="formErrorMessage">{endInvheadIDMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-				<input type="submit" name="Print" value="Print">
-			</td>
-		</tr>
-	</table>
+    <P>
+        Reprint invoices by either Printed Date or Invoice Number range. Only invoices that have been previously printed
+        will be included.
+    </P>
+    <table width="100%" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="100px" class="promptText">
+                <div align="right">Customer</div>
+            </td>
+            <td><input
+                    type="hidden"
+                    name="invoice[1][customerID]"
+                    id="customerID"
+                    value="{customerID}"
+            > <input
+                    type="text"
+                    id="customerString"
+                    name="customerString"
+                    value="{customerString}"
+                    onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    onKeypress="javascript:validateCustomerStringOnReturn()"
+                    size="50"
+                    maxlength="50"
+            > <font class="formErrorMessage"> {customerStringMessage} </font></td>
+        </tr>
+        <tr>
+            <td width="20%" class="promptText">Start Date</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="invoice[1][startDate]"
+                        id="startDate"
+                        value="{startDate}"
+                        size="10"
+                        maxlength="10"
+                >
+                <a href="javascript:;" onClick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img
+                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
+                        align="absmiddle"></a>
+                <font class="formErrorMessage">{startDateMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td width="20%" class="promptText">End Date</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="invoice[1][endDate]"
+                        id="endDate"
+                        value="{endDate}"
+                        size="10"
+                        maxlength="10"
+                >
+                <a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img
+                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
+                        align="absmiddle"></a>
+                <font class="formErrorMessage">{endDateMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td width="20%" class="promptText">Start Invoice No</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="invoice[1][startInvheadID]"
+                        id="startInvheadID"
+                        value="{startInvheadID}"
+                        size="10"
+                        maxlength="10"
+                >
+                <font class="formErrorMessage">{startInvheadIDMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td width="20%" class="promptText">End Invoice No</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="invoice[1][endInvheadID]"
+                        id="endInvheadID"
+                        value="{endInvheadID}"
+                        size="10"
+                        maxlength="10"
+                >
+                <font class="formErrorMessage">{endInvheadIDMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" name="Print" value="Print">
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: InvoiceReprint.inc.html -->

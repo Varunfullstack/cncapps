@@ -2,303 +2,309 @@
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript'>
-var state='none'; // display status
-var savedCustomerString
-function saveCustomerString(){
-	savedCustomerString = document.getElementById("customerString").value
-}
-function validateCustomerString(){
-	if (Trim(document.getElementById("customerString").value) != ""){
-		if (document.getElementById("customerString").value != savedCustomerString){
-			window.open('{urlCustomerPopup}&customerString=' +
-			escape(document.getElementById("customerString").value) +
-			'&parentIDField=customerID' +
-			'&parentDescField=customerString',
-			'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-		}
-	}
-	else{
-		document.searchForm.customerID.value = "";
-	}
-}
-function createActivity(){
-	if (document.searchForm.customerID.value != ""){
-			document.location='{urlCreateActivity}&customerID=' + escape(document.searchForm.customerID.value)
-	}
-}
-function submitOnReturn() {
-   if (event.keyCode == 13) {
-			document.searchForm.submit();
-   }
-}
-function validateCustomerStringOnReturn() {
-   if (event.keyCode == 13) {
-			validateCustomerString();
-   }
-}
-function checkAll() { 
-	for (var i=0;i<document.searchForm.elements.length;i++) { 
-		var e = document.searchForm.elements[i]; 
-		e.checked = document.searchForm.checkAllBox.checked;
-	}
-}
+    $(function () {
+        window.fromDate = $('#fromDate').get(0);
+        window.toDate = $('#toDate').get(0);
+    });
+    var state = 'none'; // display status
+    var savedCustomerString
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{urlCustomerPopup}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.searchForm.customerID.value = "";
+        }
+    }
+    function createActivity() {
+        if (document.searchForm.customerID.value != "") {
+            document.location = '{urlCreateActivity}&customerID=' + escape(document.searchForm.customerID.value)
+        }
+    }
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+    function checkAll() {
+        for (var i = 0; i < document.searchForm.elements.length; i++) {
+            var e = document.searchForm.elements[i];
+            e.checked = document.searchForm.checkAllBox.checked;
+        }
+    }
 </script>
 <style type="text/css">
-<!--
-.style2 {
-	font-size: x-small
-}
--->
+    <!--
+    .style2 {
+        font-size: x-small
+    }
+
+    -->
 </style>
 
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm" id="searchForm" method="get" action="{urlSubmit}">
-<input type="hidden" name="action" value="search">
-<table width="500px" border="0" cellspacing="0" cellpadding="1">
-	<tr>
-		<td width="100" class="promptText">
-		<div align="right">Customer</div>
-		</td>
-		<td>
-      <input
-        type="hidden"
-        name="activity[1][customerID]"
-			  id="customerID"
-        value="{customerID}"
-        onchange="document.searchForm.submit()"
-      > <input
-			type="text" id="customerString" name="customerString"
-			value="{customerString}" onFocus="javascript:saveCustomerString()"
-			onBlur="javascript:validateCustomerString()"
-			onKeypress="javascript:validateCustomerStringOnReturn()" size="50"
-			maxlength="50"> <font class="formErrorMessage">
-		{customerStringMessage} </font></td>
-	</tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Project</div>
-		</td>
-		<td><input type="text" onKeypress="javascript:submitOnReturn()"
-			name="activity[1][project]" value="{project}"></td>
-	</tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Activity ID</div>
-		</td>
-		<td><input type="text" onKeypress="javascript:submitOnReturn()"
-			name="activity[1][callActivityID]" value="{callActivityID}">
-		<font class="formErrorMessage">{callActivityIDMessage}</font></td>
-	</tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Request ID</div>
-		</td>
-		<td><input type="text" onKeypress="javascript:submitOnReturn()"
-			name="activity[1][problemID]" value="{problemID}">
-		<font class="formErrorMessage">{problemIDMessage}</font></td>
-	</tr>
-  <tr>
-    <td class="promptText">
-    <div align="right">Linked Sales Order ID</div>
-    </td>
-    <td><input type="text" onKeypress="javascript:submitOnReturn()"
-      name="activity[1][linkedSalesOrderID]" value="{linkedSalesOrderID}">
-    <font class="formErrorMessage">{linkedSalesOrderIDMessage}</font></td>
-  </tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Activity Type</div>
-		</td>
-		<td><select name="activity[1][callActTypeID]">
-			<option value="">All</option>
-			<!-- BEGIN activityTypeBlock -->
-			<option {activityTypeSelected} value="{callActTypeID}">{activityTypeDescription}</option>
-			<!-- END activityTypeBlock -->
-		</select></td>
-	</tr>
-  <tr>
-    <td class="promptText">Contract</td>
-    <td><select
-        name="activity[1][contractCustomerItemID]"
-        type="text"
-        >
-        <option value="99" {noContractSelected} >All</option>
-        <option value="" {tandMSelected}>T &amp; M</option>
-        <!-- BEGIN contractBlock -->
-        {optGroupClose}
-        {optGroupOpen}
-        <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
-        <!-- END contractBlock -->
-        </optgroup>
-      </select>
-      <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
-    </td>
-  </tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Activity Status</div>
-		</td>
-		<td><select name="activity[1][status]">
-			<!-- BEGIN statusBlock -->
-			<option {statusSelected} value="{status}">{statusDescription}</option>
-			<!-- END statusBlock -->
-		</select></td>
-	</tr>
-  <tr>
-    <td class="promptText">
-    <div align="right">Priority</div>
-    </td>
-    <td><select name="activity[1][priority]">
-      <option value="">All</option>
-      <!-- BEGIN priorityBlock -->
-      <option {prioritySelected} value="{priority}">{priorityDesc}</option>
-      <!-- END priorityBlock -->
-    </select></td>
-  </tr>
+    <input type="hidden" name="action" value="search">
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="100" class="promptText">
+                <div align="right">Customer</div>
+            </td>
+            <td>
+                <input
+                        type="hidden"
+                        name="activity[1][customerID]"
+                        id="customerID"
+                        value="{customerID}"
+                        onchange="document.searchForm.submit()"
+                > <input
+                    type="text" id="customerString" name="customerString"
+                    value="{customerString}" onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    onKeypress="javascript:validateCustomerStringOnReturn()" size="50"
+                    maxlength="50"> <font class="formErrorMessage">
+                {customerStringMessage} </font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Project</div>
+            </td>
+            <td><input type="text" onKeypress="javascript:submitOnReturn()"
+                       name="activity[1][project]" value="{project}"></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Activity ID</div>
+            </td>
+            <td><input type="text" onKeypress="javascript:submitOnReturn()"
+                       name="activity[1][callActivityID]" value="{callActivityID}">
+                <font class="formErrorMessage">{callActivityIDMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Request ID</div>
+            </td>
+            <td><input type="text" onKeypress="javascript:submitOnReturn()"
+                       name="activity[1][problemID]" value="{problemID}">
+                <font class="formErrorMessage">{problemIDMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Linked Sales Order ID</div>
+            </td>
+            <td><input type="text" onKeypress="javascript:submitOnReturn()"
+                       name="activity[1][linkedSalesOrderID]" value="{linkedSalesOrderID}">
+                <font class="formErrorMessage">{linkedSalesOrderIDMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Activity Type</div>
+            </td>
+            <td><select name="activity[1][callActTypeID]">
+                <option value="">All</option>
+                <!-- BEGIN activityTypeBlock -->
+                <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDescription}</option>
+                <!-- END activityTypeBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">Contract</td>
+            <td><select
+                    name="activity[1][contractCustomerItemID]"
+                    type="text"
+            >
+                <option value="99" {noContractSelected}>All</option>
+                <option value="" {tandMSelected}>T &amp; M</option>
+                <!-- BEGIN contractBlock -->
+                {optGroupClose}
+                {optGroupOpen}
+                <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
+                <!-- END contractBlock -->
+                </optgroup>
+            </select>
+                <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Activity Status</div>
+            </td>
+            <td><select name="activity[1][status]">
+                <!-- BEGIN statusBlock -->
+                <option {statusSelected} value="{status}">{statusDescription}</option>
+                <!-- END statusBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Priority</div>
+            </td>
+            <td><select name="activity[1][priority]">
+                <option value="">All</option>
+                <!-- BEGIN priorityBlock -->
+                <option {prioritySelected} value="{priority}">{priorityDesc}</option>
+                <!-- END priorityBlock -->
+            </select></td>
+        </tr>
 
-  <tr>
-    <td class="promptText">
-    <div align="right">SLA Status</div>
-    </td>
-    <td><select name="activity[1][breachedSlaOption]">
-      <option value="">Ignore</option>
-      <!-- BEGIN breachedSlaOptionBlock -->
-      <option {breachedSlaOptionSelected} value="{breachedSlaOption}">{breachedSlaOptionDesc}</option>
-      <!-- END breachedSlaOptionBlock -->
-    </select></td>
-  </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">SLA Status</div>
+            </td>
+            <td><select name="activity[1][breachedSlaOption]">
+                <option value="">Ignore</option>
+                <!-- BEGIN breachedSlaOptionBlock -->
+                <option {breachedSlaOptionSelected} value="{breachedSlaOption}">{breachedSlaOptionDesc}</option>
+                <!-- END breachedSlaOptionBlock -->
+            </select></td>
+        </tr>
 
-  <tr>
-    <td class="promptText">
-    <div align="right">Root Cause</div>
-    </td>
-    <td>
-      <select name="activity[1][rootCauseID]">
-      <option value="">All</option>
-      <!-- BEGIN rootCauseBlock -->
-      <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
-      <!-- END rootCauseBlock -->
-    </select></td>
-  </tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Engineer</div>
-		</td>
-    <td><select name="activity[1][userID]">
-      <option value="">All</option>
-      <!-- BEGIN userBlock -->
-      <option {userSelected} value="{userID}">{userName}</option>
-      <!-- END userBlock -->
-    </select></td>
-  </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Root Cause</div>
+            </td>
+            <td>
+                <select name="activity[1][rootCauseID]">
+                    <option value="">All</option>
+                    <!-- BEGIN rootCauseBlock -->
+                    <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+                    <!-- END rootCauseBlock -->
+                </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Engineer</div>
+            </td>
+            <td><select name="activity[1][userID]">
+                <option value="">All</option>
+                <!-- BEGIN userBlock -->
+                <option {userSelected} value="{userID}">{userName}</option>
+                <!-- END userBlock -->
+            </select></td>
+        </tr>
 
-  <tr>
-    <td class="promptText">Flagged For Review</td>
-    <td>
-      <input
-        type=checkbox
-        name="activity[1][managementReviewOnly]" 
-        {managementReviewOnlyChecked}
-        value="Y"
-      >
-    </td>
-  </tr>
-    
-	<tr>
-		<td class="promptText">
-		<div align="right">Search for</div>
-		</td>
-		<td><input name="activity[1][activityText]" type="text"
-			value="{activityText}" size="100" maxlength="100"></td>
-	</tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td class="info style2">+ stands for AND, - stands for NOT, [NO
-		OPERATOR] stands for OR. &quot;literal string&quot;</td>
-	</tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">Raised from</div>
-		</td>
-		<td><input type="text" name="activity[1][fromDate]" id="fromDate"
-			value="{fromDate}" size="10" maxlength="10"
-			onKeypress="javascript:submitOnReturn()"> <a
-			href="javascript:;"
-			onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-			src="images/calendar.gif" width="24" height="22" hspace="0"
-			vspace="0" border="0" align="absmiddle"></a> <font
-			class="formErrorMessage">{fromDateMessage}</font></td>
-	</tr>
-	<tr>
-		<td class="promptText">
-		<div align="right">to</div>
-		</td>
-		<td><input type="text" name="activity[1][toDate]" id="toDate"
-			value="{toDate}" size="10" maxlength="10"
-			onKeypress="javascript:submitOnReturn()"> <a
-			href="javascript:;"
-			onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img
-			src="images/calendar.gif" width="24" height="22" hspace="0"
-			vspace="0" border="0" align="absmiddle"></a> <font
-			class="formErrorMessage">{toDateMessage}</font></td>
-	</tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td>
-      <input type="submit" name="Search" value="Search">
-      <input type="submit" name="CSV"	value="CSV">
-      <input type="button" name="Clear" value="Clear"
-			onClick="document.location='Activity.php'" /></td>
-	</tr>
-</table>
-{rowsFound} activities found
-<div>{bulkActionButtons}</div>
-<table width="100%" border="0" cellpadding="1" cellspacing="1"
-	class="singleBorder">
-  <tr>
-    <td colspan="13" class="listHeadText">&nbsp;</td>
-    <td colspan="4" align="center">Hours</td>
-    <td nowrap class="listHeadText">&nbsp;</td>
-  </tr>
-	<tr>
-		<td class="listHeadText">{checkAllBox}</td>
-    <td nowrap class="listHeadText"><a href="{requestUri}&sortColumn=problemID">Request</a></td>
-		<td class="listHeadText"><a href="{requestUri}&sortColumn=customerName">Customer</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=date">Date</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=reason">Description</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=priority">Priority</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=fixEngineer">Fixed By</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=contractDescription">Contract</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=rootCause">Root Cause</a></td>
-    <td class="listHeadText">Start</td>
-    <td class="listHeadText">End</td>    
-    <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=slaResponseHours">SLA</a></td>
-    <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=respondedHours">Resp</a></td>
-    <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Fix</a></td>
-    <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=activityDurationHours">Activity</a></td>
-    <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
-	</tr>
-	<!-- BEGIN activityBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#FFFFCC';"
-		onMouseOut="this.bgColor='';">
-		<td>{checkBox}&nbsp;</td>
-    <td align="top" nowrap class="listItemText"><A href="{listCallURL}" target="_blank">{listProblemID}</A></td>
-		<td align="top" nowrap class="listItemText">{listCustomerName}</td>
-    <td align="top" nowrap class="listItemText">{listDate}</td>
-    <td align="top" class="listItemText">{reason}</td>
-    <td align="top" nowrap>{listPriority}</td>
-    <td align="top" nowrap>{listFixEngineer}</td>
-    <td align="top" nowrap>{listContractDescription}</td>
-    <td align="top" nowrap>{listRootCause}</td>
-    <td align="top" class="listItemText">{listStart}</td>
-    <td align="top" class="listItemText">{listEnd}</td>    
-    <td align="right" nowrap>{listSlaResponseHours}</td>
-    <td align="right" nowrap>{listRespondedHours}</td>
-    <td align="right" nowrap>{listWorkingHours}</td>
-    <td align="right" nowrap>{listActivityDurationHours}</td>
-    <td align="right" nowrap>{listActivityCount}</td>
-	</tr>
-	<!-- END activityBlock -->
-</table>
+        <tr>
+            <td class="promptText">Flagged For Review</td>
+            <td>
+                <input
+                        type=checkbox
+                        name="activity[1][managementReviewOnly]"
+                        {managementReviewOnlyChecked}
+                        value="Y"
+                >
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">
+                <div align="right">Search for</div>
+            </td>
+            <td><input name="activity[1][activityText]" type="text"
+                       value="{activityText}" size="100" maxlength="100"></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="info style2">+ stands for AND, - stands for NOT, [NO
+                OPERATOR] stands for OR. &quot;literal string&quot;
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Raised from</div>
+            </td>
+            <td><input type="text" name="activity[1][fromDate]" id="fromDate"
+                       value="{fromDate}" size="10" maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"> <a
+                    href="javascript:;"
+                    onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0"
+                    vspace="0" border="0" align="absmiddle"></a> <font
+                    class="formErrorMessage">{fromDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">to</div>
+            </td>
+            <td><input type="text" name="activity[1][toDate]" id="toDate"
+                       value="{toDate}" size="10" maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"> <a
+                    href="javascript:;"
+                    onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0"
+                    vspace="0" border="0" align="absmiddle"></a> <font
+                    class="formErrorMessage">{toDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" name="Search" value="Search">
+                <input type="submit" name="CSV" value="CSV">
+                <input type="button" name="Clear" value="Clear"
+                       onClick="document.location='Activity.php'"/></td>
+        </tr>
+    </table>
+    {rowsFound} activities found
+    <div>{bulkActionButtons}</div>
+    <table width="100%" border="0" cellpadding="1" cellspacing="1"
+           class="singleBorder">
+        <tr>
+            <td colspan="13" class="listHeadText">&nbsp;</td>
+            <td colspan="4" align="center">Hours</td>
+            <td nowrap class="listHeadText">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="listHeadText">{checkAllBox}</td>
+            <td nowrap class="listHeadText"><a href="{requestUri}&sortColumn=problemID">Request</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=customerName">Customer</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=date">Date</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=reason">Description</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=priority">Priority</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=fixEngineer">Fixed By</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=contractDescription">Contract</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=rootCause">Root Cause</a></td>
+            <td class="listHeadText">Start</td>
+            <td class="listHeadText">End</td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=slaResponseHours">SLA</a></td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=respondedHours">Resp</a></td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Fix</a></td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=activityDurationHours">Activity</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
+        </tr>
+        <!-- BEGIN activityBlock -->
+        <tr valign="top" onMouseOver="this.bgColor='#FFFFCC';"
+            onMouseOut="this.bgColor='';">
+            <td>{checkBox}&nbsp;</td>
+            <td align="top" nowrap class="listItemText"><A href="{listCallURL}" target="_blank">{listProblemID}</A></td>
+            <td align="top" nowrap class="listItemText">{listCustomerName}</td>
+            <td align="top" nowrap class="listItemText">{listDate}</td>
+            <td align="top" class="listItemText">{reason}</td>
+            <td align="top" nowrap>{listPriority}</td>
+            <td align="top" nowrap>{listFixEngineer}</td>
+            <td align="top" nowrap>{listContractDescription}</td>
+            <td align="top" nowrap>{listRootCause}</td>
+            <td align="top" class="listItemText">{listStart}</td>
+            <td align="top" class="listItemText">{listEnd}</td>
+            <td align="right" nowrap>{listSlaResponseHours}</td>
+            <td align="right" nowrap>{listRespondedHours}</td>
+            <td align="right" nowrap>{listWorkingHours}</td>
+            <td align="right" nowrap>{listActivityDurationHours}</td>
+            <td align="right" nowrap>{listActivityCount}</td>
+        </tr>
+        <!-- END activityBlock -->
+    </table>
 </form>
 <!-- End Template: ActivitySearch.inc.html -->

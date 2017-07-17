@@ -1,6 +1,6 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"] . "/CTCustomerItem.inc.php");
+require_once($cfg["path_ct"] . "/CTSecondSite.inc.php");
 session_start();
 page_open(
     array(
@@ -12,13 +12,13 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctCustomerItem = new CTCustomerItem(
+$ctSecondsite = new CTSecondSite(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,
     $_COOKIE,
     $cfg
 );
-$ctCustomerItem->execute();
+$ctSecondsite->execute();
 page_close();
 ?>

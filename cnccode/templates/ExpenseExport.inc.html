@@ -1,26 +1,34 @@
 <!-- Template: ExpenseExport.inc.html -->
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script type="application/javascript">
+    $(function () {
+        window.fromDate = $('#fromDate').get(0);
+        window.toDate = $('#toDate').get(0);
+    })
+</script>
 <form name="expenseExportForm" method="post" action="{urlSubmit}">
-  <P>Export engineer expenses for activities up to the date entered. </P>
-	<table width="100%" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td width="20%" class="promptText">End Date</td>
-			<td class="field"> <input
-					type="text"
-					name="expenseExport[1][endDate]"
-					id="endDate"
-					value="{endDate}"
-					size="10"
-					maxlength="10"
-				>
-				<a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-				<font class="formErrorMessage">{endDateMessage}</font> </td>
-		</tr>
-		<tr> 
-				<td>&nbsp;</td>
-				<td><input type="submit" name="exportType2" value="Trial" />
-						<input type="submit" name="exportType" value="Export"> </td>
-		</tr>
-	</table>
+    <P>Export engineer expenses for activities up to the date entered. </P>
+    <table width="100%" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="20%" class="promptText">End Date</td>
+            <td class="field"><input
+                    type="text"
+                    name="expenseExport[1][endDate]"
+                    id="endDate"
+                    value="{endDate}"
+                    size="10"
+                    maxlength="10"
+            >
+                <a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img
+                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
+                        align="absmiddle"></a>
+                <font class="formErrorMessage">{endDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" name="exportType2" value="Trial"/>
+                <input type="submit" name="exportType" value="Export"></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: ExpenseExport.inc.html -->

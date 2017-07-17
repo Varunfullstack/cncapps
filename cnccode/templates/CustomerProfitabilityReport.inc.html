@@ -2,158 +2,228 @@
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript'>
-var state='none'; // display status
-var savedCustomerString
-function saveCustomerString(){
-	savedCustomerString = document.getElementById("customerString").value
-}
-function validateCustomerString(){
-	if (Trim(document.getElementById("customerString").value) != ""){
-		if (document.getElementById("customerString").value != savedCustomerString){
-			window.open('{urlCustomerPopup}&customerString=' +
-			escape(document.getElementById("customerString").value) +
-			'&parentIDField=customerID' +
-			'&parentDescField=customerString',
-			'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-		}
-	}
-	else{
-		document.searchForm.customerID.value = "";
-	}
-}
-function submitOnReturn() {
-   if (event.keyCode == 13) {
-			document.searchForm.submit();
-   }
-}
-function validateCustomerStringOnReturn() {
-   if (event.keyCode == 13) {
-			validateCustomerString();
-   }
-}
+    $(function () {
+        window.fromDate = $('#fromDate').get(0);
+        window.toDate = $('#toDate').get(0);
+    });
+    var state = 'none'; // display status
+    var savedCustomerString
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{urlCustomerPopup}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.searchForm.customerID.value = "";
+        }
+    }
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
 </script>
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm" method="get" action="{urlSubmit}">
-  <table width="500px" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td width="100" class="promptText"><div align="right">Customer</div></td>
-			<td>
-			<input
-					type="hidden"
-					name="action"
-					value="search"
-				> 
-				<input
-					type="hidden"
-					name="searchForm[1][customerID]"
-					id="customerID"
-					value="{customerID}"
-				> <input
-					type="text"
-					id="customerString"
-					name="customerString"
-					value="{customerString}"
-					onFocus="javascript:saveCustomerString()"
-					onBlur="javascript:validateCustomerString()"
-					onKeypress="javascript:validateCustomerStringOnReturn()"
-					size="50"
-					maxlength="50"
-				> <font class="formErrorMessage"> {customerStringMessage} </font> </td>
-		</tr>
-		<tr>
-				<td class="promptText">&nbsp;</td>
-				<td>&nbsp;</td>
-		</tr>
-		<tr> 
-			<td class="promptText"><div align="right">from </div></td>
-			<td> <input
-					type="text"
-					name="searchForm[1][fromDate]"
-					id="fromDate"
-					value="{fromDate}"
-					size="10"
-					maxlength="10"
-					onKeypress="javascript:submitOnReturn()"
-				> <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-				<font class="formErrorMessage">{fromDateMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td class="promptText"><div align="right">to</div></td>
-			<td> <input
-					type="text"
-					name="searchForm[1][toDate]"
-					id="toDate"
-					value="{toDate}"
-					size="10"
-					maxlength="10"
-					onKeypress="javascript:submitOnReturn()"
-			> <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-				<font class="formErrorMessage">{toDateMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-			<input type="submit" name="Search" value="Search" onClick="submit();">
-			<input type="button" name="Clear" value="Clear" onClick="document.location='ActivityProfitReport.php'"/></td>
-		</tr>
-	</table>
-	<p>&nbsp;</p>
-	
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="100" class="promptText">
+                <div align="right">Customer</div>
+            </td>
+            <td>
+                <input
+                        type="hidden"
+                        name="action"
+                        value="search"
+                >
+                <input
+                        type="hidden"
+                        name="searchForm[1][customerID]"
+                        id="customerID"
+                        value="{customerID}"
+                > <input
+                    type="text"
+                    id="customerString"
+                    name="customerString"
+                    value="{customerString}"
+                    onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    onKeypress="javascript:validateCustomerStringOnReturn()"
+                    size="50"
+                    maxlength="50"
+            > <font class="formErrorMessage"> {customerStringMessage} </font></td>
+        </tr>
+        <tr>
+            <td class="promptText">&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">from</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="searchForm[1][fromDate]"
+                    id="fromDate"
+                    value="{fromDate}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            > <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+                <font class="formErrorMessage">{fromDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">to</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="searchForm[1][toDate]"
+                    id="toDate"
+                    value="{toDate}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            > <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif"
+                                                                                              width="24" height="22"
+                                                                                              hspace="0" vspace="0"
+                                                                                              border="0"
+                                                                                              align="absmiddle"></a>
+                <font class="formErrorMessage">{toDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" name="Search" value="Search" onClick="submit();">
+                <input type="button" name="Clear" value="Clear" onClick="document.location='ActivityProfitReport.php'"/>
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+
 </form>
 <p>&nbsp;</p>
 <table border="0" cellpadding="2" cellspacing="1" class="singleBorder">
-		<tr valign="top">
-				<td nowrap="nowrap" class="listHeadText"><div align="center">Customer</div></td>
-				<td align="center" nowrap="nowrap" class="listHeadText">Total Turnover</td>
+    <tr valign="top">
+        <td nowrap="nowrap" class="listHeadText">
+            <div align="center">Customer</div>
+        </td>
+        <td align="center" nowrap="nowrap" class="listHeadText">Total Turnover</td>
         <td align="center" nowrap="nowrap" class="listHeadText">Total Profit</td>
         <td align="center" nowrap="nowrap" class="listHeadText">Hours Taken</td>
         <td align="center" nowrap="nowrap" class="listHeadText">CNC Cost</td>
         <td align="center" nowrap="nowrap" class="listHeadText">Bottom Line Profit</td>
         <td align="center" nowrap="nowrap" class="listHeadText">Other Turnover</td>
-				<td align="center" nowrap="nowrap" class="listHeadText">Maintenance</td>
-				<td align="center" nowrap="nowrap" class="listHeadText">Pre-pay</td>
+        <td align="center" nowrap="nowrap" class="listHeadText">Maintenance</td>
+        <td align="center" nowrap="nowrap" class="listHeadText">Pre-pay</td>
         <td align="center" nowrap="nowrap" class="listHeadText">Internet</td>
-				<td  align="center" nowrap="nowrap" class="listHeadText">T and M</td>
-        <td  align="center" nowrap="nowrap" class="listHeadText">Service Desk</td>
-        <td  align="center" nowrap="nowrap" class="listHeadText">ServerCare</td>
-        <td  align="center" nowrap="nowrap" class="listHeadText">Managed</td>
-		</tr>
-		<!-- BEGIN resultBlock -->
-		<tr valign="top" onmouseover="this.bgColor='#FFFFCC';" onmouseout="this.bgColor=''">
-	
-				<td nowrap="nowrap">{customerName}</td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{sale}</div></td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{profit}</div></td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{hours}</div></td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{cncCost}</div></td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{bottomLineProfit}</div></td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{otherTurnover}</div></td>
-				<td align="top" nowrap="nowrap" class="listItemText"><div align="right">{maintenanceTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listItemText"><div align="right">{prePayTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listItemText"><div align="right">{internetTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listItemText"><div align="right">{tAndMTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listItemText"><div align="right">{serviceDeskTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listItemText"><div align="right">{serverCareTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listItemText"><div align="right">{managedTurnover}</div></td>
-		</tr>
-		<!-- END resultBlock -->
-		<tr valign="top">
-	
-				<td nowrap="nowrap" class="listHeadText">Totals</td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalSale}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalProfit}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalHours}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalCNCCost}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalBottomLineProfit}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalOtherTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalMaintenanceTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalPrePayTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalInternetTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalTAndMTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalServiceDeskTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalServerCareTurnover}</div></td>
-        <td align="top" nowrap="nowrap" class="listHeadText"><div align="right">{totalManagedTurnover}</div></td>
-		</tr>
+        <td align="center" nowrap="nowrap" class="listHeadText">T and M</td>
+        <td align="center" nowrap="nowrap" class="listHeadText">Service Desk</td>
+        <td align="center" nowrap="nowrap" class="listHeadText">ServerCare</td>
+        <td align="center" nowrap="nowrap" class="listHeadText">Managed</td>
+    </tr>
+    <!-- BEGIN resultBlock -->
+    <tr valign="top" onmouseover="this.bgColor='#FFFFCC';" onmouseout="this.bgColor=''">
+
+        <td nowrap="nowrap">{customerName}</td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{sale}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{profit}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{hours}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{cncCost}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{bottomLineProfit}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{otherTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{maintenanceTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{prePayTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{internetTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{tAndMTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{serviceDeskTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{serverCareTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listItemText">
+            <div align="right">{managedTurnover}</div>
+        </td>
+    </tr>
+    <!-- END resultBlock -->
+    <tr valign="top">
+
+        <td nowrap="nowrap" class="listHeadText">Totals</td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalSale}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalProfit}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalHours}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalCNCCost}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalBottomLineProfit}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalOtherTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalMaintenanceTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalPrePayTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalInternetTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalTAndMTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalServiceDeskTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalServerCareTurnover}</div>
+        </td>
+        <td align="top" nowrap="nowrap" class="listHeadText">
+            <div align="right">{totalManagedTurnover}</div>
+        </td>
+    </tr>
 </table>
 <p>&nbsp;</p>
 <!-- End Template: CustomerProfitabiltyReport.inc.html -->

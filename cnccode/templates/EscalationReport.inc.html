@@ -1,45 +1,55 @@
 <!-- Template: EscalationReport.inc.html -->
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-
+<script type="application/javascript">
+    $(function () {
+        window.fromDate = $('#fromDate').get(0);
+        window.toDate = $('#toDate').get(0);
+    })
+</script>
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm" method="get" action="{urlSubmit}">
-  <table width="500px" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td class="promptText">From</td>
-			<td> <input
-					type="text"
-					name="searchForm[1][fromDate]"
-					id="fromDate"
-					value="{fromDate}"
-					size="10"
-					maxlength="10"
-					onKeypress="javascript:submitOnReturn()"
-				> <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-				<font class="formErrorMessage">{fromDateMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">To</td>
-			<td> <input
-					type="text"
-					name="searchForm[1][toDate]"
-					id="toDate"
-					value="{toDate}"
-					size="10"
-					maxlength="10"
-					onKeypress="javascript:submitOnReturn()"
-			> <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a> 
-				<font class="formErrorMessage">{toDateMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-			<input type="submit" name="Search" value="Search" onClick="submit();">
-      </td>
-		</tr>
-	</table>
-	<p>&nbsp;</p>
-	
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td class="promptText">From</td>
+            <td><input
+                    type="text"
+                    name="searchForm[1][fromDate]"
+                    id="fromDate"
+                    value="{fromDate}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            > <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+                <font class="formErrorMessage">{fromDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td class="promptText">To</td>
+            <td><input
+                    type="text"
+                    name="searchForm[1][toDate]"
+                    id="toDate"
+                    value="{toDate}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            > <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif"
+                                                                                              width="24" height="22"
+                                                                                              hspace="0" vspace="0"
+                                                                                              border="0"
+                                                                                              align="absmiddle"></a>
+                <font class="formErrorMessage">{toDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" name="Search" value="Search" onClick="submit();">
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+
 </form>
 <h2>Team</h2>
 {teamReport}

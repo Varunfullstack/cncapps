@@ -1,463 +1,508 @@
 <!-- Template: SalesOrderDisplay.inc.html -->
 <script type="text/javascript">
-  function selectionChanged() {
-    if ( $("#action").val() == "insertFromOrder") {
+    function selectionChanged() {
+        if ($("#action").val() == "insertFromOrder") {
 
-        $("input#fromOrdheadID").show();
-    }
-    else{
-        $("input#fromOrdheadID").hide();
-    }
+            $("input#fromOrdheadID").show();
+        }
+        else {
+            $("input#fromOrdheadID").hide();
+        }
 
-    if ( $("#action").val() == "changeSupplier") {
-      $("input#updateSupplierName").show();
+        if ($("#action").val() == "changeSupplier") {
+            $("input#updateSupplierName").show();
+        }
+        else {
+            $("input#updateSupplierName").hide();
+        }
     }
-    else{
-      $("input#updateSupplierName").hide();
-    }
-  }
 </script>
 <script language='JavaScript' src="CommonJS.js"></script>
 {salesOrderLineEditJS} {salesOrderSiteEditJS}
 <script language='JavaScript'>
-function customerNotePopup(){
-    window.open(
-      '{urlCustomerNote}',
-      'item',
-      'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
-    );
+    $(function () {
+        window.fromDate = $('#fromDate').get(0);
+        window.toDate = $('#toDate').get(0);
+    });
+    function customerNotePopup() {
+        window.open(
+            '{urlCustomerNote}',
+            'item',
+            'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
+        );
 
-}
-function serviceRequestPopup(){
-    window.open(
-      '{urlServiceRequest}',
-      'item',
-      'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
-    );
+    }
+    function serviceRequestPopup() {
+        window.open(
+            '{urlServiceRequest}',
+            'item',
+            'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
+        );
 
-}
-function checkFunctionKey(field){
+    }
+    function checkFunctionKey(field) {
 
- 	if (event.keyCode == 120){			// F9 - edit
-		switch (field.id){
-			case "itemDescription":
-				if (document.getElementById("itemID").value != "0"){
-					window.open(
-						'{urlItemEdit}&itemID=' +
-						escape(document.getElementById("itemID").value) +
-						'&parentIDField=itemID' +
-						'&parentDescField=itemDescription',
-						'item',
-						'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
-					);
-				}
-				break;
-			case "supplierName":
-				if (document.getElementById("supplierID").value != "0"){
-					window.open(
-						'{urlSupplierEdit}&supplierID=' +
-						escape(document.getElementById("supplierID").value) +
-						'&parentIDField=supplierID' +
-						'&parentDescField=supplierName',
-						'supplier',
-						'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-					);
-				}
-				break;
+        if (event.keyCode == 120) {			// F9 - edit
+            switch (field.id) {
+                case "itemDescription":
+                    if (document.getElementById("itemID").value != "0") {
+                        window.open(
+                            '{urlItemEdit}&itemID=' +
+                            escape(document.getElementById("itemID").value) +
+                            '&parentIDField=itemID' +
+                            '&parentDescField=itemDescription',
+                            'item',
+                            'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "supplierName":
+                    if (document.getElementById("supplierID").value != "0") {
+                        window.open(
+                            '{urlSupplierEdit}&supplierID=' +
+                            escape(document.getElementById("supplierID").value) +
+                            '&parentIDField=supplierID' +
+                            '&parentDescField=supplierName',
+                            'supplier',
+                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
 
-      case "updateSupplierName":
-        if (document.getElementById("updateSupplierID").value != "0"){
-          window.open(
-            '{urlSupplierEdit}&supplierID=' +
-            escape(document.getElementById("updateSupplierID").value) +
-            '&parentIDField=updateSupplierID' +
-            '&parentDescField=updateSupplierName',
-            'supplier',
-            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-          );
+                case "updateSupplierName":
+                    if (document.getElementById("updateSupplierID").value != "0") {
+                        window.open(
+                            '{urlSupplierEdit}&supplierID=' +
+                            escape(document.getElementById("updateSupplierID").value) +
+                            '&parentIDField=updateSupplierID' +
+                            '&parentDescField=updateSupplierName',
+                            'supplier',
+                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "invSiteDesc":
+                    if (document.getElementById("invSiteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
+                            '&parentIDField=invSiteNo' +
+                            '&parentDescField=invSiteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "delSiteDesc":
+                    if (document.getElementById("delSiteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
+                            '&parentIDField=delSiteNo' +
+                            '&parentDescField=delSiteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                    }
+                    break;
+                case "invContactName":
+                    if (document.getElementById("invContactID").value != "") {
+                        window.open(
+                            '{urlContactEdit}' +
+                            '&contactID=' + escape(document.getElementById("invContactID").value) +
+                            '&parentIDField=invContactID' +
+                            '&parentDescField=invContactName',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                    }
+                    break;
+                case "delContactName":
+                    if (document.getElementById("delContactID").value != "") {
+                        window.open(
+                            '{urlContactEdit}' +
+                            '&contactID=' + escape(document.getElementById("delContactID").value) +
+                            '&parentIDField=delContactID' +
+                            '&parentDescField=delContactName',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                    }
+                    break;
+            }
         }
-        break;
-			case "invSiteDesc":
-				if (document.getElementById("invSiteNo").value != ""){
-					window.open(
-						'{urlSiteEdit}&customerID={customerID}' +
-						'&siteNo=' + escape(document.getElementById("invSiteNo").value) +
-						'&parentIDField=invSiteNo' +
-						'&parentDescField=invSiteDesc',
-						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-					);
-				}
-				break;
-			case "delSiteDesc":
-				if (document.getElementById("delSiteNo").value != ""){
-					window.open(
-						'{urlSiteEdit}&customerID={customerID}' +
-						'&siteNo=' + escape(document.getElementById("delSiteNo").value) +
-						'&parentIDField=delSiteNo' +
-						'&parentDescField=delSiteDesc',
-						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
-				}
-				break;
-			case "invContactName":
-				if (document.getElementById("invContactID").value != ""){
-					window.open(
-						'{urlContactEdit}'+
-						'&contactID=' + escape(document.getElementById("invContactID").value) +
-						'&parentIDField=invContactID' +
-						'&parentDescField=invContactName',
-						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
-				}
-				break;
-			case "delContactName":
-				if (document.getElementById("delContactID").value != ""){
-					window.open(
-						'{urlContactEdit}'+
-						'&contactID=' + escape(document.getElementById("delContactID").value) +
-						'&parentIDField=delContactID' +
-						'&parentDescField=delContactName',
-						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
-				}
-				break;
-		}
- 	}
- 	return;
-}
-function ToggleSelectedLines(checkedOn)
-{
-  var sa=false;
-  if(checkedOn)
-    sa=true;
-		var numberOfElements = getElementCount("orderLine");
-	  for (var i=0 ; i < numberOfElements ; i++)
-	{
-		var e = document.all("orderLine", i);
-		if(sa && !e.readOnly){
-		    $(e).attr('checked', 'checked')
-		}
-		else{
-		    $(e).removeAttr('checked')
-		}
+        return;
+    }
+    function ToggleSelectedLines(checkedOn) {
+        var sa = false;
+        if (checkedOn)
+            sa = true;
+        var numberOfElements = getElementCount("orderLine");
+        for (var i = 0; i < numberOfElements; i++) {
+            var e = document.all("orderLine", i);
+            if (sa && !e.readOnly) {
+                $(e).attr('checked', 'checked')
+            }
+            else {
+                $(e).removeAttr('checked')
+            }
 
-	}
-}
+        }
+    }
 </script>
 <TABLE width="1000px" border="0" cellpadding="2" cellspacing="1">
-	<TR>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlDeleteOrder}"  onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)">{txtDeleteOrder}</a>
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlInvoices}">{txtInvoices}</a>
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlDespatch}">{txtDespatch}</a>
-		</TD>
-    </TD>
-    <TD width="100px" class="navigateLink" valign="top"> {linkServiceRequest}
-    </TD>
-    <TD width="100px" class="navigateLink" valign="top"> <a href="{urlRenewalReport}" target="_blank">{txtRenewalReport}</a>
-    </TD>
-    <TD width="100px" class="navigateLink" valign="top"> <a href="#" onclick="customerNotePopup()">{txtCustomerNote}</a></TD>
-    <TD width="100px" class="navigateLink" valign="top">{currentDocumentsLink}
-    </TD>
-		<TD width="100px" valign="top">{uncSalesOrderConf}</TD>
-	</TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDeleteOrder}"
+                                                               onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)">{txtDeleteOrder}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlInvoices}">{txtInvoices}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDespatch}">{txtDespatch}</a>
+        </TD>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"> {linkServiceRequest}
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlRenewalReport}" target="_blank">{txtRenewalReport}</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="#"
+                                                               onclick="customerNotePopup()">{txtCustomerNote}</a></TD>
+        <TD width="100px" class="navigateLink" valign="top">{currentDocumentsLink}
+        </TD>
+        <TD width="100px" valign="top">{uncSalesOrderConf}</TD>
+    </TR>
 </table>
 <br/>
 {salesOrderHeadDisplay} {salesOrderDisplayNewLine}
 <form name="quickQuoteForm" method="POST" enctype="multipart/form-data" action="{urlSubmitOrderLines}">
-	<input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-  <input type="hidden" name="form[serviceRequestCustomerItemID]" value="{serviceRequestCustomerItemID}">
-  <input type="hidden" name="form[serviceRequestText]" value="{serviceRequestText}">
-  <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-	<INPUT type="hidden" id="ordheadID" name="ordheadID" value="{ordheadID}">
-	<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-	<table class="singleBorder" width="970" border="0" cellspacing="1" cellpadding="1">
-		<tr>
-			<td width="16px" class="listHeadText"> <input type="checkbox" name="Toggle" onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)"></td>
-			<td width="10px" class="listHeadText">&nbsp;</td>
-			<td width="242px" class="listHeadText">Description</td>
-			<td width="57px" class="listHeadText">Part No</td>
-			<td width="125px" class="listHeadText">Supplier</td>
-			<td width="50px" class="listHeadText"><DIV align="right">Qty</DIV></td>
-			<td width="50px" class="listHeadText"><DIV align="right">Cost(&pound;)</DIV></td>
-			<td width="50px" class="listHeadText"><DIV align="right">Total(&pound;)</DIV></td>
-			<td width="50px" class="listHeadText"><DIV align="right">Sale(&pound;)</DIV></td>
-			<td width="50px" class="listHeadText"><DIV align="right">Total(&pound;)</DIV></td>
-			<td width="50px" class="listHeadText"><DIV align="right">Profit(&pound;)</DIV></td>
-			<td width="50px" class="listHeadText"><DIV align="right">Profit(%)</DIV></td>
-			<td width="100px" class="orderLineClass">
-				<div align="left">{salesOrderDisplayCreatePO}{salesOrderDisplayUpdateLines}</div>			</td>
-		</tr>
-		<!-- BEGIN orderLineBlock -->
-		<INPUT type="hidden" id="lineType" name="ordline[{sequenceNo}][lineType]" value="{lineType}">
-		<INPUT type="hidden" id="description" name="ordline[{sequenceNo}][description]" value="{description}">
-		<INPUT type="hidden" id="supplierName" name="ordline[{sequenceNo}][supplierName]" value="{supplierName}">
-		{salesOrderLine}
-		<!-- END orderLineBlock -->
-		<tr>
-			<td>&nbsp;</td>
-			<td class="orderTotalItem">&nbsp;</td>
-			<td class="orderTotalItem"> <DIV align="left"> Totals </DIV></td>
-			<td class="orderTotalItem">&nbsp;</td>
-			<td class="orderTotalItem">&nbsp;</td>
-			<td class="orderTotalItem">&nbsp;</td>
-			<td class="orderTotalItem">&nbsp;</td>
-			<td class="{orderTotalCostClass}">{curCostGrandTotal}</td>
-			<td class="orderTotalItem">&nbsp;</td>
-			<td class="{orderTotalSaleClass}">{curSaleGrandTotal}</td>
-			<td class="{orderTotalProfitClass}">{curProfitGrandTotal}</td>
-			<td class="{orderTotalProfitClass}">{percProfitGrandTotal}</td>
-			<td class="{orderTotalItem}">{salesOrderDisplayUpdateLines}</td>
-		</tr>
-		<tr>
-			<td colspan="7">
-				<img src="./images/arrow_ltr.gif" border="0" width="38" height="22" alt="With selected lines:" />
+    <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
+    <input type="hidden" name="form[serviceRequestCustomerItemID]" value="{serviceRequestCustomerItemID}">
+    <input type="hidden" name="form[serviceRequestText]" value="{serviceRequestText}">
+    <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
+    <INPUT type="hidden" id="ordheadID" name="ordheadID" value="{ordheadID}">
+    <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+    <table class="singleBorder" width="970" border="0" cellspacing="1" cellpadding="1">
+        <tr>
+            <td width="16px" class="listHeadText"><input type="checkbox" name="Toggle"
+                                                         onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)">
+            </td>
+            <td width="10px" class="listHeadText">&nbsp;</td>
+            <td width="242px" class="listHeadText">Description</td>
+            <td width="57px" class="listHeadText">Part No</td>
+            <td width="125px" class="listHeadText">Supplier</td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Qty</DIV>
+            </td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Cost(&pound;)</DIV>
+            </td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Total(&pound;)</DIV>
+            </td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Sale(&pound;)</DIV>
+            </td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Total(&pound;)</DIV>
+            </td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Profit(&pound;)</DIV>
+            </td>
+            <td width="50px" class="listHeadText">
+                <DIV align="right">Profit(%)</DIV>
+            </td>
+            <td width="100px" class="orderLineClass">
+                <div align="left">{salesOrderDisplayCreatePO}{salesOrderDisplayUpdateLines}</div>
+            </td>
+        </tr>
+        <!-- BEGIN orderLineBlock -->
+        <INPUT type="hidden" id="lineType" name="ordline[{sequenceNo}][lineType]" value="{lineType}">
+        <INPUT type="hidden" id="description" name="ordline[{sequenceNo}][description]" value="{description}">
+        <INPUT type="hidden" id="supplierName" name="ordline[{sequenceNo}][supplierName]" value="{supplierName}">
+        {salesOrderLine}
+        <!-- END orderLineBlock -->
+        <tr>
+            <td>&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">
+                <DIV align="left"> Totals</DIV>
+            </td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="{orderTotalCostClass}">{curCostGrandTotal}</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="{orderTotalSaleClass}">{curSaleGrandTotal}</td>
+            <td class="{orderTotalProfitClass}">{curProfitGrandTotal}</td>
+            <td class="{orderTotalProfitClass}">{percProfitGrandTotal}</td>
+            <td class="{orderTotalItem}">{salesOrderDisplayUpdateLines}</td>
+        </tr>
+        <tr>
+            <td colspan="7">
+                <img src="./images/arrow_ltr.gif" border="0" width="38" height="22" alt="With selected lines:"/>
 
-        <input
-          type="hidden"
-          name="form[updateSupplierID]"
-          id="updateSupplierID"
-          value="{updateSupplierID}"
-        >
+                <input
+                        type="hidden"
+                        name="form[updateSupplierID]"
+                        id="updateSupplierID"
+                        value="{updateSupplierID}"
+                >
 
-				<select
-					{readOnly}
-					type="text"
-					id="action"
-					name="form[action]"
-          onChange="selectionChanged()"
-				>
-					<!-- BEGIN actionBlock -->
-					<option {SELECTED} value="{action}">{actionDescription}</option>
-					<!-- END actionBlock -->
-				</select>
-        <input
-          {fromOrdheadIDStyle}
-          type="text"
-          name="form[fromOrdheadID]"
-          id="fromOrdheadID"
-          value="{fromOrdheadID}"
-          placeholder="From Sales Order ID"
-        >
-        <input
-          {updateSupplierNameStyle}
-          type="text"
-          name="form[updateSupplierName]"
-          id="updateSupplierName"
-          value="{updateSupplierName}"
-          onChange="javascript:validateUpdateSupplierName()"
-          onKeydown="javascript:checkFunctionKey(updateSupplierName)"
-          size="35"
-          maxlength="50"
-          placeholder="Supplier Name or ID"
-        >
-        <font class="formErrorMessage">{updateSupplierNameMessage}</font>
-				<input
-					{readOnly}
-					type="submit"
-					name="Submit"
-					value="Go"
-					onClick="return bulkUpdateClick()"
-				>
-					<font class="formErrorMessage">{linesMessage}</font>
-      </td>
-		</table>
-	{salesOrderGenerateQuotes}
+                <select
+                        {readOnly}
+                        type="text"
+                        id="action"
+                        name="form[action]"
+                        onChange="selectionChanged()"
+                >
+                    <!-- BEGIN actionBlock -->
+                    <option {SELECTED} value="{action}">{actionDescription}</option>
+                    <!-- END actionBlock -->
+                </select>
+                <input
+                        {fromOrdheadIDStyle}
+                        type="text"
+                        name="form[fromOrdheadID]"
+                        id="fromOrdheadID"
+                        value="{fromOrdheadID}"
+                        placeholder="From Sales Order ID"
+                >
+                <input
+                        {updateSupplierNameStyle}
+                        type="text"
+                        name="form[updateSupplierName]"
+                        id="updateSupplierName"
+                        value="{updateSupplierName}"
+                        onChange="javascript:validateUpdateSupplierName()"
+                        onKeydown="javascript:checkFunctionKey(updateSupplierName)"
+                        size="35"
+                        maxlength="50"
+                        placeholder="Supplier Name or ID"
+                >
+                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
+                <input
+                        {readOnly}
+                        type="submit"
+                        name="Submit"
+                        value="Go"
+                        onClick="return bulkUpdateClick()"
+                >
+                <font class="formErrorMessage">{linesMessage}</font>
+            </td>
+    </table>
+    {salesOrderGenerateQuotes}
 </form>
 {salesOrderDisplayQuotes}
 <table width="700px" border="0" cellspacing="0" cellpadding="1">
-	<tr>
-		<form name="ordheadinv" method="post" action="{urlUpdateInvAddress}">
-			<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-			<td valign="top" class="mainHeadText"> <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-					<tr>
-						<td valign="top" class="listHeadText"><div align="center">Invoice
-								Address</div></td>
-					</tr>
-					<tr>
-						<td valign="top" class="mainHeadText"> <P class="addressLine">{invAdd1}</P>
-							<P class="addressLine">{invAdd2}</P>
-							<P class="addressLine">{invAdd3}</P>
-							<P class="addressLine">{invTown}</P>
-							<P class="addressLine">{invCounty}</P>
-							<P class="addressLine">{invPostcode}</P></td>
-					</tr>
-					<tr>
-						<td class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}">
-							<input type="hidden" name="form[siteNo]" id="invSiteNo" value="{invSiteNo}">
-							<input
-								type="text"
-								name ="form[invSiteDesc]"
-								id="invSiteDesc"
-								value="{invSiteDesc}"
-								onKeydown="javascript:checkFunctionKey(invSiteDesc)"
-								onChange="javascript:validateInvSiteDesc()"
-								{readOnly}
-								size="50"
-								maxlength="50"
-							> <input
-								type="text"
-								name = "blah"
-								style = "display:none"
-							> <input
-								type="button"
-								name="SubmitInvAdd"
-								{readOnly}
-								value="Select"
-								onClick="form.submit();"
-							> </td>
-					</tr>
-				</table></td>
-		</form>
-		<form name="ordheaddel" method="post" action="{urlUpdateDelAddress}">
-			<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-			<td valign="top"> <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-					<tr>
-						<td valign="top" class="listHeadText"><div align="center">Delivery
-								Address</div></td>
-					</tr>
-					<tr>
-						<td valign="top" class="mainHeadText"> <P class="addressLine">{delAdd1}</P>
-							<P class="addressLine">{delAdd2}</P>
-							<P class="addressLine">{delAdd3}</P>
-							<P class="addressLine">{delTown}</P>
-							<P class="addressLine">{delCounty}</P>
-							<P class="addressLine">{delPostcode}</P></td>
-					</tr>
-					<tr>
-						<td class="mainHeadText"> <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-							<input type="hidden" name="form[siteNo]"  id="delSiteNo" value="{delSiteNo}">
-							<input
-					type="text"
-					name ="form[delSiteDesc]"
-					id="delSiteDesc"
-					value="{delSiteDesc}"
-					{readOnly}
-					onKeydown="javascript:checkFunctionKey(delSiteDesc)"
-					onChange="javascript:validateDelSiteDesc()"
-					size="50"
-					maxlength="50"
-				> <input
-					type="text"
-					name = "blah"
-					style = "display:none"
-				> <input type="button" name="SubmitDelAdd" value="Select" onClick="form.submit();" {readOnly}>
-						</td>
-					</tr>
-				</table></td>
-		</form>
-	</tr>
+    <tr>
+        <form name="ordheadinv" method="post" action="{urlUpdateInvAddress}">
+            <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+            <td valign="top" class="mainHeadText">
+                <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+                    <tr>
+                        <td valign="top" class="listHeadText">
+                            <div align="center">Invoice
+                                Address
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" class="mainHeadText"><P class="addressLine">{invAdd1}</P>
+                            <P class="addressLine">{invAdd2}</P>
+                            <P class="addressLine">{invAdd3}</P>
+                            <P class="addressLine">{invTown}</P>
+                            <P class="addressLine">{invCounty}</P>
+                            <P class="addressLine">{invPostcode}</P></td>
+                    </tr>
+                    <tr>
+                        <td class="mainHeadText"><input type="hidden" name="form[ordheadID]" id="ordheadID"
+                                                        value="{ordheadID}">
+                            <input type="hidden" name="form[siteNo]" id="invSiteNo" value="{invSiteNo}">
+                            <input
+                                    type="text"
+                                    name="form[invSiteDesc]"
+                                    id="invSiteDesc"
+                                    value="{invSiteDesc}"
+                                    onKeydown="javascript:checkFunctionKey(invSiteDesc)"
+                                    onChange="javascript:validateInvSiteDesc()"
+                                    {readOnly}
+                                    size="50"
+                                    maxlength="50"
+                            > <input
+                                    type="text"
+                                    name="blah"
+                                    style="display:none"
+                            > <input
+                                    type="button"
+                                    name="SubmitInvAdd"
+                                    {readOnly}
+                                    value="Select"
+                                    onClick="form.submit();"
+                            ></td>
+                    </tr>
+                </table>
+            </td>
+        </form>
+        <form name="ordheaddel" method="post" action="{urlUpdateDelAddress}">
+            <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+            <td valign="top">
+                <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+                    <tr>
+                        <td valign="top" class="listHeadText">
+                            <div align="center">Delivery
+                                Address
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" class="mainHeadText"><P class="addressLine">{delAdd1}</P>
+                            <P class="addressLine">{delAdd2}</P>
+                            <P class="addressLine">{delAdd3}</P>
+                            <P class="addressLine">{delTown}</P>
+                            <P class="addressLine">{delCounty}</P>
+                            <P class="addressLine">{delPostcode}</P></td>
+                    </tr>
+                    <tr>
+                        <td class="mainHeadText"><input type="hidden" name="form[ordheadID]" value="{ordheadID}">
+                            <input type="hidden" name="form[siteNo]" id="delSiteNo" value="{delSiteNo}">
+                            <input
+                                    type="text"
+                                    name="form[delSiteDesc]"
+                                    id="delSiteDesc"
+                                    value="{delSiteDesc}"
+                                    {readOnly}
+                                    onKeydown="javascript:checkFunctionKey(delSiteDesc)"
+                                    onChange="javascript:validateDelSiteDesc()"
+                                    size="50"
+                                    maxlength="50"
+                            > <input
+                                    type="text"
+                                    name="blah"
+                                    style="display:none"
+                            > <input type="button" name="SubmitDelAdd" value="Select" onClick="form.submit();"
+                                     {readOnly}>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </form>
+    </tr>
 </table>
 <table width="700px" border="0" cellspacing="0" cellpadding="1">
-	<tr>
-		<td width="50%" class="mainHeadText"> <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-			<tr>
-				<td colspan="2" valign="top" class="listHeadText"><div align="center">Invoice
-						Contact</div></td>
-			</tr>
-			<tr>
-				<td width="60px" class="promptText">Contact</td>
-				<td width="400px" class="mainHeadText">{invContact}</td>
-			</tr>
-			<tr>
-				<td width="60px" class="promptText">Email</td>
-				<td class="mainHeadText"><a href="mailto:{invContactEmail}">{invContactEmail}</a></td>
-			</tr>
-			<tr>
-				<td width="60px" class="promptText">DDI</td>
-				<td class="mainHeadText"><a href="tel:{invContactPhone}">{invContactPhone}</a></td>
-			</tr>
-			<tr>
-				<td width="60px" class="promptText">Switchboard</td>
-				<td class="mainHeadText"><a href="tel:{invSitePhone}">{invSitePhone}</a></td>
-			</tr>
-			<tr>
-				<td width="60px" class="promptText">Fax</td>
-				<td class="mainHeadText">{invContactFax}</td>
-			</tr>
-			<tr>
-				<form name="invcon" method="post" action="{urlUpdateInvContact}">
-					<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-					<td colspan="2" class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}">
-						<input type="hidden" name="form[contactID]" id="invContactID" value="{invContactID}">
-						<input
-							type="text"
-							name ="form[invContactName]"
-							id="invContactName"
-							value="{invContactName}"
-							onKeydown="javascript:checkFunctionKey(invContactName)"
-							onChange="javascript:validateInvContactName()"
-							{readOnly}
-							size="50"
-							maxlength="50"
-						> <input
-							type="text"
-							name = "blah"
-							style = "display:none"
-						> <input type="button" name="SubmitInvContact" value="Select" onClick="form.submit();" {readOnly}>
-					</td>
-					</form>
-				</tr>
-			</table>
-		</TD>
-		<td width="50%" class="mainHeadText">
-			<table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
-				<tr>
-					<td colspan="2" valign="top" class="listHeadText"><div align="center">Delivery Contact</div></td>
-				</tr>
-				<tr>
-					<td width="60px" class="promptText">Contact</td>
-					<td width="400px" class="mainHeadText">{delContact}</td>
-				</tr>
-				<tr>
-					<td width="60px" class="promptText">Email</td>
-					<td class="mainHeadText"><a href="mailto:{delContactEmail}">{delContactEmail}</a></td>
-				</tr>
-				<tr>
-					<td width="60px" class="promptText">DDI</td>
-					<td class="mainHeadText"><a href="tel:{delContactPhone}">{delContactPhone}</a></td>
-				</tr>
-				<tr>
-					<td width="60px" class="promptText">Switchboard</td>
-					<td class="mainHeadText"><a href="tel:{delSitePhone}">{delSitePhone}</a></td>
-				</tr>
-				<tr>
-					<td width="60px" class="promptText">Fax</td>
-					<td class="mainHeadText">{delContactFax}</td>
-				</tr>
-				<tr>
-					<form name="delcon" method="post" action="{urlUpdateDelContact}">
-						<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-						<td colspan="2" class="mainHeadText"> <input type="hidden" name="form[ordheadID]" id="ordheadID" value="{ordheadID}">
-							<input type="hidden" name="form[contactID]" id="delContactID" value="{delContactID}">
-							<input
-								type="text"
-								name ="form[delContactName]"
-								id="delContactName"
-								value="{delContactName}"
-								onKeydown="javascript:checkFunctionKey(delContactName)"
-								onChange="javascript:validateDelContactName()"
-								{readOnly}
-								size="50"
-								maxlength="50"
-							> <input
-								type="text"
-								name = "blah"
-								style = "display:none"
-							> <input type="button" name="SubmitDelContact" value="Select" onClick="form.submit();" {readOnly}>
-						</td>
-					</form>
-				</tr>
-			</table>
-		</td>
-	</tr>
-  <tr>
-    <td>{salesOrderHeadAmend}</td>
-    <td>{salesOrderDisplayDocuments}</td>
-  </tr>
-  <tr>
-    <td>{despatchDisplayNotes}</td>
-    <td></td>
-  </tr>
+    <tr>
+        <td width="50%" class="mainHeadText">
+            <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+                <tr>
+                    <td colspan="2" valign="top" class="listHeadText">
+                        <div align="center">Invoice
+                            Contact
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Contact</td>
+                    <td width="400px" class="mainHeadText">{invContact}</td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Email</td>
+                    <td class="mainHeadText"><a href="mailto:{invContactEmail}">{invContactEmail}</a></td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">DDI</td>
+                    <td class="mainHeadText"><a href="tel:{invContactPhone}">{invContactPhone}</a></td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Switchboard</td>
+                    <td class="mainHeadText"><a href="tel:{invSitePhone}">{invSitePhone}</a></td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Fax</td>
+                    <td class="mainHeadText">{invContactFax}</td>
+                </tr>
+                <tr>
+                    <form name="invcon" method="post" action="{urlUpdateInvContact}">
+                        <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+                        <td colspan="2" class="mainHeadText"><input type="hidden" name="form[ordheadID]" id="ordheadID"
+                                                                    value="{ordheadID}">
+                            <input type="hidden" name="form[contactID]" id="invContactID" value="{invContactID}">
+                            <input
+                                    type="text"
+                                    name="form[invContactName]"
+                                    id="invContactName"
+                                    value="{invContactName}"
+                                    onKeydown="javascript:checkFunctionKey(invContactName)"
+                                    onChange="javascript:validateInvContactName()"
+                                    {readOnly}
+                                    size="50"
+                                    maxlength="50"
+                            > <input
+                                    type="text"
+                                    name="blah"
+                                    style="display:none"
+                            > <input type="button" name="SubmitInvContact" value="Select" onClick="form.submit();"
+                                     {readOnly}>
+                        </td>
+                    </form>
+                </tr>
+            </table>
+        </TD>
+        <td width="50%" class="mainHeadText">
+            <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+                <tr>
+                    <td colspan="2" valign="top" class="listHeadText">
+                        <div align="center">Delivery Contact</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Contact</td>
+                    <td width="400px" class="mainHeadText">{delContact}</td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Email</td>
+                    <td class="mainHeadText"><a href="mailto:{delContactEmail}">{delContactEmail}</a></td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">DDI</td>
+                    <td class="mainHeadText"><a href="tel:{delContactPhone}">{delContactPhone}</a></td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Switchboard</td>
+                    <td class="mainHeadText"><a href="tel:{delSitePhone}">{delSitePhone}</a></td>
+                </tr>
+                <tr>
+                    <td width="60px" class="promptText">Fax</td>
+                    <td class="mainHeadText">{delContactFax}</td>
+                </tr>
+                <tr>
+                    <form name="delcon" method="post" action="{urlUpdateDelContact}">
+                        <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+                        <td colspan="2" class="mainHeadText"><input type="hidden" name="form[ordheadID]" id="ordheadID"
+                                                                    value="{ordheadID}">
+                            <input type="hidden" name="form[contactID]" id="delContactID" value="{delContactID}">
+                            <input
+                                    type="text"
+                                    name="form[delContactName]"
+                                    id="delContactName"
+                                    value="{delContactName}"
+                                    onKeydown="javascript:checkFunctionKey(delContactName)"
+                                    onChange="javascript:validateDelContactName()"
+                                    {readOnly}
+                                    size="50"
+                                    maxlength="50"
+                            > <input
+                                    type="text"
+                                    name="blah"
+                                    style="display:none"
+                            > <input type="button" name="SubmitDelContact" value="Select" onClick="form.submit();"
+                                     {readOnly}>
+                        </td>
+                    </form>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>{salesOrderHeadAmend}</td>
+        <td>{salesOrderDisplayDocuments}</td>
+    </tr>
+    <tr>
+        <td>{despatchDisplayNotes}</td>
+        <td></td>
+    </tr>
 </table>
 <!-- End Template: SalesOrderDisplay.inc.html -->

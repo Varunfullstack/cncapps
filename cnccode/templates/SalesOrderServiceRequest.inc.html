@@ -3,96 +3,105 @@
 <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="ckfinder/ckfinder.js"></script>
 <script type="text/javascript">
-function insertValueQuery( myListBox, myQuery) {
-  
-  oEditor = eval( 'CKEDITOR.instances.' + myQuery  );
+    $(function () {
+        window.etaDate = $('#etaDate').get(0);
+    });
 
-  if(myListBox.options.length > 0) {
-    var chaineAj = "";
-    var NbSelect = 0;
-    for(var i=0; i<myListBox.options.length; i++) {
-      if (myListBox.options[i].selected){
-        NbSelect++;
-        if (NbSelect > 1)
-          chaineAj += ", ";
-        chaineAj += myListBox.options[i].value;
-      }
+    function insertValueQuery(myListBox, myQuery) {
+
+        oEditor = eval('CKEDITOR.instances.' + myQuery);
+
+        if (myListBox.options.length > 0) {
+            var chaineAj = "";
+            var NbSelect = 0;
+            for (var i = 0; i < myListBox.options.length; i++) {
+                if (myListBox.options[i].selected) {
+                    NbSelect++;
+                    if (NbSelect > 1)
+                        chaineAj += ", ";
+                    chaineAj += myListBox.options[i].value;
+                }
+            }
+
+            oEditor.insertHtml(chaineAj);
+
+        }
     }
 
-    oEditor.insertHtml( chaineAj );
-
-  }
-}
-
 </script>
-<form name="inputForm" method="post" action="{urlSubmit}" >
+<form name="inputForm" method="post" action="{urlSubmit}">
 
-<table style="width: 100%;" >
-  <tr>
-    <td>ETA</td>
-    <td><input type="text" name="inputForm[1][etaDate]" id="etaDate" value="{etaDate}"><a href="javascript:;" onclick="popUpCalendar(this, etaDate, 'dd/mm/yyyy')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a></td>
-  </tr>
-  <tr>
-    <td>Contract</td>
-    <td colspan="2"><select
-          id="serviceRequestCustomerItemID"
-          name="inputForm[1][serviceRequestCustomerItemID]"
-          >
-          <option value="99" >Please select</option>
-          <option value="">T &amp; M</option>
-          <!-- BEGIN contractBlock -->
-          <option {contractSelected} value="{serviceRequestCustomerItemID}">{contractDescription}</option>
-          <!-- END contractBlock -->
-        </select>
-        <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
-    </td>
-  </tr>
-  <tr>
-    <td>Priority</td>
-    <td colspan="2"><select
-          id="serviceRequestPriority"
-          name="inputForm[1][serviceRequestPriority]"
-          >
-          <option value="" >Please select</option>
-          <!-- BEGIN priorityBlock -->
-          <option {prioritySelected} value="{priority}">{priorityDescription}</option>
-          <!-- END priorityBlock -->
-        </select>
-        <span class="formErrorMessage">{priorityMessage}</span>
-    </td>
-  </tr>
-  <tr>
-    <td>Standard Text</td>
-    <td colspan="1" valign="top">
-      <select id="tablefields" name="standardText" multiple="multiple">
-        <!-- BEGIN standardTextBlock -->
-        <option value="{standardTextContent}" title="">{standardTextDescription}</option>
-        <!-- END standardTextBlock -->
-      </select><input type="button" name="insert" value="Insert" onclick="insertValueQuery( standardText, 'serviceRequestText' )" title="Insert" />
-    </td>
-  </tr>  
-  <tr>
-    <td colspan="2">
-      <textarea id="serviceRequestText" name="inputForm[1][serviceRequestText]">{serviceRequestText}</textarea>
-      <script  type="text/javascript">
-        reason = CKEDITOR.replace(
-          'serviceRequestText',
-          {
-            customConfig : '/ckeditor_config.js',
-            toolbar : 'CNCToolbarImage'
-          }
-        );
-        reason.config.width = "100%";
-        reason.config.height = "500px";
-        reason.addCss( 'body { font-size: 10pt; }' );
-      </script>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <input type="submit" name="Submit" value="Save" />
-    </td>
-  </tr>
-</table>
+    <table style="width: 100%;">
+        <tr>
+            <td>ETA</td>
+            <td><input type="text" name="inputForm[1][etaDate]" id="etaDate" value="{etaDate}"><a href="javascript:;"
+                                                                                                  onclick="popUpCalendar(this, etaDate, 'dd/mm/yyyy')"><img
+                    src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0"
+                    align="absmiddle"/></a></td>
+        </tr>
+        <tr>
+            <td>Contract</td>
+            <td colspan="2"><select
+                    id="serviceRequestCustomerItemID"
+                    name="inputForm[1][serviceRequestCustomerItemID]"
+            >
+                <option value="99">Please select</option>
+                <option value="">T &amp; M</option>
+                <!-- BEGIN contractBlock -->
+                <option {contractSelected} value="{serviceRequestCustomerItemID}">{contractDescription}</option>
+                <!-- END contractBlock -->
+            </select>
+                <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Priority</td>
+            <td colspan="2"><select
+                    id="serviceRequestPriority"
+                    name="inputForm[1][serviceRequestPriority]"
+            >
+                <option value="">Please select</option>
+                <!-- BEGIN priorityBlock -->
+                <option {prioritySelected} value="{priority}">{priorityDescription}</option>
+                <!-- END priorityBlock -->
+            </select>
+                <span class="formErrorMessage">{priorityMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Standard Text</td>
+            <td colspan="1" valign="top">
+                <select id="tablefields" name="standardText" multiple="multiple">
+                    <!-- BEGIN standardTextBlock -->
+                    <option value="{standardTextContent}" title="">{standardTextDescription}</option>
+                    <!-- END standardTextBlock -->
+                </select><input type="button" name="insert" value="Insert"
+                                onclick="insertValueQuery( standardText, 'serviceRequestText' )" title="Insert"/>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <textarea id="serviceRequestText"
+                          name="inputForm[1][serviceRequestText]">{serviceRequestText}</textarea>
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace(
+                        'serviceRequestText',
+                        {
+                            customConfig: '/ckeditor_config.js',
+                            toolbar: 'CNCToolbarImage'
+                        }
+                    );
+                    reason.config.width = "100%";
+                    reason.config.height = "500px";
+                    reason.addCss('body { font-size: 10pt; }');
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit" name="Submit" value="Save"/>
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: SalesOrderVisitRequest.inc.html -->
