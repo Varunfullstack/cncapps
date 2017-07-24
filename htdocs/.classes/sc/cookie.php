@@ -158,7 +158,7 @@ class SC_SessionCookie  extends SC_Object{
 	var $encryption='';
 	var $name='';
 
-	function SC_SessionCookie($name='MY_SESSION') {
+	function __construct($name='MY_SESSION') {
 		$this->encryption = new SC_Encryption();
 		$this->name = $name;
 	}

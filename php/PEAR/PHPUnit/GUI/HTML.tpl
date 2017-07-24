@@ -54,19 +54,19 @@
                     </td>
                 </tr>
                 
-                <? foreach($suiteResults as $aResult): ?>
+                <?php foreach($suiteResults as $aResult): ?>
                     <tr>
                         <th colspan="10">
                             <input type="checkbox" name="<?=$aResult['name'] ?>" <?=@$_REQUEST[$aResult['name']]?'checked':'' ?>>
                             <?=$aResult['name'] ?>
                             &nbsp;
-                            <? if (isset($aResult['addInfo'])): ?>
+                            <?php if (isset($aResult['addInfo'])): ?>
                                 <font class="info"><?=@$aResult['addInfo'] ?></font>
-                            <? endif ?>
+                            <?php endif ?>
                         </th>
                     </tr>
 
-                    <? if(@$aResult['percent']): ?>
+                    <?php if(@$aResult['percent']): ?>
                         <tr>
                             <td colspan="10" nowrap="nowrap">
                                 <table style="width:100%; padding:2px;" cellspacing="0" cellspan="0" cellpadding="0">
@@ -81,26 +81,26 @@
                                 </table>
                             </td>
                         </tr>
-                    <? endif ?>
+                    <?php endif ?>
 
-                    <? if(@$aResult['counts']): ?>
+                    <?php if(@$aResult['counts']): ?>
                         <tr>
                             <td colspan="10">
-                                <? foreach($aResult['counts'] as $aCount=>$value): ?>
+                                <?php foreach($aResult['counts'] as $aCount=>$value): ?>
                                     <?=$aCount ?>s = <?=$value ?> &nbsp; &nbsp; &nbsp; &nbsp; 
-                                <? endforeach ?>
+                                <?php endforeach ?>
                             </td>
                         </tr>
-                    <? endif ?>
+                    <?php endif ?>
 
-                    <? if(isset($aResult['results']['failures']) && sizeof($aResult['results']['failures']))
+                    <?php if(isset($aResult['results']['failures']) && sizeof($aResult['results']['failures']))
                         foreach($aResult['results']['failures'] as $aFailure): ?>
                         <tr>
                             <td class="failure"><?=$aFailure['testName'] ?></td>
                             <td class="failure">
-                                <? if(isset($aFailure['message']) && $aFailure['message']): ?>
+                                <?php if(isset($aFailure['message']) && $aFailure['message']): ?>
                                     <?=$aFailure['message'] ?>
-                                <? else: ?>
+                                <?php else: ?>
                                     <table class="outlineFailure">
                                         <tr>
                                             <td>expected</td>
@@ -111,12 +111,12 @@
                                             <td><?=$aFailure['actual'] ?></td>
                                         </tr>
                                     </table>
-                                <? endif ?>
+                                <?php endif ?>
                             </td>
                         </tr>
-                    <? endforeach ?>
+                    <?php endforeach ?>
 
-                    <? if(isset($aResult['results']['errors']) && sizeof($aResult['results']['errors']))
+                    <?php if(isset($aResult['results']['errors']) && sizeof($aResult['results']['errors']))
                         foreach($aResult['results']['errors'] as $aError): ?>
                         <tr>
                             <td class="failure"><?=$aError['testName'] ?></td>
@@ -124,25 +124,25 @@
                                 <?=$aError['message'] ?>
                             </td>
                         </tr>
-                    <? endforeach ?>
+                    <?php endforeach ?>
 
-                    <? if(isset($aResult['results']['passed']) && sizeof($aResult['results']['passed']))
+                    <?php if(isset($aResult['results']['passed']) && sizeof($aResult['results']['passed']))
                         foreach($aResult['results']['passed'] as $aPassed): ?>
                         <tr>
                             <td class="success"><?=$aPassed['testName'] ?></td>
                             <td class="success"><b>OK</b></td>
                         </tr>
-                    <? endforeach ?>
+                    <?php endforeach ?>
 
-                <? endforeach ?>
+                <?php endforeach ?>
             </table>
         </form>
         
         <script>
-            var allSuiteNames = new Array();
-            <? foreach($suiteResults as $aResult): ?>
+            var allSuiteNames = [];
+            <?php foreach($suiteResults as $aResult);: ?;>
                 allSuiteNames[allSuiteNames.length] = "<?=$aResult['name'] ?>";
-            <? endforeach ?>
+            <?php endforeach ?;>
             function unCheckAll()
             {
                 _checked = document.optionsForm.allChecked.checked;

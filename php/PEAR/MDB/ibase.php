@@ -116,9 +116,9 @@ class MDB_ibase extends MDB_Common
     /**
      * Constructor
      */
-    function MDB_ibase()
+    function __construct()
     {
-        $this->MDB_Common();
+        MDB_Common::__construct();
         $this->phptype  = 'ibase';
         $this->dbsyntax = 'ibase';
 

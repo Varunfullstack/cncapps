@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Expense type table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEExpenseType extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEExpenseType(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEExpenseType extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("expensetype");
  		$this->addColumn("expenseTypeID", DA_ID, DA_NOT_NULL, "ext_expensetypeno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "ext_desc");

@@ -89,9 +89,9 @@ class MDB_mssql extends MDB_Common
     /**
     * Constructor
     */
-    function MDB_mssql()
+    function __construct()
     {
-        $this->MDB_Common();
+        MDB_Common::__construct();
         $this->phptype = 'mssql';
         $this->dbsyntax = 'mssql';
 

@@ -147,7 +147,7 @@ class Session {
   * 
   * @see  name()
   */
-  function Session() {
+  function __construct() {
     $this->name($this->name);
   } // end constructor
   

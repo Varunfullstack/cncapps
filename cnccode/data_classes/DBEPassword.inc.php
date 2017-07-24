@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * AnswerType table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPassword extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPassword(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEPassword extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("password");
  		$this->addColumn("passwordID", DA_ID, DA_NOT_NULL, "pas_passwordno");
     $this->addColumn("customerID", DA_ID, DA_NOT_NULL, "pas_custno");

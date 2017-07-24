@@ -14,7 +14,7 @@ class DBEStandardText extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEStandardText(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -24,7 +24,7 @@ class DBEStandardText extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("standardtext");
  		$this->addColumn("stt_standardtextno", DA_ID, DA_NOT_NULL, 'stt_standardtextno');
  		$this->addColumn("stt_sort_order", DA_INTEGER, DA_NOT_NULL, 'stt_sort_order');

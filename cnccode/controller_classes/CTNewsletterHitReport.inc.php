@@ -1,95 +1,97 @@
 <?php
 /**
-* Newsletter hit controller class
-* CNC Ltd
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg['path_ct'].'/CTCNC.inc.php');
-require_once($cfg['path_bu'].'/BUNewsletterHitReport.inc.php');
+ * Newsletter hit controller class
+ * CNC Ltd
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_bu'] . '/BUNewsletterHitReport.inc.php');
 
-class CTNewsletterHitReport extends CTCNC {
+class CTNewsletterHitReport extends CTCNC
+{
 
-	function CTNewsletterHitReport($requestMethod,	$postVars, $getVars, $cookieVars, $cfg){
-		$this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-	}
+    public $buNewsletterHitReport;
 
-	function constructor($requestMethod,	$postVars, $getVars, $cookieVars, $cfg){
-		parent::constructor($requestMethod,	$postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
-		$this->buNewsletterHitReport = new BUNewsletterHitReport ( $this );
-	}
-	/**
-	* Route to function based upon action passed
-	*/
-	function defaultAction()
-	{
-		$this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-		switch ($_REQUEST['action']){
-			case 'search':
-			default:
-				$this->searchForm();
-				break;
-		}
-	}
-	/**
-	* Display search form
-	* @access private
-	*/
-	function searchForm()
-	{
-		if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    {
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $this->buNewsletterHitReport = new BUNewsletterHitReport ($this);
+    }
 
-			// validate
-			if ($_FILES['pureFile']['name'] == ''){
-				$this->setFormErrorMessage('Please enter a file path');
-			}
-			if(!is_uploaded_file($_FILES['pureFile']['tmp_name'])){					// Possible hack?
-				$this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
-			}
+    /**
+     * Route to function based upon action passed
+     */
+    function defaultAction()
+    {
+        $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+        switch ($_REQUEST['action']) {
+            case 'search':
+            default:
+                $this->searchForm();
+                break;
+        }
+    }
 
-			if (!$this->formError){
+    /**
+     * Display search form
+     * @access private
+     */
+    function searchForm()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-				$this->buNewsletterHitReport->uploadFile(
-					$_FILES['pureFile']
-				);
+            // validate
+            if ($_FILES['pureFile']['name'] == '') {
+                $this->setFormErrorMessage('Please enter a file path');
+            }
+            if (!is_uploaded_file($_FILES['pureFile']['tmp_name'])) {                    // Possible hack?
+                $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
+            }
 
-				exit;
-			}
+            if (!$this->formError) {
 
-		}
-		
-		$this->setMethodName('searchForm');
+                $this->buNewsletterHitReport->uploadFile(
+                    $_FILES['pureFile']
+                );
 
-		$urlSubmit = $this->buildLink(
-			$_SERVER['PHP_SELF'],
-			array(
-				'action' => CTCNC_ACT_SEARCH
-			)
-		);
+                exit;
+            }
 
-		$this->setPageTitle('newsletter hit report');
-		$this->setTemplateFiles	('NewsletterHitReport',  'NewsletterHitReport.inc');
+        }
 
-		$this->template->parse('CONTENTS', 	'NewsletterHitReport', true);
+        $this->setMethodName('searchForm');
 
-		
+        $urlSubmit = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTCNC_ACT_SEARCH
+            )
+        );
 
-		$this->parsePage();
-	
-	}
-	
-	function generateCSV(){
-		$fileName = 'ENGACT.CSV';
-		Header('Content-type: text/plain');
-		Header('Content-Disposition: attachment; filename='.$fileName);
-		echo $this->dsSearchResults->getColumnNamesAsString()."\n";
-		while ($this->dsSearchResults->fetchNext()){
-			echo $this->dsSearchResults->getColumnValuesForExcel()."\n";
-		}
-		$this->pageClose();
-		exit;
-	}
-	
+        $this->setPageTitle('newsletter hit report');
+        $this->setTemplateFiles('NewsletterHitReport', 'NewsletterHitReport.inc');
+
+        $this->template->parse('CONTENTS', 'NewsletterHitReport', true);
+
+
+        $this->parsePage();
+
+    }
+
+    function generateCSV()
+    {
+        $fileName = 'ENGACT.CSV';
+        Header('Content-type: text/plain');
+        Header('Content-Disposition: attachment; filename=' . $fileName);
+        echo $this->dsSearchResults->getColumnNamesAsString() . "\n";
+        while ($this->dsSearchResults->fetchNext()) {
+            echo $this->dsSearchResults->getColumnValuesForExcel() . "\n";
+        }
+        $this->pageClose();
+        exit;
+    }
+
 }// end of class
 ?>

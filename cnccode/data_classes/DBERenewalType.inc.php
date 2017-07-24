@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Renewal type table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBERenewalType extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBERenewalType(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBERenewalType extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("renewaltype");
  		$this->addColumn("renewalTypeID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL);

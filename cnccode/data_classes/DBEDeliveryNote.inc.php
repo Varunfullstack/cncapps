@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Delivery Note table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEDeliveryNote extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEDeliveryNote(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEDeliveryNote extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("deliverynote");
  		$this->addColumn("deliveryNoteID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("ordheadID", DA_ID, DA_NOT_NULL);

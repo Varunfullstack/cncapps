@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Item table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEItem extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEItem(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEItem extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Item");
  		$this->addColumn("itemID", DA_ID, DA_NOT_NULL, "itm_itemno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "itm_desc");

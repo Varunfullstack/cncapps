@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Return invoice totals
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEInvoiceTotals extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEInvoiceTotals(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEInvoiceTotals extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("invhead");
  		$this->addColumn("count", DA_INTEGER, DA_NOT_NULL);
  		$this->addColumn("costValue", DA_FLOAT, DA_NOT_NULL);

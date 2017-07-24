@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Call activity problem table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEProblem extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEProblem(&$owner, $pkID = false){
+	function __construct(&$owner, $pkID = false){
 		$this->constructor($owner);
     if ( $pkID ){
       $this->getRow( $pkID );
@@ -26,7 +25,7 @@ class DBEProblem extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("problem");
  		$this->addColumn("problemID", DA_ID, DA_NOT_NULL, "pro_problemno");
  		$this->addColumn("customerID", DA_INTEGER, DA_ALLOW_NULL, "pro_custno");

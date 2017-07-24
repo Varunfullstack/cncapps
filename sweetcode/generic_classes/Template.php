@@ -29,7 +29,7 @@ class Template extends Template_PHPLIB
      * @param  string how to handle unknown variables
      * @param  array fallback paths
      */
-  function Template($root = ".", $unknowns = "remove") {
+  function __construct($root = ".", $unknowns = "remove") {
   	parent::Template_PHPLIB($root, $unknowns);
   }
     /**

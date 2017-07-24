@@ -764,7 +764,7 @@ function gradient(id, level)
     box.style.KhtmlOpacity = level;
     box.style.filter = "alpha(opacity=" + level * 100 + ")";
     box.style.display="block";
-    return;
+    
 }
 
 

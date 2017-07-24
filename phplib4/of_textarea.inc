@@ -13,7 +13,7 @@ class of_textarea extends of_element {
   var $wrap;
 
   // Constructor
-  function of_textarea($a) {
+  function __construct($a) {
     $this->setup_element($a);
   }
 

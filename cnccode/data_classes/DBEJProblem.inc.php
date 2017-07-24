@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Call activity problem table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJProblem extends DBEProblem {
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJProblem(&$owner, $pkID = false){
+	function __construct(&$owner, $pkID = false){
 		$this->constructor($owner, $pkID );
 	}
 	/**
@@ -24,7 +23,7 @@ class DBEJProblem extends DBEProblem {
 	*/
 	function constructor(&$owner, $pkID = false )
 	{
-    parent::constructor($owner, $pkID );
+    parent::__construct($owner, $pkID );
  		$this->setAddColumnsOn();
  		$this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
     $this->addColumn("specialAttentionFlag", DA_STRING, DA_ALLOW_NULL, "cus_special_attention_flag");

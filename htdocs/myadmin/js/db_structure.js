@@ -35,15 +35,13 @@ AJAX.registerTeardown('db_structure.js', function() {
  * when truncating, creating, dropping or inserting into a table
  */
 function PMA_adjustTotals() {
-    var byteUnits = new Array(
-        PMA_messages['strB'],
+    var byteUnits = [PMA_messages['strB'],
         PMA_messages['strKiB'],
         PMA_messages['strMiB'],
         PMA_messages['strGiB'],
         PMA_messages['strTiB'],
         PMA_messages['strPiB'],
-        PMA_messages['strEiB']
-    );
+        PMA_messages['strEiB']];
     /**
      * @var $allTr jQuery object that references all the rows in the list of tables
      */

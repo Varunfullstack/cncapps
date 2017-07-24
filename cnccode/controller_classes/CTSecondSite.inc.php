@@ -10,14 +10,9 @@ class CTSecondSite extends CTCNC
 
     var $buSecondsite = '';
 
-    function CTSecondSite($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-    }
-
-    function constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-        parent::constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $this->buSecondsite = new buSecondsite($this);
         $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);

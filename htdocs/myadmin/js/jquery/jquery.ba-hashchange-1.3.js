@@ -107,9 +107,8 @@
   function get_fragment( url ) {
     url = url || location.href;
     return '#' + url.replace( /^[^#]*#?(.*)$/, '$1' );
-  };
-  
-  // Method: jQuery.fn.hashchange
+  }
+    // Method: jQuery.fn.hashchange
   // 
   // Bind a handler to the window.onhashchange event or trigger all bound
   // window.onhashchange event handlers. This behavior is consistent with
@@ -292,9 +291,8 @@
       }
       
       timeout_id = setTimeout( poll, $.fn[ str_hashchange ].delay );
-    };
-    
-    // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    }
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     // vvvvvvvvvvvvvvvvvvv REMOVE IF NOT SUPPORTING IE6/7/8 vvvvvvvvvvvvvvvvvvv
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     $.browser.msie && !supports_onhashchange && (function(){

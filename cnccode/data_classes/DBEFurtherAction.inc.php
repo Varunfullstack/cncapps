@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Further Action table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEFurtherAction extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEFurtherAction(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEFurtherAction extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("further_action");
  		$this->addColumn("furtherActionID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL);

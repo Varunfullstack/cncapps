@@ -142,12 +142,12 @@ var IsDigit = ( function()
 String.prototype.Trim = function()
 {
 	return this.replace( /(^\s*)|(\s*$)/g, '' ) ;
-}
+};
 
 String.prototype.StartsWith = function( value )
 {
 	return ( this.substr( 0, value.length ) == value ) ;
-}
+};
 
 String.prototype.Remove = function( start, length )
 {
@@ -160,7 +160,7 @@ String.prototype.Remove = function( start, length )
 		s += this.substring( start + length , this.length ) ;
 
 	return s ;
-}
+};
 
 String.prototype.ReplaceAll = function( searchArray, replaceArray )
 {
@@ -172,7 +172,7 @@ String.prototype.ReplaceAll = function( searchArray, replaceArray )
 	}
 
 	return replaced ;
-}
+};
 
 function OpenFileBrowser( url, width, height )
 {

@@ -57,7 +57,7 @@ String.prototype.IEquals = function()
 			return true ;
 	}
 	return false ;
-}
+};
 
 var CurrentContainers = [] ;
 if ( !AlwaysCreate )
@@ -150,7 +150,7 @@ window.onload = function()
 		for ( var i in selectableStyles )
 			AddStyleOption( i ) ;
 	}
-}
+};
 
 function CreateDiv()
 {
@@ -285,7 +285,7 @@ function Ok()
 			else
 				CurrentContainers[i].setAttribute( attrName, val ) ;
 		}
-	}
+	};
 
 	// Apply modifications to the DIV container according to dialog inputs.
 	if ( CurrentContainers.length == 1 )

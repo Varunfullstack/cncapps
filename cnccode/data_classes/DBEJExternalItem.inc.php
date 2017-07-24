@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * ExternalItem table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJExternalItem extends DBEExternalItem{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJExternalItem(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJExternalItem extends DBEExternalItem{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
      $this->setAddColumnsOn();
     $this->addColumn("itemTypeDescription", DA_STRING, DA_ALLOW_NULL, 'itemtype.ity_desc' );
  		$this->setAddColumnsOff();

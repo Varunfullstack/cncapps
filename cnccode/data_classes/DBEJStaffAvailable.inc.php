@@ -13,7 +13,7 @@ class DBEJStaffAvailable extends DBEStaffAvailable{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJStaffAvailable(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +23,7 @@ class DBEJStaffAvailable extends DBEStaffAvailable{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("firstName", DA_STRING, DA_ALLOW_NULL, "firstName");
  		$this->addColumn("lastName", DA_STRING, DA_ALLOW_NULL, "lastName");

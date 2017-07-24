@@ -1,7 +1,6 @@
-<?
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
+<?php require_once($cfg["path_gc"]."/DBEntity.inc.php");
 class DBEPortalDocumentWithoutFile extends DBEntity{
-  function DBEPortalDocumentWithoutFile(&$owner){
+  function __construct(&$owner){
     $this->constructor($owner);
   }
   /**
@@ -11,7 +10,7 @@ class DBEPortalDocumentWithoutFile extends DBEntity{
   * @param  $owner
   */  
   function constructor(&$owner){
-    parent::constructor($owner);
+    parent::__construct($owner);
     $this->setTableName("portal_document");
     $this->addColumn("portalDocumentID", DA_ID, DA_NOT_NULL);         
     $this->addColumn("description", DA_STRING, DA_NOT_NULL);
@@ -40,7 +39,7 @@ class DBEPortalDocumentWithoutFile extends DBEntity{
   }
 }
 class DBEPortalDocument extends DBEPortalDocumentWithoutFile{
-	function DBEPortalDocument(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -50,7 +49,7 @@ class DBEPortalDocument extends DBEPortalDocumentWithoutFile{
 	* @param  $owner
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
     $this->setAddColumnsOn();
  		$this->addColumn("filename", DA_STRING, DA_ALLOW_NULL);
  		$this->addColumn("file", DA_BLOB, DA_ALLOW_NULL);

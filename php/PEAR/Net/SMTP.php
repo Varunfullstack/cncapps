@@ -169,8 +169,8 @@ class Net_SMTP
      * @access  public
      * @since   1.0
      */
-    function Net_SMTP($host = null, $port = null, $localhost = null,
-        $pipelining = false, $timeout = 0, $socket_options = null)
+    function __construct($host = null, $port = null, $localhost = null,
+                         $pipelining = false, $timeout = 0, $socket_options = null)
     {
         if (isset($host)) {
             $this->host = $host;

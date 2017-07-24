@@ -17,7 +17,7 @@ page_open(
 header("Cache-control: private");
 
 class CTRecentSalesOrders extends CTCNC {
-	function CTRecentSalesOrders($requestMethod,	$postVars, $getVars, $cookieVars, $cfg){
+	function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg){
 		$this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
 	}
 	function constructor($requestMethod,	$postVars, $getVars, $cookieVars, $cfg){

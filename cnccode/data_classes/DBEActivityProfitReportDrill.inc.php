@@ -4,82 +4,75 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
-class DBEActivityProfitReport extends DBEntity{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function DBEActivityProfitReport(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::constructor($owner);
-		$this->setTableName("callactivity");
- 		$this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
- 		$this->addColumn("PPHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("PPCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("TMHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("TMCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDPaid", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCPaid", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("TotalHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDProRata", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCProRata", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("CncCost", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("Profit", DA_DECIMAL, DA_ALLOW_NULL);
-		$this->setPK(0);
- 		$this->setAddColumnsOff();
-	}
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
+class DBEActivityProfitReport extends DBEntity
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @return void
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setTableName("callactivity");
+        $this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
+        $this->addColumn("PPHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("PPCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("TMHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("TMCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDPaid", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCPaid", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("TotalHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDProRata", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCProRata", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("CncCost", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("Profit", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->setPK(0);
+        $this->setAddColumnsOff();
+    }
 
-	function getRowsBySearchCriteria(
-			$customerID,
-			$fromDate,
-			$toDate,
-			$officeStartTime,
-			$officeEndTime
-		)
-	{
+    function getRowsBySearchCriteria(
+        $customerID,
+        $fromDate,
+        $toDate,
+        $officeStartTime,
+        $officeEndTime
+    )
+    {
 
- 		$this->setMethodName('getRowsBySearchCriteria');
-/*
-Returns a column for normal and overtime activity hours for each contract type
+        $this->setMethodName('getRowsBySearchCriteria');
+        /*
+        Returns a column for normal and overtime activity hours for each contract type
 
-Diagram of different cases catered cncp1for in query:
+        Diagram of different cases catered cncp1for in query:
 
-CASE	OT	|NT		|OT
+        CASE	OT	|NT		|OT
 
-1	--------|		|
-2		|		|--------
-3	    ----|---		|
-4		|---------------|
-5		|		|
-6	--------|---------------|--------
-7		|	    ----|----
+        1	--------|		|
+        2		|		|--------
+        3	    ----|---		|
+        4		|---------------|
+        5		|		|
+        6	--------|---------------|--------
+        7		|	    ----|----
 
-*/
+        */
 
-/* use a derived table to do calculations on result */
-$query =
-"select
+        /* use a derived table to do calculations on result */
+        $query =
+            "select
 	*,
-	truncate( " . $dsHeader->getValue( 'hourlyLabourCost') . " * `TotalHours`, 2 ) AS `CnCCost`,
-	truncate( `PPCharge` + `TMCharge` + `SDProRata` + `SCProRata` -  (" . $dsHeader->getValue( 'hourlyLabourCost') . " * `TotalHours`), 2 ) AS `Profit`
+	truncate( " . $dsHeader->getValue('hourlyLabourCost') . " * `TotalHours`, 2 ) AS `CnCCost`,
+	truncate( `PPCharge` + `TMCharge` + `SDProRata` + `SCProRata` -  (" . $dsHeader->getValue('hourlyLabourCost') . " * `TotalHours`), 2 ) AS `Profit`
 from(
 select
 	*,
@@ -828,26 +821,27 @@ select
 	JOIN item AS activityitem ON callacttype.cat_itemno = activityitem.itm_itemno
 WHERE
 	caa_date BETWEEN '$fromDate' AND '$toDate'";
-					
-			if ( $customerID ){
-				
-				$query .= " AND caa_custno = $customerID";
 
-			}
-			
-			$query .=				
+        if ($customerID) {
 
-			"	GROUP BY
+            $query .= " AND caa_custno = $customerID";
+
+        }
+
+        $query .=
+
+            "	GROUP BY
 				caa_custno
 			) as temp
 			) as temp1 GROUP BY CustomerID
-			) as temp2 ORDER BY `Profit` DESC"; 
-			
-			$this->setQueryString($query);
-			
-			$ret=(parent::getRows());
-			return $ret;
-		} 
+			) as temp2 ORDER BY `Profit` DESC";
+
+        $this->setQueryString($query);
+
+        $ret = (parent::getRows());
+        return $ret;
+    }
 
 }
+
 ?>

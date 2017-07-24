@@ -46,10 +46,10 @@
  * @version  CVS: $Id: Queue.php 309130 2011-03-11 17:34:24Z till $
  * @link     http://pear.php.net/package/Mail_Queue
  */
-  /*
-  Karim Ahmed, Sweet Code
-  Added callbackBeforSend to sendMailsInQueue function so that I can set my is_sending flag
-  */
+/*
+Karim Ahmed, Sweet Code
+Added callbackBeforSend to sendMailsInQueue function so that I can set my is_sending flag
+*/
 
 /**
  * This is special constant define start offset for limit sql queries to
@@ -79,16 +79,16 @@ define('MAILQUEUE_TRY', 25);
 /**
  * MAILQUEUE_ERROR constants
  */
-define('MAILQUEUE_ERROR',                    -1);
-define('MAILQUEUE_ERROR_NO_DRIVER',          -2);
-define('MAILQUEUE_ERROR_NO_CONTAINER',       -3);
-define('MAILQUEUE_ERROR_CANNOT_INITIALIZE',  -4);
-define('MAILQUEUE_ERROR_NO_OPTIONS',         -5);
-define('MAILQUEUE_ERROR_CANNOT_CONNECT',     -6);
-define('MAILQUEUE_ERROR_QUERY_FAILED',       -7);
-define('MAILQUEUE_ERROR_UNEXPECTED',         -8);
-define('MAILQUEUE_ERROR_CANNOT_SEND_MAIL',   -9);
-define('MAILQUEUE_ERROR_NO_RECIPIENT',      -10);
+define('MAILQUEUE_ERROR', -1);
+define('MAILQUEUE_ERROR_NO_DRIVER', -2);
+define('MAILQUEUE_ERROR_NO_CONTAINER', -3);
+define('MAILQUEUE_ERROR_CANNOT_INITIALIZE', -4);
+define('MAILQUEUE_ERROR_NO_OPTIONS', -5);
+define('MAILQUEUE_ERROR_CANNOT_CONNECT', -6);
+define('MAILQUEUE_ERROR_QUERY_FAILED', -7);
+define('MAILQUEUE_ERROR_UNEXPECTED', -8);
+define('MAILQUEUE_ERROR_CANNOT_SEND_MAIL', -9);
+define('MAILQUEUE_ERROR_NO_RECIPIENT', -10);
 define('MAILQUEUE_ERROR_UNKNOWN_CONTAINER', -11);
 
 /**
@@ -184,8 +184,8 @@ class Mail_Queue extends PEAR
     /**
      * Mail_Queue constructor
      *
-     * @param  array $container_options  Mail_Queue container options
-     * @param  array $mail_options  How send mails.
+     * @param  array $container_options Mail_Queue container options
+     * @param  array $mail_options How send mails.
      *
      * @return Mail_Queue
      *
@@ -211,8 +211,8 @@ class Mail_Queue extends PEAR
             array_push($this->_initErrors, new Mail_Queue_Error(MAILQUEUE_ERROR_NO_CONTAINER,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__));
         }
-        $container_type      = strtolower($container_options['type']);
-        $container_class     = 'Mail_Queue_Container_' . $container_type;
+        $container_type = strtolower($container_options['type']);
+        $container_class = 'Mail_Queue_Container_' . $container_type;
         $container_classfile = $container_type . '.php';
 
         // Attempt to include a custom version of the named class, but don't treat
@@ -229,7 +229,7 @@ class Mail_Queue extends PEAR
             unset($container_options['type']);
 
             $this->container = new $container_class($container_options);
-            if(PEAR::isError($this->container)) {
+            if (PEAR::isError($this->container)) {
                 array_push($this->_initErrors, new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_INITIALIZE,
                     $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__));
             }
@@ -332,7 +332,7 @@ class Mail_Queue extends PEAR
      * It won't limit the number of mails you can send, just the
      * internal buffer size.
      *
-     * @param integer $size  Optional - internal preload buffer size
+     * @param integer $size Optional - internal preload buffer size
      */
     function setBufferSize($size = 10)
     {
@@ -343,19 +343,19 @@ class Mail_Queue extends PEAR
     // }}}
     // {{{ sendMailsInQueue()
 
-   /**
+    /**
      * Send mails fom queue.
      *
      * Mail_Queue::sendMailsInQueue()
      *
-     * @param integer $limit     Optional - max limit mails send.
+     * @param integer $limit Optional - max limit mails send.
      *                           This is the max number of emails send by
      *                           this function.
-     * @param integer $offset    Optional - you could load mails from $offset (by id)
-     * @param integer $try       Optional - hoh many times mailqueu should try send
+     * @param integer $offset Optional - you could load mails from $offset (by id)
+     * @param integer $try Optional - hoh many times mailqueu should try send
      *                           each mail. If mail was sent succesful it will be
      *                           deleted from Mail_Queue.
-     * @param mixed   $callback  Optional, a callback (string or array) to save the
+     * @param mixed $callback Optional, a callback (string or array) to save the
      *                           SMTP ID and the SMTP greeting.
      *
      * @return mixed  True on success else MAILQUEUE_ERROR object.
@@ -395,10 +395,10 @@ class Mail_Queue extends PEAR
             Added callback before send so that I can set my is_sending flag
             */
             $okToSend = true;
-            
+
             if ($callbackBeforeSend !== null) {
                 $queued_as = null;
-                $greeting  = null;
+                $greeting = null;
                 if (isset($this->queued_as)) {
                     $queued_as = $this->queued_as;
                 }
@@ -407,15 +407,15 @@ class Mail_Queue extends PEAR
                 }
                 $okToSend = call_user_func($callbackBeforeSend,
                     array('id' => $mail->getId(),
-                          'queued_as' => $queued_as,
-                          'greeting'  => $greeting));
+                        'queued_as' => $queued_as,
+                        'greeting' => $greeting));
             }
 
-            if ( !$okToSend ){
-              $this->container->skip();       // already being sent
-              continue;
+            if (!$okToSend) {
+                $this->container->skip();       // already being sent
+                continue;
             }
-              
+
             $this->container->countSend($mail);
 
             $result = $this->sendMail($mail, true);
@@ -424,7 +424,7 @@ class Mail_Queue extends PEAR
                 //it from the db: it might be a temporary issue.
                 $this->container->skip();
                 PEAR::raiseError(
-                    'Error in sending mail: '.$result->getMessage(),
+                    'Error in sending mail: ' . $result->getMessage(),
                     MAILQUEUE_ERROR_CANNOT_SEND_MAIL, PEAR_ERROR_TRIGGER,
                     E_USER_NOTICE
                 );
@@ -435,7 +435,7 @@ class Mail_Queue extends PEAR
             //from the mail_queue table.
             if ($callback !== null) {
                 $queued_as = null;
-                $greeting  = null;
+                $greeting = null;
                 if (isset($this->queued_as)) {
                     $queued_as = $this->queued_as;
                 }
@@ -444,8 +444,8 @@ class Mail_Queue extends PEAR
                 }
                 call_user_func($callback,
                     array('id' => $mail->getId(),
-                          'queued_as' => $queued_as,
-                          'greeting'  => $greeting));
+                        'queued_as' => $queued_as,
+                        'greeting' => $greeting));
             }
 
             // delete email from queue?
@@ -478,14 +478,14 @@ class Mail_Queue extends PEAR
     /**
      * Send Mail by $id identifier. (bypass Mail_Queue)
      *
-     * @param integer $id  Mail identifier
-     * @param  bool   $set_as_sent
+     * @param integer $id Mail identifier
+     * @param  bool $set_as_sent
      * @return mixed  boolean: true on success else false, or PEAR_Error
      *
      * @access public
      * @uses   self::sendMail()
      */
-    function sendMailById($id, $set_as_sent=true)
+    function sendMailById($id, $set_as_sent = true)
     {
         $mail =& $this->container->getMailById($id);
         if (PEAR::isError($mail)) {
@@ -502,12 +502,12 @@ class Mail_Queue extends PEAR
      *
      * @param object  Mail_Queue_Body object
      * @return mixed  True on success else pear error class
-     * @param  bool   $set_as_sent
+     * @param  bool $set_as_sent
      *
      * @access public
      * @see    self::sendMailById()
      */
-    function sendMail($mail, $set_as_sent=true)
+    function sendMail($mail, $set_as_sent = true)
     {
         if (!is_a($mail, 'Mail_Queue_Body')) {
             if (is_a($mail, 'Mail_Queue_Error')) {
@@ -570,19 +570,19 @@ class Mail_Queue extends PEAR
      *
      * @see Mail_Queue_Container::put()
      *
-     * @param string  $time_to_send  When mail have to be send
-     * @param integer $id_user  Sender id
-     * @param string  $ip    Sender ip
-     * @param string  $from  Sender e-mail
-     * @param string|array  $to    Reciepient(s) e-mail
-     * @param string  $hdrs  Mail headers (in RFC)
-     * @param string  $body  Mail body (in RFC)
+     * @param string $time_to_send When mail have to be send
+     * @param integer $id_user Sender id
+     * @param string $ip Sender ip
+     * @param string $from Sender e-mail
+     * @param string|array $to Reciepient(s) e-mail
+     * @param string $hdrs Mail headers (in RFC)
+     * @param string $body Mail body (in RFC)
      * @return mixed  ID of the record where this mail has been put
      *                or Mail_Queue_Error on error
      *
      * @access public
      */
-    function put($from, $to, $hdrs, $body, $sec_to_send=0, $delete_after_send=true, $id_user=MAILQUEUE_SYSTEM)
+    function put($from, $to, $hdrs, $body, $sec_to_send = 0, $delete_after_send = true, $id_user = MAILQUEUE_SYSTEM)
     {
         $ip = getenv('REMOTE_ADDR');
 
@@ -606,7 +606,7 @@ class Mail_Queue extends PEAR
     /**
      * Delete mail from queue database
      *
-     * @param integer $id  Maila identifier
+     * @param integer $id Maila identifier
      * @return boolean
      *
      * @access private
@@ -627,7 +627,7 @@ class Mail_Queue extends PEAR
      * @return bool whether $value is an MAILQUEUE_ERROR
      * @access public
      */
-    static function isError($value, $code= null)
+    public static function isError($value, $code = null)
     {
         return (is_object($value) && is_a($value, 'pear_error'));
     }
@@ -638,7 +638,7 @@ class Mail_Queue extends PEAR
     /**
      * Return a textual error message for a MDB error code
      *
-     * @param   int     $value error code
+     * @param   int $value error code
      * @return  string  error message, or false if the error code was
      *                  not recognized
      * @access public
@@ -648,15 +648,15 @@ class Mail_Queue extends PEAR
         static $errorMessages;
         if (!isset($errorMessages)) {
             $errorMessages = array(
-                MAILQUEUE_ERROR                    => 'unknown error',
-                MAILQUEUE_ERROR_NO_DRIVER          => 'No mail driver specified',
-                MAILQUEUE_ERROR_NO_CONTAINER       => 'No container specified',
-                MAILQUEUE_ERROR_CANNOT_INITIALIZE  => 'Cannot initialize container',
-                MAILQUEUE_ERROR_NO_OPTIONS         => 'No container options specified',
-                MAILQUEUE_ERROR_CANNOT_CONNECT     => 'Cannot connect to database',
-                MAILQUEUE_ERROR_QUERY_FAILED       => 'db query failed',
-                MAILQUEUE_ERROR_UNEXPECTED         => 'Unexpected class',
-                MAILQUEUE_ERROR_CANNOT_SEND_MAIL   => 'Cannot send email',
+                MAILQUEUE_ERROR => 'unknown error',
+                MAILQUEUE_ERROR_NO_DRIVER => 'No mail driver specified',
+                MAILQUEUE_ERROR_NO_CONTAINER => 'No container specified',
+                MAILQUEUE_ERROR_CANNOT_INITIALIZE => 'Cannot initialize container',
+                MAILQUEUE_ERROR_NO_OPTIONS => 'No container options specified',
+                MAILQUEUE_ERROR_CANNOT_CONNECT => 'Cannot connect to database',
+                MAILQUEUE_ERROR_QUERY_FAILED => 'db query failed',
+                MAILQUEUE_ERROR_UNEXPECTED => 'Unexpected class',
+                MAILQUEUE_ERROR_CANNOT_SEND_MAIL => 'Cannot send email',
             );
         }
 
@@ -665,7 +665,7 @@ class Mail_Queue extends PEAR
         }
 
         return isset($errorMessages[$value]) ?
-           $errorMessages[$value] : $errorMessages[MAILQUEUE_ERROR];
+            $errorMessages[$value] : $errorMessages[MAILQUEUE_ERROR];
     }
 
     // }}}
@@ -701,16 +701,17 @@ class Mail_Queue extends PEAR
         return $this->_initErrors;
     }
 
-/*
-    function raiseError($msg, $code = null, $file = null, $line = null, $mode = null)
-    {
-        if ($file !== null) {
-            $err = PEAR::raiseError(sprintf("%s [%s on line %d].", $msg, $file, $line), $code, $mode);
-        } else {
-            $err = PEAR::raiseError(sprintf("%s", $msg), $code, $mode);
+    /*
+        function raiseError($msg, $code = null, $file = null, $line = null, $mode = null)
+        {
+            if ($file !== null) {
+                $err = PEAR::raiseError(sprintf("%s [%s on line %d].", $msg, $file, $line), $code, $mode);
+            } else {
+                $err = PEAR::raiseError(sprintf("%s", $msg), $code, $mode);
+            }
+    ? ? ? ? return $err;
         }
-? ? ? ? return $err;
-    }
-*/
+    */
 }
+
 ?>

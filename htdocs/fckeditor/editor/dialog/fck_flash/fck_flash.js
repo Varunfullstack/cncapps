@@ -80,7 +80,7 @@ window.onload = function()
 	dialog.SetOkButton( true ) ;
 
 	SelectField( 'txtUrl' ) ;
-}
+};
 
 function LoadSelection()
 {

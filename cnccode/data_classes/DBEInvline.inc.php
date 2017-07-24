@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Invline table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEInvline extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEInvline(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEInvline extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("invline");
  		$this->addColumn("invheadID", DA_ID, DA_NOT_NULL, "inl_invno");
  		$this->addColumn("sequenceNo", DA_INTEGER, DA_NOT_NULL, "inl_line_no");

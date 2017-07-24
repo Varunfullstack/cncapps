@@ -1,40 +1,41 @@
 <?php
 /**
-* Customer Review Meetings business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-* 
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_bu"]."/BUMail.inc.php");
-require_once($cfg["path_bu"]."/BUCustomerNew.inc.php");
-require_once($cfg["path_bu"]."/BURenewal.inc.php");
-require_once($cfg["path_bu"]."/BUCustomerAnalysisReport.inc.php");
-require_once($cfg["path_dbe"]."/DBEContactNew.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * Customer Review Meetings business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ *
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_bu"] . "/BUMail.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BURenewal.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
+require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUCustomerReviewMeeting extends Business{
+class BUCustomerReviewMeeting extends Business
+{
 
-	function BUCustomerReviewMeeting( &$owner ){
-		$this->constructor( $owner );
-	}
-	function constructor( &$owner ){
-		parent::constructor( $owner );
-		
-		$this->db = new CNCMysqli( DB_HOST, DB_USER, DB_PASSWORD, DB_NAME );
-	}
-  function generateEmails() {
-    
-    $this->setMethodName ( 'generateEmails' );
-    
-    $dbeContact = new DBEContact( $this );
-    
-    $buSite = new BUSite( $this );
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
 
-    /* customers with a review meeting due within next 6 weeks */
-    $sql = 
-      "SELECT
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
+
+    function generateEmails()
+    {
+
+        $this->setMethodName('generateEmails');
+
+        $dbeContact = new DBEContact($this);
+
+        $buSite = new BUSite($this);
+
+        /* customers with a review meeting due within next 6 weeks */
+        $sql =
+            "SELECT
           cus_custno AS customerID,
           cus_name AS customerName,
           cns_logname AS accountManagerUsername,
@@ -48,441 +49,437 @@ class BUCustomerReviewMeeting extends Business{
           DATE_SUB( DATE_ADD( cus_last_review_meeting_date, INTERVAL cus_review_meeting_frequency_months MONTH ),INTERVAL 6 WEEK ) <= NOW()
           AND cus_review_meeting_email_sent_flag = 'N'
         ";
-        
-    $results = $this->db->query( $sql );        
-    
-    $customers = array();
-    
-    while( $row = $results->fetch_assoc() ){
-        
-      $customers[] = $row;
-    }
 
-    foreach ( $customers as $customer ){
-      
-      $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      $template->set_file ( 'page', 'CustomerReviewMeetingEmail.inc.html' );
+        $results = $this->db->query($sql);
 
-      $urlCustomer = 
-        'http://' . $_SERVER ['HTTP_HOST'] . '/Customer.php?customerID='. $customer[ 'customerID' ] . '&action=dispEdit';
+        $customers = array();
 
-      $template->setVar(
-        array(
-          'urlCustomer'       => $urlCustomer,
-          'lastMeetingDate'   => $customer[ 'lastMeetingDate' ],
-          'nextMeetingDate'   => $customer[ 'nextMeetingDate' ]
-        )
-      );
+        while ($row = $results->fetch_assoc()) {
 
-      $template->set_block( 'page', 'contactBlock', 'contacts');
-      
-      /* contacts with DM flag set */
-      $sql = 
-        "SELECT
-            con_first_name as firstName,
-            con_last_name as lastName,
-            con_phone as ddiPhone,
-            con_mobile_phone as mobilePhone,
-            con_email as emailAddress
+            $customers[] = $row;
+        }
+
+        foreach ($customers as $customer) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template->set_file('page', 'CustomerReviewMeetingEmail.inc.html');
+
+            $urlCustomer =
+                'http://' . $_SERVER ['HTTP_HOST'] . '/Customer.php?customerID=' . $customer['customerID'] . '&action=dispEdit';
+
+            $template->setVar(
+                array(
+                    'urlCustomer' => $urlCustomer,
+                    'lastMeetingDate' => $customer['lastMeetingDate'],
+                    'nextMeetingDate' => $customer['nextMeetingDate']
+                )
+            );
+
+            $template->set_block('page', 'contactBlock', 'contacts');
+
+            /* contacts with DM flag set */
+            $sql =
+                "SELECT
+            con_first_name AS firstName,
+            con_last_name AS lastName,
+            con_phone AS ddiPhone,
+            con_mobile_phone AS mobilePhone,
+            con_email AS emailAddress
           FROM
             contact
           WHERE
             con_discontinued <> 'Y'
             AND con_mailflag7 = 'Y'
-            AND con_custno = ". $customer[ 'customerID' ] ;
+            AND con_custno = " . $customer['customerID'];
 
-      $results = $this->db->query( $sql );        
+            $results = $this->db->query($sql);
 
-      while( $row = $results->fetch_assoc() ){
-       
-        $template->setVar(
-          array(
-            'firstName'       => $row[ 'firstName' ],
-            'lastName'        => $row[ 'lastName' ],
-            'ddiPhone'        => $row[ 'ddiPhone' ],
-            'mobilePhone'     => $row[ 'mobilePhone' ],
-            'emailAddress'    => $row[ 'emailAddress' ]
-          )
-        );
-        $template->parse('contacts', 'contactBlock', true);
-      }
+            while ($row = $results->fetch_assoc()) {
 
-      $template->parse ( 'output', 'page', true );
+                $template->setVar(
+                    array(
+                        'firstName' => $row['firstName'],
+                        'lastName' => $row['lastName'],
+                        'ddiPhone' => $row['ddiPhone'],
+                        'mobilePhone' => $row['mobilePhone'],
+                        'emailAddress' => $row['emailAddress']
+                    )
+                );
+                $template->parse('contacts', 'contactBlock', true);
+            }
 
-      $body =  $template->get_var ( 'output' );
+            $template->parse('output', 'page', true);
+
+            $body = $template->get_var('output');
 
 
-/* create a calendar attachment */
-      $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      $template->set_file ( 'page', 'CustomerReviewMeeting.inc.ics' );
-      
-      $mainSupportContacts = $dbeContact->getMainSupportRowsByCustomerID( $customer[ 'customerID' ] );
-      if ( $dbeContact->fetchNext() ){
-        
-        $buSite->getSiteByID( $customer[ 'customerID' ], $dbeContact->getValue('siteNo'), $dsSite);
-/*
-SUMMARY;LANGUAGE=en-gb:Review Meeting - {customerName} {contactName} {contactPhone}
-LOCATION:{add1} {add2} {add3} {town} {county} {postcode}
-*/
-        if ( $dbeContact->getValue('phone') ){
-          $phone = $dbeContact->getValue('phone');
-        }
-        else{
-          $phone = $dbeContact->getValue('mobilePhone');
-        }
+            /* create a calendar attachment */
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template->set_file('page', 'CustomerReviewMeeting.inc.ics');
 
-        $template->set_var(
-          array(
-            'add1'          => $dsSite->getValue( 'add1' ),
-            'add2'          => $dsSite->getValue( 'add2' ),
-            'add3'          => $dsSite->getValue( 'add3' ),
-            'town'          => $dsSite->getValue( 'town' ),
-            'county'        => $dsSite->getValue( 'county' ),
-            'postcode'      => $dsSite->getValue( 'postcode' ),
-            'contactPhone'  => $phone,
-            'contactName'   => $dbeContact->getValue( 'firstName' ) . ' ' . $dbeContact->getValue( 'lastName' )
-          )
-        );
-        
-      }
-      
-      $template->set_var(
-        array(
-        'dateYYYYMMDD'         => $nextMeetingDateYmd,
-        'nowYYYYMMDD'          => date('Ymd'),
-        'nowHHMMSS'            => date('His'),
-        'customerName'         => $customer[ 'customerName' ]
-        )
-      );
+            $mainSupportContacts = $dbeContact->getMainSupportRowsByCustomerID($customer['customerID']);
+            if ($dbeContact->fetchNext()) {
 
-      $template->parse('output', 'page', true);
-      $icsFile = $template->get_var('output');
-    
-      $buMail = new BUMail( $this );
-      
-      $senderEmail = CONFIG_SALES_EMAIL;
-      
-      $subject = 'Review meeting with ' . $customer[ 'customerName' ] . ' due by ' . $customer[ 'nextMeetingDate' ];
-      
-      $hdrs = array (
-        'From'    => $senderEmail,
-        'Subject' => $subject,
-        'Date'    => date ( "r" )
-      );
-      
-      $buMail->mime->setHTMLBody ( $body );
-      
-      $buMail->mime->addAttachment ( $icsFile, 'text/calendar', 'meeting.ics', false );
+                $buSite->getSiteByID($customer['customerID'], $dbeContact->getValue('siteNo'), $dsSite);
+                /*
+                SUMMARY;LANGUAGE=en-gb:Review Meeting - {customerName} {contactName} {contactPhone}
+                LOCATION:{add1} {add2} {add3} {town} {county} {postcode}
+                */
+                if ($dbeContact->getValue('phone')) {
+                    $phone = $dbeContact->getValue('phone');
+                } else {
+                    $phone = $dbeContact->getValue('mobilePhone');
+                }
 
-      $body = $buMail->mime->get ();
+                $template->set_var(
+                    array(
+                        'add1' => $dsSite->getValue('add1'),
+                        'add2' => $dsSite->getValue('add2'),
+                        'add3' => $dsSite->getValue('add3'),
+                        'town' => $dsSite->getValue('town'),
+                        'county' => $dsSite->getValue('county'),
+                        'postcode' => $dsSite->getValue('postcode'),
+                        'contactPhone' => $phone,
+                        'contactName' => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
+                    )
+                );
 
-      $hdrs = $buMail->mime->headers ( $hdrs );
-      
-      $buMail->putInQueue(
-        $senderEmail,
-        $customer[ 'accountManagerUsername' ] . '@' . CONFIG_PUBLIC_DOMAIN,       // account manager
-        $hdrs,
-        $body,
-        false      // to SD Managers
-      );
-      
-      /* @todo set flag */
-      $sql = 
-        "UPDATE
+            }
+
+            $template->set_var(
+                array(
+                    'dateYYYYMMDD' => $nextMeetingDateYmd,
+                    'nowYYYYMMDD' => date('Ymd'),
+                    'nowHHMMSS' => date('His'),
+                    'customerName' => $customer['customerName']
+                )
+            );
+
+            $template->parse('output', 'page', true);
+            $icsFile = $template->get_var('output');
+
+            $buMail = new BUMail($this);
+
+            $senderEmail = CONFIG_SALES_EMAIL;
+
+            $subject = 'Review meeting with ' . $customer['customerName'] . ' due by ' . $customer['nextMeetingDate'];
+
+            $hdrs = array(
+                'From' => $senderEmail,
+                'Subject' => $subject,
+                'Date' => date("r")
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $buMail->mime->addAttachment($icsFile, 'text/calendar', 'meeting.ics', false);
+
+            $body = $buMail->mime->get();
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $customer['accountManagerUsername'] . '@' . CONFIG_PUBLIC_DOMAIN,       // account manager
+                $hdrs,
+                $body,
+                false      // to SD Managers
+            );
+
+            /* @todo set flag */
+            $sql =
+                "UPDATE
           customer
         SET
             cus_review_meeting_email_sent_flag = 'Y'
         WHERE
-            cus_custno =". $customer[ 'customerID' ] ;
+            cus_custno =" . $customer['customerID'];
 
-      $this->db->query( $sql );        
-      
-    
-    } // end customers
-        
-  } // end function
-  
-  public function initialiseSearchForm(&$dsData)
-  {
-    $dsData = new DSForm($this);
-    $dsData->addColumn('customerID', DA_STRING, DA_NOT_NULL);
-    $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL);
-    $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL);
-    $dsData->addColumn('meetingDate', DA_DATE, DA_NOT_NULL);
-  }
-  
-  public function generateAgendaPdf( $customerID, $htmlBody, $meetingDate )
-  {
-    $buCustomer = new BUCustomer( $this );
-    
-    $documentFolderPath = $buCustomer->getCustomerFolderPath( $customerID );
-    
-    $reviewMeetingFolderPath  = $documentFolderPath . '/Review Meetings';
+            $this->db->query($sql);
 
-    $template = new Template ( $GLOBALS ["cfg"] ["path_templates"], "remove" );
 
-    /*
-    Template with html head etc
-    */
-    $template->set_file ( 'page', 'CustomerReviewMeetingAgendaDocument.inc.html' );
-        
-    $template->set_var( 'htmlBody', $htmlBody );
-    
-    $template->parse( 'output', 'page', true );
+        } // end customers
 
-    $htmlPage =  $template->get_var( 'output' );   
+    } // end function
 
-    @mkdir( $reviewMeetingFolderPath, '0777', true );  // ensure folder exists
-    
-/*
-    require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
-    
-    $dompdf = new DOMPDF();
-    $dompdf->set_paper( 'A4', 'portrait' );
+    public function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+        $dsData->addColumn('customerID', DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn('meetingDate', DA_DATE, DA_NOT_NULL);
+    }
 
-    $dompdf->set_option( 'enable_remote', true);
+    public function generateAgendaPdf($customerID, $htmlBody, $meetingDate)
+    {
+        $buCustomer = new BUCustomer($this);
 
-    $dompdf->set_base_path( BASE_DRIVE . '/htdocs' );   // so we can get the images and css
+        $documentFolderPath = $buCustomer->getCustomerFolderPath($customerID);
 
-    $dompdf->load_html( $htmlPage );
+        $reviewMeetingFolderPath = $documentFolderPath . '/Review Meetings';
 
-    $dompdf->render();
-  */  
-    $meetingDateDmy = substr( $meetingDate, 8, 2 ) . '-' . substr( $meetingDate, 5, 2 ) . '-' . substr( $meetingDate, 0, 4 );
+        $template = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
 
-/*
-    $dompdf->add_info('Title',  'Agenda ' . $meetingDateDmy );
+        /*
+        Template with html head etc
+        */
+        $template->set_file('page', 'CustomerReviewMeetingAgendaDocument.inc.html');
 
-    $dompdf->add_info('Author', 'CNC Ltd' );
+        $template->set_var('htmlBody', $htmlBody);
 
-    $dompdf->add_info('Subject', 'Renewal Report' );
+        $template->parse('output', 'page', true);
 
-    $pdfString = $dompdf->output();
+        $htmlPage = $template->get_var('output');
 
-    $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
-*/    
-    
-    $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
+        @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-    $handle = fopen( $filePath , 'w' );
-    
+        /*
+            require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+
+            $dompdf = new DOMPDF();
+            $dompdf->set_paper( 'A4', 'portrait' );
+
+            $dompdf->set_option( 'enable_remote', true);
+
+            $dompdf->set_base_path( BASE_DRIVE . '/htdocs' );   // so we can get the images and css
+
+            $dompdf->load_html( $htmlPage );
+
+            $dompdf->render();
+          */
+        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+
+        /*
+            $dompdf->add_info('Title',  'Agenda ' . $meetingDateDmy );
+
+            $dompdf->add_info('Author', 'CNC Ltd' );
+
+            $dompdf->add_info('Subject', 'Renewal Report' );
+
+            $pdfString = $dompdf->output();
+
+            $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
+        */
+
+        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
+
+        $handle = fopen($filePath, 'w');
+
 //    fwrite( $handle, $pdfString );
-    fwrite( $handle, $htmlPage);
-    
-  }
-  
-  /**
-  * Create a PDF file of customer profit figures and save to documentation 
-  * folder
-  * 
-  */
-  public function generateSalesPdf( $customerID, $startYearMonth, $endYearMonth, $meetingDate )
-  {
-    $buCustomer = new BUCustomer( $this );
-    
-    $buCustomer->getCustomerByID( $customerID, $dsCustomer );
-    
-    $buCustomerAnalysisReport = new BUCustomerAnalysisReport( $this );
-    
-    $documentFolderPath = $buCustomer->getCustomerFolderPath( $customerID );
-    
-    $reviewMeetingFolderPath  = $documentFolderPath . '/Review Meetings';
+        fwrite($handle, $htmlPage);
 
-    $template = new Template ( $GLOBALS ["cfg"] ["path_templates"], "remove" );
+    }
 
-    $template->set_file ( 'page', 'CustomerReviewMeetingSalesDocument.inc.html' );
+    /**
+     * Create a PDF file of customer profit figures and save to documentation
+     * folder
+     *
+     */
+    public function generateSalesPdf($customerID, $startYearMonth, $endYearMonth, $meetingDate)
+    {
+        $buCustomer = new BUCustomer($this);
 
-    $this->initialiseSearchForm ( $dsSearchForm );
-    
-    $dsSearchForm->setValue( 'customerID', $customerID );
-    $dsSearchForm->setValue( 'startYearMonth', $startYearMonth );
-    $dsSearchForm->setValue( 'endYearMonth', $endYearMonth );
-    
-    $results = $buCustomerAnalysisReport->getResults( $dsSearchForm );
-    
-    $template->set_block( 'page', 'contractsBlock', 'contracts');
+        $buCustomer->getCustomerByID($customerID, $dsCustomer);
+
+        $buCustomerAnalysisReport = new BUCustomerAnalysisReport($this);
+
+        $documentFolderPath = $buCustomer->getCustomerFolderPath($customerID);
+
+        $reviewMeetingFolderPath = $documentFolderPath . '/Review Meetings';
+
+        $template = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+        $template->set_file('page', 'CustomerReviewMeetingSalesDocument.inc.html');
+
+        $this->initialiseSearchForm($dsSearchForm);
+
+        $dsSearchForm->setValue('customerID', $customerID);
+        $dsSearchForm->setValue('startYearMonth', $startYearMonth);
+        $dsSearchForm->setValue('endYearMonth', $endYearMonth);
+
+        $results = $buCustomerAnalysisReport->getResults($dsSearchForm);
+
+        $template->set_block('page', 'contractsBlock', 'contracts');
         $totalSales = 0;
         $totalCost = 0;
         $totalLabour = 0;
         $totalLabourHours = 0;
-        
-
-    foreach ( $results as $contractName => $row ){
-      
-      if ( $row[ 'profit' ] <= 0 ){
-        $profitAlertClass = 'profitAlert';
-      }
-      else{
-        $profitAlertClass = '';
-      }
-      
-      $template->set_var(
-        array(
-          'contract'        => $contractName,
-          'sales'           => number_format( $row[ 'sales' ], 2),
-          'cost'            => number_format( $row[ 'cost' ],2 ),
-          'labour'          => number_format( $row[ 'labourCost' ], 2),
-          'profit'          => number_format( $row[ 'profit' ], 2),
-          'profitPercent'   => $row[ 'profitPercent' ],
-          'labourHours'     => $row[ 'labourHours' ],
-          'profitAlertClass'=> $profitAlertClass
-        )
-      );
-      $template->parse ( 'contracts', 'contractsBlock', true );
-      
-      $totalSales += $row[ 'sales' ];
-      $totalCost += $row[ 'cost' ];
-      $totalLabour += $row[ 'labourCost' ];
-      $totalLabourHours += $row[ 'labourHours' ];
-    }
-    $template->set_var(
-      array(
-        'customerName'     => $dsCustomer->getValue( 'name' ),
-        'startYearMonth'   => $startYearMonth,
-        'meetingDate'      => $meetingDate,
-        'endYearMonth'     => $endYearMonth,
-        'totalSales'       =>  number_format( $totalSales, 2),
-        'totalCost'        =>  number_format( $totalCost,2 ),
-        'totalLabour'      =>  number_format( $totalLabour, 2),
-        'totalProfit'      =>  number_format( $totalSales - $totalCost - $totalLabour, 2),
-        'totalProfitPercent'    =>  number_format( 100 - ( ( $totalCost + $totalLabour ) /$totalSales) * 100,2 ),
-        'totalLabourHours' =>  number_format( $totalLabourHours, 2),
-      )
-    );
- /*
- renewals
- */
- $buRenewal = new BURenewal( $this );
-    
-  $items = $buRenewal->getRenewalsAndExternalItemsByCustomer( $customerID, true );
-  
-  $lastItemTypeDescription = false;
-  
-  $template->set_block( 'page', 'itemBlock', 'items' );
-  
-  foreach( $items as $key => $item ){
-    $itemTypeDescription[ $key ] = $item[ 'itemTypeDescription' ];
-  }
-  array_multisort( $itemTypeDescription, SORT_ASC, $items  );
 
 
-  $totalCostPrice = 0;
-  $totalSalePrice = 0;
+        foreach ($results as $contractName => $row) {
 
-  foreach ( $items as $item ){
-  
-    if ( $item[ 'itemTypeDescription' ] != $lastItemTypeDescription ){
-      $itemTypeHeader = '<tr><td colspan="7"><h3>'. $item[ 'itemTypeDescription' ] . '</h3></td></tr>';
-    }  
-    else{
-      $itemTypeHeader = '';        
-    }
-     
-    $template->set_var(
-      array(
-        'itemTypeHeader'              => $itemTypeHeader
-      )
-    );
-    
-    $lastItemTypeDescription = $item[ 'itemTypeDescription' ];
-  
-    $coveredItemsString = '';
+            if ($row['profit'] <= 0) {
+                $profitAlertClass = 'profitAlert';
+            } else {
+                $profitAlertClass = '';
+            }
 
-    if ( count( $item['coveredItems'] ) > 0 ){
-      
-      foreach( $item[ 'coveredItems'] as $coveredItem ){
-      
-        $coveredItemsString .= '<br/>' . $coveredItem;
+            $template->set_var(
+                array(
+                    'contract' => $contractName,
+                    'sales' => number_format($row['sales'], 2),
+                    'cost' => number_format($row['cost'], 2),
+                    'labour' => number_format($row['labourCost'], 2),
+                    'profit' => number_format($row['profit'], 2),
+                    'profitPercent' => $row['profitPercent'],
+                    'labourHours' => $row['labourHours'],
+                    'profitAlertClass' => $profitAlertClass
+                )
+            );
+            $template->parse('contracts', 'contractsBlock', true);
+
+            $totalSales += $row['sales'];
+            $totalCost += $row['cost'];
+            $totalLabour += $row['labourCost'];
+            $totalLabourHours += $row['labourHours'];
+        }
         $template->set_var(
-          array(
-            'coveredItemsString' => $coveredItemsString
-          )
+            array(
+                'customerName' => $dsCustomer->getValue('name'),
+                'startYearMonth' => $startYearMonth,
+                'meetingDate' => $meetingDate,
+                'endYearMonth' => $endYearMonth,
+                'totalSales' => number_format($totalSales, 2),
+                'totalCost' => number_format($totalCost, 2),
+                'totalLabour' => number_format($totalLabour, 2),
+                'totalProfit' => number_format($totalSales - $totalCost - $totalLabour, 2),
+                'totalProfitPercent' => number_format(100 - (($totalCost + $totalLabour) / $totalSales) * 100, 2),
+                'totalLabourHours' => number_format($totalLabourHours, 2),
+            )
         );
-      }
+        /*
+        renewals
+        */
+        $buRenewal = new BURenewal($this);
+
+        $items = $buRenewal->getRenewalsAndExternalItemsByCustomer($customerID, true);
+
+        $lastItemTypeDescription = false;
+
+        $template->set_block('page', 'itemBlock', 'items');
+
+        foreach ($items as $key => $item) {
+            $itemTypeDescription[$key] = $item['itemTypeDescription'];
+        }
+        array_multisort($itemTypeDescription, SORT_ASC, $items);
+
+
+        $totalCostPrice = 0;
+        $totalSalePrice = 0;
+
+        foreach ($items as $item) {
+
+            if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
+                $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
+            } else {
+                $itemTypeHeader = '';
+            }
+
+            $template->set_var(
+                array(
+                    'itemTypeHeader' => $itemTypeHeader
+                )
+            );
+
+            $lastItemTypeDescription = $item['itemTypeDescription'];
+
+            $coveredItemsString = '';
+
+            if (count($item['coveredItems']) > 0) {
+
+                foreach ($item['coveredItems'] as $coveredItem) {
+
+                    $coveredItemsString .= '<br/>' . $coveredItem;
+                    $template->set_var(
+                        array(
+                            'coveredItemsString' => $coveredItemsString
+                        )
+                    );
+                }
+            }
+
+            if (is_null($item['customerItemID'])) {
+                $itemClass = 'externalItem';
+                $salePrice = '';
+                $costPrice = '';
+            } else {
+                $itemClass = '';
+
+                $salePrice = Controller::formatNumber($item['salePrice']);
+
+                $costPrice = Controller::formatNumber($item['costPrice']);
+
+                $totalCostPrice += $item['costPrice'];
+
+                $totalSalePrice += $item['salePrice'];
+            }
+
+
+            $template->set_var(
+                array(
+                    'notes' => $item['notes'],
+                    'description' => Controller::htmlDisplayText($item['description']),
+                    'itemTypeDescription' => Controller::htmlDisplayText($item['itemTypeDescription']),
+                    'expiryDate' => Controller::htmlDisplayText($item['expiryDate']),
+                    'salePrice' => $salePrice,
+                    'costPrice' => $costPrice,
+                    'customerItemID' => $item['customerItemID'],
+                    'coveredItemsString' => $coveredItemsString,
+                    'itemClass' => $itemClass
+                )
+            );
+
+            $template->parse('items', 'itemBlock', true);
+        }
+
+        $template->set_var(
+            array(
+                'totalSalePrice' => Controller::formatNumber($totalSalePrice),
+                'totalCostPrice' => Controller::formatNumber($totalCostPrice)
+            )
+        );
+
+        /*
+        end renewals
+        */
+
+        $template->parse('output', 'page', true);
+
+        $htmlPage = $template->get_var('output');
+
+        @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
+
+        require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+
+        $dompdf = new DOMPDF();
+        $dompdf->set_paper('A4', 'portrait');
+
+        $dompdf->set_option('enable_remote', true);
+
+        $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+
+        $dompdf->load_html($htmlPage);
+
+        $dompdf->render();
+
+        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+
+        $dompdf->add_info('Title', 'Renewal Report ' . $meetingDateDmy);
+
+        $dompdf->add_info('Author', 'CNC Ltd');
+
+        $dompdf->add_info('Subject', 'Renewal Report');
+
+        $pdfString = $dompdf->output();
+
+        $filePath = $reviewMeetingFolderPath . '/Renewal Report ' . $meetingDateDmy . '.pdf';
+
+        $handle = fopen($filePath, 'w');
+
+        fwrite($handle, $pdfString);
+
     }
-    
-    if ( is_null( $item[ 'customerItemID' ] ) ){
-      $itemClass = 'externalItem';
-      $salePrice = '';
-      $costPrice = '';
-    }
-    else{
-      $itemClass = '';
-
-      $salePrice = Controller::formatNumber( $item[ 'salePrice' ]);
-
-      $costPrice = Controller::formatNumber( $item[ 'costPrice' ]);
-
-      $totalCostPrice += $item['costPrice'];
-
-      $totalSalePrice += $item['salePrice'];
-    }
-
-   
-    $template->set_var(
-      array(
-        'notes'               => $item['notes'],
-        'description'         => Controller::htmlDisplayText( $item['description'] ),
-        'itemTypeDescription' => Controller::htmlDisplayText( $item['itemTypeDescription'] ),
-        'expiryDate'          => Controller::htmlDisplayText( $item[ 'expiryDate'] ),
-        'salePrice'           => $salePrice,
-        'costPrice'           => $costPrice,
-        'customerItemID'      => $item[ 'customerItemID' ],
-        'coveredItemsString'  => $coveredItemsString,
-        'itemClass'           => $itemClass
-      )
-    );
-    
-    $template->parse('items', 'itemBlock', true);
-  }
-
-  $template->set_var(
-    array(
-        'totalSalePrice'    => Controller::formatNumber( $totalSalePrice ),
-        'totalCostPrice'    => Controller::formatNumber( $totalCostPrice )
-    )
-  );
-  
-   /*
-   end renewals
-   */   
-    
-    $template->parse( 'output', 'page', true );
-
-    $htmlPage =  $template->get_var( 'output' );   
-
-    @mkdir( $reviewMeetingFolderPath, '0777', true );  // ensure folder exists
-    
-    require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
-    
-    $dompdf = new DOMPDF();
-    $dompdf->set_paper( 'A4', 'portrait' );
-    
-    $dompdf->set_option( 'enable_remote', true);
-
-    $dompdf->set_base_path( BASE_DRIVE . '/htdocs' );   // so we can get the images and css
-
-    $dompdf->load_html( $htmlPage );
-
-    $dompdf->render();
-
-    $meetingDateDmy = substr( $meetingDate, 8, 2 ) . '-' . substr( $meetingDate, 5, 2 ) . '-' . substr( $meetingDate, 0, 4 );
-
-    $dompdf->add_info('Title',  'Renewal Report ' . $meetingDateDmy );
-
-    $dompdf->add_info('Author', 'CNC Ltd' );
-
-    $dompdf->add_info('Subject', 'Renewal Report' );
-
-    $pdfString = $dompdf->output();
-    
-    $filePath = $reviewMeetingFolderPath . '/Renewal Report ' . $meetingDateDmy . '.pdf';
-    
-    $handle = fopen( $filePath , 'w' );
-    
-    fwrite( $handle, $pdfString );
-    
-  }
 }
-  
+
 ?>

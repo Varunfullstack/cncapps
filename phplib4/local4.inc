@@ -11,13 +11,14 @@
  * by your application to get you going. Once you get the hang of it,
  * you should backup this file and start over with a clean local.inc
  * which contains only your own classes and only the classes you need.
- */ 
+ */
 
-class DB_Example extends DB_Sql {
-  var $Host     = "localhost";
-  var $Database = "test";
-  var $User     = "kk";
-  var $Password = "";
+class DB_Example extends DB_Sql
+{
+    var $Host = "localhost";
+    var $Database = "test";
+    var $User = "kk";
+    var $Password = "";
 }
 
 ##
@@ -26,9 +27,10 @@ class DB_Example extends DB_Sql {
 ## in Example_Session appropriately.
 ##
 
-class Example_CT_Sql extends CT_Sql {
-  var $database_class = "DB_Example";          ## Which database to connect...
-  var $database_table = "active_sessions"; ## and find our session data in this table.
+class Example_CT_Sql extends CT_Sql
+{
+    var $database_class = "DB_Example";          ## Which database to connect...
+    var $database_table = "active_sessions"; ## and find our session data in this table.
 }
 
 ##
@@ -67,19 +69,21 @@ class Example_CT_Sql extends CT_Sql {
 #   var $dbm_file  = "must_exist.dbm";
 #}
 
-class Example_Session extends Session {
-  var $classname = "Example_Session";
+class Example_Session extends Session
+{
+    var $classname = "Example_Session";
 
-  var $cookiename     = "";                ## defaults to classname
-  var $magic          = "Hocuspocus";      ## ID seed
-  var $mode           = "cookie";          ## We propagate session IDs with cookies
-  var $fallback_mode  = "get";
-  var $lifetime       = 0;                 ## 0 = do session cookies, else minutes
-  var $that_class     = "Example_CT_Sql";  ## name of data storage container class
-  var $gc_probability = 5;  
-  var $allowcache     = "no";              ## "public", "private", or "no"
+    var $cookiename = "";                ## defaults to classname
+    var $magic = "Hocuspocus";      ## ID seed
+    var $mode = "cookie";          ## We propagate session IDs with cookies
+    var $fallback_mode = "get";
+    var $lifetime = 0;                 ## 0 = do session cookies, else minutes
+    var $that_class = "Example_CT_Sql";  ## name of data storage container class
+    var $gc_probability = 5;
+    var $allowcache = "no";              ## "public", "private", or "no"
 
 }
+
 /*
 class Example_Session_Custom extends Session_Custom {
   var $classname = "Example_Session";
@@ -100,57 +104,62 @@ es
 }
 */
 
-class Example_User extends User {
-  var $classname = "Example_User";
+class Example_User extends User
+{
+    var $classname = "Example_User";
 
-  var $magic          = "Abracadabra";     ## ID seed
-  var $that_class     = "Example_CT_Sql";  ## name of data storage container class
+    var $magic = "Abracadabra";     ## ID seed
+    var $that_class = "Example_CT_Sql";  ## name of data storage container class
 }
 
-class Example_Auth extends Auth {
-  var $classname      = "Example_Auth";
+class Example_Auth extends Auth
+{
+    var $classname = "Example_Auth";
 
-  var $lifetime       = 15;
+    var $lifetime = 15;
 
-  var $database_class = "DB_Example";
-  var $database_table = "auth_user";
-  
-  function auth_loginform() {
-    global $sess;
-    global $_PHPLIB;
+    var $database_class = "DB_Example";
+    var $database_table = "auth_user";
 
-    include($_PHPLIB["libdir"] . "loginform.ihtml");
-  }
-  
-  function auth_validatelogin() {
-    global $_POST;
+    function auth_loginform()
+    {
+        global $sess;
+        global $_PHPLIB;
 
-    if(isset($_POST["username"])) {
-      $this->auth["uname"] = $_POST["username"];        ## This provides access for "loginform.ihtml"
+        include($_PHPLIB["libdir"] . "loginform.ihtml");
     }
-    
-    $uid = false;
-    
-    $this->db->query(sprintf("select user_id, perms ".
-                             "        from %s ".
-                             "       where username = '%s' ".
-                             "         and password = '%s'",
-                          $this->database_table,
-                          addslashes($_POST["username"]),
-                          addslashes($_POST["password"])));
 
-    while($this->db->next_record()) {
-      $uid = $this->db->f("user_id");
-      $this->auth["perm"] = $this->db->f("perms");
+    function auth_validatelogin()
+    {
+        global $_POST;
+
+        if (isset($_POST["username"])) {
+            $this->auth["uname"] = $_POST["username"];        ## This provides access for "loginform.ihtml"
+        }
+
+        $uid = false;
+
+        $this->db->query(sprintf("select user_id, perms " .
+            "        from %s " .
+            "       where username = '%s' " .
+            "         and password = '%s'",
+            $this->database_table,
+            addslashes($_POST["username"]),
+            addslashes($_POST["password"])));
+
+        while ($this->db->next_record()) {
+            $uid = $this->db->f("user_id");
+            $this->auth["perm"] = $this->db->f("perms");
+        }
+        return $uid;
     }
-    return $uid;
-  }
 }
 
-class Example_Default_Auth extends Example_Auth {
-  var $classname = "Example_Default_Auth";
-  
-  var $nobody    = true;
+class Example_Default_Auth extends Example_Auth
+{
+    var $classname = "Example_Default_Auth";
+
+    var $nobody = true;
 }
 
 # A variation of Example_Auth which uses a Challenge-Response
@@ -159,66 +168,69 @@ class Example_Default_Auth extends Example_Auth {
 # Documentation section about CR Authentication to understand
 # what is going on.
 
-class Example_Challenge_Auth extends Auth {
-  var $classname      = "Example_Challenge_Auth";
+class Example_Challenge_Auth extends Auth
+{
+    var $classname = "Example_Challenge_Auth";
 
-  var $lifetime       =  1;
+    var $lifetime = 1;
 
-  var $magic          = "Simsalabim";  ## Challenge seed
-  var $database_class = "DB_Example";
-  var $database_table = "auth_user";
+    var $magic = "Simsalabim";  ## Challenge seed
+    var $database_class = "DB_Example";
+    var $database_table = "auth_user";
 
-  function auth_loginform() {
-    global $sess;
-    global $challenge;
-    global $_PHPLIB;
-    
-    $challenge = md5(uniqid($this->magic));
-    $sess->register("challenge");
-    
-    include($_PHPLIB["libdir"] . "crloginform.ihtml");
-  }
-  
-  function auth_validatelogin() {
-    global $_POST, $challenge;
+    function auth_loginform()
+    {
+        global $sess;
+        global $challenge;
+        global $_PHPLIB;
 
-    if(isset($_POST["username"])) {
-      $this->auth["uname"] = $_POST["username"];        ## This provides access for "loginform.ihtml"
-    }
-    $this->db->query(sprintf("select user_id, perms, password ".
-                "from %s where username = '%s'",
-                          $this->database_table,
-                          addslashes($_POST["username"])));
+        $challenge = md5(uniqid($this->magic));
+        $sess->register("challenge");
 
-    if ($this->db->num_rows() == 0) {
-      return false;
+        include($_PHPLIB["libdir"] . "crloginform.ihtml");
     }
 
-    while($this->db->next_record()) {
-      $uid   = $this->db->f("user_id");
-      $perm  = $this->db->f("perms");
-      $pass  = $this->db->f("password");
-    }
-    $expected_response = md5("$_POST[username]:$pass:$challenge");
+    function auth_validatelogin()
+    {
+        global $_POST, $challenge;
 
-    ## True when JS is disabled
-    if ($_POST["response"] == "") {
-      if ($_POST["password"] != $pass) {
-        return false;
-      } else {
-        $this->auth["perm"] = $perm;
-        return $uid;
-      }
+        if (isset($_POST["username"])) {
+            $this->auth["uname"] = $_POST["username"];        ## This provides access for "loginform.ihtml"
+        }
+        $this->db->query(sprintf("select user_id, perms, password " .
+            "from %s where username = '%s'",
+            $this->database_table,
+            addslashes($_POST["username"])));
+
+        if ($this->db->num_rows() == 0) {
+            return false;
+        }
+
+        while ($this->db->next_record()) {
+            $uid = $this->db->f("user_id");
+            $perm = $this->db->f("perms");
+            $pass = $this->db->f("password");
+        }
+        $expected_response = md5("$_POST[username]:$pass:$challenge");
+
+        ## True when JS is disabled
+        if ($_POST["response"] == "") {
+            if ($_POST["password"] != $pass) {
+                return false;
+            } else {
+                $this->auth["perm"] = $perm;
+                return $uid;
+            }
+        }
+
+        ## Response is set, JS is enabled
+        if ($expected_response != $_POST["response"]) {
+            return false;
+        } else {
+            $this->auth["perm"] = $perm;
+            return $uid;
+        }
     }
-    
-    ## Response is set, JS is enabled
-    if ($expected_response != $_POST["response"]) {
-      return false;
-    } else {
-      $this->auth["perm"] = $perm;
-      return $uid;
-    }
-  }
 }
 
 ##
@@ -230,88 +242,93 @@ class Example_Challenge_Auth extends Auth {
 ##                           than cleartext in database
 ## Author: Jim Zajkowski <jim@jimz.com>
 
-class Example_Challenge_Crypt_Auth extends Auth {
-  var $classname      = "Example_Challenge_Crypt_Auth";
+class Example_Challenge_Crypt_Auth extends Auth
+{
+    var $classname = "Example_Challenge_Crypt_Auth";
 
-  var $lifetime       =  1;
+    var $lifetime = 1;
 
-  var $magic          = "Frobozzica";  ## Challenge seed
-  var $database_class = "DB_Example";
-  var $database_table = "auth_user_md5";
+    var $magic = "Frobozzica";  ## Challenge seed
+    var $database_class = "DB_Example";
+    var $database_table = "auth_user_md5";
 
-  function auth_loginform() {
-    global $sess;
-    global $challenge;
-    global $_PHPLIB;
-    
-    $challenge = md5(uniqid($this->magic));
-    $sess->register("challenge");
-    
-    include($_PHPLIB["libdir"] . "crcloginform.ihtml");
-  }
-  
-  function auth_validatelogin() {
-    global $_POST, $challenge;
+    function auth_loginform()
+    {
+        global $sess;
+        global $challenge;
+        global $_PHPLIB;
 
-    $this->auth["uname"] = $_POST["username"];        ## This provides access for "loginform.ihtml"
-    
-    $this->db->query(sprintf("select user_id, perms, password ".
-                "from %s where username = '%s'",
-                          $this->database_table,
-                          addslashes($_POST["username"])));
+        $challenge = md5(uniqid($this->magic));
+        $sess->register("challenge");
 
-    if ($this->db->num_rows() == 0) {
-      return false;
+        include($_PHPLIB["libdir"] . "crcloginform.ihtml");
     }
 
-    while($this->db->next_record()) {
-      $uid   = $this->db->f("user_id");
-      $perm  = $this->db->f("perms");
-      $pass  = $this->db->f("password");   ## Password is stored as a md5 hash
-    }
-    $expected_response = md5("$_POST[username]:$pass:$challenge");
+    function auth_validatelogin()
+    {
+        global $_POST, $challenge;
 
-    ## True when JS is disabled
-    if ($_POST["response"] == "") {
-      if (md5($_POST["password"]) != $pass) {       ## md5 hash for non-JavaScript browsers
-        return false;
-      } else {
-        $this->auth["perm"] = $perm;
-        return $uid;
-      }
+        $this->auth["uname"] = $_POST["username"];        ## This provides access for "loginform.ihtml"
+
+        $this->db->query(sprintf("select user_id, perms, password " .
+            "from %s where username = '%s'",
+            $this->database_table,
+            addslashes($_POST["username"])));
+
+        if ($this->db->num_rows() == 0) {
+            return false;
+        }
+
+        while ($this->db->next_record()) {
+            $uid = $this->db->f("user_id");
+            $perm = $this->db->f("perms");
+            $pass = $this->db->f("password");   ## Password is stored as a md5 hash
+        }
+        $expected_response = md5("$_POST[username]:$pass:$challenge");
+
+        ## True when JS is disabled
+        if ($_POST["response"] == "") {
+            if (md5($_POST["password"]) != $pass) {       ## md5 hash for non-JavaScript browsers
+                return false;
+            } else {
+                $this->auth["perm"] = $perm;
+                return $uid;
+            }
+        }
+
+        ## Response is set, JS is enabled
+        if ($expected_response != $_POST["response"]) {
+            return false;
+        } else {
+            $this->auth["perm"] = $perm;
+            return $uid;
+        }
     }
-    
-    ## Response is set, JS is enabled
-    if ($expected_response != $_POST["response"]) {
-      return false;
-    } else {
-      $this->auth["perm"] = $perm;
-      return $uid;
-    }
-  }
 }
 
 ## An example implementation of a Perm subclass, implementing
 ## a few atomic permissions. You want to read up on Permission
 ## schemata design in the documentation.
 
-class Example_Perm extends Perm {
-  var $classname = "Example_Perm";
-  
-  var $permissions = array(
-                            "user"       => 1,
-                            "author"     => 2,
-                            "editor"     => 4,
-                            "supervisor" => 8,
-                            "admin"      => 16
-                          );
+class Example_Perm extends Perm
+{
+    var $classname = "Example_Perm";
 
-  function perm_invalid($does_have, $must_have) {
-    global $perm, $auth, $sess;
-    global $_PHPLIB;
-    
-    include($_PHPLIB["libdir"] . "perminvalid.ihtml");
-  }
+    var $permissions = array(
+        "user" => 1,
+        "author" => 2,
+        "editor" => 4,
+        "supervisor" => 8,
+        "admin" => 16
+    );
+
+    function perm_invalid($does_have, $must_have)
+    {
+        global $perm, $auth, $sess;
+        global $_PHPLIB;
+
+        include($_PHPLIB["libdir"] . "perminvalid.ihtml");
+    }
 }
 
 ##

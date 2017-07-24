@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Quotation table join to user table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJQuotation extends DBEQuotation{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJQuotation(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJQuotation extends DBEQuotation{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("userName", DA_STRING, DA_NOT_NULL, 'cns_name');
  		$this->setAddColumnsOff();

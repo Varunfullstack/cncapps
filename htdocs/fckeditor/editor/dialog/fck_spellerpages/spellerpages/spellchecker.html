@@ -24,7 +24,7 @@ function init_spell( spellerWindow ) {
 
 // encodeForPost
 function encodeForPost( str ) {
-	var s = new String( str );
+	var s = String( str );
 	s = encodeURIComponent( s );
 	// additionally encode single quotes to evade any PHP
 	// magic_quotes_gpc setting (it inserts escape characters and

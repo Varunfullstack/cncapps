@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * User table join to userExt
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJUser extends DBEUser{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJUser(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJUser extends DBEUser{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setAddColumnsOn();
  		$this->addColumn("signatureFilename", DA_STRING, DA_ALLOW_NULL);
  		$this->addColumn("jobTitle", DA_STRING, DA_NOT_NULL);

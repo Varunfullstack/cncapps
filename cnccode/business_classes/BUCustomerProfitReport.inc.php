@@ -1,30 +1,29 @@
 <?php
 /**
-* management reports business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * management reports business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUCustomerProfitReport extends Business{
+class BUCustomerProfitReport extends Business
+{
 
-	function BUCustomerProfitReport( &$owner ){
-		$this->constructor( $owner );
-	}
-	function constructor( &$owner ){
-		parent::constructor( $owner );
-		
-		$this->db = new CNCMysqli( DB_HOST, DB_USER, DB_PASSWORD, DB_NAME );
-	}
-  /**
-  total hours
-  **/
-	function getReport( $startDate, $endDate, $customerID=false  )
-	{
-    $sql =
-      "
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
+
+    /**
+     * total hours
+     **/
+    function getReport($startDate, $endDate, $customerID = false)
+    {
+        $sql =
+            "
       SELECT
       custno,
       customerName,
@@ -64,17 +63,17 @@ class BUCustomerProfitReport extends Business{
         JOIN invhead ON inh_invno = inl_invno
         JOIN customer ON cus_custno = inh_custno
       WHERE
-        inh_date_printed BETWEEN '$startDate' AND '$endDate'";  
+        inh_date_printed BETWEEN '$startDate' AND '$endDate'";
 
-    if ( $customerID ){
-    
-      $sql .= " AND custno = $customerID";
-      
-    }    
+        if ($customerID) {
 
-    $sql .= " GROUP BY custno";
-      
-    $sql .= "
+            $sql .= " AND custno = $customerID";
+
+        }
+
+        $sql .= " GROUP BY custno";
+
+        $sql .= "
     
       UNION
 
@@ -99,15 +98,15 @@ class BUCustomerProfitReport extends Business{
       WHERE
         caa_date BETWEEN '$startDate' AND '$endDate'";
 
-    if ( $customerID ){
-    
-      $sql .= " AND custno = $customerID";
-      
-    }    
+        if ($customerID) {
 
-    $sql .= " GROUP BY custno";
+            $sql .= " AND custno = $customerID";
 
-    $sql .= "
+        }
+
+        $sql .= " GROUP BY custno";
+
+        $sql .= "
 
       UNION
 
@@ -346,18 +345,18 @@ class BUCustomerProfitReport extends Business{
     WHERE custno <> 282
     GROUP BY custno";
 
-    if ( $customerID ){
-      $sql .= "AND cus_custno = $customerID";
-    }
+        if ($customerID) {
+            $sql .= "AND cus_custno = $customerID";
+        }
 
-    return $this->db->query( $sql );
+        return $this->db->query($sql);
 
-  /**
-  total sales
-  **/
-  function getTotalCostAndSales( $startDate, $endDate, $customerID=false  )
-  {
-    $sql ="
+        /**
+         * total sales
+         **/
+        function getTotalCostAndSales($startDate, $endDate, $customerID = false)
+        {
+            $sql = "
       SELECT
         SUM(inl_qty * inl_cost_price) as Cost,
         SUM(inl_qty * inl_unit_price) as Sale
@@ -366,34 +365,34 @@ class BUCustomerProfitReport extends Business{
         JOIN invhead ON inh_invno = inl_invno
       WHERE
         caa_date BETWEEN '$startDate' AND '$endDate'";
-    
-    if ( $customerID ){
-      $sql .= " AND caa_custno = $customerID";
-    }
-    
-    return $this->db->query( $sql );
 
-  }
+            if ($customerID) {
+                $sql .= " AND caa_custno = $customerID";
+            }
 
-	function getSpendByCategory( $year = false )
-	{
-		if ( !$year ){
-			$year = date( 'Y' );
-		}
-		
-		$sql = 
-			"
+            return $this->db->query($sql);
+
+        }
+
+        function getSpendByCategory($year = false)
+        {
+            if (!$year) {
+                $year = date('Y');
+            }
+
+            $sql =
+                "
 			SELECT
 				stc_desc AS category,
 				stc_stockcat As `code` ";
-		
-		for ($month = 1; $month <= 12; $month++ ){
-			
-			$sql .= $this->buildSpendByManufacturerSegment( $month );
-		
-		}
 
-		$sql .= "		
+            for ($month = 1; $month <= 12; $month++) {
+
+                $sql .= $this->buildSpendByManufacturerSegment($month);
+
+            }
+
+            $sql .= "		
 			FROM
 				porline
 				JOIN porhead ON poh_porno = pol_porno
@@ -407,27 +406,28 @@ class BUCustomerProfitReport extends Business{
 				stc_desc
 			;";
 
-		return $this->db->query( $sql );
-		
-	}
-	function getSpendBySupplier( $supplierID = false, $year = false )
-	{
-		if ( !$year ){
-			$year = date( 'Y' );
-		}
-		
-		$sql = 
-			"
+            return $this->db->query($sql);
+
+        }
+
+        function getSpendBySupplier($supplierID = false, $year = false)
+        {
+            if (!$year) {
+                $year = date('Y');
+            }
+
+            $sql =
+                "
 			SELECT
 				supplier.sup_name AS supplier ";
-		
-		for ($month = 1; $month <= 12; $month++ ){
-			
-			$sql .= $this->buildSpendByManufacturerSegment( $month );
-		
-		}
 
-		$sql .= "		
+            for ($month = 1; $month <= 12; $month++) {
+
+                $sql .= $this->buildSpendByManufacturerSegment($month);
+
+            }
+
+            $sql .= "		
 			FROM
 				porline
 				JOIN porhead ON poh_porno = pol_porno
@@ -438,24 +438,25 @@ class BUCustomerProfitReport extends Business{
 				YEAR(poh_date) = '$year'
 				AND poh_type = 'A'
 				AND pol_qty_ord * pol_cost > 0";
-				
-		if ( $supplierID ){
-			$sql .= "
-				AND sup_suppno = $supplierID";
-		}
 
-		$sql .= "
+            if ($supplierID) {
+                $sql .= "
+				AND sup_suppno = $supplierID";
+            }
+
+            $sql .= "
 			GROUP BY
 				sup_suppno
 			ORDER BY
 				sup_name;";
 
-		return $this->db->query( $sql );
-		
-	}
-	function buildSpendByManufacturerSegment( $month )
-	{
-		$return ="
+            return $this->db->query($sql);
+
+        }
+
+        function buildSpendByManufacturerSegment($month)
+        {
+            $return = "
 			,SUM(
 				if (
 					MONTH( poh_date ) = $month,
@@ -464,17 +465,17 @@ class BUCustomerProfitReport extends Business{
 				)
 			)as `month$month`";
 
-		return $return;
-	}
-	
-	function getSalesByCustomer( $customerID = false, $year = false )
-	{
-		if ( !$year ){
-			$year = date( 'Y' );
-		}
-		
-		$sql = 
-			"
+            return $return;
+        }
+
+        function getSalesByCustomer($customerID = false, $year = false)
+        {
+            if (!$year) {
+                $year = date('Y');
+            }
+
+            $sql =
+                "
 		SELECT
 			*,
 			salesMonth1 + salesMonth2 + salesMonth3 + salesMonth4 + salesMonth5 +salesMonth6 +salesMonth7 +salesMonth8 +salesMonth9 +salesMonth10 + salesMonth11 + salesMonth12  AS salesTotal,
@@ -484,13 +485,13 @@ class BUCustomerProfitReport extends Business{
 			SELECT
 				cus_name AS customer";
 
-		for ($month = 1; $month <= 12; $month++ ){
-		
-			$sql .= $this->buildSalesByCustomerSegment( $month );
-	
-		}
-				
-		$sql .= "
+            for ($month = 1; $month <= 12; $month++) {
+
+                $sql .= $this->buildSalesByCustomerSegment($month);
+
+            }
+
+            $sql .= "
 			FROM
 				invline
 				JOIN invhead ON inh_invno = inl_invno
@@ -499,14 +500,14 @@ class BUCustomerProfitReport extends Business{
 				YEAR(inh_date_printed) = '$year'
 				AND inl_qty * inl_unit_price > 0
 				AND inl_line_type = 'I'";
-				
-					
-			if ( $customerID ){
-				$sql .= "
+
+
+            if ($customerID) {
+                $sql .= "
 					AND cus_custno = $customerID ";
-			}
-	
-			$sql .= "
+            }
+
+            $sql .= "
 				GROUP BY
 					inh_custno
 				ORDER BY
@@ -514,12 +515,13 @@ class BUCustomerProfitReport extends Business{
 			)  AS temp
 			ORDER BY profitTotal DESC;";
 
-			return $this->db->query( $sql );
-		
-	}
-	function buildSalesByCustomerSegment( $month )
-	{
-		$return ="
+            return $this->db->query($sql);
+
+        }
+
+        function buildSalesByCustomerSegment($month)
+        {
+            $return = "
 			,SUM(
 				if (
 					MONTH( inh_date_printed ) = $month,
@@ -534,9 +536,9 @@ class BUCustomerProfitReport extends Business{
 					0
 				)
 			)as `profitMonth$month`";
-			
-		return $return;
-	}
-	
-}// End of class
+
+            return $return;
+        }
+
+    }// End of class
 ?>

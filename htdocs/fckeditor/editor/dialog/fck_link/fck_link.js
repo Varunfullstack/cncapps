@@ -56,7 +56,7 @@ function OnDialogTabChange( tabCode )
 }
 
 //#### Regular Expressions library.
-var oRegex = new Object() ;
+var oRegex = {} ;
 
 oRegex.UriProtocol = /^(((http|https|ftp|news):\/\/)|mailto:)/gi ;
 
@@ -75,19 +75,19 @@ oRegex.PopupFeatures = /(?:^|,)([^=]+)=(\d+|yes|no)/gi ;
 
 //#### Parser Functions
 
-var oParser = new Object() ;
+var oParser = {} ;
 
 // This method simply returns the two inputs in numerical order. You can even
 // provide strings, as the method would parseInt() the values.
 oParser.SortNumerical = function(a, b)
 {
 	return parseInt( a, 10 ) - parseInt( b, 10 ) ;
-}
+};
 
 oParser.ParseEMailParams = function(sParams)
 {
 	// Initialize the oEMailParams object.
-	var oEMailParams = new Object() ;
+	var oEMailParams = {} ;
 	oEMailParams.Subject = '' ;
 	oEMailParams.Body = '' ;
 
@@ -98,14 +98,14 @@ oParser.ParseEMailParams = function(sParams)
 	if ( aMatch ) oEMailParams.Body = decodeURIComponent( aMatch[2] ) ;
 
 	return oEMailParams ;
-}
+};
 
 // This method returns either an object containing the email info, or FALSE
 // if the parameter is not an email link.
 oParser.ParseEMailUri = function( sUrl )
 {
 	// Initializes the EMailInfo object.
-	var oEMailInfo = new Object() ;
+	var oEMailInfo = {} ;
 	oEMailInfo.Address = '' ;
 	oEMailInfo.Subject = '' ;
 	oEMailInfo.Body = '' ;
@@ -144,12 +144,12 @@ oParser.ParseEMailUri = function( sUrl )
 				func = func.replace( /([\/^$*+.?()\[\]])/g, '\\$1' ) ;
 
 				// Define the possible keys.
-				var keys = new Array('NAME', 'DOMAIN', 'SUBJECT', 'BODY') ;
+				var keys = ['NAME', 'DOMAIN', 'SUBJECT', 'BODY'] ;
 
 				// Get the order of the keys (hold them in the array <pos>) and
 				// the function replaced by regular expression patterns.
 				var sFunc = func ;
-				var pos = new Array() ;
+				var pos = [] ;
 				for ( var i = 0 ; i < keys.length ; i ++ )
 				{
 					var rexp = new RegExp( keys[i] ) ;
@@ -173,7 +173,7 @@ oParser.ParseEMailUri = function( sUrl )
 				var aMatch = rFunc.exec( aLinkInfo[2] ) ;
 				if ( aMatch )
 				{
-					var aInfo = new Array();
+					var aInfo = [];
 					for ( var i = 1 ; i < aMatch.length ; i ++ )
 					{
 						var k = pos[i-1].match(/^\d+:(.+)$/) ;
@@ -209,7 +209,7 @@ oParser.ParseEMailUri = function( sUrl )
 		}
 	}
 	return false;
-}
+};
 
 oParser.CreateEMailUri = function( address, subject, body )
 {
@@ -272,7 +272,7 @@ oParser.CreateEMailUri = function( address, subject, body )
 	}
 
 	return sBaseUri + sParams ;
-}
+};
 
 //#### Initialization Code
 
@@ -326,7 +326,7 @@ window.onload = function()
 			else
 				SelectField( 'cmbLinkType' ) ;
 	}
-}
+};
 
 var bHasAnchors ;
 
@@ -334,7 +334,7 @@ function LoadAnchorNamesAndIds()
 {
 	// Since version 2.0, the anchors are replaced in the DOM by IMGs so the user see the icon
 	// to edit them. So, we must look for that images now.
-	var aAnchors = new Array() ;
+	var aAnchors = [] ;
 	var i ;
 	var oImages = oEditor.FCK.EditorDocument.getElementsByTagName( 'IMG' ) ;
 	for( i = 0 ; i < oImages.length ; i++ )
@@ -602,7 +602,7 @@ function FillPopupFields( windowName, features )
 	if ( windowName )
 		GetE('txtPopupName').value = windowName ;
 
-	var oFeatures = new Object() ;
+	var oFeatures = {} ;
 	var oFeaturesMatch ;
 	while( ( oFeaturesMatch = oRegex.PopupFeatures.exec( features ) ) != null )
 	{

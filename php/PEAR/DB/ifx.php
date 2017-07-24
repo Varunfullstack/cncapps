@@ -171,9 +171,9 @@ class DB_ifx extends DB_common
      *
      * @return void
      */
-    function DB_ifx()
+    function __construct()
     {
-        $this->DB_common();
+        DB_common::__construct();
     }
 
     // }}}

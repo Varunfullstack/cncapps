@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Ordline to supplier join
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJOrdline extends DBEOrdline{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJOrdline(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJOrdline extends DBEOrdline{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("supplierName", DA_STRING, DA_ALLOW_NULL, "sup_name");
  		$this->addColumn("webSiteURL", DA_STRING, DA_ALLOW_NULL, "sup_web_site_url");

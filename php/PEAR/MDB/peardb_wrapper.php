@@ -187,13 +187,13 @@ class DB
  */
 class DB_Error extends PEAR_Error
 {
-    function DB_Error($code = DB_ERROR, $mode = PEAR_ERROR_RETURN,
-              $level = E_USER_NOTICE, $debuginfo = NULL)
+    function __construct($code = DB_ERROR, $mode = PEAR_ERROR_RETURN,
+                         $level = E_USER_NOTICE, $debuginfo = NULL)
     {
         if (is_int($code)) {
-            $this->PEAR_Error('DB Error: ' . DB::errorMessage($code), $code, $mode, $level, $debuginfo);
+            PEAR_Error::__construct('DB Error: ' . DB::errorMessage($code), $code, $mode, $level, $debuginfo);
         } else {
-            $this->PEAR_Error("DB Error: $code", DB_ERROR, $mode, $level, $debuginfo);
+            PEAR_Error::__construct("DB Error: $code", DB_ERROR, $mode, $level, $debuginfo);
         }
     }
 }
@@ -215,7 +215,7 @@ class DB_result
 
     var $limit_count = NULL;
 
-    function DB_result(&$dbh, $result)
+    function __construct(&$dbh, $result)
     {
         $this->dbh = &$dbh;
         $this->result = $result;
@@ -282,7 +282,7 @@ class DB_result
 
 class DB_row
 {
-    function DB_row(&$arr)
+    function __construct(&$arr)
     {
         for (reset($arr); $key = key($arr); next($arr)) {
             $this->$key = &$arr[$key];
@@ -294,7 +294,7 @@ class MDB_PEAR_PROXY
 {
     var $MDB_object;
 
-    function MDB_PEAR_PROXY($MDB_object)
+    function __construct($MDB_object)
     {
         $this->MDB_object = $MDB_object;
         $this->MDB_object->option['sequence_col_name'] = 'id';

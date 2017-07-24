@@ -1372,7 +1372,7 @@ class metabase_manager_class
         'TABLES' => array()
     );
 
-    function metabase_manager_class()
+    function __construct()
     {
         $this->MDB_manager_object =& new MDB_Manager;
         $this->MDB_manager_object->fail_on_invalid_names =& $this->fail_on_invalid_names;

@@ -31,13 +31,13 @@ class Template_PHPLIB
      * If set, echo assignments
      * @var bool
      */
-    var $debug     = false;
+    var $debug = false;
 
     /**
      * $file[handle] = "filename";
      * @var array
      */
-    var $file  = array();
+    var $file = array();
 
     /**
      * fallback paths that should be defined in a child class
@@ -49,14 +49,14 @@ class Template_PHPLIB
      * Relative filenames are relative to this pathname
      * @var string
      */
-    var $root   = "";
+    var $root = "";
 
     /*
      * $_varKeys[key] = "key"
      * @var array
      */
     var $_varKeys = array();
-    
+
     /**
      * $_varVals[key] = "value";
      * @var array
@@ -70,19 +70,19 @@ class Template_PHPLIB
      * @var string
      */
     var $unknowns = "remove";
-  
+
     /**
      * "yes" => halt, "report" => report error, continue, "no" => ignore error quietly
      * @var string
      */
-    var $haltOnError  = "report";
-  
+    var $haltOnError = "report";
+
     /**
      * The last error message is retained here
      * @var string
      * @see halt
      */
-    var $_lastError     = "";
+    var $_lastError = "";
 
 
     /**
@@ -93,7 +93,7 @@ class Template_PHPLIB
      * @param  string how to handle unknown variables
      * @param  array fallback paths
      */
-    function Template_PHPLIB($root = ".", $unknowns = "remove", $fallback="")
+    function __construct($root = ".", $unknowns = "remove", $fallback = "")
     {
         $this->setRoot($root);
         $this->setUnknowns($unknowns);
@@ -113,9 +113,9 @@ class Template_PHPLIB
             $this->halt("setRoot: $root is not a directory.");
             return false;
         }
-    
+
         $this->root = $root;
-    
+
         return true;
     }
 
@@ -155,16 +155,16 @@ class Template_PHPLIB
     function setFile($handle, $filename = "")
     {
         if (!is_array($handle)) {
-    
+
             if ($filename == "") {
                 $this->halt("setFile: For handle $handle filename is empty.");
                 return false;
             }
-      
+
             $this->file[$handle] = $this->_filename($filename);
-      
+
         } else {
-    
+
             reset($handle);
             while (list($h, $f) = each($handle)) {
                 $this->file[$h] = $this->_filename($f);
@@ -199,7 +199,7 @@ class Template_PHPLIB
             $this->halt("setBlock: unable to load $parent.");
             return false;
         }
-    
+
         if ($name == "") {
             $name = $handle;
         }
@@ -260,7 +260,7 @@ class Template_PHPLIB
 
         return @str_replace($this->_varKeys, $this->_varVals, $this->getVar($handle));
     }
-  
+
     /**
      * Same as subst but printing the result
      *
@@ -321,7 +321,7 @@ class Template_PHPLIB
         print $this->finish($this->parse($target, $handle, $append));
         return false;
     }
-  
+
     /**
      * Return all defined variables and their values
      *
@@ -332,7 +332,7 @@ class Template_PHPLIB
     {
         reset($this->_varKeys);
 
-        while (list($k, ) = each($this->_varKeys)) {
+        while (list($k,) = each($this->_varKeys)) {
             $result[$k] = $this->getVar($k);
         }
 
@@ -342,7 +342,7 @@ class Template_PHPLIB
     /**
      * Return one or more specific variable(s) with their values.
      *
-     * @access public    
+     * @access public
      * @param  mixed array with variable names or one variable name as a string
      * @return mixed array of variable names with their values or value of one specific variable
      */
@@ -356,15 +356,15 @@ class Template_PHPLIB
             }
         } else {
             reset($varname);
-    
-            while (list($k, ) = each($varname)) {
+
+            while (list($k,) = each($varname)) {
                 $result[$k] = (isset($this->_varVals[$k])) ? $this->_varVals[$k] : "";
             }
 
             return $result;
         }
     }
-  
+
     /**
      * Get undefined values of a handle
      *
@@ -378,7 +378,7 @@ class Template_PHPLIB
             $this->halt("getUndefined: unable to load $handle.");
             return false;
         }
-    
+
         preg_match_all("/{([^ \t\r\n}]+)}/", $this->getVar($handle), $m);
         $m = $m[1];
         if (!is_array($m)) {
@@ -391,7 +391,7 @@ class Template_PHPLIB
                 $result[$v] = $v;
             }
         }
-    
+
         if (isset($result) && count($result)) {
             return $result;
         } else {
@@ -456,19 +456,19 @@ class Template_PHPLIB
     function _filename($filename)
     {
         if (substr($filename, 0, 1) != "/") {
-            $filename = $this->root."/".$filename;
+            $filename = $this->root . "/" . $filename;
         }
 
         if (file_exists($filename)) return $filename;
         if (is_array($this->file_fallbacks) && count($this->file_fallbacks) > 0) {
             reset($this->file_fallbacks);
-            while (list(,$v) = each($this->file_fallbacks)) {
-                if (file_exists($v.basename($filename))) return $v.basename($filename);
+            while (list(, $v) = each($this->file_fallbacks)) {
+                if (file_exists($v . basename($filename))) return $v . basename($filename);
             }
-            $this->halt(sprintf("filename: file %s does not exist in the fallback paths %s.",$filename,implode(",",$this->file_fallbacks)));
+            $this->halt(sprintf("filename: file %s does not exist in the fallback paths %s.", $filename, implode(",", $this->file_fallbacks)));
             return false;
         } else {
-            $this->halt(sprintf("filename: file %s does not exist.",$filename));
+            $this->halt(sprintf("filename: file %s does not exist.", $filename));
             return false;
         }
 
@@ -484,7 +484,7 @@ class Template_PHPLIB
      */
     function _varname($varname)
     {
-        return "{".$varname."}";
+        return "{" . $varname . "}";
     }
 
     /**
@@ -509,16 +509,16 @@ class Template_PHPLIB
         if (function_exists("file_get_contents")) {
             $str = file_get_contents($filename);
         } else {
-            if (!$fp = @fopen($filename,"r")) {
+            if (!$fp = @fopen($filename, "r")) {
                 $this->halt("loadfile: couldn't open $filename");
                 return false;
             }
 
-            $str = fread($fp,filesize($filename));
+            $str = fread($fp, filesize($filename));
             fclose($fp);
         }
 
-        if ($str=='') {
+        if ($str == '') {
             $this->halt("loadfile: While loading $handle, $filename does not exist or is empty.");
             return false;
         }
@@ -545,7 +545,7 @@ class Template_PHPLIB
 
         return false;
     }
-  
+
     /**
      * printf error message to show
      *
@@ -558,4 +558,5 @@ class Template_PHPLIB
         PEAR::raiseError(sprintf("<b>Template Error:</b> %s<br>\n", $msg));
     }
 }
+
 ?>

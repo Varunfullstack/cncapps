@@ -76,18 +76,11 @@ class CTCustomer extends CTCNC
         "12" => "Annually"
     );
 
-    function CTCustomer($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-    }
-
-    function constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-//    $this->Controller($requestMethod,  $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
-        parent::constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
-//    $this->dsContact->setIgnoreNULLOn();
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
         $this->dsContact->addColumn('FirstNameClass', DA_STRING, DA_ALLOW_NULL);
         $this->dsContact->addColumn('LastNameClass', DA_STRING, DA_ALLOW_NULL);

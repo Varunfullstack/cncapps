@@ -16,13 +16,13 @@ function wordWindow() {
 	// public properties
 	this.wordChar = /[a-zA-Z]/;
 	this.windowType = "wordWindow";
-	this.originalSpellings = new Array();
-	this.suggestions = new Array();
+	this.originalSpellings = [];
+	this.suggestions = [];
 	this.checkWordBgColor = "pink";
 	this.normWordBgColor = "white";
 	this.text = "";
-	this.textInputs = new Array();
-	this.indexes = new Array();
+	this.textInputs = [];
+	this.indexes = [];
 	//this.speller = this._getSpellerObject();
 
 	// public methods

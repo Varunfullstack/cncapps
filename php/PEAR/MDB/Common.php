@@ -293,7 +293,7 @@ class MDB_Common extends PEAR
     /**
      * Constructor
      */
-    function MDB_Common()
+    function __construct()
     {
         $database = count($GLOBALS['_MDB_databases']) + 1;
         $GLOBALS['_MDB_databases'][$database] = &$this;

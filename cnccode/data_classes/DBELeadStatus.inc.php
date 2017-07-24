@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Customer type table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBELeadStatus extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEleadStatus(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBELeadStatus extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("leadstatus");
  		$this->addColumn("leadStatusID", DA_ID, DA_NOT_NULL, "lst_leadstatusno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "lst_desc");

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Site table
 * NOTE: There are all sorts of workarounds for the fact that there is not a single
 * primary key column. The primary key is composite customerID and siteNo
@@ -15,7 +14,7 @@ class DBESite extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESite(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -25,7 +24,7 @@ class DBESite extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Address");
  		$this->addColumn("customerID", DA_ID, DA_NOT_NULL, "add_custno");
  		$this->addColumn("siteNo", DA_ID, DA_ALLOW_NULL, "add_siteno");
@@ -189,7 +188,7 @@ class DBEJSite extends DBESite {
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJSite(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -199,7 +198,7 @@ class DBEJSite extends DBESite {
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
 		$this->addColumn("invContactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(icontact.con_first_name,' ',icontact.con_last_name)");
 		$this->addColumn("delContactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(dcontact.con_first_name,' ',dcontact.con_last_name)");

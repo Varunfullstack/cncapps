@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Site table
 * NOTE: There are all sorts of workarounds for the fact that there is not a single
 * primary key column. The primary key is composite customerID and siteNo
@@ -15,7 +14,7 @@ class DBESite extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESite(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -25,7 +24,7 @@ class DBESite extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Address");
  		$this->addColumn("CustomerID", DA_ID, DA_NOT_NULL, "add_custno");
  		$this->addColumn("SiteNo", DA_ID, DA_ALLOW_NULL, "add_siteno");

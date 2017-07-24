@@ -1,33 +1,32 @@
 <?php
 /**
-* Customer Sales report business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * Customer Sales report business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUTechnicalReport extends Business{
+class BUTechnicalReport extends Business
+{
 
-	/**
-	* Constructor
-	* @access Public
-	*/
-	function BUTechnicalReport(&$owner){
-		$this->constructor($owner);
-	}
-	function constructor(&$owner){
-		parent::constructor($owner);
-		
-		$this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-	}
-	
+    /**
+     * Constructor
+     * @access Public
+     * @param $owner
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
 
-	function getImmediateProblemFixCountByTechnician()
-	{
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
 
-		$sql = "
+    function getImmediateProblemFixCountByTechnician()
+    {
+
+        $sql = "
 			SELECT
 				cns_name AS `Technician`
 				COUNT(*) AS rowCount
@@ -39,12 +38,12 @@ class BUTechnicalReport extends Business{
 			        
 			WHERE
 				MONTH(caa_date) = MONTH( CURDATE() )
-				and YEAR(caa_date) = YEAR( CURDATE() )
+				AND YEAR(caa_date) = YEAR( CURDATE() )
 			        
 			GROUP BY cns_consno";
-			
-		return $this->db->query( $sql )->fetch_object()->report;
-		
-	}
+
+        return $this->db->query($sql)->fetch_object()->report;
+
+    }
 }// End of class
 ?>

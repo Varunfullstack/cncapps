@@ -84,9 +84,9 @@ class MDB_fbsql extends MDB_Common
     /**
     * Constructor
     */
-    function MDB_fbsql()
+    function __construct()
     {
-        $this->MDB_Common();
+        MDB_Common::__construct();
         $this->phptype = 'fbsql';
         $this->dbsyntax = 'fbsql';
         

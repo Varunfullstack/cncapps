@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Call activity table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEExpense extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEExpense(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEExpense extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("expense");
  		$this->addColumn("expenseID", DA_ID, DA_NOT_NULL, "exp_expenseno");
  		$this->addColumn("expenseTypeID", DA_ID, DA_NOT_NULL, "exp_expensetypeno");
@@ -49,7 +48,7 @@ class DBEJExpense extends DBEExpense{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJExpense(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -59,7 +58,7 @@ class DBEJExpense extends DBEExpense{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("expenseType", DA_STRING, DA_ALLOW_NULL, "ext_desc");		
  		$this->addColumn("userID", DA_ID, DA_ALLOW_NULL, "caa_consno");		

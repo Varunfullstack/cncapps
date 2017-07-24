@@ -1,5 +1,4 @@
-<?
-/**
+<?php /**
 * Replication from SCO UNIX DB text files to mySQL database tables.
 *
 * Replaces LINUX scripts named CopyFilesFromSCO.sh and CopyFilesFromSCO.sql and makes it OS independent

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Invhead table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEInvhead extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEInvhead(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEInvhead extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("invhead");
  		$this->addColumn("invheadID", DA_ID, DA_NOT_NULL, "inh_invno");
  		$this->addColumn("customerID", DA_ID, DA_NOT_NULL, "inh_custno");

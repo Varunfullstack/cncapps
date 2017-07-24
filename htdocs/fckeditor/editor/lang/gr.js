@@ -445,4 +445,4 @@ DlgAboutBrowserInfoTab	: "Browser Info",	//MISSING
 DlgAboutVersion		: "έκδοση",
 DlgAboutLicense		: "Άδεια χρήσης υπό τους όρους της GNU Lesser General Public License",
 DlgAboutInfo		: "Για περισσότερες πληροφορίες"
-}
+};

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Customer Item join
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJCustomerItem extends DBECustomerItem{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJCustomerItem(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJCustomerItem extends DBECustomerItem{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
  		$this->addColumn("siteDescription", DA_STRING, DA_ALLOW_NULL, "CONCAT_WS(', ', add_add1, add_town, add_postcode)");

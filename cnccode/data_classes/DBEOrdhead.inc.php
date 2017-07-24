@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Ordhead table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEOrdhead extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEOrdhead(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEOrdhead extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Ordhead");
  		$this->addColumn("ordheadID", DA_ID, DA_NOT_NULL, "odh_ordno");
  		$this->addColumn("customerID", DA_ID, DA_NOT_NULL, "odh_custno");

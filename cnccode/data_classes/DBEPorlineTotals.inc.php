@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Porline totals query
 * returns count of OS values by order
 * @authors Karim Ahmed
@@ -14,7 +13,7 @@ class DBEPorlineTotals extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPorlineTotals(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -24,7 +23,7 @@ class DBEPorlineTotals extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Porline");
  		$this->addColumn("porheadID", DA_ID, DA_NOT_NULL, "pol_porno");
  		$this->addColumn("qtyOrdered", DA_FLOAT, DA_NOT_NULL, "SUM(pol_qty_ord)");

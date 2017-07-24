@@ -1,12 +1,11 @@
-<?
-/*
+<?php /*
 * Renewal Domain table
 * @authors Karim Ahmed
 * @access public
 */
 require_once($cfg["path_dbe"]."/DBECustomerItem.inc.php");
 class DBEJRenDomain extends DBECustomerItem{
-	function DBEJRenDomain(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -16,7 +15,7 @@ class DBEJRenDomain extends DBECustomerItem{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("customerName", DA_STRING, DA_NOT_NULL, "cus_name");
     $this->addColumn("siteName", DA_STRING, DA_NOT_NULL, "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)");

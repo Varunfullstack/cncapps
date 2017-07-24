@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Porline table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPorline extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPorline(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEPorline extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Porline");
  		$this->addColumn("porheadID", DA_ID, DA_NOT_NULL, "pol_porno");
  		$this->addColumn("sequenceNo", DA_INTEGER, DA_NOT_NULL, "pol_lineno");

@@ -69,7 +69,7 @@ $('table').sortableTable('destroy')   - removes all events from the table
 			/* Mouse handlers on the child elements */
 			var onMouseUp = function(e) { 
 				dropAt(e.pageX, e.pageY); 
-			}
+			};
 			
 			var onMouseDown = function(e) {
 				$draggedEl = $(this).children();
@@ -84,7 +84,7 @@ $('table').sortableTable('destroy')   - removes all events from the table
 					options.events.start(this);
 
 				return false;
-			}
+			};
 			
 			var globalMouseMove = function(e) {
 				if(down) {
@@ -114,7 +114,7 @@ $('table').sortableTable('destroy')   - removes all events from the table
 				}
 				
 				return false;
-			}
+			};
 			
 			var globalMouseOut = function() {
 				if(down) {
@@ -123,7 +123,7 @@ $('table').sortableTable('destroy')   - removes all events from the table
 					moveTo($draggedEl);
 					previewMove = null;
 				}
-			}
+			};
 			
 			// Initialize sortable table
 			this.init = function() {
@@ -141,13 +141,13 @@ $('table').sortableTable('destroy')   - removes all events from the table
 
 				$(document).mousemove(globalMouseMove);
 				$(document).bind('mouseleave', globalMouseOut);
-			}
+			};
 			
 			// Call this when the table has been updated
 			this.refresh = function() {
 				this.destroy();
 				this.init();
-			}
+			};
 			
 			this.destroy = function() {
 				// Add some required css to each child element in the <td>s
@@ -157,12 +157,12 @@ $('table').sortableTable('destroy')   - removes all events from the table
 				});
 				
 				// Mouse events
-				$(table).find('td').unbind('mouseup',onMouseUp)
+				$(table).find('td').unbind('mouseup',onMouseUp);
 				$(table).find('td').unbind('mousedown',onMouseDown);
 					
 				$(document).unbind('mousemove',globalMouseMove);
 				$(document).unbind('mouseleave',globalMouseOut);
-			}
+			};
 			
 			function switchElement(drag, dropTo) {
 				var dragPosDiff = { 
@@ -236,7 +236,7 @@ $('table').sortableTable('destroy')   - removes all events from the table
 					if($(this).children().first().attr('class') != $(oldCell).children().first().attr('class') && inside($(this), x, y)) {
 						switchElement(oldCell, this);
 						switched = true;
-						return;
+						
 					}
 				});
 

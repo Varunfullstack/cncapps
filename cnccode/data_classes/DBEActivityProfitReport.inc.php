@@ -4,90 +4,83 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
-require_once($cfg["path_bu"]."/BUHeader.inc.php");
-class DBEActivityProfitReport extends DBEntity{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function DBEActivityProfitReport(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::constructor($owner);
-		$this->setTableName("callactivity");
-		$this->addColumn("ActivityID", DA_ID, DA_ALLOW_NULL);
-		$this->addColumn("Date", DA_DATE, DA_ALLOW_NULL);
- 		$this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
- 		$this->addColumn("PPHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("PPCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("TMHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("TMCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCCharge", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDPaid", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCPaid", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("TotalHours", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SDProRata", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SCProRata", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("SalesProfit", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("CncCost", DA_DECIMAL, DA_ALLOW_NULL);
- 		$this->addColumn("ServiceProfit", DA_DECIMAL, DA_ALLOW_NULL);
-		$this->setPK(0);
- 		$this->setAddColumnsOff();
-	}
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
+class DBEActivityProfitReport extends DBEntity
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @return void
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setTableName("callactivity");
+        $this->addColumn("ActivityID", DA_ID, DA_ALLOW_NULL);
+        $this->addColumn("Date", DA_DATE, DA_ALLOW_NULL);
+        $this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
+        $this->addColumn("PPHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("PPCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("TMHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("TMCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCCharge", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDPaid", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCPaid", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("TotalHours", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SDProRata", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SCProRata", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("SalesProfit", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("CncCost", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn("ServiceProfit", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->setPK(0);
+        $this->setAddColumnsOff();
+    }
 
-	function getRowsBySearchCriteria(
-			$customerID,
-			$fromDate,
-			$toDate,
-			$officeStartTime,
-			$officeEndTime,
-			$drill = false
-		)
-	{
+    function getRowsBySearchCriteria(
+        $customerID,
+        $fromDate,
+        $toDate,
+        $officeStartTime,
+        $officeEndTime,
+        $drill = false
+    )
+    {
 
- 		$this->setMethodName('getRowsBySearchCriteria');
+        $this->setMethodName('getRowsBySearchCriteria');
 
-    $buHeader = new BUHeader ( $this );
-    $buHeader->getHeader ( $dsHeader );
-/*
-Returns a column for normal and overtime activity hours for each contract type
+        $buHeader = new BUHeader ($this);
+        $buHeader->getHeader($dsHeader);
+        /*
+        Returns a column for normal and overtime activity hours for each contract type
 
-Diagram of different cases catered cncp1for in query:
+        Diagram of different cases catered cncp1for in query:
 
-CASE	OT	|NT		|OT
+        CASE	OT	|NT		|OT
 
-1	--------|		|
-2		|		|--------
-3	    ----|---		|
-4		|---------------|
-5		|		|
-6	--------|---------------|--------
-7		|	    ----|----
+        1	--------|		|
+        2		|		|--------
+        3	    ----|---		|
+        4		|---------------|
+        5		|		|
+        6	--------|---------------|--------
+        7		|	    ----|----
 
-*/
+        */
 
-/* use a derived table to do calculations on result */
-$query =
-"select
+        /* use a derived table to do calculations on result */
+        $query =
+            "select
 	*,
-	truncate( " . $dsHeader->getValue( 'hourlyLabourCost') . " * `TotalHours`, 2 ) AS `CnCCost`,
-	truncate( `PPCharge` + `TMCharge` + `SDProRata` + `SCProRata` -  (" . $dsHeader->getValue( 'hourlyLabourCost') . " * `TotalHours`), 2 )  AS `ServiceProfit`
+	truncate( " . $dsHeader->getValue('hourlyLabourCost') . " * `TotalHours`, 2 ) AS `CnCCost`,
+	truncate( `PPCharge` + `TMCharge` + `SDProRata` + `SCProRata` -  (" . $dsHeader->getValue('hourlyLabourCost') . " * `TotalHours`), 2 )  AS `ServiceProfit`
 from(
 select
 	*,
@@ -133,13 +126,12 @@ select
 	/* Overtime column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				contractitem.itm_desc LIKE '%Pre-pay%' AND
@@ -172,13 +164,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				contractitem.itm_desc LIKE '%Pre-pay%' AND
@@ -218,13 +209,12 @@ else{
 	/* Pre pay Normal time column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				contractitem.itm_desc LIKE '%Pre-pay%' AND
@@ -272,13 +262,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				contractitem.itm_desc LIKE '%Pre-pay%' AND
@@ -331,13 +320,12 @@ else{
 	/* SD Overtime column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServiceDesk' AND
@@ -370,13 +358,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServiceDesk' AND
@@ -416,13 +403,12 @@ else{
 	/* Normal time column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServiceDesk%' AND
@@ -470,13 +456,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServiceDesk%' AND
@@ -529,13 +514,12 @@ else{
 	/* SC Overtime column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServerCare' AND
@@ -568,13 +552,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServerCare' AND
@@ -614,13 +597,12 @@ else{
 	/* Normal time column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServerCare%' AND
@@ -667,13 +649,12 @@ else{
 	AS `SC NT`,
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				contractitem.itm_desc LIKE '%ServerCare%' AND
@@ -726,13 +707,12 @@ else{
 	/* T&M Overtime column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				pro_contract_cuino = 0 AND
@@ -765,13 +745,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 1 & 2: starting and ending ouside NT
 			if ( 
 				pro_contract_cuino = 0 AND
@@ -811,13 +790,12 @@ else{
 	/* T&M Normal time column */
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				pro_contract_cuino = 0 AND
@@ -865,13 +843,12 @@ else{
 
 	truncate(
 		";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "
 			# 4: activity starts and ends inside NT
 			if ( 
 				pro_contract_cuino = 0 AND
@@ -924,13 +901,12 @@ else{
 	IFNULL(
 		(SELECT
 			";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "custitem.cui_sale_price)
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "custitem.cui_sale_price)
 		FROM
 			custitem
 			JOIN item ON itm_itemno = cui_itemno
@@ -947,13 +923,12 @@ else{
 	IFNULL(
 		(SELECT
 			";
-if ( $drill ){
-  $query .=  "(";
-}
-else{
-	$query .= "SUM(";
-}
-	$query .= "custitem.cui_sale_price)
+        if ($drill) {
+            $query .= "(";
+        } else {
+            $query .= "SUM(";
+        }
+        $query .= "custitem.cui_sale_price)
 		FROM
 			custitem
 			JOIN item ON itm_itemno = cui_itemno
@@ -977,39 +952,40 @@ else{
 	JOIN item AS activityitem ON callacttype.cat_itemno = activityitem.itm_itemno
 WHERE
 	caa_date BETWEEN '$fromDate' AND '$toDate'";
-					
-			if ( $customerID ){
-				
-				$query .= " AND caa_custno = $customerID";
 
-			}
-			if ( !$drill ){
-			
-				$query .=				
-	
-				"	GROUP BY
+        if ($customerID) {
+
+            $query .= " AND caa_custno = $customerID";
+
+        }
+        if (!$drill) {
+
+            $query .=
+
+                "	GROUP BY
 					caa_custno";
-			}
+        }
 
-			$query .=	
+        $query .=
 
-			") as temp
+            ") as temp
 
 			) as temp1";
 
-			if ( !$drill ){
-				$query .=				
-					" GROUP BY CustomerID";
-			}
-			
-			$query .=				
-			") as temp2 ORDER BY `SalesProfit` DESC"; 
+        if (!$drill) {
+            $query .=
+                " GROUP BY CustomerID";
+        }
 
-			$this->setQueryString($query);
+        $query .=
+            ") as temp2 ORDER BY `SalesProfit` DESC";
 
-			$ret=(parent::getRows());
-			return $ret;
-		} 
+        $this->setQueryString($query);
+
+        $ret = (parent::getRows());
+        return $ret;
+    }
 
 }
+
 ?>

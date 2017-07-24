@@ -19,9 +19,9 @@
  * 		Abdul-Aziz Al-Oraij (top7up@hotmail.com)
  */
 
-var dia = new Array()
+var dia = [];
 
-dia["0060"]=new Array();dia["00B4"]=new Array();dia["005E"]=new Array();dia["00A8"]=new Array();dia["007E"]=new Array();dia["00B0"]=new Array();dia["00B7"]=new Array();dia["00B8"]=new Array();dia["00AF"]=new Array();dia["02D9"]=new Array();dia["02DB"]=new Array();dia["02C7"]=new Array();dia["02D8"]=new Array();dia["02DD"]=new Array();dia["031B"]=new Array();
+dia["0060"]=[];dia["00B4"]=[];dia["005E"]=[];dia["00A8"]=[];dia["007E"]=[];dia["00B0"]=[];dia["00B7"]=[];dia["00B8"]=[];dia["00AF"]=[];dia["02D9"]=[];dia["02DB"]=[];dia["02C7"]=[];dia["02D8"]=[];dia["02DD"]=[];dia["031B"]=[];
 dia["0060"]["0061"]="00E0";dia["00B4"]["0061"]="00E1";dia["005E"]["0061"]="00E2";dia["00A8"]["0061"]="00E4";dia["007E"]["0061"]="00E3";dia["00B0"]["0061"]="00E5";dia["00AF"]["0061"]="0101";dia["02DB"]["0061"]="0105";dia["02D8"]["0061"]="0103";
 dia["00B4"]["0063"]="0107";dia["005E"]["0063"]="0109";dia["00B8"]["0063"]="00E7";dia["02D9"]["0063"]="010B";dia["02C7"]["0063"]="010D";
 dia["02C7"]["0064"]="010F";

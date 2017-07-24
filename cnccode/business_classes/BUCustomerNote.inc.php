@@ -1,157 +1,160 @@
-<?
-/**
-* Customer Note business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
+<?php /**
+ * Customer Note business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUCustomerNote extends Business{
-	var $dbeCallActType="";
-	/**
-	* Constructor
-	* @access Public
-	*/
-	function BUCustomerNote(&$owner){
-		$this->constructor($owner);
-	}
-	function constructor(&$owner){
-		parent::constructor($owner);
-	}
-  function updateNote(
-    $customerID,
-    $customerNoteID,
-    $details,
-    $ordheadID=false
-  ){
-    
-    $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+class BUCustomerNote extends Business
+{
+    var $dbeCallActType = "";
 
-    $this->setMethodName('updateNote');
+    /**
+     * Constructor
+     * @access Public
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+    }
 
-    if ( $customerNoteID ){
-      $sql = "UPDATE customernote";      
-    }
-    else{
-      $sql = "INSERT INTO customernote";
-    }
-    
-    $sql .= "
+    function updateNote(
+        $customerID,
+        $customerNoteID,
+        $details,
+        $ordheadID = false
+    )
+    {
+
+        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+        $this->setMethodName('updateNote');
+
+        if ($customerNoteID) {
+            $sql = "UPDATE customernote";
+        } else {
+            $sql = "INSERT INTO customernote";
+        }
+
+        $sql .= "
       SET
         cno_custno = $customerID,
-        cno_details = '" . $db->real_escape_string($details). "',
-        cno_ordno = '" . $db->real_escape_string($ordheadID). "',
+        cno_details = '" . $db->real_escape_string($details) . "',
+        cno_ordno = '" . $db->real_escape_string($ordheadID) . "',
         cno_modified_consno = " . $GLOBALS['auth']->is_authenticated() .
-        ", cno_modified = NOW()";
+            ", cno_modified = NOW()";
 
-    if ( !$customerNoteID ){
-        $sql .= ",cno_created_consno = " . $GLOBALS['auth']->is_authenticated() .
+        if (!$customerNoteID) {
+            $sql .= ",cno_created_consno = " . $GLOBALS['auth']->is_authenticated() .
                 ", cno_created = NOW()";
+        }
+
+        if ($customerNoteID) {
+            $sql .= " WHERE cno_customernoteno = $customerNoteID";
+        }
+
+        if ($db->real_query($sql) === false) {
+
+            echo($db->error);
+
+        }
+
+        if ($customerNoteID) {
+            return $this->getNote($customerID, false, 'this', $customerNoteID);
+        } else {
+            return $this->getNote($customerID, false, 'last');
+
+        }
     }
 
-    if ( $customerNoteID ){
-      $sql .= " WHERE cno_customernoteno = $customerNoteID";      
-    }
-    
-    if ( $db->real_query( $sql ) === false ){
+    function getNote(
+        $customerID,
+        $created,
+        $noteIdentifier,
+        $customerNoteID = false,
+        $ordheadID = false
+    )
+    {
 
-      echo ( $db->error );
-      
-    }
-    
-    if ( $customerNoteID ){
-        return $this->getNote( $customerID, false, 'this', $customerNoteID );
-    }
-    else{
-        return $this->getNote( $customerID, false, 'last');
-      
-    }
-  }
-	function getNote(
-    $customerID,
-    $created,
-    $noteIdentifier,
-    $customerNoteID = false,
-    $ordheadID=false
-  ){
-		
-    $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
-    $this->setMethodName('getNote');
+        $this->setMethodName('getNote');
 
-    switch ( $noteIdentifier ){
-  
-      case 'this':
-        $sql = "
+        switch ($noteIdentifier) {
+
+            case 'this':
+                $sql = "
           SELECT * FROM customernote
           JOIN consultant ON cns_consno = cno_modified_consno
           WHERE cno_customernoteno = $customerNoteID";
-        break;
+                break;
 
-      case 'next':
-        $sql = "
+            case 'next':
+                $sql = "
           SELECT * FROM customernote
           JOIN consultant ON cns_consno = cno_modified_consno
           WHERE cno_custno = $customerID
           AND cno_created > '$created'
           ORDER BY cno_created
           LIMIT 0,1";
-        break;
+                break;
 
-      case 'previous':
-        $sql = "
+            case 'previous':
+                $sql = "
           SELECT * FROM customernote
           JOIN consultant ON cns_consno = cno_modified_consno
           WHERE cno_custno = $customerID
           AND cno_created < '$created'
           ORDER BY cno_created DESC
           LIMIT 0,1";
-        break;
+                break;
 
-      case 'first':
-        $sql = "
+            case 'first':
+                $sql = "
           SELECT * FROM customernote
           JOIN consultant ON cns_consno = cno_modified_consno
           WHERE cno_custno = $customerID
           ORDER BY cno_created
           LIMIT 0,1";
-        break;
+                break;
 
-      case 'last':
-        $sql = "
+            case 'last':
+                $sql = "
           SELECT * FROM customernote
           JOIN consultant ON cns_consno = cno_modified_consno
           WHERE cno_custno = $customerID
           ORDER BY cno_created DESC
           LIMIT 0,1";
-        break;
+                break;
 
-      case 'salesOrder':
-        $sql = "
+            case 'salesOrder':
+                $sql = "
           SELECT * FROM customernote
           JOIN consultant ON cns_consno = cno_modified_consno
           WHERE cno_ordno = $ordheadID";
-          
-        break;
-    
-    } // end switch
-    
-    $ret = $db->query( $sql )->fetch_object();
-        
-    return $ret;
-    
-	}
-  function getNotesByCustomerID(
-    $customerID
-  ){
-    
-    $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
-    $this->setMethodName('getNotesByCustomerID');
+                break;
 
-    $sql = "
+        } // end switch
+
+        $ret = $db->query($sql)->fetch_object();
+
+        return $ret;
+
+    }
+
+    function getNotesByCustomerID(
+        $customerID
+    )
+    {
+
+        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+        $this->setMethodName('getNotesByCustomerID');
+
+        $sql = "
       SELECT
         `cno_customernoteno`,
         `cno_custno`,
@@ -171,28 +174,29 @@ class BUCustomerNote extends Business{
       ORDER BY
         cno_created";
 
-    $ret = $db->query( $sql );
-        
-    return $ret;
-    
-  } // end function getnotesbycustomerid
-  
-  function deleteNote( $customerNoteID ){
-    
-    $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        $ret = $db->query($sql);
 
-    $this->setMethodName('updateNote');
+        return $ret;
 
-    $sql = "DELETE FROM customernote
-            WHERE cno_customernoteno = $customerNoteID";      
-    
-    if ( $db->real_query( $sql ) === false ){
+    } // end function getnotesbycustomerid
 
-      echo ( $db->error );
-      
-    }
-    
-  }// end delete
+    function deleteNote($customerNoteID)
+    {
+
+        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+        $this->setMethodName('updateNote');
+
+        $sql = "DELETE FROM customernote
+            WHERE cno_customernoteno = $customerNoteID";
+
+        if ($db->real_query($sql) === false) {
+
+            echo($db->error);
+
+        }
+
+    }// end delete
 
 }// End of class
 ?>

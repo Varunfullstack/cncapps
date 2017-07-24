@@ -165,9 +165,9 @@ class Mail_Queue_Body {
      *
      * @access public
      */
-    function Mail_Queue_Body($id, $create_time, $time_to_send, $sent_time, $id_user,
-                       $ip, $sender, $recipient, $headers, $body,
-                       $delete_after_send=true, $try_sent=0)
+    function __construct($id, $create_time, $time_to_send, $sent_time, $id_user,
+                         $ip, $sender, $recipient, $headers, $body,
+                         $delete_after_send=true, $try_sent=0)
     {
         $this->id                = $id;
         $this->create_time       = $create_time;

@@ -128,9 +128,9 @@ class DB_fbsql extends DB_common
      *
      * @return void
      */
-    function DB_fbsql()
+    function __construct()
     {
-        $this->DB_common();
+        DB_common::__construct();
     }
 
     // }}}

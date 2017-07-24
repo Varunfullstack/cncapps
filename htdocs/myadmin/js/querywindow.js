@@ -4,7 +4,7 @@ function PMA_queryAutoCommit()
     var sqlqueryform = document.getElementById('sqlqueryform');
     sqlqueryform.target = window.opener.frame_content.name;
     sqlqueryform.submit();
-    return;
+    
 }
 
 function PMA_querywindowCommit(tab)

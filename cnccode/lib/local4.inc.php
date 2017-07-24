@@ -11,9 +11,8 @@
  *
  **/
 require_once($cfg["path_func"] . "/Common.inc.php");
-
 define('PHPLIB_CLASSNAME_DB', 'dbSweetcode');
-define('PHPLIB_CLASSNAME_SESSION_CONTAINER', 'ctSweetcode');
+define('PHPLIB_CLASSNAME_SESSION_CONTAINER', 'CtSweetcode');
 define('PHPLIB_CLASSNAME_SESSION', 'seSweetcode');
 define('PHPLIB_CLASSNAME_USER', 'usSweetcode');
 define('PHPLIB_CLASSNAME_AUTH', 'auSweetcode');
@@ -58,9 +57,8 @@ class ctSweetcode extends CT_Sql {
 }
 */
 
-class ctSweetcode extends CT_File
+class CtSweetcode extends CT_File
 {
-//  var $file_path = "E:\\sessions\\";  ## Path where to store the session files
     var $file_path = PHPLIB_SESSIONS_DIR;  ## Path where to store the session files
 }
 
@@ -145,7 +143,9 @@ class auSweetcode extends Auth
         }
 
         if (
-            $GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT &&
+            ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT
+                || $GLOBALS['php7']
+            ) &&
             !$this->authenticate_on_ldap(
                 $_POST['username'],
                 $_POST['password']
@@ -195,6 +195,7 @@ class auSweetcode extends Auth
       FROM
         headert"
         );
+
         while ($this->db->next_record()) {
             $ret = $this->db->f('hed_allowed_client_ip_pattern');
         }

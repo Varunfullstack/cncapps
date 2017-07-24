@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESalesOrderTotals.inc.php');
 require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
@@ -18,20 +19,12 @@ require_once($cfg['path_bu'] . '/BUTeamPerformance.inc.php');
 
 class CTHome extends CTCNC
 {
-
     private $dsHeader = '';
-
     private $buUser;
 
-    function CTHome($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-
-    }
-
-    function constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-        parent::constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($this->dsHeader);
         $this->buUser = new BUUser($this);

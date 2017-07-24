@@ -17,7 +17,7 @@
  * @category   Database
  * @package    DB
  * @author     Sterling Hughes <sterling@php.net>
- * @author     Antônio Carlos Venâncio Júnior <floripa@php.net>
+ * @author     Antï¿½nio Carlos Venï¿½ncio Jï¿½nior <floripa@php.net>
  * @author     Daniel Convissor <danielc@php.net>
  * @copyright  1997-2007 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
@@ -42,7 +42,7 @@ require_once 'DB/common.php';
  * @category   Database
  * @package    DB
  * @author     Sterling Hughes <sterling@php.net>
- * @author     Antônio Carlos Venâncio Júnior <floripa@php.net>
+ * @author     Antï¿½nio Carlos Venï¿½ncio Jï¿½nior <floripa@php.net>
  * @author     Daniel Convissor <danielc@php.net>
  * @copyright  1997-2007 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
@@ -145,9 +145,9 @@ class DB_sybase extends DB_common
      *
      * @return void
      */
-    function DB_sybase()
+    function __construct()
     {
-        $this->DB_common();
+        DB_common::__construct();
     }
 
     // }}}

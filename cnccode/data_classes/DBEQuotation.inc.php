@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Quotation table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEQuotation extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEQuotation(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEQuotation extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("quotation");
  		$this->addColumn("quotationID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("ordheadID", DA_ID, DA_NOT_NULL);

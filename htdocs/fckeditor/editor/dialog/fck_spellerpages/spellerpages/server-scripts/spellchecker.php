@@ -152,9 +152,9 @@ function print_checker_results() {
 <link rel="stylesheet" type="text/css" href="<?php echo $spellercss ?>" />
 <script language="javascript" src="<?php echo $word_win_src ?>"></script>
 <script language="javascript">
-var suggs = new Array();
-var words = new Array();
-var textinputs = new Array();
+var suggs = [];
+var words = [];
+var textinputs = [];
 var error;
 <?php
 

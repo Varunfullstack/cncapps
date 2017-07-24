@@ -50,7 +50,7 @@ class DB_ODBC {
 
 
   /* public: constructor */
-  function DB_ODBC($query = "") {
+  function __construct($query = "") {
     if($query) {
       $this->query($query);
     }
@@ -594,9 +594,9 @@ if((4 > $_php_major_version) or !class_exists("DB_Sql"))
 	{
 	class DB_Sql extends DB_ODBC
 		{
-		function DB_Sql($query = "")
+		function __construct($query = "")
 			{
-			$this->DB_ODBC($query);
+			DB_ODBC::__construct($query);
 			}
 		}
 	}

@@ -1,112 +1,115 @@
 <?php
 /**
-* Call activity business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_gc"]."/Controller.inc.php");
-require_once($cfg["path_dbe"]."/DBEActivityProfitReport.inc.php");
-require_once($cfg["path_dbe"]."/DBEActivityProfitReportInvoice.inc.php");
-require_once($cfg["path_bu"]."/BUHeader.inc.php");
+ * Call activity business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_gc"] . "/Controller.inc.php");
+require_once($cfg["path_dbe"] . "/DBEActivityProfitReport.inc.php");
+require_once($cfg["path_dbe"] . "/DBEActivityProfitReportInvoice.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
-class BUActivityProfitReport extends Business{
-	/**
-	* Constructor
-	* @access Public
-	*/
-	function BUActivityProfitReport(&$owner){
-		$this->constructor($owner);
-	}
-	function constructor(&$owner){
-		parent::constructor($owner);
-		$this->dbeActivityProfitReport=new DBEActivityProfitReport($this);
-		$this->dbeActivityProfitReportInvoice=new DBEActivityProfitReportInvoice($this);
+class BUActivityProfitReport extends Business
+{
+    /**
+     * Constructor
+     * @access Public
+     * @param $owner
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->dbeActivityProfitReport = new DBEActivityProfitReport($this);
+        $this->dbeActivityProfitReportInvoice = new DBEActivityProfitReportInvoice($this);
+    }
 
-	}
-	function initialiseSearchForm(&$dsData)
-	{
-		$dsData = new DSForm($this);
-		$dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-		$dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-		$dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-		$dsData->setValue('customerID', '');
-	}
-	function search( &$dsSearchForm )
-	{
-		$buHeader = new BUHeader($this);
-		$buHeader->getHeader($dsHeader);
+    function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->setValue('customerID', '');
+    }
 
-		$this->dbeActivityProfitReport->getRowsBySearchCriteria(
-			trim($dsSearchForm->getValue('customerID')),
-			trim($dsSearchForm->getValue('fromDate')),
-			trim($dsSearchForm->getValue('toDate')),
-			$dsHeader->getValue('billingStartTime'),
-			$dsHeader->getValue('billingEndTime'),
-			false
-		);
+    function search(&$dsSearchForm)
+    {
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
 
-		return $this->dbeActivityProfitReport;	
-	}
+        $this->dbeActivityProfitReport->getRowsBySearchCriteria(
+            trim($dsSearchForm->getValue('customerID')),
+            trim($dsSearchForm->getValue('fromDate')),
+            trim($dsSearchForm->getValue('toDate')),
+            $dsHeader->getValue('billingStartTime'),
+            $dsHeader->getValue('billingEndTime'),
+            false
+        );
 
-	function searchDrill(
-	 $customerID,
-	 $fromDate,
-	 $toDate
-	)
-	{
-		$buHeader = new BUHeader($this);
-		$buHeader->getHeader($dsHeader);
+        return $this->dbeActivityProfitReport;
+    }
 
-		$this->dbeActivityProfitReport->getRowsBySearchCriteria(
-			trim($customerID),
-			trim($fromDate),
-			trim($toDate),
-			$dsHeader->getValue('billingStartTime'),
-			$dsHeader->getValue('billingEndTime'),
-			true			// drill down mode
-		);
+    function searchDrill(
+        $customerID,
+        $fromDate,
+        $toDate
+    )
+    {
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
 
-		return $this->dbeActivityProfitReport;	
-	}
-	function searchDrillInvoices( $customerID, $fromDate, $toDate )
-	{
+        $this->dbeActivityProfitReport->getRowsBySearchCriteria(
+            trim($customerID),
+            trim($fromDate),
+            trim($toDate),
+            $dsHeader->getValue('billingStartTime'),
+            $dsHeader->getValue('billingEndTime'),
+            true            // drill down mode
+        );
 
-		$result = $this->getResults( $customerID, $fromDate, $toDate, "'C', 'S', 'H', 'D', 'F', 'E', 'U'");
+        return $this->dbeActivityProfitReport;
+    }
 
-		$result_array['ProductSalesTurnover'] 	= $result['Turnover'];
-		$result_array['ProductSalesProfit'] 		= $result['Profit'];
+    function searchDrillInvoices($customerID, $fromDate, $toDate)
+    {
 
-		$result = $this->getResults( $customerID, $fromDate, $toDate, "'B'");
+        $result = $this->getResults($customerID, $fromDate, $toDate, "'C', 'S', 'H', 'D', 'F', 'E', 'U'");
 
-		$result_array['InternetRevenueTurnover'] 	= $result['Turnover'];
-		$result_array['InternetRevenueProfit'] 		= $result['Profit'];
+        $result_array['ProductSalesTurnover'] = $result['Turnover'];
+        $result_array['ProductSalesProfit'] = $result['Profit'];
 
-		$result = $this->getResults( $customerID, $fromDate, $toDate, "'G'");
+        $result = $this->getResults($customerID, $fromDate, $toDate, "'B'");
 
-		$result_array['ManagedServiceRevenueTurnover'] 	= $result['Turnover'];
-		$result_array['ManagedServiceRevenueProfit'] 		= $result['Profit'];
+        $result_array['InternetRevenueTurnover'] = $result['Turnover'];
+        $result_array['InternetRevenueProfit'] = $result['Profit'];
 
-		$result = $this->getResults( $customerID, $fromDate, $toDate, "'M', 'R'");
+        $result = $this->getResults($customerID, $fromDate, $toDate, "'G'");
 
-		$result_array['MaintAndGenSupportTurnover'] 	= $result['Turnover'];
-		$result_array['MaintAndGenSupportProfit'] 	= $result['Profit'];
-		
-		return $result_array;	
-	}
-	
-	function getResults( $customerID, $fromDate, $toDate, $stockcat_list ){
+        $result_array['ManagedServiceRevenueTurnover'] = $result['Turnover'];
+        $result_array['ManagedServiceRevenueProfit'] = $result['Profit'];
 
-		if (!$db=mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
-			echo 'Could not connect to mysql host ' . DB_HOST;
-			exit;
-		}
-		
-		mysqli_select_db(DB_NAME, $db);
+        $result = $this->getResults($customerID, $fromDate, $toDate, "'M', 'R'");
 
-		$query = 
-			"
+        $result_array['MaintAndGenSupportTurnover'] = $result['Turnover'];
+        $result_array['MaintAndGenSupportProfit'] = $result['Profit'];
+
+        return $result_array;
+    }
+
+    function getResults($customerID, $fromDate, $toDate, $stockcat_list)
+    {
+
+        if (!$db = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
+            echo 'Could not connect to mysql host ' . DB_HOST;
+            exit;
+        }
+
+        mysqli_select_db(DB_NAME, $db);
+
+        $query =
+            "
 			SELECT
 				SUM( invline.inl_qty * invline.inl_unit_price ) as Turnover, 
 				SUM( 
@@ -124,11 +127,11 @@ class BUActivityProfitReport extends Business{
 				AND inh_date_printed BETWEEN '$fromDate' AND '$toDate';
 			";
 
-		$result = mysqli_query($db, $query);
+        $result = mysqli_query($db, $query);
 
-		$row = mysqli_fetch_assoc( $result );
-		
-		return $row;
-	}
+        $row = mysqli_fetch_assoc($result);
+
+        return $row;
+    }
 }// End of class
 ?>

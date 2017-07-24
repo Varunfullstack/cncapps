@@ -1,41 +1,42 @@
 <?php
 /**
-* Contract profit analysis by customer
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_bu"]."/BUHeader.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * Contract profit analysis by customer
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUContractAnalysisReport extends Business{
+class BUContractAnalysisReport extends Business
+{
 
-	function BUContractAnalysisReport( &$owner ){
-		$this->constructor( $owner );
-	}
-	function constructor( &$owner ){
-		parent::constructor( $owner );
-		
-		$this->db = new CNCMysqli( DB_HOST, DB_USER, DB_PASSWORD, DB_NAME );
-	}
-  function initialiseSearchForm(&$dsData)
-  {
-    $dsData = new DSForm($this);
-    $dsData->addColumn('contracts', DA_STRING, DA_ALLOW_NULL);
-    $dsData->setValue('contracts', '');
-    $dsData->addColumn('startYearMonth', DA_STRING, DA_ALLOW_NULL);
-    $dsData->setValue('startYearMonth', '');
-    $dsData->addColumn('endYearMonth', DA_STRING, DA_ALLOW_NULL);
-    $dsData->setValue('endYearMonth', '');
-  }
-  /**
-  Get a comma-separated list of itemIDs that match contract search string
-  **/
-  function getContractItemIDs( $contracts )
-  {
-    $sql =
-      "
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
+
+    function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+        $dsData->addColumn('contracts', DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue('contracts', '');
+        $dsData->addColumn('startYearMonth', DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue('startYearMonth', '');
+        $dsData->addColumn('endYearMonth', DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue('endYearMonth', '');
+    }
+
+    /**
+     * Get a comma-separated list of itemIDs that match contract search string
+     **/
+    function getContractItemIDs($contracts)
+    {
+        $sql =
+            "
         SELECT
           GROUP_CONCAT( itm_itemno ) AS `IDs`
           
@@ -44,22 +45,22 @@ class BUContractAnalysisReport extends Business{
           
         WHERE
           item.renewalTypeID <> 0
-          AND MATCH (itm_desc) AGAINST ( '$contracts' IN BOOLEAN MODE )";    
-        
-    if ( $row = $this->db->query( $sql )->fetch_array() ){
-      return $row[ 'IDs' ];
+          AND MATCH (itm_desc) AGAINST ( '$contracts' IN BOOLEAN MODE )";
+
+        if ($row = $this->db->query($sql)->fetch_array()) {
+            return $row['IDs'];
+        } else {
+            return false;
+        }
     }
-    else{
-      return false;
-    }
-  }
-  /**
-  Get list of customers with given contracts
-  **/
-	function getCustomers( $contractItemIDs )
-	{
-    $sql =
-      "
+
+    /**
+     * Get list of customers with given contracts
+     **/
+    function getCustomers($contractItemIDs)
+    {
+        $sql =
+            "
         SELECT
           DISTINCT cus_custno AS `customerID`,
           cus_name AS `Customer`
@@ -71,23 +72,23 @@ class BUContractAnalysisReport extends Business{
         WHERE
           declinedFlag = 'N'
           AND renewalStatus ='R'";
- 
-    if ( $contractItemIDs ){
-      $sql .=
-          " AND cui_itemno IN ( $contractItemIDs )";
-    }       
 
-    $sql .= 
-      " ORDER BY
+        if ($contractItemIDs) {
+            $sql .=
+                " AND cui_itemno IN ( $contractItemIDs )";
+        }
+
+        $sql .=
+            " ORDER BY
           cus_name";
-          
-    return $this->db->query( $sql );
-  }
 
-  function getLabourHours( $customerID, $startYearMonth, $endYearMonth, $contractItemIDs = false )
-  {
-    $sql =
-      "SELECT
+        return $this->db->query($sql);
+    }
+
+    function getLabourHours($customerID, $startYearMonth, $endYearMonth, $contractItemIDs = false)
+    {
+        $sql =
+            "SELECT
         SUM( pro_total_activity_duration_hours ) as hours
         
       FROM
@@ -97,19 +98,19 @@ class BUContractAnalysisReport extends Business{
       WHERE
         pro_total_activity_duration_hours IS NOT NULL
         AND problem.pro_date_raised BETWEEN '$startYearMonth-01' AND '$endYearMonth-31'
-        AND pro_custno = $customerID";    
+        AND pro_custno = $customerID";
 
-    if ( $contractItemIDs ){
-      $sql .=
-          " AND cui_itemno IN ( $contractItemIDs )";
-    }       
-    return $this->db->query( $sql )->fetch_array();
-  }
+        if ($contractItemIDs) {
+            $sql .=
+                " AND cui_itemno IN ( $contractItemIDs )";
+        }
+        return $this->db->query($sql)->fetch_array();
+    }
 
-  function getContractValues( $customerID, $contractItemIDs = false  )
-  {
-    $sql =
-      "
+    function getContractValues($customerID, $contractItemIDs = false)
+    {
+        $sql =
+            "
         SELECT
           salePricePerMonth,
           costPricePerMonth,
@@ -129,148 +130,144 @@ class BUContractAnalysisReport extends Business{
           AND renewalTypeID <> 0
           AND declinedFlag = 'N'";
 
-    if ( $contractItemIDs ){
-      $sql .=
-          " AND cui_itemno IN ( $contractItemIDs )";
-    }       
-    $rows = $this->db->query( $sql );
-    
-    $perMonthSale = 0;
-    $perMonthCost = 0;
-    
-    while ( $row = $rows->fetch_array() ){
-    
-      if( $row[ 'salePricePerMonth' ] > 0 ){
-        $perMonthSale += $row[ 'salePricePerMonth' ];
-        $perMonthCost += $row[ 'costPricePerMonth' ];
-      }
-      elseif( $row[ 'cui_sale_price' ] > 0 ){
-        $perMonthSale += $row[ 'cui_sale_price' ];
-        $perMonthCost += $row[ 'cui_cost_price' ];
-      }
-      elseif( $row[ 'salePrice' ] > 0 ){
-        $perMonthSale += $row[ 'salePrice' ];
-        $perMonthCost += $row[ 'costPrice' ];
-      }
-      else{
-        $perMonthSale += $row[ 'itemSalePrice' ];
-        $perMonthCost += $row[ 'itemCostPrice' ];
-      }
-    }
-    
-    return array(
-      'perMonthSale'  => $perMonthSale,
-      'perMonthCost'  => $perMonthCost,
-    );
-    
-  }
-  
-  function getResults( $searchForm )
-  {
-    $buHeader = new BUHeader( $this );
-    $buHeader->getHeader( $dsHeader );
+        if ($contractItemIDs) {
+            $sql .=
+                " AND cui_itemno IN ( $contractItemIDs )";
+        }
+        $rows = $this->db->query($sql);
 
-    $contracts = $searchForm->getValue( 'contracts' );
-    
-    $startYearMonth = $searchForm->getValue( 'startYearMonth' );
-    $endYearMonth = $searchForm->getValue( 'endYearMonth' );
-    
-    $startYearMonthCompact = str_replace( '-', '', $startYearMonth );
-    $endYearMonthCompact = str_replace( '-', '', $endYearMonth );
-    
-    $numberOfMonths = $this->getMonthsBetweenYearMonths($startYearMonth,  $endYearMonth );
-    
-    $hourlyRate = $dsHeader->getValue( 'hourlyLabourCost');
-    
-    $nothingFoundForSpecifiedContractString = false;
-    
-    if ( $contracts ){
+        $perMonthSale = 0;
+        $perMonthCost = 0;
 
-      $contractItemIDs = $this->getContractItemIDs( $contracts );
+        while ($row = $rows->fetch_array()) {
 
-      if ( is_null( $contractItemIDs ) ){
-        $nothingFoundForSpecifiedContractString = true;
-      }
-    }
-    else{
-      $contractItemIDs = false;
-    }
-    
-    if ( $nothingFoundForSpecifiedContractString ){
-      return false;
-      
-    }
-    $customers = $this->getCustomers( $contractItemIDs );
+            if ($row['salePricePerMonth'] > 0) {
+                $perMonthSale += $row['salePricePerMonth'];
+                $perMonthCost += $row['costPricePerMonth'];
+            } elseif ($row['cui_sale_price'] > 0) {
+                $perMonthSale += $row['cui_sale_price'];
+                $perMonthCost += $row['cui_cost_price'];
+            } elseif ($row['salePrice'] > 0) {
+                $perMonthSale += $row['salePrice'];
+                $perMonthCost += $row['costPrice'];
+            } else {
+                $perMonthSale += $row['itemSalePrice'];
+                $perMonthCost += $row['itemCostPrice'];
+            }
+        }
 
-    $customersArray = array();
-    
-    while ($row = $customers->fetch_array()){
-      $customersArray[] = $row; 
-    }
-
-    foreach ( $customersArray as $customer ){
-      /*
-      Sales
-      */  
-      $labourHoursRow =
-        $this->getLabourHours(
-          $customer['customerID'],
-          $startYearMonth,
-          $endYearMonth,
-          $contractItemIDs
+        return array(
+            'perMonthSale' => $perMonthSale,
+            'perMonthCost' => $perMonthCost,
         );
 
-      $contractValues =
-        $this->getContractValues(
-          $customer['customerID'],
-          $contractItemIDs
-        );
-      $cost = round( $contractValues[ 'perMonthCost' ] * $numberOfMonths, 2);
-      
-      $sales = round( $contractValues[ 'perMonthSale' ] * $numberOfMonths, 2);
-      
-      $labourCost = round( $labourHoursRow[0] * $hourlyRate,2 );
-      
-      $profit = $sales - $cost - $labourCost;   
-      
-      if( $sales > 0 ){
-        $profitPercent = number_format( 100 - ( ( $cost + $labourCost ) / $sales ) * 100,2 );
-      }
-      else{
-        $profitPercent = '';
-      }
-           
-      
-      $results[ $customer[ 'Customer' ] ] =
-        array(
-          'customerID'  => $customer[ 'customerID' ],
-          'sales'       => $sales,
-          'cost'        => $cost,
-          'profit'      => $profit,
-          'labourCost'  => $labourCost,
-          'profitPercent'  => $profitPercent,
-          'labourHours' => $labourHoursRow[0]
-        );
     }
-    
-    return $results;
-    
-  }
-  function getMonthsBetweenYearMonths( $startYearMonth, $endYearMonth )
-  {
-    $d1 = new DateTime( $startYearMonth . "-01");
-    $d2 = new DateTime( $endYearMonth . "-28");
 
-    $months = 0;
+    function getResults($searchForm)
+    {
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
 
-    $d1->add(new \DateInterval('P1M'));
+        $contracts = $searchForm->getValue('contracts');
 
-    while ($d1 <= $d2){
-      $months ++;
-      $d1->add(new \DateInterval('P1M'));
-    }  
-    
-    return $months + 1;
-  }
+        $startYearMonth = $searchForm->getValue('startYearMonth');
+        $endYearMonth = $searchForm->getValue('endYearMonth');
+
+        $startYearMonthCompact = str_replace('-', '', $startYearMonth);
+        $endYearMonthCompact = str_replace('-', '', $endYearMonth);
+
+        $numberOfMonths = $this->getMonthsBetweenYearMonths($startYearMonth, $endYearMonth);
+
+        $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
+
+        $nothingFoundForSpecifiedContractString = false;
+
+        if ($contracts) {
+
+            $contractItemIDs = $this->getContractItemIDs($contracts);
+
+            if (is_null($contractItemIDs)) {
+                $nothingFoundForSpecifiedContractString = true;
+            }
+        } else {
+            $contractItemIDs = false;
+        }
+
+        if ($nothingFoundForSpecifiedContractString) {
+            return false;
+
+        }
+        $customers = $this->getCustomers($contractItemIDs);
+
+        $customersArray = array();
+
+        while ($row = $customers->fetch_array()) {
+            $customersArray[] = $row;
+        }
+
+        foreach ($customersArray as $customer) {
+            /*
+            Sales
+            */
+            $labourHoursRow =
+                $this->getLabourHours(
+                    $customer['customerID'],
+                    $startYearMonth,
+                    $endYearMonth,
+                    $contractItemIDs
+                );
+
+            $contractValues =
+                $this->getContractValues(
+                    $customer['customerID'],
+                    $contractItemIDs
+                );
+            $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
+
+            $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
+
+            $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
+
+            $profit = $sales - $cost - $labourCost;
+
+            if ($sales > 0) {
+                $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
+            } else {
+                $profitPercent = '';
+            }
+
+
+            $results[$customer['Customer']] =
+                array(
+                    'customerID' => $customer['customerID'],
+                    'sales' => $sales,
+                    'cost' => $cost,
+                    'profit' => $profit,
+                    'labourCost' => $labourCost,
+                    'profitPercent' => $profitPercent,
+                    'labourHours' => $labourHoursRow[0]
+                );
+        }
+
+        return $results;
+
+    }
+
+    function getMonthsBetweenYearMonths($startYearMonth, $endYearMonth)
+    {
+        $d1 = new DateTime($startYearMonth . "-01");
+        $d2 = new DateTime($endYearMonth . "-28");
+
+        $months = 0;
+
+        $d1->add(new \DateInterval('P1M'));
+
+        while ($d1 <= $d2) {
+            $months++;
+            $d1->add(new \DateInterval('P1M'));
+        }
+
+        return $months + 1;
+    }
 }//End of class
 ?>

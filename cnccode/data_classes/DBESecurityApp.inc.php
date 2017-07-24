@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Secutity application table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBESecurityApp extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESecurityApp(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBESecurityApp extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("securityapp");
  		$this->addColumn("securityAppID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL);

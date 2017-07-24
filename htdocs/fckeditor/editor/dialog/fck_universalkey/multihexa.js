@@ -89,39 +89,39 @@ for (i=0;i<nbActions;i++){
 for (i=0;i<4;i++){
 	document.write('<area coords="'+keyC1[i]+','+keyC2[i]+','+keyC3[i]+','+keyC4[i]+'" onclick=\'javascript:charger('+i+')\'>')
 }
-document.write('</map>')
+document.write('</map>');
 
 /*fonctions*/
 function ecrire(i){
-	txt=rechercher()+"|";subtxt=txt.split("|")
-	ceci=(lock==1)?CarMaj[i]:((caps==1)?CarMaj[i]:CarMin[i])
+	txt=rechercher()+"|";subtxt=txt.split("|");
+	ceci=(lock==1)?CarMaj[i]:((caps==1)?CarMaj[i]:CarMin[i]);
 	if (test(ceci)){subtxt[0]+=cardia(ceci);distinguer(false)}
 	else if(dia[accent]!=null&&dia[hexa(ceci)]!=null){distinguer(false);accent=hexa(ceci);distinguer(true)}
 	else if(dia[accent]!=null){subtxt[0]+=fromhexby4tocar(accent)+ceci;distinguer(false)}
 	else if(dia[hexa(ceci)]!=null){accent=hexa(ceci);distinguer(true)}
 	else {subtxt[0]+=ceci}
-	txt=subtxt[0]+"|"+subtxt[1]
-	afficher(txt)
+	txt=subtxt[0]+"|"+subtxt[1];
+	afficher(txt);
 	if (caps==1){caps=0;MinusMajus()}
 }
 function faire(ceci){
-	txt=rechercher()+"|";subtxt=txt.split("|")
-	l0=subtxt[0].length
-	l1=subtxt[1].length
-	c1=subtxt[0].substring(0,(l0-2))
-	c2=subtxt[0].substring(0,(l0-1))
-	c3=subtxt[1].substring(0,1)
-	c4=subtxt[1].substring(0,2)
-	c5=subtxt[0].substring((l0-2),l0)
-	c6=subtxt[0].substring((l0-1),l0)
-	c7=subtxt[1].substring(1,l1)
-	c8=subtxt[1].substring(2,l1)
+	txt=rechercher()+"|";subtxt=txt.split("|");
+	l0=subtxt[0].length;
+	l1=subtxt[1].length;
+	c1=subtxt[0].substring(0,(l0-2));
+	c2=subtxt[0].substring(0,(l0-1));
+	c3=subtxt[1].substring(0,1);
+	c4=subtxt[1].substring(0,2);
+	c5=subtxt[0].substring((l0-2),l0);
+	c6=subtxt[0].substring((l0-1),l0);
+	c7=subtxt[1].substring(1,l1);
+	c8=subtxt[1].substring(2,l1);
 	if(dia[accent]!=null){if(ceci==" "){ceci=fromhexby4tocar(accent)}distinguer(false)}
 	switch (ceci){
-	case("av") :if(escape(c4)!="%0D%0A"){txt=subtxt[0]+c3+"|"+c7}else{txt=subtxt[0]+c4+"|"+c8}break
-	case("ar") :if(escape(c5)!="%0D%0A"){txt=c2+"|"+c6+subtxt[1]}else{txt=c1+"|"+c5+subtxt[1]}break
-	case("bck"):if(escape(c5)!="%0D%0A"){txt=c2+"|"+subtxt[1]}else{txt=c1+"|"+subtxt[1]}break
-	case("del"):if(escape(c4)!="%0D%0A"){txt=subtxt[0]+"|"+c7}else{txt=subtxt[0]+"|"+c8}break
+	case("av") :if(escape(c4)!="%0D%0A"){txt=subtxt[0]+c3+"|"+c7}else{txt=subtxt[0]+c4+"|"+c8}break;
+	case("ar") :if(escape(c5)!="%0D%0A"){txt=c2+"|"+c6+subtxt[1]}else{txt=c1+"|"+c5+subtxt[1]}break;
+	case("bck"):if(escape(c5)!="%0D%0A"){txt=c2+"|"+subtxt[1]}else{txt=c1+"|"+subtxt[1]}break;
+	case("del"):if(escape(c4)!="%0D%0A"){txt=subtxt[0]+"|"+c7}else{txt=subtxt[0]+"|"+c8}break;
 	default:txt=subtxt[0]+ceci+"|"+subtxt[1];break
 	}
 	afficher(txt)
@@ -134,7 +134,7 @@ function bloq(){lock=(lock==1)?0:1;MinusMajus()}
 function tracer(nom,gauche,haut,ceci,classe){ceci="<span class="+classe+">"+ceci+"</span>";document.write('<div id="'+nom+'" >'+ceci+'</div>');if (ns6){document.getElementById(nom).style.left=gauche+"px";document.getElementById(nom).style.top=haut+"px";}else if (ie){document.all(nom).style.left=gauche;document.all(nom).style.top=haut}}
 function retracer(nom,ceci,classe){ceci="<span class="+classe+">"+ceci+"</span>";if (ns6){document.getElementById(nom).innerHTML=ceci}else if (ie){doc=document.all(nom);doc.innerHTML=ceci}}
 function keyscroll(n){
-	keydeb+=n
+	keydeb+=n;
 	if (keydeb<0){
 		keydeb=0
 	}
@@ -156,22 +156,22 @@ function keyscroll(n){
 	}
 }
 function charger(i){
-	langue=key[i+keydeb];setCk(langue);accent="0000"
-	CarMaj=Maj[langue].split("|");CarMin=Min[langue].split("|")
+	langue=key[i+keydeb];setCk(langue);accent="0000";
+	CarMaj=Maj[langue].split("|");CarMin=Min[langue].split("|");
 	for (i=0;i<nbTouches;i++){
-		CarMaj[i]=((CarMaj[i]!="0000")?(fromhexby4tocar(CarMaj[i])):"")
-		CarMin[i]=((CarMin[i]!="0000")?(fromhexby4tocar(CarMin[i])):"")
+		CarMaj[i]=((CarMaj[i]!="0000")?(fromhexby4tocar(CarMaj[i])):"");
+		CarMin[i]=((CarMin[i]!="0000")?(fromhexby4tocar(CarMin[i])):"");
 		if (CarMaj[i]==CarMin[i].toUpperCase()){
-			cecar=((lock==0)&&(caps==0)?CarMin[i]:CarMaj[i])
-			retracer("car"+i,cecar,((dia[hexa(cecar)]!=null)?"simpledia":"simple"))
-			retracer("minus"+i,"&nbsp;")
+			cecar=((lock==0)&&(caps==0)?CarMin[i]:CarMaj[i]);
+			retracer("car"+i,cecar,((dia[hexa(cecar)]!=null)?"simpledia":"simple"));
+			retracer("minus"+i,"&nbsp;");
 			retracer("majus"+i,"&nbsp;")
 		}
 		else{
-			retracer("car"+i,"&nbsp;")
-			cecar=CarMin[i]
-			retracer("minus"+i,cecar,((dia[hexa(cecar)]!=null)?"doubledia":"double"))
-			cecar=CarMaj[i]
+			retracer("car"+i,"&nbsp;");
+			cecar=CarMin[i];
+			retracer("minus"+i,cecar,((dia[hexa(cecar)]!=null)?"doubledia":"double"));
+			cecar=CarMaj[i];
 			retracer("majus"+i,cecar,((dia[hexa(cecar)]!=null)?"doubledia":"double"))
 		}
 	}
@@ -179,13 +179,13 @@ function charger(i){
 function distinguer(oui){
 	for (i=0;i<nbTouches;i++){
 		if (CarMaj[i]==CarMin[i].toUpperCase()){
-			cecar=((lock==0)&&(caps==0)?CarMin[i]:CarMaj[i])
+			cecar=((lock==0)&&(caps==0)?CarMin[i]:CarMaj[i]);
 			if(test(cecar)){retracer("car"+i,oui?(cardia(cecar)):cecar,oui?"simpledia":"simple")}
 		}
 		else{
-			cecar=CarMin[i]
+			cecar=CarMin[i];
 			if(test(cecar)){retracer("minus"+i,oui?(cardia(cecar)):cecar,oui?"doubledia":"double")}
-			cecar=CarMaj[i]
+			cecar=CarMaj[i];
 			if(test(cecar)){retracer("majus"+i,oui?(cardia(cecar)):cecar,oui?"doubledia":"double")}
 		}
 	}
@@ -194,7 +194,7 @@ function distinguer(oui){
 function MinusMajus(){
 	for (i=0;i<nbTouches;i++){
 		if (CarMaj[i]==CarMin[i].toUpperCase()){
-			cecar=((lock==0)&&(caps==0)?CarMin[i]:CarMaj[i])
+			cecar=((lock==0)&&(caps==0)?CarMin[i]:CarMaj[i]);
 			retracer("car"+i,(test(cecar)?cardia(cecar):cecar),((dia[hexa(cecar)]!=null||test(cecar))?"simpledia":"simple"))
 		}
 	}
@@ -202,7 +202,7 @@ function MinusMajus(){
 function test(cecar){return(dia[accent]!=null&&dia[accent][hexa(cecar)]!=null)}
 function cardia(cecar){return(fromhexby4tocar(dia[accent][hexa(cecar)]))}
 function fromhex(inval){out=0;for (a=inval.length-1;a>=0;a--){out+=Math.pow(16,inval.length-a-1)*hexchars.indexOf(inval.charAt(a))}return out}
-function fromhexby4tocar(ceci){out4=new String();for (l=0;l<ceci.length;l+=4){out4+=String.fromCharCode(fromhex(ceci.substring(l,l+4)))}return out4}
+function fromhexby4tocar(ceci){out4=String();for (l=0;l<ceci.length;l+=4){out4+=String.fromCharCode(fromhex(ceci.substring(l,l+4)))}return out4}
 function tohex(inval){return hexchars.charAt(inval/16)+hexchars.charAt(inval%16)}
 function tohex2(inval){return tohex(inval/256)+tohex(inval%256)}
 function hexa(ceci){out="";for (k=0;k<ceci.length;k++){out+=(tohex2(ceci.charCodeAt(k)))}return out}
@@ -266,4 +266,4 @@ function arkey(a) {
 	}
 var obj = document.getElementById( 'uni_area' );
 if ( obj )
-	obj.onkeydown = arkey
+	obj.onkeydown = arkey;

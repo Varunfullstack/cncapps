@@ -18,7 +18,7 @@
  * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
  */
 
-var FCKLanguageManager = new Object() ;
+var FCKLanguageManager = {} ;
 
 FCKLanguageManager.AvailableLanguages = 
 {
@@ -61,4 +61,4 @@ FCKLanguageManager.AvailableLanguages =
 	'tr'		: 'Turkish',
 	'zh'		: 'Chinese Traditional',
 	'zh-cn'		: 'Chinese Simplified'
-}
+};

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Manufacturer table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEManufacturer extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEManufacturer(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEManufacturer extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("manufact");
  		$this->addColumn("manufacturerID", DA_ID, DA_NOT_NULL, "man_manno");
  		$this->addColumn("name", DA_STRING, DA_NOT_NULL, "man_name");

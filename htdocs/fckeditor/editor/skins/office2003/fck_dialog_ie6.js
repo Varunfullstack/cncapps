@@ -76,7 +76,7 @@
 					break ;
 			}
 		}
-	}
+	};
 
 	var closeButtonOver = function()
 	{
@@ -94,7 +94,7 @@
 
 		closeButton.onmouseover	= closeButtonOver ;
 		closeButton.onmouseout	= closeButtonOut ;
-	}
+	};
 
 	var onLoad = function()
 	{
@@ -103,7 +103,7 @@
 
 		window.attachEvent( 'onresize', fixSizes ) ;
 		window.detachEvent( 'onload', onLoad ) ;
-	}
+	};
 
 	window.attachEvent( 'onload', onLoad ) ;
 

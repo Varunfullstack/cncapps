@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Porhead table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPorhead extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPorhead(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEPorhead extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Porhead");
  		$this->addColumn("porheadID", DA_ID, DA_NOT_NULL, "poh_porno");
  		$this->addColumn("type", DA_STRING, DA_NOT_NULL, "poh_type");

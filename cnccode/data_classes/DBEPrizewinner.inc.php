@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Questionnaire table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPrizewinner extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPrizewinner(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEPrizewinner extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("prizewinner");
  		$this->addColumn("prizewinnerID", DA_ID, DA_NOT_NULL, "prz_prizewinnerno");
     $this->addColumn("yearMonth", DA_TEXT, DA_NOT_NULL, "prz_yearmonth");

@@ -23,8 +23,7 @@ function UpdateMenu( f, sel_t )
 	var table_names = new Array();
 	
 
-	<?
-	  for( $i = 0; list( #i, $table ) = each( $table_list ); $i++ )
+	<?php 	  for( $i = 0; list( #i, $table ) = each( $table_list ); $i++ )
 	  {
 	    
 	      echo "\ttable_names[$i] = \"$table\";\n";

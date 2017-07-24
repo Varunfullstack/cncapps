@@ -7,16 +7,16 @@
  *
  * $Id: prepend.php,v 1.2 2002/10/04 14:14:46 joestewart Exp $
  *
- */ 
+ */
 
 $_PHPLIB = array();
 
 # Can't control your include path?
 # Point this to your PHPLIB base directory. Use a trailing "/"!
-$_PHPLIB["libdir"]  = "";
-
+$_PHPLIB["libdir"] = "";
+//
 require($_PHPLIB["libdir"] . "db_mysql.inc");  /* Change this to match your database. */
-//require($_PHPLIB["libdir"] . "ct_sql.inc");    /* Change this to match your data storage container */
+require($_PHPLIB["libdir"] . "ct_sql.inc");    /* Change this to match your data storage container */
 require($_PHPLIB["libdir"] . "ct_file.inc");    /* Change this to match your data storage container */
 
 /* Additional require statements go below this line */

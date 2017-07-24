@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Question table join to answertype table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJQuestion extends DBEQuestion{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJQuestion(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJQuestion extends DBEQuestion{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("answerType", DA_STRING, DA_NOT_NULL, 'ant_desc');
  		$this->setAddColumnsOff();

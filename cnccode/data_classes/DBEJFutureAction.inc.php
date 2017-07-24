@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Future Action join
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJFutureAction extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJFutureAction(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJFutureAction extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->addColumn("futureActionID", DA_ID, DA_NOT_NULL,"future_action.futureActionID");
  		$this->addColumn("date", DA_DATE, DA_NOT_NULL,"future_action.date");
  		$this->addColumn("callActivityID", DA_ID, DA_NOT_NULL,"future_action.callActivityID");

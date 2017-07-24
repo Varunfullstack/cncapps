@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Invhead join to customer table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJInvhead extends DBEInvhead{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJInvhead(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJInvhead extends DBEInvhead{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
  		$this->addColumn("firstName", DA_STRING, DA_ALLOW_NULL, "con_first_name");

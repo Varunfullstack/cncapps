@@ -43,7 +43,7 @@ class DB_OCI8 {
   var $num_rows; // Used to store the total of rows returned by a SELECT statement.
   
   /* public: constructor */
-  function DB_OCI8($query = "") {
+  function __construct($query = "") {
     if($query) {
       $this->query($query);
     }
@@ -447,9 +447,9 @@ if((4 > $_php_major_version) or !class_exists("DB_Sql"))
 	{
 	class DB_Sql extends DB_OCI8
 		{
-		function DB_Sql($query = "")
+		function __construct($query = "")
 			{
-			$this->DB_OCI8($query);
+			DB_OCI8::__construct($query);
 			}
 		}
 	}

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Notepad table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBENotepad extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBENotepad(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBENotepad extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Notepad");
  		$this->addColumn("noteType", DA_STRING, DA_NOT_NULL, "not_type");
  		$this->addColumn("noteKey",DA_INTEGER, DA_NOT_NULL, "not_key");

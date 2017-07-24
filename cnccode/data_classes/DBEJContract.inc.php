@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Customer Item join
 * @authors Karim Ahmed
 * @access public
@@ -14,7 +13,7 @@ class DBEJContract extends DBECustomerItem{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJContract(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -24,7 +23,7 @@ class DBEJContract extends DBECustomerItem{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
 // 		$this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "concat(itm_desc, ' ', custitem.notes, ' ', add_postcode)");
     $this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "itm_desc");

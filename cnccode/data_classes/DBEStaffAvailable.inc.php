@@ -13,7 +13,7 @@ class DBEStaffAvailable extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEStaffAvailable(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +23,7 @@ class DBEStaffAvailable extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("staffavailable");
  		$this->addColumn("staffAvailableID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("userID", DA_ID, DA_NOT_NULL);

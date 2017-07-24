@@ -38,7 +38,7 @@ class Menu {
   /***************************************************************************
    * public: constructor
    */
-  function Menu() {
+  function __construct() {
     $this->setup();
   }
   

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * SecondsiteImage table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBESecondsiteImage extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESecondsiteImage(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBESecondsiteImage extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("secondsite_image");
  		$this->addColumn("secondsiteImageID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("customerItemID", DA_ID, DA_NOT_NULL);

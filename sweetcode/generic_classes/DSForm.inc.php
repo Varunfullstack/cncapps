@@ -1,5 +1,4 @@
-<?
-/**
+<?php /**
 * Specialised Dataset decendent that has an array of form messages
 *
 * This is an experimental class to stop the silly convention of creating and
@@ -21,7 +20,7 @@ class DSForm extends DataSet{
 	* @access public
 	* @return void
 	*/
-	function DSForm(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	function constructor(&$owner){

@@ -1,5 +1,4 @@
-<?
-/**
+<?php /**
 * Sales and Cost Values of initial and part despatched Sales Orders
 * @return Boolean Success
 * @access public
@@ -15,7 +14,7 @@ class DBESalesOrderTotals extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESalesOrderTotals($owner){
+	function __construct($owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -25,7 +24,7 @@ class DBESalesOrderTotals extends DBEntity{
 	* @param  void
 	*/
 	function constructor($owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("ordhead");
  		$this->addColumn("costValue", DA_FLOAT, DA_NOT_NULL);
  		$this->addColumn("saleValue", DA_FLOAT, DA_NOT_NULL);

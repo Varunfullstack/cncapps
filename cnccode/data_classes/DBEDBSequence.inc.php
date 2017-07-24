@@ -1,5 +1,4 @@
-<?
-/**
+<?php /**
 * Handles access to the db_sequence database table
 *
 * @access public
@@ -13,7 +12,7 @@ class DBEDBSequence extends DBEntity{
 	* @see constructor()
 	* @return bool
 	*/
-	function DBEDBSequence(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/*
@@ -23,7 +22,7 @@ class DBEDBSequence extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("db_sequence");
 		// Create the columns with their DB alias'
  		$this->addColumn("SeqName", DA_STRING, DA_NOT_NULL, "seq_name");

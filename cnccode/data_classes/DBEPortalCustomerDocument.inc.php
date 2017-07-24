@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * portal document table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity{
   * @param  void
   * @see constructor()
   */
-  function DBEPortalCustomerDocumentWithoutFile(&$owner){
+  function __construct(&$owner){
     $this->constructor($owner);
   }
   /**
@@ -23,7 +22,7 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity{
   * @param  void
   */
   function constructor(&$owner){
-    parent::constructor($owner);
+    parent::__construct($owner);
     $this->setTableName("portal_customer_document");
      $this->addColumn("portalCustomerDocumentID", DA_ID, DA_NOT_NULL);         
      $this->addColumn("customerID", DA_ID, DA_ALLOW_NULL);         
@@ -45,7 +44,7 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPortalCustomerDocument(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -55,7 +54,7 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
     $this->setAddColumnsOn();
  		$this->addColumn("filename", DA_STRING, DA_ALLOW_NULL);
  		$this->addColumn("file", DA_BLOB, DA_ALLOW_NULL);

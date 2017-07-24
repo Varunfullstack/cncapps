@@ -86,9 +86,9 @@ class MDB_mysql extends MDB_Common
     /**
     * Constructor
     */
-    function MDB_mysql()
+    function __construct()
     {
-        $this->MDB_Common();
+        MDB_Common::__construct();
         $this->phptype = 'mysql';
         $this->dbsyntax = 'mysql';
 

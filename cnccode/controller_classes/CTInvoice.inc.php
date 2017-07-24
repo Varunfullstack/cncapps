@@ -58,17 +58,17 @@ class CTInvoice extends CTCNC
     /**
      * Dataset for Invoice record storage.
      *
-     * @var     DSForm
+     * @param $requestMethod
+     * @param $postVars
+     * @param $getVars
+     * @param $cookieVars
+     * @param $cfg
+     * @internal param DSForm $
      * @access  private
      */
-    function CTInvoice($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-    }
-
-    function constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-        parent::constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $this->buInvoice = new BUInvoice($this);
         $this->dsInvline = new DSForm($this);
         $this->dsInvline->copyColumnsFrom($this->buInvoice->dbeJInvline);

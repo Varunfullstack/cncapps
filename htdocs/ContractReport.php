@@ -18,7 +18,7 @@ header("Cache-control: private");
 
 class CTContractReport extends CTCNC
 {
-    function CTContractReport($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
     }

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * VAT table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEVat extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEVat(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEVat extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Vat");
  		$this->addColumn("vatRateT0", DA_STRING, DA_NOT_NULL, "vat_rate_t0");
  		$this->addColumn("vatRateT1", DA_STRING, DA_NOT_NULL, "vat_rate_t1");

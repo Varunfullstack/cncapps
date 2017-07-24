@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * ExternalItem table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEExternalItem extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEExternalItem(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEExternalItem extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("externalitem");
  		$this->addColumn("externalItemID", DA_ID, DA_NOT_NULL);
     $this->addColumn("itemTypeID", DA_ID, DA_NOT_NULL);

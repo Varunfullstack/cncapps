@@ -1,359 +1,363 @@
 <?php
 /**
-* management reports business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-* 
-* NOTE: calls to BUMail::putInQueue with 5th parameter true sends email to users flagged SDManager
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_bu"]."/BUMail.inc.php");
-require_once($cfg["path_gc"]."/Controller.inc.php");
-require_once($cfg["path_func"]."/Common.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * management reports business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ *
+ * NOTE: calls to BUMail::putInQueue with 5th parameter true sends email to users flagged SDManager
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_bu"] . "/BUMail.inc.php");
+require_once($cfg["path_gc"] . "/Controller.inc.php");
+require_once($cfg["path_func"] . "/Common.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUDailyReport extends Business{
+class BUDailyReport extends Business
+{
 
-	function BUDailyReport( &$owner ){
-		$this->constructor( $owner );
-	}
-	function constructor( &$owner ){
-		parent::constructor( $owner );
-		
-		$this->db = new CNCMysqli( DB_HOST, DB_USER, DB_PASSWORD, DB_NAME );
-	}
-  function fixedIncidents( $daysAgo ) {
-    
-    $this->setMethodName ( 'fixedIncidents' );
-
-    $fixedRequests = $this->getFixedRequests( $daysAgo );
-    
-    if ( $row = $fixedRequests->fetch_row() ){
-        
-      $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      $template->set_file ( 'page', 'ServiceFixedReportEmail.inc.html' );
-      $template->set_block( 'page', 'requestBlock', 'requests');
-
-      /* csv file template */
-      $csvTemplate = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      $csvTemplate->set_file ( 'page', 'ServiceFixedReportEmail.inc.csv' );
-      $csvTemplate->set_block( 'page', 'requestBlock', 'requests');
-
-      do {
-        
-          $urlRequest = 
-            Controller::buildLink(
-              'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
-              array(
-                'problemID'       => $row[1],
-                'action'          => 'displayLastActivity'
-              )
-            );
-
-          $description = substr(common_stripEverything($row[3]), 0, 50);
-          
-          $template->setVar(
-            array(
-              'customer'          => $row[0],
-              'serviceRequestID'  => $row[1],
-              'fixedBy'           => $row[2],
-              'description'       => $description,
-              'durationHours'     => $row[4],
-              'timeSpentHours'    => $row[5],
-              'responseTimeHours' => $row[6],
-              'fixTimeHours'      => $row[7],
-              'contract'          => $row[8],
-              'urlRequest'        => $urlRequest
-            )
-          );
-          
-        $template->parse('requests', 'requestBlock', true);
-
-        $csvTemplate->setVar(
-            array(
-              'customer'          => $row[0],
-              'serviceRequestID'  => $row[1],
-              'fixedBy'           => $row[2],
-              'description'       => $description,
-              'durationHours'     => $row[4],
-              'timeSpentHours'    => $row[5],
-              'responseTimeHours' => $row[6],
-              'fixTimeHours'      => $row[7],
-              'contract'          => $row[8]
-            )
-          );
-          
-        $csvTemplate->parse('requests', 'requestBlock', true);
-
-    }while( $row = $fixedRequests->fetch_row());
-    
-    $template->parse ( 'output', 'page', true );
-
-    $body =  $template->get_var ( 'output' );
-  
-    $csvTemplate->parse ( 'output', 'page', true );
-
-    $csvFileString =  $csvTemplate->get_var ( 'output' );
-    
-    $this->sendByEmailTo(
-      'fixedyesterday@' . CONFIG_PUBLIC_DOMAIN,
-      'Service requests fixed yesterday',
-      $body,
-      $csvFileString
-    );
-
-    echo $body;
-    
-    }
-    
-  } // end function
-  /**
-  * Customer
-  * Incident No (Link)
-  * Details
-  * Assigned technician
-  * Engineering time spent
-  * Time since logged (days)
-  *   
-  * @param mixed $daysAgo
-  */
-  function outstandingIncidents( $daysAgo, $priorityFiveOnly = false ) {
-    
-    $this->setMethodName ( 'outstandingIncidents' );
-
-    $outstandingRequests = $this->getOustandingRequests( $daysAgo, $priorityFiveOnly );
-    
-    if ( $row = $outstandingRequests->fetch_row() ){
-        
-      $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      
-      $template->set_file ( 'page', 'ServiceOutstandingReportEmail.inc.html' );
-
-      $template->set_block( 'page', 'requestBlock', 'requests');
-
-      $csvTemplate = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      
-      $csvTemplate->set_file ( 'page', 'ServiceOutstandingReportEmail.inc.csv' );
-
-      $csvTemplate->set_block( 'page', 'requestBlock', 'requests');
-
-      do {
-        
-          $urlRequest = 
-            Controller::buildLink(
-              'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
-              array(
-                'problemID'       => $row[1],
-                'action'          => 'displayLastActivity'
-              )
-            );
-
-          $template->setVar(
-            array(
-              'customer'          => $row[0],
-              'serviceRequestID'  => $row[1],
-              'assignedTo'        => $row[2],
-              'description'       => substr(common_stripEverything($row[3]), 0, 50),
-              'durationHours'     => $row[4],
-              'timeSpentHours'    => $row[5],
-              'lastUpdatedDate'   => $row[6],
-              'priority'          => $row[7],
-              'teamName'          => $row[8],
-              'urlRequest'        => $urlRequest
-            )
-          );
-          
-          $csvTemplate->setVar(
-            array(
-              'customer'          => $row[0],
-              'serviceRequestID'  => $row[1],
-              'assignedTo'        => $row[2],
-              'description'       => str_replace(',','', substr(common_stripEverything($row[3]), 0, 50) ),
-              'durationHours'     => $row[4],
-              'timeSpentHours'    => $row[5],
-              'lastUpdatedDate'   => $row[6],
-              'priority'          => $row[7],
-              'teamName'          => $row[8],
-            )
-          );
-          
-        $template->parse('requests', 'requestBlock', true);
-        $csvTemplate->parse('requests', 'requestBlock', true);
-
-    }while( $row = $outstandingRequests->fetch_row());
-    
-    $template->setVar(
-      array(
-        'daysAgo'          => $daysAgo
-      )
-    );
-    
-    $template->parse ( 'output', 'page', true );
-    $body =  $template->get_var ( 'output' );
-  
-    $csvTemplate->parse ( 'output', 'page', true );
-    $csvFile =  $csvTemplate->get_var ( 'output' );
-    
-    if ( $priorityFiveOnly ){
-      $subject = 'Priority 5';
-    }
-    else{
-      $subject = 'Priority 1-4';
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
-    $subject .=  ' SRs Outstanding For ' . $daysAgo . ' Days';
-    
-    $this->sendByEmailTo(
-      'sropenfordays@'. CONFIG_PUBLIC_DOMAIN,
-      $subject,
-      $body,
-      $csvFile
-    );
+    function fixedIncidents($daysAgo)
+    {
 
-    echo $body;
-    
-    }
-    
-  } // end function outstandingIncidents
-  
-  function focActivities(  $daysAgo ) {
-    
-    $this->setMethodName ( 'focActivities' );
+        $this->setMethodName('fixedIncidents');
 
-    $activities = $this->getFocActivities( $daysAgo );
-    
-    if ( $row = $activities->fetch_row() ){
-        
-      $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      
-      $template->set_file ( 'page', 'ServiceFocReportEmail.inc.html' );
+        $fixedRequests = $this->getFixedRequests($daysAgo);
 
-      $template->set_block( 'page', 'activityBlock', 'activities');
+        if ($row = $fixedRequests->fetch_row()) {
 
-      do {
-        
-          $urlRequest = 
-            Controller::buildLink(
-              'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
-              array(
-                'problemID'       => $row[1],
-                'action'          => 'displayLastActivity'
-              )
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template->set_file('page', 'ServiceFixedReportEmail.inc.html');
+            $template->set_block('page', 'requestBlock', 'requests');
+
+            /* csv file template */
+            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $csvTemplate->set_file('page', 'ServiceFixedReportEmail.inc.csv');
+            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+
+            do {
+
+                $urlRequest =
+                    Controller::buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $description = substr(common_stripEverything($row[3]), 0, 50);
+
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'fixedBy' => $row[2],
+                        'description' => $description,
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'responseTimeHours' => $row[6],
+                        'fixTimeHours' => $row[7],
+                        'contract' => $row[8],
+                        'urlRequest' => $urlRequest
+                    )
+                );
+
+                $template->parse('requests', 'requestBlock', true);
+
+                $csvTemplate->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'fixedBy' => $row[2],
+                        'description' => $description,
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'responseTimeHours' => $row[6],
+                        'fixTimeHours' => $row[7],
+                        'contract' => $row[8]
+                    )
+                );
+
+                $csvTemplate->parse('requests', 'requestBlock', true);
+
+            } while ($row = $fixedRequests->fetch_row());
+
+            $template->parse('output', 'page', true);
+
+            $body = $template->get_var('output');
+
+            $csvTemplate->parse('output', 'page', true);
+
+            $csvFileString = $csvTemplate->get_var('output');
+
+            $this->sendByEmailTo(
+                'fixedyesterday@' . CONFIG_PUBLIC_DOMAIN,
+                'Service requests fixed yesterday',
+                $body,
+                $csvFileString
             );
 
-          $urlActivity = 
-            Controller::buildLink(
-              'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
-              array(
-                'callActivityID'   => $row[2],
-                'action'          => 'displayActivity'
-              )
+            echo $body;
+
+        }
+
+    } // end function
+
+    /**
+     * Customer
+     * Incident No (Link)
+     * Details
+     * Assigned technician
+     * Engineering time spent
+     * Time since logged (days)
+     *
+     * @param mixed $daysAgo
+     */
+    function outstandingIncidents($daysAgo, $priorityFiveOnly = false)
+    {
+
+        $this->setMethodName('outstandingIncidents');
+
+        $outstandingRequests = $this->getOustandingRequests($daysAgo, $priorityFiveOnly);
+
+        if ($row = $outstandingRequests->fetch_row()) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'ServiceOutstandingReportEmail.inc.html');
+
+            $template->set_block('page', 'requestBlock', 'requests');
+
+            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $csvTemplate->set_file('page', 'ServiceOutstandingReportEmail.inc.csv');
+
+            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+
+            do {
+
+                $urlRequest =
+                    Controller::buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'assignedTo' => $row[2],
+                        'description' => substr(common_stripEverything($row[3]), 0, 50),
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'lastUpdatedDate' => $row[6],
+                        'priority' => $row[7],
+                        'teamName' => $row[8],
+                        'urlRequest' => $urlRequest
+                    )
+                );
+
+                $csvTemplate->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'assignedTo' => $row[2],
+                        'description' => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'lastUpdatedDate' => $row[6],
+                        'priority' => $row[7],
+                        'teamName' => $row[8],
+                    )
+                );
+
+                $template->parse('requests', 'requestBlock', true);
+                $csvTemplate->parse('requests', 'requestBlock', true);
+
+            } while ($row = $outstandingRequests->fetch_row());
+
+            $template->setVar(
+                array(
+                    'daysAgo' => $daysAgo
+                )
             );
-          $template->setVar(
-            array(
-              'customer'          => $row[0],
-              'serviceRequestID'  => $row[1],
-              'activityID'        => $row[2],
-              'technician'        => $row[3],
-              'hours'             => number_format($row[4], 2),
-              'contract'          => $row[5],
-              'category'          => $row[6],
-              'urlRequest'        => $urlRequest,
-              'urlActivity'       => $urlActivity
-            )
-          );
-          
-        $template->parse('activities', 'activityBlock', true);
 
-    }while( $row = $activities->fetch_row() );
-    
-    $template->parse ( 'output', 'page', true );
+            $template->parse('output', 'page', true);
+            $body = $template->get_var('output');
 
-    $body =  $template->get_var ( 'output' );
+            $csvTemplate->parse('output', 'page', true);
+            $csvFile = $csvTemplate->get_var('output');
 
-    $this->sendByEmailTo(
-      'focyesterday@' . CONFIG_PUBLIC_DOMAIN,
-      'FOC activities logged yesterday',
-      $body
-    );
-  
-    echo $body;
-    
-    }
-    
-  } // end function
-  
-  function prepayOverValue( $daysAgo ) {
-    
-    $this->setMethodName ( 'focActivities' );
+            if ($priorityFiveOnly) {
+                $subject = 'Priority 5';
+            } else {
+                $subject = 'Priority 1-4';
+            }
 
-    $activities = $this->getPrePayActivitiesOverValue( $daysAgo );
-    
-    if ( $row = $activities->fetch_row() ){
-        
-      $template = new Template ( EMAIL_TEMPLATE_DIR, "remove" );
-      
-      $template->set_file ( 'page', 'ServicePrepayOverValueReportEmail.inc.html' );
+            $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
 
-      $template->set_block( 'page', 'activityBlock', 'activities');
-
-      do {
-        
-          $urlRequest = 
-            Controller::buildLink(
-              'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
-              array(
-                'problemID'       => $row[1],
-                'action'          => 'displayLastActivity'
-              )
+            $this->sendByEmailTo(
+                'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
+                $subject,
+                $body,
+                $csvFile
             );
 
-          $urlActivity = 
-            Controller::buildLink(
-              'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
-              array(
-                'callActivityID'   => $row[2],
-                'action'          => 'displayActivity'
-              )
+            echo $body;
+
+        }
+
+    } // end function outstandingIncidents
+
+    function focActivities($daysAgo)
+    {
+
+        $this->setMethodName('focActivities');
+
+        $activities = $this->getFocActivities($daysAgo);
+
+        if ($row = $activities->fetch_row()) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'ServiceFocReportEmail.inc.html');
+
+            $template->set_block('page', 'activityBlock', 'activities');
+
+            do {
+
+                $urlRequest =
+                    Controller::buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $urlActivity =
+                    Controller::buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'callActivityID' => $row[2],
+                            'action' => 'displayActivity'
+                        )
+                    );
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'activityID' => $row[2],
+                        'technician' => $row[3],
+                        'hours' => number_format($row[4], 2),
+                        'contract' => $row[5],
+                        'category' => $row[6],
+                        'urlRequest' => $urlRequest,
+                        'urlActivity' => $urlActivity
+                    )
+                );
+
+                $template->parse('activities', 'activityBlock', true);
+
+            } while ($row = $activities->fetch_row());
+
+            $template->parse('output', 'page', true);
+
+            $body = $template->get_var('output');
+
+            $this->sendByEmailTo(
+                'focyesterday@' . CONFIG_PUBLIC_DOMAIN,
+                'FOC activities logged yesterday',
+                $body
             );
-          $template->setVar(
-            array(
-              'customer'          => $row[0],
-              'serviceRequestID'  => $row[1],
-              'activityID'        => $row[2],
-              'value'             => number_format($row[3], 2),
-              'technician'        => $row[4],
-              'urlRequest'        => $urlRequest,
-              'urlActivity'       => $urlActivity,
-              'contract'          => $row[8]
-            )
-          );
-          
-        $template->parse('activities', 'activityBlock', true);
 
-    }while( $row = $activities->fetch_row() );
-    
-    $template->parse ( 'output', 'page', true );
+            echo $body;
 
-    $body =  $template->get_var ( 'output' );
-  
-    echo $body;
-    
-    $this->sendByEmailTo(
-      CONFIG_SALES_MANAGER_EMAIL,
-      'Pre-pay activities logged yesterday over GBP 100 in value',
-      $body
-    );
-    
-    }
-    
-    
-  } // end function
-	function getFixedRequests(  $daysAgo = 1  )
-	{
-    $sql =
-      "SELECT 
+        }
+
+    } // end function
+
+    function prepayOverValue($daysAgo)
+    {
+
+        $this->setMethodName('focActivities');
+
+        $activities = $this->getPrePayActivitiesOverValue($daysAgo);
+
+        if ($row = $activities->fetch_row()) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'ServicePrepayOverValueReportEmail.inc.html');
+
+            $template->set_block('page', 'activityBlock', 'activities');
+
+            do {
+
+                $urlRequest =
+                    Controller::buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $urlActivity =
+                    Controller::buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'callActivityID' => $row[2],
+                            'action' => 'displayActivity'
+                        )
+                    );
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'activityID' => $row[2],
+                        'value' => number_format($row[3], 2),
+                        'technician' => $row[4],
+                        'urlRequest' => $urlRequest,
+                        'urlActivity' => $urlActivity,
+                        'contract' => $row[8]
+                    )
+                );
+
+                $template->parse('activities', 'activityBlock', true);
+
+            } while ($row = $activities->fetch_row());
+
+            $template->parse('output', 'page', true);
+
+            $body = $template->get_var('output');
+
+            echo $body;
+
+            $this->sendByEmailTo(
+                CONFIG_SALES_MANAGER_EMAIL,
+                'Pre-pay activities logged yesterday over GBP 100 in value',
+                $body
+            );
+
+        }
+
+
+    } // end function
+
+    function getFixedRequests($daysAgo = 1)
+    {
+        $sql =
+            "SELECT 
         cus_name AS `customer`,
         pro_problemno AS `requestID`,
         cns_name AS `fixedBy`,
@@ -384,17 +388,18 @@ class BUDailyReport extends Business{
         pro_status IN ( 'F', 'C' )
         AND
           DATE(pro_fixed_date) = DATE(
-          DATE_SUB(NOW(), INTERVAL ". $daysAgo . " DAY)
+          DATE_SUB(NOW(), INTERVAL " . $daysAgo . " DAY)
         ) 
       ORDER BY customer,
         pro_problemno ";
 
-    return $this->db->query( $sql );
-  } // end function
-  function getOustandingRequests(  $daysAgo = 1, $priorityFiveOnly = false  )
-  {
-    $sql =
-      "SELECT 
+        return $this->db->query($sql);
+    } // end function
+
+    function getOustandingRequests($daysAgo = 1, $priorityFiveOnly = false)
+    {
+        $sql =
+            "SELECT 
         cus_name AS `customer`,
         pro_problemno AS `requestID`,
         cns_name AS `assignedTo`,
@@ -436,14 +441,13 @@ class BUDailyReport extends Business{
           DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
           AND pro_status NOT IN ('F', 'C')";
 
-    if ( $priorityFiveOnly ){
-      $sql .= " AND pro_priority = 5";
-    }    
-    else{
-      $sql .= " AND pro_priority < 5";
-    }
-    
-    $sql .= "
+        if ($priorityFiveOnly) {
+            $sql .= " AND pro_priority = 5";
+        } else {
+            $sql .= " AND pro_priority < 5";
+        }
+
+        $sql .= "
         /*
         Exclude SRs with open future activities
         */
@@ -464,19 +468,20 @@ class BUDailyReport extends Business{
       ORDER BY customer,
         pro_problemno";
 
-    return $this->db->query( $sql );
-  }
-  function getFocActivities(  $daysAgo = 1 )
-  {
-    $sql =
-      "SELECT
+        return $this->db->query($sql);
+    }
+
+    function getFocActivities($daysAgo = 1)
+    {
+        $sql =
+            "SELECT
           cus_name AS `customer`,
           caa_problemno AS `requestID`,
           caa_callactivityno AS `activityID`,
           cns_name AS `engineer`,
-          ( TIME_TO_SEC( caa_endtime ) - TIME_TO_SEC( caa_starttime ) ) / 3600 as `hours`,
-          ci.itm_desc as `contract`,
-          callacttype.cat_desc as `category`
+          ( TIME_TO_SEC( caa_endtime ) - TIME_TO_SEC( caa_starttime ) ) / 3600 AS `hours`,
+          ci.itm_desc AS `contract`,
+          callacttype.cat_desc AS `category`
           
         FROM
           callactivity 
@@ -488,7 +493,7 @@ class BUDailyReport extends Business{
           JOIN customer ON cus_custno = pro_custno
           JOIN consultant ON caa_consno = cns_consno
         WHERE
-          DATE(caa_date) = DATE( DATE_SUB( NOW(), INTERVAL ". $daysAgo . " DAY ))
+          DATE(caa_date) = DATE( DATE_SUB( NOW(), INTERVAL " . $daysAgo . " DAY ))
           AND cat.itm_sstk_price = 0 
           AND caa_starttime <> caa_endtime
           AND travelFlag = 'N'
@@ -496,13 +501,14 @@ class BUDailyReport extends Business{
           hours >= .5
         ORDER BY
           cus_name, caa_problemno";
-                
-    return $this->db->query( $sql );
-  }
-  function getPrePayActivitiesOverValue( $daysAgo = 1 )
-  {
-    $sql =
-      "SELECT
+
+        return $this->db->query($sql);
+    }
+
+    function getPrePayActivitiesOverValue($daysAgo = 1)
+    {
+        $sql =
+            "SELECT
           cus_name AS `customer`,
           caa_problemno AS `requestID`,
           caa_callactivityno AS `activityID`,
@@ -520,7 +526,7 @@ class BUDailyReport extends Business{
           JOIN consultant ON caa_consno = cns_consno
 
         WHERE
-          DATE(caa_date) = DATE( DATE_SUB( NOW(), INTERVAL ". $daysAgo . " DAY ) )
+          DATE(caa_date) = DATE( DATE_SUB( NOW(), INTERVAL " . $daysAgo . " DAY ) )
           AND itm_itemtypeno = 57 
           AND at.itm_sstk_price > 0
           AND travelFlag = 'N'
@@ -528,43 +534,44 @@ class BUDailyReport extends Business{
          Cost >= 100
         ORDER BY
           cus_name, caa_problemno";
-                
-    return $this->db->query( $sql );
-  }
 
-  function sendByEmailTo( $toEmail, $subject, $body, $attachment = false ){
-
-    $buMail = new BUMail( $this );
-    
-    $senderEmail = CONFIG_SALES_EMAIL;
-    
-    $hdrs = array (
-      'From'    => $senderEmail,
-      'Subject' => $subject,
-      'Date'    => date ( "r" )
-    );
-    
-    $buMail->mime->setHTMLBody ( $body );
-    
-    if ( $attachment ){
-      $buMail->mime->addAttachment ( $attachment, 'text/plain', 'report.csv', false );
+        return $this->db->query($sql);
     }
 
-    $body = $buMail->mime->get ();
+    function sendByEmailTo($toEmail, $subject, $body, $attachment = false)
+    {
 
-    $hdrs = $buMail->mime->headers ( $hdrs );
-    
-    $buMail->putInQueue(
-      $senderEmail,
-      $toEmail,
-      $hdrs,
-      $body,
-      true      // to SD Managers
-    );
-    
-    echo "SENT";
+        $buMail = new BUMail($this);
 
-  } // send email 
-  
+        $senderEmail = CONFIG_SALES_EMAIL;
+
+        $hdrs = array(
+            'From' => $senderEmail,
+            'Subject' => $subject,
+            'Date' => date("r")
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        if ($attachment) {
+            $buMail->mime->addAttachment($attachment, 'text/plain', 'report.csv', false);
+        }
+
+        $body = $buMail->mime->get();
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body,
+            true      // to SD Managers
+        );
+
+        echo "SENT";
+
+    } // send email
+
 }//End of class
 ?>

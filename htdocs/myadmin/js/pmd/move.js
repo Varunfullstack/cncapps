@@ -1063,14 +1063,12 @@ function getColorByTarget( target )
    var j = (i - d) / 6;
    j = j % 4;
    j++;
-   var color_case = new Array(
-                        new Array(1, 0, 0),
-                        new Array(0, 1, 0),
-                        new Array(0, 0, 1),
-                        new Array(1, 1, 0),
-                        new Array(1, 0, 1),
-                        new Array(0, 1, 1)
-                        );
+   var color_case = [[1, 0, 0],
+                        [0, 1, 0],
+                        [0, 0, 1],
+                        [1, 1, 0],
+                        [1, 0, 1],
+                        [0, 1, 1]];
     var a = color_case[d][0];
     var b = color_case[d][1];
     var c = color_case[d][2];
@@ -1081,7 +1079,7 @@ function getColorByTarget( target )
     var b = Math.round(c * 200 * e);
     var color = "rgba("+r+","+g+","+b+",1)";
 
-    TargetColors.push( new Array(target, color) );
+    TargetColors.push( [target, color] );
 
 
   }

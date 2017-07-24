@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Ordline purchase order rows
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEOrdlinePO extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEOrdlinePO(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEOrdlinePO extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Ordline");
  		$this->addColumn("supplierID", DA_ID, DA_ALLOW_NULL, "odl_suppno");
  		$this->addColumn("stockcat", DA_STRING, DA_ALLOW_NULL, "odl_stockcat");

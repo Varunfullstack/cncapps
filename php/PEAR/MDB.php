@@ -718,14 +718,14 @@ class MDB_Error extends PEAR_Error
      *                           $mode & PEAR_ERROR_TRIGGER
      * @param smixed  $debuginfo additional debug info, such as the last query
      */
-    function MDB_Error($code = MDB_ERROR, $mode = PEAR_ERROR_RETURN,
-              $level = E_USER_NOTICE, $debuginfo = NULL)
+    function __construct($code = MDB_ERROR, $mode = PEAR_ERROR_RETURN,
+                         $level = E_USER_NOTICE, $debuginfo = NULL)
     {
         if (is_int($code)) {
-            $this->PEAR_Error('MDB Error: '.MDB::errorMessage($code), $code,
+            PEAR_Error::__construct('MDB Error: '.MDB::errorMessage($code), $code,
                 $mode, $level, $debuginfo);
         } else {
-            $this->PEAR_Error("MDB Error: $code", MDB_ERROR, $mode, $level,
+            PEAR_Error::__construct("MDB Error: $code", MDB_ERROR, $mode, $level,
                 $debuginfo);
         }
     }

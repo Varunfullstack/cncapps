@@ -410,9 +410,9 @@ class XML_RPC_Client extends XML_RPC_Base {
     var $username = "";
     var $password = "";
 
-    function XML_RPC_Client($path, $server, $port = 80,
-                            $proxy = '', $proxy_port = 8080,
-                            $proxy_user = '', $proxy_pass = '')
+    function __construct($path, $server, $port = 80,
+                         $proxy = '', $proxy_port = 8080,
+                         $proxy_user = '', $proxy_pass = '')
     {
         $this->port = $port;
         $this->server = $server;
@@ -529,7 +529,7 @@ class XML_RPC_Response extends XML_RPC_Base
     var $fs;
     var $hdrs;
 
-    function XML_RPC_Response($val, $fcode = 0, $fstr = "")
+    function __construct($val, $fcode = 0, $fstr = "")
     {
         if ($fcode != 0) {
             $this->fn = $fcode;
@@ -593,7 +593,7 @@ class XML_RPC_Message extends XML_RPC_Base
     var $params = array();
     var $debug = 0;
 
-    function XML_RPC_Message($meth, $pars = 0)
+    function __construct($meth, $pars = 0)
     {
         $this->methodname = $meth;
         if (is_array($pars) && sizeof($pars)>0) {
@@ -769,7 +769,7 @@ class XML_RPC_Value extends XML_RPC_Base
     var $me = array();
     var $mytype = 0;
 
-    function XML_RPC_Value($val = -1, $type = "")
+    function __construct($val = -1, $type = "")
     {
         global $XML_RPC_Types;
         $this->me = array();

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Question table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEQuestion extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEQuestion(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEQuestion extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("question");
  		$this->addColumn("questionID", DA_ID, DA_NOT_NULL, "que_questionno");
     $this->addColumn("questionnaireID", DA_ID, DA_NOT_NULL, "que_questionnaireno");

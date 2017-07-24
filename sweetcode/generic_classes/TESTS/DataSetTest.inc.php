@@ -10,7 +10,7 @@ class DataSetTest extends SweetcodeTestCase{
 	var $dsTest;
 	var $dsReplicated;
 
-	function DataSetTest() {
+	function __construct() {
 		parent::constructor();
 		$this->dsTest = new DataSet($this);
 		$this->dsReplicated = new DataSet($this);

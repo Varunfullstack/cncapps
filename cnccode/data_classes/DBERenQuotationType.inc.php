@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Item type table access
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBERenQuotationType extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBERenQuotationType(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBERenQuotationType extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("renquotationtype");
  		$this->addColumn("renQuotationTypeID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL);

@@ -39,7 +39,7 @@ class DB_Oracle {
   var $revision = "1.2";
 
   /* public: constructor */
-  function DB_Oracle($query = "") {
+  function __construct($query = "") {
     if($query) {
       $this->query($query);
     }
@@ -440,9 +440,9 @@ if((4 > $_php_major_version) or !class_exists("DB_Sql"))
 	{
 	class DB_Sql extends DB_Oracle
 		{
-		function DB_Sql($query = "")
+		function __construct($query = "")
 			{
-			$this->DB_Oracle($query);
+			DB_Oracle::__construct($query);
 			}
 		}
 	}

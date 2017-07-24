@@ -13,7 +13,7 @@ class DBEStandardTextType extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEStandardTextType(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +23,7 @@ class DBEStandardTextType extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("standardtexttype");
  		$this->addColumn("standardTextTypeID", DA_ID, DA_NOT_NULL, 'sty_standardtexttypeno');
     $this->addColumn("description", DA_STRING, DA_NOT_NULL, 'sty_desc');

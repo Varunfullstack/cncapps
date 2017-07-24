@@ -38,7 +38,7 @@ class PHPUnit_GUI_HTML
     *                   when calling getSuitesFromDir()
     *
     */
-    function PHPUnit_GUI_HTML($suites=array())
+    function __construct($suites=array())
     {
         if (!is_array($suites)) {
             $this->_suites = array($suites);

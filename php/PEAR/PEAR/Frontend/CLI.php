@@ -47,7 +47,7 @@ class PEAR_Frontend_CLI extends PEAR_Frontend
         'normal' => '',
     );
 
-    function PEAR_Frontend_CLI()
+    function __construct()
     {
         parent::PEAR();
         $term = getenv('TERM'); //(cox) $_ENV is empty for me in 4.1.1

@@ -29,7 +29,7 @@ function spellChecker( textObject ) {
 	this.fromReplAll = "~RA";	// an occurance of a "replace all" word
 	this.fromIgnrAll = "~IA";	// an occurance of a "ignore all" word
 	// properties set at run time
-	this.wordFlags = new Array();
+	this.wordFlags = [];
 	this.currentTextIndex = 0;
 	this.currentWordIndex = 0;
 	this.spellCheckerWin = null;
@@ -188,7 +188,7 @@ function replaceWord() {
 	}
 	var txt = this.controlWin.replacementText;
 	if( txt.value ) {
-		var newspell = new String( txt.value );
+		var newspell = String( txt.value );
 		if( this._setWordText( ti, wi, newspell, this.replWordFlag )) {
 			this.currentWordIndex++;
 			this._spellcheck();
@@ -211,7 +211,7 @@ function replaceAll() {
 	}
 	var txt = this.controlWin.replacementText;
 	if( !txt.value ) return false;
-	var newspell = new String( txt.value );
+	var newspell = String( txt.value );
 
 	// set this word as a "replace all" word.
 	this._setWordText( ti, wi, newspell, this.replAllFlag );
@@ -449,7 +449,7 @@ function _setWordText( text_num, word_num, newText, flag ) {
 }
 
 function _getFormInputs( inputPattern ) {
-	var inputs = new Array();
+	var inputs = [];
 	for( var i = 0; i < document.forms.length; i++ ) {
 		for( var j = 0; j < document.forms[i].elements.length; j++ ) {
 			if( document.forms[i].elements[j].type.match( inputPattern )) {

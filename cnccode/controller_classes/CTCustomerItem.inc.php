@@ -51,14 +51,9 @@ class CTCustomerItem extends CTCNC
         "3" => "3"
     );
 
-    function CTCustomerItem($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-    }
-
-    function constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-        parent::constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsCustomerItem = new DSForm($this);

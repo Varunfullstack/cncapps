@@ -42,7 +42,7 @@ class PHPUnit_TestFailure {
     * @param  string
     * @access public
     */
-    function PHPUnit_TestFailure(&$failedTest, &$thrownException) {
+    function __construct(&$failedTest, &$thrownException) {
         $this->_failedTest      = $failedTest;
         $this->_thrownException = $thrownException;
     }

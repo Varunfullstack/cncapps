@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Stockcat table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEStockcat extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEStockcat(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEStockcat extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("stockcat");
  		$this->addColumn("stockcat", DA_STRING, DA_NOT_NULL, "stc_stockcat");
  		$this->addColumn("description", DA_STRING, DA_ALLOW_NULL, "stc_desc");

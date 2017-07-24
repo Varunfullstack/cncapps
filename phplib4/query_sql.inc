@@ -40,8 +40,7 @@ Here is an example:
 
 file: insert.php3
 ------------------
-<?
-## gets data from my form and inserts it into db
+<?php ## gets data from my form and inserts it into db
 
 require("prepend.inc"); ## here the classes are loaded and configured
 $db = new hugobla;
@@ -52,8 +51,7 @@ echo "Values inserted";
 
 file: insert2.php3
 -------------------
-<?
-## gets data from my form and inserts it into db with a new INDEX
+<?php ## gets data from my form and inserts it into db with a new INDEX
 ## myindex is defined as INT AUTO_INCREMENT PRIMARY KEY
 ## (this is mysql, in oracle you have to define a trigger)
 ## mytime is defined as DATETIME (DATE in oracle)

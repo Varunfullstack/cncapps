@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Supplier table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBESupplier extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESupplier(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBESupplier extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("Supplier");
  		$this->addColumn("supplierID", DA_ID, DA_NOT_NULL, "sup_suppno");
  		$this->addColumn("name", DA_STRING, DA_NOT_NULL, "sup_name");
@@ -65,7 +64,7 @@ class DBEJSupplier extends DBESupplier {
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
 		$this->addColumn("contactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(contact.con_first_name,' ',contact.con_last_name)");
  		$this->setAddColumnsOff();

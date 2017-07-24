@@ -62,7 +62,7 @@ GetNextNonEmptyTextNode = function( node, stopNode )
 	while ( ( node = FCKDomTools.GetNextSourceNode( node, false, 3, stopNode ) ) && node && node.length < 1 )
 		1 ;
 	return node ;
-}
+};
 
 CharacterCursor = function( arg )
 {
@@ -78,7 +78,7 @@ CharacterCursor = function( arg )
 		this._offset = arguments[1] ;
 		this._doc = FCKTools.GetElementDocument( arguments[0] ) ;
 	}
-}
+};
 CharacterCursor.prototype =
 {
 	GetCharacter : function()
@@ -157,7 +157,7 @@ CharacterRange = function( initCursor, maxLength )
 	this._cursors = initCursor.push ? initCursor : [initCursor] ;
 	this._maxLength = maxLength ;
 	this._highlightRange = null ;
-}
+};
 CharacterRange.prototype =
 {
 	ToDomRange : function()
@@ -305,7 +305,7 @@ CharacterRange.CreateFromDomRange = function( domRange )
 	}
 
 	return new CharacterRange( cursors, cursors.length ) ;
-}
+};
 
 // Knuth-Morris-Pratt Algorithm for stream input
 KMP_NOMATCH = 0 ;
@@ -327,7 +327,7 @@ KmpMatch = function( pattern, ignoreCase )
 		this.Pattern = pattern.toLowerCase();
 	else
 		this.Pattern = pattern ;
-}
+};
 KmpMatch.prototype = {
 	FeedCharacter : function( c )
 	{
@@ -515,7 +515,7 @@ function Replace()
 
 		if ( ieRange )
 			setTimeout( function(){ ieRange.select() ; }, 1 ) ;
-	}
+	};
 
 	if ( FindRange && FindRange.GetHighlightDomRange() )
 	{

@@ -1,184 +1,182 @@
 <?php
 /**
-* Escalation Report business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * Escalation Report business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUEscalationReport extends Business{
-	/**
-	* Constructor
-	* @access Public
-	*/
-  private $db;
+class BUEscalationReport extends Business
+{
+    /**
+     * Constructor
+     * @access Public
+     */
+    private $db;
 
-	function BUEscalationReport(&$owner){
-		$this->constructor($owner);
-	}
-  
-	function constructor(&$owner){
-		parent::constructor($owner);
-    $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-	}
-  
-	public function initialiseSearchForm(&$dsData)
-	{
-		$dsData = new DSForm($this);
-		$dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-		$dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-	}
-  
-  public function getTeamReport( $dsSearchForm ){
-    
-    $fromDate = $dsSearchForm->getValue('fromDate');
-    $toDate = $dsSearchForm->getValue('toDate');
-    
-    $teamReport = $this->getTeamData( $fromDate, $toDate );
-    
-    $html = '<table name="team" width="100%" border="1">';
-        
-    foreach( $teamReport as $key => $reportRow ){
-      
-      if ( $key == 0 ){
-        $html .= '<thead><tr>';
-        foreach ( $reportRow as $value ){
-          $html .= '<th>' . $value . '</th>';
-        }
-        $html .= '</tr></thead><tbody>';
-      }
-      else{
-        $html .= '<tr>';
-        foreach ( $reportRow as $value ){
-          $html .= '<td>' . $value . '</td>';
-        }
-        $html .= '</tr>';
-      }
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
-    $html .= '</tbody></table>';
-    
-    return $html;
-  }
-  
-  public function getTechnicianReport( $dsSearchForm ){
-    
-    $fromDate = $dsSearchForm->getValue('fromDate');
-    $toDate = $dsSearchForm->getValue('toDate');
-    
-    $technicianReport = $this->getTechnicianData( $fromDate, $toDate );    
-    
-    $html = '<table name="technician" width="100%" border="1">';
-        
-    foreach( $technicianReport as $key => $reportRow ){
-      
-      if ( $key == 0 ){
-        $html .= '<thead><tr>';
-        foreach ( $reportRow as $value ){
-          $html .= '<th>' . $value . '</th>';
+
+    public function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+    }
+
+    public function getTeamReport($dsSearchForm)
+    {
+
+        $fromDate = $dsSearchForm->getValue('fromDate');
+        $toDate = $dsSearchForm->getValue('toDate');
+
+        $teamReport = $this->getTeamData($fromDate, $toDate);
+
+        $html = '<table name="team" width="100%" border="1">';
+
+        foreach ($teamReport as $key => $reportRow) {
+
+            if ($key == 0) {
+                $html .= '<thead><tr>';
+                foreach ($reportRow as $value) {
+                    $html .= '<th>' . $value . '</th>';
+                }
+                $html .= '</tr></thead><tbody>';
+            } else {
+                $html .= '<tr>';
+                foreach ($reportRow as $value) {
+                    $html .= '<td>' . $value . '</td>';
+                }
+                $html .= '</tr>';
+            }
         }
-        $html .= '</tr></thead><tbody>';
-      }
-      else{
-        $html .= '<tr>';
-        foreach ( $reportRow as $value ){
-          $html .= '<td>' . $value . '</td>';
+        $html .= '</tbody></table>';
+
+        return $html;
+    }
+
+    public function getTechnicianReport($dsSearchForm)
+    {
+
+        $fromDate = $dsSearchForm->getValue('fromDate');
+        $toDate = $dsSearchForm->getValue('toDate');
+
+        $technicianReport = $this->getTechnicianData($fromDate, $toDate);
+
+        $html = '<table name="technician" width="100%" border="1">';
+
+        foreach ($technicianReport as $key => $reportRow) {
+
+            if ($key == 0) {
+                $html .= '<thead><tr>';
+                foreach ($reportRow as $value) {
+                    $html .= '<th>' . $value . '</th>';
+                }
+                $html .= '</tr></thead><tbody>';
+            } else {
+                $html .= '<tr>';
+                foreach ($reportRow as $value) {
+                    $html .= '<td>' . $value . '</td>';
+                }
+                $html .= '</tr>';
+            }
         }
-        $html .= '</tr>';
-      }
+        $html .= '</tbody></table>';
+
+        return $html;
     }
-    $html .= '</tbody></table>';
-    
-    return $html;
-  }
 
-	public function getTeamData( $fromDate, $toDate )
-	{
-    /*
-    Team Report--------------
-    */
-    $teamReport = array();
-    
-    $teams = $this->getTeams();
-      
-    /* 1st row: Table headings */
-    $resultRow[] = 'Team';
-    $resultRow[] = 'Fixed';
+    public function getTeamData($fromDate, $toDate)
+    {
+        /*
+        Team Report--------------
+        */
+        $teamReport = array();
 
-    $escalations = $this->getEscalations();
+        $teams = $this->getTeams();
 
-    foreach ( $escalations as $escalation ){
+        /* 1st row: Table headings */
+        $resultRow[] = 'Team';
+        $resultRow[] = 'Fixed';
 
-      $resultRow[] = $escalation[ 'description' ];
+        $escalations = $this->getEscalations();
 
-    }
-    $teamReport[] = $resultRow;
-    
-    /* Remaining: 1 row per team */
+        foreach ($escalations as $escalation) {
 
-    foreach ( $teams as $team ){
-      $resultRow = array();
+            $resultRow[] = $escalation['description'];
 
-      $resultRow[]    = $team[ 'name' ];
-      $resultRow[]  = $this->getTeamFixedCount( $team[ 'teamID' ], $fromDate, $toDate );
-      
-      foreach ( $escalations as $escalation ){
+        }
+        $teamReport[] = $resultRow;
 
-        $resultRow[]  = $this->getTeamEscalationCount( $team[ 'teamID' ], $escalation[ 'escalationID'], $fromDate, $toDate );
-      }
-      $teamReport[] = $resultRow;
-    }        
-    return $teamReport;    
-	} // end function search
-  
-  public function getTechnicianData( $fromDate, $toDate )
-  {
-    $resultRow = array();
-    $technicianReport = array();
-    
-    /* 1st row: Table headings */
-    $resultRow[] = 'Technician';
-    $resultRow[] = 'Team';
-    $resultRow[] = 'Fixed';
+        /* Remaining: 1 row per team */
 
-    $escalations = $this->getEscalations();
+        foreach ($teams as $team) {
+            $resultRow = array();
 
-    foreach ( $escalations as $escalation ){
+            $resultRow[] = $team['name'];
+            $resultRow[] = $this->getTeamFixedCount($team['teamID'], $fromDate, $toDate);
 
-      $resultRow[] = $escalation[ 'description' ];
-    }
-    $technicianReport[] = $resultRow;
+            foreach ($escalations as $escalation) {
 
-    $technicians = $this->getTechnicians();
+                $resultRow[] = $this->getTeamEscalationCount($team['teamID'], $escalation['escalationID'], $fromDate, $toDate);
+            }
+            $teamReport[] = $resultRow;
+        }
+        return $teamReport;
+    } // end function search
 
-    /* Remaining: 1 row per technician */
+    public function getTechnicianData($fromDate, $toDate)
+    {
+        $resultRow = array();
+        $technicianReport = array();
 
-    foreach ( $technicians as $technician ){
-      $resultRow = array();
+        /* 1st row: Table headings */
+        $resultRow[] = 'Technician';
+        $resultRow[] = 'Team';
+        $resultRow[] = 'Fixed';
 
-      $resultRow[]    = $technician[ 'firstName' ] . ' ' . $technician[ 'lastName' ];
+        $escalations = $this->getEscalations();
 
-      $resultRow[]    = $technician[ 'level' ];
+        foreach ($escalations as $escalation) {
 
-      $resultRow[]  = $this->getTechnicianFixedCount( $technician[ 'cns_consno' ], $fromDate, $toDate );
-      
-      foreach ( $escalations as $escalation ){
+            $resultRow[] = $escalation['description'];
+        }
+        $technicianReport[] = $resultRow;
 
-        $resultRow[]  = $this->getTechnicianEscalationCount( $technician[ 'cns_consno' ], $escalation[ 'escalationID'], $fromDate, $toDate );
+        $technicians = $this->getTechnicians();
 
-      }
-      $technicianReport[] = $resultRow;
-    }        
+        /* Remaining: 1 row per technician */
 
-    return $technicianReport;
-    
-  } // end get technician data
-  
-  function getEscalations(){
+        foreach ($technicians as $technician) {
+            $resultRow = array();
 
-    $sql ="
+            $resultRow[] = $technician['firstName'] . ' ' . $technician['lastName'];
+
+            $resultRow[] = $technician['level'];
+
+            $resultRow[] = $this->getTechnicianFixedCount($technician['cns_consno'], $fromDate, $toDate);
+
+            foreach ($escalations as $escalation) {
+
+                $resultRow[] = $this->getTechnicianEscalationCount($technician['cns_consno'], $escalation['escalationID'], $fromDate, $toDate);
+
+            }
+            $technicianReport[] = $resultRow;
+        }
+
+        return $technicianReport;
+
+    } // end get technician data
+
+    function getEscalations()
+    {
+
+        $sql = "
       SELECT
         escalation.escalationID,
         escalation.description
@@ -186,20 +184,21 @@ class BUEscalationReport extends Business{
         escalation
       ORDER BY
         description";
-        
-    $ret = array();
-    
-    $result = $this->db->query( $sql );
 
-    while( $row = $result->fetch_array( MYSQLI_ASSOC ) ){
-      $ret[] = $row;
+        $ret = array();
+
+        $result = $this->db->query($sql);
+
+        while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+            $ret[] = $row;
+        }
+        return $ret;
     }
-    return $ret; 
-  }	
 
-  function getTeams(){
+    function getTeams()
+    {
 
-    $sql ="
+        $sql = "
       SELECT
         team.teamID,
         team.name
@@ -207,20 +206,20 @@ class BUEscalationReport extends Business{
         team
       ORDER BY
         level";
-        
-    $ret = array();
-    
-    $result = $this->db->query( $sql );
 
-    while( $row = $result->fetch_array( MYSQLI_ASSOC ) ){
-      $ret[] = $row;
+        $ret = array();
+
+        $result = $this->db->query($sql);
+
+        while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+            $ret[] = $row;
+        }
+        return $ret;
     }
-    return $ret; 
-  }  
 
-  function getTeamFixedCount( $teamID, $fromDate, $toDate )
-  {
-    $query = "
+    function getTeamFixedCount($teamID, $fromDate, $toDate)
+    {
+        $query = "
       SELECT
         COUNT(*) as count
       FROM
@@ -229,14 +228,14 @@ class BUEscalationReport extends Business{
       WHERE
         consultant.teamID = $teamID
         AND pro_date_raised between '$fromDate' AND '$toDate'";
-        
-        
-    return $this->db->query( $query )->fetch_object()->count;
-  }
 
-  function getTeamEscalationCount( $teamID, $escalationID, $fromDate, $toDate )
-  {
-    $query = "
+
+        return $this->db->query($query)->fetch_object()->count;
+    }
+
+    function getTeamEscalationCount($teamID, $escalationID, $fromDate, $toDate)
+    {
+        $query = "
       SELECT
         COUNT(*) as count
       FROM
@@ -248,14 +247,15 @@ class BUEscalationReport extends Business{
         AND callactivity.escalationID = $escalationID
         AND callactivity.escalationAcceptedFlag = 'Y'
         AND pro_date_raised between '$fromDate' AND '$toDate'";
-        
-        
-    return $this->db->query( $query )->fetch_object()->count;
-  }
 
-  function getTechnicians(){
 
-    $sql ="
+        return $this->db->query($query)->fetch_object()->count;
+    }
+
+    function getTechnicians()
+    {
+
+        $sql = "
       SELECT
         consultant.cns_consno,
         consultant.firstName,
@@ -270,20 +270,20 @@ class BUEscalationReport extends Business{
 
       ORDER BY
         team.level, consultant.lastName";
-        
-    $ret = array();
-    
-    $result = $this->db->query( $sql );
 
-    while( $row = $result->fetch_array( MYSQLI_ASSOC ) ){
-      $ret[] = $row;
+        $ret = array();
+
+        $result = $this->db->query($sql);
+
+        while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+            $ret[] = $row;
+        }
+        return $ret;
     }
-    return $ret; 
-  }  
 
-  function getTechnicianFixedCount( $technicianID, $fromDate, $toDate )
-  {
-    $query = "
+    function getTechnicianFixedCount($technicianID, $fromDate, $toDate)
+    {
+        $query = "
       SELECT
         COUNT(*) as count
       FROM
@@ -292,14 +292,14 @@ class BUEscalationReport extends Business{
       WHERE
         consultant.cns_consno = $technicianID
         AND pro_date_raised between '$fromDate' AND '$toDate'";
-        
-        
-    return $this->db->query( $query )->fetch_object()->count;
-  }
 
-  function getTechnicianEscalationCount( $technicianID, $escalationID, $fromDate, $toDate )
-  {
-    $query = "
+
+        return $this->db->query($query)->fetch_object()->count;
+    }
+
+    function getTechnicianEscalationCount($technicianID, $escalationID, $fromDate, $toDate)
+    {
+        $query = "
       SELECT
         COUNT(*) as count
       FROM
@@ -311,10 +311,10 @@ class BUEscalationReport extends Business{
         AND callactivity.escalationID = $escalationID
         AND callactivity.escalationAcceptedFlag = 'Y'
         AND pro_date_raised between '$fromDate' AND '$toDate'";
-        
-        
-    return $this->db->query( $query )->fetch_object()->count;
-  }
+
+
+        return $this->db->query($query)->fetch_object()->count;
+    }
 
 }// End of class
 ?>

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Order delivery method table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEDeliveryMethod extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEDeliveryMethod(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEDeliveryMethod extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("delivery");
  		$this->addColumn("deliveryMethodID", DA_ID, DA_NOT_NULL, "del_delno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "del_desc");

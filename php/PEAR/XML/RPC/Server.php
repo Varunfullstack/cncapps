@@ -150,7 +150,7 @@ class XML_RPC_Server
 {
     var $dmap = array();
 
-    function XML_RPC_Server($dispMap, $serviceNow = 1)
+    function __construct($dispMap, $serviceNow = 1)
     {
         global $HTTP_RAW_POST_DATA;
         // dispMap is a despatch array of methods

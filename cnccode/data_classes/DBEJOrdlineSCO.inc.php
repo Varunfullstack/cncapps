@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * ordlinesco table join to ordheadsco table for new ID
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJOrdlineSCO extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJOrdlineSCO(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJOrdlineSCO extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("ordline_sco");
  		$this->addColumn("lineType", DA_STRING, DA_NOT_NULL, "odl_type");
  		$this->addColumn("ordheadID", DA_ID, DA_NOT_NULL, "odl_ordno");

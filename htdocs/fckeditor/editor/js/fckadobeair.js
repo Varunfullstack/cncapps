@@ -156,13 +156,13 @@ if ( FCKBrowserInfo.IsAIR )
 
 			if ( panel._focusTimer )
 				clearTimeout( panel._focusTimer ) ;
-		}
+		};
 
 		FCKPanel_Window_OnBlur = function( e, panel )
 		{
 			// Delay the execution of the original function.
 			panel._focusTimer = FCKTools.SetTimeout( _Original_FCKPanel_Window_OnBlur, 100, this, [ e, panel ] ) ;
-		}
+		};
 
 		FCK.StartEditor = function()
 		{

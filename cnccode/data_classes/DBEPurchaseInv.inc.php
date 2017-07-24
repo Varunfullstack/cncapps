@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Purchase invoice table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPurchaseInv extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPurchaseInv(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEPurchaseInv extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName('pinline');
  		$this->addColumn('pinlineID', DA_ID, DA_NOT_NULL, 'pin_pinno');
  		$this->addColumn('type', DA_STRING, DA_NOT_NULL, 'pin_type');

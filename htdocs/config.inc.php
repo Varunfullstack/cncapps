@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set('Europe/London');
 
-ini_set('memory_limit', '2048M');
+ini_set('memory_limit', '8192M');
 /**
  * Configuration settings.
  *
@@ -49,9 +49,8 @@ define('MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT', 'development');
 define('MAIN_CONFIG_SERVER_TYPE_REPLICATED', 'replicated'); // replicated server
 
 $onPavilionWebServer = false;
-
+$php7 = false;
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
-
     switch ($_SERVER['HTTP_HOST']) {
 
         case 'cncapps':
@@ -75,7 +74,8 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 
             break;
 
-        case 'cncdev7':
+        case 'cncdev7:85':
+            $GLOBALS['php7'] = true;
             $php7 = true;
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
 
@@ -112,7 +112,7 @@ switch ($server_type) {
             define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmail@cnc-ltd.co.uk');
             define("DB_HOST", "188.39.98.130");
             error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
-            ini_set('display_errors', 'off');
+            ini_set('display_errors', 'on');
 
             $GLOBALS['mail_options'] =
                 array(
@@ -121,6 +121,25 @@ switch ($server_type) {
                     'port' => 25,
                     'auth' => false
                 );
+        } elseif ($php7) {
+            define("BASE_DRIVE", "C:\\Sites\cncdev7");
+            define("DB_HOST", "localhost");
+            define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
+            define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
+            define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
+            define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
+//            error_reporting(E_ALL & ~E_STRICT)
+            error_reporting(E_ALL & ~E_WARNING);
+            ini_set('display_errors', 'on');
+
+            $GLOBALS['mail_options'] =
+                array(
+                    'driver' => 'smtp',
+                    'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                    'port' => 25,
+                    'auth' => false
+                );
+
         } else {
             define("BASE_DRIVE", "C:\\Sites\cncappsdev");
             define("DB_HOST", "localhost");
@@ -412,7 +431,7 @@ require_once(BASE_DRIVE . "/phplib4/prepend.php"); // need to do this on live si
 require_once($cfg["path_phplib_classes"] . DIRECTORY_SEPARATOR . "local4.inc.php");
 $db = new dbSweetcode;
 
-$db->query("SET sql_mode = ''");    // strict mode off
+//$db->query("SET sql_mode = ''");    // strict mode off
 //$pkdb= new dbSweetcode;
 //$db->Debug = DEBUG;        // Turn this on if database debug output needed
 ?>

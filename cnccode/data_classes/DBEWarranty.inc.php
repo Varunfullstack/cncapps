@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Warranty table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEWarranty extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEWarranty(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEWarranty extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("contract");
  		$this->addColumn("warrantyID", DA_ID, DA_NOT_NULL, "cnt_contno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "cnt_desc");

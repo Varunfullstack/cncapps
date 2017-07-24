@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Call activity table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBERootCause extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBERootCause(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBERootCause extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("rootcause");
  		$this->addColumn("rootCauseID", DA_ID, DA_NOT_NULL, "rtc_rootcauseno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "rtc_desc");

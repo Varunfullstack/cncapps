@@ -85,9 +85,9 @@ class MDB_pgsql extends MDB_Common
     /**
     * Constructor
     */
-    function MDB_pgsql()
+    function __construct()
     {
-        $this->MDB_Common();
+        MDB_Common::__construct();
         $this->phptype = 'pgsql';
         $this->dbsyntax = 'pgsql';
 

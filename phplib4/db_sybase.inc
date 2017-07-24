@@ -30,7 +30,7 @@ class DB_Sybase {
   var $PConnect  = 0;     ## Set to 1 to use persistent database connections
 
   /* public: constructor */
-  function DB_Sybase($query = "") {
+  function __construct($query = "") {
     if($query) {
       $this->query($query);
     }
@@ -173,9 +173,9 @@ if((4 > $_php_major_version) or !class_exists("DB_Sql"))
 	{
 	class DB_Sql extends DB_Sybase
 		{
-		function DB_Sql($query = "")
+		function __construct($query = "")
 			{
-			$this->DB_Sybase($query);
+			DB_Sybase::__construct($query);
 			}
 		}
 	}

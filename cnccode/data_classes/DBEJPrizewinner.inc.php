@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * prizewinner table join to contact
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJPrizewinner extends DBEPrizewinner {
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJPrizewinner(&$owner, $pkID = false){
+	function __construct(&$owner, $pkID = false){
 		$this->constructor($owner, $pkID );
 	}
 	/**
@@ -24,7 +23,7 @@ class DBEJPrizewinner extends DBEPrizewinner {
 	*/
 	function constructor(&$owner, $pkID = false )
 	{
-    parent::constructor($owner, $pkID );
+    parent::__construct($owner, $pkID );
  		$this->setAddColumnsOn();
     $this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
  		$this->addColumn("contactFirstName", DA_STRING, DA_ALLOW_NULL, "con_first_name");

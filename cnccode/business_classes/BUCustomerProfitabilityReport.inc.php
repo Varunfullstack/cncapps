@@ -1,46 +1,47 @@
 <?php
 /**
-* management reports business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_bu"]."/BUHeader.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * management reports business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUCustomerProfitabilityReport extends Business{
+class BUCustomerProfitabilityReport extends Business
+{
 
-	function BUCustomerProfitabilityReport( &$owner ){
-		$this->constructor( $owner );
-	}
-	function constructor( &$owner ){
-		parent::constructor( $owner );
-		
-		$this->db = new CNCMysqli( DB_HOST, DB_USER, DB_PASSWORD, DB_NAME );
-	}
-  function initialiseSearchForm(&$dsData)
-  {
-    $dsData = new DSForm($this);
-    $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-    $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-    $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-    $dsData->setValue('customerID', '');
-  }
-  /**
-  total hours
-  **/
-	function search( $dsSearchForm )
-	{
-    $fromDate = $dsSearchForm->getValue( 'fromDate');
-    $toDate = $dsSearchForm->getValue( 'toDate');
-    $customerID = $dsSearchForm->getValue( 'customerID');
-    
-    $buHeader = new BUHeader( $this );
-    $buHeader->getHeader( $dsHeader );
-    
-    $sql =
-      "
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
+
+    function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->setValue('customerID', '');
+    }
+
+    /**
+     * total hours
+     **/
+    function search($dsSearchForm)
+    {
+        $fromDate = $dsSearchForm->getValue('fromDate');
+        $toDate = $dsSearchForm->getValue('toDate');
+        $customerID = $dsSearchForm->getValue('customerID');
+
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
+
+        $sql =
+            "
       SELECT
         custno,
         customerName,
@@ -48,8 +49,8 @@ class BUCustomerProfitabilityReport extends Business{
         SUM(sale) AS sale,
         SUM(sale) - SUM( cost ) AS profit,
         SUM(hours) AS hours,
-        SUM(hours) * " . $dsHeader->getValue( 'hourlyLabourCost') . " AS cncCost,
-        ( SUM( sale ) - SUM( cost ) ) -  ( SUM( hours ) * " . $dsHeader->getValue( 'hourlyLabourCost') . " ) AS bottomLineProfit,
+        SUM(hours) * " . $dsHeader->getValue('hourlyLabourCost') . " AS cncCost,
+        ( SUM( sale ) - SUM( cost ) ) -  ( SUM( hours ) * " . $dsHeader->getValue('hourlyLabourCost') . " ) AS bottomLineProfit,
         SUM( otherTurnover ) AS otherTurnover,
         SUM( maintenanceTurnover ) AS maintenanceTurnover,
         SUM( prePayTurnover ) AS prePayTurnover,
@@ -82,11 +83,11 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'";
 
-    if ( $customerID ){
-      $sql .= " AND inh_custno =  $customerID ";
-    }
+        if ($customerID) {
+            $sql .= " AND inh_custno =  $customerID ";
+        }
 
-    $sql .="
+        $sql .= "
       GROUP BY custno
 
       UNION
@@ -111,13 +112,13 @@ class BUCustomerProfitabilityReport extends Business{
         JOIN customer ON cus_custno = pro_custno
       WHERE
         caa_date BETWEEN '$fromDate' AND '$toDate'";
-      
-      
-    if ( $customerID ){
-      $sql .= " AND pro_custno = " . $customerID;
-    }
 
-    $sql .="
+
+        if ($customerID) {
+            $sql .= " AND pro_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
       UNION
 
@@ -144,12 +145,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
       AND ( itm_itemtypeno NOT IN(23, 57, 3, 11, 56, 55, 54) OR itm_itemtypeno IS NULL )";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
 
       UNION
@@ -178,12 +179,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 23";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
 
       UNION
@@ -212,12 +213,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 57";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
 
       UNION
@@ -246,12 +247,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 3";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
     GROUP BY custno
 
       UNION
@@ -280,12 +281,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 11";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
 
       UNION
@@ -313,12 +314,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 56";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
     GROUP BY custno
 
       UNION
@@ -347,12 +348,12 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 55";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
 
       UNION
@@ -381,20 +382,20 @@ class BUCustomerProfitabilityReport extends Business{
       WHERE
         inh_date_printed BETWEEN '$fromDate' AND '$toDate'
         AND itm_itemtypeno = 54";
-      
-    if ( $customerID ){
-      $sql .= " AND inh_custno = " . $customerID;
-    }
 
-    $sql .="
+        if ($customerID) {
+            $sql .= " AND inh_custno = " . $customerID;
+        }
+
+        $sql .= "
       GROUP BY custno
       )
       AS temp
       WHERE custno <> 282
       GROUP BY custno";
-      
-    return $this->db->query( $sql );
-  }
-	
+
+        return $this->db->query($sql);
+    }
+
 }//End of class
 ?>

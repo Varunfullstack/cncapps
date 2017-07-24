@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 foldmethod=marker: */
 // +-----------------------------------------------------------------------------+
-// | Copyright (c) 2003 Sérgio Gonçalves Carvalho                                |
+// | Copyright (c) 2003 Sï¿½rgio Gonï¿½alves Carvalho                                |
 // +-----------------------------------------------------------------------------+
 // | This file is part of Structures_Graph.                                      |
 // |                                                                             |
@@ -20,7 +20,7 @@
 // | Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA                    |
 // | 02111-1307 USA                                                              |
 // +-----------------------------------------------------------------------------+
-// | Author: Sérgio Carvalho <sergio.carvalho@portugalmail.com>                  |
+// | Author: Sï¿½rgio Carvalho <sergio.carvalho@portugalmail.com>                  |
 // +-----------------------------------------------------------------------------+
 //
 /**
@@ -48,8 +48,8 @@ define('STRUCTURES_GRAPH_ERROR_GENERIC', 100);
  * directional, and can be traveled only one way. In an undirected graph, arcs
  * are bidirectional, and can be traveled both ways.
  *
- * @author		Sérgio Carvalho <sergio.carvalho@portugalmail.com> 
- * @copyright	(c) 2004 by Sérgio Carvalho
+ * @author		Sï¿½rgio Carvalho <sergio.carvalho@portugalmail.com> 
+ * @copyright	(c) 2004 by Sï¿½rgio Carvalho
  * @package Structures_Graph
  */
 /* }}} */
@@ -73,7 +73,7 @@ class Structures_Graph {
     * @param    boolean    Set to true if the graph is directed. Set to false if it is not directed. (Optional, defaults to true)
     * @access	public
     */
-    function Structures_Graph($directed = true) {
+    function __construct($directed = true) {
         $this->_directed = $directed;
     }
     /* }}} */

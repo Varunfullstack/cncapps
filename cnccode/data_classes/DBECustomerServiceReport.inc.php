@@ -4,46 +4,39 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
-class DBECustomerServiceReport extends DBEntity{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function DBECustomerServiceReport(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::constructor($owner);
-		$this->setTableName("callactivity");
- 		$this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
- 		$this->addColumn("Activities", DA_INTEGER, DA_ALLOW_NULL);
- 		$this->addColumn("OnSite", DA_INTEGER, DA_ALLOW_NULL);
-		$this->setPK(0);
- 		$this->setAddColumnsOff();
-	}
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
+class DBECustomerServiceReport extends DBEntity
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @return void
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setTableName("callactivity");
+        $this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
+        $this->addColumn("Activities", DA_INTEGER, DA_ALLOW_NULL);
+        $this->addColumn("OnSite", DA_INTEGER, DA_ALLOW_NULL);
+        $this->setPK(0);
+        $this->setAddColumnsOff();
+    }
 
-	function getRowsBySearchCriteria(
-			$fromDate,
-			$toDate
-		)
-	{
+    function getRowsBySearchCriteria(
+        $fromDate,
+        $toDate
+    )
+    {
 
- 		$this->setMethodName('getRowsBySearchCriteria');
+        $this->setMethodName('getRowsBySearchCriteria');
 
-		$query = 
-    "SELECT
+        $query =
+            "SELECT
       CustomerID,
       CustomerName,
       SUM(Activities) AS Activities,
@@ -72,7 +65,7 @@ class DBECustomerServiceReport extends DBEntity{
           callactivity
         WHERE
           caa_problemno = pro_problemno
-          AND caa_callacttypeno = ". CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID . "
+          AND caa_callacttypeno = " . CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID . "
       ) > 0
     GROUP BY CustomerID
     UNION
@@ -109,11 +102,12 @@ class DBECustomerServiceReport extends DBEntity{
     GROUP BY CustomerID
     ORDER BY CustomerName;";
 
-		$this->setQueryString($query);
-			
-			$ret=(parent::getRows());
-			return $ret;
-		} 
+        $this->setQueryString($query);
+
+        $ret = (parent::getRows());
+        return $ret;
+    }
 
 }
+
 ?>

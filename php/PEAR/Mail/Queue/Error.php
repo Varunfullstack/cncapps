@@ -71,16 +71,16 @@ class Mail_Queue_Error extends PEAR_Error
      *                           $mode & PEAR_ERROR_TRIGGER
      * @param string  $debuginfo additional debug info
      */
-    function Mail_Queue_Error($code = MAILQUEUE_ERROR, $mode = PEAR_ERROR_RETURN,
-              $level = E_USER_NOTICE,  $file=__FILE__, $line=__LINE__, $debuginfo='')
+    function __construct($code = MAILQUEUE_ERROR, $mode = PEAR_ERROR_RETURN,
+                         $level = E_USER_NOTICE, $file=__FILE__, $line=__LINE__, $debuginfo='')
     {
 
         $debuginfo .= (empty($debuginfo) ? '' : ' - '). 'FILE: '.$file.', LINE: '.$line;
         if (is_int($code)) {
-            $this->PEAR_Error('Mail Queue Error: ' . Mail_Queue::errorMessage($code),
+            PEAR_Error::__construct('Mail Queue Error: ' . Mail_Queue::errorMessage($code),
                               $code, $mode, $level, $debuginfo);
         } else {
-            $this->PEAR_Error('Mail Queue Error: ' . $code, MAILQUEUE_ERROR, $mode,
+            PEAR_Error::__construct('Mail Queue Error: ' . $code, MAILQUEUE_ERROR, $mode,
                               $level, $debuginfo);
         }
     }

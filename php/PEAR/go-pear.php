@@ -13,7 +13,7 @@
 # | license@php.net so we can mail you a copy immediately.               |
 # +----------------------------------------------------------------------+
 # | Authors: Tomas V.V.Cox <cox@idecnet.com>                             |
-# |          Stig Sæther Bakken <stig@php.net>                           |
+# |          Stig Sï¿½ther Bakken <stig@php.net>                           |
 # |			 Christian Dickmann <dickmann@php.net>						 |
 # |			 Pierre-Alain Joye <pajoye@pearfr.org>						 |
 # +----------------------------------------------------------------------+
@@ -1627,8 +1627,8 @@ function displayHTML($page = 'Welcome', $data = array())
 			<!--
 				if (document.getElementById('BCmode')) {
 					document.getElementById('BCmode').checked = 0;
-				};
-			// -->
+                }
+            // -->
 			</script>
 
 <?php
@@ -1649,7 +1649,7 @@ function displayHTML($page = 'Welcome', $data = array())
 		}
 ?>
 			<br/>
-			<input type="submit" value="Install" onClick="javascript: submitButton.value='Downloading and installing ... please wait ...'" name="submitButton">
+			<input type="submit" value="Install" onClick="submitButton.value='Downloading and installing ... please wait ...'" name="submitButton">
 			</form>
 <?php
 	} elseif ($page == 'install') {
@@ -1701,8 +1701,8 @@ function displayHTML($page = 'Welcome', $data = array())
 							document.getElementById('progress_cell_1').style.backgroundColor = "#006600";
 						case  1:
 							document.getElementById('progress_cell_0').style.backgroundColor = "#006600";
-					};
-				}
+                    }
+                }
 
 				function addprogress(value)
 				{
@@ -1716,9 +1716,8 @@ function displayHTML($page = 'Welcome', $data = array())
 
 					prog = document.getElementById('download_file');
 					prog.innerHTML = 'Downloading '+value+' ...';
-				};
-
-				function setdownloadprogress(value)
+                }
+            function setdownloadprogress(value)
 				{
 					downloadprogress = value;
 
@@ -1750,10 +1749,9 @@ function displayHTML($page = 'Welcome', $data = array())
 							document.getElementById('download_progress_cell_1').style.backgroundColor = "#006600";
 						case  1:
 							document.getElementById('download_progress_cell_0').style.backgroundColor = "#006600";
-					};
-				};
-
-			// -->
+                    }
+                }
+            // -->
 			</script>
 			<table style="border-width: 1px; border-color: #000000" cellspacing="0" cellpadding="0">
 			<tr>

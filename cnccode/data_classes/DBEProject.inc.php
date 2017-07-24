@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Project table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEProject extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEProject(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEProject extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("project");
  		$this->addColumn("projectID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("customerID", DA_ID, DA_NOT_NULL);

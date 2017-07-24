@@ -1,93 +1,95 @@
-<?
-/**
-* MonthlyReport business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
-require_once($cfg["path_dbe"]."/DBEServiceDeskReport.inc.php");
+<?php /**
+ * MonthlyReport business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
+require_once($cfg["path_dbe"] . "/DBEServiceDeskReport.inc.php");
 
 
-class BUMonthlyReport extends Business{
+class BUMonthlyReport extends Business
+{
 
-	/**
-	* Constructor
-	* @access Public
-	*/
-  
-	function BUMonthlyReport(&$owner){
-		$this->constructor($owner);
-	}
-	function constructor(&$owner){
-		parent::constructor($owner);
-    $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-    
-	}
-	function getAll(){
-		$this->setMethodName('getAll');
-    
-    $sql = 
-      "SELECT
+    /**
+     * Constructor
+     * @access Public
+     * @param $owner
+     */
+
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    }
+
+    function getAll()
+    {
+        $this->setMethodName('getAll');
+
+        $sql =
+            "SELECT
         sdr_servicedeskreportno,
         sdr_year_month
       FROM
         servicedeskreport";
-    
-    return $this->db->query( $sql );
-	}
-  function getMonthlyReportByID( $ID, &$dsResults )
-  {
-    $dbeServiceDeskReport = new DBEServiceDeskReport( $this );
-    $dbeServiceDeskReport->setPKValue ( $ID );
-    $dbeServiceDeskReport->getRow ();
-    
-    $this->getData ( $dbeServiceDeskReport, $dsResults );
-  }
-  function reportExistsByPeriod( $period )
-  {
-    $dbeServiceDeskReport = new DBEServiceDeskReport( $this );
-    $dbeServiceDeskReport->setValue ( 'yearMonth', $period );
-    return ( $dbeServiceDeskReport->getRowByColumn( 'yearMonth'));
-  }
-  function getIncidentCount( $periodType='M', $period = false, $priority=false, $measure=false )
-  {
-    $sql =
-      "SELECT
-        COUNT(*) as `count`
+
+        return $this->db->query($sql);
+    }
+
+    function getMonthlyReportByID($ID, &$dsResults)
+    {
+        $dbeServiceDeskReport = new DBEServiceDeskReport($this);
+        $dbeServiceDeskReport->setPKValue($ID);
+        $dbeServiceDeskReport->getRow();
+
+        $this->getData($dbeServiceDeskReport, $dsResults);
+    }
+
+    function reportExistsByPeriod($period)
+    {
+        $dbeServiceDeskReport = new DBEServiceDeskReport($this);
+        $dbeServiceDeskReport->setValue('yearMonth', $period);
+        return ($dbeServiceDeskReport->getRowByColumn('yearMonth'));
+    }
+
+    function getIncidentCount($periodType = 'M', $period = false, $priority = false, $measure = false)
+    {
+        $sql =
+            "SELECT
+        COUNT(*) AS `count`
       FROM
         problem
       WHERE";
-    
-    if ( $periodType == 'M')  {
-      $sql .= " DATE_FORMAT( pro_date_raised , '%Y%m')  = '$period'";
+
+        if ($periodType == 'M') {
+            $sql .= " DATE_FORMAT( pro_date_raised , '%Y%m')  = '$period'";
+        } else {
+            $sql .= " pro_date_raised BETWEEN '" . $period['start'] . "' AND '" . $period['end'] . "'";
+        }
+
+        if ($priority) {
+            $sql .= " AND pro_priority = $priority";
+        }
+
+        if ($measure) {
+            if ($measure == 'R') {
+                $sql .= " AND pro_working_hours < 6";
+            } else {
+                $sql .= " AND pro_responded_hours < 1";
+
+            }
+        }
+        $row = $this->db->query($sql)->fetch_row();
+
+        return $row[0];
     }
-    else{
-      $sql .= " pro_date_raised BETWEEN '" . $period['start'] . "' AND '" . $period['end'] . "'";
-    }
-        
-    if ( $priority){
-      $sql .= " AND pro_priority = $priority";
-    }
-        
-    if ( $measure){
-      if ( $measure == 'R' ){ 
-        $sql .= " AND pro_working_hours < 6";
-      }
-      else{
-        $sql .= " AND pro_responded_hours < 1";
-        
-      }
-    }
-    $row = $this->db->query( $sql )->fetch_row();     
-    
-    return $row[0];
-  }   
-  function getRequestsOutsideOla( $yearMonth )
-  {
-    $sql =
-      "SELECT
+
+    function getRequestsOutsideOla($yearMonth)
+    {
+        $sql =
+            "SELECT
         pro_problemno,
         cus_name,
         pro_breach_comment
@@ -99,13 +101,14 @@ class BUMonthlyReport extends Business{
         AND pro_responded_hours >= 1
         AND pro_priority < 3";
 
-    return $this->db->query( $sql );     
-    
-  }
-  function getRootCauses( $yearMonth )
-  {
-    $sql =
-      "SELECT
+        return $this->db->query($sql);
+
+    }
+
+    function getRootCauses($yearMonth)
+    {
+        $sql =
+            "SELECT
         rtc_desc,
         COUNT(*) as count
       FROM
@@ -118,71 +121,76 @@ class BUMonthlyReport extends Business{
       ORDER BY
         COUNT DESC";
 
-    return $this->db->query( $sql );     
-    
-  }
-  function updateMonthlyReport( &$dsServiceDeskReport )
-  {
-    $dbeServiceDeskReport = new DBEServiceDeskReport( $this );
-    
-    $this->updateDataaccessObject( $dsServiceDeskReport, $dbeServiceDeskReport );
-    
-    return $dbeServiceDeskReport->getPKValue();
-    
-  }
-  function updateBreachComment( $problemID, $comment )
-  {
-  $sql =
-      "UPDATE
+        return $this->db->query($sql);
+
+    }
+
+    function updateMonthlyReport(&$dsServiceDeskReport)
+    {
+        $dbeServiceDeskReport = new DBEServiceDeskReport($this);
+
+        $this->updateDataaccessObject($dsServiceDeskReport, $dbeServiceDeskReport);
+
+        return $dbeServiceDeskReport->getPKValue();
+
+    }
+
+    function updateBreachComment($problemID, $comment)
+    {
+        $sql =
+            "UPDATE
         problem
       SET
-        pro_breach_comment = '". mysql_escape_string( $comment ) ."'
+        pro_breach_comment = '" . mysql_escape_string($comment) . "'
       WHERE
         pro_problemno = $problemID";
 
-    return $this->db->query( $sql );     
-      
-  }
-  function emailLink( $link ){
+        return $this->db->query($sql);
 
-    $buMail = new BUMail( $this );
-    
-    $toEmail = CONFIG_SALES_EMAIL;
-    
-    $subject = 'Monthly Report';
-    
-    $senderEmail = CONFIG_SALES_EMAIL;
-    
-    $hdrs = array (
-      'From'    => $senderEmail,
-      'To'      => $toEmail,
-      'Subject' => $subject,
-      'Date'    => date ( "r" )
-    );
-    
-    $body = '<A HREF="'. $link . '">Monthly Report</A>';
-    
-    $buMail->mime->setHTMLBody ( $body );
-    
-    $body = $buMail->mime->get ();
+    }
 
-    $hdrs = $buMail->mime->headers ( $hdrs );
+    function emailLink($link)
+    {
 
-    $buMail->putInQueue(
-      $senderEmail,
-      $toEmail,
-      $hdrs,
-      $body,
-      true
-    );
-    
-    echo "SENT";
+        $buMail = new BUMail($this);
 
-  } // send email 
-  function getManagerComments( $yearMonth )
-  {
-    $sql =
-      "SELECT
+        $toEmail = CONFIG_SALES_EMAIL;
+
+        $subject = 'Monthly Report';
+
+        $senderEmail = CONFIG_SALES_EMAIL;
+
+        $hdrs = array(
+            'From' => $senderEmail,
+            'To' => $toEmail,
+            'Subject' => $subject,
+            'Date' => date("r")
+        );
+
+        $body = '<A HREF="' . $link . '">Monthly Report</A>';
+
+        $buMail->mime->setHTMLBody($body);
+
+        $body = $buMail->mime->get();
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body,
+            true
+        );
+
+        echo "SENT";
+
+    } // send email
+
+    function getManagerComments($yearMonth)
+    {
+        $sql =
+            "SELECT
         pro_problemno,
         cus_name,
         pro_manager_comment
@@ -193,8 +201,8 @@ class BUMonthlyReport extends Business{
         DATE_FORMAT( pro_date_raised , '%Y%m')  = '$yearMonth'
         AND pro_manager_comment > ''";
 
-    return $this->db->query( $sql );     
-    
-  }
+        return $this->db->query($sql);
+
+    }
 }// End of class
 ?>

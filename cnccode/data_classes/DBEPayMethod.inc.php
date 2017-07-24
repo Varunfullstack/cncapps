@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Supplier payment method table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEPayMethod extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEPayMethod(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEPayMethod extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("paymeth");
  		$this->addColumn("payMethodID", DA_ID, DA_NOT_NULL, "pay_payno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "pay_desc");

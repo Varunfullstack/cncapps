@@ -72,7 +72,7 @@ class Controller extends BaseObject{
 	var $htmlFmt=CT_HTML_FMT_SCREEN;		// HTML formatting
 	var $formErrorMessage="";
 	var $action="";
-	function Controller(
+	function __construct(
 		$requestMethod,
 		&$postVars,
 		&$getVars,
@@ -768,7 +768,7 @@ class Controller extends BaseObject{
 		}
 		else{
 
-			return '£' . number_format($unformattedNumber, $dps, '.', $thousandsSep);
+			return 'ï¿½' . number_format($unformattedNumber, $dps, '.', $thousandsSep);
 		}
 	}
 	/**

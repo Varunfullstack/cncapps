@@ -1,44 +1,44 @@
 <?php
 /**
-* Call activity business class
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg["path_gc"]."/Business.inc.php");
-require_once($cfg["path_gc"]."/Controller.inc.php");
-require_once($cfg["path_bu"]."/BUHeader.inc.php");
-require_once($cfg["path_dbe"]."/CNCMysqli.inc.php");
+ * Call activity business class
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_gc"] . "/Controller.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-class BUServiceRequestReport extends Business{
-	/**
-	* Constructor
-	* @access Public
-	*/
-	function BUServiceRequestReport(&$owner){
-		$this->constructor($owner);
-	}
-	function constructor(&$owner){
-		parent::constructor($owner);
+class BUServiceRequestReport extends Business
+{
+    /**
+     * Constructor
+     * @access Public
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+    }
 
-	}
-	function initialiseSearchForm(&$dsData)
-	{
-		$dsData = new DSForm($this);
-		$dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-		$dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-		$dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-		$dsData->setValue('customerID', '');
-	}
-	function search( &$dsSearchForm )
-	{
-		$buHeader = new BUHeader($this);
-		$buHeader->getHeader($dsHeader);
+    function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->setValue('customerID', '');
+    }
 
-    $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    function search(&$dsSearchForm)
+    {
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
 
-    $query = 
-      "
+        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+        $query =
+            "
         SELECT 
           DATE_FORMAT(pro_date_raised, '%Y-%m-%d') AS `RaisedDate`,
           DATE_FORMAT(pro_date_raised, '%H:%i') AS `RaisedTime`,
@@ -61,7 +61,7 @@ class BUServiceRequestReport extends Business{
             caa_problemno = pro_problemno
           ) AS `created`,
           cus_name AS `Customer`,
-          concat(con_first_name, ' ', con_last_name) as `Contact`,
+          concat(con_first_name, ' ', con_last_name) AS `Contact`,
           pro_priority AS `Priority`,
           rootcause.rtc_desc AS `RootCause`,
           CONCAT('Ref-', pro_problemno) AS `CallReference`,
@@ -95,29 +95,29 @@ class BUServiceRequestReport extends Business{
           LEFT JOIN item 
             ON itm_itemno = cui_itemno
           WHERE 1=1";
-          
+
 //        WHERE pro_status IN ('C', 'F')";
-      
-    if ( $dsSearchForm->getValue('fromDate') ){
-      $query .= " AND pro_date_raised >= '" . $dsSearchForm->getValue('fromDate') . "'";
-    }
-    
-    if ( $dsSearchForm->getValue('toDate') ){
-      $query .= " AND pro_date_raised <= '" . $dsSearchForm->getValue('toDate') . "'";
-    }
-    
-    if ( $dsSearchForm->getValue('customerID') ){
-      $query .=
-      " AND pro_custno = " . $dsSearchForm->getValue('customerID');
+
+        if ($dsSearchForm->getValue('fromDate')) {
+            $query .= " AND pro_date_raised >= '" . $dsSearchForm->getValue('fromDate') . "'";
+        }
+
+        if ($dsSearchForm->getValue('toDate')) {
+            $query .= " AND pro_date_raised <= '" . $dsSearchForm->getValue('toDate') . "'";
+        }
+
+        if ($dsSearchForm->getValue('customerID')) {
+            $query .=
+                " AND pro_custno = " . $dsSearchForm->getValue('customerID');
+        }
+
+        $query .= " ORDER BY pro_date_raised";
+
+        $result = $db->query($query);
+
+        return $result;
     }
 
-    $query .= " ORDER BY pro_date_raised";
-    
-    $result = $db->query( $query );
-    
-		return $result;	
-	}
 
-	
 }// End of class
 ?>

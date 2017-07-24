@@ -230,7 +230,7 @@ else{
 								if ( SC_Ajax::ajaxIsEnabled() ){
 									?>
 									<A
-										href="javascript:;"
+										href="javascript:"
 										onClick="loadXMLDoc('<?php print SC_HTTP::phpSelf()?>?ajax_table_update=1&order_by=<?php print $order_by ?>')"
 									>
 									<?php

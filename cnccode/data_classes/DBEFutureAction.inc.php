@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Future Action table holds rows for internal email reminders to do stuff
 * rows deleted as email sent
 * @authors Karim Ahmed
@@ -14,7 +13,7 @@ class DBEFutureAction extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEFutureAction(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -24,7 +23,7 @@ class DBEFutureAction extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("future_action");
  		$this->addColumn("futureActionID", DA_ID, DA_NOT_NULL);
  		$this->addColumn("date", DA_DATE, DA_NOT_NULL);

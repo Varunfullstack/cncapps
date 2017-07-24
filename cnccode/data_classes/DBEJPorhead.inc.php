@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Porhead table join for descriptions: purchase order header
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJPorhead extends DBEPorhead{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJPorhead(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJPorhead extends DBEPorhead{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("supplierName", DA_STRING, DA_NOT_NULL, 'sup_name');
  		$this->addColumn("supplierPhone", DA_STRING, DA_NOT_NULL, 'sup_phone');

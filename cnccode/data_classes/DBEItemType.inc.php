@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Item type table access
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEItemType extends DBCNCEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEItemType(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEItemType extends DBCNCEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("itemtype");
  		$this->addColumn("itemTypeID", DA_ID, DA_NOT_NULL, "ity_itemtypeno");
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, "ity_desc");

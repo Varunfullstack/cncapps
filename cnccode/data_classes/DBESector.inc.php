@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Activity Categories
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBESector extends DBEntity{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBESector(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBESector extends DBEntity{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
 		$this->setTableName("sector");
  		$this->addColumn("sectorID", DA_ID, DA_NOT_NULL, 'sec_sectorno');
  		$this->addColumn("description", DA_STRING, DA_NOT_NULL, 'sec_desc');

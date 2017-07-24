@@ -1,227 +1,229 @@
 <?php
 /**
-* Daily Helpdesk Report controller class
-* CNC Ltd
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
-require_once($cfg['path_ct'].'/CTCNC.inc.php');
-require_once($cfg['path_bu'].'/BUDailyServiceDeskReport.inc.php');
-require_once($cfg['path_func'].'/Common.inc.php');
+ * Daily Helpdesk Report controller class
+ * CNC Ltd
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
+require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_bu'] . '/BUDailyServiceDeskReport.inc.php');
+require_once($cfg['path_func'] . '/Common.inc.php');
 require_once("Mail.php");
 require_once("Mail/mime.php");
 
-class CTDailyServiceDeskReport extends CTCNC {
-	var $dsActivtyEngineer='';
-	var $page='';
-	function CTDailyServiceDeskReport($requestMethod,	$postVars, $getVars, $cookieVars, $cfg){
-		$this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-	}
-	function constructor($requestMethod,	$postVars, $getVars, $cookieVars, $cfg){
-		parent::constructor($requestMethod,	$postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
-		$this->buDailyServiceDeskReport=new buDailyServiceDeskReport($this);
-	}
-	/**
-	* Route to function based upon action passed
-	*/
-	function defaultAction()
-	{
-		switch ($_REQUEST['action']){
+class CTDailyServiceDeskReport extends CTCNC
+{
+    var $dsActivtyEngineer = '';
+    var $page = '';
 
-			default:
-				$this->page = $this->allInOne();
-				break;
-		}
-	}
-	/**
-	* @access private
-	*/
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    {
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $this->buDailyServiceDeskReport = new buDailyServiceDeskReport($this);
+    }
 
-	function allInOne()
-	{
-		$this->setMethodName('allInOne');
+    /**
+     * Route to function based upon action passed
+     */
+    function defaultAction()
+    {
+        switch ($_REQUEST['action']) {
 
-		//$this->setHTMLFmt( CT_HTML_FMT_PRINTER );
-		
-		$this->setTemplateFiles(
-			array(
-				'HelpdeskReport'				        => 'HelpdeskReport.inc',
-				'HelpdeskReportStatus'			    => 'HelpdeskReportStatus.inc',
-				'HelpdeskReportTopTenCustomers'	=> 'HelpdeskReportTopTenCustomers.inc',
-				'HelpdeskReportTopTenProblems'	=> 'HelpdeskReportTopTenProblems.inc'
-			)
-		);
+            default:
+                $this->page = $this->allInOne();
+                break;
+        }
+    }
 
-		$this->setPageTitle("Help Desk Report");
-		
-		$counts = $this->buDailyServiceDeskReport->getOutstandingActivityCounts();
+    /**
+     * @access private
+     */
 
-		$this->template->set_var(
-	
-			array(
-				'totalActivityCount'			=> Controller::htmlDisplayText( $this->buDailyServiceDeskReport->getTotalActivityCount() ),
-				'serverGuardActivityCount'		=> Controller::htmlDisplayText( $this->buDailyServiceDeskReport->getServerguardActivityCount() ),
-				'helpDeskOSServiceDeskCount'	=> Controller::htmlDisplayText( $counts->helpDeskOSServiceDeskCount),
-				'helpDeskOSServerCareCount'		=> Controller::htmlDisplayText( $counts->helpDeskOSServerCareCount),
-				'helpDeskOSPrePayCount'			=> Controller::htmlDisplayText( $counts->helpDeskOSPrePayCount),
-				'helpDeskOSEscalationCount'		=> Controller::htmlDisplayText( $counts->helpDeskOSEscalationCount),
-				'helpDeskOSCustResponseCount'	=> Controller::htmlDisplayText( $counts->helpDeskOSCustResponseCount),
-				'helpDeskProblems'				=> Controller::formatForHTML($this->buDailyServiceDeskReport->getHelpDeskProblems())
+    function allInOne()
+    {
+        $this->setMethodName('allInOne');
 
-			)
-		);
+        //$this->setHTMLFmt( CT_HTML_FMT_PRINTER );
 
-		if ( $_REQUEST['today'] == 1 ){
+        $this->setTemplateFiles(
+            array(
+                'HelpdeskReport' => 'HelpdeskReport.inc',
+                'HelpdeskReportStatus' => 'HelpdeskReportStatus.inc',
+                'HelpdeskReportTopTenCustomers' => 'HelpdeskReportTopTenCustomers.inc',
+                'HelpdeskReportTopTenProblems' => 'HelpdeskReportTopTenProblems.inc'
+            )
+        );
 
-			if ( $result = $this->buDailyServiceDeskReport->getStaffAvailability() ){
-				$this->template->set_block( 'HelpdeskReportStatus', 'availablityBlock', 'staffAvailables' );
-				
-				while ( $available = $result->fetch_object() ) {
-	
-					$this->template->set_var(
-						array(
-							'engineer' 			=> Controller::htmlDisplayText( $available->engineer ),
-							'amChecked'			=> $available->am == 0.5 ? CT_CHECKED : '',
-							'pmChecked'			=> $available->pm == 0.5 ? CT_CHECKED : ''
-						)
-					);
-	
-					$this->template->parse('staffAvailables', 'availablityBlock', true);
-				
-				}			
-			}
-			
-			if ( $result = $this->buDailyServiceDeskReport->getVisits() ){
-	
-				$this->template->set_block( 'HelpdeskReportStatus', 'visitBlock', 'visits' );
-				
-				while ( $visit = $result->fetch_object() ) {
-					
-					$this->template->set_var(
-						array(
-							'visitEngineer' 	=> Controller::htmlDisplayText( $visit->engineer ),
-							'visitCustomer' 	=> Controller::htmlDisplayText( $visit->customer ),
-							'visitDate' 		=> Controller::htmlDisplayText( $visit->date ),
-							'visitTimeOfDay' 	=> Controller::htmlDisplayText( $visit->timeOfDay )
-						)
-					);
-	
-					$this->template->parse('visits', 'visitBlock', true);
-				
-				}			
-			}
-		
-		} // end if $_REQUEST['today'] == 1
-		
-		$customers = array();
-		$hours = array();
-		$activities = array();
-		
-		if ( $result = $this->buDailyServiceDeskReport->getTopTenCustomers( $_REQUEST['today'] ) ){
+        $this->setPageTitle("Help Desk Report");
 
-			$this->template->set_block( 'HelpdeskReportTopTenCustomers', 'customerBlock','customers' );
+        $counts = $this->buDailyServiceDeskReport->getOutstandingActivityCounts();
 
-			$minHours = 99999;
-			$minActivities = 99999;
-			$maxHours = 0;
-			$maxActivities = 0;
+        $this->template->set_var(
 
-			while ( $customer = $result->fetch_object() ) {
+            array(
+                'totalActivityCount' => Controller::htmlDisplayText($this->buDailyServiceDeskReport->getTotalActivityCount()),
+                'serverGuardActivityCount' => Controller::htmlDisplayText($this->buDailyServiceDeskReport->getServerguardActivityCount()),
+                'helpDeskOSServiceDeskCount' => Controller::htmlDisplayText($counts->helpDeskOSServiceDeskCount),
+                'helpDeskOSServerCareCount' => Controller::htmlDisplayText($counts->helpDeskOSServerCareCount),
+                'helpDeskOSPrePayCount' => Controller::htmlDisplayText($counts->helpDeskOSPrePayCount),
+                'helpDeskOSEscalationCount' => Controller::htmlDisplayText($counts->helpDeskOSEscalationCount),
+                'helpDeskOSCustResponseCount' => Controller::htmlDisplayText($counts->helpDeskOSCustResponseCount),
+                'helpDeskProblems' => Controller::formatForHTML($this->buDailyServiceDeskReport->getHelpDeskProblems())
 
-			
-				$customers[] = $customer->customer;
-				$hours[] = $customer->hours;
-				$activities[] = $customer->activities;
+            )
+        );
 
-				if ( $customer->hours > $maxHours ){
-				
-					$maxHours = $customer->hours;
-					
-				}
+        if ($_REQUEST['today'] == 1) {
 
-				if ( $customer->activities > $maxActivities ){
-				
-					$maxActivities = $customer->activities;
-					
-				}
+            if ($result = $this->buDailyServiceDeskReport->getStaffAvailability()) {
+                $this->template->set_block('HelpdeskReportStatus', 'availablityBlock', 'staffAvailables');
 
-				if ( $customer->hours < $minHours ){
-				
-					$minHours = $customer->hours;
-					
-				}
+                while ($available = $result->fetch_object()) {
 
-				if ( $customer->activities < $minActivities ){
-				
-					$minActivities = $customer->activities;
-					
-				}
-					
-				$this->template->set_var(
-					array(
-						'periodDescription' => $this->buDailyServiceDeskReport->getPeriodDescription( $_REQUEST['today'] ),
-						'customer' 		=> Controller::htmlDisplayText( $customer->customer ),
-						'activities' 	=> Controller::htmlDisplayText( $customer->activities ),
-						'hours' 			=> common_numberFormat( $customer->hours )
-					)
-				);
+                    $this->template->set_var(
+                        array(
+                            'engineer' => Controller::htmlDisplayText($available->engineer),
+                            'amChecked' => $available->am == 0.5 ? CT_CHECKED : '',
+                            'pmChecked' => $available->pm == 0.5 ? CT_CHECKED : ''
+                        )
+                    );
 
-				$this->template->parse('customers', 'customerBlock', true);
-			
-			}			
+                    $this->template->parse('staffAvailables', 'availablityBlock', true);
 
-		}
-	
-		if ( $result = $this->buDailyServiceDeskReport->getTopTenProblems( $_REQUEST['today'] ) ){
+                }
+            }
 
-			$this->template->set_block( 'HelpdeskReportTopTenProblems', 'problemBlock','problems' );
+            if ($result = $this->buDailyServiceDeskReport->getVisits()) {
 
-			$minValue = 0;
-			$maxValue = 0;
-			$data = false;
-			$ylabel = false;
-			
-			while ( $problem = $result->fetch_object() ) {
-			
-				$data[] = $problem->hours;
-				$ylabel[] = $problem->category;
+                $this->template->set_block('HelpdeskReportStatus', 'visitBlock', 'visits');
 
-	
-				if ( $problem->hours > $maxValue ){
-				
-					$maxValue = $problem->hours;
-					
-				}
-											
-				$this->template->set_var(
-					array(
-						'periodDescription' => $this->buDailyServiceDeskReport->getPeriodDescription( $_REQUEST['today'] ) ,
-						'category' 		=> Controller::htmlDisplayText( $problem->category ),
-						'hours' 			=> common_numberFormat( $problem->hours )
-					)
-				);
+                while ($visit = $result->fetch_object()) {
 
-				$this->template->parse('problems', 'problemBlock', true);
-			
-			}			
+                    $this->template->set_var(
+                        array(
+                            'visitEngineer' => Controller::htmlDisplayText($visit->engineer),
+                            'visitCustomer' => Controller::htmlDisplayText($visit->customer),
+                            'visitDate' => Controller::htmlDisplayText($visit->date),
+                            'visitTimeOfDay' => Controller::htmlDisplayText($visit->timeOfDay)
+                        )
+                    );
 
-		}
+                    $this->template->parse('visits', 'visitBlock', true);
 
-		if ( $_REQUEST[ 'today' ] == 1 ){
-			$this->template->parse('helpdeskReportStatus', 	'HelpdeskReportStatus', true);
-		}
-		$this->template->parse('helpdeskReportTopTenCustomers', 'HelpdeskReportTopTenCustomers', true);
-		$this->template->parse('helpdeskReportTopTenProblems', 'HelpdeskReportTopTenProblems', true);
+                }
+            }
 
-		$this->template->parse("CONTENTS", "HelpdeskReport", true);	
+        } // end if $_REQUEST['today'] == 1
+
+        $customers = array();
+        $hours = array();
+        $activities = array();
+
+        if ($result = $this->buDailyServiceDeskReport->getTopTenCustomers($_REQUEST['today'])) {
+
+            $this->template->set_block('HelpdeskReportTopTenCustomers', 'customerBlock', 'customers');
+
+            $minHours = 99999;
+            $minActivities = 99999;
+            $maxHours = 0;
+            $maxActivities = 0;
+
+            while ($customer = $result->fetch_object()) {
+
+
+                $customers[] = $customer->customer;
+                $hours[] = $customer->hours;
+                $activities[] = $customer->activities;
+
+                if ($customer->hours > $maxHours) {
+
+                    $maxHours = $customer->hours;
+
+                }
+
+                if ($customer->activities > $maxActivities) {
+
+                    $maxActivities = $customer->activities;
+
+                }
+
+                if ($customer->hours < $minHours) {
+
+                    $minHours = $customer->hours;
+
+                }
+
+                if ($customer->activities < $minActivities) {
+
+                    $minActivities = $customer->activities;
+
+                }
+
+                $this->template->set_var(
+                    array(
+                        'periodDescription' => $this->buDailyServiceDeskReport->getPeriodDescription($_REQUEST['today']),
+                        'customer' => Controller::htmlDisplayText($customer->customer),
+                        'activities' => Controller::htmlDisplayText($customer->activities),
+                        'hours' => common_numberFormat($customer->hours)
+                    )
+                );
+
+                $this->template->parse('customers', 'customerBlock', true);
+
+            }
+
+        }
+
+        if ($result = $this->buDailyServiceDeskReport->getTopTenProblems($_REQUEST['today'])) {
+
+            $this->template->set_block('HelpdeskReportTopTenProblems', 'problemBlock', 'problems');
+
+            $minValue = 0;
+            $maxValue = 0;
+            $data = false;
+            $ylabel = false;
+
+            while ($problem = $result->fetch_object()) {
+
+                $data[] = $problem->hours;
+                $ylabel[] = $problem->category;
+
+
+                if ($problem->hours > $maxValue) {
+
+                    $maxValue = $problem->hours;
+
+                }
+
+                $this->template->set_var(
+                    array(
+                        'periodDescription' => $this->buDailyServiceDeskReport->getPeriodDescription($_REQUEST['today']),
+                        'category' => Controller::htmlDisplayText($problem->category),
+                        'hours' => common_numberFormat($problem->hours)
+                    )
+                );
+
+                $this->template->parse('problems', 'problemBlock', true);
+
+            }
+
+        }
+
+        if ($_REQUEST['today'] == 1) {
+            $this->template->parse('helpdeskReportStatus', 'HelpdeskReportStatus', true);
+        }
+        $this->template->parse('helpdeskReportTopTenCustomers', 'HelpdeskReportTopTenCustomers', true);
+        $this->template->parse('helpdeskReportTopTenProblems', 'HelpdeskReportTopTenProblems', true);
+
+        $this->template->parse("CONTENTS", "HelpdeskReport", true);
 
 //		$this->template->parse("CONTENTS", "page");
-		
+
 //		return $this->template->finish($this->template->get_var('CONTENTS'));
-		$this->parsePage();
-		
-		
-	}
+        $this->parsePage();
+
+
+    }
 }// end of class
 ?>

@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Invline table
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJInvline extends DBEInvline{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJInvline(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJInvline extends DBEInvline{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "itm_desc");
  		$this->setAddColumnsOff();

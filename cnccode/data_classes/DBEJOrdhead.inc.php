@@ -1,5 +1,4 @@
-<?
-/*
+<?php /*
 * Ordhead table join
 * @authors Karim Ahmed
 * @access public
@@ -13,7 +12,7 @@ class DBEJOrdhead extends DBEOrdhead{
 	* @param  void
 	* @see constructor()
 	*/
-	function DBEJOrdhead(&$owner){
+	function __construct(&$owner){
 		$this->constructor($owner);
 	}
 	/**
@@ -23,7 +22,7 @@ class DBEJOrdhead extends DBEOrdhead{
 	* @param  void
 	*/
 	function constructor(&$owner){
-		parent::constructor($owner);
+		parent::__construct($owner);
  		$this->setAddColumnsOn();
  		$this->addColumn("customerName", DA_STRING, DA_NOT_NULL, 'cus_name');
  		$this->addColumn("contract", DA_STRING, DA_ALLOW_NULL, 'itm_desc');

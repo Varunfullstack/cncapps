@@ -110,15 +110,11 @@ class BUActivity extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
-    function BUActivity(&$owner)
+    function __construct(&$owner)
     {
-        $this->constructor($owner);
-    }
-
-    function constructor(&$owner)
-    {
-        parent::constructor($owner);
+        parent::__construct($owner);
         $this->dbeJCallActivity = new DBEJCallActivity($this);
         $this->dbeCallActivitySearch = new DBECallActivitySearch($this);
         $this->dbeUser = new DBEUser($this);
@@ -336,7 +332,7 @@ class BUActivity extends Business
         );
     }
 
-        function initialiseCallActivity($customerID, $userID, &$dsCallActivity)
+    function initialiseCallActivity($customerID, $userID, &$dsCallActivity)
     {
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
@@ -358,7 +354,7 @@ class BUActivity extends Business
         $dsCallActivity->post();
     } // end sendServiceReallocatedEmail
 
-        /**
+    /**
      *
      * Set the activity tyoe to customer contact
      *
@@ -456,7 +452,7 @@ class BUActivity extends Business
         $this->escalateProblemByProblemID($dsCallActivity->getValue('problemID'));
     }
 
-        function getActivityByID($callActivityID, &$dsResults)
+    function getActivityByID($callActivityID, &$dsResults)
     {
         $this->dbeJCallActivity->setPKValue($callActivityID);
         $this->dbeJCallActivity->getRow();
@@ -464,7 +460,7 @@ class BUActivity extends Business
         return ($this->getData($this->dbeJCallActivity, $dsResults));
     } // end sendSpecialAttentionEmail
 
-        function escalateProblemByProblemID($problemID)
+    function escalateProblemByProblemID($problemID)
     {
 
         $dbeProblem = new DBEProblem($this, $problemID);
@@ -490,7 +486,7 @@ class BUActivity extends Business
 
     } // end sendCritcalEmail
 
-        /**
+    /**
      * Create an operational activity using passed description
      *
      * @param mixed $description
@@ -537,7 +533,7 @@ class BUActivity extends Business
         }
     }
 
-        /**
+    /**
      * reopen problem that has previously been fixed
      *
      * @param mixed problemID
@@ -566,7 +562,7 @@ class BUActivity extends Business
 
     } // end sendActivityLoggedEmail
 
-function sendPriorityFiveFixedEmail($problemID)
+    function sendPriorityFiveFixedEmail($problemID)
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
@@ -1102,7 +1098,7 @@ function sendPriorityFiveFixedEmail($problemID)
         );
     } // end sendUpdatedByAnotherUserEmail
 
-/**
+    /**
      * Sends email to client when an activity has been logged
      *
      * @param mixed $callActivityID
@@ -1279,7 +1275,7 @@ function sendPriorityFiveFixedEmail($problemID)
 
     }
 
-/**
+    /**
      * Sends email to service desk managers when activity logged against  customer
      *
      * @param mixed $activityID
@@ -1429,7 +1425,7 @@ function sendPriorityFiveFixedEmail($problemID)
         );
     } // end sendRequestCompletedEarlyEmail
 
-/**
+    /**
      * Sends email to sales when future on-site activity logged
      *
      * @param mixed $activityID
@@ -1492,7 +1488,7 @@ function sendPriorityFiveFixedEmail($problemID)
         );
     }
 
-private function sendChangeRequestEmail($dbeCallActivity)
+    private function sendChangeRequestEmail($dbeCallActivity)
     {
         $buMail = new BUMail($this);
 
@@ -1679,7 +1675,7 @@ private function sendChangeRequestEmail($dbeCallActivity)
         return $dbeNewActivity->getPKValue();
     }
 
-private function sendChangeRequestReplyEmail($dbeCallActivity, $subject, $requestingUserID)
+    private function sendChangeRequestReplyEmail($dbeCallActivity, $subject, $requestingUserID)
     {
         $buMail = new BUMail($this);
 
@@ -1780,7 +1776,7 @@ private function sendChangeRequestReplyEmail($dbeCallActivity, $subject, $reques
         }
     }
 
-        function travelActivityForCustomerEngineerTodayExists(
+    function travelActivityForCustomerEngineerTodayExists(
         $customerID,
         $siteNo,
         $userID,
@@ -1987,7 +1983,7 @@ private function sendChangeRequestReplyEmail($dbeCallActivity, $subject, $reques
 
     }
 
-        function deleteCallActivity($callActivityID)
+    function deleteCallActivity($callActivityID)
     {
 
         $this->setMethodName('deleteCallActivity');
@@ -2037,7 +2033,7 @@ private function sendChangeRequestReplyEmail($dbeCallActivity, $subject, $reques
 
     }
 
-function sendServiceRemovedEmail($problemID, $allocatedToSystemUser = false)
+    function sendServiceRemovedEmail($problemID, $allocatedToSystemUser = false)
     {
 
         $buMail = new BUMail($this);
@@ -2607,7 +2603,7 @@ function sendServiceRemovedEmail($problemID, $allocatedToSystemUser = false)
         $dsData->post();
     }
 
-function checkDefaultSiteContacts(&$dsData, &$failList)
+    function checkDefaultSiteContacts(&$dsData, &$failList)
     {
 
         $this->setMethodName('checkDefaultSiteContacts');
@@ -3453,7 +3449,7 @@ customer with the past 8 hours email to GL
         return $dsCallActivity;
     }
 
-        function sendServiceReAddedEmail($newProblemID, $oldProblemID)
+    function sendServiceReAddedEmail($newProblemID, $oldProblemID)
     {
 
         $buMail = new BUMail($this);
@@ -4124,7 +4120,7 @@ customer with the past 8 hours email to GL
         $this->dbeProblem->updateRow();
     }
 
-/**
+    /**
      * Sends email to new user when service request reallocated
      *
      * @param mixed $problemID
@@ -4330,7 +4326,7 @@ customer with the past 8 hours email to GL
   Engineer activity is one not raised by system
   */
 
-function createSalesServiceRequest($ordheadID, $dsInput, $selectedOrderLine = false)
+    function createSalesServiceRequest($ordheadID, $dsInput, $selectedOrderLine = false)
     {
         $buSalesOrder = new BUSalesOrder($this);
 
@@ -4516,7 +4512,7 @@ function createSalesServiceRequest($ordheadID, $dsInput, $selectedOrderLine = fa
 
     }
 
-function sendSalesRequestAlertEmail($problemID, $internalNotes)
+    function sendSalesRequestAlertEmail($problemID, $internalNotes)
     {
 
         $buMail = new BUMail($this);
@@ -5202,7 +5198,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
         return $ret;
     }
 
-        function getRequestByCustPostcodeMonitorNameAgentName(
+    function getRequestByCustPostcodeMonitorNameAgentName(
         $customerID,
         $postcode,
         $monitorName,
@@ -5776,7 +5772,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
         return $date->format('H:i');
     }
 
-/**
+    /**
      * Sends email to the tecnician that escalated request to let them know request is fixed
      *
      * @param mixed $problemID
@@ -5868,7 +5864,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
         }
     }
 
-/**
+    /**
      * Sends email to client when a service request it's priority changed
      *
      * @param mixed $callActivityID
@@ -6334,7 +6330,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
         $dbeCallActivity->insertRow();
     }
 
-        function sendSiteVisitEmail($callActivityID)
+    function sendSiteVisitEmail($callActivityID)
     {
         $buMail = new BUMail($this);
 
@@ -6436,7 +6432,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
 
     } // end clearSystemSRQueue
 
-/**
+    /**
      * Remove all SRs assigned to system user
      *
      */
@@ -6647,7 +6643,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
         $this->createSecondsiteSR($customerID, $contractCustomerItemID, $details, $details, $serverName, $serverCustomerItemID);
     }
 
-        public function updateLinkedSalesOrder($callActivityID, $salesOrderID)
+    public function updateLinkedSalesOrder($callActivityID, $salesOrderID)
     {
         $this->getActivityByID($callActivityID, $dsCallActivity);
 
@@ -7036,7 +7032,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
 
     }
 
-        private function logAllocatedTime($userID, $hours, $comments)
+    private function logAllocatedTime($userID, $hours, $comments)
     {
         global $db;
 
@@ -7065,7 +7061,7 @@ function sendSalesRequestAlertEmail($problemID, $internalNotes)
   Send email to SD Managers requesting more time to be allocated to SR
   */
 
-private function sendTimeAllocatedEmail($hours, $comments)
+    private function sendTimeAllocatedEmail($hours, $comments)
     {
         $buMail = new BUMail($this);
 
