@@ -45,6 +45,8 @@ class dbSweetcode extends DB_Sql
     var $Database = DB_NAME;
     var $User = DB_USER;
     var $Password = DB_PASSWORD;
+
+
 }
 
 /**

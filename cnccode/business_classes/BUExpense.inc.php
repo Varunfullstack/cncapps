@@ -387,7 +387,7 @@ class BUExpense extends Business
     {
         require_once("Mail.php");
 
-        $mail = new Mail('smtp', $GLOBALS['mail_options']);
+        $mail = Mail::factory('smtp', $GLOBALS['mail_options']);
 
         if ($GLOBALS['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $email_to = CONFIG_SALES_MANAGER_EMAIL;
@@ -716,6 +716,7 @@ class BUExpense extends Business
             return TRUE;
         } // end if ( $db->next_record() )
         else {
+
             return FALSE;
         }
     }
@@ -728,7 +729,7 @@ class BUExpense extends Business
     {
         require_once("Mail.php");
 
-        $mail = new Mail('smtp', $GLOBALS['mail_options']);
+        $mail = Mail::factory('smtp', $GLOBALS['mail_options']);
 
         if ($GLOBALS['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $email_to = CONFIG_SALES_MANAGER_EMAIL;
@@ -776,7 +777,7 @@ class BUExpense extends Business
     {
         require_once("Mail.php");
 
-        $mail = new Mail('smtp', $GLOBALS['mail_options']);
+        $mail = Mail::factory('smtp', $GLOBALS['mail_options']);
 
         $hdrs = array(
             'From' => 'grahaml@cnc-ltd.co.uk',

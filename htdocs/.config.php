@@ -5,7 +5,7 @@ session_start();
 ini_set('zlib.output_compression', 'On');
 ini_set('zlib.output_compression_level', '9');
 // define 2 error levels
-define('CONFIG_ERROR_LEVEL_DEVELOPMENT', E_ALL & ~E_STRICT);            // we want to see them all!
+define('CONFIG_ERROR_LEVEL_DEVELOPMENT', E_ALL & ~E_STRICT & ~E_WARNING);            // we want to see them all!
 define('CONFIG_ERROR_LEVEL_PRODUCTION', CONFIG_ERROR_LEVEL_DEVELOPMENT);
 /*
 * Handy
@@ -34,6 +34,11 @@ if ($_SERVER['HTTP_HOST'] == 'cncapp' OR $_SERVER['HTTP_HOST'] == 'cncapps') {
 if ($_SERVER['HTTP_HOST'] == 'devtest.pavilionweb.com') {
     $server_type = CONFIG_SERVER_TYPE_DEVELOPMENT;
 }
+if ($_SERVER['HTTP_HOST'] == 'cncdev7:85') {
+    $serverPhp7 = true;
+}
+
+
 /*
 * Paths
 */
@@ -65,7 +70,12 @@ switch ($server_type) {
         define('CONFIG_DB_NAME', 'cncapps');
         break;
     case CONFIG_SERVER_TYPE_DEVELOPMENT:
-        define('CONFIG_DB_HOST', "188.39.98.130");
+        if ($serverPhp7) {
+            define('CONFIG_DB_HOST', "localhost");
+        } else {
+            define('CONFIG_DB_HOST', "188.39.98.130");
+        }
+
         define('CONFIG_DB_USERNAME', 'webuser');
         define('CONFIG_DB_PASSWORD', 'CnC1988');
         define('CONFIG_DB_NAME', 'cncappsdev');

@@ -55,6 +55,7 @@ class DBECallActivity extends DBEntity
 
         $this->setPK(0);
         $this->setAddColumnsOff();
+        $this->db->connect();
     }
 
     function changeProblemID($fromProblemID, $toProblemID)
@@ -62,12 +63,25 @@ class DBECallActivity extends DBEntity
 
         $query =
             "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName('problemID') . " = " . mysql_escape_string($toProblemID) .
-            " WHERE " . $this->getDBColumnName('problemID') . " = " . mysql_escape_string($fromProblemID);
+            " SET " . $this->getDBColumnName('problemID') . " = ? " .
+            " WHERE " . $this->getDBColumnName('problemID') . " = ?";
 
-        $this->setQueryString($query);
 
-        return (parent::getRows());
+        $parameters = [
+            [
+                'type' => 'i',
+                'value' => $toProblemID
+            ],
+            [
+                'type' => 'i',
+                'value' => $fromProblemID
+            ],
+
+        ];
+        /**
+         * @var mysqli_result $result
+         */
+        $result = $this->db->prepareQuery($query, $parameters);
 
     }
 
@@ -319,8 +333,8 @@ class DBEJCallActivity extends DBECallActivity
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE caa_date >= '" . mysql_escape_string($startDate) . "'" .
-            " AND caa_date <= '" . mysql_escape_string($endDate) . "' AND callactivity.caa_problemno <> 0"
+            " WHERE caa_date >= '" . mysqli_real_escape_string($this->db->link_id(), $startDate) . "'" .
+            " AND caa_date <= '" . mysqli_real_escape_string($this->db->link_id(), $endDate) . "' AND callactivity.caa_problemno <> 0"
         );
 
         return (parent::getRows());
@@ -360,7 +374,7 @@ class DBEJCallActivity extends DBECallActivity
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE callactivity.caa_problemno = '" . mysql_escape_string($problemID) . "' AND callactivity.caa_problemno <> 0";
+            " WHERE callactivity.caa_problemno = '" . mysqli_real_escape_string($this->db->link_id(), $problemID) . "' AND callactivity.caa_problemno <> 0";
 
         if (!$includeTravel) {           // isnull in case this is an incomplete activity with no call activity set yet
             $query .= " AND ( travelFlag <> 'Y' OR ISNULL(travelFlag) )";

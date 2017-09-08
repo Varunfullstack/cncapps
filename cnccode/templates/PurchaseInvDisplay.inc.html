@@ -1,201 +1,229 @@
 <!-- Template: PurchaseInvDisplay.inc.html -->
 <script language='JavaScript' src='CommonJS.js'></script>
 <SCRIPT language="JavaScript">
-var qtySetZero = true; // initialise flag to indicate current toggle state 
-document.onkeydown = function () {
-  if (event.keyCode == 116) { // F5 toggle
-		event.keyCode = 0;
-		event.returnValue = false;
-		event.cancelBubble = true;
-		numberOfElements = getElementCount("qtyToInvoice");
-	  for (var i=0 ; i < numberOfElements ; i++)
-		{
-			var qtyToInvoice = document.all("qtyToInvoice", i);
-			var qtyOS = document.all("qtyOS", i);
-			if(qtySetZero && !qtyToInvoice.disabled){
-				qtyToInvoice.value = qtyOS.value;
-			}
-			else{
-				qtyToInvoice.value=0;
-			}
-		}
-		// toggle global flag
-		if(qtySetZero){
-			qtySetZero = false;
-		}
-		else{
-			qtySetZero = true;
-		}
-		calculateTotals();
-  }
-}
-/*
- based upon current values in invoice qty and price , calculate and display VAT value and ex-VAT totals
-*/
-function calculateTotals(){
-	var curInvGrandTotal = 0;
-	var curVATGrandTotal = 0;
-	var lineTotal = 0;
-	numberOfElements = getElementCount("qtyToInvoice");
-  for (var i=0 ; i < numberOfElements ; i++)
-	{
-		var qtyToInvoice = document.all("qtyToInvoice", i);
-		var curInvUnitCost = document.all("curInvUnitCost", i);
-		var curInvTotalCost = document.all("curInvTotalCost", i);
-		var curVAT = document.all("curVAT", i);
-		if (IsNumeric(qtyToInvoice.value) && IsNumeric(curInvUnitCost.value)){
-			lineTotal = (qtyToInvoice.value * curInvUnitCost.value);
-			curInvTotalCost.innerHTML = lineTotal.toFixed(2);
-			vat = lineTotal * ({vatRate} / 100);
-			vatRounded = Math.round(vat*100)/100;
-			curVAT.value = vatRounded.toFixed(2);
-			curInvGrandTotal = curInvGrandTotal + lineTotal;
-			curVATGrandTotal = curVATGrandTotal + vatRounded;
-		}
-	}
-	document.getElementById("curInvGrandTotal").innerHTML = curInvGrandTotal.toFixed(2);
-	document.getElementById("curVATGrandTotal").innerHTML = curVATGrandTotal.toFixed(2);
-}
-/*
- based upon current values in invoice qty and price , calculate and display VAT value and ex-VAT totals
-*/
-function calculateVATTotal(){
-	var curVATGrandTotal = 0;
-	numberOfElements = getElementCount("qtyToInvoice");
-  for (var i=0 ; i < numberOfElements ; i++)
-	{
-		var curVAT = document.all("curVAT", i);
-		if (IsNumeric(curVAT.value)){
-			curVATGrandTotal = curVATGrandTotal + eval(curVAT.value);
-		}
-	}
-	document.getElementById("curVATGrandTotal").innerHTML = curVATGrandTotal.toFixed(2);
-}
+    var qtySetZero = true; // initialise flag to indicate current toggle state
+    document.onkeydown = function (event) {
+        if (event.keyCode == 116) { // F5 toggle
+            event.keyCode = 0;
+            event.cancelBubble = true;
+            event.preventDefault ? event.preventDefault() : event.returnValue = false;
+            var qtyToInvoiceElements = $('.qtyToInvoice');
+            var qtyOSElements = $('.qtyOS');
+
+            qtyToInvoiceElements.each(function (index, item, arary) {
+                var qtyToInvoice = qtyToInvoiceElements[index];
+                var qtyOS = qtyOSElements[index];
+                if (qtySetZero && !qtyToInvoice.disabled) {
+                    qtyToInvoice.value = qtyOS.value;
+                }
+                else {
+                    qtyToInvoice.value = 0;
+                }
+            });
+            // toggle global flag
+            qtySetZero = !qtySetZero;
+            calculateTotals();
+        }
+    };
+
+    /*
+     based upon current values in invoice qty and price , calculate and display VAT value and ex-VAT totals
+    */
+    function calculateTotals() {
+        var curInvGrandTotal = 0;
+        var curVATGrandTotal = 0;
+        var lineTotal = 0;
+
+        var qtyToInvoiceElements = $('.qtyToInvoice');
+        var curInvUnitCostElements = $('.curInvUnitCost');
+        var curInvTotalCostElements = $('.curInvTotalCost');
+        var curVATElements = $('.curVat');
+        qtyToInvoiceElements.each(function (index, item, array) {
+            var qtyToInvoice = qtyToInvoiceElements[index];
+            var curInvUnitCost = curInvUnitCostElements[index];
+            var curInvTotalCost = curInvTotalCostElements[index];
+            var curVAT = curVATElements[index];
+            if (IsNumeric(qtyToInvoice.value) && IsNumeric(curInvUnitCost.value)) {
+                lineTotal = (qtyToInvoice.value * curInvUnitCost.value);
+                curInvTotalCost.innerHTML = lineTotal.toFixed(2);
+                var vat = lineTotal * ({vatRate}
+                / 100);
+                var vatRounded = Math.round(vat * 100) / 100;
+                curVAT.value = vatRounded.toFixed(2);
+                curInvGrandTotal = curInvGrandTotal + lineTotal;
+                curVATGrandTotal = curVATGrandTotal + vatRounded;
+            }
+        });
+
+        document.getElementById("curInvGrandTotal").innerHTML = curInvGrandTotal.toFixed(2);
+        document.getElementById("curVATGrandTotal").innerHTML = curVATGrandTotal.toFixed(2);
+    }
+
+    /*
+     based upon current values in invoice qty and price , calculate and display VAT value and ex-VAT totals
+    */
+    function calculateVATTotal() {
+        var curVATGrandTotal = 0;
+        var qtyToInvoiceElements = $('.qtyToInvoice');
+        var curVATElements = $('.curVat');
+        qtyToInvoiceElements.each(function (index, item, array) {
+            var curVAT = curVATElements[index];
+            if (IsNumeric(curVAT.value)) {
+                curVATGrandTotal = curVATGrandTotal + eval(curVAT.value);
+            }
+        });
+        document.getElementById("curVATGrandTotal").innerHTML = curVATGrandTotal.toFixed(2);
+    }
 </SCRIPT>
 <TABLE width="203px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlPurchaseOrder}">Purchase Order</a> 
-		</TD>
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlSalesOrder}" target="_blank" title="Show sales order in a popup window">Sales Order</a> 
-		</TD>
-	</TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlPurchaseOrder}">Purchase Order</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlSalesOrder}" target="_blank"
+                                                               title="Show sales order in a popup window">Sales
+            Order</a>
+        </TD>
+    </TR>
 </TABLE>
 <form name="purchaseInvoiceForm" method="POST" enctype="multipart/form-data" action="{urlUpdate}">
-<input type="hidden" name="porheadID" value="{porheadID}">
-<TABLE width="300px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="120px" class="promptText" valign="top">Supplier</a></TD>
-		<TD class="displayfield" valign="top">{supplierName}</a> 
-		</TD>
-	</TR>
-	<TR> 
-		<TD class="promptText" valign="top">Purchase Order</a></TD>
-		<TD class="displayfield" valign="top">{porheadID}</a> 
-		</TD>
-	</TR>
-	<TR> 
-		<TD class="promptText">Purchase Invoice No</a></TD>
-		<TD class="field">
-				<input type="text" id="purchaseInvoiceNo" name="purchaseInvoiceNo" value="{purchaseInvoiceNo}" maxlength="30" size="30"> 
-		</TD>
-	</TR>
-	<TR> 
-		<TD class="promptText">Invoice Date</a></TD>
-		<TD class="field">
-				<input type="text" id="purchaseInvoiceDate" name="purchaseInvoiceDate" value="{purchaseInvoiceDate}" maxlength="10" size="10"> 
-		</TD>
-		</TD>
-	</TR>
-</TABLE>
-<br/>
-  <table class="singleBorder" width="900" border="0" cellspacing="1" cellpadding="1">
-		<tr> 
-			<td width="25%" class="listHeadText">Description</td>
-			<td width="5%" class="listHeadText">Order</td>
-			<td width="5%" class="listHeadText">OS</td>
-			<td width="5%" class="listHeadText">Price</td>
-			<td width="5%" class="listHeadText">Inv Qty</td>
-			<td width="5%" class="listHeadText">Inv Price</td>
-			<td width="5%" class="listHeadText">Total</td>
-			<td width="5%" class="listHeadText">VAT</td>
-			<td width="15%" class="listHeadText">Serial No</td>
-			<td width="15%" class="listHeadText">Warranty</td>
-			<td width="5%" class="listHeadText">Renew</td>
-		</tr>
-		<!-- BEGIN orderLineBlock -->
-		<input type="hidden" id="description" name="purchaseInv[{sequenceNo}][description]" value="{description}">
-		<input type="hidden" id="sequenceNo" name="purchaseInv[{sequenceNo}][sequenceNo]" value="{sequenceNo}">
-		<input type="hidden" id="qtyOS" name="purchaseInv[{sequenceNo}][qtyOS]" value="{qtyOS}">
-		<input type="hidden" id="qtyOrdered" name="purchaseInv[{sequenceNo}][qtyOrdered]" value="{qtyOrdered}">
-		<input type="hidden" id="itemID" name="purchaseInv[{sequenceNo}][itemID]" value="{itemID}">
-		<input type="hidden" id="orderSequenceNo" name="purchaseInv[{sequenceNo}][orderSequenceNo]" value="{orderSequenceNo}">
-		<input type="hidden" id="requireSerialNo" name="purchaseInv[{sequenceNo}][requireSerialNo]" value="{requireSerialNo}">
-		<input type="hidden" id="customerItemID" name="purchaseInv[{sequenceNo}][customerItemID]" value="{customerItemID}">
-		<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
-			<td class="orderLineClass"><DIV align="left">{description}</DIV></td>
-			<td class="orderLineClass"><DIV align="right">{qtyOrdered}</DIV></td>
-			<td class="orderLineClass"><DIV align="right">{qtyOS}</DIV></td>
-			<td class="orderLineClass"><DIV align="right">{curPOUnitCost}</DIV></td>
-			<td class="orderLineClass"> <input
-				type="text"
-				id="qtyToInvoice"
-				name="purchaseInv[{sequenceNo}][qtyToInvoice]"
-				value="{qtyToInvoice}"
-				maxlength="5"
-				size="5"
-				onChange="calculateTotals()"
-			> </td>
-			<td class="orderLineClass"> <input
-				onChange="calculateTotals()"
-				type="text"
-				id="curInvUnitCost"
-				name="purchaseInv[{sequenceNo}][curInvUnitCost]"
-				value="{curInvUnitCost}"
-				maxlength="8"
-				size="8"
-			> </td>
-			<td class="orderLineClass"><DIV id="curInvTotalCost" align="right">{curInvTotalCost}</DIV></td>
-			<td class="orderLineClass"> <input
-				onChange="calculateVATTotal()"
-				type="text"
-				id="curVAT"
-				name="purchaseInv[{sequenceNo}][curVAT]"
-				value="{curVAT}"
-				maxlength="8"
-				size="8"
-			> </td>
-			<td class="orderLineClass"> <input
-				{DISABLED}
-				type="text"
-				id="serialNo"
-				name="purchaseInv[{sequenceNo}][serialNo]"
-				value="{serialNo}"
-				maxlength="20"
-				size="20"
-			> </td>
-			<td class="orderLineClass"> <select
-				type="text"
-				id="warrantyID"
-				name="purchaseInv[{sequenceNo}][warrantyID]"
-				{DISABLED}
-			>
-					<option value="">N/A</option>
-					<!-- BEGIN warrantyBlock -->
-					<option {warrantySelected} value="{warrantyID}">{warrantyDescription}</option>
-					<!-- END warrantyBlock -->
-				</select> </td>
-				<td class="orderLineClass"><INPUT {DISABLED} name="purchaseInv[{sequenceNo}][renew]" type="checkbox" value="Y" {renewChecked}></td>
-		</tr>
-		<!-- END orderLineBlock -->
-		<tr> 
-			<td colspan="6" class="listHeadText">&nbsp;</td>
-			<td class="listHeadText"><DIV id="curInvGrandTotal" align="right"></DIV></td>
-			<td class="listHeadText"><DIV id="curVATGrandTotal" align="right"></DIV></td>
-			<td colspan="3" class="listHeadText">&nbsp;</td>
-		</tr>
-		<tr> 
-			<td colspan="11"> <input {SUBMIT_DISABLED} type="submit" name="Submit" value="Update"> </td>
-		</tr>
-	</table>
+    <input type="hidden" name="porheadID" value="{porheadID}">
+    <TABLE width="300px" border="0" cellpadding="2" cellspacing="1">
+        <TR>
+            <TD width="120px" class="promptText" valign="top">Supplier</a></TD>
+            <TD class="displayfield" valign="top">{supplierName}</a>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText" valign="top">Purchase Order</a></TD>
+            <TD class="displayfield" valign="top">{porheadID}</a>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Purchase Invoice No</a></TD>
+            <TD class="field">
+                <input type="text" id="purchaseInvoiceNo" name="purchaseInvoiceNo" value="{purchaseInvoiceNo}"
+                       maxlength="30" size="30">
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Invoice Date</a></TD>
+            <TD class="field">
+                <input type="text" id="purchaseInvoiceDate" name="purchaseInvoiceDate" value="{purchaseInvoiceDate}"
+                       maxlength="10" size="10">
+            </TD>
+            </TD>
+        </TR>
+    </TABLE>
+    <br/>
+    <table class="singleBorder" width="900" border="0" cellspacing="1" cellpadding="1">
+        <tr>
+            <td width="25%" class="listHeadText">Description</td>
+            <td width="5%" class="listHeadText">Order</td>
+            <td width="5%" class="listHeadText">OS</td>
+            <td width="5%" class="listHeadText">Price</td>
+            <td width="5%" class="listHeadText">Inv Qty</td>
+            <td width="5%" class="listHeadText">Inv Price</td>
+            <td width="5%" class="listHeadText">Total</td>
+            <td width="5%" class="listHeadText">VAT</td>
+            <td width="15%" class="listHeadText">Serial No</td>
+            <td width="15%" class="listHeadText">Warranty</td>
+            <td width="5%" class="listHeadText">Renew</td>
+        </tr>
+        <!-- BEGIN orderLineBlock -->
+        <input type="hidden" id="description" name="purchaseInv[{sequenceNo}][description]" value="{description}">
+        <input type="hidden" id="sequenceNo" name="purchaseInv[{sequenceNo}][sequenceNo]" value="{sequenceNo}">
+        <input type="hidden" class="qtyOS" name="purchaseInv[{sequenceNo}][qtyOS]" value="{qtyOS}">
+        <input type="hidden" id="qtyOrdered" name="purchaseInv[{sequenceNo}][qtyOrdered]" value="{qtyOrdered}">
+        <input type="hidden" id="itemID" name="purchaseInv[{sequenceNo}][itemID]" value="{itemID}">
+        <input type="hidden" id="orderSequenceNo" name="purchaseInv[{sequenceNo}][orderSequenceNo]"
+               value="{orderSequenceNo}">
+        <input type="hidden" id="requireSerialNo" name="purchaseInv[{sequenceNo}][requireSerialNo]"
+               value="{requireSerialNo}">
+        <input type="hidden" id="customerItemID" name="purchaseInv[{sequenceNo}][customerItemID]"
+               value="{customerItemID}">
+        <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+            <td class="orderLineClass">
+                <DIV align="left">{description}</DIV>
+            </td>
+            <td class="orderLineClass">
+                <DIV align="right">{qtyOrdered}</DIV>
+            </td>
+            <td class="orderLineClass">
+                <DIV align="right">{qtyOS}</DIV>
+            </td>
+            <td class="orderLineClass">
+                <DIV align="right">{curPOUnitCost}</DIV>
+            </td>
+            <td class="orderLineClass"><input
+                    type="text"
+                    id="qtyToInvoice"
+                    class="qtyToInvoice"
+                    name="purchaseInv[{sequenceNo}][qtyToInvoice]"
+                    value="{qtyToInvoice}"
+                    maxlength="5"
+                    size="5"
+                    onChange="calculateTotals()"
+            ></td>
+            <td class="orderLineClass"><input
+                    onChange="calculateTotals()"
+                    type="text"
+                    id="curInvUnitCost"
+                    class="curInvUnitCost"
+                    name="purchaseInv[{sequenceNo}][curInvUnitCost]"
+                    value="{curInvUnitCost}"
+                    maxlength="8"
+                    size="8"
+            ></td>
+            <td class="orderLineClass">
+                <DIV id="curInvTotalCost" class="curInvTotalCost" align="right">{curInvTotalCost}</DIV>
+            </td>
+            <td class="orderLineClass"><input
+                    onChange="calculateVATTotal()"
+                    type="text"
+                    id="curVAT"
+                    class="curVAT"
+                    name="purchaseInv[{sequenceNo}][curVAT]"
+                    value="{curVAT}"
+                    maxlength="8"
+                    size="8"
+            ></td>
+            <td class="orderLineClass"><input
+                    {DISABLED}
+                    type="text"
+                    id="serialNo"
+                    name="purchaseInv[{sequenceNo}][serialNo]"
+                    value="{serialNo}"
+                    maxlength="20"
+                    size="20"
+            ></td>
+            <td class="orderLineClass"><select
+                    type="text"
+                    id="warrantyID"
+                    name="purchaseInv[{sequenceNo}][warrantyID]"
+                    {DISABLED}
+            >
+                <option value="">N/A</option>
+                <!-- BEGIN warrantyBlock -->
+                <option {warrantySelected} value="{warrantyID}">{warrantyDescription}</option>
+                <!-- END warrantyBlock -->
+            </select></td>
+            <td class="orderLineClass"><INPUT {DISABLED} name="purchaseInv[{sequenceNo}][renew]" type="checkbox"
+                                              value="Y" {renewChecked}></td>
+        </tr>
+        <!-- END orderLineBlock -->
+        <tr>
+            <td colspan="6" class="listHeadText">&nbsp;</td>
+            <td class="listHeadText">
+                <DIV id="curInvGrandTotal" align="right"></DIV>
+            </td>
+            <td class="listHeadText">
+                <DIV id="curVATGrandTotal" align="right"></DIV>
+            </td>
+            <td colspan="3" class="listHeadText">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="11"><input {SUBMIT_DISABLED} type="submit" name="Submit" value="Update"></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: PurchaseInvDisplay.inc.html -->

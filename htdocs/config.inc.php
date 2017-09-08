@@ -243,7 +243,7 @@ define("PHPLIB_SESSIONS_DIR", BASE_DRIVE . "/sessions/");
 $GLOBALS['db_options'] =
     array(
         'type' => 'db',
-        'dsn' => 'mysql://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST . '/' . DB_NAME,
+        'dsn' => 'mysqli://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST . '/' . DB_NAME,
         'mail_table' => 'mail_queue'
     );
 

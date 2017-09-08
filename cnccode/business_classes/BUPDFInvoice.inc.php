@@ -65,7 +65,6 @@ class BUPDFInvoice extends BaseObject
     function __construct(&$owner, &$buInvoice)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         if (is_a($buInvoice, 'buInvoice')) {
             $this->_buInvoice = $buInvoice;
         } else {
@@ -190,9 +189,9 @@ class BUPDFInvoice extends BaseObject
                     $this->_buPDF->printStringAt(BUPDFINV_DETAILS_COL, $dsInvline->getValue('description'));
                 }
                 $this->_buPDF->printStringRJAt(BUPDFINV_QTY_COL, $dsInvline->getValue('qty'));
-                $this->_buPDF->printStringRJAt(BUPDFINV_UNIT_PRICE_COL, '�' . number_format($dsInvline->getValue('curUnitSale'), 2, '.', ','));
+                $this->_buPDF->printStringRJAt(BUPDFINV_UNIT_PRICE_COL, POUND_CHAR . number_format($dsInvline->getValue('curUnitSale'), 2, '.', ','));
                 $total = ($dsInvline->getValue('curUnitSale') * $dsInvline->getValue('qty'));
-                $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, '�' . number_format($total, 2, '.', ','));
+                $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, POUND_CHAR . number_format($total, 2, '.', ','));
                 $grandTotal += $total;
                 $this->_buNotepad->getNotes(BUPDFINV_NOTEPAD_ITEM, $dsInvline->getValue('itemID'), $dsNotepad);
                 if ($dsNotepad->fetchNext()) {
@@ -239,7 +238,7 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->box(BUPDFINV_UNIT_PRICE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFINV_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->box(BUPDFINV_COST_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFINV_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->printStringRJAt(BUPDFINV_UNIT_PRICE_COL, 'Sub Total');
-        $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, '�' . number_format($grandTotal, 2, '.', ','));
+        $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, POUND_CHAR . number_format($grandTotal, 2, '.', ','));
         $this->_buPDF->CR();
         if ($this->_dsInvhead->getValue('type') == 'I') {
             $this->_buPDF->printString('Payment terms: ' . $dbePaymentTerms->getValue('description'));
@@ -252,12 +251,12 @@ class BUPDFInvoice extends BaseObject
         // for some reason number_format insists on truncating the VAT value so I round it first!
         $vatValue = $this->myFormattedRoundedNumber($vatValue);
 //		$vatValue = round($vatValue,2);
-        $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, '�' . number_format($vatValue, 2, '.', ','));
+        $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, POUND_CHAR . number_format($vatValue, 2, '.', ','));
         $this->_buPDF->CR();
         $this->_buPDF->box(BUPDFINV_UNIT_PRICE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFINV_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->box(BUPDFINV_COST_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFINV_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->printStringRJAt(BUPDFINV_UNIT_PRICE_COL, 'Grand Total');
-        $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, '�' . number_format($grandTotal + $vatValue, 2, '.', ','));
+        $this->_buPDF->printStringRJAt(BUPDFINV_COST_COL, POUND_CHAR . number_format($grandTotal + $vatValue, 2, '.', ','));
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->CR();

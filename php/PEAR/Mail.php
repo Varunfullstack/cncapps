@@ -62,16 +62,21 @@ class Mail
      */
     var $sep = "\r\n";
 
+    public static function getMailer($driver, $params = array())
+    {
+        return self::factory($driver, $params);
+    }
+
     /**
      * Provides an interface for generating Mail:: objects of various
      * types
      *
      * @param string $driver The kind of Mail:: object to instantiate.
-     * @param array  $params The parameters to pass to the Mail:: object.
+     * @param array $params The parameters to pass to the Mail:: object.
      * @return object Mail a instance of the driver class or if fails a PEAR Error
      * @access public
      */
-    function &factory($driver, $params = array())
+    public static function &factory($driver, $params = array())
     {
         $driver = strtolower($driver);
         @include_once 'Mail/' . $driver . '.php';
@@ -155,7 +160,7 @@ class Mail
         foreach ($headers as $key => $value) {
             $headers[$key] =
                 preg_replace('=((<CR>|<LF>|0x0A/%0A|0x0D/%0D|\\n|\\r)\S).*=i',
-                             null, $value);
+                    null, $value);
         }
     }
 
@@ -203,8 +208,7 @@ class Mail
                     foreach ($value as $line) {
                         $received[] = $key . ': ' . $line;
                     }
-                }
-                else {
+                } else {
                     $received[] = $key . ': ' . $value;
                 }
                 // Put Received: headers at the top.  Spam detectors often

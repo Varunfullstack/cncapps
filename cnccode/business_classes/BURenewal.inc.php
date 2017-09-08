@@ -282,8 +282,11 @@ class BURenewal extends Business
      * create an array of renewals items and external items
      *
      * @param mixed $customerID
+     * @param bool $displayAccountsInfo
+     * @param Controller $controller
+     * @return array
      */
-    function getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo = true)
+    function getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo = true, $controller)
     {
         $returnArray = array();
 
@@ -298,7 +301,7 @@ class BURenewal extends Business
             $row = array();
 
             $row['linkURL'] =
-                Controller::buildLink(
+                $controller->buildLink(
                     'RenContract.php',
                     array(
                         'action' => 'edit',
@@ -353,7 +356,7 @@ class BURenewal extends Business
             $row = array();
 
             $row['linkURL'] =
-                Controller::buildLink(
+                $controller->buildLink(
                     'RenDomain.php',
                     array(
                         'action' => 'edit',
@@ -386,7 +389,7 @@ class BURenewal extends Business
             $row = array();
 
             $row['linkURL'] =
-                Controller::buildLink(
+                $controller->buildLink(
                     'RenBroadband.php',
                     array(
                         'action' => 'edit',
@@ -419,7 +422,7 @@ class BURenewal extends Business
             $row = array();
 
             $row['linkURL'] =
-                Controller::buildLink(
+                $controller->buildLink(
                     'RenHosting.php',
                     array(
                         'action' => 'edit',
@@ -454,7 +457,7 @@ class BURenewal extends Business
             $row = array();
 
             $row['linkURL'] =
-                Controller::buildLink(
+                $controller->buildLink(
                     'RenQuotation.php',
                     array(
                         'action' => 'edit',
@@ -486,7 +489,7 @@ class BURenewal extends Business
         while ($dsExternalItem->fetchNext()) {
 
             $row['linkURL'] =
-                Controller::buildLink(
+                $controller->buildLink(
                     'ExternalItem.php',
                     array(
                         'action' => 'edit',

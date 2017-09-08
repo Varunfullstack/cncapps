@@ -36,7 +36,7 @@
  *
  * @category    HTTP
  * @package     HTTP_Request
- * @author      Jon Parise <jon@php.net> 
+ * @author      Jon Parise <jon@php.net>
  * @author      Chuck Hagenbuch <chuck@horde.org>
  * @copyright   2010 Chuck Hagenbuch
  * @license     http://opensource.org/licenses/bsd-license.php New BSD License
@@ -71,7 +71,8 @@ define('PEAR_MAIL_SMTP_ERROR_DATA', 10006);
  * @package Mail
  * @version $Revision$
  */
-class Mail_smtp extends Mail {
+class Mail_smtp extends Mail
+{
 
     /**
      * SMTP connection object.
@@ -162,7 +163,7 @@ class Mail_smtp extends Mail {
      * @var bool
      */
     var $pipelining;
-    
+
     var $socket_options = array();
 
     /**
@@ -271,7 +272,7 @@ class Mail_smtp extends Mail {
         if (!isset($from)) {
             $this->_smtp->rset();
             return PEAR::raiseError('No From: address has been provided',
-                                    PEAR_MAIL_SMTP_ERROR_FROM);
+                PEAR_MAIL_SMTP_ERROR_FROM);
         }
 
         $params = null;
@@ -303,15 +304,15 @@ class Mail_smtp extends Mail {
 
         /* Send the message's headers and the body as SMTP data. */
         $res = $this->_smtp->data($body, $textHeaders);
-		list(,$args) = $this->_smtp->getResponse();
+        list(, $args) = $this->_smtp->getResponse();
 
-		if (preg_match("/Ok: queued as (.*)/", $args, $queued)) {
-			$this->queued_as = $queued[1];
-		}
+        if (preg_match("/Ok: queued as (.*)/", $args, $queued)) {
+            $this->queued_as = $queued[1];
+        }
 
-		/* we need the greeting; from it we can extract the authorative name of the mail server we've really connected to.
-		 * ideal if we're connecting to a round-robin of relay servers and need to track which exact one took the email */
-		$this->greeting = $this->_smtp->getGreeting();
+        /* we need the greeting; from it we can extract the authorative name of the mail server we've really connected to.
+         * ideal if we're connecting to a round-robin of relay servers and need to track which exact one took the email */
+        $this->greeting = $this->_smtp->getGreeting();
 
         if (is_a($res, 'PEAR_Error')) {
             $error = $this->_error('Failed to send data', $res);
@@ -344,16 +345,16 @@ class Mail_smtp extends Mail {
 
         include_once 'Net/SMTP.php';
         $this->_smtp = new Net_SMTP($this->host,
-                                     $this->port,
-                                     $this->localhost,
-                                     $this->pipelining,
-                                     0,
-                                     $this->socket_options);
+            $this->port,
+            $this->localhost,
+            $this->pipelining,
+            0,
+            $this->socket_options);
 
         /* If we still don't have an SMTP object at this point, fail. */
         if (is_object($this->_smtp) === false) {
             return PEAR::raiseError('Failed to create a Net_SMTP object',
-                                    PEAR_MAIL_SMTP_ERROR_CREATE);
+                PEAR_MAIL_SMTP_ERROR_CREATE);
         }
 
         /* Configure the SMTP connection. */
@@ -364,8 +365,8 @@ class Mail_smtp extends Mail {
         /* Attempt to connect to the configured SMTP server. */
         if (PEAR::isError($res = $this->_smtp->connect($this->timeout))) {
             $error = $this->_error('Failed to connect to ' .
-                                   $this->host . ':' . $this->port,
-                                   $res);
+                $this->host . ':' . $this->port,
+                $res);
             return PEAR::raiseError($error, PEAR_MAIL_SMTP_ERROR_CONNECT);
         }
 
@@ -374,10 +375,10 @@ class Mail_smtp extends Mail {
             $method = is_string($this->auth) ? $this->auth : '';
 
             if (PEAR::isError($res = $this->_smtp->auth($this->username,
-                                                        $this->password,
-                                                        $method))) {
+                $this->password,
+                $method))) {
                 $error = $this->_error("$method authentication failure",
-                                       $res);
+                    $res);
                 $this->_smtp->rset();
                 return PEAR::raiseError($error, PEAR_MAIL_SMTP_ERROR_AUTH);
             }
@@ -420,7 +421,7 @@ class Mail_smtp extends Mail {
     /**
      * Build a standardized string describing the current SMTP error.
      *
-     * @param string $text  Custom string describing the error context.
+     * @param string $text Custom string describing the error context.
      * @param object $error Reference to the current PEAR_Error object.
      *
      * @return string       A string describing the current SMTP error.

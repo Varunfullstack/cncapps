@@ -5223,15 +5223,26 @@ customer with the past 8 hours email to GL
             AND pro_custno = add_custno
          
       WHERE pro_custno = $customerID 
-        AND pro_monitor_name = '" . mysql_escape_string($monitorName) . "' 
-        AND pro_monitor_agent_name = '" . mysql_escape_string($monitorAgentName) . "' 
+        AND pro_monitor_name = ? 
+        AND pro_monitor_agent_name = ? 
         AND pro_status NOT IN ('C') 
         AND add_postcode = '$postcode'
       ORDER BY pro_date_raised DESC";
 
-        $db->query($sql);
-        $db->next_record();
-        return $db->Record;
+        $parameters = [
+            [
+                'type' => 's',
+                'value' => $monitorName
+            ], [
+                'type' => 's',
+                'value' => $monitorAgentName
+            ],
+        ];
+        /**
+         * @var mysqli_result $result
+         */
+        $result = $db->prepareQuery($sql, $parameters);
+        return $result->fetch_array();
     } // end email to customer
 
     /**
@@ -6265,9 +6276,16 @@ customer with the past 8 hours email to GL
         cpr_serverguard_flag = '" . $record['serverGuardFlag'] . "',
         cpr_send_email = '" . $record['sendEmail'] . "',
         cpr_priority = '" . $record['priority'] . "',
-        cpr_reason = '" . mysql_escape_string($details) . "'";
+        cpr_reason = ?";
 
-        $db->query($queryString);
+        $parameters = [
+            [
+                'type' => 's',
+                'value' => $details
+            ]
+        ];
+
+        $db->preparedQuery($queryString, $parameters);
     }
 
     function getManagerComment($problemID)
@@ -6297,11 +6315,18 @@ customer with the past 8 hours email to GL
           UPDATE
             problem
           SET
-            pro_manager_comment = '" . mysql_escape_string($details) . "'
+            pro_manager_comment = ?
           WHERE
             pro_problemno = $problemID";
 
-        $db->query($sql);
+        $parameters = [
+            [
+                'type' => 's',
+                'value' => $details,
+            ],
+        ];
+
+        $db->preparedQuery($sql, $parameters);
     }
 
     function addInitialActivityToNewRequest($dbeProblem, $siteNo, $contactID, $reason, $oldProblemID = false)

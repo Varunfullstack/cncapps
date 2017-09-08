@@ -4,69 +4,49 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
-class DBEStaffAvailable extends DBEntity{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function __construct(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::__construct($owner);
-		$this->setTableName("staffavailable");
- 		$this->addColumn("staffAvailableID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("userID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("date", DA_DATE, DA_NOT_NULL);
- 		$this->addColumn("am", DA_FLOAT, DA_NOT_NULL);
- 		$this->addColumn("pm", DA_FLOAT, DA_NOT_NULL);
- 		$this->setPK(0);
- 		$this->setAddColumnsOff();
- 	}
- 	/**
- 	 * Get all service user records for today
- 	 *
- 	 * @return unknown
-	function getRowsToday(){
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
-		$this->setQueryString(
-			"SELECT ".$this->getDBColumnNamesAsString() .
-			" FROM ".$this->getTableName() .
-			" JOIN consultant on userID = cns_consno" .
-			" WHERE date = CURDATE()"
-		);
+class DBEStaffAvailable extends DBEntity
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @return void
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setTableName("staffavailable");
+        $this->addColumn("staffAvailableID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("userID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("date", DA_DATE, DA_NOT_NULL);
+        $this->addColumn("am", DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn("pm", DA_FLOAT, DA_NOT_NULL);
+        $this->setPK(0);
+        $this->setAddColumnsOff();
+    }
 
-		return($this->getRows());
-	}
- 	 */
-	/**
-	 * Get a specific user record for today
-	 *
-	 * @param unknown_type $userID
-	 * @return unknown
-	 */
-	function getUserRecordForToday( $userID ){
+    /**
+     * Get a specific user record for today
+     *
+     * @param unknown_type $userID
+     * @return unknown
+     */
+    function getUserRecordForToday($userID)
+    {
 
-	
-		$this->setQueryString(
-			"SELECT ".$this->getDBColumnNamesAsString() .
-			" FROM ".$this->getTableName() .
-			" WHERE date = CURDATE()" . 
-			" AND userID = " . $userID
-		);
 
-		return($this->getRow());
-	}
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE date = CURDATE()" .
+            " AND userID = " . $userID
+        );
+
+        return ($this->getRow());
+    }
 }
 
 ?>

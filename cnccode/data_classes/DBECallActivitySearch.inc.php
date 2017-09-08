@@ -176,16 +176,16 @@ class DBECallActivitySearch extends DBEntity
             if ($activityText != '') {
                 $whereParameters .=
                     " AND ( MATCH (reason)
-					AGAINST ('" . mysql_escape_string($activityText) . "' IN BOOLEAN MODE)
+					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE)
           OR MATCH (pro_internal_notes)
-          AGAINST ('" . mysql_escape_string($activityText) . "' IN BOOLEAN MODE) )";
+          AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE) )";
             }
 
             if ($project != '') {
                 $project = strtoupper($project);
                 $whereParameters .=
-                    " AND (project.description LIKE '%" . mysql_escape_string($project) . "%'" .
-                    " OR project.projectID = '" . mysql_escape_string($project) . "')";
+                    " AND (project.description LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $project) . "%'" .
+                    " OR project.projectID = '" . mysqli_real_escape_string($this->db->link_id(), $project) . "')";
             }
 
             switch ($status) {

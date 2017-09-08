@@ -780,6 +780,14 @@ class CTCustomer extends CTCNC
         $this->setPageTitle("Customer");
         $submitURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCUSTOMER_ACT_SEARCH));
         $createURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCUSTOMER_ACT_ADDCUSTOMER));
+        $customerPopupURL =
+            $this->buildLink(
+                CTCNC_PAGE_CUSTOMER,
+                array(
+                    'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
         $this->template->set_var(
             array(
                 'contactString' => $this->getContactString(),
@@ -792,7 +800,8 @@ class CTCustomer extends CTCNC
                 'droppedCustomerFromDate' => $this->getDroppedCustomerFromDate(),
                 'droppedCustomerToDate' => $this->getDroppedCustomerToDate(),
                 'submitURL' => $submitURL,
-                'createURL' => $createURL
+                'createURL' => $createURL,
+                'customerPopupURL' => $customerPopupURL,
             )
         );
         if (is_object($this->dsCustomer)) {

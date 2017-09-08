@@ -129,15 +129,15 @@ class CTPrepay extends CTCNC
                     $this->dsPrepayExport,
                     $_REQUEST['update']
                 );
-
-            if ($_REQUEST['update']) {
-                if ($dsResults) {
-                    $this->setFormErrorMessage('Export files created');
-                } else {
-                    $this->setFormErrorMessage('No data to export for this date');
-                }
-            }
-
+//
+//            if ($_REQUEST['update']) {
+//                if ($dsResults) {
+//                    $this->setFormErrorMessage('Export files created');
+//                } else {
+//                    $this->setFormErrorMessage('No data to export for this date');
+//                }
+//            }
+//
         }
         $this->exportForm($dsResults);
     }

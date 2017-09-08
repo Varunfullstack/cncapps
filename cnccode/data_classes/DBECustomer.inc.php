@@ -136,20 +136,20 @@ class DBECustomer extends DBCNCEntity
 
         if ($newCustomerFromDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('becameCustomerDate') . ">='" . mysql_escape_string($newCustomerFromDate) . "'";
+                " AND " . $this->getDBColumnName('becameCustomerDate') . ">='" . mysqli_real_escape_string($this->db->link_id(), $newCustomerFromDate) . "'";
         }
         if ($newCustomerToDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('becameCustomerDate') . "<='" . mysql_escape_string($newCustomerToDate) . "'";
+                " AND " . $this->getDBColumnName('becameCustomerDate') . "<='" . mysqli_real_escape_string($this->db->link_id(), $newCustomerToDate) . "'";
         }
 
         if ($droppedCustomerFromDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('droppedCustomerDate') . ">='" . mysql_escape_string($droppedCustomerFromDate) . "'";
+                " AND " . $this->getDBColumnName('droppedCustomerDate') . ">='" . mysqli_real_escape_string($this->db->link_id(), $droppedCustomerFromDate) . "'";
         }
         if ($droppedCustomerToDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('droppedCustomerDate') . "<='" . mysql_escape_string($droppedCustomerToDate) . "'";
+                " AND " . $this->getDBColumnName('droppedCustomerDate') . "<='" . mysqli_real_escape_string($this->db->link_id(), $droppedCustomerToDate) . "'";
         }
 
         if ($name != '') {

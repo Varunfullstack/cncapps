@@ -24,6 +24,7 @@
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
     });
+
     function customerNotePopup() {
         window.open(
             '{urlCustomerNote}',
@@ -32,6 +33,7 @@
         );
 
     }
+
     function serviceRequestPopup() {
         window.open(
             '{urlServiceRequest}',
@@ -40,6 +42,7 @@
         );
 
     }
+
     function checkFunctionKey(field) {
 
         if (event.keyCode == 120) {			// F9 - edit
@@ -126,6 +129,7 @@
         }
         return;
     }
+
     function ToggleSelectedLines(checkedOn) {
         var sa = false;
         if (checkedOn)
@@ -153,7 +157,6 @@
         <TD width="100px" class="navigateLink" valign="top"><a href="{urlInvoices}">{txtInvoices}</a>
         </TD>
         <TD width="100px" class="navigateLink" valign="top"><a href="{urlDespatch}">{txtDespatch}</a>
-        </TD>
         </TD>
         <TD width="100px" class="navigateLink" valign="top"> {linkServiceRequest}
         </TD>

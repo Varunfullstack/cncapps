@@ -44,7 +44,6 @@ class BUPDFDeliveryNote extends BaseObject
     function __construct(&$owner, &$dsOrdhead, &$dsOrdline, &$dsDespatch, &$dsContact, &$dsDeliveryMethod, $noteNo, $fullyDespatched)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         $this->_dsOrdhead = $dsOrdhead;
         $this->_dsOrdline = $dsOrdline;
         $this->_dsDespatch = $dsDespatch;

@@ -6,10 +6,12 @@
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
     });
-    var savedCustomerString
+    var savedCustomerString;
+
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -24,21 +26,25 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function createQuote() {
         if (document.searchForm.customerID.value != "") {
             document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
         }
     }
+
     function createOrder() {
         if (document.searchForm.customerID.value != "") {
             document.location = '{createOrderURL}&customerID=' + escape(document.searchForm.customerID.value)
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
@@ -182,10 +188,10 @@
     </tr>
     <!-- BEGIN orderBlock -->
     <!--	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">  -->
-    <tr
-            onmousedown="setPointer(this, {rowNum}, 'click', '#FFFFFF', '#FFFFCC', '#FFCC99');"
-            onmouseover="setPointer(this, {rowNum}, 'over', '#FFFFFF', '#FFFFCC', '#FFCC99');"
-            onmouseout="setPointer(this, {rowNum}, 'out', '#FFFFFF', '#FFFFCC', '#FFCC99');"
+    <tr style="background-color: white"
+        onmousedown="setPointer(this, {rowNum}, 'click', '#FFFFFF', '#FFFFCC', '#FFCC99');"
+        onmouseover="setPointer(this, {rowNum}, 'over', '#FFFFFF', '#FFFFCC', '#FFCC99');"
+        onmouseout="setPointer(this, {rowNum}, 'out', '#FFFFFF', '#FFFFCC', '#FFCC99');"
     >
         <td nowrap class="listItemText">{listCustomerLink}</td>
         <td class="listItemText"><A HREF="{listOrderURL}" target="_blank">{listOrdheadID}</A></td>

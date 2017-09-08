@@ -245,7 +245,10 @@ class BUSageExport extends Business
      */
     function postTransVATRow()
     {
-        $vat_amount = $this->total_gross_amount * ($this->lastRecord['inh_vat_rate'] / 100);
+        if ($this->lastRecord == "") {
+            return;
+        }
+        $vat_amount = $this->total_gross_amount * ($this->lastRecord["inh_vat_rate"] / 100);
         if ($this->total_gross_amount >= 0) {
             $trans_type = 'SI';            // Invoice
         } else {

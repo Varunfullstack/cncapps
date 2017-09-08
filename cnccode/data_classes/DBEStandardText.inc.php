@@ -5,34 +5,30 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
-class DBEStandardText extends DBEntity{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function __construct(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::__construct($owner);
-		$this->setTableName("standardtext");
- 		$this->addColumn("stt_standardtextno", DA_ID, DA_NOT_NULL, 'stt_standardtextno');
- 		$this->addColumn("stt_sort_order", DA_INTEGER, DA_NOT_NULL, 'stt_sort_order');
-    $this->addColumn("stt_desc", DA_STRING, DA_NOT_NULL, 'stt_desc');
-    $this->addColumn("stt_text", DA_TEXT, DA_NOT_NULL, 'stt_text');
-    $this->addColumn("stt_standardtexttypeno", DA_INTEGER, DA_NOT_NULL, 'stt_standardtexttypeno');
- 		$this->setPK(0);
- 		$this->setAddColumnsOff();
-	}
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
+
+class DBEStandardText extends DBEntity
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @return void
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setTableName("standardtext");
+        $this->addColumn("stt_standardtextno", DA_ID, DA_NOT_NULL, 'stt_standardtextno');
+        $this->addColumn("stt_sort_order", DA_INTEGER, DA_NOT_NULL, 'stt_sort_order');
+        $this->addColumn("stt_desc", DA_STRING, DA_NOT_NULL, 'stt_desc');
+        $this->addColumn("stt_text", DA_TEXT, DA_NOT_NULL, 'stt_text');
+        $this->addColumn("stt_standardtexttypeno", DA_INTEGER, DA_NOT_NULL, 'stt_standardtexttypeno');
+        $this->setPK(0);
+        $this->setAddColumnsOff();
+    }
+
 }
+
 ?>

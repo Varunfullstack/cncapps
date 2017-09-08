@@ -171,17 +171,18 @@ class CTRenewalReport extends CTCNC
 
         $buRenewal = new BURenewal($this);
 
-        $items = $buRenewal->getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo);
+        $items = $buRenewal->getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo, $this);
 
         $lastItemTypeDescription = false;
 
         $this->template->set_block('RenewalReport', 'itemBlock', 'items');
 
+        $itemTypeDescription = [];
+
         foreach ($items as $key => $item) {
             $itemTypeDescription[$key] = $item['itemTypeDescription'];
         }
-        array_multisort($itemTypeDescription, SORT_ASC, $items);
-
+        array_multisort($items, $itemTypeDescription, SORT_ASC);
 
         $totalCostPrice = 0;
         $totalSalePrice = 0;

@@ -47,7 +47,6 @@ class BUPDFSCR extends BaseObject
     function __construct(&$owner, $activityID, &$params)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         $this->_buSite = new BUSite($this);
         $this->_buActivity = new BUActivity($this);
         $this->_buCustomerItem = new BUCustomerItem($this);

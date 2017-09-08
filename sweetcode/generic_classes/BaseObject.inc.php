@@ -55,7 +55,7 @@ class BaseObject
 
     /**
      * Raise error on owner object
-     * Recursively raises errors on owner objects until the owner is a controller then displays a formated error message
+     * Recursively raises errors on owner objects until the owner is a controller then displays a formatted error message
      *
      * @access public
      * @param  string $message Error message

@@ -3,47 +3,42 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_dbe"]."/DBEExternalItem.inc.php");
-class DBEJExternalItem extends DBEExternalItem{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function __construct(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::__construct($owner);
-     $this->setAddColumnsOn();
-    $this->addColumn("itemTypeDescription", DA_STRING, DA_ALLOW_NULL, 'itemtype.ity_desc' );
- 		$this->setAddColumnsOff();
-	}
-	function getRowsByCustomerID( $customerID )
-	{
-		$this->setMethodName("getRowsByCustomerID");
-		if ($customerID==''){
-			$this->raiseError('customerID not passed');
-		}
+require_once($cfg["path_dbe"] . "/DBEExternalItem.inc.php");
 
-	$queryString = 
-			"SELECT ".$this->getDBColumnNamesAsString().
-			" FROM ".$this->getTableName().
-      " JOIN itemtype ON itemtype.ity_itemtypeno = externalitem.itemTypeID
-			WHERE ".$this->getDBColumnName('customerID')."='".mysql_escape_string($customerID)."'";			
+class DBEJExternalItem extends DBEExternalItem
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setAddColumnsOn();
+        $this->addColumn("itemTypeDescription", DA_STRING, DA_ALLOW_NULL, 'itemtype.ity_desc');
+        $this->setAddColumnsOff();
+    }
 
-		$this->setQueryString( $queryString );
+    function getRowsByCustomerID($customerID)
+    {
+        $this->setMethodName("getRowsByCustomerID");
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
 
-    return (parent::getRows());
-	}
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " JOIN itemtype ON itemtype.ity_itemtypeno = externalitem.itemTypeID
+			WHERE " . $this->getDBColumnName('customerID') . "='" . mysqli_real_escape_string($this->db->link_id(), $customerID) . "'";
+
+        $this->setQueryString($queryString);
+
+        return (parent::getRows());
+    }
 
 }
+
 ?>

@@ -32,9 +32,9 @@ class Sql_Query {
       "searchfor" => "Suchen nach:",
       "and"       => "und",
       "or"        => "oder",
-      "like"      => "enthält",
+      "like"      => "enthlt",
       "reset"     => "Neu",
-      "submit"    => "Ausführen",
+      "submit"    => "Ausfhren",
       "less"      => "Weniger",
       "more"      => "Mehr"
     ),

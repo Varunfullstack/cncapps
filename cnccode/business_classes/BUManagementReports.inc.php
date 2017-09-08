@@ -11,6 +11,8 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 class BUManagementReports extends Business
 {
 
+    public $db;
+
     /**
      * Constructor
      * @access Public

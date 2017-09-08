@@ -70,7 +70,7 @@ class CTServiceRequestReport extends CTCNC
                 Header('Content-type: text/plain');
                 Header('Content-Disposition: attachment; filename=ServiceRequests.csv');
 
-                while ($row = $results->fetch_array(MYSQL_NUM)) {
+                while ($row = $results->fetch_array(MYSQLI_NUM)) {
 
                     if ($firstRow) {
                         echo "RaisedDate,RaisedTime,FixDate,FixTime,LastUpdated,Created,Customer,Contact,Priority,RootCause,CallReference, TotalHours,ResponseHours,MinContractResponseHours,DiffResponseContract, FixHours,FixEngineer,Contract\n";

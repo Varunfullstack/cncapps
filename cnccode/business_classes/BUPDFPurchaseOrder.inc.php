@@ -74,7 +74,6 @@ class BUPDFPurchaseOrder extends BaseObject
     function __construct(&$owner, &$buPurchaseOrder, $porheadID)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         $this->_porheadID = $porheadID;
         if (is_a($buPurchaseOrder, 'buPurchaseOrder')) {
             $this->_buPurchaseOrder = $buPurchaseOrder;
@@ -136,6 +135,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $lineCount = 0;
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
+        $grandTotal = 0;
         while ($dsPorline->fetchNext()) {
             $lineCount++;
             if ($lineCount > BUPDFPOR_NUMBER_OF_LINES - 4) { // can't be bothered to find out why -4 !
@@ -148,9 +148,9 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_buPDF->printStringRJAt(BUPDFPOR_QTY_COL, $dsPorline->getValue('qtyOrdered'));
             $this->_buPDF->printStringAt(BUPDFPOR_DETAILS_COL, $dsPorline->getValue('itemDescription'));
             $this->_buPDF->printStringAt(BUPDFPOR_PART_COL - 5, $dsPorline->getValue('partNo'));
-            $this->_buPDF->printStringRJAt(BUPDFPOR_UNIT_PRICE_COL, '�' . number_format($dsPorline->getValue('curUnitCost'), 2, '.', ','));
+            $this->_buPDF->printStringRJAt(BUPDFPOR_UNIT_PRICE_COL, POUND_CHAR . number_format($dsPorline->getValue('curUnitCost'), 2, '.', ','));
             $total = ($dsPorline->getValue('curUnitCost') * $dsPorline->getValue('qtyOrdered'));
-            $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, '�' . number_format($total, 2, '.', ','));
+            $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, POUND_CHAR . number_format($total, 2, '.', ','));
             $grandTotal += $total;
             $this->_buPDF->CR();
         }
@@ -163,7 +163,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->box(BUPDFPOR_UNIT_PRICE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->box(BUPDFPOR_COST_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->printStringRJAt(BUPDFPOR_UNIT_PRICE_COL, 'Sub Total');
-        $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, '�' . number_format($grandTotal, 2, '.', ','));
+        $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, POUND_CHAR . number_format($grandTotal, 2, '.', ','));
         $this->_buPDF->CR();
         $this->_buPDF->box(BUPDFPOR_UNIT_PRICE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->box(BUPDFPOR_COST_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
@@ -173,12 +173,12 @@ class BUPDFPurchaseOrder extends BaseObject
         // for some reason number_format insists on truncating the VAT value so I round it first!
         $vatValue = $this->myFormattedRoundedNumber($vatValue);
 //		$vatValue = round($vatValue,2);
-        $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, '�' . number_format($vatValue, 2, '.', ','));
+        $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, POUND_CHAR . number_format($vatValue, 2, '.', ','));
         $this->_buPDF->CR();
         $this->_buPDF->box(BUPDFPOR_UNIT_PRICE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->box(BUPDFPOR_COST_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->printStringRJAt(BUPDFPOR_UNIT_PRICE_COL, 'Grand Total');
-        $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, '�' . number_format($grandTotal + $vatValue, 2, '.', ','));
+        $this->_buPDF->printStringRJAt(BUPDFPOR_COST_COL, POUND_CHAR . number_format($grandTotal + $vatValue, 2, '.', ','));
         $this->_buPDF->setFontSize(10);
         $this->_buPDF->setFont();
 //		$this->_buPDF->moveYTo($this->_titleLine + (BUPDFPOR_NUMBER_OF_LINES * $this->_buPDF->getFontSize()/2) - 2);

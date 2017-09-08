@@ -141,12 +141,22 @@ class BUMonthlyReport extends Business
             "UPDATE
         problem
       SET
-        pro_breach_comment = '" . mysql_escape_string($comment) . "'
+        pro_breach_comment = ?
       WHERE
         pro_problemno = $problemID";
 
-        return $this->db->query($sql);
+        $parameters = [
+            [
+                'type' => 's',
+                'value' => $comment
+            ]
+        ];
 
+        /**
+         * @var mysqli_result $result
+         */
+        $result = $this->db->prepareQuery($sql, $parameters);
+        return $result->fetch_array();
     }
 
     function emailLink($link)

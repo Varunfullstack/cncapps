@@ -18,9 +18,9 @@ class CTManagementReports extends CTCNC
 {
     public $buManagementReports;
 
-    function CTSalesReport($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $this->buManagementReports = new BUManagementReports($this);
     }
 

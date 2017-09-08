@@ -1,7 +1,7 @@
 <?php
 
 require_once ( "base.php" );
-$mail_queue =& new Mail_Queue($db_options, $mail_options);
+$mail_queue = new Mail_Queue($db_options, $mail_options);
 
 $from = 'user@server.com';
 $from_name = "Chief";

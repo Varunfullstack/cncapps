@@ -51,7 +51,6 @@ class BUPDFSupportContract extends BaseObject
     function __construct(&$owner, &$dsContract, &$dsCustomerItem, &$dsSite, &$dsCustomer, &$buActivity, $customerHasServiceDeskContract)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         $this->_dsContract = $dsContract;
         $this->_dsCustomer = $dsCustomer;
         $this->_dsCustomerItem = $dsCustomerItem;
@@ -415,7 +414,7 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->setFont();
             $this->_buPDF->printStringAt(
                 BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
-                '�' . $annualPrice . ' + VAT'
+                POUND_CHAR . $annualPrice . ' + VAT'
 
 
             );

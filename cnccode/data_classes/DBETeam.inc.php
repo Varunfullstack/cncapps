@@ -17,17 +17,6 @@ class DBETeam extends DBEntity
      */
     function __construct(&$owner)
     {
-        $this->constructor($owner);
-    }
-
-    /**
-     * constructor
-     * @access public
-     * @return void
-     * @param  void
-     */
-    function constructor(&$owner)
-    {
         parent::__construct($owner);
         $this->setTableName("team");
         $this->addColumn("teamID", DA_ID, DA_NOT_NULL);

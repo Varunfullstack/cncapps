@@ -531,6 +531,7 @@ class MDB_PEAR_PROXY
 
     function nextId($seq_name, $ondemand = TRUE)
     {
+        echo 'File: ' . __FILE__ . ' line: ' . __LINE__;
         return($this->MDB_object->nextId($seq_name, $ondemand));
     }
 

@@ -1,8 +1,8 @@
 BEGIN:VCALENDAR
 BEGIN:VEVENT
-SUMMARY;CHARSET=ISO-8859-1;ENCODING=quoted-printable:{customerName} {add1} {add2} {add3} {town} {county} {postcode} {contactName} DDI: {contactPhone} Call {scrRef}
+SUMMARY;CHARSET=UTF-8;ENCODING=quoted-printable:{customerName} {add1} {add2} {add3} {town} {county} {postcode} {contactName} DDI: {contactPhone} Call {scrRef}
 
-DESCRIPTION;CHARSET=ISO-8859-1;ENCODING=quoted-printable:{reason} 
+DESCRIPTION;CHARSET=UTF-8;ENCODING=quoted-printable:{reason}
 LOCATION:
 ATTENDEE:
 DTSTART:{dateYYYYMMDD}T{startHHMM}21Z

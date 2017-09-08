@@ -103,18 +103,25 @@ class BUPopulateCustomerNotes extends Business
                     // update table
                     $sql =
                         "INSERT INTO
-                  customernote
-              SET
-                  cno_custno = " . $custno . ",
-                  cno_created = '" . $created . "',
-                  cno_consno = 30,
-                  cno_details = '" . mysql_escape_string($details) . "'";
+                          customernote
+                        SET
+                          cno_custno  = " . $custno . ",
+                          cno_created = '" . $created . "',
+                          cno_consno  = 30,
+                          cno_details = ?";
 
                     echo $sql . '<BR/>';
 
-                    mysqli_query($dbUpdate, $sql);
-
-
+                    $parameters = [
+                        [
+                            'type' => 's',
+                            'value' => $details
+                        ]
+                    ];
+                    /**
+                     * @var mysqli_result $result
+                     */
+                    $result = $db->prepareQuery($sql, $parameters);
                 }
 
             } // while $element = $comments_array[]

@@ -39,7 +39,6 @@ class BUPDFSystemBuild extends BaseObject
     function __construct(&$owner, &$dsOrdhead, &$dsOrdline, $dsContact)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         $this->_dsOrdhead = $dsOrdhead;
         $this->_dsOrdline = $dsOrdline;
         $this->_dsContact = $dsContact;

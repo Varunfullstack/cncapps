@@ -215,6 +215,7 @@ class Mail_Queue extends PEAR
         $container_class = 'Mail_Queue_Container_' . $container_type;
         $container_classfile = $container_type . '.php';
 
+
         // Attempt to include a custom version of the named class, but don't treat
         // a failure as fatal.  The caller may have already included their own
         // version of the named class.

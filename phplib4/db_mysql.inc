@@ -38,7 +38,7 @@ class DB_Sql
     var $revision = "1.2";
 
     /* private: link and query handles */
-    var $Link_ID = null;
+    public static $Link_ID = null;
     var $Query_ID = null;
 
     var $locked = false;      ## set to true while we have a lock
@@ -52,7 +52,7 @@ class DB_Sql
     /* public: some trivial reporting */
     function link_id()
     {
-        return $this->Link_ID;
+        return self::$Link_ID;
     }
 
     function query_id()
@@ -74,21 +74,26 @@ class DB_Sql
             $Password = $this->Password;
 
         /* establish connection, select database */
-        if (!isset($this->Link_ID)) {
-            $this->Link_ID = mysqli_connect($Host, $User, $Password, $Database);
+        if (!isset(self::$Link_ID)) {
+            self::$Link_ID = mysqli_connect($Host, $User, $Password, $Database);
 
-            if (!$this->Link_ID) {
+            if (!self::$Link_ID->set_charset("utf8")) {
+                printf("Error loading utf8 charset: %s\n", self::$Link_ID->error);
+                exit();
+            }
+
+            if (!self::$Link_ID) {
                 $this->halt("connect($Host, $User, \$Password) failed.");
                 return 0;
             }
 
-            if (!@mysqli_select_db($this->Link_ID, $Database)) {
+            if (!@mysqli_select_db(self::$Link_ID, $Database)) {
                 $this->halt("cannot use database " . $Database);
                 return 0;
             }
         }
 
-        return $this->Link_ID;
+        return self::$Link_ID;
     }
 
     /* public: discard the query result */
@@ -97,6 +102,70 @@ class DB_Sql
         @mysqli_free_result($this->Query_ID);
         $this->Query_ID = 0;
     }
+
+    /**
+     * @param $queryString
+     * @param $parameters
+     * @return bool|int|mysqli_result
+     */
+    function preparedQuery($queryString, $parameters)
+    {
+        /* No empty queries, please, since PHP4 chokes on them. */
+        if ($queryString == "")
+            /* The empty query string is passed on from the constructor,
+             * when calling the class without a query, e.g. in situations
+             * like these: '$db = new DB_Sql_Subclass;'
+             */
+            return 0;
+
+        if (!$this->connect()) {
+            return 0; /* we already complained in connect() about that. */
+        };
+
+        # New query, discard previous result.
+        if ($this->Query_ID) {
+            $this->free();
+        }
+
+        if ($this->Debug)
+            printf("Debug: query = %s<br>\n", $queryString);
+
+        if (!$parameters) {
+            return null;
+        }
+        $a_params = array();
+
+        $param_type = '';
+        $n = count($parameters);
+        for ($i = 0; $i < $n; $i++) {
+            $param_type .= $parameters['type'][$i];
+        }
+
+        /* with call_user_func_array, array params must be passed by reference */
+        $a_params[] = &$param_type;
+
+        for ($i = 0; $i < $n; $i++) {
+            /* with call_user_func_array, array params must be passed by reference */
+            $a_params[] = &$parameters['value'][$i];
+        }
+
+        $statement = mysqli_prepare(self::$Link_ID, $queryString);
+        call_user_func_array([$statement, 'bind_param'], [$statement, $a_params]);
+
+        mysqli_stmt_execute($statement);
+
+        $result = mysqli_stmt_get_result($statement);
+        $this->Row = 0;
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
+        if ($result) {
+            $this->halt("Invalid SQL: " . $queryString);
+        }
+
+        # Will return nada if it fails. That's fine.
+        return $result;
+    }
+
 
     /* public: perform a query */
     function query($Query_String)
@@ -121,11 +190,10 @@ class DB_Sql
         if ($this->Debug)
             printf("Debug: query = %s<br>\n", $Query_String);
 
-
-        $this->Query_ID = mysqli_query($this->Link_ID, $Query_String);
+        $this->Query_ID = mysqli_query(self::$Link_ID, $Query_String);
         $this->Row = 0;
-        $this->Errno = mysqli_errno($this->Link_ID);
-        $this->Error = mysqli_error($this->Link_ID);
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
         if (!$this->Query_ID) {
             $this->halt("Invalid SQL: " . $Query_String);
         }
@@ -144,8 +212,8 @@ class DB_Sql
 
         $this->Record = @mysqli_fetch_array($this->Query_ID);
         $this->Row += 1;
-        $this->Errno = mysqli_errno($this->Link_ID);
-        $this->Error = mysqli_error($this->Link_ID);
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
 
         $stat = is_array($this->Record);
         if (!$stat && $this->Auto_Free) {
@@ -219,7 +287,7 @@ class DB_Sql
     /* public: evaluate the result (size, width) */
     function affected_rows()
     {
-        return @mysqli_affected_rows($this->Link_ID);
+        return @mysqli_affected_rows(self::$Link_ID);
     }
 
     function num_rows()
@@ -261,7 +329,6 @@ class DB_Sql
     /* public: sequence numbers */
     function nextid($seq_name)
     {
-        var_dump($seq_name);
         $locked = false;
         /* if no current lock, lock sequence table */
         if (!$this->locked) {
@@ -274,7 +341,9 @@ class DB_Sql
         }
 
         /* get sequence number and increment */
-        $q = sprintf("SELECT nextid FROM %s WHERE seq_name = '%s'",
+        $q = sprintf(
+        /** @lang text */
+            "SELECT nextid FROM %s WHERE seq_name = '%s'",
             $this->Seq_Table,
             $seq_name);
         if (!$this->query($q)) {
@@ -285,7 +354,8 @@ class DB_Sql
         /* No current value, make one */
         if (!$this->next_record()) {
             $currentid = 0;
-            $q = sprintf("INSERT INTO %s VALUES('%s', %s)",
+            $q = sprintf(/** @lang text */
+                "INSERT INTO %s VALUES('%s', %s)",
                 $this->Seq_Table,
                 $seq_name,
                 $currentid);
@@ -297,7 +367,8 @@ class DB_Sql
             $currentid = $this->f("nextid");
         }
         $nextid = $currentid + 1;
-        $q = sprintf("UPDATE %s SET nextid = '%s' WHERE seq_name = '%s'",
+        $q = sprintf(/** @lang text */
+            "UPDATE %s SET nextid = '%s' WHERE seq_name = '%s'",
             $this->Seq_Table,
             $nextid,
             $seq_name);
@@ -349,7 +420,10 @@ class DB_Sql
         // result
         if ($table) {
             $this->connect();
-            $id = mysqli_query($this->Link_ID, "select * from $table limit 1");
+            $id = mysqli_query(
+                self::$Link_ID,
+                "select * from $table limit 1"
+            );
             if (!$id) {
                 $this->halt("Metadata query failed.");
                 return false;
@@ -397,7 +471,7 @@ class DB_Sql
     function table_names()
     {
         $this->connect();
-        $h = @mysqli_query($this->Link_ID, "show tables");
+        $h = @mysqli_query(self::$Link_ID, "show tables");
         $i = 0;
         $return = [];
         while ($info = @mysqli_fetch_row($h)) {
@@ -414,8 +488,8 @@ class DB_Sql
     /* private: error handling */
     function halt($msg)
     {
-        $this->Error = @mysqli_error($this->Link_ID);
-        $this->Errno = @mysqli_errno($this->Link_ID);
+        $this->Error = @mysqli_error(self::$Link_ID);
+        $this->Errno = @mysqli_errno(self::$Link_ID);
 
         if ($this->locked) {
             $this->unlock();

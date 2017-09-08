@@ -228,7 +228,7 @@ class CTDailyReport extends CTCNC
 
             $this->buDailyReport->sendByEmailTo(
                 $emailTo,
-                'Pre-pay activities logged yesterday over �100 in value',
+                'Pre-pay activities logged yesterday over £100 in value',
                 $body
             );
 

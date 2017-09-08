@@ -14,7 +14,7 @@ define('BUPDF_FONT_ARIAL', 'Arial');
 
 class BUPDF extends BaseObject
 {
-    var $pdf = '';                    // fpdf object
+    public $pdf;                    // fpdf object
     var $currentXPos = '';    // Position accross page from LHS
     var $currentYPos = '';    // Position up page from bottom
     var $margin = '';                // Non-print area
@@ -29,7 +29,6 @@ class BUPDF extends BaseObject
     function __construct(&$owner, $filename, $author, $title, $creator, $subject, $paperSize)
     {
         BaseObject::__construct($owner);
-        $this->setMethodName('constructor');
         if ($filename == '') {
             $this->raiseError('No filename passed');
             return FALSE;
@@ -61,7 +60,7 @@ class BUPDF extends BaseObject
 //		$this->pdf = pdf_new();
         $this->pdf = new FPDF();
         $this->setFilename($filename);        // Disk file to be created
-        $this->open();
+//        $this->open();
         $this->setInfo("Author", $author);
         $this->setInfo("Title", $title);
         $this->setInfo("Creator", $creator);
@@ -273,7 +272,7 @@ class BUPDF extends BaseObject
 
     function close()
     {
-        $this->pdf->Output($this->getFilename());
+        $this->pdf->Output('F', $this->getFilename(), true);
     }
 
     function placeImageAt($filename, $imageType, $position, $width = 0)

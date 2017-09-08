@@ -152,8 +152,8 @@ class DBEContact extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysql_escape_string($match) . "%'" .
-            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysql_escape_string($match) . "%')" .
+            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%'" .
+            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%')" .
             " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
             " AND " . $this->getDBColumnName('supplierID') . " = " . $this->getFormattedValue('supplierID') .
             " ORDER BY " . $this->getDBColumnName('lastName') . "," . $this->getDBColumnName('firstName')
@@ -187,8 +187,8 @@ class DBEContact extends DBCNCEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysql_escape_string($match) . "%'" .
-            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysql_escape_string($match) . "%')" .
+            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%'" .
+            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%')" .
             " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
             " AND " . $this->getDBColumnName('customerID') . " = " . $this->getFormattedValue('customerID');
 

@@ -3,52 +3,49 @@
 * @authors Karim Ahmed
 * @access public
 */
-require_once($cfg["path_gc"]."/DBEntity.inc.php");
-class DBEExternalItem extends DBEntity{
-	/**
-	* calls constructor()
-	* @access public
-	* @return void
-	* @param  void
-	* @see constructor()
-	*/
-	function __construct(&$owner){
-		$this->constructor($owner);
-	}
-	/**
-	* constructor
-	* @access public
-	* @return void
-	* @param  void
-	*/
-	function constructor(&$owner){
-		parent::__construct($owner);
-		$this->setTableName("externalitem");
- 		$this->addColumn("externalItemID", DA_ID, DA_NOT_NULL);
-    $this->addColumn("itemTypeID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("customerID", DA_ID, DA_NOT_NULL);
- 		$this->addColumn("description", DA_STRING, DA_NOT_NULL);
-    $this->addColumn("notes", DA_MEMO, DA_ALLOW_NULL);
-    $this->addColumn("licenceRenewalDate", DA_DATE, DA_ALLOW_NULL);
-		$this->setPK(0);
- 		$this->setAddColumnsOff();
-	}
-	function getRowsByCustomerID( $customerID )
-	{
-		$this->setMethodName("getRowsByCustomerID");
-		if ($customerID==''){
-			$this->raiseError('customerID not passed');
-		}
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
-	$queryString = 
-			"SELECT ".$this->getDBColumnNamesAsString().
-			" FROM ".$this->getTableName().
-			" WHERE ".$this->getDBColumnName('customerID')."='".mysql_escape_string($customerID);			
+class DBEExternalItem extends DBEntity
+{
+    /**
+     * calls constructor()
+     * @access public
+     * @return void
+     * @param  void
+     * @see constructor()
+     */
+    function __construct(&$owner)
+    {
+        parent::__construct($owner);
+        $this->setTableName("externalitem");
+        $this->addColumn("externalItemID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("itemTypeID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("customerID", DA_ID, DA_NOT_NULL);
+        $this->addColumn("description", DA_STRING, DA_NOT_NULL);
+        $this->addColumn("notes", DA_MEMO, DA_ALLOW_NULL);
+        $this->addColumn("licenceRenewalDate", DA_DATE, DA_ALLOW_NULL);
+        $this->setPK(0);
+        $this->setAddColumnsOff();
+    }
 
-		$this->setQueryString( $queryString );
+    function getRowsByCustomerID($customerID)
+    {
+        $this->setMethodName("getRowsByCustomerID");
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
 
-		return($this->getRows());
-	}
+        //TODO: sort this issue out!!
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName('customerID') . "='" . mysqli_real_escape_string($this->db->link_id(), $customerID);
+
+        $this->setQueryString($queryString);
+
+        return ($this->getRows());
+    }
 
 }
+
 ?>

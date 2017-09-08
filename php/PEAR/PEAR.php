@@ -136,6 +136,11 @@ class PEAR
      */
     var $_expected_errors = array();
 
+    public function __construct($error_class = null)
+    {
+        $this->PEAR($error_class = null);
+    }
+
     /**
      * Constructor.  Registers this object in
      * $_PEAR_destructor_object_list for destructor emulation if a
@@ -146,7 +151,7 @@ class PEAR
      * @access public
      * @return void
      */
-    function __construct($error_class = null)
+    function PEAR($error_class = null)
     {
         $classname = strtolower(get_class($this));
         if ($this->_debug) {
@@ -524,6 +529,7 @@ class PEAR
 
         if (intval(PHP_VERSION) < 5) {
             // little non-eval hack to fix bug #12147
+            $a = null;
             include 'PEAR/FixPHP5PEARWarnings.php';
             return $a;
         }

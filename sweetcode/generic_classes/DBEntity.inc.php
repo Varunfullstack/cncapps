@@ -61,19 +61,10 @@ class DBEntity extends DataAccess
         } else {
             $this->db = clone $db;            // creates a copy of the global connection
             $this->pkdb = clone $db;            // COPIES the global connetion to a NEW VARIABLE
+            $this->db->connect();
         }
         $this->setShowSQLOff();
         $this->setLogSQLOff();
-    }
-
-    /**
-     * Constructor
-     * @return void
-     * @access public
-     */
-    function constructor(&$owner)
-    {
-
     }
 
     /**
@@ -439,7 +430,6 @@ class DBEntity extends DataAccess
     /**
      * Set the SQL statement. Setting it this way will allow validation etc
      * @access public
-     * @return bool Success
      */
     function setQueryString($queryString)
     {
@@ -738,7 +728,9 @@ class DBEntity extends DataAccess
      */
     function getNextPKValue()
     {
-        return $this->pkdb->nextid($this->getTableName());
+        $tableName = $this->getTableName();
+        $data = $this->pkdb->nextid($tableName);
+        return $data;
     }
 
     /**
@@ -1035,8 +1027,7 @@ class DBEntity extends DataAccess
 
     function prepareForSQL($string)
     {
-        $string = mysql_escape_string($string);
-//		$string = str_replace('\\', '\\\\', $string);
+        $string = mysqli_real_escape_string($this->db->Link_ID, $string);
         return $string;
     }
 }

@@ -3,12 +3,10 @@
 <SCRIPT language="JavaScript">
     var qtySetZero = true; // initialise flag to indicate current toggle state
     $(function () {
-        document.onkeydown = function () {
+        document.onkeydown = function (event) {
             if (event.keyCode == 116) { // F5 toggle
-                event.preventDefault();
-                event.stopPropagation();
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
                 event.keyCode = 0;
-                event.returnValue = false;
                 event.cancelBubble = true;
 
                 var qtyToDespatchElements = $('.qtyToDespatch');
@@ -46,11 +44,7 @@
                     <tr>
                         <td width="60px" class="promptText">Deliver By</td>
                         <td class="field">
-                            <select
-                                    type="text"
-                                    id="deliveryMethodID"
-                                    name="deliveryMethodID"
-                            >
+                            <select id="deliveryMethodID" name="deliveryMethodID">
                                 <option value="">Please Select</option>
                                 <!-- BEGIN deliveryMethodBlock -->
                                 <option {deliveryMethodSelected} value="{deliveryMethodID}">
@@ -85,13 +79,15 @@
                         <td width="350px" class="listHeadText">Description</td>
                         <td width="57px" class="listHeadText">Part No</td>
                         <td width="50px" class="listHeadText">Ordered</td>
-                        <td width="50px" class="listHeadText">Outstanding</td>
+                        <td width="50px" class="listHeadText">Outstanding aaa</td>
                         <td width="140px" class="listHeadText">Despatch (F5 toggle)</td>
-                        <td width="10px" class="listHeadText">&nbsp;</td>
+                        <td width="10px" class="listHeadText">
+                            &nbsp;
+                        </td>
+
                     </tr>
                     <!-- BEGIN orderLineBlock -->
-                    <input type="hidden" id="sequenceNo" name="despatch[{sequenceNo}][sequenceNo]" value={sequenceNo}>
-                    <input type="hidden" class="qtyOutstandingHide" value="{qtyOutstandingHide}">
+
                     <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
                         <td class="{orderLineClass}">
                             <DIV align="left">{description}</DIV>
@@ -102,9 +98,14 @@
                         <td class="{orderLineClass}">{qtyOrdered}</td>
                         <td class="{orderLineClass}">{qtyOutstanding}</td>
                         <td class="{orderLineClass}">
-                            <DIV align="right"><input type="text" class="qtyToDespatch"
-                                                      name="despatch[{sequenceNo}][qtyToDespatch]"
-                                                      value="{qtyToDespatch}" maxlength="5"></DIV>
+                            <DIV align="right">
+                                <input type="text" class="qtyToDespatch"
+                                       name="despatch[{sequenceNo}][qtyToDespatch]"
+                                       value="{qtyToDespatch}" maxlength="5">
+                            </DIV>
+                            <input type="hidden" id="sequenceNo" name="despatch[{sequenceNo}][sequenceNo]"
+                                   value={sequenceNo}>
+                            <input type="hidden" class="qtyOutstandingHide" value="{qtyOutstandingHide}">
                         </td>
                         <td class="{orderLineClass}">
                             <DIV align="right">{renewalLink}

@@ -113,14 +113,16 @@ class BUPrepay extends Business
             " AND	cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID .
             " AND	renewalStatus  <> 'D'";
 
+
         $db->query($queryString);
         while ($db->next_record()) {
             $validContracts [$db->Record ['cui_cuino']] = 0; // initialise to no activity
+
         }
 
-        $dbUpdate = new dbSweetcode (); // database connection for update query
+//        $dbUpdate = new dbSweetcode (); // database connection for update query
 
-        $dbeCallActivity = new DBECallActivity ($this); // for update of status
+//        $dbeCallActivity = new DBECallActivity ($this); // for update of status
         /*
         Bring out a list of PrePay Service Requests to be included in the statement run
         */
@@ -166,6 +168,8 @@ class BUPrepay extends Business
           ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topup)
             " GROUP BY pro_problemno
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
+
+        var_dump($queryString);
 
         $db->query($queryString);
 
@@ -309,7 +313,6 @@ class BUPrepay extends Business
 
         }
         //close file
-
 
         if ($ret == TRUE) {
             $topupValue = $this->doTopUp($lastRecord);

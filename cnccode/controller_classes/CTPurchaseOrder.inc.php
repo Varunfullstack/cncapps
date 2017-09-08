@@ -1052,29 +1052,5 @@ class CTPurchaseOrder extends CTCNC
         );
         parent::parsePage();
     }
-
-    /**
-     * From Controller.php
-     * Don't understand why but on site this func could not be found in
-     * Controller so put it here!
-     *    convert a database-formatted date Y-M-D to a dd/mm/yyyy date
-     * NOTE1: If empty string then return same
-     * NOTE2: If invalid input date format then return same
-     */
-    function dateYMDtoDMY($dateYMD)
-    {
-        if (($dateYMD == '') OR ($dateYMD == '0000-00-00')) {
-            return '';
-        } else {
-            if (ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})", $dateYMD, $regs)) {
-                $day = $regs[3];
-                $month = $regs[2];
-                $year = $regs[1];
-                return $day . '/' . $month . '/' . $year;
-            } else {
-                return $dateYMD; // it isn't a valid date format so just return it as-is for display
-            }
-        }
-    }
 }// end of class
 ?>

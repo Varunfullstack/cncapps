@@ -45,7 +45,6 @@ class CTQuestionnaire extends CTCNC
                 $this->updateQuestion();
                 break;
             case 'displayQuestionList':
-            default:
                 $this->displayQuestions();
                 break;
             case 'create':

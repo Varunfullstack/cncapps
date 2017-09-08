@@ -29,7 +29,7 @@ class CTSupplier extends CTCNC
      * @var     DSForm
      * @access  private
      */
-    var $dsSupplier = '';
+    var $dsSupplier;
     public $buSupplier;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
@@ -209,7 +209,7 @@ class CTSupplier extends CTCNC
     {
         $this->setMethodName('search');
 // Parameter validation
-        if ($_REQUEST['supplierString'] == '' & $_REQUEST['address'] == '') {
+        if ($_REQUEST['supplierString'] == '' && $_REQUEST['address'] == '') {
             $GLOBALS['supplierStringMessage'] = 'You must specify some parameters';
             $this->displaySearchForm();
             exit;
@@ -222,6 +222,7 @@ class CTSupplier extends CTCNC
             ) {
                 $GLOBALS['supplierStringMessage'] = CTSUPPLIER_MSG_NONE_FND;
             }
+
         }
 
         if ($this->dsSupplier->rowCount() == 1) {
@@ -250,6 +251,7 @@ class CTSupplier extends CTCNC
         } else {
             $urlSubmit = $this->supplierFormPrepareEdit();
         }
+
         // template
         $this->setTemplateFiles(
             array(
@@ -277,9 +279,10 @@ class CTSupplier extends CTCNC
                         'htmlFmt' => CT_HTML_FMT_POPUP
                     )
                 );
+
             $this->template->set_var(
                 array(
-                    'contactName' => Controller::htmlDisplayText($this->dsSupplier->getValue('contactName')),
+                    'contactName' => Controller::htmlDisplayText($this->dsSupplier->getValue('contactID')),
                     'contactID' => $this->dsSupplier->getValue('contactID'),
                     'urlContactEdit' => $urlContactEdit,
                     'urlContactPopup' => $urlContactPopup
@@ -306,7 +309,6 @@ class CTSupplier extends CTCNC
                 'fax' => Controller::htmlInputText($this->dsSupplier->getValue('fax')),
                 'faxMessage' => Controller::htmlDisplayText($this->dsSupplier->getMessage('fax')),
                 'webSiteURL' => Controller::htmlInputText($this->dsSupplier->getValue('webSiteURL')),
-                'phoneMessage' => Controller::htmlDisplayText($this->dsSupplier->getMessage('phone')),
                 'creditLimit' => Controller::htmlInputText($this->dsSupplier->getValue('creditLimit')),
                 'creditLimitMessage' => Controller::htmlDisplayText($this->dsSupplier->getMessage('creditLimit')),
                 'cncAccountNo' => Controller::htmlInputText($this->dsSupplier->getValue('cncAccountNo')),

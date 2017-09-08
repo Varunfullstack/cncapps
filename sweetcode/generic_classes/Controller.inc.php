@@ -1,28 +1,29 @@
 <?php
 /**
-* Controller base class
-* Provides generic functionality to process HTML requests.
-* Supplies some generic actions triggered by the value of a HTTP_GET_VARS
-* variable named "action". The user is expected to override the generic
-* methods and may also add user-defined actions and handlers by overriding
-* the default method.
-*
-* e.g. http://www.mysite.com/task.php?action=displayAddForm&processid=2
-* If session classnames are supplied then it will use the PHPLib sessions and
-* security classes to provide comprehensive session, authentication and
-* security support.
-*
-* @author Karim Ahmed.
-* @access virtual
-*/
+ * Controller base class
+ * Provides generic functionality to process HTML requests.
+ * Supplies some generic actions triggered by the value of a HTTP_GET_VARS
+ * variable named "action". The user is expected to override the generic
+ * methods and may also add user-defined actions and handlers by overriding
+ * the default method.
+ *
+ * e.g. http://www.mysite.com/task.php?action=displayAddForm&processid=2
+ * If session classnames are supplied then it will use the PHPLib sessions and
+ * security classes to provide comprehensive session, authentication and
+ * security support.
+ *
+ * @author Karim Ahmed.
+ * @access virtual
+ */
 function stripslashes_deep($value)
 {
     $value = is_array($value) ?
-                array_map('stripslashes_deep', $value) :
-                stripslashes($value);
+        array_map('stripslashes_deep', $value) :
+        stripslashes($value);
 
     return $value;
 }
+
 // Session level constants
 
 define("CT_LEVEL_NONE", 0);
@@ -46,751 +47,824 @@ define('CT_DOC_TYPE_HTML', 'html');
 define('CT_DOC_TYPE_XML', 'xml');
 
 // HTML display format
-define("CT_HTML_FMT_SCREEN", 'screen');				// HTML Document to be formatted for screen output
-define("CT_HTML_FMT_POPUP", 'popup');				// HTML Document to be formatted for popup window
-define("CT_HTML_FMT_PRINTER", 'printer');			// HTML Document to be formatted for printer output
+define("CT_HTML_FMT_SCREEN", 'screen');                // HTML Document to be formatted for screen output
+define("CT_HTML_FMT_POPUP", 'popup');                // HTML Document to be formatted for popup window
+define("CT_HTML_FMT_PRINTER", 'printer');            // HTML Document to be formatted for printer output
 define("CT_HTML_FMT_PDF", 'pdf');        // HTML Document to be formatted for PDF file output
 define('CT_HTML_READONLY', 'readonly'); // HTML for setting text fields readonly
 // Other
 define("CT_FORM_ERROR_MESSAGE", "Please complete the fields highlighted in red");
 define("CT_SELECTED", "selected");
 define("CT_CHECKED", "checked");
-require_once($cfg["path_gc"]."/BaseObject.inc.php");
-class Controller extends BaseObject{
+define("POUND_CHAR", chr(163));
+
+require_once($cfg["path_gc"] . "/BaseObject.inc.php");
+
+class Controller extends BaseObject
+{
 // instance vars
-	var $requestMethod="";		// this->requestMethod from html request
-	var $postVars="";					// HTTP_POST_VARS from html request
-	var $startTime;
-	var $getVars="";					// HTTP_GET_VARS from html request
-	var $cookieVars="";				// HTTP_COOKIE_VARS from html request
-	var $template="";					// PHPLib template object
-	var $cfg="";							// Configuration variables
-	var $db="";								// PHPLib DB object
-	var $pageTitle="";
-	var $formError=FALSE;
-	var $docType=CT_DOC_TYPE_HTML;
-	var $htmlFmt=CT_HTML_FMT_SCREEN;		// HTML formatting
-	var $formErrorMessage="";
-	var $action="";
-	function __construct(
-		$requestMethod,
-		&$postVars,
-		&$getVars,
-		&$cookieVars,
-		&$cfg,
-		$sessClassName,
-		$authClassName,
-		$permClassName,
-		$userClassName
-	){
-		$this->BaseObjectNoOwner();
+    var $requestMethod = "";        // this->requestMethod from html request
+    var $postVars = "";                    // HTTP_POST_VARS from html request
+    var $startTime;
+    var $getVars = "";                    // HTTP_GET_VARS from html request
+    var $cookieVars = "";                // HTTP_COOKIE_VARS from html request
+    var $template = "";                    // PHPLib template object
+    var $cfg = "";                            // Configuration variables
+    var $db = "";                                // PHPLib DB object
+    var $pageTitle = "";
+    var $formError = FALSE;
+    var $docType = CT_DOC_TYPE_HTML;
+    var $htmlFmt = CT_HTML_FMT_SCREEN;        // HTML formatting
+    var $formErrorMessage = "";
+    var $action = "";
+
+    function __construct(
+        $requestMethod,
+        &$postVars,
+        &$getVars,
+        &$cookieVars,
+        &$cfg,
+        $sessClassName,
+        $authClassName,
+        $permClassName,
+        $userClassName
+    )
+    {
+        $this->BaseObjectNoOwner();
 //		$this->BaseObject();
-		$this->pageOpen();
-		$this->postVars=&$postVars;
-		$this->getVars=&$getVars;
-		$this->cookieVars=&$cookieVars;
-		$this->cfg=&$cfg;
-		$this->createTemplate();
-		$this->requestMethod=$requestMethod;
-		$this->setFormErrorOff();
-	}
-	/**
-	* Set document output type
-	* @param string $documentType The type of document to return
-	* @access public
-	* @return boolean
-	*/
-	function setDocType($docType){
-		$this->setMethodName('setDocumentType');
-		if (($docType==CT_DOC_TYPE_HTML)|($docType==CT_DOC_TYPE_XML)){
-			$this->docType=$docType;
-		}
-		else{
-			$this->displayFatalError('Document Type must be '.CT_DOC_TYPE_HTML.' or '.CT_DOC_TYPE_XML);
-		}
-	}
-	/**
-	* Get document output type
-	* @access public
-	* @return string DocumentType
-	*/
-	function getDocType(){
-		return $this->docType;
-	}
-	/**
-	* Set html display format
-	* @param string $format The html format
-	* @access public
-	* @return boolean
-	*/
-	function setHTMLFmt($format){
-		$this->setMethodName('setHTMLFmt');
-		if (($format==CT_HTML_FMT_SCREEN)|($format==CT_HTML_FMT_PRINTER)|($format==CT_HTML_FMT_POPUP | ( $format == CT_HTML_FMT_PDF ))){
-			$this->htmlFmt=$format;
-		}
-		else{
-			$this->displayFatalError('Format must be '.CT_HTML_FMT_SCREEN.' or '.CT_HTML_FMT_PRINTER.' or '.CT_HTML_FMT_POPUP);
-		}
-	}
-	/**
-	* Get html display format
-	* @access public
-	* @return string format
-	*/
-	function getHTMLFmt(){
-		return $this->htmlFmt;
-	}
-	function setPageTitle($pageTitle){
-		$this->pageTitle=$pageTitle;
-	}
-	function getPageTitle(){
-		return $this->pageTitle;
-	}
-	function setFormErrorOn(){
-		$this->formError=TRUE;
-	}
-	function setFormErrorOff(){
-		$this->formError=FALSE;
-	}
-	function getFormError(){
-		return $this->formError;
-	}
-	function setFormErrorMessage($message){
-		if (func_get_arg(0)!="") $this->setFormErrorOn();
-		$this->formErrorMessage=$message;
-	}
-	function getFormErrorMessage(){
-		return $this->formErrorMessage;
-	}
-	/**
-	* Create template object
-	*
-	* @access public
-	* @return boolean Success
-	*/
-	function createTemplate(){
-		$this->template=new Template($this->cfg["path_templates"], "remove");
-		return TRUE;
-	}
-	/**
-	* Return the HTMLOutputText
-	* NOTE: Used, at present, during test mode
-	* @access public
-	* @return string HTML text
-	*/
-	function getHTMLOutputText(){
-		return $this->htmlOutputText;
-	}
-	/**
-	* Execute the current request
-	* @access public
-	* @return boolean Success
-	*/
-	function execute(){
-		$this->setMethodName("execute");
-		// This function to be defined in descendent class for anything to
-		// be done before all requests are processed.
-		$this->initialProcesses();
-		// This actually processes the request
-		$this->handleRequest();
-		return TRUE;
-	}
-/**
-* Get the HTML action
-* @access public
-* @return string Action CT_METHOD_POST or CT_METHOD_GET
-*/
-	function getAction(){
-		return $this->action;
-	}
-/**
-* Set the HTML action
-* @access public
-* @param string $action CT_METHOD_POST or CT_METHOD_GET
-* @return boolean Success
-*/
-	function setAction($action){
-		$this->action=$action;
-		return TRUE;
-	}
-/**
-* Reset the HTML action
-* @access private
-* @return boolean Success
-*/
-	function resetAction(){
-		$this->action="";
-		return TRUE;
-	}
-/**
-* All initialisation upon execution of request
-* @access private
-* @return boolean Success
-*/
-	function pageOpen(){
-	  $timeOfDay=gettimeofday();
-		if (SHOW_TIMINGS) {
-			$this->startTime = $timeOfDay["sec"]+($timeOfDay["usec"]/1000000);
-		}
+        $this->pageOpen();
+        $this->postVars =& $postVars;
+        $this->getVars =& $getVars;
+        $this->cookieVars =& $cookieVars;
+        $this->cfg =& $cfg;
+        $this->createTemplate();
+        $this->requestMethod = $requestMethod;
+        $this->setFormErrorOff();
+    }
+
+    /**
+     * Set document output type
+     * @param string $documentType The type of document to return
+     * @access public
+     * @return boolean
+     */
+    function setDocType($docType)
+    {
+        $this->setMethodName('setDocumentType');
+        if (($docType == CT_DOC_TYPE_HTML) | ($docType == CT_DOC_TYPE_XML)) {
+            $this->docType = $docType;
+        } else {
+            $this->displayFatalError('Document Type must be ' . CT_DOC_TYPE_HTML . ' or ' . CT_DOC_TYPE_XML);
+        }
+    }
+
+    /**
+     * Get document output type
+     * @access public
+     * @return string DocumentType
+     */
+    function getDocType()
+    {
+        return $this->docType;
+    }
+
+    /**
+     * Set html display format
+     * @param string $format The html format
+     * @access public
+     * @return boolean
+     */
+    function setHTMLFmt($format)
+    {
+        $this->setMethodName('setHTMLFmt');
+        if (($format == CT_HTML_FMT_SCREEN) | ($format == CT_HTML_FMT_PRINTER) | ($format == CT_HTML_FMT_POPUP | ($format == CT_HTML_FMT_PDF))) {
+            $this->htmlFmt = $format;
+        } else {
+            $this->displayFatalError('Format must be ' . CT_HTML_FMT_SCREEN . ' or ' . CT_HTML_FMT_PRINTER . ' or ' . CT_HTML_FMT_POPUP);
+        }
+    }
+
+    /**
+     * Get html display format
+     * @access public
+     * @return string format
+     */
+    function getHTMLFmt()
+    {
+        return $this->htmlFmt;
+    }
+
+    function setPageTitle($pageTitle)
+    {
+        $this->pageTitle = $pageTitle;
+    }
+
+    function getPageTitle()
+    {
+        return $this->pageTitle;
+    }
+
+    function setFormErrorOn()
+    {
+        $this->formError = TRUE;
+    }
+
+    function setFormErrorOff()
+    {
+        $this->formError = FALSE;
+    }
+
+    function getFormError()
+    {
+        return $this->formError;
+    }
+
+    function setFormErrorMessage($message)
+    {
+        if (func_get_arg(0) != "") $this->setFormErrorOn();
+        $this->formErrorMessage = $message;
+    }
+
+    function getFormErrorMessage()
+    {
+        return $this->formErrorMessage;
+    }
+
+    /**
+     * Create template object
+     *
+     * @access public
+     * @return boolean Success
+     */
+    function createTemplate()
+    {
+        $this->template = new Template($this->cfg["path_templates"], "remove");
+        return TRUE;
+    }
+
+    /**
+     * Return the HTMLOutputText
+     * NOTE: Used, at present, during test mode
+     * @access public
+     * @return string HTML text
+     */
+    function getHTMLOutputText()
+    {
+        return $this->htmlOutputText;
+    }
+
+    /**
+     * Execute the current request
+     * @access public
+     * @return boolean Success
+     */
+    function execute()
+    {
+        $this->setMethodName("execute");
+        // This function to be defined in descendent class for anything to
+        // be done before all requests are processed.
+        $this->initialProcesses();
+        // This actually processes the request
+        $this->handleRequest();
+        return TRUE;
+    }
+
+    /**
+     * Get the HTML action
+     * @access public
+     * @return string Action CT_METHOD_POST or CT_METHOD_GET
+     */
+    function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * Set the HTML action
+     * @access public
+     * @param string $action CT_METHOD_POST or CT_METHOD_GET
+     * @return boolean Success
+     */
+    function setAction($action)
+    {
+        $this->action = $action;
+        return TRUE;
+    }
+
+    /**
+     * Reset the HTML action
+     * @access private
+     * @return boolean Success
+     */
+    function resetAction()
+    {
+        $this->action = "";
+        return TRUE;
+    }
+
+    /**
+     * All initialisation upon execution of request
+     * @access private
+     * @return boolean Success
+     */
+    function pageOpen()
+    {
+        $timeOfDay = gettimeofday();
+        if (SHOW_TIMINGS) {
+            $this->startTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+        }
 //		ob_start("ob_gz_handler"); // start output buffering
-		return TRUE;
-	}
-	/**
-	* All clean-up on completion of client request
-	* @access private
-	* @return boolean Success
-	*/
-	function pageClose(){
-		$this->setMethodName("pageClose");
+        return TRUE;
+    }
+
+    /**
+     * All clean-up on completion of client request
+     * @access private
+     * @return boolean Success
+     */
+    function pageClose()
+    {
+        $this->setMethodName("pageClose");
 //		ob_end_flush();				// flush output buffer (to client)
-	}
-	/**
-	* Anything you want to do before execution. e.g. setting variables
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function initialProcesses()
-	{
-	}
-	/**
-	* Action to perform on insert
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function insert()
-	{
-	}
-	/**
-	* Action to perform on delete
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function delete()
-	{
-	}
-	/**
-	* Action to perform on update request
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function update()
-	{
-	}
-	/**
-	* Action to perform on display edit form request
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function displayEditForm()
-	{
-	}
-	/**
-	* Action to perform on display delete form request
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function displayDeleteForm()
-	{
-	}
-	/**
-	* Action to perform on display add form request
-	* Override in decendent
-	* @access private
-	* @return void
-	*/
-	function displayAddForm()
-	{
-	}
-	/**
-	* Override this one with the action to take when none of the generic
-	* action parameters have been passed
-	*
-	* e.g. You may simply want some code to display a page.
-	*
-	* HINT:
-	*
-	*	You can add your own list of actions like this:
-	*
-	*	In your defaultAction function, add your own switch statement with the new
-	*	actions:
-	*
-	*	function defaultAction(){
-	*		switch ($this->getAction()){
-	*			case "new_action":
-	*				<------ CODE TO DO NEW ACTION HERE ------>
-	*				break;
-	*			default:					// This becomes the new defaultAction
-	*				<------ CODE TO DISPLAY PAGE HERE ----->
-	*				break;
-	*		}
-	* 	}
-	*
-	* SECURITY WARNING: The default action only provides user-level permissions
-	*		checking(if authentication is on) as it stands so you may want to preceed
-	*		your code with $this->permCheck(<level>)
-	* @access private
-	* @return void
-	*/
-	function defaultAction()
-	{
-	}
+    }
 
-	/**
-	* Action to perform on display add form request
-	* As explained above, you will have to, at least, override the defaultAction
-	* method in your decendent class to make anything happen in "execute()"
-	* The generic action handlers provide assumed security levels but you
-	* can quite easily preceed your own overriden methods with alternate
-	* levels of security.
-	* Override in decendent
-	* @access public
-	* @return void
-	*/
-	function handleRequest()
-	{
-		$this->setMethodName("handleRequest");
-		switch ($this->getAction()){
-			case CT_ACTION_INSERT:
-				$this->insert();
-				break;
+    /**
+     * Anything you want to do before execution. e.g. setting variables
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function initialProcesses()
+    {
+    }
 
-			case CT_ACTION_DISPLAY_ADD:
-				$this->displayAddForm();
-				break;
+    /**
+     * Action to perform on insert
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function insert()
+    {
+    }
 
-			case CT_ACTION_DISPLAY_DELETE:
-				$this->displayDeleteForm();
-				break;
+    /**
+     * Action to perform on delete
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function delete()
+    {
+    }
 
-			case CT_ACTION_DELETE:
-				$this->delete();
-				break;
+    /**
+     * Action to perform on update request
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function update()
+    {
+    }
 
-			case CT_ACTION_DISPLAY_EDIT:
-				$this->displayEditForm();
-				break;
+    /**
+     * Action to perform on display edit form request
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function displayEditForm()
+    {
+    }
 
-			case CT_ACTION_UPDATE:
-				$this->update();
-				break;
+    /**
+     * Action to perform on display delete form request
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function displayDeleteForm()
+    {
+    }
 
-			default:
-				$this->defaultAction();
-				break;
-		}
-		//$this->pageClose();
-	}
-	/**
-	* Set template files, automatically includes the page template then calls
-	* the PHPLib template set_file method
-	*
-	* @access private
-	*/
-	function setTemplateFiles($handle, $fileName="") {
+    /**
+     * Action to perform on display add form request
+     * Override in decendent
+     * @access private
+     * @return void
+     */
+    function displayAddForm()
+    {
+    }
 
-		// We always include the page or report template
-		switch ($this->getHTMLFmt()){
-			case CT_HTML_FMT_PRINTER:
-				$file=array("page" => "printer.inc.".$this->getDocType());
-				break;
-			case CT_HTML_FMT_POPUP:
-				$file=array("page" => "PopupPage.inc.".$this->getDocType());
-				break;
-      case CT_HTML_FMT_PDF:
-        $file=array("page" => "pdf_layout.inc.".$this->getDocType());
-        break;
-			default:
-				$file=array("page" => "screen.inc.".$this->getDocType());
-				break;
-		}
-		if (!is_array($handle)) {
+    /**
+     * Override this one with the action to take when none of the generic
+     * action parameters have been passed
+     *
+     * e.g. You may simply want some code to display a page.
+     *
+     * HINT:
+     *
+     *    You can add your own list of actions like this:
+     *
+     *    In your defaultAction function, add your own switch statement with the new
+     *    actions:
+     *
+     *    function defaultAction(){
+     *        switch ($this->getAction()){
+     *            case "new_action":
+     *                <------ CODE TO DO NEW ACTION HERE ------>
+     *                break;
+     *            default:                    // This becomes the new defaultAction
+     *                <------ CODE TO DISPLAY PAGE HERE ----->
+     *                break;
+     *        }
+     *    }
+     *
+     * SECURITY WARNING: The default action only provides user-level permissions
+     *        checking(if authentication is on) as it stands so you may want to preceed
+     *        your code with $this->permCheck(<level>)
+     * @access private
+     * @return void
+     */
+    function defaultAction()
+    {
+    }
+
+    /**
+     * Action to perform on display add form request
+     * As explained above, you will have to, at least, override the defaultAction
+     * method in your decendent class to make anything happen in "execute()"
+     * The generic action handlers provide assumed security levels but you
+     * can quite easily preceed your own overriden methods with alternate
+     * levels of security.
+     * Override in decendent
+     * @access public
+     * @return void
+     */
+    function handleRequest()
+    {
+        $this->setMethodName("handleRequest");
+        switch ($this->getAction()) {
+            case CT_ACTION_INSERT:
+                $this->insert();
+                break;
+
+            case CT_ACTION_DISPLAY_ADD:
+                $this->displayAddForm();
+                break;
+
+            case CT_ACTION_DISPLAY_DELETE:
+                $this->displayDeleteForm();
+                break;
+
+            case CT_ACTION_DELETE:
+                $this->delete();
+                break;
+
+            case CT_ACTION_DISPLAY_EDIT:
+                $this->displayEditForm();
+                break;
+
+            case CT_ACTION_UPDATE:
+                $this->update();
+                break;
+
+            default:
+                $this->defaultAction();
+                break;
+        }
+        //$this->pageClose();
+    }
+
+    /**
+     * Set template files, automatically includes the page template then calls
+     * the PHPLib template set_file method
+     *
+     * @access private
+     */
+    function setTemplateFiles($handle, $fileName = "")
+    {
+
+        // We always include the page or report template
+        switch ($this->getHTMLFmt()) {
+            case CT_HTML_FMT_PRINTER:
+                $file = array("page" => "printer.inc." . $this->getDocType());
+                break;
+            case CT_HTML_FMT_POPUP:
+                $file = array("page" => "PopupPage.inc." . $this->getDocType());
+                break;
+            case CT_HTML_FMT_PDF:
+                $file = array("page" => "pdf_layout.inc." . $this->getDocType());
+                break;
+            default:
+                $file = array("page" => "screen.inc." . $this->getDocType());
+                break;
+        }
+        if (!is_array($handle)) {
 // FOR DOS $file[$handle] = $this->template->fileName($fileName);
-			$file[$handle] = $fileName.'.'.$this->getDocType();
-		}
-		else {
-      			reset($handle);
-      			while(list($h, $f) = each($handle)) {
+            $file[$handle] = $fileName . '.' . $this->getDocType();
+        } else {
+            reset($handle);
+            while (list($h, $f) = each($handle)) {
 //FOR DOS        $file[$h] = $this->template->fileName($f);
-				$file[$h] = $f.'.'.$this->getDocType();
-			}
-		}
-		$this->template->set_file($file);
-	}
-	/**
-	* Parse templates into page
-	*
-	* @access private
-	*/
-	function parsePage(){
-		$this->template->set_var("STYLESHEET", $this->cfg["stylesheet"]);
-		$this->template->set_var("pageTitle", $this->getPageTitle());
-    if ( $GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT ){
-      $this->template->set_var("environmentTag", 'bgcolor="#FAE8EF"');
+                $file[$h] = $f . '.' . $this->getDocType();
+            }
+        }
+        $this->template->set_file($file);
     }
-		if ($this->getFormError()){
-			if ($this->getFormErrorMessage()!=''){
-				$this->template->set_var("formErrorMessage", $this->getFormErrorMessage());
-			}
-			else{
-				$this->template->set_var("formErrorMessage", CT_FORM_ERROR_MESSAGE);
-			}
-		}
-		$this->template->parse("CONTENTS", "page");
-		if (SHOW_TIMINGS) {
-			$timeOfDay=gettimeofday();
-			$endTime=$timeOfDay["sec"]+($timeOfDay["usec"]/1000000);
-			$executeTime = $endTime - $this->startTime;
-			$timeOfDay=gettimeofday();
-			$startTime=$timeOfDay["sec"]+($timeOfDay["usec"]/1000000);
-		}
-		$this->template->p("CONTENTS");
-		if (SHOW_TIMINGS) {
-			$timeOfDay=gettimeofday();
-			$endTime=$timeOfDay["sec"]+($timeOfDay["usec"]/1000000);
-			$pageTime = $endTime - $startTime;
-			echo "Time to excecute script: ".$executeTime." seconds.<BR/>";
-			echo "Time to return page: ".$pageTime." seconds.<BR/>";
-			echo "Total: ".($executeTime + $pageTime)." seconds.<BR/>";
-		}
-	}
-	/**
-	* Build a link
-	*
-	* @access private
-	* @returns string $urlString
-	*/
-	function buildLink($args)
-	{
-		$this->setMethodName("buildLink");
-		$numargs = func_num_args();
-		if ($numargs<2){
-			$this->displayFatalError("Too few arguments passed");
-		}
-		// get args
-		$url=func_get_arg (0);
-		$parameters=func_get_arg (1);
 
-		// This bit added so that extensions such as gif for image files may be
-		// passed.
-		if ($numargs>2){
-			$fileExtension=func_get_arg (2);
-		}
-		else{
-			$fileExtension="";
-		}
-
-	  	if ($url == "") {
-	  		$this->displayFatalError("Blank url");
-	  	}
-
-		$urlString = $url;
-
-		$first = TRUE;
-
-		reset($parameters);
-
-		while(list($p, $v) = each($parameters)){
-			$v=urlencode($v);
-			if ($first==TRUE){
-				$urlString = $urlString."?".$p."=".$v;
-				$first=FALSE;
-			}
-			else
-			{
-				$urlString = $urlString."&".$p."=".$v;
-			};
-		};
-		// This idiot guard prevents the URL page rom being cached by the browser
-		if ( (defined('CONFIG_IDIOT_GUARD_ON')) && CONFIG_IDIOT_GUARD_ON ){
-			$urlString = $this->addParametersToLink($urlString, array("ig"=>time()));
-		}
-		return $urlString;
-	}
-	/**
-	* Add additional parameters to an existing link
-	*
-	* @access private
-	*/
-	function addParametersToLink($url, $parameters)
-	{
-		if ($url == "") {
-			$this->displayFatalError("Blank url");
-		}
-
-		$urlString = $url;
-
-		// Do we have at least one parameter already?
-
-		if (stristr($urlString,"?") == FALSE){
-			$first = TRUE;
-		}
-		else {
-			$first = FALSE;
-		}
-
-		reset($parameters);
-		while(list($p, $v) = each($parameters)){
-			if ($first==TRUE){
-				$urlString = $urlString."?".$p."=".$v;
-    		$first=FALSE;
-  		}
-			else {
-				$urlString = $urlString."&".$p."=".$v;
-			}
-		};
-		return $urlString;
-	}
-
-	/**
-	* Add a string to the end of the generated page title
-	* @access private
-	* @returns void
-	*/
-	function addStringToPageTitle($newString){
-		// Truncate if it will become longer than max allowed
-		$totalNewLength = strlen($this->pageTitle) + strlen($newString)+2;
-
-		if ($totalNewLength > MAX_PAGE_TITLE){
-			$this->pageTitle=
-				substr(
-					$this->pageTitle,
-					0,
-					(strlen($this->pageTitle)-($totalNewLength - MAX_PAGE_TITLE)-3
-				)
-			);
-			$this->pageTitle=$this->pageTitle."...";
-		}
-
-		if ($this->pageTitle!="") {
-			$this->pageTitle=$this->pageTitle."> ";
-		}
-
-		$this->pageTitle=$this->pageTitle.$newString;
-	}
-	/**
-	* Display fatal error page with passed message
-	* @access private
-	*/
-	function displayFatalError($errorMessage){
-		$this->setPageTitle('A Problem Has Occured');
-		$this->setTemplateFiles(array("FatalError" =>"FatalError.inc"));
-		$this->template->set_var(
-			array(
-				"errorMessage" => $errorMessage,
-				"className" => $this->getClassName(),
-				"methodName" => $this->getMethodName(),
-				"url" => $_SERVER['PHP_SELF'],
-				"arguments" => $_SERVER['argv']
-			)
-		);
-		$this->template->parse("CONTENTS", "FatalError", true);
-		$this->parsePage();
-		exit;
-	}
-
-	/**
-	* Check Email Format is valid
-	* @access private
-	*/
-	function checkEmailFormat($emailAddress){
-		return eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@([0-9a-z](-?[0-9a-z])*\.)+[a-z]{2}([zmuvtg]|fo|me)?$",$emailAddress);
-	}
-	/**
-	*  This loops around all the get vars and post vars giving prioity to post vars
-	* @access private
-	* @param String $variableName The variable to retrieve/set
-	*/
-	function retrieveHTMLVars(){
-		while (list ($key, $val) = each ($this->getVars)) {
-			if ($key!="ig"){											// Don't try to find $this->SetIg(), [I]diot [G]uard is simply to avoid unwanted caching
-				$this->getHTMLGetVar($key);
-			}
-		}
-		if (isset($this->postVars["form"])){
-			while (list ($key, $val) = each ($this->postVars["form"])) {
-				$this->getHTMLPostVar($key);
-			}
-		}
-
-    if (isset($this->getVars)){
-      
-      while (list ($key, $val) = each ($this->getVars)) {
-        $this->getHTMLGetVar($key);
-      }
+    /**
+     * Parse templates into page
+     *
+     * @access private
+     */
+    function parsePage()
+    {
+        $this->template->set_var("STYLESHEET", $this->cfg["stylesheet"]);
+        $this->template->set_var("pageTitle", $this->getPageTitle());
+        if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
+            $this->template->set_var("environmentTag", 'bgcolor="#FAE8EF"');
+        }
+        if ($this->getFormError()) {
+            if ($this->getFormErrorMessage() != '') {
+                $this->template->set_var("formErrorMessage", $this->getFormErrorMessage());
+            } else {
+                $this->template->set_var("formErrorMessage", CT_FORM_ERROR_MESSAGE);
+            }
+        }
+        $this->template->parse("CONTENTS", "page");
+        if (SHOW_TIMINGS) {
+            $timeOfDay = gettimeofday();
+            $endTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+            $executeTime = $endTime - $this->startTime;
+            $timeOfDay = gettimeofday();
+            $startTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+        }
+        $this->template->p("CONTENTS");
+        if (SHOW_TIMINGS) {
+            $timeOfDay = gettimeofday();
+            $endTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
+            $pageTime = $endTime - $startTime;
+            echo "Time to excecute script: " . $executeTime . " seconds.<BR/>";
+            echo "Time to return page: " . $pageTime . " seconds.<BR/>";
+            echo "Total: " . ($executeTime + $pageTime) . " seconds.<BR/>";
+        }
     }
-	}
-	/**
-	* This builds a call at run time to methord 'getHTMLPostVar'. the post must be from an HTML array named 'form'
-	* the varibale name is collected then reused with 'ucwords' to make it uppercase, needs to have slashes removed
-	* @access private
-	* @param String $variableName The variable to retrieve/set
-	*/
-	function getHTMLPostVar($variableName){
-		$this->setMethodName("getHTMLPostVar");
-		$methodName="set" . ucwords($variableName);
-		if (!method_exists($this, $methodName)){
-			//$this->displayFatalError("Method ".$methodName."() does not exist");
-		}
-		else{
-			$command=
-				"if(isset(\$this->postVars[\"form\"][\"". $variableName. "\"]))".
-				"\$this->" . $methodName .
-				"(stripslashes_deep(\$this->postVars[\"form\"][\"" . $variableName. "\"]));";
-			eval($command);
-		}
-	}
-  /**
-	* This builds a call at run time to methord 'getHTMLGetVar'.
-	* the varibale name is collected then reused with 'ucwords' to make it uppercase, needs to have slashes removed
-	* @access private
-	* @param String $variableName The variable to retrieve/set
-	*/
-	function getHTMLGetVar($variableName){
-		$this->setMethodName("getHTMLGetVar");
-		$methodName="set" . ucwords($variableName);
-		if (!method_exists($this, $methodName)){
+
+    /**
+     * Build a link
+     *
+     * @access private
+     * @returns string $urlString
+     */
+    function buildLink($args)
+    {
+        $this->setMethodName("buildLink");
+        $numargs = func_num_args();
+        if ($numargs < 2) {
+            $this->displayFatalError("Too few arguments passed");
+        }
+        // get args
+        $url = func_get_arg(0);
+        $parameters = func_get_arg(1);
+
+        // This bit added so that extensions such as gif for image files may be
+        // passed.
+        if ($numargs > 2) {
+            $fileExtension = func_get_arg(2);
+        } else {
+            $fileExtension = "";
+        }
+
+        if ($url == "") {
+            $this->displayFatalError("Blank url");
+        }
+
+        $urlString = $url;
+
+        $first = TRUE;
+
+        reset($parameters);
+
+        while (list($p, $v) = each($parameters)) {
+            $v = urlencode($v);
+            if ($first == TRUE) {
+                $urlString = $urlString . "?" . $p . "=" . $v;
+                $first = FALSE;
+            } else {
+                $urlString = $urlString . "&" . $p . "=" . $v;
+            };
+        };
+        // This idiot guard prevents the URL page rom being cached by the browser
+        if ((defined('CONFIG_IDIOT_GUARD_ON')) && CONFIG_IDIOT_GUARD_ON) {
+            $urlString = $this->addParametersToLink($urlString, array("ig" => time()));
+        }
+        return $urlString;
+    }
+
+    /**
+     * Add additional parameters to an existing link
+     *
+     * @access private
+     */
+    function addParametersToLink($url, $parameters)
+    {
+        if ($url == "") {
+            $this->displayFatalError("Blank url");
+        }
+
+        $urlString = $url;
+
+        // Do we have at least one parameter already?
+
+        if (stristr($urlString, "?") == FALSE) {
+            $first = TRUE;
+        } else {
+            $first = FALSE;
+        }
+
+        reset($parameters);
+        while (list($p, $v) = each($parameters)) {
+            if ($first == TRUE) {
+                $urlString = $urlString . "?" . $p . "=" . $v;
+                $first = FALSE;
+            } else {
+                $urlString = $urlString . "&" . $p . "=" . $v;
+            }
+        };
+        return $urlString;
+    }
+
+    /**
+     * Add a string to the end of the generated page title
+     * @access private
+     * @returns void
+     */
+    function addStringToPageTitle($newString)
+    {
+        // Truncate if it will become longer than max allowed
+        $totalNewLength = strlen($this->pageTitle) + strlen($newString) + 2;
+
+        if ($totalNewLength > MAX_PAGE_TITLE) {
+            $this->pageTitle =
+                substr(
+                    $this->pageTitle,
+                    0,
+                    (strlen($this->pageTitle) - ($totalNewLength - MAX_PAGE_TITLE) - 3
+                    )
+                );
+            $this->pageTitle = $this->pageTitle . "...";
+        }
+
+        if ($this->pageTitle != "") {
+            $this->pageTitle = $this->pageTitle . "> ";
+        }
+
+        $this->pageTitle = $this->pageTitle . $newString;
+    }
+
+    /**
+     * Display fatal error page with passed message
+     * @access private
+     */
+    function displayFatalError($errorMessage)
+    {
+        $this->setPageTitle('A Problem Has Occured');
+        $this->setTemplateFiles(array("FatalError" => "FatalError.inc"));
+        $this->template->set_var(
+            array(
+                "errorMessage" => $errorMessage,
+                "className" => $this->getClassName(),
+                "methodName" => $this->getMethodName(),
+                "url" => $_SERVER['PHP_SELF'],
+                "arguments" => $_SERVER['argv']
+            )
+        );
+        $this->template->parse("CONTENTS", "FatalError", true);
+        $this->parsePage();
+        exit;
+    }
+
+    /**
+     * Check Email Format is valid
+     * @access private
+     */
+    function checkEmailFormat($emailAddress)
+    {
+        return !!filter_var($emailAddress, FILTER_VALIDATE_EMAIL);
+    }
+
+    /**
+     *  This loops around all the get vars and post vars giving prioity to post vars
+     * @access private
+     * @param String $variableName The variable to retrieve/set
+     */
+    function retrieveHTMLVars()
+    {
+        while (list ($key, $val) = each($this->getVars)) {
+            if ($key != "ig") {                                            // Don't try to find $this->SetIg(), [I]diot [G]uard is simply to avoid unwanted caching
+                $this->getHTMLGetVar($key);
+            }
+        }
+        if (isset($this->postVars["form"])) {
+            while (list ($key, $val) = each($this->postVars["form"])) {
+                $this->getHTMLPostVar($key);
+            }
+        }
+
+        if (isset($this->getVars)) {
+
+            while (list ($key, $val) = each($this->getVars)) {
+                $this->getHTMLGetVar($key);
+            }
+        }
+    }
+
+    /**
+     * This builds a call at run time to methord 'getHTMLPostVar'. the post must be from an HTML array named 'form'
+     * the varibale name is collected then reused with 'ucwords' to make it uppercase, needs to have slashes removed
+     * @access private
+     * @param String $variableName The variable to retrieve/set
+     */
+    function getHTMLPostVar($variableName)
+    {
+        $this->setMethodName("getHTMLPostVar");
+        $methodName = "set" . ucwords($variableName);
+        if (!method_exists($this, $methodName)) {
+            //$this->displayFatalError("Method ".$methodName."() does not exist");
+        } else {
+            $command =
+                "if(isset(\$this->postVars[\"form\"][\"" . $variableName . "\"]))" .
+                "\$this->" . $methodName .
+                "(stripslashes_deep(\$this->postVars[\"form\"][\"" . $variableName . "\"]));";
+            eval($command);
+        }
+    }
+
+    /**
+     * This builds a call at run time to methord 'getHTMLGetVar'.
+     * the varibale name is collected then reused with 'ucwords' to make it uppercase, needs to have slashes removed
+     * @access private
+     * @param String $variableName The variable to retrieve/set
+     */
+    function getHTMLGetVar($variableName)
+    {
+        $this->setMethodName("getHTMLGetVar");
+        $methodName = "set" . ucwords($variableName);
+        if (!method_exists($this, $methodName)) {
 //			$this->displayFatalError("Method ".$methodName."() does not exist");
-		}
-		else{
-			$command=
-				"if(isset(\$this->getVars[\"". $variableName. "\"]))".
-				"\$this->" . $methodName .
-				"(stripslashes(\$this->getVars[\"" . $variableName. "\"]));";
-			eval($command);
-		}
-	}
-  	/**
-	* This builds a call at run time to methord 'getHTMLGetVar'.
-	* the varibale name is collected then reused with 'ucwords' to make it uppercase, needs to have slashes removed
-	* @access private
-	* @param String $variableName The variable to retrieve/set
-	*/
-	function setNumericVar($variableName, $value){
-		if (!is_numeric($value)&($value!='')){
-			$this->displayFatalError('Non-numeric value passed to numeric variable '.$variableName);
-		}
-		else{
-			eval('$this->'.$variableName.'=\''.$value.'\';');
-		}
-	}
-	function formatForHTML($string, $html_encode = true){
-/*
-		$string = str_replace("\011", ' &nbsp;&nbsp;&nbsp;', str_replace('  ', ' &nbsp;', $string));
-		$string = ereg_replace("((\015\012)|(\015)|(\012))", '<br />', $string);
-*/		
-		if ( $html_encode ){
-			$string = htmlentities( $string );
-		}
+        } else {
+            $command =
+                "if(isset(\$this->getVars[\"" . $variableName . "\"]))" .
+                "\$this->" . $methodName .
+                "(stripslashes(\$this->getVars[\"" . $variableName . "\"]));";
+            eval($command);
+        }
+    }
 
-		$string = ereg_replace("((\015\012)|(\015)|(\012))", '<br />', $string);
-		
-		return $string;
-	}
-	function htmlChecked($flag){
+    /**
+     * This builds a call at run time to methord 'getHTMLGetVar'.
+     * the varibale name is collected then reused with 'ucwords' to make it uppercase, needs to have slashes removed
+     * @access private
+     * @param String $variableName The variable to retrieve/set
+     */
+    function setNumericVar($variableName, $value)
+    {
+        if (!is_numeric($value) & ($value != '')) {
+            $this->displayFatalError('Non-numeric value passed to numeric variable ' . $variableName);
+        } else {
+            eval('$this->' . $variableName . '=\'' . $value . '\';');
+        }
+    }
+
+    public static function formatForHTML($string, $html_encode = true)
+    {
+        /*
+                $string = str_replace("\011", ' &nbsp;&nbsp;&nbsp;', str_replace('  ', ' &nbsp;', $string));
+                $string = ereg_replace("((\015\012)|(\015)|(\012))", '<br />', $string);
+        */
+        if ($html_encode) {
+            $string = htmlentities($string);
+        }
+
+        $string = preg_replace("/((\015\012)|(\015)|(\012))/", '<br />', $string);
+
+        return $string;
+    }
+
+    public static function htmlChecked($flag)
+    {
 //		return ($flag=='N' ? '' : CT_CHECKED);
-		if ($flag == 'N' OR $flag == ''){
-			$ret = '';
-		}
-		else{
-			$ret = CT_CHECKED;
-		}
-		return $ret;
-	}
-	/**
-	* Prepare string for DB
-	*/
-	function myText($string){
-		$string = mysql_real_escape_string($string);
-		return trim($string);
-	}
-	/**
-	* Prepare string for display on HTML page
-	*/
-	function htmlDisplayText($text,$format=0) {
-		$text = stripslashes($text);
-		$text = htmlspecialchars($text, ENT_QUOTES);
-		$text = str_replace("\r\n","\n",$text);
-		switch($format):
-			case 1: //  
-				// convert \r\n to <br>
-				$text = Controller::formatForHTML($text);
-				break;
-			case 2:
-			// change case - use on all uppercase strings
-				$text = ucwords(strtolower($text));
-				break;
-		endswitch;
-		return trim($text);
-	}
-	/**
-	* Prepare string for display in HTML text input field
-	*/
-	function htmlInputText($text) {
+        if ($flag == 'N' OR $flag == '') {
+            $ret = '';
+        } else {
+            $ret = CT_CHECKED;
+        }
+        return $ret;
+    }
+
+    /**
+     * Prepare string for DB
+     */
+    function myText($string)
+    {
+        $string = mysql_real_escape_string($string);
+        return trim($string);
+    }
+
+    /**
+     * Prepare string for display on HTML page
+     */
+    public static function htmlDisplayText($text, $format = 0)
+    {
+        $text = stripslashes($text);
+        $text = htmlspecialchars($text, ENT_QUOTES);
+        $text = str_replace("\r\n", "\n", $text);
+        switch ($format):
+            case 1: //
+                // convert \r\n to <br>
+                $text = Controller::formatForHTML($text);
+                break;
+            case 2:
+                // change case - use on all uppercase strings
+                $text = ucwords(strtolower($text));
+                break;
+        endswitch;
+        return trim($text);
+    }
+
+    /**
+     * Prepare string for display in HTML text input field
+     */
+    function htmlInputText($text)
+    {
 //		$text = addslashes($text);// replaced because it resulted in e.g. Karim O\'Ahmed
 //		$text = str_replace('"','\"', $text);	// this one only escapes "
-		$text = htmlspecialchars($text, ENT_QUOTES);
-		return trim($text);
-	}
-	/**
-	* Prepare string for display in HTML text area input field
-	*/
-	function htmlTextArea($text) {
-		return trim($text);
-	}
-	/**
-	* format number for display in HTML cell
-	* Default 2dps
-	*/
-	function formatNumber( $unformattedNumber, $dps = 2, $thousandsSep = ',', $blankZeros=true ) {
+        $text = htmlspecialchars($text, ENT_QUOTES);
+        return trim($text);
+    }
 
-		if ( $unformattedNumber == 0 && $blankZeros ){
-			return '&nbsp;';
-		}
-		else{
+    /**
+     * Prepare string for display in HTML text area input field
+     */
+    function htmlTextArea($text)
+    {
+        return trim($text);
+    }
 
-			return number_format($unformattedNumber, $dps, '.', $thousandsSep);
-		}
-	}
-	/**
-	* format GBP currency value for display
-	* Default 2dps
-	*/
-	function formatNumberCur( $unformattedNumber, $dps = 2, $thousandsSep = ',', $blankZeros=true ) {
+    /**
+     * format number for display in HTML cell
+     * Default 2dps
+     */
+    public static function formatNumber($unformattedNumber, $dps = 2, $thousandsSep = ',', $blankZeros = true)
+    {
 
-		if ( $unformattedNumber == 0 && $blankZeros ){
-			return '';
-		}
-		else{
+        if ($unformattedNumber == 0 && $blankZeros) {
+            return '&nbsp;';
+        } else {
 
-			return '�' . number_format($unformattedNumber, $dps, '.', $thousandsSep);
-		}
-	}
-	/**
-	*	convert a database-formatted date Y-M-D to a dd/mm/yyyy date
-	* NOTE1: If empty string then return same
-	* NOTE2: If invalid input date format then return same
-	*/
-	function dateYMDtoDMY($dateYMD, $separator = '/'){
-		if (($dateYMD=='') OR ($dateYMD=='0000-00-00')){
-			return '';
-		}
-		else{
-			if (ereg ("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})", $dateYMD, $regs)) {
-				$day = $regs[3];
-				$month = $regs[2];
-				$year = $regs[1];
-				return $day.$separator.$month.$separator.$year;
-			}
-			else{
-				return $dateYMD; // it isn't a valid date format so just return it as-is for display
-			}
-		}
-	}
+            return number_format($unformattedNumber, $dps, '.', $thousandsSep);
+        }
+    }
+
+    /**
+     * format GBP currency value for display
+     * Default 2dps
+     */
+    public static function formatNumberCur($unformattedNumber, $dps = 2, $thousandsSep = ',', $blankZeros = true)
+    {
+
+        if ($unformattedNumber == 0 && $blankZeros) {
+            return '';
+        } else {
+            return POUND_CHAR . number_format($unformattedNumber, $dps, '.', $thousandsSep);
+        }
+    }
+
+    /**
+     *    convert a database-formatted date Y-M-D to a dd/mm/yyyy date
+     * NOTE1: If empty string then return same
+     * NOTE2: If invalid input date format then return same
+     * @param $dateYMD
+     * @param string $separator
+     * @return string
+     */
+    function dateYMDtoDMY($dateYMD, $separator = '/')
+    {
+        if (($dateYMD == '') OR ($dateYMD == '0000-00-00')) {
+            return '';
+        } else {
+            if (preg_match_all("/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $dateYMD, $regs)) {
+                $day = $regs[3][0];
+                $month = $regs[2][0];
+                $year = $regs[1][0];
+                return $day . $separator . $month . $separator . $year;
+            } else {
+                return $dateYMD; // it isn't a valid date format so just return it as-is for display
+            }
+        }
+    }
 }// End of class
 ?>

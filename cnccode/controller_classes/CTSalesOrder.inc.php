@@ -819,8 +819,10 @@ class CTSalesOrder extends CTCNC
      */
     function displayOrder()
     {
+
         $this->setMethodName('displayOrder');
         if ($this->getAction() != CTSALESORDER_ACT_CREATE_QUOTE AND $this->getAction() != CTSALESORDER_ACT_CREATE_ORDER) {
+
             if ($this->getOrdheadID() == '') {
                 $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
                 return;
@@ -946,6 +948,7 @@ class CTSalesOrder extends CTCNC
             }
 
         }
+
         // Build the various URL links required on the page
         if (!$restrictedView) {
 
@@ -1084,7 +1087,6 @@ class CTSalesOrder extends CTCNC
                         'htmlFmt' => CT_HTML_FMT_POPUP
                     )
                 );
-
             if ($orderType != 'Q') {
                 // Display link to sales order confirmation document
                 $uncSalesOrderConf =
@@ -1275,7 +1277,6 @@ class CTSalesOrder extends CTCNC
                 )
             );
         }
-
         $this->template->set_var(
             array(
                 'customerID' => $dsOrdhead->getValue('customerID'),
@@ -2729,6 +2730,7 @@ class CTSalesOrder extends CTCNC
         header("Content-Transfer-Encoding: binary");
         header("Content-Length: " . filesize('quotes/' . $quoteFile));
         readfile('quotes/' . $quoteFile);
+
         exit();
     }
 

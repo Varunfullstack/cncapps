@@ -1,8 +1,8 @@
 BEGIN:VCALENDAR
 BEGIN:VEVENT
-SUMMARY;CHARSET=ISO-8859-1;ENCODING=quoted-printable:{userName} from CNC Support - SCR {scrRef}
+SUMMARY;CHARSET=UTF-8;ENCODING=quoted-printable:{userName} from CNC Support - SCR {scrRef}
 
-DESCRIPTION;CHARSET=ISO-8859-1;ENCODING=quoted-printable:{reason}=0D=0A=0D=0ACNC Support, +44(0) 1273 386333
+DESCRIPTION;CHARSET=UTF-8;ENCODING=quoted-printable:{reason}=0D=0A=0D=0ACNC Support, +44(0) 1273 386333
 LOCATION:{add1} {add2} {add3} {town} {county} {postcode}
 ATTENDEE:{userName} ({contactPhone})
 DTSTART:{dateYYYYMMDD}T{startHHMM}21Z

@@ -20,18 +20,13 @@ class CTContractReport extends CTCNC
 {
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
-        $this->constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-    }
-
-    function constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-        parent::constructor($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
     }
 
     function defaultAction()
     {
 //		$this->checkPermissions(PHPLIB_PERM_TECHNICAL);
-        $business = &new CNC_ContractReport();
+        $business = new CNC_ContractReport();
         $_REQUEST['show_edit'] = 0;
         $_REQUEST['show_fields'] = 1;
         $_REQUEST['show_filters'] = 1;

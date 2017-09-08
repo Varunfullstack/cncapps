@@ -405,10 +405,10 @@ class DataSet extends DataAccess
                         switch ($columnType) {
                             case DA_DATE:
                                 if ($value != '') {
-                                    if (ereg("([0-9]{1,2})/([0-9]{1,2})/([0-9]{4})", $value, $regs)) {
-                                        $day = $regs[1];
-                                        $month = $regs[2];
-                                        $year = $regs[3];
+                                    if (preg_match_all("/([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})/", $value, $regs)) {
+                                        $day = (int)$regs[1][0];
+                                        $month = (int)$regs[2][0];
+                                        $year = (int)$regs[3][0];
                                         if (checkdate($month, $day, $year)) {
                                             $this->setValue($fieldName, $year . '-' . $month . '-' . $day);
                                         } else {

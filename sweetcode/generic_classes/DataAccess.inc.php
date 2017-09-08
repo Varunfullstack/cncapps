@@ -147,6 +147,7 @@ class DataAccess extends BaseObject
      */
     function replicate(&$data)
     {
+
         $this->setMethodName("replicate");
         $ret = FALSE;
         $this->_colCount = $this->colCount();
@@ -198,6 +199,7 @@ class DataAccess extends BaseObject
         if (!$data->firstRowFetched) {        // in case get_row has been called
             $data->fetchNext();
         }
+
         while (!$data->eof) {
             /*
             Update row on this object if allowed and the primary key column in $data has a value
@@ -263,6 +265,7 @@ class DataAccess extends BaseObject
         ) {
             $this->initialise();                // So the dataset is ready to use
         }
+
         return $ret;
     }
 
@@ -958,7 +961,6 @@ class DataAccess extends BaseObject
         } else {
             return TRUE;
         }
-
         // inherited post method must be implemented here
     }
 

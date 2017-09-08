@@ -340,6 +340,7 @@ class BUSalesOrder extends Business
      */
     function initialiseQuote(&$dsOrdhead, &$dsOrdline, &$dsCustomer, $type = 'Q')
     {
+
         $this->setMethodName('initialiseQuote');
         $dsOrdhead = new DataSet($this);
         $dbeOrdhead = new DBEOrdhead($this);
