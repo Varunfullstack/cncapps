@@ -169,8 +169,6 @@ class BUPrepay extends Business
             " GROUP BY pro_problemno
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
 
-        var_dump($queryString);
-
         $db->query($queryString);
 
         $ret = FALSE; // indicates there were no statements to export
