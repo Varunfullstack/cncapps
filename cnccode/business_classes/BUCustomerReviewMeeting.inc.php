@@ -20,8 +20,6 @@ class BUCustomerReviewMeeting extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     function generateEmails()

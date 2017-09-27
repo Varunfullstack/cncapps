@@ -27,9 +27,6 @@ class BUCustomerNote extends Business
         $ordheadID = false
     )
     {
-
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $this->setMethodName('updateNote');
 
         if ($customerNoteID) {
@@ -41,8 +38,8 @@ class BUCustomerNote extends Business
         $sql .= "
       SET
         cno_custno = $customerID,
-        cno_details = '" . $db->real_escape_string($details) . "',
-        cno_ordno = '" . $db->real_escape_string($ordheadID) . "',
+        cno_details = '" . $this->db->real_escape_string($details) . "',
+        cno_ordno = '" . $this->db->real_escape_string($ordheadID) . "',
         cno_modified_consno = " . $GLOBALS['auth']->is_authenticated() .
             ", cno_modified = NOW()";
 
@@ -55,10 +52,8 @@ class BUCustomerNote extends Business
             $sql .= " WHERE cno_customernoteno = $customerNoteID";
         }
 
-        if ($db->real_query($sql) === false) {
-
-            echo($db->error);
-
+        if ($this->db->real_query($sql) === false) {
+            echo($this->db->error);
         }
 
         if ($customerNoteID) {
@@ -77,9 +72,6 @@ class BUCustomerNote extends Business
         $ordheadID = false
     )
     {
-
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $this->setMethodName('getNote');
 
         switch ($noteIdentifier) {
@@ -139,7 +131,7 @@ class BUCustomerNote extends Business
 
         } // end switch
 
-        $ret = $db->query($sql)->fetch_object();
+        $ret = $this->db->query($sql)->fetch_object();
 
         return $ret;
 
@@ -149,9 +141,6 @@ class BUCustomerNote extends Business
         $customerID
     )
     {
-
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $this->setMethodName('getNotesByCustomerID');
 
         $sql = "
@@ -174,7 +163,7 @@ class BUCustomerNote extends Business
       ORDER BY
         cno_created";
 
-        $ret = $db->query($sql);
+        $ret = $this->db->query($sql);
 
         return $ret;
 
@@ -182,18 +171,13 @@ class BUCustomerNote extends Business
 
     function deleteNote($customerNoteID)
     {
-
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $this->setMethodName('updateNote');
 
         $sql = "DELETE FROM customernote
             WHERE cno_customernoteno = $customerNoteID";
 
-        if ($db->real_query($sql) === false) {
-
-            echo($db->error);
-
+        if ($this->db->real_query($sql) === false) {
+            echo($this->db->error);
         }
 
     }// end delete

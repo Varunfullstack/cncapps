@@ -21,7 +21,6 @@ class BURenContract extends Business
     var $dbeRenContract = "";
     var $dbeJRenContract = "";
     var $buCustomerItem = "";
-    var $db = '';
 
     /**
      * Constructor
@@ -467,8 +466,6 @@ class BURenContract extends Business
                 'expiryDate' => $dsContract->getValue('expiryDate')
             )
         );
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
         $sql =
             "

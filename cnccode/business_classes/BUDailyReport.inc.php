@@ -19,17 +19,16 @@ class BUDailyReport extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     function fixedIncidents($daysAgo)
     {
-
         $this->setMethodName('fixedIncidents');
 
         $fixedRequests = $this->getFixedRequests($daysAgo);
+        $row = $fixedRequests->fetch_row();
 
-        if ($row = $fixedRequests->fetch_row()) {
+        if ($row) {
 
             $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
             $template->set_file('page', 'ServiceFixedReportEmail.inc.html');
@@ -40,10 +39,22 @@ class BUDailyReport extends Business
             $csvTemplate->set_file('page', 'ServiceFixedReportEmail.inc.csv');
             $csvTemplate->set_block('page', 'requestBlock', 'requests');
 
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
+
             do {
 
                 $urlRequest =
-                    Controller::buildLink(
+                    $controller->buildLink(
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -107,7 +118,7 @@ class BUDailyReport extends Business
 
         }
 
-    } // end function
+    }
 
     /**
      * Customer
@@ -118,6 +129,7 @@ class BUDailyReport extends Business
      * Time since logged (days)
      *
      * @param mixed $daysAgo
+     * @param bool $priorityFiveOnly
      */
     function outstandingIncidents($daysAgo, $priorityFiveOnly = false)
     {
@@ -140,10 +152,21 @@ class BUDailyReport extends Business
 
             $csvTemplate->set_block('page', 'requestBlock', 'requests');
 
-            do {
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
 
+            do {
                 $urlRequest =
-                    Controller::buildLink(
+                    $controller->buildLink(
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -233,10 +256,21 @@ class BUDailyReport extends Business
 
             $template->set_block('page', 'activityBlock', 'activities');
 
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
             do {
 
                 $urlRequest =
-                    Controller::buildLink(
+                    $controller->buildLink(
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -245,7 +279,7 @@ class BUDailyReport extends Business
                     );
 
                 $urlActivity =
-                    Controller::buildLink(
+                    $controller->buildLink(
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'callActivityID' => $row[2],
@@ -288,7 +322,6 @@ class BUDailyReport extends Business
 
     function prepayOverValue($daysAgo)
     {
-
         $this->setMethodName('focActivities');
 
         $activities = $this->getPrePayActivitiesOverValue($daysAgo);
@@ -301,10 +334,22 @@ class BUDailyReport extends Business
 
             $template->set_block('page', 'activityBlock', 'activities');
 
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
+
             do {
 
                 $urlRequest =
-                    Controller::buildLink(
+                    $controller->buildLink(
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -313,7 +358,7 @@ class BUDailyReport extends Business
                     );
 
                 $urlActivity =
-                    Controller::buildLink(
+                    $controller->buildLink(
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'callActivityID' => $row[2],
@@ -527,7 +572,7 @@ class BUDailyReport extends Business
 
         WHERE
           DATE(caa_date) = DATE( DATE_SUB( NOW(), INTERVAL " . $daysAgo . " DAY ) )
-          AND itm_itemtypeno = 57 
+          AND item.itm_itemtypeno = 57 
           AND at.itm_sstk_price > 0
           AND travelFlag = 'N'
         HAVING
@@ -571,7 +616,5 @@ class BUDailyReport extends Business
 
         echo "SENT";
 
-    } // send email
-
-}//End of class
-?>
+    }
+}

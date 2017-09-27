@@ -35,8 +35,6 @@ class BUServiceRequestReport extends Business
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
 
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $query =
             "
         SELECT 
@@ -113,7 +111,7 @@ class BUServiceRequestReport extends Business
 
         $query .= " ORDER BY pro_date_raised";
 
-        $result = $db->query($query);
+        $result = $this->db->query($query);
 
         return $result;
     }

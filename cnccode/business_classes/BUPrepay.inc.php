@@ -779,7 +779,7 @@ is currently a balance of ';
     {
         $db = $GLOBALS['db'];
 
-        $fileString = mysql_real_escape_string(file_get_contents($filename));
+        $fileString = mysqli_real_escape_string($db->link_id(), file_get_contents($filename));
 
         $sql =
 

@@ -19,8 +19,6 @@ class BUHelpdeskReport extends Business
     function BUActivityProfitReport(&$owner)
     {
         parent::__construct($owner);
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     function getTotalActivityCount($today = true)

@@ -13,9 +13,6 @@ require_once($cfg ["path_func"] . "/Common.inc.php");
 
 class BUServiceDeskReport extends Business
 {
-
-    private $db; // database connection
-
     public $customerID = false;
 
     public $startDate;
@@ -35,7 +32,6 @@ class BUServiceDeskReport extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
         $this->buActivity = new BUActivity($this);
     }
 
@@ -53,8 +49,6 @@ class BUServiceDeskReport extends Business
         $this->endDate = date('Y-m-d', $endDateUnix);
 
         $this->startDateOneYearAgo = date('Y-m-d', strtotime('-1 year', $startDateUnix));
-
-
     }
 
     function setStartPeriod($period)
@@ -825,4 +819,3 @@ class BUServiceDeskReport extends Business
 
     }
 } // End of class
-?>

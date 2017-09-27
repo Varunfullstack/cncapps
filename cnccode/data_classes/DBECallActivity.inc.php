@@ -399,9 +399,7 @@ class DBEJCallActivity extends DBECallActivity
         }
 
         $this->setQueryString($query);
-
         return (parent::getRows());
-
     }
 
     function countRowsByCustomerSiteNo($customerID, $siteNo)

@@ -21,10 +21,6 @@ class BUCurrentActivityReport extends Business
 
     function getProblems($status, $futureOnly = false)
     {
-        require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
-
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $queryString = "
       SELECT
         pro_problemno AS problemID,
@@ -76,7 +72,7 @@ class BUCurrentActivityReport extends Business
 
         $queryString .= " ORDER BY pro_consno, pro_do_next_flag DESC, pro_alarm_date, pro_alarm_time";
 
-        return $db->query($sql)->fetch_all(MYSQLI_ASSOC); // one associative array
+        return $this->db->query($queryString)->fetch_all(MYSQLI_ASSOC); // one associative array
 
     }
 } // End of class

@@ -133,24 +133,24 @@ class DB_Sql
         if (!$parameters) {
             return null;
         }
+        $statement = mysqli_prepare(self::$Link_ID, $queryString);
+
         $a_params = array();
 
         $param_type = '';
         $n = count($parameters);
         for ($i = 0; $i < $n; $i++) {
-            $param_type .= $parameters['type'][$i];
+            $param_type .= $parameters[$i]['type'];
         }
 
         /* with call_user_func_array, array params must be passed by reference */
-        $a_params[] = &$param_type;
+        $a_params[] = $param_type;
 
         for ($i = 0; $i < $n; $i++) {
             /* with call_user_func_array, array params must be passed by reference */
-            $a_params[] = &$parameters['value'][$i];
+            $a_params[] = &$parameters[$i]['value'];
         }
-
-        $statement = mysqli_prepare(self::$Link_ID, $queryString);
-        call_user_func_array([$statement, 'bind_param'], [$statement, $a_params]);
+        call_user_func_array([$statement, 'bind_param'], $a_params);
 
         mysqli_stmt_execute($statement);
 
@@ -158,7 +158,8 @@ class DB_Sql
         $this->Row = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
-        if ($result) {
+        if (!$result) {
+            debug_print_backtrace();
             $this->halt("Invalid SQL: " . $queryString);
         }
 
@@ -195,6 +196,7 @@ class DB_Sql
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
         if (!$this->Query_ID) {
+            debug_print_backtrace();
             $this->halt("Invalid SQL: " . $Query_String);
         }
 
@@ -209,7 +211,6 @@ class DB_Sql
             $this->halt("next_record called with no query pending.");
             return 0;
         }
-
         $this->Record = @mysqli_fetch_array($this->Query_ID);
         $this->Row += 1;
         $this->Errno = mysqli_errno(self::$Link_ID);

@@ -12,7 +12,7 @@ class BUSecondsite extends Business
     var $log;
     var $serverCount;
     var $imageCount;
-    var $suspendedCheckServers;
+    private $suspendedCheckServers = [];
     var $delayedCheckServers;
     var $excludedLocalServers;
     var $db;
@@ -40,7 +40,6 @@ class BUSecondsite extends Business
     {
         parent::__construct($owner);
         $this->dbeSecondsiteImage = new DBESecondsiteImage($this);
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     function getActivityModel()

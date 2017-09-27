@@ -23,10 +23,6 @@ class BUPopulateLostCustomerField extends Business
 
     function update()
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        $db1 = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        $dbUpdate = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $sql =
             "SELECT  cus_custno, MAX(odh_date) AS `lastOrderDate`
             FROM ordhead
@@ -36,17 +32,20 @@ class BUPopulateLostCustomerField extends Business
             AND cus_became_customer_date <> '0000-00-00'
             GROUP BY odh_custno";
 
-        $result = $db->query($sql);
+        $result = $this->db->query($sql);
 
-        while ($row = $result->fetch_object()) {
+        $results = $result->fetch_all(MYSQLI_ASSOC);
 
+        foreach ($results as $rowArray) {
+
+            $row = (object)$rowArray;
             $sql =
                 "SELECT COUNT(*) AS `orderCount`
               FROM ordhead
               WHERE odh_custno = " . $row->cus_custno . "
               AND odh_type = 'C'";
 
-            $result1 = $db1->query($sql);
+            $result1 = $this->db->query($sql);
             $row1 = $result1->fetch_object();
 
             if (
@@ -64,7 +63,7 @@ class BUPopulateLostCustomerField extends Business
                   cus_custno = " . $row->cus_custno . "
                   AND cus_dropped_customer_date = '0000-00-00'";
 
-                if (!$dbUpdate->query($sql)) {
+                if (!$this->db->query($sql)) {
                     echo "Error";
                 }
 

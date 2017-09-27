@@ -94,15 +94,12 @@ class BURenewal extends Business
     {
         $this->dbeCustomer->getRenewalRequests();
         $this->getData($this->dbeCustomer, $dsCustomer);
-
         while ($dsCustomer->fetchNext()) {
-
             $this->sendRenewalEmailToCustomer($dsCustomer);
 
             $this->dbeCustomer->getRow($dsCustomer->getValue('customerID'));
             $this->dbeCustomer->setValue('sendContractEmail', '');
             $this->dbeCustomer->updateRow();
-
         }
     }
 

@@ -48,8 +48,8 @@ class CTDailyReport extends CTCNC
         $this->setMethodName('fixedIncidents');
 
         $fixedRequests = $this->buDailyReport->getFixedRequests();
-
-        if ($row = $fixedRequests->fetch_row()) {
+        $row = $fixedRequests->fetch_row();
+        if ($row) {
 
             $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
 
@@ -153,8 +153,7 @@ class CTDailyReport extends CTCNC
 
             $body = $template->get_var('output');
 
-//    $emailTo = CONFIG_SUPPORT_ADMINISTRATOR_EMAIL;
-            $emailTo = 'karim@karimahmed.com';
+            $emailTo = CONFIG_CATCHALL_EMAIL;
 
             $this->buDailyReport->sendByEmailTo(
                 $emailTo,

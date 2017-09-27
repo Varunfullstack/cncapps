@@ -12,11 +12,6 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUCustomerSrAnalysisReport extends Business
 {
-    /**
-     * Constructor
-     * @access Public
-     */
-    private $db;
     private $includedItemTypes;
 
     const ITEMTYPENO_SERVERCARE = 55;
@@ -25,8 +20,6 @@ class BUCustomerSrAnalysisReport extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         /* so that we can extract "other" itemtypes */
         $this->includedItemTypes = self::ITEMTYPENO_SERVERCARE . ',' . self::ITEMTYPENO_SERVICEDESK . ',' . CONFIG_PREPAY_ITEMTYPEID;
 
@@ -399,5 +392,4 @@ class BUCustomerSrAnalysisReport extends Business
         }
         return $this->db->query($query)->fetch_object()->count;
     }
-}// End of class
-?>
+}

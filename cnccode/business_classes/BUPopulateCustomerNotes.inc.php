@@ -27,13 +27,6 @@ class BUPopulateCustomerNotes extends Business
     {
         $trim_list = array('-', ' ', '.');
 
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-        //$dbUpdate = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-        $dbUpdate = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD);
-        mysqli_select_db($dbUpdate, DB_NAME);
-
         $sql =
             "SELECT cus_custno, 
         comments
@@ -41,9 +34,13 @@ class BUPopulateCustomerNotes extends Business
         WHERE comments > ''
         ";
 
-        $result = $db->query($sql);
+        $result = $this->db->query($sql);
 
-        while ($row = $result->fetch_object()) {
+        $results = $result->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($results as $rowArray) {
+
+            $row = (object)$rowArray;
 
             $seconds = 1;
 
@@ -112,16 +109,11 @@ class BUPopulateCustomerNotes extends Business
 
                     echo $sql . '<BR/>';
 
-                    $parameters = [
-                        [
-                            'type' => 's',
-                            'value' => $details
-                        ]
-                    ];
                     /**
                      * @var mysqli_result $result
                      */
-                    $result = $db->prepareQuery($sql, $parameters);
+                    $statement = $this->db->prepare($sql);
+                    $statement->bind_param('s', $details);
                 }
 
             } // while $element = $comments_array[]

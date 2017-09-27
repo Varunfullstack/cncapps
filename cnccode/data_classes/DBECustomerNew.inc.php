@@ -115,12 +115,10 @@ class DBECustomer extends DBCNCEntity
 
     function getRenewalRequests()
     {
-
         $this->setMethodName("getRenewalRequests");
 
         $ret = FALSE;
         $queryString =
-
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName('sendContractEmail') . " <> ''";
@@ -143,7 +141,7 @@ class DBECustomer extends DBCNCEntity
             " WHERE " . $this->getDBColumnName('sendTandcEmail') . " <> ''";
 
         $this->setQueryString($queryString);
-        $ret = (parent::getRows());
+        $ret = (self::getRows());
         return $ret;
     }
 }

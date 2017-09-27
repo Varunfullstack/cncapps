@@ -14,8 +14,6 @@ require_once($cfg ["path_func"] . "/Common.inc.php");
 
 class BUDailyServiceDeskReport extends Business
 {
-
-    private $db; // database connection
     private $buActivity;
     public $nonSlaLoggedToday;
     public $slaLoggedToday;
@@ -36,8 +34,6 @@ class BUDailyServiceDeskReport extends Business
         parent::__construct($owner);
 
         $this->buActivity = new BUActivity($this);
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
         $sql =
             "SELECT COUNT(*) AS count
@@ -277,8 +273,7 @@ class BUDailyServiceDeskReport extends Business
         LIMIT 0,1
         ";
 
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        return $db->query($sql)->fetch_object()->details;
+        return $this->db->query($sql)->fetch_object()->details;
 
     }
 

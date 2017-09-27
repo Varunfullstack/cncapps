@@ -34,8 +34,6 @@ class BUContactExport extends Business
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
 
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $query =
             "SELECT DISTINCT";
 
@@ -254,7 +252,7 @@ class BUContactExport extends Business
                 " AND cus_sectorno IN (" . implode(',', $sectorIDs) . ")";
         }
 
-        return $db->query($query);
+        return $this->db->query($query);
 
     }
 

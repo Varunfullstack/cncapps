@@ -19,8 +19,6 @@ class BUTechnicalReport extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     function getImmediateProblemFixCountByTechnician()
@@ -28,7 +26,7 @@ class BUTechnicalReport extends Business
 
         $sql = "
 			SELECT
-				cns_name AS `Technician`
+				cns_name AS `Technician`,
 				COUNT(*) AS rowCount
 				
 			FROM
@@ -43,7 +41,6 @@ class BUTechnicalReport extends Business
 			GROUP BY cns_consno";
 
         return $this->db->query($sql)->fetch_object()->report;
-
     }
 }// End of class
 ?>

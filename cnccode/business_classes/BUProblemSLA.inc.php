@@ -42,14 +42,14 @@ class BUProblemSLA extends Business
 
     private $awaitingCustomerResponseFlag = false;
 
-    private $ukBankHolidays = '';
-    private $buActivity = '';
-    private $buCustomerItem = '';
-    private $dbeProblem = '';
-    private $dbeJProblem = '';
-    private $dbeCallActivityFix = '';
-    private $dbeCallActivity = '';
-    private $dbeJCallActivity = '';
+    private $ukBankHolidays;
+    private $buActivity;
+    private $buCustomerItem;
+    private $dbeProblem;
+    private $dbeJProblem;
+    private $dbeJCallActivityFix;
+    private $dbeCallActivity;
+    private $dbeJCallActivity;
 
     /**
      * Constructor
@@ -59,9 +59,6 @@ class BUProblemSLA extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         // build a list of UK Bank Holidays in over 3 years
         $lastYearBH = common_getUkBankHolidays(date('Y') - 1);
         $thisYearBH = common_getUkBankHolidays(date('Y'));
@@ -101,11 +98,14 @@ class BUProblemSLA extends Business
     {
         $this->buActivity->getProblemsByStatus('I', $dsResults); // initial status
 
+
         while ($dsResults->fetchNext()) {
+
 
             $this->dbeProblem->getRow($dsResults->getValue('problemID'));
 
             $workingHours = $this->getWorkingHours($dsResults->getValue('problemID'));
+
 
             $hoursToSLA = $dsResults->getValue('slaResponseHours') - $workingHours;
 
@@ -132,9 +132,7 @@ class BUProblemSLA extends Business
             $this->dbeProblem->setValue('workingHours', $workingHours);
 
             if ($this->hoursCalculated) {
-
                 $this->dbeProblem->setValue('workingHoursCalculatedToTime', date(CONFIG_MYSQL_DATETIME));
-
             }
 
             echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
@@ -390,8 +388,6 @@ class BUProblemSLA extends Business
         while ($row = $results->fetch_object()) {
             $this->sendSpecialAttentionEmailAlert($row);
         }
-
-
     }
 
     function sendSpecialAttentionEmailAlert($customer)
@@ -670,6 +666,9 @@ class BUProblemSLA extends Business
 
         $pauseStart = false;
 
+        $this->dbeJCallActivity->fetchNext();
+
+
         while ($this->dbeJCallActivity->fetchNext()) {
 
             if ($this->dbeJCallActivity->getValue('awaitingCustomerResponseFlag') == 'Y') {
@@ -726,13 +725,9 @@ class BUProblemSLA extends Business
         );
 
         if ($addHoursSinceLastCalculation) {
-
             $returnHours = $this->dbeJProblem->getValue('workingHours') + $this->hoursCalculated;
-
         } else {
-
             $returnHours = $this->hoursCalculated;
-
         }
 
         return $returnHours;
@@ -746,8 +741,6 @@ class BUProblemSLA extends Business
      */
     function updateFixDurations()
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $dbeJCallActivity = new DBEJCallActivity($this);
 
         $this->buActivity->getProblemsByStatus('C', $dsResults); // completed

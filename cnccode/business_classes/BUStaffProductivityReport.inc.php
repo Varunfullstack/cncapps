@@ -32,8 +32,6 @@ class BUStaffProductivityReport extends Business
 
     function getTandMBilled($userID, $startDate, $endDate)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $query = "
       SELECT
         cns_name as username
@@ -44,7 +42,7 @@ class BUStaffProductivityReport extends Business
 
         //echo $query . '<BR/>';
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
         $row = $results->fetch_object();
 
         $username = $row->username;
@@ -61,7 +59,7 @@ class BUStaffProductivityReport extends Business
 
 //    echo $query . '<BR/>';
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
         $row = $results->fetch_object();
 
         if ($row->value == null) {
@@ -74,8 +72,6 @@ class BUStaffProductivityReport extends Business
 
     function getHours($userID, $startDate, $endDate, $contractItemID = 0)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $query = "
       SELECT
         SUM( ( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) )/ 60/60 ) AS hours
@@ -104,7 +100,7 @@ class BUStaffProductivityReport extends Business
 
         //echo $query . '<BR/>';
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
         $row = $results->fetch_object();
 
         if ($row->hours == null) {
@@ -117,8 +113,6 @@ class BUStaffProductivityReport extends Business
 
     function getInHouseHours($userID, $startDate, $endDate)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $query = "
       SELECT
         SUM(caa_endtime - caa_starttime) as hours
@@ -134,7 +128,7 @@ class BUStaffProductivityReport extends Business
 
         //echo $query . '<BR/>';
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
         $row = $results->fetch_object();
 
         if ($row->hours == null) {
@@ -147,8 +141,6 @@ class BUStaffProductivityReport extends Business
 
     function getCost($userID, $startDate, $endDate, $contractItemID = 0, $inHouse = false)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
@@ -170,7 +162,7 @@ class BUStaffProductivityReport extends Business
 
         //echo $query . '<BR/>';
 
-        $result = $db->query($query);
+        $result = $this->db->query($query);
         $row = $result->fetch_object();
         $helpdeskFlag = $row->helpdeskFlag;
         $weekdayOvertimeFlag = $row->weekdayOvertimeFlag;
@@ -222,7 +214,7 @@ class BUStaffProductivityReport extends Business
       ORDER BY
         caa_date";
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
 
         $overtimeCost = 0;
         $normalTimeCost = 0;
@@ -273,8 +265,6 @@ class BUStaffProductivityReport extends Business
 
     function getPrepayBilled($userID, $startDate, $endDate, $contractItemID = 0)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
@@ -292,7 +282,7 @@ class BUStaffProductivityReport extends Business
       WHERE
         cns_consno = $userID";
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
         $row = $results->fetch_object();
         $helpdeskFlag = $row->helpdeskFlag;
         $weekdayOvertimeFlag = $row->weekdayOvertimeFlag;
@@ -333,7 +323,7 @@ class BUStaffProductivityReport extends Business
       ORDER BY
         caa_date";
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
 
         $totalCost = 0;
 
@@ -368,8 +358,6 @@ class BUStaffProductivityReport extends Business
 
     function search(&$dsSearchForm)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $query =
             "
       SELECT 
@@ -380,7 +368,7 @@ class BUStaffProductivityReport extends Business
       WHERE
         activeFlag = 'Y'";
 
-        $results = $db->query($query);
+        $results = $this->db->query($query);
 
         $ret = array();
 

@@ -6,6 +6,7 @@
  */
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 require_once($cfg["path_gc"] . "/DataSet.inc.php");
+require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 define("BUSINESS_FK_ERR", "_fk_error");    // ext for fk ref integrity error columns in datasets
 define("BUSINESS_NT_PSD", "not passed");    // ext for fk ref integrity error columns in datasets
@@ -13,10 +14,13 @@ define("BUSINESS_NT_PSD", "not passed");    // ext for fk ref integrity error co
 class Business extends BaseObject
 {
 
+    protected $db;
+
     function __construct(&$owner)
     {
         BaseObject::__construct($owner);
         $this->setMethodName("unsetMethodName");
+        $this->db = CNCMysqli::instance()->getDB();
     }
 
     /**

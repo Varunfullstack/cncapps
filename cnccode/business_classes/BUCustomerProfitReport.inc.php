@@ -14,7 +14,6 @@ class BUCustomerProfitReport extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     /**
@@ -540,5 +539,5 @@ class BUCustomerProfitReport extends Business
             return $return;
         }
 
-    }// End of class
-?>
+    }
+}

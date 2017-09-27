@@ -10,16 +10,9 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUEscalationReport extends Business
 {
-    /**
-     * Constructor
-     * @access Public
-     */
-    private $db;
-
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     public function initialiseSearchForm(&$dsData)

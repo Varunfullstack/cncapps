@@ -61,7 +61,7 @@ class DBEntity extends DataAccess
         } else {
             $this->db = clone $db;            // creates a copy of the global connection
             $this->pkdb = clone $db;            // COPIES the global connetion to a NEW VARIABLE
-            $this->db->connect();
+//            $this->db->connect();
         }
         $this->setShowSQLOff();
         $this->setLogSQLOff();
@@ -239,6 +239,7 @@ class DBEntity extends DataAccess
     {
         parent::fetchNext();
         // We don't actually use dbrow
+
         if ($this->db->next_record()) {
             $this->eof = FALSE;
 //			$this->copyColumnsFromDB();
@@ -704,11 +705,6 @@ class DBEntity extends DataAccess
                     $this->raiseError("PK value not set");
                 }
             }
-            /*
-                        echo $this->db->Record['reason']."<BR/>";
-                        echo $this->getValue('reason')."<BR/>";
-                        echo $this->getUpdateString()."<BR/>";
-            */
             $this->setQueryString(
                 "UPDATE " . $this->getTableName() .
                 " SET " . $this->getUpdateString() .
@@ -1027,8 +1023,8 @@ class DBEntity extends DataAccess
 
     function prepareForSQL($string)
     {
-        $string = mysqli_real_escape_string($this->db->Link_ID, $string);
-        return $string;
+        $escapedString = mysqli_real_escape_string($this->db->link_id(), $string);
+        return $escapedString;
     }
 }
 

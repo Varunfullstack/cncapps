@@ -115,6 +115,7 @@ class BUActivity extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
+
         $this->dbeJCallActivity = new DBEJCallActivity($this);
         $this->dbeCallActivitySearch = new DBECallActivitySearch($this);
         $this->dbeUser = new DBEUser($this);
@@ -133,7 +134,6 @@ class BUActivity extends Business
             $this->loggedInUserID = $GLOBALS ['auth']->is_authenticated();
         } else {
             $this->loggedInUserID = USER_SYSTEM;
-
         }
         $this->dbeUser->getRow($this->loggedInUserID);
         $this->loggedInEmail = $this->dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
@@ -632,52 +632,12 @@ class BUActivity extends Business
     function updateCallActivity(&$dsCallActivity, $isFixed = false)
     {
         $this->setMethodName('updateCallActivity');
-
-        $dbStatment = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-        $sql =
-            "SELECT
-        SUM(( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600 ) * at_item.itm_sstk_price  AS prepayValue
-      FROM
-        callactivity
-        JOIN problem ON pro_problemno = caa_problemno
-        LEFT JOIN custitem ON cui_cuino = pro_contract_cuino
-        JOIN callacttype ON cat_callacttypeno = caa_callacttypeno
-        JOIN item AS at_item ON cat_itemno = at_item.itm_itemno
-        JOIN item AS co_item ON cui_itemno = co_item.itm_itemno
-      WHERE
-        caa_problemno = ?
-        AND co_item.itm_itemno = ?
-        AND  at_item.itm_sstk_price  > 0";
-
-        $stmtPrepayValue = $dbStatment->prepare($sql);
-
         $dbeCallActivity = new DBECallActivity($this);
-
-        $prepayValueBefore = 0;
-
+        $oldEndTime = ''; // new activity
         if ($dsCallActivity->getValue('callActivityID') != 0) {
             $dbeCallActivity->getRow($dsCallActivity->getValue('callActivityID'));
             $oldEndTime = $dbeCallActivity->getValue('endTime');
             $oldReason = $dbeCallActivity->getValue('reason');
-
-            /*
-      Prepay Value before
-      */
-            $problemID = $dsCallActivity->getValue('problemID');
-            $prePayItemID = $this->dsHeader->getValue('gscItemID');
-
-            $stmtPrepayValue->bind_param('ii', $problemID, $prePayItemID);
-
-            $stmtPrepayValue->execute();
-
-            $stmtPrepayValue->bind_result($prepayValueBefore);
-
-            $stmtPrepayValue->fetch();
-
-        } else {
-
-            $oldEndTime = ''; // new activity
         }
 
         $dbeCallActType = new DBECallActType($this);
@@ -694,17 +654,9 @@ class BUActivity extends Business
         } else {
             $enteredEndTime = false;
         }
-        /*
-    For some reason, the problemStatus gets cleared when this happens so save it
-    */
-        $problemStatus = $dsCallActivity->getValue('problemStatus');
 
         $this->updateDataaccessObject($dsCallActivity, $dbeCallActivity);
-        /*
-    Get total hours spent
-    */
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
+        /**Get total hours spent*/
         $sql =
             "SELECT
         SUM( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600 AS totalHours
@@ -713,7 +665,8 @@ class BUActivity extends Business
       WHERE
           caa_problemno = " . $dsCallActivity->getValue('problemID');
 
-        $totalHours = $db->query($sql)->fetch_object()->totalHours;
+        $result = $this->db->query($sql);
+        $totalHours = $result->fetch_object()->totalHours;
 
         /*
     Get total travel hours spent
@@ -728,7 +681,9 @@ class BUActivity extends Business
           cat.travelFlag = 'Y'
           AND ca.caa_problemno = " . $dsCallActivity->getValue('problemID');
 
-        $totalTravelHours = $db->query($sql)->fetch_object()->totalHours;
+
+        $result = $this->db->query($sql);
+        $totalTravelHours = $result->fetch_object()->totalHours;
 
         $sql =
             "SELECT
@@ -743,21 +698,8 @@ class BUActivity extends Business
         caa_problemno = " . $dsCallActivity->getValue('problemID') .
             " AND  at_item.itm_sstk_price  > 0";
 
-        $chargeableHours = $db->query($sql)->fetch_object()->chargeableHours;
-        /*
-    Prepay Value after
-    */
-        $problemID = $dsCallActivity->getValue('problemID');
-        $prePayItemID = $this->dsHeader->getValue('gscItemID');
-        $prepayValueAfter = 0;
-
-        $stmtPrepayValue->bind_param('ii', $problemID, $prePayItemID);
-
-        $stmtPrepayValue->execute();
-
-        $stmtPrepayValue->bind_result($prepayValueAfter);
-
-        $stmtPrepayValue->fetch();
+        $result = $this->db->query($sql);
+        $chargeableHours = $result->fetch_object()->chargeableHours;
 
         $dbeProblem = new DBEProblem($this);
 
@@ -805,7 +747,7 @@ class BUActivity extends Business
           FROM contact
           WHERE con_contno = " . $dsCallActivity->getValue('contactID');
 
-            $oldNotes = $db->query($sql)->fetch_object()->con_notes;
+            $oldNotes = $this->db->query($sql)->fetch_object()->con_notes;
 
             if (
                 $oldNotes != $dsCallActivity->getValue('contactNotes')
@@ -815,7 +757,7 @@ class BUActivity extends Business
               SET con_notes = '" . $dsCallActivity->getValue('contactNotes') .
                     "' WHERE con_contno = " . $dsCallActivity->getValue('contactID');
 
-                $db->query($sql);
+                $this->db->query($sql);
             }
         }
         if ($dsCallActivity->getValue('techNotes') && $dsCallActivity->getValue('customerID')) {
@@ -824,7 +766,7 @@ class BUActivity extends Business
           FROM customer
           WHERE cus_custno = " . $dsCallActivity->getValue('customerID');
 
-            $oldTechNotes = $db->query($sql)->fetch_object()->cus_tech_notes;
+            $oldTechNotes = $this->db->query($sql)->fetch_object()->cus_tech_notes;
 
             if (
                 $oldTechNotes != $dsCallActivity->getValue('techNotes')
@@ -834,7 +776,7 @@ class BUActivity extends Business
               SET cus_tech_notes = '" . $dsCallActivity->getValue('techNotes') .
                     "' WHERE cus_custno = " . $dsCallActivity->getValue('customerID');
 
-                $db->query($sql);
+                $this->db->query($sql);
             }
         }
         if (
@@ -923,7 +865,7 @@ class BUActivity extends Business
 
 
         if ($dbeCallActivity->getValue('userID') != USER_SYSTEM) {
-            $this->updateTotalUserLoggedHours($dbeCallActivity->getValue('userID'), $dbeCallActivity->getValue('date'), $db);
+            $this->updateTotalUserLoggedHours($dbeCallActivity->getValue('userID'), $dbeCallActivity->getValue('date'));
         }
 
         return $enteredEndTime;
@@ -931,7 +873,7 @@ class BUActivity extends Business
 
     function highActivityAlertCheck($problemID)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
 
         $sql =
             "SELECT
@@ -942,7 +884,14 @@ class BUActivity extends Business
         caa_problemno = $problemID
         AND caa_date = CURDATE()";
 
-        $totalActivities = $db->query($sql)->fetch_object()->activityCount;
+
+        $totalActivities = 0;
+        $result = $this->db->query($sql);
+        if ($result) {
+            $totalActivities = $result->fetch_object()->activityCount;
+        } else {
+            var_dump($this->db->error_list);
+        }
 
         if ($totalActivities == $this->dsHeader->getValue('highActivityAlertCount')) {
             $this->sendHighActivityAlertEmail($problemID);
@@ -1560,7 +1509,7 @@ class BUActivity extends Business
         );
     }
 
-    function updateTotalUserLoggedHours($userID, $date, $db)
+    function updateTotalUserLoggedHours($userID, $date)
     {
 
         $sql =
@@ -1582,7 +1531,7 @@ class BUActivity extends Business
         userID = $userID
         AND loggedDate = '$date'";
 
-        $db->query($sql);
+        $this->db->query($sql);
 
     }
 
@@ -1752,9 +1701,6 @@ class BUActivity extends Business
 
     function updateAllHistoricUserLoggedHours()
     {
-
-        global $db;
-
         $sql =
             "SELECT
         userID,
@@ -1762,17 +1708,10 @@ class BUActivity extends Business
       FROM
         user_time_log";
 
-        $db->query($sql);
-
-        $records = array();
-
-        while ($db->next_record()) {
-            $records[] = $db->Record;
-        }
-
-        foreach ($records as $record) {
+        $result = $this->db->query($sql);
+        while ($record = $result->fetch_assoc()) {
             echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . "<BR/>";
-            $this->updateTotalUserLoggedHours($record['userID'], $record['loggedDate'], $db);
+            $this->updateTotalUserLoggedHours($record['userID'], $record['loggedDate']);
         }
     }
 
@@ -3342,7 +3281,6 @@ is currently a balance of ';
 
     function createActivityFromSession($sessionKey)
     {
-
         $dbeCallActivity = new DBECallActivity($this);
         $dsCallActivity = new DataSet($this);
         $dsCallActivity->copyColumnsFrom($dbeCallActivity);
@@ -3429,12 +3367,11 @@ customer with the past 8 hours email to GL
             " AND  trim(substr( reason, 0, 200 )) = TRIM( substr( '" . addslashes($shortReason) . "',0,200))" .
             " AND DATE_ADD(CONCAT(caa_date, ' ', caa_starttime ) , INTERVAL 8 HOUR ) >= NOW()";
 
-        $db = $GLOBALS['db'];
 
-        $db->query($queryString);
-        if ($db->next_record()) {
-            $this->sendServiceReAddedEmail($dbeProblem->getPKValue(), $db->Record['caa_problemno']);
-
+        $resultSet = $this->db->query($queryString);
+        if ($record = $resultSet->fetch_assoc()) {
+            $this->sendServiceReAddedEmail($dbeProblem->getPKValue(), $record['caa_problemno']);
+            $resultSet->close();
         }
 
         $buCustomer = new BUCustomer($this);
@@ -5241,7 +5178,7 @@ customer with the past 8 hours email to GL
         /**
          * @var mysqli_result $result
          */
-        $result = $db->prepareQuery($sql, $parameters);
+        $result = $db->preparedQuery($sql, $parameters);
         return $result->fetch_array();
     } // end email to customer
 
@@ -5681,8 +5618,6 @@ customer with the past 8 hours email to GL
 
     function countOpenActivitiesInRequest($problemID, $exceptCallActivityID = false)
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $sql =
             "SELECT
         COUNT( * ) AS openActivityCount
@@ -5697,7 +5632,7 @@ customer with the past 8 hours email to GL
             $sql .= " AND caa_callactivityno <> " . $exceptCallActivityID;
         }
 
-        return $db->query($sql)->fetch_object()->openActivityCount;
+        return $this->db->query($sql)->fetch_object()->openActivityCount;
 
     }
 
@@ -6153,7 +6088,7 @@ customer with the past 8 hours email to GL
             FROM
               contact
             WHERE
-              con_email = '" . mysql_real_escape_string($record[senderEmailAddress]) . "'
+              con_email = '" . mysqli_real_escape_string($db->link_id(), $record[senderEmailAddress]) . "'
               AND con_custno <> 0 
               AND con_mailflag5 = 'Y'";
 
@@ -6477,15 +6412,11 @@ customer with the past 8 hours email to GL
         $db->query($sql);
         $ids = array();
         while ($db->next_record()) {
-
             $ids[] = $db->Record[0];
-
         }
 
         foreach ($ids as $id) {
-
             $this->sendServiceRemovedEmail($id, true);
-
         }
 
         if (count($ids) > 0) {

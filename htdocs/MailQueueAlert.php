@@ -1,24 +1,26 @@
 <?php
 /**
-* Check that the mail queue has no emails older than 15 minutes
-*
-* If it does then email graham and gary and Karim
-*
-* @authors Karim Ahmed - Sweet Code Limited
-*/
+ * Check that the mail queue has no emails older than 15 minutes
+ *
+ * If it does then email graham and gary and Karim
+ *
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
 require_once("config.inc.php");
 
-require_once($cfg["path_bu"]."/BUMail.inc.php");
+require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
-define('EMAIL_SUBJECT', 'Email Queue Problem'); 
+define('EMAIL_SUBJECT', 'Email Queue Problem');
 
 $error = false;
 
-$send_to_email =
-  'grahaml@cnc-ltd.co.uk,' .
-  'karim@sweetcode.co.uk,' .
-	CONFIG_SALES_MANAGER_EMAIL;
-	
+
+if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
+    $send_to_email = CONFIG_CATCHALL_EMAIL;
+} else {
+    $send_to_email = 'grahaml@cnc-ltd.co.uk,' . CONFIG_SALES_MANAGER_EMAIL;
+}
+
 $sql = "
   SELECT 
     COUNT(*)
@@ -28,46 +30,45 @@ $sql = "
     TIMEDIFF( NOW(), time_to_send ) > '00:30:00'
     AND sent_time IS NULL";
 
-$db->query( $sql );    
+$db->query($sql);
 $db->next_record();
 $count = $db->Record[0];
 
-if ( $count > 0 ){
+if ($count > 0) {
 
-	$body = "$count emails have been in the mail queue for longer than 30 minutes.\n";
-	
-	$hdrs_array = array(
-		'From'		=> CONFIG_SALES_MANAGER_EMAIL,
-		'Subject'	=> EMAIL_SUBJECT
-	);
+    $body = "$count emails have been in the mail queue for longer than 30 minutes.\n";
 
-  $buMail= new BUMail( $this );
+    $hdrs_array = array(
+        'From' => CONFIG_SALES_MANAGER_EMAIL,
+        'Subject' => EMAIL_SUBJECT
+    );
 
-  $buMail->mime->setTXTBody( $body );
+    $buMail = new BUMail($this);
 
-  $body = $buMail->mime->get ();
+    $buMail->mime->setHTMLBody($body);
 
-  $hdrs = array(
-    'From'    => CONFIG_SALES_MANAGER_EMAIL,
-    'Subject'  => EMAIL_SUBJECT
-  );
+    $body = $buMail->mime->get();
 
-  $hdrs = $buMail->mime->headers ( $hdrs );
+    $hdrs = array(
+        'From' => CONFIG_SALES_MANAGER_EMAIL,
+        'Subject' => EMAIL_SUBJECT
+    );
 
-  $sent = $buMail->send(
-    $send_to_email,
-    $hdrs,
-    $body,
-    true
-  );
-  
-  if ( $sent ){
-    echo "message sent";
-  }
-  else{
-    echo "not sent";
-    
-  }
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    $sent = $buMail->send(
+        $send_to_email,
+        $hdrs,
+        $body,
+        true
+    );
+
+    if ($sent) {
+        echo "message sent";
+    } else {
+        echo "not sent";
+
+    }
 
 }
 ?>

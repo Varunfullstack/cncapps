@@ -83,6 +83,7 @@ class CTCurrentActivityReport extends CTCNC
     function defaultAction()
     {
 
+
         if (!isset($_SESSION['displayToBeLoggedSectionFlag'])) {
             $_SESSION['displayToBeLoggedSectionFlag'] = 1;
         }

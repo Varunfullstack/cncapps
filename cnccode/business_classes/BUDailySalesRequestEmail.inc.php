@@ -11,9 +11,6 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BUDailySalesRequestEmail extends Business
 {
-
-    private $db; // database connection
-
     /**
      * Constructor
      * @access Public
@@ -21,8 +18,6 @@ class BUDailySalesRequestEmail extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     function getRequests()
@@ -104,7 +99,6 @@ class BUDailySalesRequestEmail extends Business
                 $hdrs,
                 $body
             );
-        } // end if
+        }
     }
-} // End of class
-?>
+}

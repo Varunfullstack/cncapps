@@ -163,7 +163,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
         $days = $_REQUEST['days'];
 
-
         $dsSearchForm->setValue('days', $days);
 
         $results = $this->buActivity->getSrPercentages($days);
@@ -208,6 +207,8 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 $body,
                 true
             );
+
+            echo 'email queued to be sent';
         }
 
     } // end email

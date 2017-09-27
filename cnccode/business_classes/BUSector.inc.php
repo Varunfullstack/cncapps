@@ -73,8 +73,6 @@ class BUSector extends Business
 
     function getCustomerWithoutSector()
     {
-        $db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
         $sql =
             "SELECT
         cus_custno
@@ -88,7 +86,7 @@ class BUSector extends Business
       LIMIT 1,1
         ";
 
-        return $db->query($sql)->fetch_object()->cus_custno;
+        return $this->db->query($sql)->fetch_object()->cus_custno;
 
     }
 }// End of class

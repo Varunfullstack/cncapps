@@ -27,7 +27,6 @@ class BUMail extends Business
     private $mailQueue;
     private $mailQueueSendLimit;
     public $mime;
-    private $db;
     private $buUser;
 
     /**
@@ -43,7 +42,6 @@ class BUMail extends Business
             $GLOBALS ['db_options'],
             $GLOBALS ['mail_options']
         );
-        $this->db = new CNCMysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
         $this->buUser = new BUUser($this);
     }
