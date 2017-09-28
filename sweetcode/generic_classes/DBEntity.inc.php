@@ -60,8 +60,9 @@ class DBEntity extends DataAccess
             $this->raiseError("Requires an initialised db object");
         } else {
             $this->db = clone $db;            // creates a copy of the global connection
+            $this->db->connect();
             $this->pkdb = clone $db;            // COPIES the global connetion to a NEW VARIABLE
-//            $this->db->connect();
+            $this->pkdb->connect();
         }
         $this->setShowSQLOff();
         $this->setLogSQLOff();

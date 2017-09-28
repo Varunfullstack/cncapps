@@ -56,10 +56,13 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 
         case 'cncapps':
             $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
+
             break;
         case 'cncdev7:85':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
+
             break;
+
     }
 
     $GLOBALS['isRunningFromCommandLine'] = false;
@@ -72,9 +75,10 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $_SERVER['HTTP_HOST'] = 'cncapps';
 
 }
+
+
 define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
 define("DB_HOST", "localhost");
-
 switch ($server_type) {
 
 
@@ -84,23 +88,22 @@ switch ($server_type) {
         define("DB_NAME", "cncappsdev");
 
 
-        define("BASE_DRIVE", "C:\\Sites\cncdev7");
-
-        define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
-        define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
-        define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
-        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
+            define("BASE_DRIVE", "C:\\Sites\cncdev7");
+            define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
+            define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
+            define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
+            define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
 //            error_reporting(E_ALL & ~E_STRICT)
-        error_reporting(E_ALL & ~E_WARNING);
-        ini_set('display_errors', 'on');
+            error_reporting(E_ALL & ~E_WARNING);
+            ini_set('display_errors', 'on');
 
-        $GLOBALS['mail_options'] =
-            array(
-                'driver' => 'smtp',
-                'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
-                'port' => 25,
-                'auth' => false
-            );
+            $GLOBALS['mail_options'] =
+                array(
+                    'driver' => 'smtp',
+                    'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                    'port' => 25,
+                    'auth' => false
+                );
 
         define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
@@ -132,6 +135,7 @@ switch ($server_type) {
         define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer");
         define("COMPANY_DIR_FROM_BROWSER", "//cncltd/cnc/Company");
         define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer");
+
         define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
         define('CONFIG_SALES_MANAGER_EMAIL', 'garyj@' . CONFIG_PUBLIC_DOMAIN);
@@ -212,7 +216,7 @@ List of userIDs that can add managers comments to service requests
 $GLOBALS['can_add_manager_comment'] =
     array(USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA);
 
-/*
+/* 
 When automated emails coming in from unrecognised email addresses with these domains,
 do not attempt to match a customer whos contacts have the domain
 */

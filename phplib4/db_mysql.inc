@@ -21,7 +21,7 @@ class DB_Sql
     /* public: configuration parameters */
     var $Auto_Free = 0;     ## Set to 1 for automatic mysql_free_result()
     var $Debug = 0;     ## Set to 1 for debugging messages.
-    var $Halt_On_Error = "yes"; ## "yes" (halt with message), "no" (ignore errors quietly), "report" (ignore errror, but spit a warning)
+    var $Halt_On_Error = "report"; ## "yes" (halt with message), "no" (ignore errors quietly), "report" (ignore errror, but spit a warning)
     var $PConnect = 0;     ## Set to 1 to use persistent database connections
     var $Seq_Table = "db_sequence";
 
@@ -37,7 +37,9 @@ class DB_Sql
     var $type = "mysql";
     var $revision = "1.2";
 
-    /* private: link and query handles */
+    /**
+     * @var mysqli
+     */
     public static $Link_ID = null;
     var $Query_ID = null;
 
@@ -49,7 +51,9 @@ class DB_Sql
         $this->query($query);
     }
 
-    /* public: some trivial reporting */
+    /**
+     * @return mysqli
+     */
     function link_id()
     {
         return self::$Link_ID;

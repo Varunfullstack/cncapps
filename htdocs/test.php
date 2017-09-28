@@ -6,8 +6,3 @@
  * Time: 13:56
  */
 
-include('DB.php');
-
-$test = DB::connect($dsn, true);
-
-var_dump($test);
