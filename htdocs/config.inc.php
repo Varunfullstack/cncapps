@@ -39,7 +39,7 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
-set_time_limit(8 * 60);
+set_time_limit(12 * 60);
 // if magic_quotes_gpc is set then strip all backslashes from GPC arrays first
 // absolute path to root application directory
 
