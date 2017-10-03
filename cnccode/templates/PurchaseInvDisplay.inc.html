@@ -37,7 +37,7 @@
         var qtyToInvoiceElements = $('.qtyToInvoice');
         var curInvUnitCostElements = $('.curInvUnitCost');
         var curInvTotalCostElements = $('.curInvTotalCost');
-        var curVATElements = $('.curVat');
+        var curVATElements = $('.curVAT');
         qtyToInvoiceElements.each(function (index, item, array) {
             var qtyToInvoice = qtyToInvoiceElements[index];
             var curInvUnitCost = curInvUnitCostElements[index];
@@ -65,7 +65,7 @@
     function calculateVATTotal() {
         var curVATGrandTotal = 0;
         var qtyToInvoiceElements = $('.qtyToInvoice');
-        var curVATElements = $('.curVat');
+        var curVATElements = $('.curVAT');
         qtyToInvoiceElements.each(function (index, item, array) {
             var curVAT = curVATElements[index];
             if (IsNumeric(curVAT.value)) {
