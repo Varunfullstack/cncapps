@@ -47,11 +47,11 @@ class DBEJSupplier extends DBESupplier
     /**
      * calls constructor()
      * @access public
-     * @return void
-     * @param  void
+     * @param $owner
+     * @internal param $void
      * @see constructor()
      */
-    function DBESupplier(&$owner)
+    function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();

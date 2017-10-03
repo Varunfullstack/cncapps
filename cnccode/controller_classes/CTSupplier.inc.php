@@ -202,7 +202,7 @@ class CTSupplier extends CTCNC
     }
 
     /**
-     * Search for suppliers usng supplierName
+     * Search for suppliers using supplierName
      * @access private
      */
     function search()
@@ -282,7 +282,7 @@ class CTSupplier extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'contactName' => Controller::htmlDisplayText($this->dsSupplier->getValue('contactID')),
+                    'contactName' => Controller::htmlDisplayText($this->dsSupplier->getValue('contactName')),
                     'contactID' => $this->dsSupplier->getValue('contactID'),
                     'urlContactEdit' => $urlContactEdit,
                     'urlContactPopup' => $urlContactPopup
