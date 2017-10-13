@@ -6,6 +6,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
+
 define('FPDF_FONTPATH', PDF_DIR . '/font/');    // Used by fpdf class
 define('BUPDF_A4_WIDTH', 595);
 define('BUPDF_A4_LENGTH', 842);
@@ -29,6 +30,8 @@ class BUPDF extends BaseObject
     function __construct(&$owner, $filename, $author, $title, $creator, $subject, $paperSize)
     {
         BaseObject::__construct($owner);
+
+
         if ($filename == '') {
             $this->raiseError('No filename passed');
             return FALSE;
@@ -59,6 +62,9 @@ class BUPDF extends BaseObject
         }
 //		$this->pdf = pdf_new();
         $this->pdf = new FPDF();
+
+//        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
+//        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
 //        $this->open();
         $this->setInfo("Author", $author);
@@ -246,8 +252,24 @@ class BUPDF extends BaseObject
     */
     function printString($string)
     {
+        if ($this->detectUTF8($string)) {
+            $string = utf8_decode($string);
+        }
         $this->pdf->Write(($this->getFontSize() / 2), $string); // Fix bug where auto line break adds blank line
         return TRUE;
+    }
+
+    function detectUTF8($string)
+    {
+        return preg_match('%(?:
+        [\xC2-\xDF][\x80-\xBF]        # non-overlong 2-byte
+        |\xE0[\xA0-\xBF][\x80-\xBF]               # excluding overlongs
+        |[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}      # straight 3-byte
+        |\xED[\x80-\x9F][\x80-\xBF]               # excluding surrogates
+        |\xF0[\x90-\xBF][\x80-\xBF]{2}    # planes 1-3
+        |[\xF1-\xF3][\x80-\xBF]{3}                  # planes 4-15
+        |\xF4[\x80-\x8F][\x80-\xBF]{2}    # plane 16
+        )+%xs', $string);
     }
 
     function printStringAt($position, $string)

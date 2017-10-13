@@ -36,7 +36,6 @@ class DB_Sql
     /* public: this is an api revision, not a CVS revision. */
     var $type = "mysql";
     var $revision = "1.2";
-
     /**
      * @var mysqli
      */
@@ -151,10 +150,9 @@ class DB_Sql
         $a_params[] = $param_type;
 
         for ($i = 0; $i < $n; $i++) {
-            /* with call_user_func_array, array params must be passed by reference */
             $a_params[] = &$parameters[$i]['value'];
         }
-        call_user_func_array([$statement, 'bind_param'], $a_params);
+        call_user_func_array(array($statement, 'bind_param'), $a_params);
 
         mysqli_stmt_execute($statement);
 
@@ -446,22 +444,29 @@ class DB_Sql
         // made this IF due to performance (one if is faster than $count if's)
         if (!$full) {
             for ($i = 0; $i < $count; $i++) {
-                $res[$i]["table"] = @($id->fetch_field_direct($i))->table;
-                $res[$i]["name"] = @($id->fetch_field_direct($i)->name);
-                $res[$i]["type"] = @($id->fetch_field_direct($i)->type);
-                $res[$i]["len"] = @($id->fetch_field_direct($i)->max_length);
-                $res[$i]["flags"] = @($id->fetch_field_direct($i)->flags);
+                $fetchedObject = $id->fetch_field_direct($i);
+                if ($fetchedObject) {
+                    $res[$i]["table"] = $fetchedObject->table;
+                    $res[$i]["name"] = $fetchedObject->name;
+                    $res[$i]["type"] = $fetchedObject->type;
+                    $res[$i]["len"] = $fetchedObject->max_length;
+                    $res[$i]["flags"] = $fetchedObject->flags;
+                }
             }
         } else { // full
             $res["num_fields"] = $count;
 
             for ($i = 0; $i < $count; $i++) {
-                $res[$i]["table"] = @($id->fetch_field_direct($i))->table;
-                $res[$i]["name"] = @($id->fetch_field_direct($i)->name);
-                $res[$i]["type"] = @($id->fetch_field_direct($i)->type);
-                $res[$i]["len"] = @($id->fetch_field_direct($i)->max_length);
-                $res[$i]["flags"] = @($id->fetch_field_direct($i)->flags);
-                $res["meta"][$res[$i]["name"]] = $i;
+                $fetchedObject = $id->fetch_field_direct($i);
+                if ($fetchedObject) {
+                    $res[$i]["table"] = $fetchedObject->table;
+                    $res[$i]["name"] = $fetchedObject->name;
+                    $res[$i]["type"] = $fetchedObject->type;
+                    $res[$i]["len"] = $fetchedObject->max_length;
+                    $res[$i]["flags"] = $fetchedObject->flags;
+                    $res["meta"][$res[$i]["name"]] = $i;
+                }
+
             }
         }
 
@@ -478,7 +483,7 @@ class DB_Sql
         $this->connect();
         $h = @mysqli_query(self::$Link_ID, "show tables");
         $i = 0;
-        $return = [];
+        $return = array();
         while ($info = @mysqli_fetch_row($h)) {
             $return[$i]["table_name"] = $info[0];
             $return[$i]["tablespace_name"] = $this->Database;

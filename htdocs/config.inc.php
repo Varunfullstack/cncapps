@@ -39,10 +39,9 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
-set_time_limit(12 * 60);
+set_time_limit(30 * 60);
 // if magic_quotes_gpc is set then strip all backslashes from GPC arrays first
 // absolute path to root application directory
-
 define('MAIN_CONFIG_SERVER_TYPE_TEST', 'test');
 define('MAIN_CONFIG_SERVER_TYPE_LIVE', 'live');
 define('MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT', 'development');
@@ -88,22 +87,22 @@ switch ($server_type) {
         define("DB_NAME", "cncappsdev");
 
 
-            define("BASE_DRIVE", "C:\\Sites\cncdev7");
-            define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
-            define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
-            define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
-            define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
+        define("BASE_DRIVE", "C:\\Sites\cncdev7");
+        define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
+        define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
+        define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
+        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
 //            error_reporting(E_ALL & ~E_STRICT)
-            error_reporting(E_ALL & ~E_WARNING);
-            ini_set('display_errors', 'on');
+        error_reporting(E_ALL & ~E_WARNING);
+        ini_set('display_errors', 'on');
 
-            $GLOBALS['mail_options'] =
-                array(
-                    'driver' => 'smtp',
-                    'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
-                    'port' => 25,
-                    'auth' => false
-                );
+        $GLOBALS['mail_options'] =
+            array(
+                'driver' => 'smtp',
+                'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                'port' => 25,
+                'auth' => false
+            );
 
         define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
