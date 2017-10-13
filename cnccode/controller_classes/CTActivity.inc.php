@@ -491,6 +491,7 @@ class CTActivity extends CTCNC
         $dsSearchForm = &$this->dsSearchForm; // ref to global
         $dsSearchResults = &$this->dsSearchResults; // ref to global
         $this->setMethodName('displaySearchForm');
+
         if (!$this->hasPermissions('PHPLIB_PERM_CUSTOMER')) {
             $urlCustomerPopup = $this->buildLink(
                 CTCNC_PAGE_CUSTOMER,
@@ -545,11 +546,7 @@ class CTActivity extends CTCNC
                 'problemID' => Controller::htmlDisplayText($dsSearchForm->getValue('problemID')),
                 'problemIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('problemID')),
                 'callActivityID' => Controller::htmlDisplayText($dsSearchForm->getValue('callActivityID')),
-                'callActivityIDMessage'
-                => Controller::htmlDisplayText($dsSearchForm->getMessage('callActivityID')),
-                'callActivityID' => Controller::htmlDisplayText($dsSearchForm->getValue('callActivityID')),
-                'callActivityIDMessage'
-                => Controller::htmlDisplayText($dsSearchForm->getMessage('callActivityID')),
+                'callActivityIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('callActivityID')),
                 'activityText' => Controller::htmlDisplayText($dsSearchForm->getValue('activityText')),
                 'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
                 'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),

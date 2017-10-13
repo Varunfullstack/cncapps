@@ -141,84 +141,84 @@ class DBECallActivitySearch extends DBEntity
                 $whereParameters .=
                     " AND caa_callactivityno = " . $callActivityID;
             }
-        } else {
-            if ($problemID) {
-                if (strpos($problemID, ',')) {
-                    $whereParameters .=
-                        " AND caa_problemno IN (" . $problemID . ")";
-
-                } else {
-                    $whereParameters .=
-                        " AND caa_problemno = " . $problemID;
-                }
-            }
-
-            if ($customerID != '' AND $customerID != 0) {
-                $whereParameters = $whereParameters .
-                    " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
-            }
-
-            if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
-                $whereParameters = $whereParameters .
-                    " AND " . $this->getDBColumnName('linkedSalesOrderID') . "=" . $linkedSalesOrderID;
-            }
-
-            if ($userID != '' AND $userID != 0) {
-                $whereParameters = $whereParameters .
-                    " AND " . $this->getDBColumnName('userID') . "=" . $userID;
-            }
-
-            if ($managementReviewOnly == 'Y') {
-                $whereParameters = $whereParameters .
-                    " AND " . $this->getDBColumnName('managementReviewReason') . "<> ''";
-            }
-
-            if ($activityText != '') {
+        }
+        if ($problemID) {
+            if (strpos($problemID, ',')) {
                 $whereParameters .=
-                    " AND ( MATCH (reason)
+                    " AND caa_problemno IN (" . $problemID . ")";
+
+            } else {
+                $whereParameters .=
+                    " AND caa_problemno = " . $problemID;
+            }
+        }
+
+        if ($customerID != '' AND $customerID != 0) {
+            $whereParameters = $whereParameters .
+                " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
+        }
+
+        if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
+            $whereParameters = $whereParameters .
+                " AND " . $this->getDBColumnName('linkedSalesOrderID') . "=" . $linkedSalesOrderID;
+        }
+
+        if ($userID != '' AND $userID != 0) {
+            $whereParameters = $whereParameters .
+                " AND " . $this->getDBColumnName('userID') . "=" . $userID;
+        }
+
+        if ($managementReviewOnly == 'Y') {
+            $whereParameters = $whereParameters .
+                " AND " . $this->getDBColumnName('managementReviewReason') . "<> ''";
+        }
+
+        if ($activityText != '') {
+            $whereParameters .=
+                " AND ( MATCH (reason)
 					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE)
           OR MATCH (pro_internal_notes)
           AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE) )";
-            }
+        }
 
-            if ($project != '') {
-                $project = strtoupper($project);
+        if ($project != '') {
+            $project = strtoupper($project);
+            $whereParameters .=
+                " AND (project.description LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $project) . "%'" .
+                " OR project.projectID = '" . mysqli_real_escape_string($this->db->link_id(), $project) . "')";
+        }
+
+        switch ($status) {
+            case 'INITIAL':
                 $whereParameters .=
-                    " AND (project.description LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $project) . "%'" .
-                    " OR project.projectID = '" . mysqli_real_escape_string($this->db->link_id(), $project) . "')";
-            }
-
-            switch ($status) {
-                case 'INITIAL':
-                    $whereParameters .=
-                        " AND pro_status = 'I'";
-                    break;
-                case 'CUSTOMER':
-                    $whereParameters .=
-                        " AND pro_awaiting_customer_response_flag = 'Y'
+                    " AND pro_status = 'I'";
+                break;
+            case 'CUSTOMER':
+                $whereParameters .=
+                    " AND pro_awaiting_customer_response_flag = 'Y'
             AND pro_status = 'P'";
-                    break;
-                case 'CNC':
-                    $whereParameters .=
-                        " AND pro_awaiting_customer_response_flag = 'N'
+                break;
+            case 'CNC':
+                $whereParameters .=
+                    " AND pro_awaiting_customer_response_flag = 'N'
             AND pro_status = 'P'";
-                    break;
-                /*
-                Checked T&M on Fixed SRs which are due for completion
-                */
-                case 'CHECKED_T_AND_M':
-                    $whereParameters .=
-                        " AND caa_status = 'C' AND " . $this->getDBColumnName('contractCustomerItemID') . "= 0
+                break;
+            /*
+            Checked T&M on Fixed SRs which are due for completion
+            */
+            case 'CHECKED_T_AND_M':
+                $whereParameters .=
+                    " AND caa_status = 'C' AND " . $this->getDBColumnName('contractCustomerItemID') . "= 0
             AND pro_status = 'F'
             AND pro_complete_date <= now()
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
-                    break;
-                /*
-                Checked Non-T&M on Fixed SRs which are due for completion
-                */
-                case 'CHECKED_NON_T_AND_M':
-                    $whereParameters .=
-                        " AND caa_status = 'C' AND " . $this->getDBColumnName('contractCustomerItemID') . "<> 0
+                break;
+            /*
+            Checked Non-T&M on Fixed SRs which are due for completion
+            */
+            case 'CHECKED_NON_T_AND_M':
+                $whereParameters .=
+                    " AND caa_status = 'C' AND " . $this->getDBColumnName('contractCustomerItemID') . "<> 0
 
             AND pro_status = 'F'
 
@@ -234,92 +234,86 @@ class DBECallActivitySearch extends DBEntity
             )
             
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
-                    break;
+                break;
 
-                case 'UNCHECKED':              // UnChecked
-                    $whereParameters .=
-                        " AND caa_status = 'O'
+            case 'UNCHECKED':              // UnChecked
+                $whereParameters .=
+                    " AND caa_status = 'O'
             AND caa_endtime <> ''";
-                    break;
-                case 'FIXED':
-                    $whereParameters .=
-                        " AND pro_status ='F'";
-                    break;
-                case 'NOT_FIXED':
-                    $whereParameters .=
-                        " AND ( pro_status ='I' OR pro_status ='P' )";
-                    break;
-                case 'COMPLETED':
-                    $whereParameters .=
-                        " AND pro_status ='C'";
-                    break;
-            }
-            // Contract Type:
-
-            if ($contractCustomerItemID == '') {                        // Time and materials
+                break;
+            case 'FIXED':
                 $whereParameters .=
-                    " AND " . $this->getDBColumnName('contractCustomerItemID') . " = 0";
-            } elseif ($contractCustomerItemID != 99) {        // anything other than All
+                    " AND pro_status ='F'";
+                break;
+            case 'NOT_FIXED':
                 $whereParameters .=
-                    " AND " . $this->getDBColumnName('contractCustomerItemID') . " = $contractCustomerItemID";
-            }
-
-            if ($fromDate != '') {
+                    " AND ( pro_status ='I' OR pro_status ='P' )";
+                break;
+            case 'COMPLETED':
                 $whereParameters .=
-                    " AND caa_date >= '" . $fromDate . "'";
-            }
+                    " AND pro_status ='C'";
+                break;
+        }
+        // Contract Type:
 
-            if ($toDate != '') {
+        if ($contractCustomerItemID == '') {                        // Time and materials
+            $whereParameters .=
+                " AND " . $this->getDBColumnName('contractCustomerItemID') . " = 0";
+        } elseif ($contractCustomerItemID != 99) {        // anything other than All
+            $whereParameters .=
+                " AND " . $this->getDBColumnName('contractCustomerItemID') . " = $contractCustomerItemID";
+        }
+
+        if ($fromDate != '') {
+            $whereParameters .=
+                " AND caa_date >= '" . $fromDate . "'";
+        }
+
+        if ($toDate != '') {
+            $whereParameters .=
+                " AND caa_date <= '" . $toDate . "'";
+        }
+
+        if ($callActTypeID != '') {
+            $whereParameters .=
+                " AND caa_callacttypeno = " . $callActTypeID;
+        }
+
+        switch ($breachedSlaOption) {
+            case 'B':
                 $whereParameters .=
-                    " AND caa_date <= '" . $toDate . "'";
-            }
-
-            if ($callActTypeID != '') {
+                    " AND pro_responded_hours > pro_sla_response_hours";
+                break;
+            case 'N':
                 $whereParameters .=
-                    " AND caa_callacttypeno = " . $callActTypeID;
-            }
+                    " AND pro_responded_hours <= pro_sla_response_hours";
+                break;
+        }
 
-            switch ($breachedSlaOption) {
-                case 'B':
-                    $whereParameters .=
-                        " AND pro_responded_hours > pro_sla_response_hours";
-                    break;
-                case 'N':
-                    $whereParameters .=
-                        " AND pro_responded_hours <= pro_sla_response_hours";
-                    break;
-            }
+        if ($rootCauseID != '') {
+            $whereParameters .=
+                " AND pro_rootcauseno = " . $rootCauseID;
+        }
 
-            if ($rootCauseID != '') {
-                $whereParameters .=
-                    " AND pro_rootcauseno = " . $rootCauseID;
-            }
+        if ($priority != '') {
+            $whereParameters .=
+                " AND problem.pro_priority = '" . $priority . "'";
+        }
 
-            if ($priority != '') {
-                $whereParameters .=
-                    " AND problem.pro_priority = '" . $priority . "'";
-            }
+        if ($whereParameters) {
+            $statement .= $whereParameters;
+        }
 
-            if (!$whereParameters) {
-                /*
-                No parameters for search so return false
-                */
-                return false;
+        if ($sortColumn) {
+            $statement .= " ORDER BY " . $this->getDBColumnName($sortColumn) . " " . $sortDirection;
+        } else {
+            $statement .= " ORDER BY callactivity.caa_date DESC, callactivity.caa_starttime DESC, callactivity.caa_consno";
+        }
 
-            } else {
-                $statement = $statement . $whereParameters;
-            }
+        if ($limit) {
+            $statement .= " LIMIT 0, 150";
+        }
 
-            if ($sortColumn) {
-                $statement .= " ORDER BY " . $this->getDBColumnName($sortColumn) . " " . $sortDirection;
-            } else {
-                $statement .= " ORDER BY callactivity.caa_date DESC, callactivity.caa_starttime DESC, callactivity.caa_consno";
-            }
-
-            if ($limit) {
-                $statement .= " LIMIT 0, 150";
-            }
-        } // end if ( $callActivityID )
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;

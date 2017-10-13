@@ -8,9 +8,11 @@
     });
     var state = 'none'; // display status
     var savedCustomerString
+
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -25,21 +27,25 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function createActivity() {
         if (document.searchForm.customerID.value != "") {
             document.location = '{urlCreateActivity}&customerID=' + escape(document.searchForm.customerID.value)
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
         }
     }
+
     function checkAll() {
         for (var i = 0; i < document.searchForm.elements.length; i++) {
             var e = document.searchForm.elements[i];
@@ -87,12 +93,12 @@
                        name="activity[1][project]" value="{project}"></td>
         </tr>
         <tr>
-            <td class="promptText">
-                <div align="right">Activity ID</div>
-            </td>
-            <td><input type="text" onKeypress="javascript:submitOnReturn()"
-                       name="activity[1][callActivityID]" value="{callActivityID}">
-                <font class="formErrorMessage">{callActivityIDMessage}</font></td>
+        <td class="promptText">
+        <div align="right">Activity ID</div>
+        </td>
+        <td><input type="text" onKeypress="javascript:submitOnReturn()"
+        name="activity[1][callActivityID]" value="{callActivityID}">
+        <font class="formErrorMessage">{callActivityIDMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
