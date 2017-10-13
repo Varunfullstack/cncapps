@@ -2,146 +2,147 @@
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <script language='JavaScript' src="CommonJS.js"></script>
 <script language='JavaScript'>
-function validatesiteDesc(){
-	if (Trim(document.getElementById("siteDesc").value) != ""){
-		window.open(
-			'{urlSitePopup}&customerID=' + document.getElementById("customerID").value +
-			'&siteDesc=' + escape(document.getElementById("siteDesc").value) +
-			'&parentIDField=siteNo' +
-			'&parentDescField=siteDesc',
-			'address',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}
-function checkFunctionKey(field){
-	if (event.keyCode == 120){			// F9 - edit
-		switch (field.id){
-			case "itemDescription": 
-				if (document.getElementById("itemID").value != "0"){
-					window.open(
-						'{urlItemEdit}&itemID=' +
-						escape(document.getElementById("itemID").value) +
-						'&parentIDField=itemID' +
-						'&parentDescField=itemDescription',
-						'item',
-						'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-					);
-				}
-				break;
-			case "siteDesc": 
-				if (document.getElementById("siteNo").value != ""){
-					window.open(
-						'{urlSiteEdit}&customerID={customerID}' +
-						'&siteNo=' + escape(document.getElementById("siteNo").value) +
-						'&parentIDField=siteNo' +
-						'&parentDescField=siteDesc',
-						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-					);
-				}
-				break;
-		}		
- 	}
- 	return;
-}
-function validateItemDescription(){
-	if (Trim(document.getElementById("itemDescription").value) != ""){
-		window.open('{urlItemPopup}&itemDescription=' +
-		escape(document.getElementById("itemDescription").value) +
-		'&parentIDField=itemID' +
-    '&parentSlaResponseHoursField=slaResponseHours' +
-		'&parentDescField=itemDescription',
-		'items','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
-	}
-}
-function validateCustomerName(){
-	if (Trim(document.getElementById("customerName").value) != ""){
-		window.open('{urlCustomerPopup}&customerString=' +
-		escape(document.getElementById("customerName").value) +
-		'&parentIDField=customerID' +
-		'&parentDescField=customerName',
-		'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-	}
-}
+    function validatesiteDesc() {
+        if (Trim(document.getElementById("siteDesc").value) != "") {
+            window.open(
+                '{urlSitePopup}&customerID=' + document.getElementById("customerID").value +
+                '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+                '&parentIDField=siteNo' +
+                '&parentDescField=siteDesc',
+                'address',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
+
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {			// F9 - edit
+            switch (field.id) {
+                case "itemDescription":
+                    if (document.getElementById("itemID").value != "0") {
+                        window.open(
+                            '{urlItemEdit}&itemID=' +
+                            escape(document.getElementById("itemID").value) +
+                            '&parentIDField=itemID' +
+                            '&parentDescField=itemDescription',
+                            'item',
+                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "siteDesc":
+                    if (document.getElementById("siteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("siteNo").value) +
+                            '&parentIDField=siteNo' +
+                            '&parentDescField=siteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+            }
+        }
+        return;
+    }
+
+    function validateItemDescription() {
+        if (Trim(document.getElementById("itemDescription").value) != "") {
+            window.open('{urlItemPopup}&itemDescription=' +
+                escape(document.getElementById("itemDescription").value) +
+                '&parentIDField=itemID' +
+                '&parentSlaResponseHoursField=slaResponseHours' +
+                '&parentDescField=itemDescription',
+                'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+        }
+    }
+
+    function validateCustomerName() {
+        if (Trim(document.getElementById("customerName").value) != "") {
+            window.open('{urlCustomerPopup}&customerString=' +
+                escape(document.getElementById("customerName").value) +
+                '&parentIDField=customerID' +
+                '&parentDescField=customerName',
+                'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+        }
+    }
 </SCRIPT>
 <form name="customerItem" method="post" action="{urlSubmit}">
-  <TABLE width="600px" border="0" cellpadding="1" cellspacing="1">
-		<tr> 
-			<td class="promptText">Item</td>
-			<td class="field">
-			<input
-					type="hidden"
-					name="customerItem[1][itemID]"
-					id="itemID"
-					value="{itemID}" />
-			<input
-				type="text"
-				name="customerItem[1][itemDescription]"
-				id="itemDescription"
-				value="{itemDescription}"
-				onChange="javascript:validateItemDescription()"
-				onKeydown="javascript:checkFunctionKey(itemDescription)"
-				size="50"
-				maxlength="50"
-			> <font class="formErrorMessage">{descriptionMessage}</font> </td>
-		</tr>
-		<TR> 
-			<td class="promptText">Customer</td>
-			<td><input
-					type="hidden"
-					name="customerItem[1][customerID]"
-					id="customerID"
-					value="{customerID}" />
-					<input
-					type="text"
-					name="customerItem[1][customerName]"
-					id="customerName"
-					value="{customerName}"
-					onChange="javascript:validateCustomerName()"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{customerNameMessage}</span> </td>
-		</TR>
-		<TR> 
-			<TD class="promptText">Site</TD>
-			<TD class="displayfield"> 
-				<input
-					type="hidden"
-					name="customerItem[1][siteNo]"
-					id="siteNo"
-					value="{siteNo}"
-				/>
-							<input
-								type="text"
-								name ="customerItem[1][siteDesc]"
-								id="siteDesc"
-								value="{siteDesc}"
-								onKeydown="javascript:checkFunctionKey(siteDesc)"
-								onChange="javascript:validatesiteDesc()"
-								{DISABLED}
-								size="50"
-								maxlength="50"
-							>
-							<span class="formErrorMessage">{siteDescMessage}</span> </TD>
-		</TR>
-		<TR> 
-			<TD class="promptText">Serial Number</TD>
-			<TD class="field"> <input 
-				type="text"
-				id="serialNo"
-				name="customerItem[1][serialNo]"
-				value="{serialNo}"
-			>
-					<span class="formErrorMessage">{serialNoMessage}</span> </TD>
-		</TR>
-		<tr>
-			<td valign="top" class="promptText">&nbsp;</td>
-			<td colspan="2">&nbsp;</td>
-		</tr>
-		<tr> 
-			<td>&nbsp; </td>
-			<td colspan="2">
-				<input type="submit" name="Update" value="Save"></td>
-		</tr>
-	</table>
+    <TABLE width="600px" border="0" cellpadding="1" cellspacing="1">
+        <tr>
+            <td class="promptText">Item</td>
+            <td class="field">
+                <input
+                        type="hidden"
+                        name="customerItem[1][itemID]"
+                        id="itemID"
+                        value="{itemID}"/>
+                <input
+                        type="text"
+                        name="customerItem[1][itemDescription]"
+                        id="itemDescription"
+                        value="{itemDescription}"
+                        onChange="javascript:validateItemDescription()"
+                        onKeydown="javascript:checkFunctionKey(itemDescription)"
+                        size="50"
+                        maxlength="50"
+                > <font class="formErrorMessage">{descriptionMessage}</font></td>
+        </tr>
+        <TR>
+            <td class="promptText">Customer</td>
+            <td><input
+                    type="hidden"
+                    name="customerItem[1][customerID]"
+                    id="customerID"
+                    value="{customerID}"/>
+                <input
+                        type="text"
+                        name="customerItem[1][customerName]"
+                        id="customerName"
+                        value="{customerName}"
+                        onChange="javascript:validateCustomerName()"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{customerNameMessage}</span></td>
+        </TR>
+        <TR>
+            <TD class="promptText">Site</TD>
+            <TD class="displayfield">
+                <input
+                        type="hidden"
+                        name="customerItem[1][siteNo]"
+                        id="siteNo"
+                        value="{siteNo}"
+                />
+                <input
+                        type="text"
+                        name="customerItem[1][siteDesc]"
+                        id="siteDesc"
+                        value="{siteDesc}"
+                        onKeydown="javascript:checkFunctionKey(siteDesc)"
+                        onChange="javascript:validatesiteDesc()"
+                        {DISABLED}
+                >
+                <span class="formErrorMessage">{siteDescMessage}</span></TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Serial Number</TD>
+            <TD class="field"><input
+                    type="text"
+                    id="serialNo"
+                    name="customerItem[1][serialNo]"
+                    value="{serialNo}"
+            >
+                <span class="formErrorMessage">{serialNoMessage}</span></TD>
+        </TR>
+        <tr>
+            <td valign="top" class="promptText">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">
+                <input type="submit" name="Update" value="Save"></td>
+        </tr>
+    </table>
 </form>
