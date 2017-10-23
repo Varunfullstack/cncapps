@@ -617,4 +617,183 @@ class BUDailyReport extends Business
         echo "SENT";
 
     }
+
+    public function p5IncidentsWithoutSalesOrders($daysAgo)
+    {
+        $this->setMethodName('outstandingIncidents');
+
+        $outstandingRequests = $this->getP5IncidentsWithoutSalesOrders($daysAgo);
+
+        if ($row = $outstandingRequests->fetch_row()) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'ServiceOutstandingReportEmail.inc.html');
+
+            $template->set_block('page', 'requestBlock', 'requests');
+
+            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $csvTemplate->set_file('page', 'ServiceOutstandingReportEmail.inc.csv');
+
+            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
+
+            do {
+                $urlRequest =
+                    $controller->buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'assignedTo' => $row[2],
+                        'description' => substr(common_stripEverything($row[3]), 0, 50),
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'lastUpdatedDate' => $row[6],
+                        'priority' => $row[7],
+                        'teamName' => $row[8],
+                        'urlRequest' => $urlRequest
+                    )
+                );
+
+                $csvTemplate->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'assignedTo' => $row[2],
+                        'description' => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'lastUpdatedDate' => $row[6],
+                        'priority' => $row[7],
+                        'teamName' => $row[8],
+                    )
+                );
+
+                $template->parse('requests', 'requestBlock', true);
+                $csvTemplate->parse('requests', 'requestBlock', true);
+
+            } while ($row = $outstandingRequests->fetch_row());
+
+            $template->setVar(
+                array(
+                    'daysAgo' => $daysAgo
+                )
+            );
+
+            $template->parse('output', 'page', true);
+            $body = $template->get_var('output');
+
+            $csvTemplate->parse('output', 'page', true);
+            $csvFile = $csvTemplate->get_var('output');
+
+            if ($priorityFiveOnly) {
+                $subject = 'Priority 5';
+            } else {
+                $subject = 'Priority 1-4';
+            }
+
+            $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
+
+            $this->sendByEmailTo(
+                'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
+                $subject,
+                $body,
+                $csvFile
+            );
+
+            echo $body;
+
+        }
+    }
+
+    private function getP5IncidentsWithoutSalesOrders($daysAgo)
+    {
+        $sql =
+            "SELECT 
+        cus_name AS `customer`,
+        pro_problemno AS `requestID`,
+        cns_name AS `assignedTo`,
+        (SELECT 
+          reason 
+        FROM
+          callactivity 
+        WHERE caa_problemno = pro_problemno 
+          AND caa_callacttypeno = 51) AS `description`,
+          
+        DATEDIFF(NOW(),pro_date_raised ) AS `openDays`,
+        pro_total_activity_duration_hours AS `timeSpentHours`,
+
+        last.caa_date as lastUpdatedDate,
+        
+        pro_priority as `priority`,
+        team.name AS teamName
+      FROM
+        problem 
+        JOIN customer 
+          ON cus_custno = pro_custno 
+        LEFT JOIN consultant 
+          ON pro_consno = cns_consno 
+        LEFT JOIN team
+          ON team.teamID = consultant.teamID
+        
+        JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            )
+        WHERE
+        
+          DATE(pro_date_raised) <=DATE(
+          DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
+          AND pro_status NOT IN ('F', 'C')";
+        $sql .= " AND pro_priority = 5";
+
+
+        $sql .= "
+        /*
+        Exclude SRs with open future activities
+        */
+        AND
+          (
+            SELECT
+              COUNT(*)
+            FROM
+              callactivity
+            WHERE
+              caa_problemno = pro_problemno
+              AND caa_date > DATE( NOW() )
+              AND caa_endtime = ''
+          ) = 0
+        
+          
+        
+      ORDER BY customer,
+        pro_problemno";
+
+        return $this->db->query($sql);
+    }
 }
