@@ -322,9 +322,11 @@ class CTHome extends CTCNC
                 $this->buildLink('Project.php',
                     array(
                         'action' => 'edit',
-                        'projectID' => $project['projectID']
+                        'projectID' => $project['projectID'],
+                        'backToHome' => true
                     )
                 );
+
 
             $this->template->set_var(
                 array(
