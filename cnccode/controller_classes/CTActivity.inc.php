@@ -1139,7 +1139,7 @@ class CTActivity extends CTCNC
 
             if ($dsContact->getValue('email') != '') {
                 $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue('email') . '"' .
+                    '<A HREF="mailto:' . $dsContact->getValue('email') . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') .  '"' .
                     ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
             }
         }
@@ -3289,7 +3289,7 @@ class CTActivity extends CTCNC
 
             if ($dsContact->getValue('email') != '') {
                 $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue('email') . '"' .
+                    '<A HREF="mailto:' . $dsContact->getValue('email') . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') . '"' .
                     ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
             }
             if ($dsContact->getValue('notes') != '') {
