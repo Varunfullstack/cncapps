@@ -53,6 +53,7 @@ class BUMail extends Business
      * @param mixed $headers
      * @param mixed $body
      * @param mixed $sendToSdManagerRecipients
+     * @return mixed
      */
     public function send(
         $toEmail,
