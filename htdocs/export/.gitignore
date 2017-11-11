@@ -1,0 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+#Ignore all files in this folder
+*
+#except the subfolder
+!session_log/.gitignore
