@@ -1,5 +1,5 @@
 <?php
-require_once('HTML/Template/PHPLIB.php');                // PEAR PHPLib template
+//require_once('HTML/Template/PHPLIB.php');                // PEAR PHPLib template
 class Template extends Template_PHPLIB
     /**
      * This extended class is a wrapper for the new PEAR Template_PHPLib class so that code written
