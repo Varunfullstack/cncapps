@@ -85,7 +85,7 @@ class Template
      * @var       int
      * @access    public
      */
-    var $debug = false;
+    var $debug = true;
 
     /**
      * Determines whether Template outputs filename comments.
