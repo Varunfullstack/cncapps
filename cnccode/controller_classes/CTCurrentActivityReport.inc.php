@@ -110,7 +110,6 @@ class CTCurrentActivityReport extends CTCNC
 
             case 'allocateUser':
                 //       $this->checkPermissions(PHPLIB_PERM_SUPERVISOR); is this required now?
-                var_dump('allocation');
                 $this->allocateUser();
                 break;
 
