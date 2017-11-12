@@ -197,6 +197,7 @@ class Template
      */
     function __construct($root = ".", $unknowns = "remove")
     {
+        echo 'This is ' . __FILE__;
         if ($this->debug & 4) {
             echo "<p><b>Template:</b> root = $root, unknowns = $unknowns</p>\n";
         }
