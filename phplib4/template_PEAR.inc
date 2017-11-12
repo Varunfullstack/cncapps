@@ -34,7 +34,6 @@ class Template extends Template_PHPLIB
     function __construct($root = ".", $unknowns = "remove")
     {
         parent::__construct($root, $unknowns);
-        echo 'This is ' . __FILE__;
     }
 
     /**
