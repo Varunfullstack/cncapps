@@ -199,7 +199,6 @@ class Controller extends BaseObject
     function createTemplate()
     {
         $this->template = new Template($this->cfg["path_templates"], "remove");
-        var_dump(get_class($this->template));
         return TRUE;
     }
 
