@@ -4110,6 +4110,17 @@ customer with the past 8 hours email to GL
 
         $body = $template->get_var('output');
 
+        global $userName;
+        // if new session then username not set yet
+        if ($userName == '') {
+            $dbeUser = new DBEUser ($this);
+            $dbeUser->setValue('userID', $this->userID);
+            $dbeUser->getRow();
+            $userName = $dbeUser->getValue('name');
+        }
+
+        var_dump($userName);
+
         if (!$subject) {
             $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you';
         }

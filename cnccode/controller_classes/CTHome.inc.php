@@ -28,8 +28,6 @@ class CTHome extends CTCNC
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($this->dsHeader);
         $this->buUser = new BUUser($this);
-
-        var_dump($this->buUser);
     }
 
     /**
