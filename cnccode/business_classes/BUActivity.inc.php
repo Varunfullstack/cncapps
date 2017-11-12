@@ -4034,8 +4034,9 @@ customer with the past 8 hours email to GL
      *
      * @param mixed $problemID
      * @param mixed $userID
+     * @param $allocatedBy
      */
-    function allocateUserToRequest($problemID, $userID, $subject = false)
+    function allocateUserToRequest($problemID, $userID, $allocatedBy)
     {
         if (!$this->dbeProblem) {
             $this->dbeProblem = new DBEProblem($this);
@@ -4048,7 +4049,7 @@ customer with the past 8 hours email to GL
     */
         if ($userID > 0 && $userID != USER_SYSTEM) { // not deallocating
 
-            $this->sendServiceReallocatedEmail($problemID, $userID, $subject);
+            $this->sendServiceReallocatedEmail($problemID, $userID, $allocatedBy);
 
         }
 
@@ -4061,9 +4062,10 @@ customer with the past 8 hours email to GL
      * Sends email to new user when service request reallocated
      *
      * @param mixed $problemID
-     * @param mixed $newUserEmail
+     * @param $newUserID
+     * @param $DBUser
      */
-    function sendServiceReallocatedEmail($problemID, $newUserID, $subject = false)
+    function sendServiceReallocatedEmail($problemID, $newUserID, DBEUser $DBUser)
     {
 
         if ($newUserID == 0) {
@@ -4110,20 +4112,7 @@ customer with the past 8 hours email to GL
 
         $body = $template->get_var('output');
 
-        global $userName;
-        // if new session then username not set yet
-        if ($userName == '') {
-            $dbeUser = new DBEUser ($this);
-            $dbeUser->setValue('userID', $this->userID);
-            $dbeUser->getRow();
-            $userName = $dbeUser->getValue('name');
-        }
-
-        var_dump($userName);
-
-        if (!$subject) {
-            $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you';
-        }
+        $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you by ' . $DBUser->getValue('name');;
 
         $hdrs = array(
             'From' => $senderEmail,

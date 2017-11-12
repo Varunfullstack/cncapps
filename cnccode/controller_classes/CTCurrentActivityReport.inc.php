@@ -269,8 +269,11 @@ class CTCurrentActivityReport extends CTCNC
 
     function allocateUser()
     {
+        $dbeUser = new DBEUser ($this);
+        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->getRow();
 
-        $this->buActivity->allocateUserToRequest($_REQUEST['problemID'], $_REQUEST['userID']);
+        $this->buActivity->allocateUserToRequest($_REQUEST['problemID'], $_REQUEST['userID'], $dbeUser);
 
         $urlNext =
             $this->buildLink(
