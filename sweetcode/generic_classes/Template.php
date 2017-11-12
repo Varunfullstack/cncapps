@@ -1,12 +1,13 @@
 <?php
 /**
-* Well, they have converted the PHPLib template class for PEAR and changed all the method names!!
-* This extended class tries to wrap all the new names in old methods so my code doesn't have to 
-* change.
-*
-* @authors: Karim.
-*/
-require_once('HTML/Template/PHPLIB.php');				// PEAR PHPLib template 
+ * Well, they have converted the PHPLib template class for PEAR and changed all the method names!!
+ * This extended class tries to wrap all the new names in old methods so my code doesn't have to
+ * change.
+ *
+ * @authors: Karim.
+ */
+require_once('HTML/Template/PHPLIB.php');                // PEAR PHPLib template
+
 /**
  * Converted PHPLIB Template class
  *
@@ -19,7 +20,7 @@ require_once('HTML/Template/PHPLIB.php');				// PEAR PHPLib template
  * @author  Martin Jansen <mj@php.net> (PEAR conformance)
  * @version 1.0
  */
-class Template extends Template_PHPLIB 
+class Template extends Template_PHPLIB
 {
     /**
      * Constructor
@@ -29,9 +30,12 @@ class Template extends Template_PHPLIB
      * @param  string how to handle unknown variables
      * @param  array fallback paths
      */
-  function __construct($root = ".", $unknowns = "remove") {
-  	parent::Template_PHPLIB($root, $unknowns);
-  }
+    function __construct($root = ".", $unknowns = "remove")
+    {
+        parent::Template_PHPLIB($root, $unknowns);
+        var_dump('this is the template file');
+    }
+
     /**
      * Sets the template directory
      *
@@ -39,8 +43,9 @@ class Template extends Template_PHPLIB
      * @param  string new template directory
      * @return bool
      */
-	  function set_root($root) {
-	  	return ($this->setRoot($root));
+    function set_root($root)
+    {
+        return ($this->setRoot($root));
     }
 
     /**
@@ -56,9 +61,11 @@ class Template extends Template_PHPLIB
      * @access public
      * @param  string unknowns
      */
-	  function set_unknowns($unknowns = "remove") {
-			return($this->set_unknowns($unknowns));
+    function set_unknowns($unknowns = "remove")
+    {
+        return ($this->set_unknowns($unknowns));
     }
+
     /**
      * Set appropriate template files
      *
@@ -74,9 +81,11 @@ class Template extends Template_PHPLIB
      * @param  string name of template file
      * @return bool
      */
-	  function set_file($varname, $filename = "") {
-	  	return ($this->setFile($varname, $filename));
-	  }
+    function set_file($varname, $filename = "")
+    {
+        return ($this->setFile($varname, $filename));
+    }
+
     /**
      * Set a block in the appropriate template handle
      *
@@ -98,9 +107,11 @@ class Template extends Template_PHPLIB
      * @param  string block name handle
      * @param  string variable substitution name
      */
-	  function set_block($parent, $varname, $name = "") {
-	  	return ($this->setBlock($parent, $varname, $name));
-	  }
+    function set_block($parent, $varname, $name = "")
+    {
+        return ($this->setBlock($parent, $varname, $name));
+    }
+
     /**
      * Set corresponding substitutions for placeholders
      *
@@ -109,98 +120,104 @@ class Template extends Template_PHPLIB
      * @param  string value of that variable
      * @param  boolean if true, the value is appended to the variable's existing value
      */
-	  function set_var($varname, $value = "", $append = false) {
-	  	return ($this->setVar($varname, $value, $append));
-	  }
-	 /******************************************************************************
-		* NOTE: This method NOT defined in new PEAR template class so try doing nothing (for now)
-		* cause I dont think I call it anyhow!
-		*
-	 	* This functions clears the value of a variable.
-	  *
-	  * It may be called with either a varname as a string or an array with the 
-	  * values being the varnames to be cleared.
-	  *
-	  * The function sets the value of the variable in the $varkeys and $varvals 
-	  * hashes to "". It is not necessary for a variable to exist in these hashes
-	  * before calling this function.
-	  *
-	  *
-	  * usage: clear_var(string $varname)
-	  * or
-	  * usage: clear_var(array $varname = (string $varname))
-	  *
-	  * @param     $varname      either a string containing a varname or an array of varnames.
-	  * @access    public
-	  * @return    void
-	  */
-	  function clear_var($varname) {
-/* original PHPLib code
-	  	if (!is_array($varname)) {
-	      if (!empty($varname)) {
-	        if ($this->debug & 1) {
-	          printf("<b>clear_var:</b> (with scalar) <b>%s</b><br>\n", $varname);
-	        }
-	        $this->set_var($varname, "");
-	      }
-	    } else {
-	      reset($varname);
-	      while(list($k, $v) = each($varname)) {
-	        if (!empty($v)) {
-	          if ($this->debug & 1) {
-	            printf("<b>clear_var:</b> (with array) <b>%s</b><br>\n", $v);
-	          }
-	          $this->set_var($v, "");
-	        }
-	      }
-	    }
-*/
-	  }
-	 /******************************************************************************
-		* NOTE: This method NOT defined in new PEAR template class so try doing nothing (for now)
-		* cause I dont think I call it anyhow!
-	  * This functions unsets a variable completely.
-	  *
-	  * It may be called with either a varname as a string or an array with the 
-	  * values being the varnames to be cleared.
-	  *
-	  * The function removes the variable from the $varkeys and $varvals hashes.
-	  * It is not necessary for a variable to exist in these hashes before calling
-	  * this function.
-	  *
-	  *
-	  * usage: unset_var(string $varname)
-	  * or
-	  * usage: unset_var(array $varname = (string $varname))
-	  *
-	  * @param     $varname      either a string containing a varname or an array of varnames.
-	  * @access    public
-	  * @return    void
-	  */
-	  function unset_var($varname) {
-/* original PHPLib code
-	  	if (!is_array($varname)) {
-	      if (!empty($varname)) {
-	        if ($this->debug & 1) {
-	          printf("<b>unset_var:</b> (with scalar) <b>%s</b><br>\n", $varname);
-	        }
-	        unset($this->varkeys[$varname]);
-	        unset($this->varvals[$varname]);
-	      }
-	    } else {
-	      reset($varname);
-	      while(list($k, $v) = each($varname)) {
-	        if (!empty($v)) {
-	          if ($this->debug & 1) {
-	            printf("<b>unset_var:</b> (with array) <b>%s</b><br>\n", $v);
-	          }
-	          unset($this->varkeys[$v]);
-	          unset($this->varvals[$v]);
-	        }
-	      }
-	    }
-	*/
-	  }
+    function set_var($varname, $value = "", $append = false)
+    {
+        return ($this->setVar($varname, $value, $append));
+    }
+
+    /******************************************************************************
+     * NOTE: This method NOT defined in new PEAR template class so try doing nothing (for now)
+     * cause I dont think I call it anyhow!
+     *
+     * This functions clears the value of a variable.
+     *
+     * It may be called with either a varname as a string or an array with the
+     * values being the varnames to be cleared.
+     *
+     * The function sets the value of the variable in the $varkeys and $varvals
+     * hashes to "". It is not necessary for a variable to exist in these hashes
+     * before calling this function.
+     *
+     *
+     * usage: clear_var(string $varname)
+     * or
+     * usage: clear_var(array $varname = (string $varname))
+     *
+     * @param     $varname      either a string containing a varname or an array of varnames.
+     * @access    public
+     * @return    void
+     */
+    function clear_var($varname)
+    {
+        /* original PHPLib code
+                  if (!is_array($varname)) {
+                  if (!empty($varname)) {
+                    if ($this->debug & 1) {
+                      printf("<b>clear_var:</b> (with scalar) <b>%s</b><br>\n", $varname);
+                    }
+                    $this->set_var($varname, "");
+                  }
+                } else {
+                  reset($varname);
+                  while(list($k, $v) = each($varname)) {
+                    if (!empty($v)) {
+                      if ($this->debug & 1) {
+                        printf("<b>clear_var:</b> (with array) <b>%s</b><br>\n", $v);
+                      }
+                      $this->set_var($v, "");
+                    }
+                  }
+                }
+        */
+    }
+
+    /******************************************************************************
+     * NOTE: This method NOT defined in new PEAR template class so try doing nothing (for now)
+     * cause I dont think I call it anyhow!
+     * This functions unsets a variable completely.
+     *
+     * It may be called with either a varname as a string or an array with the
+     * values being the varnames to be cleared.
+     *
+     * The function removes the variable from the $varkeys and $varvals hashes.
+     * It is not necessary for a variable to exist in these hashes before calling
+     * this function.
+     *
+     *
+     * usage: unset_var(string $varname)
+     * or
+     * usage: unset_var(array $varname = (string $varname))
+     *
+     * @param     $varname      either a string containing a varname or an array of varnames.
+     * @access    public
+     * @return    void
+     */
+    function unset_var($varname)
+    {
+        /* original PHPLib code
+                  if (!is_array($varname)) {
+                  if (!empty($varname)) {
+                    if ($this->debug & 1) {
+                      printf("<b>unset_var:</b> (with scalar) <b>%s</b><br>\n", $varname);
+                    }
+                    unset($this->varkeys[$varname]);
+                    unset($this->varvals[$varname]);
+                  }
+                } else {
+                  reset($varname);
+                  while(list($k, $v) = each($varname)) {
+                    if (!empty($v)) {
+                      if ($this->debug & 1) {
+                        printf("<b>unset_var:</b> (with array) <b>%s</b><br>\n", $v);
+                      }
+                      unset($this->varkeys[$v]);
+                      unset($this->varvals[$v]);
+                    }
+                  }
+                }
+            */
+    }
+
     /**
      * Return all defined variables and their values
      *
@@ -209,21 +226,21 @@ class Template extends Template_PHPLIB
      */
     function get_vars()
     {
-    	return ($this->getVars());
+        return ($this->getVars());
     }
 
     /**
      * Return one or more specific variable(s) with their values.
      *
-     * @access public    
+     * @access public
      * @param  mixed array with variable names or one variable name as a string
      * @return mixed array of variable names with their values or value of one specific variable
      */
     function get_var($varname)
     {
-	    return ($this->getVar($varname));
+        return ($this->getVar($varname));
     }
-  
+
     /**
      * Get undefined values of a handle
      *
@@ -231,10 +248,11 @@ class Template extends Template_PHPLIB
      * @param  string handle name
      * @return mixed  false if an error occured or the undefined values
      */
-		function get_undefined($varname)
+    function get_undefined($varname)
     {
-	    return ($this->getUndefined($varname));
+        return ($this->getUndefined($varname));
     }
+
     /**
      * Complete filename
      *
@@ -244,8 +262,9 @@ class Template extends Template_PHPLIB
      * @param  string filename to be completed
      * @return string completed filename
      */
-	  function filename($filename) {
-			return ($this->_filename($filename));
+    function filename($filename)
+    {
+        return ($this->_filename($filename));
     }
 
     /**
@@ -255,8 +274,9 @@ class Template extends Template_PHPLIB
      * @param  string name of replacement variable
      * @return string replaced variable
      */
-	  function varname($varname) {
-			return ($this->_varname($filename));
+    function varname($varname)
+    {
+        return ($this->_varname($filename));
     }
 
     /**
@@ -266,10 +286,11 @@ class Template extends Template_PHPLIB
      * @param  string handle
      * @return bool   FALSE if error, true if all is ok
      */
-	  function loadfile($varname) {
-			return ($this->_loadFile($varname));
+    function loadfile($varname)
+    {
+        return ($this->_loadFile($varname));
     }
-  
+
     /**
      * printf error message to show
      *
@@ -277,8 +298,10 @@ class Template extends Template_PHPLIB
      * @param  string message to show
      * @return object PEAR error object
      */
-	  function haltmsg($msg) {
-			return ($this->haltMsg($msg));
+    function haltmsg($msg)
+    {
+        return ($this->haltMsg($msg));
     }
 }
+
 ?>
