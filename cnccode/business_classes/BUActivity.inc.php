@@ -4095,6 +4095,8 @@ customer with the past 8 hours email to GL
 
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue();
 
+        $assignedByUserName = (string)$DBUser->getValue('name');
+
         $template->setVar(
             array(
                 'activityRef' => $activityRef,
@@ -4102,8 +4104,8 @@ customer with the past 8 hours email to GL
                 'reason' => $dbeJCallActivity->getValue('reason'),
                 'urlActivity' => $urlActivity,
                 'lastDetails' => $dbeJLastCallActivity->getValue('reason'),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                'assignedByUserName' => $assignedByUserName,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -4112,7 +4114,7 @@ customer with the past 8 hours email to GL
 
         $body = $template->get_var('output');
 
-        $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you by ' . $DBUser->getValue('name');;
+        $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you by ' . $assignedByUserName;
 
         $hdrs = array(
             'From' => $senderEmail,
