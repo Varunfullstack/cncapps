@@ -162,7 +162,7 @@ switch ($server_type) {
             );
         break;
     case MAIN_CONFIG_SERVER_TYPE_TEST:
-        define("DB_NAME", "cncappsdev");
+        define("DB_NAME", "cnctest");
         define("BASE_DRIVE", dirname(__DIR__));
         define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
         define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
