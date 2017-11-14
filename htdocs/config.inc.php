@@ -50,6 +50,7 @@ define('MAIN_CONFIG_SERVER_TYPE_REPLICATED', 'replicated'); // replicated server
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
+
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -61,6 +62,8 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
 
             break;
+        case 'cnctest:86':
+            $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
 
     }
 
@@ -72,7 +75,6 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
     $GLOBALS['isRunningFromCommandLine'] = true;
     $_SERVER['HTTP_HOST'] = 'cncapps';
-
 }
 
 
@@ -80,14 +82,10 @@ define('CONFIG_PUBLIC_DOMAIN', 'cnc-ltd.co.uk');
 define("DB_HOST", "localhost");
 switch ($server_type) {
 
-
     case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
 
-
         define("DB_NAME", "cncappsdev");
-
-
-        define("BASE_DRIVE", "C:\\Sites\cncdev7");
+        define("BASE_DRIVE", dirname(__DIR__));
         define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
         define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
         define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
@@ -129,7 +127,7 @@ switch ($server_type) {
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 
-        define("BASE_DRIVE", "C:\\Sites\cncapps");
+        define("BASE_DRIVE", dirname(__DIR__));
         define("SCR_DIR", "\\\\cncltd\\cnc\\Customer\\scr");
         define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer");
         define("COMPANY_DIR_FROM_BROWSER", "//cncltd/cnc/Company");
@@ -163,7 +161,43 @@ switch ($server_type) {
                 'auth' => false
             );
         break;
+    case MAIN_CONFIG_SERVER_TYPE_TEST:
+        define("DB_NAME", "cncappsdev");
+        define("BASE_DRIVE", dirname(__DIR__));
+        define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
+        define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
+        define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
+        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
+//            error_reporting(E_ALL & ~E_STRICT)
+        error_reporting(E_ALL & ~E_WARNING);
+        ini_set('display_errors', 'on');
 
+        $GLOBALS['mail_options'] =
+            array(
+                'driver' => 'smtp',
+                'host' => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                'port' => 25,
+                'auth' => false
+            );
+
+        define('CONFIG_TEST_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SALES_EMAIL', 'sales@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SALES_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SUPPORT_EMAIL', 'support@cnc-ltd.co.uk');
+        define('CONFIG_CUSTOMER_SERVICE_EMAIL', ' customerservice@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_SUPPORT_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', CONFIG_CATCHALL_EMAIL);
+        define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
+
+
+        $GLOBALS['request_mail_options'] =
+            array(
+                'host' => 'cncmx01',
+                'port' => 143,
+                'user' => 'devasr',
+                'password' => 'Unread01$'
+            );
+        break;
 
 } // end switch
 
