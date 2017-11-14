@@ -62,7 +62,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
 
             break;
-        case 'cncdev7.local':
+        case 'cnctest:86':
             $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
 
     }

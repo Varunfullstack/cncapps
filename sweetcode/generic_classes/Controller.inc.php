@@ -487,6 +487,10 @@ class Controller extends BaseObject
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var("environmentTag", 'bgcolor="#FAE8EF"');
         }
+        if ($GLOBALS['server_type'] == MAIN_CONFIG_SERVER_TYPE_TEST) {
+            $this->template->set_var("environmentTag", 'bgcolor=#f1f9d1');
+        }
+
         if ($this->getFormError()) {
             if ($this->getFormErrorMessage() != '') {
                 $this->template->set_var("formErrorMessage", $this->getFormErrorMessage());
