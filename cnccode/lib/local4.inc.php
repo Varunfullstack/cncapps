@@ -136,7 +136,8 @@ class auSweetcode extends Auth
         Login from allowed client Ip range or localhost only
         */
         $allowedIpPattern = $this->get_allowed_ip_pattern();
-        if ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT &&
+        if (($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT ||
+                $GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_TEST) &&
             !preg_match('/' . $allowedIpPattern . '/', $_SERVER['REMOTE_ADDR'])
         ) {
             $GLOBALS['loginMessage'] = 'Login blocked: You are not on the CNC network';
