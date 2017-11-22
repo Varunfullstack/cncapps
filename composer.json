@@ -1,5 +1,7 @@
 {
   "require" : {
-    "dompdf/dompdf" : "0.6.*"
+    "dompdf/dompdf" : "0.6.*",
+    "doctrine/orm": "^2.5",
+    "doctrine/migrations": "^1.5"
   }
 }
