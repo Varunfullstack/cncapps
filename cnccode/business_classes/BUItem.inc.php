@@ -59,11 +59,9 @@ class BUItem extends Business
     }
 
     /**
-     * Get item row by itemID
-     * @parameter integer $itemID
-     * @parameter DataSet &$dsResults results
-     * @return bool : Success
-     * @access public
+     * @param $ID
+     * @param DataSet $dsResults
+     * @return bool
      */
     function getItemByID($ID, &$dsResults)
     {

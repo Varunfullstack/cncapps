@@ -57,8 +57,8 @@ class CTCustomerAnalysisReport extends CTCNC
                     $template->set_file('page', 'CustomerAnalysisReport.inc.csv');
 
                     $template->set_block('page', 'contractsBlock', 'contracts');
-
                     foreach ($results as $row) {
+
                         $template->set_var(
                             array(
                                 'contract' => $contractName,
@@ -99,7 +99,6 @@ class CTCustomerAnalysisReport extends CTCNC
                     }
 
                     foreach ($results as $contractName => $row) {
-
                         if ($row['profit'] <= 0) {
                             $profitAlertClass = 'profitAlert';
                         } else {
