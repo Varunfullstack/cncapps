@@ -9,6 +9,7 @@
         window.alarmDate = $('#alarmDate').get(0);
     })
     var formChanged = false;
+
     function proceedWithCancel(form) {
         if (formChanged == true) {
             return confirm('Are you sure that you want to cancel without saving your changes?');
@@ -17,12 +18,15 @@
             return true;
         }
     }
+
     function setFormChanged() {
         formChanged = true;
     }
+
     function strpad(val) {
         return (!isNaN(val) && val.toString().length == 1) ? "0" + val : val;
     }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
         }
@@ -36,7 +40,7 @@
     </tr>
 </table>
 <P><span class="formErrorMessage">{problemStatusMessage}</span></P>
-<FORM method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off">
+<form method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off" enctype="multipart/form-data">
     <input type="hidden" name="userWarned" value="{userWarned}">
 
     <input type="hidden" id="callActivityID" name="callActivity[1][callActivityID]" value="{callActivityID}">
@@ -430,16 +434,29 @@
                         </td>
                         <td nowrap="nowrap">{createDate}</td>
                         <td nowrap="nowrap">{createUserName}</td>
-                        <td><A href="{urlDeleteFile}" title="Delete attached document"
+                        <td><A href="{urlDeleteFile}&isEdit=true" title="Delete attached document"
                                onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
                         </td>
                     </tr>
                     <!-- END documentBlock -->
+                    <tr>
+                        <td class="promptTextLeft">Description</td>
+                        <td colspan="4">
+                            <input name="uploadDescription" type="text" size="45" maxlength="50"
+                                   value="{uploadDescription}">
+                            <input
+                                    name="userfile"
+                                    type="file"
+                                    value="{userfile}"
+                            >
+                            <input type="submit" name="uploadFile" value="Upload">
+                        </td>
+                    </tr>
                 </table>
             </td>
         </tr>
     </table>
-</FORM>
+</form>
 <div id="dialog" title="Alert"><p></p></div>
 <script>
     var pauseCount = {hdPauseCount}; // number of times count-down timer paused for this SR
