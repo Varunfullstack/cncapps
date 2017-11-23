@@ -1458,7 +1458,7 @@ class BUActivity extends Business
 
         $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
 
-        $urlChangeControlRequest = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue('callActivityID');
+        $urlChangeControlRequest = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue('callActivityID') . '&fromEmail=true';
 
         $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue('callActivityID');
 

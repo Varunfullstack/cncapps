@@ -142,6 +142,7 @@ class CTActivity extends CTCNC
             $_SESSION[$this->sessionKey]['contactID'] = $this->contactID;
             $sess[$this->sessionKey]['contactID'] = $this->contactID;
         }
+
         switch ($_REQUEST['action']) {
 
             case CTCNC_ACT_SEARCH:
@@ -260,22 +261,21 @@ class CTActivity extends CTCNC
             case CTACTIVITY_ACT_VIEW_FILE:
                 $this->viewFile();
                 break;
+
             case CTACTIVITY_ACT_GET_FILE:
                 $this->getFile();
                 break;
+
             case CTACTIVITY_ACT_DELETE_FILE:
                 $this->deleteFile();
                 break;
+
             case 'autoUpdate':
                 $this->autoUpdate();
                 break;
 
             case 'incrementPauseCounter':
                 $this->incrementPauseCounter();
-                break;
-
-            case 'linkProblems':
-                $this->linkProblems();
                 break;
 
             case 'gatherFixedInformation':
@@ -294,11 +294,8 @@ class CTActivity extends CTCNC
                 $this->requestAdditionalTime();
                 break;
 
-            case CTACTIVITY_ACT_CHANGE_REQUEST:
-                $this->ch();
-                break;
-
             case CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW:
+
                 $this->changeRequestReview();
                 break;
 
@@ -1139,7 +1136,7 @@ class CTActivity extends CTCNC
 
             if ($dsContact->getValue('email') != '') {
                 $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue('email') . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') .  '"' .
+                    '<A HREF="mailto:' . $dsContact->getValue('email') . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') . '"' .
                     ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
             }
         }
@@ -4824,6 +4821,7 @@ class CTActivity extends CTCNC
 
     function changeRequestReview()
     {
+
         $this->setMethodName('changeRequestReview');
 
         $callActivityID = $_REQUEST['callActivityID'];
@@ -4842,7 +4840,20 @@ class CTActivity extends CTCNC
 
         $this->setPageTitle("Review Change Request");
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (isset($_REQUEST['fromEmail'])) {
+            $url =
+                $this->buildLink(
+                    'Activity.php',
+                    [
+                        "action" => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
+                        "callActivityID" => $_REQUEST['callActivityID']
+                    ]
+                );
+            header('Location: ' . $url);
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_REQUEST['fromEmail'])) {
 
             switch ($_REQUEST['Submit']) {
 
