@@ -136,8 +136,6 @@ class CTActivity extends CTCNC
         /*
       Get contactID for session key if passed
       */
-        var_dump($_REQUEST);
-        var_dump($_GET);
         if (isset($_REQUEST['contactID'])) {
             $this->contactID = $_REQUEST['contactID'];
             $this->sessionKey = 'activity_create' . $this->contactID;
@@ -4361,7 +4359,6 @@ class CTActivity extends CTCNC
         if (!is_uploaded_file($_FILES['userfile']['tmp_name'])) {
             $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
         }
-        var_dump($_POST);
         if ($this->formError) {
             if ($_POST['gatherFixed']) {
 
