@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 - Issue 115 - CNC008
+- Issue 117 - CNC010
 
 
 ## [1.0.0] - 2017-07-15

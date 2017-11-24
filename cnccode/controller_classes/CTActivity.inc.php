@@ -1139,7 +1139,7 @@ class CTActivity extends CTCNC
 
             if ($dsContact->getValue('email') != '') {
                 $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue('email') . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') .  '"' .
+                    '<A HREF="mailto:' . $dsContact->getValue('email') . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') . '"' .
                     ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
             }
         }
@@ -2510,6 +2510,12 @@ class CTActivity extends CTCNC
         $dsActiveSrs = $this->buActivity->getActiveProblemsByCustomer($_REQUEST['customerID']);
 
         $this->setTemplateFiles('ActivityExistingRequests', 'ActivityExistingRequests.inc');
+
+        $this->template->set_var(
+            [
+                'techNotes' => $dsCustomer->getValue('techNotes')
+            ]
+        );
 
         $this->template->set_block('ActivityExistingRequests', 'problemBlock', 'problems');
 
