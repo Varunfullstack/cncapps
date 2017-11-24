@@ -2120,6 +2120,20 @@ class CTActivity extends CTCNC
         exit;
     }
 
+    function redirectToFixed($callActivityID)
+    {
+        $urlNext =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $callActivityID,
+                    'action' => 'gatherFixedInformation'
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
     function displayLastActivity()
     {
         $dbeCallActivity = $this->buActivity->getLastActivityInProblem($_REQUEST['problemID']);
@@ -3178,7 +3192,6 @@ class CTActivity extends CTCNC
         if (!$this->buActivity->canEdit($dsCallActivity)) {
             $this->raiseError('No permissions to edit this activity');
         }
-
         if ($this->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
 
             $disabled = ''; // not
@@ -3345,6 +3358,15 @@ class CTActivity extends CTCNC
             $onSiteFlag = 'N';
 
         }
+
+        if (isset($_FILES['userfile']) && $_FILES['userfile']['name'] != '') {
+            $this->buActivity->uploadDocumentFile(
+                $dsCallActivity->getValue('problemID'),
+                $_REQUEST['uploadDescription'],
+                $_FILES['userfile']
+            );
+        }
+
         $this->template->set_var(
             array(
                 'level' => $level,
@@ -4329,6 +4351,7 @@ class CTActivity extends CTCNC
     function uploadFile()
     {
 
+        echo 'this should be called';
         // validate
         if ($_REQUEST['problemID'] == '') {
             $this->setFormErrorMessage('problemID not passed');
@@ -4343,6 +4366,11 @@ class CTActivity extends CTCNC
             $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
         }
         if ($this->formError) {
+            if ($_POST['gatherFixed']) {
+
+                $this->redirectToFixed($_REQUEST['callActivityID']);
+            }
+
             $this->displayActivity();
             exit;
         }
@@ -4351,6 +4379,11 @@ class CTActivity extends CTCNC
             $_REQUEST['uploadDescription'],
             $_FILES['userfile']
         );
+
+        if ($_POST['gatherFixed']) {
+            $this->redirectToFixed($_REQUEST['callActivityID']);
+        }
+
         $this->redirectToDisplay($_REQUEST['callActivityID']);
     }
 
@@ -4428,7 +4461,15 @@ class CTActivity extends CTCNC
         }
         $callActivityID = $_REQUEST['callActivityID'];
         $dbeCallDocument->deleteRow();
-        $this->redirectToDisplay($callActivityID);
+        if ($_GET['isEdit']) {
+            return $this->redirectToEdit($callActivityID);
+        }
+
+        if ($_GET['isGather']) {
+            return $this->redirectToGather($callActivityID);
+        }
+
+        return $this->redirectToDisplay($callActivityID);
     }
 
     /**
@@ -4543,12 +4584,35 @@ class CTActivity extends CTCNC
             $_REQUEST['contractCustomerItemID'] = 99; // prompts for Please select
         }
 
+        if ($_FILES['userfile']['name'] != '' & !$_REQUEST['uploadDescription']) {
+            $errorFile = 'Description Required';
+        }
+
+        if (!$errorFile && isset($_FILES['userfile']) && $_FILES['userfile']['name'] != '') {
+            $this->buActivity->uploadDocumentFile(
+                $dsCallActivity->getValue('problemID'),
+                $_REQUEST['uploadDescription'],
+                $_FILES['userfile']
+            );
+        }
 
         $submitURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'gatherFixedInformation'
+                )
+            );
+
+        $this->documents($_REQUEST['callActivityID'], $dsCallActivity->getValue('problemID'), 'ServiceRequestFixedEdit');
+
+        $uploadURL =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'gatherFixedInformation',
+                    'problemID' => $dsCallActivity->getValue('problemID'),
+                    'callActivityID' => $_REQUEST['callActivityID']
                 )
             );
 
@@ -4562,7 +4626,9 @@ class CTActivity extends CTCNC
                 'rootCauseIDMessage' => $error['rootCauseID'],
                 'contractCustomerItemIDMessage' => $error['contractCustomerItemID'],
                 'submitURL' => $submitURL,
-                'historyLink' => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID'))
+                'historyLink' => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
+                'uploadErrors' => $errorFile,
+                'uploadURL' => $uploadURL
             )
         );
 
@@ -5264,6 +5330,20 @@ class CTActivity extends CTCNC
                 array(
                     'callActivityID' => $callActivityID,
                     'action' => CTACTIVITY_ACT_EDIT_ACTIVITY
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    private function redirectToGather($callActivityID)
+    {
+        $urlNext =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $callActivityID,
+                    'action' => 'gatherFixedInformation'
                 )
             );
         header('Location: ' . $urlNext);
