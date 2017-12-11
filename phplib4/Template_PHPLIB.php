@@ -233,7 +233,6 @@ class Template_PHPLIB
 
         } else {
             reset($varname);
-
             while (list($k, $v) = each($varname)) {
                 if (!empty($k))
                     if ($this->debug) print "array: set *$k* to *$v*<br>\n";

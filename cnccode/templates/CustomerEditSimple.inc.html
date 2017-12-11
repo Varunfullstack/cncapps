@@ -14,6 +14,7 @@
             return 'You haven\'t saved your notes';
         }
     }
+
     function setCaretPosition(elemId, caretPos) {
         var elem = document.getElementById(elemId);
 
@@ -33,6 +34,7 @@
             }
         }
     }
+
     var customerNotesChanged = false;
 
     function setCustomerNotesChanged() {
@@ -40,10 +42,12 @@
         customerNotesChanged = true;
 
     }
+
     function MM_jumpMenu(targ, selObj, restore) { //v3.0
         window.open(selObj.options[selObj.selectedIndex].value, targ);
         if (restore) selObj.selectedIndex = 0;
     }
+
     function loadNote(noteIdentifier) {
 
         var customerID = document.getElementById('customerID').value;
@@ -66,6 +70,7 @@
         loadXMLDoc(url);
 
     }
+
     function newNote() {
 
         var customerNoteID = document.getElementById('customerNoteID');
@@ -79,6 +84,7 @@
         customerNoteModifiedText.innerHTML = '';
 
     }
+
     function deleteNote() {
         var customerID = document.getElementById('customerID').value;
         var customerNoteID = document.getElementById('customerNoteID');
@@ -105,6 +111,7 @@
         customerNoteModifiedText.innerHTML = 'Note Deleted';
 
     }
+
     function saveNote() {
 
         var customerID = document.getElementById('customerID').value;
@@ -125,6 +132,7 @@
         loadXMLDoc(url);
 
     }
+
     function contactPopup(contactID, action, customerID, siteNo) {
         window.open(
             '{urlContactPopup}' +
@@ -138,7 +146,33 @@
             'scrollbars=yes,resizable=yes,height=700,width=500,copyhistory=no, menubar=0'
         );
     }
+
+    function checkMailShotOptions() {
+        var x = document.getElementsByClassName('stmCheckBox');
+
+        console.log(x);
+
+        var count = 0;
+        var i = 0;
+        do {
+            if (x[i].checked) {
+                count++;
+            }
+
+            i++;
+        } while (count < 2 && i < x.length);
+
+        if (count > 1) {
+            alert('There cannot be more than one "stm" option selected');
+            return false
+        }
+
+        return true;
+    }
+
     $(function () {
+
+
         loadNote('first');
     })
     //-->
@@ -146,7 +180,7 @@
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}" onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)">{deleteCustomerText}</a>
-<form name="form" method="post" action="{submitURL}" AUTOCOMPLETE="off">
+<form name="form" method="post" action="{submitURL}" AUTOCOMPLETE="off" onsubmit="return checkMailShotOptions()">
     <input type="hidden" id="customerID" name="form[customer][{customerID}][customerID]" value="{customerID}">
     <input type="hidden" name="form[customer][{customerID}][createDate]" value="{createDate}">
     <input type="hidden" name="form[customer][{customerID}][regNo]" value="{regNo}" size="10" maxlength="10">
@@ -971,7 +1005,7 @@
                     </td>
                     <td class="content">
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot4Flag]" value="Y"
-                               {mailshot4FlagChecked}/>
+                               {mailshot4FlagChecked} class="stmCheckBox"/>
                     </td>
                     <td class="content">
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot5Flag]" value="Y"

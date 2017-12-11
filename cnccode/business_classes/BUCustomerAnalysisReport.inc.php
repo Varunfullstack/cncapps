@@ -8,6 +8,7 @@
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
+require_once($cfg["path_bu"] . '/BUItem.inc.php');
 
 class BUCustomerAnalysisReport extends Business
 {
@@ -197,6 +198,16 @@ class BUCustomerAnalysisReport extends Business
 
         $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
 
+
+        $test = new BUItem($this);
+        /**
+         * @var DataSet $data
+         */
+        $data = null;
+        $test->getItemByID(2237, $data);
+
+        $hourlyLabourCharge = $data->getValue('curUnitSale');
+
         $contractItems = $this->getContractItems($customerID, $startYearMonth, $endYearMonth);
         $contractItemsArray = array();
 
@@ -205,9 +216,8 @@ class BUCustomerAnalysisReport extends Business
         }
 
         foreach ($contractItemsArray as $item) {
-            /*
-            Sales
-            */
+
+
             $labourHoursRow =
                 $this->getContractLabourHours(
                     $customerID,
@@ -222,9 +232,13 @@ class BUCustomerAnalysisReport extends Business
                     $item['ID']
                 );
 
+
             $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
 
             $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
+            if ($item['Contract'] === 'Pre-Pay Contract') {
+                $sales = round($hourlyLabourCharge * $labourHoursRow[0],2);
+            }
 
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
 

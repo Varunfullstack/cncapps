@@ -572,9 +572,7 @@ class DataAccess extends BaseObject
      */
     function columnExists($ixColumn)
     {
-// it's a column name:
         if ($this->_colCount == 0) return DA_OUT_OF_RANGE;
-
         $ixColumnNo = $this->colNameInverse[$ixColumn];
 
         if ($ixColumnNo === FALSE or is_null($ixColumnNo)) {

@@ -118,7 +118,6 @@ class BUContractAnalysisReport extends Business
           `costPrice`  * `qty` / 12  AS costPrice,
           `itm_sstk_price` / 12 AS itemSalePrice,
           `itm_sstk_cost` / 12  AS itemCostPrice
-          
         FROM
           custitem
           JOIN item ON itm_itemno = cui_itemno
@@ -223,6 +222,7 @@ class BUContractAnalysisReport extends Business
             $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
 
             $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
+
 
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
 

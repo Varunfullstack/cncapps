@@ -68,7 +68,10 @@ class Controller extends BaseObject
     var $startTime;
     var $getVars = "";                    // HTTP_GET_VARS from html request
     var $cookieVars = "";                // HTTP_COOKIE_VARS from html request
-    var $template;                    // PHPLib template object
+    /**
+     * @var Template $template
+     */
+    public $template;                    // PHPLib template object
     var $cfg = "";                            // Configuration variables
     var $db = "";                                // PHPLib DB object
     var $pageTitle = "";

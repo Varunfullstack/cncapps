@@ -1458,7 +1458,7 @@ class BUActivity extends Business
 
         $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
 
-        $urlChangeControlRequest = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue('callActivityID');
+        $urlChangeControlRequest = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue('callActivityID') . '&fromEmail=true';
 
         $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue('callActivityID');
 
@@ -4034,8 +4034,9 @@ customer with the past 8 hours email to GL
      *
      * @param mixed $problemID
      * @param mixed $userID
+     * @param $allocatedBy
      */
-    function allocateUserToRequest($problemID, $userID, $subject = false)
+    function allocateUserToRequest($problemID, $userID, $allocatedBy)
     {
         if (!$this->dbeProblem) {
             $this->dbeProblem = new DBEProblem($this);
@@ -4048,7 +4049,7 @@ customer with the past 8 hours email to GL
     */
         if ($userID > 0 && $userID != USER_SYSTEM) { // not deallocating
 
-            $this->sendServiceReallocatedEmail($problemID, $userID, $subject);
+            $this->sendServiceReallocatedEmail($problemID, $userID, $allocatedBy);
 
         }
 
@@ -4061,9 +4062,10 @@ customer with the past 8 hours email to GL
      * Sends email to new user when service request reallocated
      *
      * @param mixed $problemID
-     * @param mixed $newUserEmail
+     * @param $newUserID
+     * @param $DBUser
      */
-    function sendServiceReallocatedEmail($problemID, $newUserID, $subject = false)
+    function sendServiceReallocatedEmail($problemID, $newUserID, DBEUser $DBUser)
     {
 
         if ($newUserID == 0) {
@@ -4093,6 +4095,8 @@ customer with the past 8 hours email to GL
 
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue();
 
+        $assignedByUserName = (string)$DBUser->getValue('name');
+
         $template->setVar(
             array(
                 'activityRef' => $activityRef,
@@ -4100,8 +4104,8 @@ customer with the past 8 hours email to GL
                 'reason' => $dbeJCallActivity->getValue('reason'),
                 'urlActivity' => $urlActivity,
                 'lastDetails' => $dbeJLastCallActivity->getValue('reason'),
-                'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                'assignedByUserName' => $assignedByUserName,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -4110,9 +4114,7 @@ customer with the past 8 hours email to GL
 
         $body = $template->get_var('output');
 
-        if (!$subject) {
-            $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you';
-        }
+        $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you by ' . $assignedByUserName;
 
         $hdrs = array(
             'From' => $senderEmail,
