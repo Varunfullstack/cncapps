@@ -71,6 +71,7 @@ class CTPassword extends CTCNC
                 $customerID = $dsSearchForm->getValue('customerID');
 
                 $report = $this->displayList($customerID);
+                exit;
             }
 
         }
