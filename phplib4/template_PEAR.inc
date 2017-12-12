@@ -117,6 +117,7 @@ class Template extends Template_PHPLIB
             $this->halt("setBlock: unable to load $parent.");
             return false;
         }
+
         if ($name == "") {
             $name = $handle;
         }
@@ -125,18 +126,16 @@ class Template extends Template_PHPLIB
         $reg = "/[ \t]*<!--\s+BEGIN $handle\s+-->\s*?\n?(\s*.*?\n?)\s*<!--\s+END $handle\s+-->\s*?\n?/sm";
         preg_match_all($reg, $str, $m);
         $str = preg_replace($reg, "{" . "$name}", $str);
-
-        /*
-        This is what Template_PHPLIB::setBlock() does but it will not clear down nested inner blocks
-        in the same way that the original PHPLib code does and so your code would have broken.
-        I have replaced it with code that does the same as the orginal code
-                if (isset($m[1][0])) $this->setVar($handle, $m[1][0]);
-        */
-        $this->setVar($handle, $m[1][0]);
-        $this->setVar($parent, $str);
-        return true;
+/*
+This is what Template_PHPLIB::setBlock() does but it will not clear down nested inner blocks
+in the same way that the original PHPLib code does and so your code would have broken.
+I have replaced it with code that does the same as the orginal code
+        if (isset($m[1][0])) $this->setVar($handle, $m[1][0]);
+*/
+				$this->setVar($handle, $m[1][0]);
+				$this->setVar($parent, $str);
+	  return true;
     }
-
     /**
      * Set corresponding substitutions for placeholders
      *

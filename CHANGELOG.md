@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 126 - CNC018
 - Issue 133 - CNC025
 - Issue 136 - CNC028
+- Issue 116 - CNC009
 
 
 ## [1.0.0] - 2017-07-15
