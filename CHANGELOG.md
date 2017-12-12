@@ -2,6 +2,11 @@
 This project changes will be shown here.
 
 ## [unreleased]
+
+
+
+## [1.0.0] - 2017-07-15
+### Fixed
 - Issue 143 - CNC030
 - Issue 115 - CNC008
 - Issue 117 - CNC010
@@ -9,10 +14,6 @@ This project changes will be shown here.
 - Issue 133 - CNC025
 - Issue 136 - CNC028
 - Issue 116 - CNC009
-
-
-## [1.0.0] - 2017-07-15
-### Fixed
 - Issue 139
 - Issue 138
 - Issue 115 - CNC008
