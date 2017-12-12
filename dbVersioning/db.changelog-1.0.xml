@@ -1,0 +1,3169 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1513022273926-0">
+      <tagDatabase tag="1.0"/>
+    </changeSet>
+	<changeSet author="pavwebdev (generated)" id="1513022273926-1">
+        <createTable tableName="activitycategory">
+            <column autoIncrement="true" name="activityCategoryID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="allowSelection" remarks="Can this be selected by users in drop-downs?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-2">
+        <createTable tableName="address">
+            <column defaultValueNumeric="0" name="add_custno" remarks="PK to customer" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="add_add1" remarks="Address lines" type="CHAR(35)"/>
+            <column name="add_add2" type="CHAR(35)"/>
+            <column name="add_add3" type="CHAR(35)"/>
+            <column name="add_town" type="CHAR(25)"/>
+            <column name="add_county" type="CHAR(25)"/>
+            <column name="add_postcode" type="CHAR(15)"/>
+            <column name="add_inv_contno" remarks="PK to Default Invoice contact" type="INT"/>
+            <column name="add_del_contno" remarks="PK to Default delivery contact" type="INT"/>
+            <column name="add_debtor_code" remarks="Used by Sage accounts" type="CHAR(10)"/>
+            <column defaultValueNumeric="0" name="add_siteno" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="add_sage_ref" remarks="Sage accounts reference" type="CHAR(6)"/>
+            <column name="add_phone" type="CHAR(40)"/>
+            <column defaultValueNumeric="1.50" name="add_max_travel_hours" remarks="Maximum travel hours to this site from CNC" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="add_active_flag" remarks="Active site" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-3">
+        <createTable tableName="answer">
+            <column autoIncrement="true" name="ans_answerno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="ans_questionno" remarks="PK to question" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ans_problemno" remarks="PK to related Service Request" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ans_answer" remarks="Text of the answer" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ans_name" remarks="Name of client contact" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="ans_date" remarks="Date/time" type="TIMESTAMP(19)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-4">
+        <createTable tableName="answertype">
+            <column autoIncrement="true" name="ant_answertypeno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="ant_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-5">
+        <createTable tableName="arecord">
+            <column name="are_arecordno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="are_custitemno" remarks="PK to Internet contract" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="are_type" remarks="Type of record. e.g. MX" type="CHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="are_name" type="CHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="are_destination_ip" remarks="IP address" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="are_function" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-6">
+        <createTable tableName="audit_trail">
+            <column autoIncrement="true" name="auditTrailId" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tableName" remarks="table affected" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primaryKey" remarks="PK value of row affected" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colName" remarks="field name" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="oldValue" remarks="old value" type="LONGTEXT"/>
+            <column name="newValue" remarks="new value" type="LONGTEXT"/>
+            <column name="userID" remarks="user" type="INT"/>
+            <column name="modifyDate" type="datetime"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-7">
+        <createTable tableName="auto_request_activitycategory">
+            <column name="activityCategoryID" type="INT UNSIGNED"/>
+            <column name="description" type="CHAR(50)"/>
+            <column name="allowSelection" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-8">
+        <createTable tableName="auto_request_contracts">
+            <column name="contractCustomerItemID" type="INT UNSIGNED"/>
+            <column name="customerID" type="INT"/>
+            <column name="customerName" type="VARCHAR(35)"/>
+            <column name="renewalType" type="CHAR(50)"/>
+            <column name="postcode" type="CHAR(15)"/>
+            <column name="description" type="VARCHAR(45)"/>
+            <column name="adslPhone" type="VARCHAR(255)"/>
+            <column name="routerIpAddress" type="TEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-9">
+        <createTable tableName="auto_request_rootcause">
+            <column name="rootCauseID" type="INT UNSIGNED"/>
+            <column name="description" type="CHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-10">
+        <createTable tableName="automated_request">
+            <column autoIncrement="true" name="automatedRequestID" remarks="Primary Key (leave blank when INSERTing)" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="customerID" remarks="Optional" type="INT UNSIGNED"/>
+            <column name="serviceRequestID" type="INT"/>
+            <column name="postcode" remarks="Optional" type="CHAR(10)"/>
+            <column name="senderEmailAddress" remarks="Required" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="textBody" remarks="Required" type="LONGTEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="htmlBody" remarks="Optional (if exists then used instead of textBody)" type="LONGTEXT"/>
+            <column defaultValue="5" name="priority" remarks="1 - 5" type="ENUM('1', '2', '3', '4', '5')"/>
+            <column defaultValue="A" name="sendEmail" remarks="Always, Never, Skip work commenced email" type="ENUM('A', 'N', 'S')"/>
+            <column defaultValue="N" name="serverGuardFlag" remarks="Y/N" type="ENUM('Y', 'N')"/>
+            <column defaultValue="N" name="importedFlag" remarks="Was this row imported successfully? Y/N" type="ENUM('Y', 'N')"/>
+            <column name="attachment" remarks="Is there an attachment?" type="CHAR(1)"/>
+            <column name="attachmentFilename" remarks="Attachment name (required for attachment)" type="CHAR(255)"/>
+            <column name="attachmentMimeType" remarks="Attachment MIME type. e.g. application/pdf" type="CHAR(100)"/>
+            <column name="rootCauseID" type="INT"/>
+            <column name="contractCustomerItemID" type="INT"/>
+            <column name="activityCategoryID" type="INT"/>
+            <column name="monitorName" remarks="name of the monitor, to allow tracking of the failure and success" type="CHAR(100)"/>
+            <column name="monitorAgentName" remarks="This is the computer that the monitor has failed against." type="CHAR(100)"/>
+            <column name="monitorStatus" remarks="Success or Failure" type="CHAR(1)"/>
+            <column defaultValue="N" name="importErrorFound" remarks="Has the import process already found this error" type="ENUM('Y', 'N')"/>
+            <column name="importDateTime" remarks="Date this row was updated into the CNC datbase" type="datetime"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="createDateTime" remarks="Date this row was created in this table" type="TIMESTAMP(19)"/>
+            <column name="subjectLine" remarks="Subject line of email" type="CHAR(255)"/>
+            <column defaultValueNumeric="1" name="queueNo" remarks="Queue number for SR" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-11">
+        <createTable tableName="base_password">
+            <column autoIncrement="true" name="basePasswordID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="passwordString" remarks="Password base string" type="CHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-12">
+        <createTable tableName="broadbandservicetype">
+            <column name="broadbandServiceTypeID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-13">
+        <createTable tableName="callactengineer">
+            <column defaultValueNumeric="0" name="cae_callactengno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="cae_callactivityno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="cae_item" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="cae_consno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cae_expn_exp_flag" type="CHAR(1)"/>
+            <column name="cae_ot_exp_flag" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-14">
+        <createTable tableName="callactivity">
+            <column defaultValueNumeric="0" name="caa_callactivityno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_siteno" remarks="Site for activity. FK to address.add_siteno" type="INT"/>
+            <column defaultValueNumeric="0" name="caa_contno" remarks="Customer Contact. FK to contact.con_contno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_item" remarks="OBSOLETE" type="SMALLINT"/>
+            <column defaultValueNumeric="0" name="caa_callacttypeno" remarks="Activity Type. FK to callacttype.cat_callacttypeno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="projectID" remarks="Project. FK to project.projectID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_problemno" remarks="Service Request. FK to problem.problemno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00" name="caa_date" remarks="Date of activity" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_date_yearmonth" remarks="For speed of reporting" type="CHAR(6)"/>
+            <column defaultValue="" name="caa_starttime" remarks="Start Time HH:SS" type="VARCHAR(5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_endtime" remarks="End Time HH:SS" type="VARCHAR(5)"/>
+            <column name="caa_status" remarks="Status [O]pen, [C]hecked, [A]uthorised" type="CHAR(1)"/>
+            <column name="caa_expexport_flag" remarks="Staff expenses processed Y/N" type="CHAR(1)"/>
+            <column name="reason" remarks="Details" type="TEXT"/>
+            <column name="internalNotes" remarks="OBSOLETE: on Service Request now" type="MEDIUMTEXT"/>
+            <column defaultValueNumeric="0.00" name="curValue" remarks="Value in £ for (used for PrePay)" type="DECIMAL(6, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="statementYearMonth" remarks="OBSOLETE?" type="VARCHAR(7)"/>
+            <column defaultValueNumeric="0" name="caa_custno" remarks="Customer. FK to customer.cus_custno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_cuino" remarks="OBSOLETE" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="caa_under_contract" remarks="OBSOLETE" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="caa_authorised" remarks="T&amp;M processed Y/N" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_consno" remarks="User. FK to consultant.cns_consno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="caa_ot_exp_flag" remarks="Overtime processed" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_completed_consno" remarks="User that completed activity. . FK to consultant.cns_consno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="caa_completed_date" remarks="Completed date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="caa_serverguard" remarks="Serverguard? Y/N" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_parent_callactivityno" remarks="OBSOLETE" type="INT"/>
+            <column defaultValue="N" name="caa_awaiting_customer_response_flag" remarks="If so then exclude this from time duration calculations" type="CHAR(1)"/>
+            <column name="caa_class" remarks="[W]orking, [I]nformational, [O]ther" type="CHAR(1)"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created" remarks="Date/time created on database" type="TIMESTAMP(19)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="caa_logging_error_flag" remarks="Was there an error when logging this activity" type="CHAR(1)"/>
+            <column name="escalationID" remarks="FK to Escalation table" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="escalationAcceptedFlag" remarks="Was the escalation request accepted?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="caa_hide_from_customer_flag" remarks="Hide this activity from customer" type="CHAR(1)"/>
+            <column name="caa_secondsite_error_server" remarks="When 2ndSite error activity, this is the server name" type="CHAR(50)"/>
+            <column name="caa_secondsite_error_cuino" remarks="When 2ndSite error, item no" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-15">
+        <createTable tableName="callactivity_archive">
+            <column defaultValueNumeric="0" name="caa_callactivityno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_siteno" type="INT"/>
+            <column defaultValueNumeric="0" name="caa_contno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_item" type="SMALLINT"/>
+            <column defaultValueNumeric="0" name="caa_callacttypeno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activityCategoryID" type="INT UNSIGNED"/>
+            <column defaultValueNumeric="0" name="projectID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_problemno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00" name="caa_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="caa_starttime" type="VARCHAR(5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_endtime" type="VARCHAR(5)"/>
+            <column name="caa_status" type="CHAR(1)"/>
+            <column name="caa_expexport_flag" type="CHAR(1)"/>
+            <column name="reason" type="TEXT"/>
+            <column name="internalNotes" type="MEDIUMTEXT"/>
+            <column defaultValueNumeric="0.00" name="curValue" type="DECIMAL(6, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="statementYearMonth" type="VARCHAR(7)"/>
+            <column defaultValueNumeric="0" name="caa_custno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_cuino" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_contract_cuino" type="INT UNSIGNED"/>
+            <column defaultValue="" name="caa_under_contract" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="caa_authorised" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_consno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="caa_ot_exp_flag" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="caa_completed_consno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="caa_completed_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="caa_serverguard" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="caa_parent_callactivityno" type="INT"/>
+            <column defaultValue="N" name="caa_awaiting_customer_response_flag" remarks="If so then exclude this from time duration calculations" type="CHAR(1)"/>
+            <column name="caa_class" remarks="[W]orking, [I]nformational, [O]ther" type="CHAR(1)"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created" type="TIMESTAMP(19)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="caa_logging_error_flag" remarks="Was there an error when logging this activity" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-16">
+        <createTable tableName="callacttype">
+            <column defaultValueNumeric="0" name="cat_callacttypeno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="cat_desc" remarks="Description" type="CHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cat_ooh_multiplier" remarks="Cost Multiplier to apply when activity is Out of Office Hours" type="DECIMAL(5, 2)"/>
+            <column name="cat_itemno" remarks="PK to underlying item" type="INT"/>
+            <column name="cat_min_hours" remarks="Minumum charge hours" type="DECIMAL(5, 2)"/>
+            <column name="cat_max_hours" remarks="Maximum charge hours" type="DECIMAL(5, 2)"/>
+            <column name="cat_req_check_flag" remarks="Requires manual checking (especially for T&amp;M)" type="CHAR(1)"/>
+            <column name="cat_allow_exp_flag" remarks="Users may log expense claims against this" type="CHAR(1)"/>
+            <column name="cat_problem_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="cat_action_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="cat_resolve_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="cat_r_problem_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="cat_r_action_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="cat_r_resolve_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column defaultValue="N" name="allowSCRFlag" remarks="Allow On-site activity" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="curValueFlag" remarks="Currency value only (used for prepay topup)" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="customerEmailFlag" remarks="Send Emails to customer" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="travelFlag" remarks="Travel type of activity" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="activeFlag" remarks="Is this activity type in use?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="showNotChargeableFlag" remarks="On customer activity emails, show if not chargeable" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="engineerOvertimeFlag" remarks="Allow overtime against this activity" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="cat_on_site_flag" remarks="Is this on site" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="cat_portal_display_flag" remarks="SHould activity be displayed on portal" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-17">
+        <createTable tableName="calldocument">
+            <column defaultValueNumeric="0" name="callDocumentID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="problemID" remarks="PK Service Request" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="callActivityID" remarks="OBSOLETE" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="description" remarks="Description of file" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="filename" remarks="File name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" remarks="File contents (binary)" type="LONGBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="fileMIMEType" remarks="File Mime type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="fileLength" remarks="Length Bytes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="createDate" remarks="Create date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="createUserID" remarks="Create user" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-18">
+        <createTable tableName="consultant">
+            <column defaultValueNumeric="0" name="cns_consno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cns_manager" remarks="PK to manager user" type="SMALLINT"/>
+            <column defaultValue="" name="cns_name" remarks="Name" type="VARCHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cns_salutation" remarks="Salutation" type="VARCHAR(35)"/>
+            <column name="cns_add1" remarks="Address line 1" type="VARCHAR(35)"/>
+            <column name="cns_add2" remarks="Address line 2" type="VARCHAR(35)"/>
+            <column name="cns_add3" remarks="Address line 3" type="VARCHAR(35)"/>
+            <column name="cns_town" remarks="Town" type="VARCHAR(25)"/>
+            <column name="cns_county" remarks="County" type="VARCHAR(25)"/>
+            <column name="cns_postcode" remarks="Postcode" type="VARCHAR(15)"/>
+            <column name="cns_logname" remarks="Login username" type="VARCHAR(20)"/>
+            <column name="cns_employee_no" remarks="Employee number" type="VARCHAR(20)"/>
+            <column name="cns_petrol_rate" remarks="Petrol mileage rate" type="DECIMAL(5, 2)"/>
+            <column defaultValueNumeric="25.00" name="cns_hourly_pay_rate" remarks="Hourly pay" type="DECIMAL(5, 2)"/>
+            <column name="cns_perms" remarks="Permission Groups" type="VARCHAR(100)"/>
+            <column name="signatureFilename" remarks="NAme of signature file" type="VARCHAR(50)"/>
+            <column name="jobTitle" remarks="Job title" type="VARCHAR(50)"/>
+            <column name="firstName" remarks="First name" type="VARCHAR(50)"/>
+            <column name="lastName" remarks="Last Name" type="VARCHAR(50)"/>
+            <column name="activeFlag" remarks="Active user?" type="CHAR(1)"/>
+            <column name="weekdayOvertimeFlag" remarks="Gets overtime during week days?" type="CHAR(1)"/>
+            <column name="customerID" remarks="OBSOLETE" type="INT"/>
+            <column name="cns_helpdesk_flag" remarks="Helpdesk technician" type="CHAR(1)"/>
+            <column name="teamID" remarks="Team of user" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="receiveSdManagerEmailFlag" remarks="Recieve SD Manager Emails" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="changePriorityFlag" remarks="Can change SR priority" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="appearInQueueFlag" remarks="Does this user appear in the dashboard queues?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="standardDayHours" remarks="Number of hours in user's standard day" type="DECIMAL(4, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="changeApproverFlag" remarks="Allowed to approve changes in Change Control process" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-19">
+        <createTable tableName="contact">
+            <column defaultValueNumeric="0" name="con_contno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="con_siteno" remarks="Default Site FK (only if Customer)" type="SMALLINT"/>
+            <column name="con_custno" remarks="Customer PK (optional)" type="INT"/>
+            <column name="con_suppno" remarks="Supplier PK (optional)" type="INT"/>
+            <column name="con_title" remarks="Title" type="CHAR(10)"/>
+            <column name="con_position" remarks="Position" type="CHAR(50)"/>
+            <column defaultValue="" name="con_last_name" remarks="Last name" type="CHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="con_first_name" remarks="First name" type="CHAR(25)"/>
+            <column name="con_email" remarks="Email address" type="CHAR(60)"/>
+            <column name="con_phone" remarks="Phone number" type="CHAR(25)"/>
+            <column name="con_mobile_phone" remarks="Mobile phone" type="CHAR(25)"/>
+            <column name="con_fax" remarks="Fax" type="CHAR(25)"/>
+            <column name="con_mailshot" remarks="Send Mailshots?" type="CHAR(1)"/>
+            <column defaultValue="" name="con_accounts_flag" remarks="Is member of Accounts?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="con_statement_flag" remarks="Should receive PrePay statements?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="con_discontinued" remarks="Is no longer active?" type="CHAR(1)"/>
+            <column name="con_mailflag1" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag2" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag3" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag4" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag5" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag6" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag7" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag8" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag9" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag10" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_notes" remarks="Notes" type="CHAR(200)"/>
+            <column name="con_portal_password" remarks="Customer portal password" type="CHAR(10)"/>
+            <column name="con_failed_login_count" remarks="Failed portal log in count" type="INT"/>
+            <column defaultValue="Y" name="con_work_started_email_flag" remarks="Send Request Work Started email?" type="CHAR(1)"/>
+            <column defaultValue="Y" name="con_auto_close_email_flag" remarks="Send Request automatically closed email?" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-20">
+        <createTable tableName="contract">
+            <column defaultValueNumeric="0" name="cnt_contno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="cnt_desc" remarks="Description" type="CHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cnt_years" remarks="Years of cover" type="SMALLINT"/>
+            <column name="cnt_manno" remarks="FK to manufacturer" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-21">
+        <createTable tableName="custitem">
+            <column autoIncrement="true" name="cui_cuino" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="cui_custno" remarks="PK Customer" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="cui_siteno" remarks="PK Site" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="cui_itemno" remarks="PK Underlying Item" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cui_man_contno" remarks="PK Manufacturer Warranty" type="SMALLINT"/>
+            <column name="cui_contract_cuino" remarks="Contract" type="INT"/>
+            <column name="cui_serial" remarks="Serial No" type="VARCHAR(30)"/>
+            <column name="cui_cust_ref" remarks="Server name" type="VARCHAR(45)"/>
+            <column name="cui_ordno" remarks="PK Sales Order" type="INT"/>
+            <column name="cui_sale_price" remarks="Sale price" type="DECIMAL(12, 2)"/>
+            <column name="cui_porno" remarks="PK Purchase Order" type="INT"/>
+            <column name="cui_pord_price" remarks="Purchase price" type="DECIMAL(12, 2)"/>
+            <column name="cui_cost_price" remarks="Cost price" type="DECIMAL(12, 2)"/>
+            <column name="cui_users" remarks="Number of users" type="SMALLINT"/>
+            <column name="cui_ord_date" remarks="OBSOLETE" type="date"/>
+            <column name="cui_expiry_date" remarks="Contract expiry date" type="date"/>
+            <column defaultValueNumeric="0.00" name="curGSCBalance" remarks="Prepay balance" type="DECIMAL(8, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="R" name="renewalStatus" remarks="Contract Renewal status [D]eclined, [R]enewed" type="CHAR(1)"/>
+            <column defaultValueNumeric="0" name="renewalOrdheadID" remarks="PK Sales order of renewal" type="INT"/>
+            <column name="itemNotes" remarks="Contract Details (used on printed contract)" type="TEXT"/>
+            <column name="cui_prepay_balance" remarks="OBSOLETE" type="DECIMAL(6, 2)"/>
+            <column name="cui_sales_order_status" remarks="Which type of sales order to create when billing" type="ENUM('', 'Q', 'I', 'C')"/>
+            <column name="renewalDate" remarks="Date renewed" type="date"/>
+            <column name="customerName" remarks="Customer Name (useage to be verified)" type="CHAR(50)"/>
+            <column name="customerID" remarks="PK Customer" type="INT UNSIGNED"/>
+            <column name="itemID" remarks="PK Underlying Item" type="INT UNSIGNED"/>
+            <column name="customerItemID" remarks="OBSOLETE" type="INT UNSIGNED"/>
+            <column name="months" remarks="Contract months already  billed" type="INT"/>
+            <column name="ordheadID" remarks="OBSOLETE" type="CHAR(10)"/>
+            <column name="broadbandServiceType" remarks="OBSOLETE" type="CHAR(50)"/>
+            <column name="broadbandServiceTypeID" remarks="OBSOLETE" type="INT"/>
+            <column name="adslPhone" remarks="Internet service contract phone line" type="VARCHAR(255)"/>
+            <column name="fee" remarks="Contract cost per month" type="DOUBLE"/>
+            <column name="macCode" remarks="Internet MAC code" type="VARCHAR(255)"/>
+            <column name="batchNo" remarks="OBSOLETE" type="CHAR(50)"/>
+            <column name="reference" remarks="OSOLETE" type="VARCHAR(255)"/>
+            <column name="defaultGateway" remarks="Hosting domain name" type="CHAR(50)"/>
+            <column name="networkAddress" remarks="Internet network address" type="CHAR(50)"/>
+            <column name="subnetMask" remarks="Internet sub-net mask" type="CHAR(50)"/>
+            <column name="routerIPAddress" remarks="Internet IP addresses" type="TEXT"/>
+            <column name="userName" remarks="Hosting/internet username" type="VARCHAR(255)"/>
+            <column name="password" remarks="Hosting/Internet password" type="VARCHAR(255)"/>
+            <column name="etaDate" remarks="Internet install ETA date" type="date"/>
+            <column name="installationDate" remarks="Internet actual install date" type="date"/>
+            <column name="costPerAnnum" remarks="Sale price per annum" type="DOUBLE"/>
+            <column name="salePricePerMonth" remarks="Sales Price Per Month" type="DECIMAL(6, 2)"/>
+            <column name="costPricePerMonth" remarks="Cost per month" type="DECIMAL(6, 2)"/>
+            <column name="ispID" remarks="Internet ISP" type="VARCHAR(255)"/>
+            <column name="requiresChangesFlag" remarks="OBSOLETE" type="VARCHAR(1)"/>
+            <column name="dualBroadbandFlag" remarks="Internet Dual Broadband?" type="VARCHAR(1)"/>
+            <column name="dnsCompany" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="ipCurrentNo" remarks="OBSOLETE" type="CHAR(50)"/>
+            <column name="mx" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="secureServer" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="vpns" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="owa" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="oma" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="remotePortal" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="smartHost" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="preparationRecords" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="assignedTo" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="initialSpeedTest" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="preMigrationNotes" remarks="OBSOLETE" type="LONGBLOB"/>
+            <column name="postMigrationNotes" remarks="OBSOLETE" type="LONGBLOB"/>
+            <column name="docsUpdatedAndChecksCompleted" remarks="OBSOLETE" type="VARCHAR(255)"/>
+            <column name="invoicePeriodMonths" remarks="Number of months between invoices" type="INT"/>
+            <column name="totalInvoiceMonths" remarks="Number of months to add to install date to calculate next invoice due date" type="INT"/>
+            <column name="declinedFlag" remarks="Contract declied by customer?" type="CHAR(1)"/>
+            <column name="hostingCompany" remarks="Hosting provider" type="CHAR(100)"/>
+            <column name="osPlatform" remarks="Hosting server OS" type="CHAR(50)"/>
+            <column name="domainNames" remarks="OBSOLETE" type="CHAR(100)"/>
+            <column name="controlPanelUrl" remarks="Hosting control panel URL" type="CHAR(50)"/>
+            <column name="ftpAddress" remarks="Hosting FTP server" type="CHAR(50)"/>
+            <column name="ftpUsername" remarks="Hosting FTP username" type="CHAR(50)"/>
+            <column name="wwwAddress" remarks="OBSOLETE" type="CHAR(50)"/>
+            <column name="websiteDeveloper" remarks="OBSOLETE" type="CHAR(50)"/>
+            <column defaultValue="0000-00-00" name="dateGenerated" remarks="Contract date of last Sales Order/Invoice" type="date"/>
+            <column name="startDate" remarks="Contract start of billing date" type="date"/>
+            <column name="salePrice" remarks="Sale price for billing" type="DECIMAL(6, 2)"/>
+            <column name="costPrice" remarks="Cost price" type="DECIMAL(6, 2)"/>
+            <column name="qty" remarks="Quotation renewal unit qty (e.g. Antivirus users)" type="INT"/>
+            <column name="renQuotationTypeID" remarks="PK Quotation contract type" type="INT"/>
+            <column name="comment" remarks="Contract internal comments" type="CHAR(50)"/>
+            <column name="grantNumber" remarks="Quotation renewal Details field" type="CHAR(50)"/>
+            <column name="notes" remarks="Quotation renewal Notes (seen by customer)" type="TEXT"/>
+            <column name="cui_consno" remarks="User who originaly despatched sales order" type="SMALLINT"/>
+            <column name="cui_ctactno" remarks="Contact who ordered contract" type="SMALLINT"/>
+            <column name="cui_desp_date" remarks="Sales order despatch date" type="date"/>
+            <column name="cui_pord_date" remarks="Purchase order date" type="date"/>
+            <column name="cui_ref_cust" remarks="Sales order Cust ref" type="VARCHAR(35)"/>
+            <column name="cui_sla_response_hours" remarks="OBSOLETE" type="INT"/>
+            <column name="hostingUserName" remarks="Hosting username" type="CHAR(50)"/>
+            <column name="cui_internal_notes" remarks="Contract internal notes" type="TEXT"/>
+            <column name="bandwidthAllowance" remarks="Broadband Bandwidth Allowance" type="CHAR(10)"/>
+            <column name="secondsiteLocationPath" remarks="Network path to image" type="CHAR(150)"/>
+            <column name="secondsiteStorageUsedGb" remarks="Storage used in Mb" type="INT"/>
+            <column name="secondsiteServerDriveLetters" remarks="Comma-sep list of drives" type="CHAR(100)"/>
+            <column name="secondsiteValidationSuspendUntilDate" remarks="Suspend 2nd site validation until this date" type="date"/>
+            <column defaultValueNumeric="0" name="secondsiteSuspendedByUserID" remarks="User that last suspended" type="INT"/>
+            <column name="secondsiteSuspendedDate" remarks="Date last suspended" type="date"/>
+            <column name="secondsiteImageDelayDays" remarks="Delay image date check by this many days" type="INT"/>
+            <column name="secondsiteImageDelayUserID" remarks="User that last set image delay" type="INT"/>
+            <column name="secondsiteImageDelayDate" remarks="Date that image delay was last set on" type="date"/>
+            <column defaultValue="N" name="secondsiteLocalExcludeFlag" remarks="Exclude local server from 2ndSite checks" type="CHAR(1)"/>
+            <column defaultValue="N" name="autoGenerateContractInvoice" remarks="Indicates if Contract Renewal automatically generates an invoice or just a sales order" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-22">
+        <createTable tableName="custitem_contract">
+            <column autoIncrement="true" name="cic_custitemcontractno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="cic_cuino" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cic_contractcuino" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-23">
+        <createTable tableName="customer">
+            <column defaultValueNumeric="0" name="cus_custno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cus_name" remarks="Name" type="VARCHAR(35)"/>
+            <column name="cus_reg_no" remarks="Company Registraction Number" type="VARCHAR(10)"/>
+            <column name="cus_inv_siteno" remarks="Default invoice site" type="SMALLINT"/>
+            <column name="cus_del_siteno" remarks="Default delivery site" type="SMALLINT"/>
+            <column name="cus_mailshot" remarks="Send mailshots to contacts?" type="VARCHAR(2)"/>
+            <column name="cus_create_date" remarks="Customer first created" type="date"/>
+            <column name="cus_referred" remarks="Referred status?" type="CHAR(1)"/>
+            <column name="cus_pcx" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="cus_ctypeno" remarks="How this customer was obtained" type="INT"/>
+            <column name="cus_prospect" remarks="Is this a prospect?" type="CHAR(1)"/>
+            <column defaultValue="Y" name="cus_others_email_main_flag" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column defaultValue="Y" name="cus_work_started_email_main_flag" remarks="Should work stared emails be sent from service system?" type="CHAR(1)"/>
+            <column defaultValue="Y" name="cus_auto_close_email_main_flag" remarks="Email main contact?" type="CHAR(1)"/>
+            <column defaultValue="0000-00-00" name="cus_became_customer_date" remarks="Date became a customer" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00" name="cus_dropped_customer_date" remarks="Date dropped as customer" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cus_leadstatusno" remarks="PK prospect lead status" type="INT UNSIGNED"/>
+            <column defaultValueNumeric="0.00" name="gscTopUpAmount" remarks="Amount for PrePay top-ups" type="DECIMAL(8, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="modifyDate" remarks="Modified datetime" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0" name="noOfPCs" remarks="Prospect: Number of PCs" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="noOfServers" remarks="Prospect: Number of Servers" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="1" name="noOfSites" remarks="Prospect: Number of sites" type="TINYINT(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comments" remarks="Comments" type="TEXT"/>
+            <column name="reviewDate" remarks="Prospect next review" type="date"/>
+            <column name="reviewTime" remarks="Prospect next review" type="CHAR(5)"/>
+            <column name="reviewAction" remarks="What to do on next review" type="LONGTEXT"/>
+            <column name="reviewUserID" remarks="Who should review" type="INT"/>
+            <column name="modifyUserID" remarks="Record modified by" type="INT"/>
+            <column name="cus_sectorno" remarks="Organisation business sector" type="INT UNSIGNED"/>
+            <column name="cus_tech_notes" remarks="Notes to appear on all request screens" type="CHAR(100)"/>
+            <column defaultValue="N" name="cus_special_attention_flag" remarks="Customer is special attention" type="CHAR(1)"/>
+            <column name="cus_special_attention_end_date" remarks="Special attention period end" type="date"/>
+            <column defaultValue="N" name="cus_support_24_hour_flag" remarks="Support is 24 hours" type="CHAR(1)"/>
+            <column name="cus_sla_p1" remarks="Support P1 response hours" type="DECIMAL(4, 1)"/>
+            <column name="cus_sla_p2" remarks="Support P2 response hours" type="DECIMAL(4, 1)"/>
+            <column name="cus_sla_p3" remarks="Support P3 response hours" type="DECIMAL(4, 1)"/>
+            <column name="cus_sla_p4" remarks="Support P4 response hours" type="DECIMAL(4, 1)"/>
+            <column name="cus_sla_p5" remarks="Support P5 response hours" type="DECIMAL(4, 1)"/>
+            <column defaultValue="" name="cus_send_contract_email" remarks="If set then send an email of conttracts to email address" type="CHAR(100)"/>
+            <column name="cus_send_tandc_email" remarks="If set then send T&amp;C email to portal user" type="CHAR(100)"/>
+            <column name="cus_last_review_meeting_date" remarks="Date of last review meeting" type="date"/>
+            <column defaultValueNumeric="6" name="cus_review_meeting_frequency_months" remarks="Frequency of review meetings" type="INT"/>
+            <column defaultValue="N" name="cus_review_meeting_email_sent_flag" remarks="Has a meeting reminder been sent?" type="CHAR(1)"/>
+            <column name="cus_account_manager_consno" remarks="Account manager user" type="INT UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-24">
+        <createTable tableName="customeritemdocument">
+            <column defaultValueNumeric="0" name="customerItemDocumentID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="customerItemID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="description" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="filename" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" type="LONGBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="fileMIMEType" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="fileLength" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="createDate" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="createUserID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-25">
+        <createTable tableName="customernote">
+            <column autoIncrement="true" name="cno_customernoteno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="cno_custno" remarks="Customer" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cno_created" remarks="Created date" type="datetime"/>
+            <column name="cno_modified" remarks="Modified date" type="datetime"/>
+            <column name="cno_modified_consno" remarks="Modified by" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cno_details" remarks="Details of action" type="TEXT"/>
+            <column name="cno_created_consno" remarks="Created by" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cno_ordno" remarks="Sales Order" type="INT UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-26">
+        <createTable tableName="customerproblem">
+            <column autoIncrement="true" name="cpr_customerproblemno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="cpr_custno" type="INT UNSIGNED"/>
+            <column defaultValueNumeric="99" name="cpr_siteno" type="INT"/>
+            <column name="cpr_contno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cpr_date" type="datetime"/>
+            <column name="cpr_priority" type="INT"/>
+            <column name="cpr_reason" type="TEXT"/>
+            <column name="cpr_internal_notes" type="TEXT"/>
+            <column defaultValue="N" name="cpr_serverguard_flag" type="CHAR(1)"/>
+            <column defaultValue="S" name="cpr_source" type="ENUM('C', 'S')"/>
+            <column name="cpr_problemno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="true" name="cpr_update_existing_request" type="BIT"/>
+            <column name="cpr_send_email" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-27">
+        <createTable tableName="custype">
+            <column defaultValueNumeric="0" name="cty_ctypeno" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="cty_desc" type="CHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-28">
+        <createTable tableName="date_xref">
+            <column name="date_field" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="is_bank_holiday" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-29">
+        <createTable tableName="db_sequence">
+            <column defaultValue="" name="seq_name" remarks="table name" type="VARCHAR(127)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="nextid" remarks="Next PK value" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-30">
+        <createTable tableName="delivery">
+            <column defaultValueNumeric="0" name="del_delno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="del_desc" remarks="Delivery description" type="CHAR(35)"/>
+            <column name="del_send_note" remarks="Send note?" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-31">
+        <createTable tableName="deliverynote">
+            <column defaultValueNumeric="0" name="deliveryNoteID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="ordheadID" remarks="Sales Order" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="noteNo" remarks="Delivery note sequence no (starts at 1)" type="TINYINT(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="dateTime" remarks="Date/time shipped" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-32">
+        <createTable tableName="deshead">
+            <column defaultValueNumeric="0" name="deh_desno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="deh_ordno" remarks="Sales order" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="deh_custno" remarks="Customer" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deh_invno" remarks="Sales Invoice" type="INT"/>
+            <column name="deh_ref_cust" remarks="Customer Ref" type="CHAR(23)"/>
+            <column name="deh_ref_ecc" remarks="CNC Ref" type="CHAR(35)"/>
+            <column name="deh_method" remarks="Delivery Method" type="CHAR(12)"/>
+            <column name="deh_date" remarks="Despatch date" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-33">
+        <createTable tableName="desline">
+            <column defaultValueNumeric="0" name="del_desno" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="del_line_no" remarks="Despatch sequence no" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="del_ord_line_no" remarks="Sales order line no" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="del_qty" remarks="Qty despatched now" type="DECIMAL(7, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-34">
+        <createTable tableName="domain_import">
+            <column name="domain" type="CHAR(100)"/>
+            <column name="expiryDate" type="date"/>
+            <column name="customerID" type="INT"/>
+            <column name="invoicePeriodMonths" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-35">
+        <createTable tableName="escalation">
+            <column autoIncrement="true" name="escalationID" remarks="PK" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="description" remarks="Escalation description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="activeFlag" remarks="Allowed for selection" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-36">
+        <createTable tableName="expense">
+            <column defaultValueNumeric="0" name="exp_expenseno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="exp_callactivityno" remarks="Service request activity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="exp_expensetypeno" remarks="FK to expense type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="exp_mileage" remarks="Miles claimed" type="INT"/>
+            <column defaultValueNumeric="0.00" name="exp_value" remarks="Value claimed" type="DECIMAL(8, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="exp_vat_flag" remarks="VAT included?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="exp_exported_flag" remarks="indicates whether this expense has been exported to the file" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-37">
+        <createTable tableName="expensetype">
+            <column defaultValueNumeric="0" name="ext_expensetypeno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="ext_desc" remarks="Description" type="CHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="ext_mileage_flag" remarks="Is this mileage?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ext_vat_flag" remarks="Include VAT by default?" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-38">
+        <createTable tableName="externalitem">
+            <column name="externalitemID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customerID" remarks="customer" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="itemTypeID" remarks="category of item" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" remarks="description of item" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notes" remarks="Notes about this item" type="LONGTEXT"/>
+            <column name="licenceRenewalDate" remarks="Date item is due for renewal" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-39">
+        <createTable tableName="further_action">
+            <column defaultValueNumeric="0" name="furtherActionID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="description" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="emailAddress" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="requireDate" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emailBody" type="TEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-40">
+        <createTable tableName="future_action">
+            <column defaultValueNumeric="0" name="futureActionID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="furtherActionID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00" name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="callActivityID" type="VARCHAR(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="engineerName" type="CHAR(50)"/>
+            <column name="dateCreated" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-41">
+        <createTable tableName="headert">
+            <column defaultValueNumeric="0" name="headerID" type="TINYINT(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="hed_name" remarks="Company name" type="CHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_add1" remarks="Address1" type="CHAR(35)"/>
+            <column name="hed_add2" remarks="Add2" type="CHAR(35)"/>
+            <column name="hed_add3" remarks="Add3" type="CHAR(35)"/>
+            <column name="hed_town" remarks="Town" type="CHAR(30)"/>
+            <column name="hed_county" remarks="County" type="CHAR(30)"/>
+            <column name="hed_postcode" remarks="Postcode" type="CHAR(15)"/>
+            <column name="hed_phone" remarks="Phone" type="CHAR(20)"/>
+            <column name="hed_fax" remarks="Fax" type="CHAR(20)"/>
+            <column name="hed_goods_contact" remarks="Goods In Contact" type="CHAR(35)"/>
+            <column name="hed_sstk_suppno" remarks="FK to Sales Stock Supplier" type="SMALLINT"/>
+            <column name="hed_mstk_suppno" remarks="PK to Manufacturing Stock Supplier" type="SMALLINT"/>
+            <column name="hed_std_vatcode" remarks="Standard VAT code" type="CHAR(2)"/>
+            <column name="hed_car_stockcat" remarks="OBSOLETE" type="CHAR(1)"/>
+            <column name="hed_next_porno" remarks="OBSOLETE" type="SMALLINT"/>
+            <column name="hed_next_itemno" remarks="OBSOLETE" type="SMALLINT"/>
+            <column name="hed_next_invno" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_sstk_locno" remarks="OBSOLETE" type="SMALLINT"/>
+            <column name="hed_mstk_locno" remarks="OBSOLETE" type="SMALLINT"/>
+            <column name="hed_ecc_ass_locno" remarks="OBSOLETE" type="SMALLINT"/>
+            <column name="hed_ecc_op_locno" remarks="OBSOLETE" type="SMALLINT"/>
+            <column name="hed_invoice_prt" remarks="OBSOLETE" type="CHAR(30)"/>
+            <column name="hed_porder_prt" remarks="OBSOLETE" type="CHAR(30)"/>
+            <column name="hed_plaser_prt" remarks="OBSOLETE" type="CHAR(30)"/>
+            <column name="hed_llaser_prt" remarks="OBSOLETE" type="CHAR(30)"/>
+            <column name="hed_system_prt" remarks="OBSOLETE" type="CHAR(30)"/>
+            <column name="hed_audit_prt" remarks="OBSOLETE" type="CHAR(30)"/>
+            <column name="hed_bill_starttime" remarks="Billing start time" type="CHAR(5)"/>
+            <column name="hed_bill_endtime" remarks="Billing end time HH:MM" type="CHAR(5)"/>
+            <column name="hed_hd_starttime" remarks="Help Desk Start time" type="CHAR(5)"/>
+            <column name="hed_hd_endtime" remarks="Help Desk end time" type="CHAR(5)"/>
+            <column name="hed_pro_starttime" remarks="Project work start time" type="CHAR(5)"/>
+            <column name="hed_pro_endtime" remarks="Project work end time" type="CHAR(5)"/>
+            <column name="hed_gensup_itemno" remarks="FK to Pre-pay Contract item" type="INT"/>
+            <column name="hed_portal_pin" remarks="Customer Portal PIN" type="CHAR(5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_next_schedno" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_ot_adjust_hour" remarks="OBSOLETE" type="DECIMAL(5, 2)"/>
+            <column name="hed_mailflg1_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg2_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg3_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg4_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg5_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg6_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg7_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg8_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg9_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg10_def" remarks="Contact Flag Default Value" type="CHAR(1)"/>
+            <column name="hed_mailflg1_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg2_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg3_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg4_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg5_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg6_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg7_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg8_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg9_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_mailflg10_desc" remarks="Contact Flag Description" type="CHAR(30)"/>
+            <column name="hed_helpdesk_problems" remarks="Daily helpdesk problems" type="TEXT"/>
+            <column name="hed_helpdesk_os_count" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_helpdesk_os_service_desk_count" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_helpdesk_os_servercare_count" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_helpdesk_os_prepay_count" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_helpdesk_os_escalation_count" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_helpdesk_os_cust_response_count" remarks="OBSOLETE" type="INT"/>
+            <column name="hed_hourly_labour_cost" remarks="Cost to CNC" type="DECIMAL(5, 2)"/>
+            <column name="hed_portal_24_hour_pin" remarks="24 hour support PIN" type="CHAR(5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_high_activity_alert_count" remarks="Number of activities per day per request triggers an alert email" type="INT"/>
+            <column name="hed_priority_1_desc" remarks="Priority 1 description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_priority_2_desc" remarks="Priority 2 description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_priority_3_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_priority_4_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_priority_5_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_sr_import_attachment_directory" remarks="Network path to SR import email attachments" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_allowed_client_ip_pattern" remarks="regx pattern for allowed client IP" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_limit_hours" remarks="Default time limit for solving problems by helpdesk team" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_es_team_limit_hours" remarks="Default time limit for escalations team to solve SR" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_im_team_limit_hours" remarks="Default time linit for implementations team to solve SR" type="DECIMAL(5, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_max_pause_count" remarks="Maximum no of times activity may be paused by member of SD team" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_pause_seconds" remarks="Length of activity pause in seconds" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_target_log_percentage" remarks="Help Desk team target percentage of time to be logged per day" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_es_team_target_log_percentage" remarks="Escalations team target percentage of time to be logged per day" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_im_team_target_log_percentage" remarks="Implementation team target % of time to be logged per day" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_target_sla_percentage" remarks="HD team target response within SLA percentage" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_es_team_target_sla_percentage" remarks="ES team target response within SLA percentage" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_im_team_target_sla_percentage" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_target_fix_hours" remarks="HD team target fix hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_es_team_target_fix_hours" remarks="ES team target fix hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_im_team_target_fix_hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_hd_team_target_fix_qty_per_month" remarks="HD team target fix qty" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_es_team_target_fix_qty_per_month" remarks="ES team target fix qty" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_im_team_target_fix_qty_per_month" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_sr_autocomplete_threshold_hours" remarks="Hours under which SRs get automatically completed" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_sr_prompt_contract_threshold_hours" remarks="Hours under which to prompt for a contract when fixing SRs above P3" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_remote_support_warn_hours" remarks="Hours over which on remote support activity to warn user" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hed_customer_contact_warn_hours" remarks="Hours over which on remote customer contact activity to warn user" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-42">
+        <createTable tableName="invhead">
+            <column defaultValueNumeric="0" name="inh_invno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="inh_custno" remarks="FK to customer" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inh_siteno" type="SMALLINT"/>
+            <column name="inh_ordno" type="INT"/>
+            <column defaultValue="" name="inh_type" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="inh_add1" type="CHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inh_add2" type="CHAR(35)"/>
+            <column name="inh_add3" type="CHAR(35)"/>
+            <column name="inh_town" type="CHAR(25)"/>
+            <column name="inh_county" type="CHAR(25)"/>
+            <column name="inh_postcode" type="CHAR(15)"/>
+            <column name="inh_contno" type="INT"/>
+            <column name="inh_contact" type="CHAR(25)"/>
+            <column name="inh_salutation" type="CHAR(25)"/>
+            <column defaultValue="" name="inh_pay_method" type="CHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="paymentTermsID" type="TINYINT(3)"/>
+            <column name="inh_vat_code" type="CHAR(2)"/>
+            <column name="inh_vat_rate" type="DECIMAL(4, 2)"/>
+            <column name="inh_ref_ecc" type="CHAR(35)"/>
+            <column name="inh_ref_cust" type="CHAR(23)"/>
+            <column name="inh_debtor_code" type="CHAR(10)"/>
+            <column name="inh_source" type="CHAR(1)"/>
+            <column name="inh_vat_only" type="CHAR(1)"/>
+            <column name="inh_date_printed" remarks="PDF file of the invoice" type="date"/>
+            <column name="inh_date_printed_yearmonth" type="CHAR(6)"/>
+            <column name="inh_pdf_file" type="LONGBLOB"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-43">
+        <createTable tableName="invline">
+            <column name="inl_invno" type="INT"/>
+            <column name="inl_line_no" type="SMALLINT"/>
+            <column name="inl_ord_line_no" type="SMALLINT"/>
+            <column name="inl_line_type" type="CHAR(1)"/>
+            <column name="inl_itemno" type="INT"/>
+            <column name="inl_desc" type="CHAR(45)"/>
+            <column name="inl_qty" type="DECIMAL(7, 2)"/>
+            <column name="inl_unit_price" type="DECIMAL(7, 2)"/>
+            <column name="inl_cost_price" type="DECIMAL(7, 2)"/>
+            <column name="inl_stockcat" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-44">
+        <createTable tableName="item">
+            <column defaultValueNumeric="0" name="itm_itemno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="itm_manno" type="SMALLINT"/>
+            <column defaultValue="" name="itm_desc" type="VARCHAR(45)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="itm_stockcat" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="itm_itemtypeno" type="INT"/>
+            <column name="itm_sstk_price" type="DECIMAL(12, 2)"/>
+            <column name="itm_sstk_cost" type="DECIMAL(12, 2)"/>
+            <column name="itm_mstk_cost" type="DECIMAL(12, 2)"/>
+            <column name="itm_serial_req" type="CHAR(1)"/>
+            <column name="itm_sstk_qty" type="DECIMAL(5, 2)"/>
+            <column name="itm_mstk_qty" type="DECIMAL(5, 2)"/>
+            <column name="itm_discontinued" type="CHAR(1)"/>
+            <column name="itm_unit_of_sale" type="VARCHAR(20)"/>
+            <column name="itm_contno" type="INT"/>
+            <column defaultValue="0" name="itm_servercare_flag" remarks="is this a servercare contract?" type="CHAR(1)"/>
+            <column defaultValueNumeric="8" name="contractResponseTime" type="INT UNSIGNED"/>
+            <column name="notes" type="TEXT"/>
+            <column name="renewalTypeID" type="INT UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-45">
+        <createTable tableName="itemtype">
+            <column defaultValueNumeric="0" name="ity_itemtypeno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="ity_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="ity_stockcat" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-46">
+        <createTable tableName="leadstatus">
+            <column name="lst_leadstatusno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lst_desc" type="CHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-47">
+        <createTable tableName="mail_queue">
+            <column defaultValueNumeric="0" name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="create_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="time_to_send" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_time" type="datetime"/>
+            <column defaultValueNumeric="0" name="id_user" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="unknown" name="ip" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="sender" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="recipient" type="VARCHAR(300)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="headers" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="LONGTEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="try_sent" type="TINYINT(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="true" name="delete_after_send" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="is_sending" type="BIT"/>
+            <column defaultValue="0000-00-00 00:00:00" name="time_started_sending" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-48">
+        <createTable tableName="mail_queue_seq">
+            <column autoIncrement="true" name="id" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-49">
+        <createTable tableName="mailshot_table">
+            <column name="keyfield" type="CHAR(50)"/>
+            <column name="hits" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-50">
+        <createTable tableName="main_contacts">
+            <column name="ContactFirstName" type="CHAR(25)"/>
+            <column name="ContactLastName" type="CHAR(35)"/>
+            <column name="ContactEmail" type="CHAR(60)"/>
+            <column name="CustomerName" type="VARCHAR(35)"/>
+            <column name="CustomerID" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-51">
+        <createTable tableName="manufact">
+            <column defaultValueNumeric="0" name="man_manno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="man_name" type="CHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="man_disc_rate" type="DECIMAL(4, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-52">
+        <createTable tableName="notepad">
+            <column defaultValue="" name="not_type" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="not_key" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="not_line" type="TINYINT(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="not_text" type="VARCHAR(76)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-53">
+        <createTable tableName="ordhead">
+            <column defaultValueNumeric="0" name="odh_ordno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="odh_custno" type="INT"/>
+            <column name="odh_type" type="CHAR(1)"/>
+            <column name="odh_part_invoice" type="CHAR(1)"/>
+            <column name="odh_date" type="date"/>
+            <column name="odh_req_date" type="date"/>
+            <column name="odh_prom_date" type="date"/>
+            <column name="odh_expect_date" type="date"/>
+            <column name="odh_quotation_ordno" type="INT"/>
+            <column name="odh_ref_cust" type="CHAR(23)"/>
+            <column name="odh_vat_code" type="CHAR(2)"/>
+            <column name="odh_vat_rate" type="DECIMAL(4, 2)"/>
+            <column name="odh_inv_siteno" type="SMALLINT"/>
+            <column name="odh_inv_add1" type="CHAR(35)"/>
+            <column name="odh_inv_add2" type="CHAR(35)"/>
+            <column name="odh_inv_add3" type="CHAR(35)"/>
+            <column name="odh_inv_town" type="CHAR(25)"/>
+            <column name="odh_inv_county" type="CHAR(25)"/>
+            <column name="odh_inv_postcode" type="CHAR(15)"/>
+            <column name="odh_inv_contno" type="INT"/>
+            <column name="odh_inv_contact" type="CHAR(25)"/>
+            <column name="odh_inv_salutation" type="CHAR(15)"/>
+            <column name="odh_inv_phone" type="CHAR(20)"/>
+            <column name="odh_inv_fax" type="CHAR(20)"/>
+            <column name="odh_inv_sphone" type="CHAR(20)"/>
+            <column name="odh_inv_email" type="CHAR(60)"/>
+            <column name="odh_del_siteno" type="SMALLINT"/>
+            <column name="odh_del_add1" type="CHAR(35)"/>
+            <column name="odh_del_add2" type="CHAR(35)"/>
+            <column name="odh_del_add3" type="CHAR(35)"/>
+            <column name="odh_del_town" type="CHAR(25)"/>
+            <column name="odh_del_county" type="CHAR(25)"/>
+            <column name="odh_del_postcode" type="CHAR(15)"/>
+            <column name="odh_del_contno" type="INT"/>
+            <column name="odh_del_contact" type="CHAR(25)"/>
+            <column name="odh_del_salutation" type="CHAR(15)"/>
+            <column name="odh_del_phone" type="CHAR(20)"/>
+            <column name="odh_del_fax" type="CHAR(20)"/>
+            <column name="odh_del_sphone" type="CHAR(20)"/>
+            <column name="odh_del_email" type="CHAR(60)"/>
+            <column name="odh_debtor_code" type="CHAR(10)"/>
+            <column name="odh_wip" type="CHAR(1)"/>
+            <column name="odh_consno" type="SMALLINT"/>
+            <column name="odh_pay_method" type="CHAR(30)"/>
+            <column name="paymentTermsID" type="TINYINT(3)"/>
+            <column name="odh_add_item" type="CHAR(1)"/>
+            <column name="odh_callno" type="INT"/>
+            <column name="odh_quotation_subject" type="CHAR(50)"/>
+            <column name="odh_quotation_introduction" type="CHAR(200)"/>
+            <column name="updatedTime" type="datetime"/>
+            <column name="odh_service_request_custitemno" type="INT"/>
+            <column name="odh_service_request_text" type="TEXT"/>
+            <column name="odh_service_request_bill_to_sales_order" type="CHAR(1)"/>
+            <column name="odh_service_request_priority" type="INT"/>
+            <column name="odh_quotation_create_date" remarks="Date that original quotation created" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-54">
+        <createTable tableName="ordhead_sco">
+            <column defaultValueNumeric="0" name="odh_ordno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="odh_custno" type="INT"/>
+            <column name="odh_type" type="CHAR(1)"/>
+            <column name="odh_part_invoice" type="CHAR(1)"/>
+            <column name="odh_date" type="date"/>
+            <column name="odh_req_date" type="date"/>
+            <column name="odh_prom_date" type="date"/>
+            <column name="odh_expect_date" type="date"/>
+            <column name="odh_ref_ecc" type="CHAR(100)"/>
+            <column name="odh_ref_cust" type="CHAR(23)"/>
+            <column name="odh_vat_code" type="CHAR(2)"/>
+            <column name="odh_vat_rate" type="DECIMAL(4, 2)"/>
+            <column name="odh_inv_siteno" type="SMALLINT"/>
+            <column name="odh_inv_add1" type="CHAR(35)"/>
+            <column name="odh_inv_add2" type="CHAR(35)"/>
+            <column name="odh_inv_add3" type="CHAR(35)"/>
+            <column name="odh_inv_town" type="CHAR(25)"/>
+            <column name="odh_inv_county" type="CHAR(25)"/>
+            <column name="odh_inv_postcode" type="CHAR(15)"/>
+            <column name="odh_inv_contno" type="INT"/>
+            <column name="odh_inv_contact" type="CHAR(25)"/>
+            <column name="odh_inv_salutation" type="CHAR(15)"/>
+            <column name="odh_inv_phone" type="CHAR(20)"/>
+            <column name="odh_inv_sphone" type="CHAR(20)"/>
+            <column name="odh_inv_fax" type="CHAR(20)"/>
+            <column name="odh_inv_email" type="CHAR(60)"/>
+            <column name="odh_del_siteno" type="SMALLINT"/>
+            <column name="odh_del_add1" type="CHAR(35)"/>
+            <column name="odh_del_add2" type="CHAR(35)"/>
+            <column name="odh_del_add3" type="CHAR(35)"/>
+            <column name="odh_del_town" type="CHAR(25)"/>
+            <column name="odh_del_county" type="CHAR(25)"/>
+            <column name="odh_del_postcode" type="CHAR(15)"/>
+            <column name="odh_del_contno" type="INT"/>
+            <column name="odh_del_contact" type="CHAR(25)"/>
+            <column name="odh_del_salutation" type="CHAR(15)"/>
+            <column name="odh_del_phone" type="CHAR(20)"/>
+            <column name="odh_del_sphone" type="CHAR(20)"/>
+            <column name="odh_del_fax" type="CHAR(20)"/>
+            <column name="odh_del_email" type="CHAR(60)"/>
+            <column name="odh_debtor_code" type="CHAR(10)"/>
+            <column name="odh_wip" type="CHAR(1)"/>
+            <column name="odh_consno" type="SMALLINT"/>
+            <column name="odh_pay_method" type="CHAR(30)"/>
+            <column name="odh_add_item" type="CHAR(1)"/>
+            <column name="odh_callno" type="INT"/>
+            <column defaultValue="0000-00-00 00:00:00" name="updatedTime" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="newOrdheadID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-55">
+        <createTable tableName="ordline">
+            <column autoIncrement="true" name="odl_ordlineno" remarks="PK so that phpMyAdmin can edit rows" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="odl_type" type="CHAR(1)"/>
+            <column defaultValueNumeric="0" name="odl_ordno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="odl_item_no" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="odl_custno" type="INT"/>
+            <column name="odl_itemno" type="INT"/>
+            <column name="odl_stockcat" type="CHAR(1)"/>
+            <column name="odl_desc" type="CHAR(45)"/>
+            <column name="odl_qty_ord" type="DECIMAL(7, 2)"/>
+            <column name="odl_qty_desp" type="DECIMAL(7, 2)"/>
+            <column name="odl_qty_last_desp" type="DECIMAL(7, 2)"/>
+            <column name="odl_suppno" type="SMALLINT"/>
+            <column name="odl_d_unit" type="DECIMAL(7, 2)"/>
+            <column name="odl_d_total" type="DECIMAL(7, 2)"/>
+            <column name="odl_e_unit" type="DECIMAL(7, 2)"/>
+            <column name="odl_e_total" type="DECIMAL(7, 2)"/>
+            <column name="odl_renewal_cuino" type="INT UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-56">
+        <createTable tableName="ordline_sco">
+            <column name="odl_type" type="CHAR(1)"/>
+            <column name="odl_ordno" type="INT"/>
+            <column name="odl_item_no" type="SMALLINT"/>
+            <column name="odl_custno" type="INT"/>
+            <column name="odl_itemno" type="INT"/>
+            <column name="odl_stockcat" type="CHAR(1)"/>
+            <column name="odl_desc" type="CHAR(45)"/>
+            <column name="odl_qty_ord" type="DECIMAL(7, 2)"/>
+            <column name="odl_qty_desp" type="DECIMAL(7, 2)"/>
+            <column name="odl_qty_last_desp" type="DECIMAL(7, 2)"/>
+            <column name="odl_suppno" type="SMALLINT"/>
+            <column name="odl_d_unit" type="DECIMAL(7, 2)"/>
+            <column name="odl_d_total" type="DECIMAL(7, 2)"/>
+            <column name="odl_e_unit" type="DECIMAL(7, 2)"/>
+            <column name="odl_e_total" type="DECIMAL(7, 2)"/>
+            <column defaultValueBoolean="false" name="processedFlag" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-57">
+        <createTable tableName="page_view">
+            <column autoIncrement="true" name="page_view_id" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValue="" name="script_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_fields" type="LONGTEXT"/>
+            <column name="order_by" type="LONGTEXT"/>
+            <column name="filters" type="LONGTEXT"/>
+            <column defaultValueNumeric="0" name="created_by_user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="created_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="modified_by_user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00 00:00:00" name="modified_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-58">
+        <createTable tableName="password">
+            <column name="pas_passwordno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pas_custno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pas_username" type="CHAR(100)"/>
+            <column name="pas_service" type="MEDIUMTEXT"/>
+            <column name="pas_password" type="MEDIUMTEXT"/>
+            <column name="pas_notes" type="MEDIUMTEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-59">
+        <createTable tableName="paymentterms">
+            <column defaultValueNumeric="0" name="paymentTermsID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="days" type="TINYINT(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="generateInvoiceFlag" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="automaticInvoiceFlag" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-60">
+        <createTable tableName="paymeth">
+            <column defaultValueNumeric="0" name="pay_payno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="pay_desc" type="CHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="pay_card" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pay_cardno" type="CHAR(30)"/>
+            <column name="pay_exp_date" type="date"/>
+            <column name="pay_consno" type="SMALLINT"/>
+            <column defaultValue="Y" name="automaticInvoiceFlag" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-61">
+        <createTable tableName="pinline">
+            <column defaultValueNumeric="0" name="pin_pinno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="pin_type" type="CHAR(2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="pin_ac_ref" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="pin_nom_ref" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="pin_dept" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0000-00-00" name="pin_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="pin_ref" type="CHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="pin_details" type="CHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="pin_net_amnt" type="DECIMAL(12, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="pin_tax_code" type="CHAR(2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="pin_tax_amnt" type="DECIMAL(12, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pin_printed" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-62">
+        <createTable tableName="porhead">
+            <column defaultValueNumeric="0" name="poh_porno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="poh_type" type="CHAR(1)"/>
+            <column defaultValueNumeric="0" name="poh_suppno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="poh_contno" type="INT"/>
+            <column name="poh_date" type="date"/>
+            <column name="poh_ordno" type="INT"/>
+            <column name="poh_supp_ref" type="CHAR(30)"/>
+            <column name="poh_direct_del" type="CHAR(1)"/>
+            <column name="poh_payno" type="SMALLINT"/>
+            <column name="poh_invoices" type="CHAR(60)"/>
+            <column name="poh_printed" type="CHAR(1)"/>
+            <column name="poh_consno" type="SMALLINT"/>
+            <column name="poh_vat_code" type="CHAR(2)"/>
+            <column name="poh_vat_rate" type="DECIMAL(5, 2)"/>
+            <column name="poh_locno" type="SMALLINT"/>
+            <column name="poh_ord_consno" type="SMALLINT"/>
+            <column name="poh_ord_date" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-63">
+        <createTable tableName="porline">
+            <column defaultValueNumeric="0" name="pol_porno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="pol_lineno" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pol_itemno" type="INT"/>
+            <column name="pol_qty_ord" type="DECIMAL(12, 2)"/>
+            <column name="pol_qty_rec" type="DECIMAL(12, 2)"/>
+            <column name="pol_qty_inv" type="DECIMAL(12, 6)"/>
+            <column name="pol_cost" type="DECIMAL(12, 2)"/>
+            <column name="pol_stockcat" type="CHAR(1)"/>
+            <column name="pol_exp_date" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-64">
+        <createTable tableName="portal_customer_document">
+            <column autoIncrement="true" name="portalCustomerDocumentID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="customerID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" remarks="Description of the document" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filename" remarks="Name of file" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" remarks="The binary" type="LONGBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileMimeType" remarks="Mime type for display" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="startersFormFlag" remarks="Starters form" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="leaversFormFlag" remarks="Leavers form?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="mainContactOnlyFlag" remarks="View by Main Contact only?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdDate" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdUserID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-65">
+        <createTable tableName="portal_document">
+            <column defaultValueNumeric="0" name="portalDocumentID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" remarks="Description of the document" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filename" remarks="Name of file" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" remarks="The binary" type="LONGBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileMimeType" remarks="Mime type for display" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="mainContactOnlyFlag" remarks="View by Main Contact only?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="requiresAcceptanceFlag" remarks="Requires acceptance by main contact?" type="CHAR(1)"/>
+            <column name="createdDate" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdUserID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-66">
+        <createTable tableName="portal_document_acceptance">
+            <column autoIncrement="true" name="portalDocumentAcceptanceID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="portalDocumentID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customerID" remarks="Customer that accepted" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="acceptedDate" remarks="Date accepted" type="datetime"/>
+            <column name="acceptedByContactID" remarks="Person that accepted" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-67">
+        <createTable tableName="prepaystatement">
+            <column autoIncrement="true" name="pre_prepayno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="pre_custno" type="INT UNSIGNED"/>
+            <column name="pre_date" type="date"/>
+            <column name="pre_balance" type="DECIMAL(8, 2)"/>
+            <column name="pre_file" type="LONGBLOB"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-68">
+        <createTable tableName="prizewinner">
+            <column autoIncrement="true" name="prz_prizewinnerno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="prz_yearmonth" remarks="YYYY-MM" type="CHAR(7)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="prz_contno" remarks="Customer contact that woin" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="prz_approved_flag" remarks="has the prize been approved?" type="CHAR(1)"/>
+            <column name="prz_survey_name" remarks="name entered on the survey" type="CHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-69">
+        <createTable tableName="problem">
+            <column defaultValueNumeric="0" name="pro_problemno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="pro_custno" remarks="Customer FK to customer.cus_custno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pro_priority" remarks="1 to 5" type="INT"/>
+            <column name="pro_consno" remarks="Allocated User. FK to consultant.cns_consno" type="INT"/>
+            <column defaultValue="I" name="pro_status" remarks="I=Initial P=In Progress F=Fixed C=Completed" type="ENUM('I', 'P', 'F', 'C')"/>
+            <column name="pro_date_raised" remarks="Date the problem was first raised in the system" type="datetime"/>
+            <column defaultValueNumeric="0.00" name="pro_responded_hours" remarks="duration in hours until response" type="DECIMAL(7, 2)"/>
+            <column name="pro_fixed_consno" remarks="User that fixed problem. FK to consultant.cns_consno" type="INT"/>
+            <column name="pro_fixed_date" remarks="Dat/time fixed" type="datetime"/>
+            <column defaultValueNumeric="0.00" name="pro_working_hours" remarks="Number of working hours since problem first raised" type="DECIMAL(7, 2)"/>
+            <column defaultValue="N" name="pro_sent_sla_alert_flag" remarks="Set to show SLA alert email has been sent" type="CHAR(1)"/>
+            <column name="pro_internal_notes" remarks="Internal CNC Notes" type="MEDIUMTEXT"/>
+            <column defaultValueNumeric="0" name="pro_completion_alert_count" remarks="How many completion alerts have been sent to the customer" type="INT"/>
+            <column name="pro_complete_date" remarks="Date when request to be completed either manually or automatically" type="date"/>
+            <column defaultValue="A" name="pro_email_option" remarks="A=Always, N=Never or S=Skip work commenced email" type="ENUM('A', 'N', 'S')"/>
+            <column defaultValue="N" name="pro_hide_from_customer_flag" remarks="Hide all SR activity from customer" type="CHAR(1)"/>
+            <column defaultValue="0000-00-00" name="pro_alarm_date" remarks="Future alarm date" type="date"/>
+            <column name="pro_alarm_time" remarks="Future alarm time" type="CHAR(5)"/>
+            <column name="pro_total_activity_duration_hours" remarks="Combined duration of all Activities" type="DECIMAL(7, 2)"/>
+            <column name="pro_total_travel_activity_duration_hours" remarks="Combined duration of Travel activity" type="DECIMAL(7, 2)"/>
+            <column name="pro_chargeable_activity_duration_hours" remarks="Combined duration of chargeable Activities" type="DECIMAL(7, 2)"/>
+            <column name="pro_sla_response_hours" remarks="Elapsed hours from raised to responded" type="DECIMAL(12, 2)"/>
+            <column name="pro_contract_cuino" remarks="Contract. FK to custitem.cui_cuino" type="INT"/>
+            <column defaultValue="N" name="pro_escalated_flag" remarks="Was this escalated" type="CHAR(1)"/>
+            <column name="pro_escalated_consno" remarks="User that escalated. FK to consultant.cns_consno" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="pro_reopened_flag" remarks="Was this reopened" type="CHAR(1)"/>
+            <column name="pro_contno" remarks="Customer Contact that raised Request. FK to contact.con_contno" type="INT UNSIGNED"/>
+            <column name="activityCategoryID" remarks="Activity Category. FK to activitycategory.act_activityCategoryID" type="INT UNSIGNED"/>
+            <column defaultValue="1" name="pro_technician_weighting" remarks="Priority for engineer dashboard. Not used in any other context." type="ENUM('1', '2', '3', '4', '5')"/>
+            <column name="pro_rejected_consno" remarks="User that last rejected request. FK to consultant.cns_consno" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="pro_do_next_flag" remarks="Indicates the engineer should work on this request next" type="CHAR(1)"/>
+            <column name="pro_rootcauseno" remarks="Root Cause of problem. FK to rootcause.rtc_rootcauseno" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="pro_working_hours_alert_sent_flag" remarks="Has an alert been sent when number of elapsed hours exceeds system limit?" type="CHAR(1)"/>
+            <column defaultValue="N" name="pro_awaiting_customer_response_flag" remarks="Are we waiting for customer action?" type="CHAR(1)"/>
+            <column defaultValue="0000-00-00 00:00:00" name="pro_working_hours_calculated_to_time" remarks="This is an optomisisation used by BUProblemSLA" type="datetime"/>
+            <column name="pro_manager_comment" remarks="Manager's comments (only visible to helpdesk manager)" type="TEXT"/>
+            <column name="pro_breach_comment" remarks="Comment about breach of SLA" type="TEXT"/>
+            <column name="pro_message_to_sales" remarks="Message sent to sales" type="TEXT"/>
+            <column name="pro_monitor_name" remarks="Automatic import Monitor Name" type="CHAR(100)"/>
+            <column name="pro_monitor_agent_name" remarks="Automatic import Monitor Agent Name" type="CHAR(100)"/>
+            <column name="pro_projectno" remarks="Project" type="INT UNSIGNED"/>
+            <column name="pro_linked_ordno" remarks="Related Sales Order" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="pro_critical_flag" remarks="Critical Service Request" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="1" name="pro_queue_no" remarks="Queue number" type="INT"/>
+            <column name="pro_hd_remain_hours" remarks="HD team time remaining" type="DECIMAL(8, 3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pro_es_remain_hours" remarks="Escalation team time remaining" type="DECIMAL(8, 3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pro_im_remain_hours" remarks="Implementations team time remaining" type="DECIMAL(8, 3)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="pro_hd_time_alert_flag" remarks="HD team time alert has been displayed" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="N" name="pro_es_time_alert_flag" remarks="ES team time alert has been displayed" type="CHAR(1)"/>
+            <column defaultValue="N" name="pro_im_time_alert_flag" remarks="IM team time alert flag has been displayed" type="CHAR(1)"/>
+            <column defaultValueNumeric="0" name="pro_hd_pause_count" remarks="Number of times HD pause button has been clicked" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pro_management_review_reason" remarks="Reason for management review" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pro_started_consno" remarks="User that started work on SR" type="INT UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-70">
+        <createTable tableName="project">
+            <column defaultValueNumeric="0" name="projectID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="customerID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startDate" type="date"/>
+            <column name="expiryDate" type="date"/>
+            <column name="notes" type="TEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-71">
+        <createTable tableName="question">
+            <column autoIncrement="true" name="que_questionno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="que_questionnaireno" type="INT UNSIGNED"/>
+            <column name="que_desc" remarks="Description" type="CHAR(130)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="que_answertypeno" remarks="Type of answer. 1=" type="INT"/>
+            <column defaultValue="Y" name="que_active_flag" remarks="Question is active?" type="CHAR(1)"/>
+            <column defaultValueNumeric="0" name="que_weight" remarks="Weighting to control display order on screen" type="INT"/>
+            <column defaultValue="Y" name="que_required_flag" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-72">
+        <createTable tableName="question_type">
+            <column autoIncrement="true" name="qut_questiontypeno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="qut_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-73">
+        <createTable tableName="questionnaire">
+            <column autoIncrement="true" name="qur_questionnaireno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="qur_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qur_intro" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qur_thank_you" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qur_rating_1_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qur_rating_5_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="qur_name_required" remarks="Is a name required when completing questionnaire?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-74">
+        <createTable tableName="queue_history">
+            <column autoIncrement="true" name="queueHistoryID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="queueName" remarks="Name of queue" type="CHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="srCount" remarks="How many SRs in queue" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" remarks="Date and time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-75">
+        <createTable tableName="quotation">
+            <column defaultValueNumeric="0" name="quotationID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="ordheadID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="versionNo" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sentDateTime" type="datetime"/>
+            <column defaultValueNumeric="0" name="userID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="salutation" type="CHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="emailSubject" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileExtension" type="CHAR(5)"/>
+            <column name="documentType" type="CHAR(20)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-76">
+        <createTable tableName="renbroadband">
+            <column autoIncrement="true" name="renBroadbandID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="renewalDate" type="date"/>
+            <column name="customerName" type="CHAR(50)"/>
+            <column name="customerID" type="INT UNSIGNED"/>
+            <column name="itemID" type="INT UNSIGNED"/>
+            <column name="customerItemID" type="INT UNSIGNED"/>
+            <column name="months" type="INT"/>
+            <column name="ordheadID" type="CHAR(10)"/>
+            <column name="broadbandServiceType" type="CHAR(50)"/>
+            <column name="broadbandServiceTypeID" type="INT"/>
+            <column name="adslPhone" type="VARCHAR(255)"/>
+            <column name="fee" remarks="Cost per month" type="DOUBLE"/>
+            <column name="macCode" type="VARCHAR(255)"/>
+            <column name="batchNo" type="CHAR(50)"/>
+            <column name="reference" type="VARCHAR(255)"/>
+            <column name="defaultGateway" type="CHAR(50)"/>
+            <column name="networkAddress" type="CHAR(50)"/>
+            <column name="subnetMask" type="CHAR(50)"/>
+            <column name="routerIPAddress" remarks="one or more IP addresses" type="TEXT"/>
+            <column name="userName" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="etaDate" type="date"/>
+            <column name="installationDate" type="date"/>
+            <column name="costPerAnnum" remarks="Sale price per annum" type="DOUBLE"/>
+            <column name="salePricePerMonth" remarks="Sales Price Per Month" type="DECIMAL(6, 2)"/>
+            <column name="costPricePerMonth" type="DECIMAL(6, 2)"/>
+            <column name="ispID" type="VARCHAR(255)"/>
+            <column name="requiresChangesFlag" type="VARCHAR(1)"/>
+            <column name="dualBroadbandFlag" type="VARCHAR(1)"/>
+            <column name="dnsCompany" type="VARCHAR(255)"/>
+            <column name="ipCurrentNo" type="CHAR(50)"/>
+            <column name="mx" type="VARCHAR(255)"/>
+            <column name="secureServer" type="VARCHAR(255)"/>
+            <column name="vpns" type="VARCHAR(255)"/>
+            <column name="owa" type="VARCHAR(255)"/>
+            <column name="oma" type="VARCHAR(255)"/>
+            <column name="remotePortal" type="VARCHAR(255)"/>
+            <column name="smartHost" type="VARCHAR(255)"/>
+            <column name="preparationRecords" type="VARCHAR(255)"/>
+            <column name="assignedTo" type="VARCHAR(255)"/>
+            <column name="initialSpeedTest" type="VARCHAR(255)"/>
+            <column name="preMigrationNotes" type="LONGBLOB"/>
+            <column name="postMigrationNotes" type="LONGBLOB"/>
+            <column name="docsUpdatedAndChecksCompleted" type="VARCHAR(255)"/>
+            <column name="invoicePeriodMonths" remarks="Number of months between invoices" type="INT"/>
+            <column name="totalInvoiceMonths" remarks="Number of months to add to install date to calculate next invoice due date" type="INT"/>
+            <column name="declinedFlag" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-77">
+        <createTable tableName="rencontract">
+            <column autoIncrement="true" name="renContractID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="customerItemID" type="INT"/>
+            <column name="installationDate" type="date"/>
+            <column name="invoicePeriodMonths" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="declinedFlag" type="CHAR(1)"/>
+            <column name="totalInvoiceMonths" type="INT"/>
+            <column name="notes" type="CHAR(45)"/>
+            <column name="hostingCompany" type="CHAR(100)"/>
+            <column name="password" type="CHAR(50)"/>
+            <column name="osPlatform" type="CHAR(50)"/>
+            <column name="domainNames" type="CHAR(100)"/>
+            <column name="controlPanelUrl" type="CHAR(50)"/>
+            <column name="ftpAddress" type="CHAR(50)"/>
+            <column name="ftpUsername" type="CHAR(50)"/>
+            <column name="wwwAddress" type="CHAR(50)"/>
+            <column name="websiteDeveloper" type="CHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-78">
+        <createTable tableName="rendomain">
+            <column name="renDomainID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customerItemID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="installationDate" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invoicePeriodMonths" type="INT UNSIGNED"/>
+            <column defaultValue="N" name="declinedFlag" type="CHAR(1)"/>
+            <column name="totalInvoiceMonths" type="INT"/>
+            <column name="notes" type="CHAR(45)"/>
+            <column defaultValue="0000-00-00" name="dateGenerated" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-79">
+        <createTable tableName="renewaltype">
+            <column autoIncrement="true" name="renewalTypeID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="allowSrLogging" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-80">
+        <createTable tableName="renquotation">
+            <column autoIncrement="true" name="renQuotationID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="customerItemID" type="INT"/>
+            <column name="startDate" type="date"/>
+            <column defaultValue="N" name="declinedFlag" type="CHAR(1)"/>
+            <column name="salePrice" type="DECIMAL(6, 2)"/>
+            <column name="costPrice" type="DECIMAL(6, 2)"/>
+            <column name="qty" type="INT"/>
+            <column name="renQuotationTypeID" type="INT"/>
+            <column name="comment" type="CHAR(50)"/>
+            <column name="grantNumber" type="CHAR(50)"/>
+            <column defaultValue="0000-00-00" name="dateGenerated" remarks="This is the date that the quotation was generated from the renewal record" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-81">
+        <createTable tableName="renquotationtype">
+            <column autoIncrement="true" name="renQuotationTypeID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="addInstallationCharge" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-82">
+        <createTable tableName="rootcause">
+            <column autoIncrement="true" name="rtc_rootcauseno" remarks="ID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="rtc_desc" remarks="Short description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rtc_long_desc" remarks="Long description" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-83">
+        <createTable tableName="salesorder_document">
+            <column defaultValueNumeric="0" name="salesOrderDocumentID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordheadID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" remarks="Description of the document" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filename" remarks="Name of file" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" remarks="The binary" type="LONGBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileMimeType" remarks="Mime type for display" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdDate" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdUserID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-84">
+        <createTable tableName="salesrequest">
+            <column autoIncrement="true" name="srq_salesrequestno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="srq_ordno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="srq_text" type="TEXT"/>
+            <column name="srq_contractcuino" type="INT UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-85">
+        <createTable tableName="secondsite_image">
+            <column autoIncrement="true" name="secondsiteImageID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="customerItemID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imageName" remarks="e.g. disk label C" type="CHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imagePath" remarks="Path to last image file" type="CHAR(255)"/>
+            <column name="status" remarks="Status when last checked" type="CHAR(20)"/>
+            <column name="imageTime" remarks="Date/time of image" type="datetime"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-86">
+        <createTable tableName="sector">
+            <column name="sec_sectorno" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sec_desc" type="CHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-87">
+        <createTable tableName="securityapp">
+            <column defaultValueNumeric="0" name="securityAppID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="backupFlag" type="CHAR(1)"/>
+            <column name="emailAVFlag" type="CHAR(1)"/>
+            <column name="serverAVFlag" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-88">
+        <createTable tableName="service request review_csv">
+            <column name="F1" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="F2" type="TEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-89">
+        <createTable tableName="servicedeskreport">
+            <column autoIncrement="true" name="sdr_servicedeskreportno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="sdr_year_month" type="CHAR(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sdr_calls_received" type="INT"/>
+            <column name="sdr_calls_overflowed" type="INT"/>
+            <column name="sdr_calls_helpdesk" type="INT"/>
+            <column name="sdr_calls_answer_seconds" type="INT"/>
+            <column name="sdr_calls_abandoned" type="INT"/>
+            <column name="sdr_meeting_results" type="TEXT"/>
+            <column name="sdr_staff_issues" type="TEXT"/>
+            <column name="sdr_staff_holiday_days" type="INT"/>
+            <column name="sdr_staff_sick_days" type="INT"/>
+            <column name="sdr_training" type="TEXT"/>
+            <column name="sdr_any_other_business" type="TEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-90">
+        <createTable tableName="sessions">
+            <column defaultValue="" name="sid" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="name" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="val" type="TEXT"/>
+            <column defaultValue="" name="changed" type="VARCHAR(14)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-91">
+        <createTable tableName="staffavailable">
+            <column name="staffAvailableID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userID" type="INT"/>
+            <column name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.5" name="am" remarks="available in the morning" type="DECIMAL(2, 1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.5" name="pm" remarks="available in the afternoon" type="DECIMAL(2, 1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-92">
+        <createTable tableName="standardtext">
+            <column autoIncrement="true" name="stt_standardtextno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueNumeric="1" name="stt_sort_order" remarks="Order of appearance in drop-downs" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stt_desc" remarks="Text for drop-downs etc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stt_text" remarks="Content to be pasted" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stt_standardtexttypeno" remarks="Type of text" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-93">
+        <createTable tableName="standardtexttype">
+            <column autoIncrement="true" name="sty_standardtexttypeno" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="sty_desc" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-94">
+        <createTable tableName="stockcat">
+            <column defaultValue="" name="stc_stockcat" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stc_desc" type="CHAR(25)"/>
+            <column name="stc_sal_nom" type="CHAR(6)"/>
+            <column name="stc_pur_cust" type="CHAR(6)"/>
+            <column name="stc_pur_sales_stk" type="CHAR(6)"/>
+            <column name="stc_pur_maint_stk" type="CHAR(6)"/>
+            <column name="stc_pur_ecc_asset" type="CHAR(6)"/>
+            <column name="stc_pur_ecc_oper" type="CHAR(6)"/>
+            <column name="stc_serial_req" type="CHAR(1)"/>
+            <column name="stc_post_movement" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-95">
+        <createTable tableName="supplier">
+            <column defaultValueNumeric="0" name="sup_suppno" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sup_name" type="CHAR(35)"/>
+            <column name="sup_contact" type="CHAR(35)"/>
+            <column name="sup_add1" type="CHAR(35)"/>
+            <column name="sup_add2" type="CHAR(35)"/>
+            <column name="sup_town" type="CHAR(25)"/>
+            <column name="sup_county" type="CHAR(25)"/>
+            <column name="sup_postcode" type="CHAR(15)"/>
+            <column name="sup_phone" type="CHAR(20)"/>
+            <column name="sup_fax" type="CHAR(20)"/>
+            <column name="sup_web_site_url" type="CHAR(100)"/>
+            <column name="sup_pay_method" type="CHAR(15)"/>
+            <column name="sup_credit_limit" type="DECIMAL(10, 2)"/>
+            <column name="sup_approval" type="CHAR(1)"/>
+            <column name="sup_scopeno" type="SMALLINT"/>
+            <column name="sup_payno" type="SMALLINT"/>
+            <column name="sup_date_quest" type="date"/>
+            <column name="sup_contno" type="INT"/>
+            <column name="sup_cnc_accno" type="CHAR(20)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-96">
+        <createTable tableName="team">
+            <column name="teamID" remarks="PK field" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" remarks="Team name" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="teamRoleID" remarks="FK to teamrole table" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" remarks="Level" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="Y" name="activeFlag" remarks="Whether this team is active" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-97">
+        <createTable tableName="team_performance">
+            <column autoIncrement="true" name="teamPerformanceID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="year" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="month" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hdTeamTargetSlaPercentage" remarks="HD team target response within SLA percentage" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hdTeamTargetFixHours" remarks="HD team target fix hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hdTeamTargetFixQtyPerMonth" remarks="HD team target fix qty" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hdTeamActualSlaPercentage" remarks="HD team actual response within SLA percentage" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hdTeamActualFixHours" remarks="HD team actual fix hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hdTeamActualFixQtyPerMonth" remarks="HD team actual fix qty" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="esTeamTargetSlaPercentage" remarks="ES team target response within SLA percentage" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="esTeamTargetFixHours" remarks="ES team target fix hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="esTeamTargetFixQtyPerMonth" remarks="ES team target fix qty" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="esTeamActualSlaPercentage" remarks="ES team actual response within SLA percentage" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="esTeamActualFixHours" remarks="ES team actual fix hours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="esTeamActualFixQtyPerMonth" remarks="ES team actual fix qty" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imTeamTargetSlaPercentage" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imTeamTargetFixHours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imTeamTargetFixQtyPerMonth" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imTeamActualSlaPercentage" type="DECIMAL(5, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imTeamActualFixHours" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="imTeamActualFixQtyPerMonth" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-98">
+        <createTable tableName="team_role">
+            <column name="teamRoleID" remarks="PK" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" remarks="Role description" type="CHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-99">
+        <createTable tableName="temp_table">
+            <column name="id" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="CHAR(200)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-100">
+        <createTable tableName="time_breach">
+            <column autoIncrement="true" name="timeBreachID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="userID" remarks="Person that breached" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="breachDate" remarks="Date and time breached" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="breachCount" remarks="Number of breaches of this SR on this Date" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-101">
+        <createTable tableName="time_granted">
+            <column autoIncrement="true" name="timeGrantedID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="userID" remarks="Person granted to" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hours" remarks="Additional hours granted" type="DECIMAL(7, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="grantedDate" remarks="Date granted" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-102">
+        <createTable tableName="user_time_log">
+            <column autoIncrement="true" name="userTimeLogID" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="userID" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="teamLevel" remarks="team that user was in" type="INT UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="loggedDate" remarks="date time logged" type="date"/>
+            <column name="loggedHours" remarks="hours logged" type="DECIMAL(6, 2) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dayHours" remarks="work hours for date" type="DECIMAL(6, 2)"/>
+            <column name="startedTime" remarks="time started work - use for daily running performance" type="time">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-103">
+        <createTable tableName="userext">
+            <column defaultValueNumeric="0" name="userID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="signatureFilename" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="jobTitle" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="firstName" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="lastName" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="" name="activeFlag" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-104">
+        <createTable tableName="vat">
+            <column defaultValueNumeric="0.00" name="vat_rate_t0" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t1" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t2" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t3" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t4" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t5" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t6" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t7" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t8" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0.00" name="vat_rate_t9" type="DECIMAL(4, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-105">
+        <addPrimaryKey columnNames="add_custno, add_siteno" constraintName="PRIMARY" tableName="address"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-106">
+        <addPrimaryKey columnNames="are_arecordno" constraintName="PRIMARY" tableName="arecord"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-107">
+        <addPrimaryKey columnNames="broadbandServiceTypeID" constraintName="PRIMARY" tableName="broadbandservicetype"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-108">
+        <addPrimaryKey columnNames="date_field" constraintName="PRIMARY" tableName="date_xref"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-109">
+        <addPrimaryKey columnNames="seq_name" constraintName="PRIMARY" tableName="db_sequence"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-110">
+        <addPrimaryKey columnNames="deliveryNoteID" constraintName="PRIMARY" tableName="deliverynote"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-111">
+        <addPrimaryKey columnNames="externalitemID" constraintName="PRIMARY" tableName="externalitem"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-112">
+        <addPrimaryKey columnNames="furtherActionID" constraintName="PRIMARY" tableName="further_action"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-113">
+        <addPrimaryKey columnNames="headerID" constraintName="PRIMARY" tableName="headert"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-114">
+        <addPrimaryKey columnNames="ity_itemtypeno" constraintName="PRIMARY" tableName="itemtype"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-115">
+        <addPrimaryKey columnNames="lst_leadstatusno" constraintName="PRIMARY" tableName="leadstatus"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-116">
+        <addPrimaryKey columnNames="id" constraintName="PRIMARY" tableName="mail_queue"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-117">
+        <addPrimaryKey columnNames="pas_passwordno" constraintName="PRIMARY" tableName="password"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-118">
+        <addPrimaryKey columnNames="paymentTermsID" constraintName="PRIMARY" tableName="paymentterms"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-119">
+        <addPrimaryKey columnNames="pin_pinno" constraintName="PRIMARY" tableName="pinline"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-120">
+        <addPrimaryKey columnNames="portalDocumentID" constraintName="PRIMARY" tableName="portal_document"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-121">
+        <addPrimaryKey columnNames="pro_problemno" constraintName="PRIMARY" tableName="problem"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-122">
+        <addPrimaryKey columnNames="quotationID" constraintName="PRIMARY" tableName="quotation"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-123">
+        <addPrimaryKey columnNames="renDomainID" constraintName="PRIMARY" tableName="rendomain"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-124">
+        <addPrimaryKey columnNames="sec_sectorno" constraintName="PRIMARY" tableName="sector"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-125">
+        <addPrimaryKey columnNames="securityAppID" constraintName="PRIMARY" tableName="securityapp"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-126">
+        <addPrimaryKey columnNames="F1" constraintName="PRIMARY" tableName="service request review_csv"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-127">
+        <addPrimaryKey columnNames="name, sid" constraintName="PRIMARY" tableName="sessions"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-128">
+        <addPrimaryKey columnNames="staffAvailableID" constraintName="PRIMARY" tableName="staffavailable"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-129">
+        <addPrimaryKey columnNames="sup_suppno" constraintName="PRIMARY" tableName="supplier"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-130">
+        <addPrimaryKey columnNames="teamID" constraintName="PRIMARY" tableName="team"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-131">
+        <addPrimaryKey columnNames="teamRoleID" constraintName="PRIMARY" tableName="team_role"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-132">
+        <addPrimaryKey columnNames="userID" constraintName="PRIMARY" tableName="userext"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-133">
+        <addUniqueConstraint columnNames="customerItemDocumentID" constraintName="XPKCustomerItemDocument" tableName="customeritemdocument"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-134">
+        <addUniqueConstraint columnNames="callDocumentID" constraintName="XPKDocument" tableName="calldocument"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-135">
+        <addUniqueConstraint columnNames="cae_callactengno" constraintName="caeix_1" tableName="callactengineer"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-136">
+        <addUniqueConstraint columnNames="cic_cuino, cic_contractcuino" constraintName="cic_cuino" tableName="custitem_contract"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-137">
+        <addUniqueConstraint columnNames="inh_invno" constraintName="ix115_1" tableName="invhead"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-138">
+        <addUniqueConstraint columnNames="deh_desno" constraintName="ix130_1" tableName="deshead"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-139">
+        <addUniqueConstraint columnNames="del_delno" constraintName="ix141_1" tableName="delivery"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-140">
+        <addUniqueConstraint columnNames="poh_porno" constraintName="ix149_1" tableName="porhead"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-141">
+        <addUniqueConstraint columnNames="pay_payno" constraintName="ix178_1" tableName="paymeth"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-142">
+        <addUniqueConstraint columnNames="caa_callactivityno" constraintName="ix354_1" tableName="callactivity"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-143">
+        <addUniqueConstraint columnNames="cat_callacttypeno" constraintName="ix358_1" tableName="callacttype"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-144">
+        <addUniqueConstraint columnNames="ext_expensetypeno" constraintName="ix401_1" tableName="expensetype"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-145">
+        <addUniqueConstraint columnNames="exp_expenseno" constraintName="ix402_1" tableName="expense"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-146">
+        <addUniqueConstraint columnNames="con_contno" constraintName="ix_con2" tableName="contact"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-147">
+        <addUniqueConstraint columnNames="projectID" constraintName="ixcallt_1" tableName="project"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-148">
+        <addUniqueConstraint columnNames="cns_consno" constraintName="ixcns_1" tableName="consultant"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-149">
+        <addUniqueConstraint columnNames="cnt_contno" constraintName="ixcnt_1" tableName="contract"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-150">
+        <addUniqueConstraint columnNames="cui_cuino" constraintName="ixcui_1" tableName="custitem"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-151">
+        <addUniqueConstraint columnNames="cus_custno" constraintName="ixcus_1" tableName="customer"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-152">
+        <addUniqueConstraint columnNames="itm_itemno" constraintName="ixitm_1" tableName="item"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-153">
+        <addUniqueConstraint columnNames="man_manno" constraintName="ixman_1" tableName="manufact"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-154">
+        <addUniqueConstraint columnNames="odh_ordno" constraintName="ixodh_1" tableName="ordhead"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-155">
+        <addUniqueConstraint columnNames="odh_ordno" constraintName="ixodh_1" tableName="ordhead_sco"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-156">
+        <addUniqueConstraint columnNames="stc_stockcat" constraintName="ixstc_1" tableName="stockcat"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-157">
+        <addUniqueConstraint columnNames="ordheadID, versionNo" constraintName="ordhead_ix1" tableName="quotation"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-158">
+        <addUniqueConstraint columnNames="year, month" constraintName="teamID" tableName="team_performance"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-159">
+        <addUniqueConstraint columnNames="userID, loggedDate" constraintName="userID" tableName="user_time_log"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-160">
+        <addUniqueConstraint columnNames="userID, breachDate" constraintName="userID_breachDate" tableName="time_breach"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-161">
+        <addUniqueConstraint columnNames="userID, grantedDate" constraintName="userID_grantedDate" tableName="time_granted"/>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-162">
+        <createIndex indexName="are_custitem" tableName="arecord">
+            <column name="are_custitemno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-163">
+        <createIndex indexName="caa_callacttypeno" tableName="callactivity">
+            <column name="caa_callacttypeno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-164">
+        <createIndex indexName="caa_custno" tableName="callactivity">
+            <column name="caa_custno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-165">
+        <createIndex indexName="caa_date_yearmonth" tableName="callactivity">
+            <column name="caa_date_yearmonth"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-166">
+        <createIndex indexName="caeix_2" tableName="callactengineer">
+            <column name="cae_consno"/>
+            <column name="cae_callactivityno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-167">
+        <createIndex indexName="changed" tableName="sessions">
+            <column name="changed"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-168">
+        <createIndex indexName="contno" tableName="callactivity">
+            <column name="caa_contno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-169">
+        <createIndex indexName="contno" tableName="invhead">
+            <column name="inh_contno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-170">
+        <createIndex indexName="created_by_user_id" tableName="page_view">
+            <column name="created_by_user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-171">
+        <createIndex indexName="cui_custno" tableName="custitem">
+            <column name="cui_custno"/>
+            <column name="renewalStatus"/>
+            <column name="declinedFlag"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-172">
+        <createIndex indexName="cui_itemno" tableName="custitem">
+            <column name="cui_itemno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-173">
+        <createIndex indexName="cus_sectorno" tableName="customer">
+            <column name="cus_sectorno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-174">
+        <createIndex indexName="custno" tableName="invhead">
+            <column name="inh_custno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-175">
+        <createIndex indexName="custno_status" tableName="problem">
+            <column name="pro_custno"/>
+            <column name="pro_status"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-176">
+        <createIndex indexName="customerID" tableName="externalitem">
+            <column name="customerID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-177">
+        <createIndex indexName="customerID" tableName="portal_customer_document">
+            <column name="customerID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-178">
+        <createIndex indexName="date_callacttypeno" tableName="callactivity">
+            <column name="caa_date"/>
+            <column name="caa_callacttypeno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-179">
+        <createIndex indexName="date_starttime_consno" tableName="callactivity">
+            <column name="caa_date"/>
+            <column name="caa_starttime"/>
+            <column name="caa_consno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-180">
+        <createIndex indexName="details_full" tableName="callactivity">
+            <column name="reason"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-181">
+        <createIndex indexName="id_user" tableName="mail_queue">
+            <column name="id_user"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-182">
+        <createIndex indexName="idodl_3" tableName="ordline">
+            <column name="odl_custno"/>
+            <column name="odl_desc"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-183">
+        <createIndex indexName="idxodl_2" tableName="ordline">
+            <column name="odl_suppno"/>
+            <column name="odl_desc"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-184">
+        <createIndex indexName="impotCheck_idx" tableName="automated_request">
+            <column name="importedFlag"/>
+            <column name="importErrorFound"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-185">
+        <createIndex indexName="inh_date_printed" tableName="invhead">
+            <column name="inh_date_printed"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-186">
+        <createIndex indexName="inh_date_printed_yearmonth" tableName="invhead">
+            <column name="inh_date_printed_yearmonth"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-187">
+        <createIndex indexName="inh_type" tableName="invhead">
+            <column name="inh_type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-188">
+        <createIndex indexName="inl_itemno" tableName="invline">
+            <column name="inl_itemno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-189">
+        <createIndex indexName="inl_line_type" tableName="invline">
+            <column name="inl_line_type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-190">
+        <createIndex indexName="internalNotes_full" tableName="callactivity">
+            <column name="internalNotes"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-191">
+        <createIndex indexName="itemTypeID" tableName="externalitem">
+            <column name="itemTypeID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-192">
+        <createIndex indexName="itm_desc" tableName="item">
+            <column name="itm_desc"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-193">
+        <createIndex indexName="itm_itemtypeno" tableName="item">
+            <column name="itm_itemtypeno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-194">
+        <createIndex indexName="ix131_1" tableName="desline">
+            <column name="del_desno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-195">
+        <createIndex indexName="ix132_5" tableName="deshead">
+            <column name="deh_ref_cust"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-196">
+        <createIndex indexName="ix135_6" tableName="deshead">
+            <column name="deh_ref_ecc"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-197">
+        <createIndex indexName="ix_cui2" tableName="custitem">
+            <column name="cui_custno"/>
+            <column name="cui_siteno"/>
+            <column name="cui_cuino"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-198">
+        <createIndex indexName="ix_not1" tableName="notepad">
+            <column name="not_type"/>
+            <column name="not_key"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-199">
+        <createIndex indexName="ix_ordno" tableName="ordline">
+            <column name="odl_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-200">
+        <createIndex indexName="ixcon_1" tableName="contact">
+            <column name="con_custno"/>
+            <column name="con_siteno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-201">
+        <createIndex indexName="ixdeh_1" tableName="deshead">
+            <column name="deh_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-202">
+        <createIndex indexName="ixinh_2" tableName="invhead">
+            <column name="inh_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-203">
+        <createIndex indexName="ixinl_1" tableName="invline">
+            <column name="inl_invno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-204">
+        <createIndex indexName="ixodh_10" tableName="ordhead">
+            <column name="odh_custno"/>
+            <column name="odh_date"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-205">
+        <createIndex indexName="ixodh_2" tableName="ordhead">
+            <column name="odh_type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-206">
+        <createIndex indexName="ixodh_3" tableName="ordhead">
+            <column name="odh_date"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-207">
+        <createIndex indexName="ixodh_4" tableName="ordhead">
+            <column name="odh_custno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-208">
+        <createIndex indexName="ixodh_5" tableName="ordhead">
+            <column name="odh_quotation_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-209">
+        <createIndex indexName="ixodh_6" tableName="ordhead">
+            <column name="odh_ref_cust"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-210">
+        <createIndex indexName="ixodh_7" tableName="ordhead">
+            <column name="odh_custno"/>
+            <column name="odh_type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-211">
+        <createIndex indexName="ixodl_1" tableName="ordline_sco">
+            <column name="odl_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-212">
+        <createIndex indexName="ixpoh_1" tableName="porhead">
+            <column name="poh_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-213">
+        <createIndex indexName="ixpoh_2" tableName="porhead">
+            <column name="poh_suppno"/>
+            <column name="poh_type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-214">
+        <createIndex indexName="ixpoh_3" tableName="porhead">
+            <column name="poh_type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-215">
+        <createIndex indexName="modified_by_user_id" tableName="page_view">
+            <column name="modified_by_user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-216">
+        <createIndex indexName="new_ordheadid" tableName="ordhead_sco">
+            <column name="newOrdheadID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-217">
+        <createIndex indexName="odl_desc_fulltext" tableName="ordline">
+            <column name="odl_desc"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-218">
+        <createIndex indexName="odl_itemno" tableName="ordline">
+            <column name="odl_itemno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-219">
+        <createIndex indexName="odl_itemno" tableName="ordline_sco">
+            <column name="odl_itemno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-220">
+        <createIndex indexName="pas_custno" tableName="password">
+            <column name="pas_custno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-221">
+        <createIndex indexName="paymentTerms" tableName="invhead">
+            <column name="paymentTermsID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-222">
+        <createIndex indexName="paymentTerms" tableName="ordhead">
+            <column name="paymentTermsID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-223">
+        <createIndex indexName="poh_date" tableName="porhead">
+            <column name="poh_date"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-224">
+        <createIndex indexName="pol_itemno" tableName="porline">
+            <column name="pol_itemno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-225">
+        <createIndex indexName="pol_porno" tableName="porline">
+            <column name="pol_porno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-226">
+        <createIndex indexName="pro_alarm_date" tableName="problem">
+            <column name="pro_alarm_date"/>
+            <column name="pro_alarm_time"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-227">
+        <createIndex indexName="pro_critical_flag" tableName="problem">
+            <column name="pro_critical_flag"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-228">
+        <createIndex indexName="pro_custno_idx" tableName="problem">
+            <column name="pro_custno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-229">
+        <createIndex indexName="pro_date_raised" tableName="problem">
+            <column name="pro_date_raised"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-230">
+        <createIndex indexName="pro_fixed_date" tableName="problem">
+            <column name="pro_fixed_date"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-231">
+        <createIndex indexName="pro_internal_notes" tableName="problem">
+            <column name="pro_internal_notes"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-232">
+        <createIndex indexName="pro_linked_ordno" tableName="problem">
+            <column name="pro_linked_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-233">
+        <createIndex indexName="pro_monitor_name" tableName="problem">
+            <column name="pro_monitor_name"/>
+            <column name="pro_monitor_agent_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-234">
+        <createIndex indexName="pro_problemno_cust_no_idx" tableName="problem">
+            <column name="pro_problemno"/>
+            <column name="pro_custno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-235">
+        <createIndex indexName="pro_queue_no" tableName="problem">
+            <column name="pro_queue_no"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-236">
+        <createIndex indexName="pro_status_consno" tableName="problem">
+            <column name="pro_status"/>
+            <column name="pro_consno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-237">
+        <createIndex indexName="problemID" tableName="calldocument">
+            <column name="problemID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-238">
+        <createIndex indexName="problem_callacttypeno" tableName="callactivity">
+            <column name="caa_problemno"/>
+            <column name="caa_callacttypeno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-239">
+        <createIndex indexName="quotationCreateDate" tableName="ordhead">
+            <column name="odh_quotation_create_date"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-240">
+        <createIndex indexName="renewalOrdheadID" tableName="custitem">
+            <column name="renewalOrdheadID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-241">
+        <createIndex indexName="renewalTypeID" tableName="item">
+            <column name="renewalTypeID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-242">
+        <createIndex indexName="senderEmailAddress" tableName="automated_request">
+            <column name="senderEmailAddress"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-243">
+        <createIndex indexName="srq_ordno" tableName="salesrequest">
+            <column name="srq_ordno"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev (generated)" id="1513022273926-244">
+        <createIndex indexName="time_to_send" tableName="mail_queue">
+            <column name="time_to_send"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
