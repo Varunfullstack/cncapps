@@ -2,16 +2,18 @@
 This project changes will be shown here.
 
 ## [unreleased]
+
+
+
+## [1.0.0] - 2017-07-15
+### Fixed
+- Issue 116 - CNC009 - Copy to clipboard button for the passwords
 - Issue 143 - CNC030
 - Issue 115 - CNC008
 - Issue 117 - CNC010
 - Issue 126 - CNC018
 - Issue 133 - CNC025
 - Issue 136 - CNC028
-
-
-## [1.0.0] - 2017-07-15
-### Fixed
 - Issue 139
 - Issue 138
 - Issue 115 - CNC008
