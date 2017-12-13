@@ -8,6 +8,7 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPassword.inc.php');
@@ -70,6 +71,7 @@ class CTPassword extends CTCNC
                 $customerID = $dsSearchForm->getValue('customerID');
 
                 $report = $this->displayList($customerID);
+                exit;
             }
 
         }
