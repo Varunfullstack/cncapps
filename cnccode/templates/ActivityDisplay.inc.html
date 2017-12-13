@@ -74,7 +74,7 @@
                                                         id="toggleIncludeOperationalTasks" value="checkbox"
                                                         onclick="window.location='{urlToggleIncludeOperationalTasks}'"
                                                         {includeOperationalTasksChecked}/><label
-                                        for="includeOperationalTasks">Show Operational Tasks</label>
+                                        for="toggleIncludeOperationalTasks">Show Operational Tasks</label>
                                 </td>
 
                                 <td valign="top"><input type="checkbox" name="checkbox" id="includeServerGuardUpdates"
@@ -202,7 +202,6 @@
     </tr>
     <tr>
         <td>
-            this is the display
             <table class="singleBorder" width="100%">
                 <tr>
                     <td width="29%" class="listHeadText">Description</td>
@@ -224,6 +223,9 @@
                     </td>
                 </tr>
                 <!-- END documentBlock -->
+                <tr style="height: 10px !important;">
+                    <td colspan="5"></td>
+                </tr>
                 <form name="uploadFile" action="{urlUploadFile}" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
                     <!-- max 6 mbyte -->
@@ -261,16 +263,16 @@
                 <!-- BEGIN expenseBlock -->
                 <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
                     <td class="orderLineItem">
-                        <DIV align="left">{expenseType}
+                        <DIV align="left">{expenseType}</DIV>
                     </td>
                     <td class="orderLineItem">
-                        <DIV align="left">{mileage}
+                        <DIV align="left">{mileage}</DIV>
                     </td>
                     <td class="orderLineItem">
-                        <DIV align="left">{value}
+                        <DIV align="left">{value}</DIV>
                     </td>
                     <td class="orderLineItem">
-                        <DIV align="left">{vatFlag}
+                        <DIV align="left">{vatFlag}</DIV>
                     </td>
                 </tr>
                 <!-- END expenseBlock -->
