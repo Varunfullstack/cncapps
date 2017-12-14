@@ -1,0 +1,48 @@
+<html>
+<!-- Service requests fixed the previous day -->
+<head>
+    <style type="text/css">
+        <!--
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+
+        -->
+    </style>
+</head>
+<body>
+<h1>Priority 5 Requests With No Sales Order</h1>
+<table>
+    <tr>
+        <th>Customer</th>
+        <th>Incident No</th>
+        <th>Details</th>
+        <th>Assigned To</th>
+        <th>Open For(days)</th>
+    </tr>
+    <!-- BEGIN requestBlock -->
+    <tr>
+        <td align="center">{customer}</td>
+        <td align="center"><a href="{urlRequest}">{serviceRequestID}</a></td>
+        <td align="center">{description}</td>
+        <td align="center">{assignedTo}</td>
+        <!--<td align="center">{teamName}</td>-->
+        <td align="center">{durationHours}</td>
+        <!--<td align="center">{timeSpentHours}</td>-->
+        <!--<td align="center">{priority}</td>-->
+        <!--<td align="center">{lastUpdatedDate}</td>-->
+    </tr>
+    <!-- END requestBlock -->
+</table>
+</body>
+</html>
+
