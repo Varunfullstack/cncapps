@@ -3,7 +3,8 @@ This project changes will be shown here.
 
 ## [unreleased]
 
-
+## [1.0.1] - 2017-12-14
+- Copy Username in password List.
 
 ## [1.0.0] - 2017-07-15
 ### Fixed
