@@ -618,17 +618,17 @@ class BUDailyReport extends Business
 
     }
 
-    public function p5IncidentsWithoutSalesOrders($daysAgo)
+    public function p5IncidentsWithoutSalesOrders()
     {
         $this->setMethodName('outstandingIncidents');
 
-        $outstandingRequests = $this->getP5IncidentsWithoutSalesOrders($daysAgo);
+        $outstandingRequests = $this->getP5IncidentsWithoutSalesOrders();
 
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
 
-            $template->set_file('page', 'ServiceOutstandingReportEmail.inc.html');
+            $template->set_file('page', 'P5NoSalesReportEmail.inc.html');
 
             $template->set_block('page', 'requestBlock', 'requests');
 
@@ -694,28 +694,16 @@ class BUDailyReport extends Business
 
             } while ($row = $outstandingRequests->fetch_row());
 
-            $template->setVar(
-                array(
-                    'daysAgo' => $daysAgo
-                )
-            );
-
             $template->parse('output', 'page', true);
             $body = $template->get_var('output');
 
             $csvTemplate->parse('output', 'page', true);
             $csvFile = $csvTemplate->get_var('output');
 
-            if ($priorityFiveOnly) {
-                $subject = 'Priority 5';
-            } else {
-                $subject = 'Priority 1-4';
-            }
-
-            $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
+            $subject = 'Priority 5 Requests with no sales Order';
 
             $this->sendByEmailTo(
-                'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
+                ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
                 $subject,
                 $body,
                 $csvFile
@@ -726,74 +714,26 @@ class BUDailyReport extends Business
         }
     }
 
-    private function getP5IncidentsWithoutSalesOrders($daysAgo)
+    private function getP5IncidentsWithoutSalesOrders()
     {
-        $sql =
-            "SELECT 
-        cus_name AS `customer`,
-        pro_problemno AS `requestID`,
-        cns_name AS `assignedTo`,
-        (SELECT 
-          reason 
-        FROM
-          callactivity 
-        WHERE caa_problemno = pro_problemno 
-          AND caa_callacttypeno = 51) AS `description`,
-          
-        DATEDIFF(NOW(),pro_date_raised ) AS `openDays`,
-        pro_total_activity_duration_hours AS `timeSpentHours`,
-
-        last.caa_date as lastUpdatedDate,
-        
-        pro_priority as `priority`,
-        team.name AS teamName
-      FROM
-        problem 
-        JOIN customer 
-          ON cus_custno = pro_custno 
-        LEFT JOIN consultant 
-          ON pro_consno = cns_consno 
-        LEFT JOIN team
-          ON team.teamID = consultant.teamID
-        
-        JOIN callactivity `last`
-            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
-              (
-              SELECT
-                MAX( ca.caa_callactivityno )
-              FROM callactivity ca
-              WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
-            )
-        WHERE
-        
-          DATE(pro_date_raised) <=DATE(
-          DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
-          AND pro_status NOT IN ('F', 'C')";
-        $sql .= " AND pro_priority = 5";
-
-
-        $sql .= "
-        /*
-        Exclude SRs with open future activities
-        */
-        AND
-          (
-            SELECT
-              COUNT(*)
-            FROM
-              callactivity
-            WHERE
-              caa_problemno = pro_problemno
-              AND caa_date > DATE( NOW() )
-              AND caa_endtime = ''
-          ) = 0
-        
-          
-        
-      ORDER BY customer,
-        pro_problemno";
-
+        $sql = "SELECT 
+                  cus_name AS `customer`,
+                  pro_problemno AS `requestID`,
+                  cns_name AS `assignedTo`,
+                  reason,
+                  DATEDIFF(NOW(), pro_date_raised) AS `openDays`
+                FROM
+                  problem 
+                  LEFT JOIN customer 
+                    ON cus_custno = pro_custno 
+                  LEFT JOIN consultant 
+                    ON pro_consno = cns_consno
+                  LEFT JOIN callactivity
+                   ON caa_problemno = pro_problemno AND caa_callacttypeno = 51
+                  WHERE pro_priority = 5
+                  AND pro_status != 'C' 
+                  AND pro_linked_ordno = 0
+                  AND pro_custno != 282";
         return $this->db->query($sql);
     }
 }
