@@ -5,7 +5,7 @@ DM Leter
 require_once("config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
-require_once('HTML/Template/PHPLIB.php');
+require_once('../phplib4/template_PEAR.inc');
 include( $_SERVER['DOCUMENT_ROOT'] . '/fckeditor/fckeditor.php') ;
 GLOBAL $cfg;
 page_open(
