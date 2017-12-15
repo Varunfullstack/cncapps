@@ -5,58 +5,78 @@
  *
  * @package PhpMyAdmin-Setup
  */
+use PMA\libraries\config\FormDisplay;
+use PMA\libraries\URL;
+use PMA\libraries\Response;
 
 /**
  * Processes forms registered in $form_display, handles error correction
  *
- * @param FormDisplay $form_display
+ * @param FormDisplay $form_display Form to display
  *
  * @return void
  */
-function process_formset(FormDisplay $form_display)
+function PMA_Process_formset(FormDisplay $form_display)
 {
-    if (filter_input(INPUT_GET, 'mode') == 'revert') {
+    if (isset($_GET['mode']) && $_GET['mode'] == 'revert') {
         // revert erroneous fields to their default values
         $form_display->fixErrors();
-        // drop post data
-        header('HTTP/1.1 303 See Other');
-        header('Location: index.php');
-        exit;
+        PMA_generateHeader303();
     }
+
     if (!$form_display->process(false)) {
         // handle form view and failed POST
-        $form_display->display(true, true);
-    } else {
-        // check for form errors
-        if ($form_display->hasErrors()) {
-            // form has errors, show warning
-            $separator = PMA_get_arg_separator('html');
-            $page = filter_input(INPUT_GET, 'page');
-            $formset = filter_input(INPUT_GET, 'formset');
-            $formset = $formset ? "{$separator}formset=$formset" : '';
-            $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-            if ($id === null && $page == 'servers') {
-                // we've just added a new server, get it's id
-                $id = ConfigFile::getInstance()->getServerCount();
-            }
-            $id = $id ? "{$separator}id=$id" : '';
-            ?>
-            <div class="error">
-                <h4><?php echo __('Warning') ?></h4>
-                <?php echo __('Submitted form contains errors') ?><br />
-                <a href="?page=<?php echo $page . $formset . $id . $separator ?>mode=revert"><?php echo __('Try to revert erroneous fields to their default values') ?></a>
-            </div>
-            <?php $form_display->displayErrors() ?>
-            <a class="btn" href="index.php"><?php echo __('Ignore errors') ?></a>
-            &nbsp;
-            <a class="btn" href="?page=<?php echo $page . $formset . $id . $separator ?>mode=edit"><?php echo __('Show form') ?></a>
-            <?php
-        } else {
-            // drop post data
-            header('HTTP/1.1 303 See Other');
-            header('Location: index.php');
-            exit;
-        }
+        echo $form_display->getDisplay(true, true);
+        return;
+    }
+
+    // check for form errors
+    if (!$form_display->hasErrors()) {
+        PMA_generateHeader303();
+        return;
+    }
+
+    // form has errors, show warning
+    $page = isset($_GET['page']) ? $_GET['page'] : '';
+    $formset = isset($_GET['formset']) ? $_GET['formset'] : '';
+    $formId = PMA_isValid($_GET['id'], 'numeric') ? $_GET['id'] : '';
+    if ($formId === null && $page == 'servers') {
+        // we've just added a new server, get its id
+        $formId = $form_display->getConfigFile()->getServerCount();
+    }
+    ?>
+    <div class="error">
+        <h4><?php echo __('Warning') ?></h4>
+        <?php echo __('Submitted form contains errors') ?><br />
+        <a href="<?php echo URL::getCommon(array('page' => $page, 'formset' => $formset, 'id' => $formId, 'mode' => 'revert')) ?>">
+            <?php echo __('Try to revert erroneous fields to their default values') ?>
+        </a>
+    </div>
+    <?php echo $form_display->displayErrors() ?>
+    <a class="btn" href="index.php<?php echo URL::getCommon() ?>">
+        <?php echo __('Ignore errors') ?>
+    </a>
+    &nbsp;
+    <a class="btn" href="<?php echo URL::getCommon(array('page' => $page, 'formset' => $formset, 'id' => $formId, 'mode' => 'edit')) ?>">
+        <?php echo __('Show form') ?>
+    </a>
+    <?php
+}
+
+/**
+ * Generate header for 303
+ *
+ * @return void
+ */
+function PMA_generateHeader303()
+{
+    $response = Response::getInstance();
+
+    // drop post data
+    $response->header('HTTP/1.1 303 See Other');
+    $response->header('Location: index.php' . URL::getCommonRaw());
+
+    if (!defined('TESTSUITE')) {
+        exit;
     }
 }
-?>
