@@ -617,4 +617,123 @@ class BUDailyReport extends Business
         echo "SENT";
 
     }
+
+    public function p5IncidentsWithoutSalesOrders()
+    {
+        $this->setMethodName('outstandingIncidents');
+
+        $outstandingRequests = $this->getP5IncidentsWithoutSalesOrders();
+
+        if ($row = $outstandingRequests->fetch_row()) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'P5NoSalesReportEmail.inc.html');
+
+            $template->set_block('page', 'requestBlock', 'requests');
+
+            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $csvTemplate->set_file('page', 'ServiceOutstandingReportEmail.inc.csv');
+
+            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
+
+            do {
+                $urlRequest =
+                    $controller->buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'assignedTo' => $row[2],
+                        'description' => substr(common_stripEverything($row[3]), 0, 50),
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'lastUpdatedDate' => $row[6],
+                        'priority' => $row[7],
+                        'teamName' => $row[8],
+                        'urlRequest' => $urlRequest
+                    )
+                );
+
+                $csvTemplate->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'assignedTo' => $row[2],
+                        'description' => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'durationHours' => $row[4],
+                        'timeSpentHours' => $row[5],
+                        'lastUpdatedDate' => $row[6],
+                        'priority' => $row[7],
+                        'teamName' => $row[8],
+                    )
+                );
+
+                $template->parse('requests', 'requestBlock', true);
+                $csvTemplate->parse('requests', 'requestBlock', true);
+
+            } while ($row = $outstandingRequests->fetch_row());
+
+            $template->parse('output', 'page', true);
+            $body = $template->get_var('output');
+
+            $csvTemplate->parse('output', 'page', true);
+            $csvFile = $csvTemplate->get_var('output');
+
+            $subject = 'Priority 5 Requests with no sales Order';
+
+            $this->sendByEmailTo(
+                ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
+                $subject,
+                $body,
+                $csvFile
+            );
+
+            echo $body;
+
+        }
+    }
+
+    private function getP5IncidentsWithoutSalesOrders()
+    {
+        $sql = "SELECT 
+                  cus_name AS `customer`,
+                  pro_problemno AS `requestID`,
+                  cns_name AS `assignedTo`,
+                  reason,
+                  DATEDIFF(NOW(), pro_date_raised) AS `openDays`
+                FROM
+                  problem 
+                  LEFT JOIN customer 
+                    ON cus_custno = pro_custno 
+                  LEFT JOIN consultant 
+                    ON pro_consno = cns_consno
+                  LEFT JOIN callactivity
+                   ON caa_problemno = pro_problemno AND caa_callacttypeno = 51
+                  WHERE pro_priority = 5
+                  AND pro_status != 'C' 
+                  AND pro_linked_ordno = 0
+                  AND pro_custno != 282";
+        return $this->db->query($sql);
+    }
 }
