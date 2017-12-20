@@ -650,6 +650,8 @@ class BUDailyReport extends Business
                 null
             );
 
+            $title = "P5 SRs with no SO";
+
             do {
                 $urlRequest =
                     $controller->buildLink(
@@ -671,7 +673,8 @@ class BUDailyReport extends Business
                         'lastUpdatedDate' => $row[6],
                         'priority' => $row[7],
                         'teamName' => $row[8],
-                        'urlRequest' => $urlRequest
+                        'urlRequest' => $urlRequest,
+                        'title' => $title
                     )
                 );
 
@@ -700,7 +703,7 @@ class BUDailyReport extends Business
             $csvTemplate->parse('output', 'page', true);
             $csvFile = $csvTemplate->get_var('output');
 
-            $subject = 'Priority 5 Requests with no sales Order';
+            $subject = $title;
 
             $this->sendByEmailTo(
                 ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
@@ -757,6 +760,8 @@ class BUDailyReport extends Business
 
             $csvTemplate->set_block('page', 'requestBlock', 'requests');
 
+            $title = "P5 SRs with SO and not T&M";
+
             $controller = new Controller(
                 '',
                 $nothing,
@@ -784,7 +789,8 @@ class BUDailyReport extends Business
                         'customer' => $row[0],
                         'serviceRequestID' => $row[1],
                         'description' => substr(common_stripEverything($row[2]), 0, 50),
-                        'urlRequest' => $urlRequest
+                        'urlRequest' => $urlRequest,
+                        'title' => $title
                     )
                 );
 
@@ -807,7 +813,7 @@ class BUDailyReport extends Business
             $csvTemplate->parse('output', 'page', true);
             $csvFile = $csvTemplate->get_var('output');
 
-            $subject = 'Priority 5 Requests with sales Order and Contract Assigned';
+            $subject = $title;
 
             $this->sendByEmailTo(
                 ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
