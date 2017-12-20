@@ -1,0 +1,4 @@
+Customer,IncidentNo,Details,AssignedTo,OpenDays
+<!-- BEGIN requestBlock -->
+{customer},{serviceRequestID},{description},{assignedTo},{durationHours}
+<!-- END requestBlock -->

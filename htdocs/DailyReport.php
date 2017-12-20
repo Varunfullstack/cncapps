@@ -28,9 +28,10 @@ switch ($_REQUEST['action']) {
         $buDailyReport->outstandingIncidents($daysAgo, true);
         break;
     case 'p5SRWithoutSalesOrders':
-        $buDailyReport->p5IncidentsWithoutSalesOrders($daysAgo);
+        $buDailyReport->p5IncidentsWithoutSalesOrders();
         break;
-    default :
+    case 'p5SRWithSalesOrdersAndContract':
+        $buDailyReport->p5WithSalesOrderAndContractAssigned();
         break;
 }
 ?>

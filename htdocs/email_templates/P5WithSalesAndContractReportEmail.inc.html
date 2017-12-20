@@ -20,22 +20,18 @@
     </style>
 </head>
 <body>
-<h1>Priority 5 Requests With No Sales Order</h1>
+<h1>Priority 5 Requests With Sales Order And Contract Assigned</h1>
 <table>
     <tr>
         <th>Customer</th>
         <th>Incident No</th>
         <th>Details</th>
-        <th>Assigned To</th>
-        <th>Open For(days)</th>
     </tr>
     <!-- BEGIN requestBlock -->
     <tr>
         <td align="center">{customer}</td>
         <td align="center"><a href="{urlRequest}">{serviceRequestID}</a></td>
         <td align="center">{description}</td>
-        <td align="center">{assignedTo}</td>
-        <td align="center">{durationHours}</td>
     </tr>
     <!-- END requestBlock -->
 </table>

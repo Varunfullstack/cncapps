@@ -2,7 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-- Issue 56 - CNC004
+- Issue 56  - CNC004
+- Issue 149 - Create a Daily Report for P5 with sales orders to be sent to nosales@
 
 ## [1.0.1] - 2017-12-14
 - Copy Username in password List.
