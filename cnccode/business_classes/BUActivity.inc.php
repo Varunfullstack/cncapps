@@ -4332,7 +4332,7 @@ customer with the past 8 hours email to GL
         $dbeProblem->setValue('customerID', $dsOrdhead->getValue('customerID'));
         $dbeProblem->setValue('dateRaised', $dateRaised);
         $dbeProblem->setValue('userID', 0);
-        $dbeProblem->setValue('queueNo', 5);      //Managers
+        $dbeProblem->setValue('queueNo', 3);      //Managers
         $dbeProblem->setValue('rootCauseID', 0);
         $dbeProblem->setValue('status', 'I');
         $dbeProblem->setValue('slaResponseHours', $slaResponseHours);
