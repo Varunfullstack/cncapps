@@ -2,7 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-- Issue 56 - CNC004
+- Issue 125 - CNC017 - New SR from SO to Imt queue
+- Issue 56  - CNC004
 
 ## [1.0.1] - 2017-12-14
 - Copy Username in password List.
