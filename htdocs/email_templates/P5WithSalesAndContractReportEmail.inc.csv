@@ -1,0 +1,4 @@
+Customer,IncidentNo,Details
+<!-- BEGIN requestBlock -->
+{customer},{serviceRequestID},{description}
+<!-- END requestBlock -->

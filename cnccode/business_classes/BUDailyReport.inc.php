@@ -634,7 +634,7 @@ class BUDailyReport extends Business
 
             $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
 
-            $csvTemplate->set_file('page', 'ServiceOutstandingReportEmail.inc.csv');
+            $csvTemplate->set_file('page', 'P5NoSalesReportEmail.inc.csv');
 
             $csvTemplate->set_block('page', 'requestBlock', 'requests');
 
@@ -649,6 +649,8 @@ class BUDailyReport extends Business
                 null,
                 null
             );
+
+            $title = "P5 SRs with no SO";
 
             do {
                 $urlRequest =
@@ -671,7 +673,8 @@ class BUDailyReport extends Business
                         'lastUpdatedDate' => $row[6],
                         'priority' => $row[7],
                         'teamName' => $row[8],
-                        'urlRequest' => $urlRequest
+                        'urlRequest' => $urlRequest,
+                        'title' => $title
                     )
                 );
 
@@ -700,7 +703,7 @@ class BUDailyReport extends Business
             $csvTemplate->parse('output', 'page', true);
             $csvFile = $csvTemplate->get_var('output');
 
-            $subject = 'Priority 5 Requests with no sales Order';
+            $subject = $title;
 
             $this->sendByEmailTo(
                 ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
@@ -734,6 +737,118 @@ class BUDailyReport extends Business
                   AND pro_status != 'C' 
                   AND pro_linked_ordno = 0
                   AND pro_custno != 282";
+        return $this->db->query($sql);
+    }
+
+    public function p5WithSalesOrderAndContractAssigned()
+    {
+        $this->setMethodName('outstandingIncidents');
+
+        $outstandingRequests = $this->getP5WithSalesOrdersAndContractAssigned();
+
+        if ($row = $outstandingRequests->fetch_row()) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'P5WithSalesAndContractReportEmail.inc.html');
+
+            $template->set_block('page', 'requestBlock', 'requests');
+
+            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $csvTemplate->set_file('page', 'P5WithSalesAndContractReportEmail.inc.csv');
+
+            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+
+            $title = "P5 SRs with SO and not T&M";
+
+            $controller = new Controller(
+                '',
+                $nothing,
+                $nothing,
+                $nothing,
+                $nothing,
+                null,
+                null,
+                null,
+                null
+            );
+
+            do {
+                $urlRequest =
+                    $controller->buildLink(
+                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action' => 'displayLastActivity'
+                        )
+                    );
+
+                $template->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'description' => substr(common_stripEverything($row[2]), 0, 50),
+                        'urlRequest' => $urlRequest,
+                        'title' => $title
+                    )
+                );
+
+                $csvTemplate->setVar(
+                    array(
+                        'customer' => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'description' => str_replace(',', '', substr(common_stripEverything($row[2]), 0, 50)),
+                    )
+                );
+
+                $template->parse('requests', 'requestBlock', true);
+                $csvTemplate->parse('requests', 'requestBlock', true);
+
+            } while ($row = $outstandingRequests->fetch_row());
+
+            $template->parse('output', 'page', true);
+            $body = $template->get_var('output');
+
+            $csvTemplate->parse('output', 'page', true);
+            $csvFile = $csvTemplate->get_var('output');
+
+            $subject = $title;
+
+            $this->sendByEmailTo(
+                ' nosalesorder@' . CONFIG_PUBLIC_DOMAIN,
+                $subject,
+                $body,
+                $csvFile
+            );
+
+            echo $body;
+
+        }
+    }
+
+    private function getP5WithSalesOrdersAndContractAssigned()
+    {
+        $sql = "SELECT 
+  cus_name AS `customer`,
+  pro_problemno AS `requestID`,
+  reason
+FROM
+  problem 
+  LEFT JOIN customer 
+    ON cus_custno = pro_custno
+  LEFT JOIN consultant 
+    ON pro_consno = cns_consno 
+  LEFT JOIN callactivity 
+    ON caa_problemno = pro_problemno 
+    AND caa_callacttypeno = 51 
+WHERE pro_priority = 5 
+  AND pro_status = 'F' 
+  AND pro_linked_ordno IS NOT NULL 
+  AND pro_linked_ordno <> 0 
+  AND pro_custno != 282 
+  AND pro_contract_cuino <> 0 
+  AND pro_contract_cuino IS NOT NULL";
         return $this->db->query($sql);
     }
 }
