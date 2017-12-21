@@ -3,6 +3,12 @@ This project changes will be shown here.
 
 ## [unreleased]
 
+## [1.0.2] - 2017-12-21
+- Issue 125 - CNC017 - New SR from SO to Imt queue
+- Issue 56  - CNC004
+- Issue 149 - Create a Daily Report for P5 with sales orders to be sent to nosales@
+- Issue 129 - CNC021
+
 ## [1.0.1] - 2017-12-14
 - Copy Username in password List.
 

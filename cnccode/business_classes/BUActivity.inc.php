@@ -4332,7 +4332,7 @@ customer with the past 8 hours email to GL
         $dbeProblem->setValue('customerID', $dsOrdhead->getValue('customerID'));
         $dbeProblem->setValue('dateRaised', $dateRaised);
         $dbeProblem->setValue('userID', 0);
-        $dbeProblem->setValue('queueNo', 5);      //Managers
+        $dbeProblem->setValue('queueNo', 3);      //Managers
         $dbeProblem->setValue('rootCauseID', 0);
         $dbeProblem->setValue('status', 'I');
         $dbeProblem->setValue('slaResponseHours', $slaResponseHours);
@@ -5751,9 +5751,11 @@ customer with the past 8 hours email to GL
         $initialID = $dbeJCallActivity->getPKValue();
 
         $dbeJCallActivity = $this->getLastActivityInProblem($problemID);
+        $fixedBy = $dbeJCallActivity->getValue('userName');
         $fixSummary = $dbeJCallActivity->getValue('reason');
 
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $initialID;
+
 
         $template->setVar(
             array(
@@ -5762,6 +5764,7 @@ customer with the past 8 hours email to GL
                 'customerName' => $customerName,
                 'fixSummary' => $fixSummary,
                 'urlActivity' => $urlActivity,
+                'fixedBy' => $fixedBy,
                 'CONFIG_SERVICE_REQUEST_DESC'
                 => CONFIG_SERVICE_REQUEST_DESC
 
@@ -5775,7 +5778,7 @@ customer with the past 8 hours email to GL
         $hdrs = array(
             'From' => $senderEmail,
             'To' => $toEmail,
-            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Is Fixed',
+            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By '.$fixedBy ,
             'Date' => date("r")
         );
 
