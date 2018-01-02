@@ -2500,8 +2500,13 @@ class BUActivity extends Business
             $dbeCallActivity->getRow($dbeJCallActivity->getValue('callActivityID'));
             $dbeCallActivity->setValue('status', 'A');
             $dbeCallActivity->updateRow();
-            $this->setProblemToCompleted($dbeJCallActivity->getValue('problemID'));
+
+
         } // end while($dbeJCallActivity->fetchNext())
+
+        foreach ($problemIDArray as $currentProblemID) {
+            $this->setProblemToCompleted($currentProblemID);
+        }
         /*
     Consolidate sales order lines on final order by description/rate
     */
@@ -5778,7 +5783,7 @@ customer with the past 8 hours email to GL
         $hdrs = array(
             'From' => $senderEmail,
             'To' => $toEmail,
-            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By '.$fixedBy ,
+            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By ' . $fixedBy,
             'Date' => date("r")
         );
 
