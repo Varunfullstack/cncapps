@@ -7,7 +7,7 @@
         window.toDate = $('#toDate').get(0);
     });
     var state = 'none'; // display status
-    var savedCustomerString
+    var savedCustomerString;
 
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
@@ -207,11 +207,36 @@
             <td class="promptText">Flagged For Review</td>
             <td>
                 <input
-                        type=checkbox
+                        type="checkbox"
                         name="activity[1][managementReviewOnly]"
                         {managementReviewOnlyChecked}
                         value="Y"
                 >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Individual Activity Spent Time</td>
+            <td>
+                <input
+                        type="text"
+                        name="activity[1][individualActivitySpentTime]"
+                        value="{individualActivitySpentTime}"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Service Request Spent Time</td>
+            <td>
+                <input
+                        type="text"
+                        name="activity[1][serviceRequestSpentTime]"
+                        value="{serviceRequestSpentTime}"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="info style2">Search like 4.5, > 4.5, >= 4.5, < 4.5, <= 4.5 or <> 4.5
             </td>
         </tr>
 
