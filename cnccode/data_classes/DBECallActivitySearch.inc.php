@@ -104,7 +104,7 @@ class DBECallActivitySearch extends DBEntity
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
             "
-            , (TIME_TO_SEC('16:26') - TIME_TO_SEC('16:21'))/3600 as callActivitySpentTime
+            
             FROM
           callactivity 
           LEFT JOIN callacttype 
@@ -201,14 +201,14 @@ class DBECallActivitySearch extends DBEntity
             $whereParameters .=
                 " and pro_total_activity_duration_hours " . mysqli_real_escape_string($this->db->link_id(), $serviceRequestSpentTime);
         }
-        
-        if($individualActivitySpentTime != '' && $this->testSpentTimeSearchString($individualActivitySpentTime)){
+
+        if ($individualActivitySpentTime != '' && $this->testSpentTimeSearchString($individualActivitySpentTime)) {
             if (preg_match('/^\d/', $individualActivitySpentTime) === 1) {
                 $individualActivitySpentTime = '= ' . $individualActivitySpentTime;
             }
 
             $whereParameters .=
-                " and callActivitySpentTime " . mysqli_real_escape_string($this->db->link_id(), $individualActivitySpentTime);
+                " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string($this->db->link_id(), $individualActivitySpentTime);
         }
 
         if ($project != '') {
@@ -343,8 +343,6 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
-
-        var_dump($statement);
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());
