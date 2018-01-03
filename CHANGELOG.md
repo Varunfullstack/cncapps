@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
 - Issue 151 - T&M Authorisation Process Error
 
 ## [1.0.2] - 2017-12-21
