@@ -73,7 +73,7 @@ class DBECallActivitySearch extends DBEntity
             return true;
         }
 
-        return preg_match("/((\d+\.?\d+)|= |< |<= |> |>= |<> )(\d+.?\d+)/", $timeSpentString);
+        return preg_match("/((\d+(\.?\d+)?)|=|<|<=|>|>=|<>)\s*(\d+(\.?\d+)?)/", $timeSpentString);
     }
 
     function getRowsBySearchCriteria(
@@ -194,6 +194,7 @@ class DBECallActivitySearch extends DBEntity
         }
 
         if ($serviceRequestSpentTime != '' && $this->testSpentTimeSearchString($serviceRequestSpentTime)) {
+
             if (preg_match('/^\d/', $serviceRequestSpentTime) === 1) {
                 $serviceRequestSpentTime = '= ' . $serviceRequestSpentTime;
             }
@@ -343,7 +344,6 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;
