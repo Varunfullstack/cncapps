@@ -156,6 +156,8 @@ class BUActivity extends Business
         $dsData->addColumn('priority', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('customerName', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('activityText', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('serviceRequestSpentTime', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('individualActivitySpentTime', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
         $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
         $dsData->addColumn('callActivityID', DA_STRING, DA_ALLOW_NULL);
@@ -165,6 +167,7 @@ class BUActivity extends Business
         $dsData->addColumn('linkedSalesOrderID', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('managementReviewOnly', DA_YN, DA_ALLOW_NULL);
         $dsData->addColumn('breachedSlaOption', DA_STRING, DA_ALLOW_NULL);
+
 
         $dsData->setValue('customerID', '');
         $dsData->setValue('project', '');
@@ -190,6 +193,8 @@ class BUActivity extends Business
         $dsData->setValue('customerID', '');
     }
 
+
+
     function search(
         &$dsSearchForm,
         &$dsResults,
@@ -208,6 +213,8 @@ class BUActivity extends Business
             trim($dsSearchForm->getValue('rootCauseID')),
             trim($dsSearchForm->getValue('priority')),
             trim($dsSearchForm->getValue('activityText')),
+            trim($dsSearchForm->getValue('serviceRequestSpentTime')),
+            trim($dsSearchForm->getValue('individualActivitySpentTime')),
             trim($dsSearchForm->getValue('fromDate')),
             trim($dsSearchForm->getValue('toDate')),
             trim($dsSearchForm->getValue('contractCustomerItemID')),

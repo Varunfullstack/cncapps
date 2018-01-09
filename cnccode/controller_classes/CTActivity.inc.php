@@ -542,6 +542,8 @@ class CTActivity extends CTCNC
                 'problemIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('problemID')),
                 'callActivityID' => Controller::htmlDisplayText($dsSearchForm->getValue('callActivityID')),
                 'callActivityIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('callActivityID')),
+                'serviceRequestSpentTime' => Controller::htmlDisplayText($dsSearchForm->getValue('serviceRequestSpentTime')),
+                'individualActivitySpentTime' => Controller::htmlDisplayText($dsSearchForm->getValue('individualActivitySpentTime')),
                 'activityText' => Controller::htmlDisplayText($dsSearchForm->getValue('activityText')),
                 'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
                 'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),

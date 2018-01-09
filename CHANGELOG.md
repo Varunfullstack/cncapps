@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 120 - CNC013 - Allow searching for activities based on time spent
 - Issue 151 - T&M Authorisation Process Error
 
 ## [1.0.2] - 2017-12-21
