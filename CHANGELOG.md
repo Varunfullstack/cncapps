@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 164 - Create a system where a log of the scheduled tasks runs are located
 - Issue 120 - CNC013 - Allow searching for activities based on time spent
 - Issue 151 - T&M Authorisation Process Error
 
