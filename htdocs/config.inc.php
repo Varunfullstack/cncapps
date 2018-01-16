@@ -1,11 +1,6 @@
 <?php
 date_default_timezone_set('Europe/London');
 
-
-$dat = getrusage();
-define('PHP_TUSAGE', microtime(true));
-define('PHP_RUSAGE', $dat["ru_utime.tv_sec"] * 1e6 + $dat["ru_utime.tv_usec"]);
-
 ini_set('memory_limit', '8192M');
 /**
  * Configuration settings.

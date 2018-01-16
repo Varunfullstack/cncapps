@@ -9,18 +9,18 @@
     <changeSet id="issue164-1516109244-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="task-log"/>
+                <tableExists tableName="taskLog"/>
             </not>
         </preConditions>
-        <createTable tableName="task-log">
+        <createTable tableName="taskLog">
             <column type="bigint" name="id" autoIncrement="true">
                 <constraints primaryKey="true" unique="true"/>
             </column>
             <column type="text" name="description"/>
-            <column type="DATETIME" name="start"/>
-            <column type="DATETIME" name="end"/>
-            <column type="decimal(5,2)"  name="max-cpu-usage"/>
-            <column type="" name="max-memory-usage"/>
+            <column type="DATETIME" name="startedAt"/>
+            <column type="DATETIME" name="finishedAt"/>
+            <column type="decimal(5,2)"  name="maxCpuUsage"/>
+            <column type="bigint" name="maxMemoryUsage"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
