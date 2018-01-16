@@ -43,7 +43,7 @@ class DBEntity extends DataAccess
     var $db = "";            // Initialised PHPLib database object
     var $queryString = "";// SQL query statement
     var $tableName = "";    // RDBMS table name
-    var $showSQL = FALSE;    // For debug puposes - TRUE causes all SQL statements to be output
+    var $showSQL = true;    // For debug puposes - TRUE causes all SQL statements to be output
     // MUST be N in production systems!!!
     var $logSQL = FALSE;    // For debug puposes - TRUE causes all SQL statements to be output
     var $rowBefore = '';        // For comparison during update
@@ -600,6 +600,7 @@ class DBEntity extends DataAccess
     /**
      * Return all rows from DB
      * @access public
+     * @param string $sortColumn
      * @return bool Success
      */
     function getRows($sortColumn = '')

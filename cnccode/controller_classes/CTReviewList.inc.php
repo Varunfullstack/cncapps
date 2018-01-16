@@ -57,7 +57,7 @@ class CTReviewList extends CTCNC
 
                 $linkURL =
                     $this->buildLink(
-                        'Customer.php',
+                        'CustomerCRM.php',
                         array(
                             'action' => 'displayEditForm',
                             'customerID' => $dsCustomer->getValue('customerID')

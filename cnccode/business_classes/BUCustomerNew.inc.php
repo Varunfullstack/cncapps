@@ -15,11 +15,11 @@ define('BUCUSTOMER_NAME_STR_NT_PASD', 'No name string passed');
 
 class BUCustomer extends Business
 {
-    var $dbeCustomer = "";
-    var $dbeSite = "";
-    var $dbeContact = "";
-    var $dbeCustomerType = "";
-    var $dsHeader = '';
+    protected $dbeCustomer;
+    protected $dbeSite;
+    protected $dbeContact;
+    protected $dbeCustomerType;
+    protected $dsHeader;
 
     /**
      * Constructor
