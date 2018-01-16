@@ -57,8 +57,8 @@ class Business extends BaseObject
 
     /**
      * Get all rows from a data access object into a dataset
-     * @param Database &$Source Data access object
-     * @param DataSet &$Destinantion Set of data
+     * @param $dbSource
+     * @param $dsDestination
      * @return bool
      * @access private
      */

@@ -7,6 +7,9 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomer extends DBCNCEntity
 {
+    const CustomerLeadStatusID = "CustomerLeadStatusID";
+    const DateMeetingConfirmed = 'DateMeetingConfirmed';
+
     /**
      * calls constructor()
      * @access public
@@ -60,7 +63,8 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn("lastReviewMeetingDate", DA_DATE, DA_ALLOW_NULL, 'cus_last_review_meeting_date');
         $this->addColumn("reviewMeetingEmailSentFlag", DA_YN, DA_ALLOW_NULL, 'cus_review_meeting_email_sent_flag');
         $this->addColumn("accountManagerUserID", DA_ID, DA_ALLOW_NULL, "cus_account_manager_consno");
-
+        $this->addColumn(self::CustomerLeadStatusID, DA_ID, DA_ALLOW_NULL, "customer_lead_status_id");
+        $this->addColumn(self::DateMeetingConfirmed, DA_DATE, DA_ALLOW_NULL, 'date_meeting_confirmed');
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

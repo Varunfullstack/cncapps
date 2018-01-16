@@ -29,20 +29,6 @@ class BUCNC extends Business
      */
     function getData(&$dbSource, &$dsDestination)
     {
-        /*
-                if (!is_object($dsDestination)){
-                    $dsDestination=new Dataset($this);
-                }
-                else{
-                    if (
-                        (get_class($dsDestination)!=DA_CLASSNAME_DATASET)&
-                        (!is_subclass_of($dsDestination, DA_CLASSNAME_DATASET))
-                    ){
-                        $this->raiseError("dsDestination must be subclass or class of ".
-                            DA_CLASSNAME_DATASET);
-                    }
-                }
-        */
         if (gettype($dbSource) != "object")
             $this->raiseError("dbSource is not initialised");
         if (!is_subclass_of($dbSource, DA_CLASSNAME_DBENTITY))
