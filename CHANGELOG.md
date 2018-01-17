@@ -2,9 +2,11 @@
 This project changes will be shown here.
 
 ## [unreleased]
+
+## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
-- Issue 120 - CNC013 - Allow searching for activities based on time spent
 - Issue 151 - T&M Authorisation Process Error
+- Issue 120 - CNC013 - Allow searching for activities based on time spent
 
 ## [1.0.2] - 2017-12-21
 - Issue 125 - CNC017 - New SR from SO to Imt queue
