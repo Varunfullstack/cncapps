@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue164-1516109244-0">
+        <tagDatabase tag="issue164"/>
+    </changeSet>
+    <changeSet id="issue164-1516109244-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="taskLog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="taskLog">
+            <column type="bigint" name="id" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column type="text" name="description"/>
+            <column type="DATETIME" name="startedAt"/>
+            <column type="DATETIME" name="finishedAt"/>
+            <column type="decimal(5,2)"  name="maxCpuUsage"/>
+            <column type="bigint" name="maxMemoryUsage"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

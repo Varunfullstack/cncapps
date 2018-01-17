@@ -67,6 +67,14 @@ class DBECallActivitySearch extends DBEntity
         $this->setAddColumnsOff();
     }
 
+    private function testSpentTimeSearchString($timeSpentString)
+    {
+        if ($timeSpentString == '') {
+            return true;
+        }
+
+        return preg_match("/((\d+(\.?\d+)?)|=|<|<=|>|>=|<>)\s*(\d+(\.?\d+)?)/", $timeSpentString);
+    }
 
     function getRowsBySearchCriteria(
         $callActivityID,
@@ -78,6 +86,8 @@ class DBECallActivitySearch extends DBEntity
         $rootCauseID,
         $priority,
         $activityText,
+        $serviceRequestSpentTime,
+        $individualActivitySpentTime,
         $fromDate,                        // raised dates
         $toDate,
         $contractCustomerItemID,
@@ -93,7 +103,9 @@ class DBECallActivitySearch extends DBEntity
         $this->setMethodName('getRowsBySearchCriteria');
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM
+            "
+            
+            FROM
           callactivity 
           LEFT JOIN callacttype 
             ON caa_callacttypeno = cat_callacttypeno 
@@ -179,6 +191,25 @@ class DBECallActivitySearch extends DBEntity
 					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE)
           OR MATCH (pro_internal_notes)
           AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE) )";
+        }
+
+        if ($serviceRequestSpentTime != '' && $this->testSpentTimeSearchString($serviceRequestSpentTime)) {
+
+            if (preg_match('/^\d/', $serviceRequestSpentTime) === 1) {
+                $serviceRequestSpentTime = '= ' . $serviceRequestSpentTime;
+            }
+
+            $whereParameters .=
+                " and pro_total_activity_duration_hours " . mysqli_real_escape_string($this->db->link_id(), $serviceRequestSpentTime);
+        }
+
+        if ($individualActivitySpentTime != '' && $this->testSpentTimeSearchString($individualActivitySpentTime)) {
+            if (preg_match('/^\d/', $individualActivitySpentTime) === 1) {
+                $individualActivitySpentTime = '= ' . $individualActivitySpentTime;
+            }
+
+            $whereParameters .=
+                " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string($this->db->link_id(), $individualActivitySpentTime);
         }
 
         if ($project != '') {
@@ -313,7 +344,6 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;

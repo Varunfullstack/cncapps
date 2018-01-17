@@ -156,6 +156,8 @@ class BUActivity extends Business
         $dsData->addColumn('priority', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('customerName', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('activityText', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('serviceRequestSpentTime', DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn('individualActivitySpentTime', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
         $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
         $dsData->addColumn('callActivityID', DA_STRING, DA_ALLOW_NULL);
@@ -165,6 +167,7 @@ class BUActivity extends Business
         $dsData->addColumn('linkedSalesOrderID', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('managementReviewOnly', DA_YN, DA_ALLOW_NULL);
         $dsData->addColumn('breachedSlaOption', DA_STRING, DA_ALLOW_NULL);
+
 
         $dsData->setValue('customerID', '');
         $dsData->setValue('project', '');
@@ -190,6 +193,8 @@ class BUActivity extends Business
         $dsData->setValue('customerID', '');
     }
 
+
+
     function search(
         &$dsSearchForm,
         &$dsResults,
@@ -208,6 +213,8 @@ class BUActivity extends Business
             trim($dsSearchForm->getValue('rootCauseID')),
             trim($dsSearchForm->getValue('priority')),
             trim($dsSearchForm->getValue('activityText')),
+            trim($dsSearchForm->getValue('serviceRequestSpentTime')),
+            trim($dsSearchForm->getValue('individualActivitySpentTime')),
             trim($dsSearchForm->getValue('fromDate')),
             trim($dsSearchForm->getValue('toDate')),
             trim($dsSearchForm->getValue('contractCustomerItemID')),
@@ -2500,8 +2507,13 @@ class BUActivity extends Business
             $dbeCallActivity->getRow($dbeJCallActivity->getValue('callActivityID'));
             $dbeCallActivity->setValue('status', 'A');
             $dbeCallActivity->updateRow();
-            $this->setProblemToCompleted($dbeJCallActivity->getValue('problemID'));
+
+
         } // end while($dbeJCallActivity->fetchNext())
+
+        foreach ($problemIDArray as $currentProblemID) {
+            $this->setProblemToCompleted($currentProblemID);
+        }
         /*
     Consolidate sales order lines on final order by description/rate
     */
@@ -5778,7 +5790,7 @@ customer with the past 8 hours email to GL
         $hdrs = array(
             'From' => $senderEmail,
             'To' => $toEmail,
-            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By '.$fixedBy ,
+            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By ' . $fixedBy,
             'Date' => date("r")
         );
 
