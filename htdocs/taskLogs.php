@@ -43,6 +43,7 @@ $result = $statement->fetchAll(PDO::FETCH_ASSOC);
             <td>Description</td>
             <td>Started At</td>
             <td>Finished At</td>
+            <td>Elapsed Time</td>
             <td>Max CPU Usage %</td>
             <td>Max Memory Usage Bytes</td>
         </tr>
@@ -56,6 +57,11 @@ $result = $statement->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= $datum['description'] ?></td>
                 <td><?= $datum['startedAt'] ?></td>
                 <td><?= $datum['finishedAt'] ?></td>
+                <td><?php
+                    $datetime1 = strtotime($datum['startedAt']);
+                    $datetime2 = strtotime($datum['finishedAt']);
+                    echo($datetime2 - $datetime1)
+                    ?></td>
                 <td><?= $datum['maxCpuUsage'] ?></td>
                 <td><?= $datum['maxMemoryUsage'] ?></td>
             </tr>
