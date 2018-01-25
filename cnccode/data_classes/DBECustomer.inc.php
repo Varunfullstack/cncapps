@@ -9,6 +9,16 @@ class DBECustomer extends DBCNCEntity
 {
     const CustomerLeadStatusID = "CustomerLeadStatusID";
     const DateMeetingConfirmed = 'DateMeetingConfirmed';
+    const MeetingDateTime = 'MeetingDateTime';
+    const InviteSent = 'InviteSent';
+    const ReportProcessed = 'ReportProcessed';
+    const ReportSent = 'ReportSent';
+    const CrmComments = 'CrmComments';
+    const CompanyBackground = 'CompanyBackground';
+    const DecisionMakerBackground = 'DecisionMakerBackground';
+    const OpportunityDeal = 'OpportunityDeal';
+    const Rating = 'Rating';
+
 
     /**
      * calls constructor()
@@ -65,6 +75,15 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn("accountManagerUserID", DA_ID, DA_ALLOW_NULL, "cus_account_manager_consno");
         $this->addColumn(self::CustomerLeadStatusID, DA_ID, DA_ALLOW_NULL, "customer_lead_status_id");
         $this->addColumn(self::DateMeetingConfirmed, DA_DATE, DA_ALLOW_NULL, 'date_meeting_confirmed');
+        $this->addColumn(self::MeetingDateTime, DA_DATETIME, DA_ALLOW_NULL, 'meeting_datetime');
+        $this->addColumn(self::InviteSent, DA_BOOLEAN, DA_NOT_NULL, "invite_sent");
+        $this->addColumn(self::ReportProcessed, DA_BOOLEAN, DA_NOT_NULL, "report_processed");
+        $this->addColumn(self::ReportSent, DA_BOOLEAN, DA_NOT_NULL, "report_sent");
+        $this->addColumn(self::CrmComments, DA_STRING, DA_ALLOW_NULL, "crm_comments");
+        $this->addColumn(self::CompanyBackground, DA_STRING, DA_ALLOW_NULL, "company_background");
+        $this->addColumn(self::DecisionMakerBackground, DA_STRING, DA_ALLOW_NULL, "decision_maker_background");
+        $this->addColumn(self::OpportunityDeal, DA_STRING, DA_ALLOW_NULL, "opportunity_deal");
+        $this->addColumn(self::Rating, DA_INTEGER, DA_ALLOW_NULL, "rating");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

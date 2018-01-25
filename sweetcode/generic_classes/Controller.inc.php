@@ -105,6 +105,14 @@ class Controller extends BaseObject
         $this->setFormErrorOff();
     }
 
+    public static function dateToISO($getValue)
+    {
+        $date = new \DateTime($getValue);
+
+        return $date->format("Y-m-d\TH:i:s");
+
+    }
+
     /**
      * Set document output type
      * @param string $documentType The type of document to return

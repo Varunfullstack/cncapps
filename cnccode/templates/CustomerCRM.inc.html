@@ -1,12 +1,12 @@
 <!-- Template: CustomerEdit.inc.html -->
 <script language='JavaScript' src='.javascript/ajax.js'></script>
+<script src="ckeditor/ckeditor.js"></script>
 <script type="text/JavaScript">
 
     $(function () {
         window.specialAttentionEndDate = $('#specialAttentionEndDate').get(0);
         window.lastReviewMeetingDate = $('#lastReviewMeetingDate').get(0);
         window.reviewDate = $('#reviewDate').get(0);
-        window.dateMeetingConfirmed = $('#dateMeetingConfirmed').get(0);
         window.meetingDate = $('#meetingDate').get(0);
     });
     window.onbeforeunload = bunload;
@@ -767,55 +767,90 @@
                value="Y" {mailshotFlagChecked}/>
     </div>
     <div>
-
+        <label for="dateMeetingConfirmed" class="content">Date Meeting Confirmed</label>
         <input
                 {disabled}
-                type="text"
+                type="date"
                 name="form[customer][{customerID}][dateMeetingConfirmedDate]"
                 id="dateMeetingConfirmed"
                 value="{dateMeetingConfirmedDate}"
-                size="10"
-                maxlength="10"
         >
-        <a
-                href="javascript:;"
-                onClick="popUpCalendar(this, dateMeetingConfirmed, 'dd/mm/yyyy')">
-            <img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            > </a>
     </div>
     <div>
-
+        <label for="meetingDateTime" class="content">
+            Meeting Date
+        </label>
         <input
                 {disabled}
-                type="text"
-                name="form[customer][{customerID}][meetingDate]"
-                id="meetingDate"
-                value="{meetingDate}"
+                type="datetime-local"
+                name="form[customer][{customerID}][meetingDateTime]"
+                id="meetingDateTime"
+                value="{meetingDateTime}"
                 size="10"
                 maxlength="10"
         >
-        <a
-                href="javascript:;"
-                onClick="popUpCalendar(this, dateMeetingConfirmed, 'dd/mm/yyyy')">
-            <img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            > </a>
+    </div>
+    <div>
+        <div class="content">Invite Sent</div>
+        <input type="checkbox" name="form[customer][{customerID}][InviteSent]"
+               value="Y" {InviteSent}/>
+    </div>
+    <div>
+        <div class="content">Report Processed</div>
+        <input type="checkbox" name="form[customer][{customerID}][ReportProcessed]"
+               value="Y" {ReportProcessed}/>
+    </div>
+    <div>
+        <div class="content">Report Sent</div>
+        <input type="checkbox" name="form[customer][{customerID}][ReportSent]"
+               value="Y" {ReportSent}/>
+    </div>
+    <div>
+        <div class="content">
+            Comments
+        </div>
+        <textarea name="form[customer][{customerID}][CrmComments]" id="crmComments">{CrmComments}</textarea>
+        <script type="text/javascript">
+            reason = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
+        </script>
+    </div>
+    <div>
+        <div class="content">
+            Company Background
+        </div>
+        <textarea name="form[customer][{customerID}][CompanyBackground]"
+                  id="CompanyBackground">{CompanyBackground}</textarea>
+        <script type="text/javascript">
+            reason = CKEDITOR.replace('CompanyBackground', {customConfig: '/ckeditor_config.js'});
+        </script>
+    </div>
+    <div>
+        <div class="content">
+            Decision Maker Background
+        </div>
+        <textarea name="form[customer][{customerID}][DecisionMakerBackground]"
+                  id="DecisionMakerBackground">{DecisionMakerBackground}</textarea>
+        <script type="text/javascript">
+            reason = CKEDITOR.replace('DecisionMakerBackground', {customConfig: '/ckeditor_config.js'});
+        </script>
+    </div>
+    <div>
+        <div class="content">
+            Opportunity Deal
+        </div>
+        <textarea name="form[customer][{customerID}][OpportunityDeal]"
+                  id="OpportunityDeal">{OpportunityDeal}</textarea>
+        <script type="text/javascript">
+            reason = CKEDITOR.replace('OpportunityDeal', {customConfig: '/ckeditor_config.js'});
+        </script>
     </div>
 
-
+    <div>
+        <div class="content">
+            Rating
+        </div>
+        <input type="number" value="{Rating}" name="form[customer][{customerID}][Rating]">
+    </div>
 
     <input {disabled} type="submit" name="Go" value="Save">
 
