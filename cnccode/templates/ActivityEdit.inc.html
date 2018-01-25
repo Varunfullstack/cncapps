@@ -125,6 +125,7 @@
                     onchange="setFormChanged();"
                     id="contractID"
                     name="callActivity[1][callActTypeID]"
+                    required
             >
                 <option value="">Please Select</option>
                 <!-- BEGIN activityTypeBlock -->
@@ -154,19 +155,18 @@
         </tr>
         <tr>
             <td class="promptText">Contact</td>
-            <td class="mainHeadText"><select
-                    name="callActivity[1][contactID]"
-            >
+            <td class="mainHeadText">
+                <select name="callActivity[1][contactID]" required>
 
-                <option value="">Please Select</option>
-                <!-- BEGIN contactBlock -->
-                {optGroupOpen}
-                <option {contactSelected} value="{contactID}">{startMainContactStyle} {contactName}
-                    {endMainContactStyle}
-                </option>
-                {optGroupClose}
-                <!-- END contactBlock -->
-            </select>
+                    <option value="">Please Select</option>
+                    <!-- BEGIN contactBlock -->
+                    {optGroupOpen}
+                    <option {contactSelected} value="{contactID}">{startMainContactStyle} {contactName}
+                        {endMainContactStyle}
+                    </option>
+                    {optGroupClose}
+                    <!-- END contactBlock -->
+                </select>
                 {contactPhone}<span class="formErrorMessage">{contactIDMessage}</span>
             </td>
             <td colspan="2" style="color: red;">
@@ -239,6 +239,7 @@
                     {PRIORITY_DISABLED}
                     id="priority"
                     name="callActivity[1][priority]"
+                    required
             >
                 <option value="">Please Select</option>
                 <!-- BEGIN priorityBlock -->
@@ -255,6 +256,7 @@
                 <select
                         name="callActivity[1][userID]"
                         onchange="setFormChanged();"
+                        required
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN userBlock -->
