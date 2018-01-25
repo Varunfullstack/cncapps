@@ -39,6 +39,8 @@
             (11, 'Not Interested'),
             (12, 'Do Not Call' )
         </sql>
+        <rollback>
+        </rollback>
     </changeSet>
     <changeSet id="Issue112-1515523724-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
