@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 122 - CNC015 - Check activity length and flag if remote support and under 5 minutes
 
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
