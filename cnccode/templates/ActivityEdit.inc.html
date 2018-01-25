@@ -192,8 +192,7 @@
         <tr>
             <td class="promptText">Site</td>
             <td class="fieldText">
-                <select
-                        name="callActivity[1][siteNo]">
+                <select name="callActivity[1][siteNo]" required>
                     <option value="">Please Select</option>
                     <!-- BEGIN siteBlock -->
                     <option {siteSelected} value="{siteNo}">{siteDesc}</option>
@@ -564,7 +563,7 @@
          No timer for priority 5
          */
         if (
-            ( '{problemStatus}' == 'I' | '{problemStatus}' == 'P' ) &
+            ('{problemStatus}' == 'I' | '{problemStatus}' == 'P') &
 
             {hiddenPriority} < 5 &
 
