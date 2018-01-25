@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 130 - CNC022 - Include Internal Notes that are saved with SSL auto renewals in the service request that’s created.
 
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
