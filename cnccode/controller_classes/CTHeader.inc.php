@@ -237,7 +237,9 @@ class CTHeader extends CTCNC
                 'remoteSupportWarnHours' => Controller::htmlInputText($dsHeader->getValue('remoteSupportWarnHours')),
 
                 'remoteSupportWarnHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('remoteSupportWarnHours')),
+                DBEHeader::RemoteSupportMinWarnHours => Controller::htmlInputText($dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours)),
 
+                DBEHeader::RemoteSupportMinWarnHours . 'Message' => Controller::htmlDisplayText($dsHeader->getMessage(DBEHeader::RemoteSupportMinWarnHours)),
 
                 'urlItemPopup' => $urlItemPopup,
                 'urlUpdate' => $urlUpdate

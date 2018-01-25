@@ -1,829 +1,854 @@
 <!-- Template: HeaderEdit.inc.html -->
 <script language='JavaScript'>
-  function validateItemDescription(){
-    if ( Trim(document.getElementById("gscItemDescription").value) != "" ){
-      window.open('{urlItemPopup}&itemDescription=' +
-        escape(document.getElementById("gscItemDescription").value) +
-        '&parentIDField=gscItemID' +
-        '&parentDescField=gscItemDescription',
-        'items','scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0'
-      )
+    function validateItemDescription() {
+        if (Trim(document.getElementById("gscItemDescription").value) != "") {
+            window.open('{urlItemPopup}&itemDescription=' +
+                escape(document.getElementById("gscItemDescription").value) +
+                '&parentIDField=gscItemID' +
+                '&parentDescField=gscItemDescription',
+                'items', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0'
+            )
+        }
     }
-  }
 </script>
-<FORM  method="post" action="{urlUpdate}" name="header" AUTOCOMPLETE="OFF">
-  <input
-    name="header[1][headerID]"
-    type="hidden" value="{headerID}"
+<FORM method="post" action="{urlUpdate}" name="header" AUTOCOMPLETE="OFF">
+    <input
+            name="header[1][headerID]"
+            type="hidden" value="{headerID}"
     >
-  <table width="700px" border="0">
-    <tr> 
-      <td class="promptText">Company Name</td>
-      <td class="fieldText"> <input
-          name="header[1][name]"
-          type="text" value="{name}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{nameMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td width="20%" class="promptText">Address</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][add1]"
-          value="{add1}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{add1Message}</span> </td>
-    </tr>
-    <tr> 
-      <td>&nbsp;</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][add2]"
-          value="{add2}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{add2Message}</span> </td>
-    </tr>
-    <tr> 
-      <td>&nbsp;</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][add3]"
-          value="{add3}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{add3Message}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Town</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][town]"
-          value="{town}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{townMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">County</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][county]"
-          value="{county}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{countyMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Postcode</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][postcode]"
-          value="{postcode}"
-          size="20"
-          maxlength="20"
-        > <span class="formErrorMessage">{postcodeMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Phone</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][phone]"
-          value="{phone}"
-          size="20"
-          maxlength="20"
-        > <span class="formErrorMessage">{phoneMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Fax</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][fax]"
-          value="{fax}"
-          size="20"
-          maxlength="20"
-        > <span class="formErrorMessage">{faxMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Goods Contact</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][goodsContact]"
-          value="{goodsContact}"
-          size="20"
-          maxlength="20"
-        > <span class="formErrorMessage">{goodsContactMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Standard VAT Code</td>
-      <td class="field"> <select
-        type="text"
-        name="header[1][stdVATCode]"
-        >
-        <!-- BEGIN vatCodeBlock -->
-        <option {vatCodeSelected} value="{vatCode}">{vatCode}</option>
-        <!-- END vatCodeBlock -->
-      </select> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Billing Start Time</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][billingStartTime]"
-          value="{billingStartTime}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{billingStartTimeMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Billing End Time</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][billingEndTime]"
-          value="{billingEndTime}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{billingEndTimeMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Helpdesk Start Time</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][helpdeskStartTime]"
-          value="{helpdeskStartTime}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{helpdeskStartTimeMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Helpdesk End Time</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][helpdeskEndTime]"
-          value="{helpdeskEndTime}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{helpdeskEndTimeMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Project Start Time</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][projectStartTime]"
-          value="{projectStartTime}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{projectStartTimeMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Project End Time</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][projectEndTime]"
-          value="{projectEndTime}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{projectEndTimeMessage}</span> </td>
-    </tr>
+    <table width="700px" border="0">
+        <tr>
+            <td class="promptText">Company Name</td>
+            <td class="fieldText"><input
+                    name="header[1][name]"
+                    type="text" value="{name}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{nameMessage}</span></td>
+        </tr>
+        <tr>
+            <td width="20%" class="promptText">Address</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][add1]"
+                    value="{add1}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{add1Message}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][add2]"
+                    value="{add2}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{add2Message}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][add3]"
+                    value="{add3}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{add3Message}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Town</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][town]"
+                    value="{town}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{townMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">County</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][county]"
+                    value="{county}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{countyMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Postcode</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][postcode]"
+                    value="{postcode}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{postcodeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Phone</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][phone]"
+                    value="{phone}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{phoneMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Fax</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][fax]"
+                    value="{fax}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{faxMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Goods Contact</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][goodsContact]"
+                    value="{goodsContact}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{goodsContactMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Standard VAT Code</td>
+            <td class="field"><select
+                    type="text"
+                    name="header[1][stdVATCode]"
+            >
+                <!-- BEGIN vatCodeBlock -->
+                <option {vatCodeSelected} value="{vatCode}">{vatCode}</option>
+                <!-- END vatCodeBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">Billing Start Time</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][billingStartTime]"
+                    value="{billingStartTime}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{billingStartTimeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Billing End Time</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][billingEndTime]"
+                    value="{billingEndTime}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{billingEndTimeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Helpdesk Start Time</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][helpdeskStartTime]"
+                    value="{helpdeskStartTime}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{helpdeskStartTimeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Helpdesk End Time</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][helpdeskEndTime]"
+                    value="{helpdeskEndTime}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{helpdeskEndTimeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Project Start Time</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][projectStartTime]"
+                    value="{projectStartTime}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{projectStartTimeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Project End Time</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][projectEndTime]"
+                    value="{projectEndTime}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{projectEndTimeMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">SR Auto-complete Threshold Hours</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          title="Activity hours below which SRs are automatically set to completed by the system"
-          name="header[1][srAutocompleteThresholdHours]"
-          value="{srAutocompleteThresholdHours}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{srCompleteThresholdHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">SR Auto-complete Threshold Hours</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    title="Activity hours below which SRs are automatically set to completed by the system"
+                    name="header[1][srAutocompleteThresholdHours]"
+                    value="{srAutocompleteThresholdHours}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{srCompleteThresholdHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">P4 SR Prompt for Contract Threshold Hours</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          title="Activity Hours below which to prompt for a contract when fixing SRs of priority greater than 3"
-          name="header[1][srPromptContractThresholdHours]"
-          value="{srPromptContractThresholdHours}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{srPromptContractThresholdHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">P4 SR Prompt for Contract Threshold Hours</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    title="Activity Hours below which to prompt for a contract when fixing SRs of priority greater than 3"
+                    name="header[1][srPromptContractThresholdHours]"
+                    value="{srPromptContractThresholdHours}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{srPromptContractThresholdHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team SR Limit Hours</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamLimitHours]"
-          value="{hdTeamLimitHours}"
-          title="Default limit in hours that members of HD team have to solve SRs"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamLimitHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team SR Limit Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamLimitHours]"
+                        value="{hdTeamLimitHours}"
+                        title="Default limit in hours that members of HD team have to solve SRs"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamLimitHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team Maximum Pauses</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamMaxPauseCount]"
-          value="{hdTeamMaxPauseCount}"
-          title="Number of times member of HD team can pause the activity counter whilst editing an SR"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamMaxPauseCountMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team Maximum Pauses</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamMaxPauseCount]"
+                        value="{hdTeamMaxPauseCount}"
+                        title="Number of times member of HD team can pause the activity counter whilst editing an SR"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamMaxPauseCountMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team Pause Seconds</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamPauseSeconds]"
-          value="{hdTeamPauseSeconds}"
-          title="How long memeber of HD team can pause an activity for"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamPauseSecondsMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team Pause Seconds</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamPauseSeconds]"
+                        value="{hdTeamPauseSeconds}"
+                        title="How long memeber of HD team can pause an activity for"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamPauseSecondsMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team Target Log %</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamTargetLogPercentage]"
-          value="{hdTeamTargetLogPercentage}"
-          title="Target % of time to be logged in a day for Help Desk team"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamTargetLogPercentageMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team Target Log %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamTargetLogPercentage]"
+                        value="{hdTeamTargetLogPercentage}"
+                        title="Target % of time to be logged in a day for Help Desk team"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamTargetLogPercentageMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team Target SLA Response %</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamTargetSlaPercentage]"
-          value="{hdTeamTargetSlaPercentage}"
-          title="Target % of SRs to be responded to within SLA"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamTargetSlaPercentageMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team Target SLA Response %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamTargetSlaPercentage]"
+                        value="{hdTeamTargetSlaPercentage}"
+                        title="Target % of SRs to be responded to within SLA"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamTargetSlaPercentageMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team Target Fix Hours</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamTargetFixHours]"
-          value="{hdTeamTargetFixHours}"
-          title="Target hours within which to fix an SR"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamTargetFixHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team Target Fix Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamTargetFixHours]"
+                        value="{hdTeamTargetFixHours}"
+                        title="Target hours within which to fix an SR"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamTargetFixHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Helpdesk Team Target Fix Qty Per Month</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][hdTeamTargetFixQtyPerMonth]"
-          value="{hdTeamTargetFixQtyPerMonth}"
-          title="Target number of SRs fix per month"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{hdTeamTargetFixQtyPerMonthMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Helpdesk Team Target Fix Qty Per Month</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][hdTeamTargetFixQtyPerMonth]"
+                        value="{hdTeamTargetFixQtyPerMonth}"
+                        title="Target number of SRs fix per month"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{hdTeamTargetFixQtyPerMonthMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Escalation Team Target Log %</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][esTeamTargetLogPercentage]"
-          value="{esTeamTargetLogPercentage}"
-          title="Target % of time to be logged in a day for Escalation team"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{esTeamTargetLogPercentageMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Escalation Team Target Log %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][esTeamTargetLogPercentage]"
+                        value="{esTeamTargetLogPercentage}"
+                        title="Target % of time to be logged in a day for Escalation team"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{esTeamTargetLogPercentageMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Escalation Team SR Limit Hours</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][esTeamLimitHours]"
-          value="{esTeamLimitHours}"
-          title="Default limit in hours that members of Escalation team have to solve SRs"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{esTeamLimitHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Escalation Team SR Limit Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][esTeamLimitHours]"
+                        value="{esTeamLimitHours}"
+                        title="Default limit in hours that members of Escalation team have to solve SRs"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{esTeamLimitHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Escalation Team Target SLA Response %</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][esTeamTargetSlaPercentage]"
-          value="{esTeamTargetSlaPercentage}"
-          title="Target % of SRs to be responded to within SLA"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{esTeamTargetSlaPercentageMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Escalation Team Target SLA Response %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][esTeamTargetSlaPercentage]"
+                        value="{esTeamTargetSlaPercentage}"
+                        title="Target % of SRs to be responded to within SLA"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{esTeamTargetSlaPercentageMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Escalation Team Target Fix Hours</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][esTeamTargetFixHours]"
-          value="{esTeamTargetFixHours}"
-          title="Target hours for SRs to be fixed to within"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{esTeamTargetFixHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Escalation Team Target Fix Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][esTeamTargetFixHours]"
+                        value="{esTeamTargetFixHours}"
+                        title="Target hours for SRs to be fixed to within"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{esTeamTargetFixHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Escalation Team Target Fix Qty Per Month</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][esTeamTargetFixQtyPerMonth]"
-          value="{esTeamTargetFixQtyPerMonth}"
-          title="Target number of SRs fix per month"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{esTeamTargetFixQtyPerMonthMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Escalation Team Target Fix Qty Per Month</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][esTeamTargetFixQtyPerMonth]"
+                        value="{esTeamTargetFixQtyPerMonth}"
+                        title="Target number of SRs fix per month"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{esTeamTargetFixQtyPerMonthMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Implementation Team Target Log %</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][imTeamTargetLogPercentage]"
-          value="{imTeamTargetLogPercentage}"
-          title="Target % of time to be logged in a day for Implementation team"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{imTeamTargetLogPercentageMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Implementation Team Target Log %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][imTeamTargetLogPercentage]"
+                        value="{imTeamTargetLogPercentage}"
+                        title="Target % of time to be logged in a day for Implementation team"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{imTeamTargetLogPercentageMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Implementation Team SR Limit Hours</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][imTeamLimitHours]"
-          value="{imTeamLimitHours}"
-          title="Default limit in hours that members of Implementation team have to solve SRs"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{imTeamLimitHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Implementation Team SR Limit Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][imTeamLimitHours]"
+                        value="{imTeamLimitHours}"
+                        title="Default limit in hours that members of Implementation team have to solve SRs"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{imTeamLimitHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Implementation Team Target SLA Response %</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][imTeamTargetSlaPercentage]"
-          value="{imTeamTargetSlaPercentage}"
-          title="Target % of SRs to be responded to within SLA"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{imTeamTargetSlaPercentageMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Implementation Team Target SLA Response %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][imTeamTargetSlaPercentage]"
+                        value="{imTeamTargetSlaPercentage}"
+                        title="Target % of SRs to be responded to within SLA"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{imTeamTargetSlaPercentageMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Implementation Team Target Fix Hours</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][imTeamTargetFixHours]"
-          value="{imTeamTargetFixHours}"
-          title="Target hours for SRs to be fixed to within"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{imTeamTargetFixHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Implementation Team Target Fix Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][imTeamTargetFixHours]"
+                        value="{imTeamTargetFixHours}"
+                        title="Target hours for SRs to be fixed to within"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{imTeamTargetFixHoursMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Implementation Team Target Fix Qty Per Month</td>
-      <td class="field">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][imTeamTargetFixQtyPerMonth]"
-          value="{imTeamTargetFixQtyPerMonth}"
-          title="Target number of SRs fix per month"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{imTeamTargetFixQtyPerMonthMessage}</span> </td>
-    </tr>
-    
-    <tr> 
-      <td class="promptText">Hourly Labour Cost</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="header[1][hourlyLabourCost]"
-          value="{hourlyLabourCost}"
-          size="7"
-          maxlength="7"
-        > <span class="formErrorMessage">{hourlyLabourCostMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">GSC Item</td>
-      <td class="field"> <input
-          type="hidden"
-          name="header[1][gscItemID]"
-          id="gscItemID"
-          value="{gscItemID}"
-          > <input
-          {DISABLED}
-          type="text"
-          name="header[1][gscItemDescription]"
-          id="gscItemDescription"
-          value="{gscItemDescription}"
-          onChange="javascript:validateItemDescription()"
-          size="50"
-          maxlength="50"
-        > </td>
-    </tr>
-    <tr>
-      <td class="promptText">Portal PIN</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][portalPin]"
-          value="{portalPin}"
-          size="5"
-          maxlength="5"
-          > <span class="formErrorMessage">{portalPinMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">Portal 24 Hour Support PIN</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][portal24HourPin]"
-          value="{portal24HourPin}"
-          size="5"
-          maxlength="5"
-          > <span class="formErrorMessage">{portal24HourPinMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">SR High Activity Count Email Trigger</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][highActivityAlertCount]"
-          value="{highActivityAlertCount}"
-          title="The number of activities for a Service Request on 1 day that triggers alert email"
-          size="5"
-          maxlength="5"
-          > <span class="formErrorMessage">{highActivityAlertCountMessage}</span>
-      </td>
-    </tr>
-    
-    <tr> 
-      <td class="promptText">Customer Contact Activity Warn Hours</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          title="Activity hours on customer contact above which to warn user"
-          name="header[1][customerContactWarnHours]"
-          value="{customerContactWarnHours}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{customerContactWarnHoursMessage}</span> </td>
-    </tr>
-    
-    <tr> 
-      <td class="promptText">Remote Support Activity Warn Hours</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          title="Activity hours on remote support above which to warn user"
-          name="header[1][remoteSupportWarnHours]"
-          value="{remoteSupportWarnHours}"
-          size="5"
-          maxlength="5"
-        > <span class="formErrorMessage">{remoteSupportWarnHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Implementation Team Target Fix Qty Per Month</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][imTeamTargetFixQtyPerMonth]"
+                        value="{imTeamTargetFixQtyPerMonth}"
+                        title="Target number of SRs fix per month"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{imTeamTargetFixQtyPerMonthMessage}</span></td>
+        </tr>
 
-    <tr>
-      <td class="promptText">Allowed client IP pattern</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][allowedClientIpPattern]"
-          value="{allowedClientIpPattern}"
-          title="Regex pattern for restricting client log in"
-          size="70"
-          maxlength="70"
-          > <span class="formErrorMessage">{allowedClientIpPatternMessage}</span>
-      </td>
-    </tr>
-  </table>
-  <BR>
-  <table>
-    <tr> 
-      <td class="tableHeader">Flag</td>
-      <td class="tableHeader">Description</td>
-      <td class="tableHeader">Default Setting</td>
-    </tr>
-    <tr>
-      <td class="promptText">1</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot1FlagDesc]"
-          value="{mailshot1FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot1FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot1FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot1FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">2</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot2FlagDesc]"
-          value="{mailshot2FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot2FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot2FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot2FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">3</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot3FlagDesc]"
-          value="{mailshot3FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot3FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot3FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot3FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">4</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot4FlagDesc]"
-          value="{mailshot4FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot4FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot4FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot4FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">5</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot5FlagDesc]"
-          value="{mailshot5FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot5FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot5FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot5FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">6</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot6FlagDesc]"
-          value="{mailshot6FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot6FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot6FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot6FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">7</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot7FlagDesc]"
-          value="{mailshot7FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot7FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot7FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot7FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">8</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot8FlagDesc]"
-          value="{mailshot8FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot8FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot8FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot8FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">9</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot9FlagDesc]"
-          value="{mailshot9FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot9FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot9FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot9FlagDefChecked}></td>
-    </tr>
-    <tr>
-      <td class="promptText">10</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][mailshot10FlagDesc]"
-          value="{mailshot10FlagDesc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{mailshot10FlagDescMessage}</span>
-      </td>
-      <td class="inputText"><INPUT name="header[1][mailshot10FlagDef]" {DISABLED} type="checkbox" value="Y" {mailshot10FlagDefChecked}></td>
-    </tr>
-  </table>
-  <BR>
-  <table>
-    <tr> 
-      <td class="tableHeader">Priority</td>
-      <td class="tableHeader">Description</td>
-    </tr>
-    <tr>
-      <td class="promptText">1</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][priority1Desc]"
-          value="{priority1Desc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{priority1DescMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">2</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][priority2Desc]"
-          value="{priority2Desc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{priority2DescMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">3</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][priority3Desc]"
-          value="{priority3Desc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{priority3DescMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">4</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][priority4Desc]"
-          value="{priority4Desc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{priority4DescMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">5</td>
-      <td class="inputText">
-        <input
-          {DISABLED}
-          type="text"
-          name="header[1][priority5Desc]"
-          value="{priority5Desc}"
-          size="50"
-          maxlength="50"
-          > <span class="formErrorMessage">{priority5DescMessage}</span>
-      </td>
-    </tr>
+        <tr>
+            <td class="promptText">Hourly Labour Cost</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][hourlyLabourCost]"
+                    value="{hourlyLabourCost}"
+                    size="7"
+                    maxlength="7"
+            > <span class="formErrorMessage">{hourlyLabourCostMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">GSC Item</td>
+            <td class="field"><input
+                    type="hidden"
+                    name="header[1][gscItemID]"
+                    id="gscItemID"
+                    value="{gscItemID}"
+            > <input
+                    {DISABLED}
+                    type="text"
+                    name="header[1][gscItemDescription]"
+                    id="gscItemDescription"
+                    value="{gscItemDescription}"
+                    onChange="javascript:validateItemDescription()"
+                    size="50"
+                    maxlength="50"
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">Portal PIN</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][portalPin]"
+                        value="{portalPin}"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{portalPinMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Portal 24 Hour Support PIN</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][portal24HourPin]"
+                        value="{portal24HourPin}"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{portal24HourPinMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">SR High Activity Count Email Trigger</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][highActivityAlertCount]"
+                        value="{highActivityAlertCount}"
+                        title="The number of activities for a Service Request on 1 day that triggers alert email"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{highActivityAlertCountMessage}</span>
+            </td>
+        </tr>
 
-  </table>
+        <tr>
+            <td class="promptText">Customer Contact Activity Warn Hours</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    title="Activity hours on customer contact above which to warn user"
+                    name="header[1][customerContactWarnHours]"
+                    value="{customerContactWarnHours}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{customerContactWarnHoursMessage}</span></td>
+        </tr>
 
-  <input type="submit" name="Submit" value="Update">
+        <tr>
+            <td class="promptText">Remote Support Activity Warn Hours</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    title="Activity hours on remote support above which to warn user"
+                    name="header[1][remoteSupportWarnHours]"
+                    value="{remoteSupportWarnHours}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{remoteSupportWarnHoursMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Remote Support Activity Min Warn Hours</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    title="Activity hours on remote support below which to warn user"
+                    name="header[1][RemoteSupportMinWarnHours]"
+                    value="{RemoteSupportMinWarnHours}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{remoteSupportWarnMinHoursMessage}</span></td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Allowed client IP pattern</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][allowedClientIpPattern]"
+                        value="{allowedClientIpPattern}"
+                        title="Regex pattern for restricting client log in"
+                        size="70"
+                        maxlength="70"
+                > <span class="formErrorMessage">{allowedClientIpPatternMessage}</span>
+            </td>
+        </tr>
+    </table>
+    <BR>
+    <table>
+        <tr>
+            <td class="tableHeader">Flag</td>
+            <td class="tableHeader">Description</td>
+            <td class="tableHeader">Default Setting</td>
+        </tr>
+        <tr>
+            <td class="promptText">1</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot1FlagDesc]"
+                        value="{mailshot1FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot1FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot1FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot1FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">2</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot2FlagDesc]"
+                        value="{mailshot2FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot2FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot2FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot2FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">3</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot3FlagDesc]"
+                        value="{mailshot3FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot3FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot3FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot3FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">4</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot4FlagDesc]"
+                        value="{mailshot4FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot4FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot4FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot4FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">5</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot5FlagDesc]"
+                        value="{mailshot5FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot5FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot5FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot5FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">6</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot6FlagDesc]"
+                        value="{mailshot6FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot6FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot6FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot6FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">7</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot7FlagDesc]"
+                        value="{mailshot7FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot7FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot7FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot7FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">8</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot8FlagDesc]"
+                        value="{mailshot8FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot8FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot8FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot8FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">9</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot9FlagDesc]"
+                        value="{mailshot9FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot9FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot9FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot9FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">10</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][mailshot10FlagDesc]"
+                        value="{mailshot10FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot10FlagDescMessage}</span>
+            </td>
+            <td class="inputText"><INPUT name="header[1][mailshot10FlagDef]" {DISABLED} type="checkbox" value="Y"
+                                         {mailshot10FlagDefChecked}></td>
+        </tr>
+    </table>
+    <BR>
+    <table>
+        <tr>
+            <td class="tableHeader">Priority</td>
+            <td class="tableHeader">Description</td>
+        </tr>
+        <tr>
+            <td class="promptText">1</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][priority1Desc]"
+                        value="{priority1Desc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{priority1DescMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">2</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][priority2Desc]"
+                        value="{priority2Desc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{priority2DescMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">3</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][priority3Desc]"
+                        value="{priority3Desc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{priority3DescMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">4</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][priority4Desc]"
+                        value="{priority4Desc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{priority4DescMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">5</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][priority5Desc]"
+                        value="{priority5Desc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{priority5DescMessage}</span>
+            </td>
+        </tr>
+
+    </table>
+
+    <input type="submit" name="Submit" value="Update">
 </form>
 <div class="headerEditPortalDocuments">
-<h3>Portal Documents</h3>
-<a href="{urlAddDocument}">{txtAddDocument}</a>
-<table class="singleBorder" width="50%">
-  <tr> 
-    <td class="listHeadText">Description</td>
-    <td class="listHeadText">File</td>
-    <td class="listHeadText">Main Contact Only</td>
-    <td class="listHeadText">Requires Acceptance?</td>
-    <td class="listHeadText" colspan="2">&nbsp;</td>
-  </tr>
-  <!-- BEGIN portalDocumentBlock -->
-  <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-    <td class="content" nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" >{description}</A></td>
-    <td class="content" nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" >{filename}</A></td>
-    <td class="content" nowrap="nowrap">{mainContactOnlyFlag}</td>
-    <td class="content" nowrap="nowrap">{requiresAcceptanceFlag}</td>
-    <td class="content"><A href="{urlEditDocument}">edit</A></td>
-    <td class="content">
-      <A href="{urlDeleteDocument}" title="Delete attached document" onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">delete</A> 
-    </td>
-  </tr>
-  <!-- END portalDocumentBlock -->
-</table>
-<!-- End Template: HeaderEdit.inc.html -->
+    <h3>Portal Documents</h3>
+    <a href="{urlAddDocument}">{txtAddDocument}</a>
+    <table class="singleBorder" width="50%">
+        <tr>
+            <td class="listHeadText">Description</td>
+            <td class="listHeadText">File</td>
+            <td class="listHeadText">Main Contact Only</td>
+            <td class="listHeadText">Requires Acceptance?</td>
+            <td class="listHeadText" colspan="2">&nbsp;</td>
+        </tr>
+        <!-- BEGIN portalDocumentBlock -->
+        <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+            <td class="content" nowrap="nowrap"><A href="{urlViewFile}" title="View attached document">{description}</A>
+            </td>
+            <td class="content" nowrap="nowrap"><A href="{urlViewFile}" title="View attached document">{filename}</A>
+            </td>
+            <td class="content" nowrap="nowrap">{mainContactOnlyFlag}</td>
+            <td class="content" nowrap="nowrap">{requiresAcceptanceFlag}</td>
+            <td class="content"><A href="{urlEditDocument}">edit</A></td>
+            <td class="content">
+                <A href="{urlDeleteDocument}" title="Delete attached document"
+                   onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">delete</A>
+            </td>
+        </tr>
+        <!-- END portalDocumentBlock -->
+    </table>
+    <!-- End Template: HeaderEdit.inc.html -->
