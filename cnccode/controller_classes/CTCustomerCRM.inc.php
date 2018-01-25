@@ -279,7 +279,16 @@ class CTCustomerCRM extends CTCNC
             $this->dsCustomer->setValue('comments', $value['comments']);
             $this->dsCustomer->setValue('techNotes', $value['techNotes']);
             $this->dsCustomer->setValue(DBECustomer::CustomerLeadStatusID, $value['customerLeadStatusID']);
-            $this->dsCustomer->setValue(DBECustomer::DateMeetingConfirmed, $this->convertDateYMD($value['dateMeetingConfirmedDate']));
+            $this->dsCustomer->setValue(DBECustomer::DateMeetingConfirmed, $value['dateMeetingConfirmedDate']);
+            $this->dsCustomer->setValue(DBECustomer::MeetingDateTime, $value['meetingDateTime']);
+            $this->dsCustomer->setValue(DBECustomer::InviteSent, $this->getTrueFalse($value[DBECustomer::InviteSent]));
+            $this->dsCustomer->setValue(DBECustomer::ReportProcessed, $this->getTrueFalse($value[DBECustomer::ReportProcessed]));
+            $this->dsCustomer->setValue(DBECustomer::ReportSent, $this->getTrueFalse($value[DBECustomer::ReportSent]));
+            $this->dsCustomer->setValue(DBECustomer::CrmComments, $value[DBECustomer::CrmComments]);
+            $this->dsCustomer->setValue(DBECustomer::CompanyBackground, $value[DBECustomer::CompanyBackground]);
+            $this->dsCustomer->setValue(DBECustomer::DecisionMakerBackground, $value[DBECustomer::DecisionMakerBackground]);
+            $this->dsCustomer->setValue(DBECustomer::OpportunityDeal, $value[DBECustomer::OpportunityDeal]);
+            $this->dsCustomer->setValue(DBECustomer::Rating, $value[DBECustomer::Rating]);
             $this->dsCustomer->post();
         }
     }
@@ -412,7 +421,7 @@ class CTCustomerCRM extends CTCNC
 
     function getChecked($flag)
     {
-        return ($flag == 'N' ? '' : CT_CHECKED);
+        return ($flag == 'N' || $flag == false ? '' : CT_CHECKED);
     }
 
     function convertDateYMD($dateDMY)
@@ -1013,7 +1022,16 @@ class CTCustomerCRM extends CTCNC
                 'specialAttentionEndDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue('specialAttentionEndDate')),
                 'specialAttentionEndDateMessage' => $this->dsCustomer->getValue('specialAttentionEndDateMessage'),
                 'lastReviewMeetingDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue('lastReviewMeetingDate')),
-                'dateMeetingConfirmedDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::DateMeetingConfirmed)),
+                'dateMeetingConfirmedDate' => $this->dsCustomer->getValue(DBECustomer::DateMeetingConfirmed),
+                'meetingDateTime' => Controller::dateToISO($this->dsCustomer->getValue(DBECustomer::MeetingDateTime)),
+                DBECustomer::InviteSent => $this->getChecked($this->dsCustomer->getValue(DBECustomer::InviteSent)),
+                DBECustomer::ReportProcessed => $this->getChecked($this->dsCustomer->getValue(DBECustomer::ReportProcessed)),
+                DBECustomer::ReportSent => $this->getChecked($this->dsCustomer->getValue(DBECustomer::ReportSent)),
+                DBECustomer::CrmComments => $this->dsCustomer->getValue(DBECustomer::CrmComments),
+                DBECustomer::CompanyBackground => $this->dsCustomer->getValue(DBECustomer::CompanyBackground),
+                DBECustomer::DecisionMakerBackground => $this->dsCustomer->getValue(DBECustomer::DecisionMakerBackground),
+                DBECustomer::OpportunityDeal => $this->dsCustomer->getValue(DBECustomer::OpportunityDeal),
+                DBECustomer::Rating => $this->dsCustomer->getValue(DBECustomer::Rating),
                 'lastReviewMeetingDateMessage' => $this->dsCustomer->getValue('lastReviewMeetingDateMessage'),
                 'support24HourFlagChecked' => $this->getChecked($this->dsCustomer->getValue('support24HourFlag')),
                 'prospectFlagChecked' => $this->getChecked($this->dsCustomer->getValue('ProspectFlag')),
@@ -1921,6 +1939,12 @@ class CTCustomerCRM extends CTCNC
 
         } // end if
 
+
+    }
+
+    private function getTrueFalse($value)
+    {
+        return $value == 'Y';
 
     } // end function documents
 
