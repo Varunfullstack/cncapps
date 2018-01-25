@@ -8,8 +8,8 @@
             <columnExists tableName="questionnaire" columnName="qur_custom_logo_base64"/>
         </preConditions>
         <addColumn tableName="questionnaire">
-            <column name="qur_custom_logo_base64" type="text" >
-
+            <column name="qur_custom_logo_base64" type="clob" >
+                
             </column>
         </addColumn>
     </changeSet>
