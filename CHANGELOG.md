@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 144 - CNC031 - Contract and numbers report
 - Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
 
 ## [1.0.3] - 2017-01-17
