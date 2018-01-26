@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 142 - Pre-pay activity over £100 - where is the email address set?
 - Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
 
 ## [1.0.3] - 2017-01-17
