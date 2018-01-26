@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
 
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
