@@ -338,12 +338,12 @@ class BURenContract extends Business
 
                     $internalNotes = $dsRenContract->getValue('internalNotes');
 
-                    $renCOntractId = $dsRenContract->getValue('ID');
+                    $renContractId = $dsRenContract->getValue('customerItemID');
 
                     $serviceRequestText = <<<HEREDOC
                         <p>$internalNotes</p>
                         <p>Please update SSL contract item internal notes with the servers that have the SSL installed 
-                        onto: <a href="http://cncapps/RenContract.php?action=edit&ID=$renCOntractId">Contract</a></p> 
+                        onto: <a href="http://cncapps/RenContract.php?action=edit&ID=$renContractId">Contract</a></p> 
                         <p>Please check that the above SSL Certificate is still required before renewing</p>
                         <p style="color: red">PLEASE RENEW FOR 3 YEARS</p>
 HEREDOC;
