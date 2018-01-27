@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 142 - Pre-pay activity over £100 - where is the email address set?
 - Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
 - Issue 122 - CNC015 - Check activity length and flag if remote support and under 5 minutes
 - Issue 131 - CNC023 - When editing customer contacts make the main contact appear in red text
