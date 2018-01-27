@@ -337,6 +337,7 @@ class BURenContract extends Business
                     $dsInput->setValue('etaDate', date('Y-m-d'));
 
                     $internalNotes = $dsRenContract->getValue('internalNotes');
+                    $internalNotes = nl2br($internalNotes);
 
                     $renContractId = $dsRenContract->getValue('customerItemID');
 
