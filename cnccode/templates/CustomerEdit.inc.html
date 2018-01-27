@@ -25,6 +25,11 @@
 
     //-->
 </SCRIPT>
+<style>
+    tr.redText {
+        color: red;
+    }
+</style>
 
 <form name="form" method="post" action="{submitURL}" AUTOCOMPLETE="off">
     <input type="hidden" name="form[customer][{customerID}][customerID]" value="{customerID}">
@@ -252,7 +257,7 @@
             <td colspan="22"><a href="{addContactURL}">{addContactText}</a></td>
         </tr>
         <!-- BEGIN contactBlock -->
-        <tr>
+        <tr class="redText">
             <td>&nbsp;{deleteContactLink}</td>
             <td>
                 <select name="letters_menu" onchange="MM_jumpMenu('_blank',this,0)">
