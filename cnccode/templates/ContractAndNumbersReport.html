@@ -1,0 +1,75 @@
+<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" type="text/css">
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script>
+    $(function () {
+        $('#theTable').DataTable();
+    })
+</script>
+
+<table id="theTable">
+    <thead>
+    <tr>
+        <th>
+            Customer
+        </th>
+        <th>
+            ServiceDesk Product
+        </th>
+        <th>
+            ServiceDesk Users
+        </th>
+        <th>
+            ServiceDesk Contract
+        </th>
+        <th>
+            Cost per user per month
+        </th>
+        <th>
+            ServerCare Product
+        </th>
+        <th>
+            Physical Servers
+        </th>
+        <th>
+            Virtual Servers
+        </th>
+        <th>
+            ServerCare Contract
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN contractItemBlock -->
+    <tr valign="top">
+        <td>
+            {customerName}
+        </td>
+        <td>
+            {serviceDeskProduct}
+        </td>
+        <td>
+            {serviceDeskUsers}
+        </td>
+        <td>
+            {serviceDeskContract}
+        </td>
+        <td>
+            {serviceDeskCostPerUserMonth}
+        </td>
+        <td>
+            {serverCareProduct}
+        </td>
+        <td>
+            {virtualServers}
+        </td>
+        <td>
+            {physicalServers}
+        </td>
+        <td>
+            {serverCareContract}
+        </td>
+
+    </tr>
+    <!-- END contractItemBlock -->
+    </tbody>
+</table>

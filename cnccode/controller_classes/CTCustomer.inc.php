@@ -517,6 +517,12 @@ class CTCustomer extends CTCNC
             case 'displaySpecialAttentionCustomers':
                 $this->displaySpecialAttentionCustomers();
                 break;
+            case 'displayContractAndNumbersReport':
+                $this->displayContractAndNumbersReport();
+                break;
+            case 'csvContractAndNumbersReport':
+                $this->csvContractAndNumbersReport();
+                break;
             default:
                 $this->displaySearchForm();
                 break;
@@ -656,6 +662,148 @@ class CTCustomer extends CTCNC
         exit;
 
 
+    }
+
+
+    private function getContractAndNumberData()
+    {
+        global $db; //PHPLib DB object
+
+
+        $queryString =
+            "
+				SELECT 
+  cus_name AS customerName,
+  serviceDeskProduct,
+  serviceDeskUsers,
+  serviceDeskContract,
+  serviceDeskCostPerUserMonth,
+  serverCareProduct,
+  virtualServers,
+  physicalServers,
+  serverCareContract 
+FROM
+  (SELECT 
+    `cui_custno` AS customerId,
+    itm_desc AS serviceDeskProduct,
+    custitem.`cui_users` AS serviceDeskUsers,
+    round(custitem.cui_sale_price,0) AS serviceDeskContract,
+    ROUND(custitem.cui_sale_price / custitem.cui_users / 12, 2) AS serviceDeskCostPerUserMonth 
+  FROM
+    custitem 
+    LEFT JOIN item 
+      ON item.`itm_itemno` = custitem.`cui_itemno` 
+  WHERE itm_desc LIKE '%servicedesk%' 
+    AND itm_discontinued <> 'Y' 
+    AND custitem.`declinedFlag` <> 'Y') AS test1 
+  LEFT JOIN 
+    (SELECT 
+      custitem.`cui_custno` AS customerId,
+      item.itm_desc AS serverCareProduct,
+      SUM(
+        serverItem.`itm_desc` LIKE '%virtual%'
+      ) AS virtualServers,
+      SUM(
+        serverItem.itm_desc NOT LIKE '%virtual%'
+      ) AS physicalServers,
+      round(custitem.`cui_sale_price`,0) AS serverCareContract 
+    FROM
+      custitem 
+      LEFT JOIN item 
+        ON item.`itm_itemno` = custitem.`cui_itemno` 
+      LEFT JOIN custitem_contract 
+        ON custitem_contract.`cic_contractcuino` = cui_cuino 
+      LEFT JOIN custitem AS servers 
+        ON custitem_contract.`cic_cuino` = servers.cui_cuino 
+      LEFT JOIN item AS serverItem 
+        ON servers.cui_itemno = serverItem.`itm_itemno` 
+    WHERE item.`itm_desc` LIKE '%servercare%' 
+      AND item.itm_discontinued <> 'Y' 
+      AND custitem.`declinedFlag` <> 'Y' 
+    GROUP BY custitem.`cui_cuino`) test2 
+    ON test1.customerId = test2.customerId 
+  LEFT JOIN customer 
+    ON test1.customerId = customer.`cus_custno` ORDER BY cus_name ASC ";
+
+        $db->query($queryString);
+        return $db;
+    }
+
+    function csvContractAndNumbersReport()
+    {
+        $csv_export = '';
+        $db = $this->getContractAndNumberData();
+
+        $headersSet = false;
+
+        while ($db->next_record()) {
+            $row = $db->Record;
+            if(!$headersSet){
+                foreach (array_keys($row) as $key){
+                    if(!is_numeric($key)){
+                        $csv_export.= $key.';';
+                    }
+                }
+            }
+            $this->template->set_var(
+                array(
+                    'customerName' => $row["customerName"],
+                    'serviceDeskProduct' => $row['serviceDeskProduct'],
+                    'serviceDeskUsers' => $row['serviceDeskUsers'],
+                    'serviceDeskContract' => $row['serviceDeskContract'],
+                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
+                    'serverCareProduct' => $row['serverCareProduct'],
+                    'virtualServers' => $row['virtualServers'],
+                    'physicalServers' => $row['physicalServers'],
+                    'serverCareContract' => $row['serverCareContract']
+
+                )
+            );
+
+            $this->template->parse('contracts', 'contractItemBlock', true);
+
+        }
+    }
+
+    function displayContractAndNumbersReport()
+    {
+
+        $this->setPageTitle("Contract And Numbers Report");
+
+        $this->setTemplateFiles('ContractAndNumbersReport', 'ContractAndNumbersReport');
+
+        $this->template->set_block('ContractAndNumbersReport', 'contractItemBlock', 'contracts');
+
+        $db = $this->getContractAndNumberData();
+
+        while ($db->next_record()) {
+
+            $row = $db->Record;
+            $this->template->set_var(
+                array(
+                    'customerName' => $row["customerName"],
+                    'serviceDeskProduct' => $row['serviceDeskProduct'],
+                    'serviceDeskUsers' => $row['serviceDeskUsers'],
+                    'serviceDeskContract' => $row['serviceDeskContract'],
+                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
+                    'serverCareProduct' => $row['serverCareProduct'],
+                    'virtualServers' => $row['virtualServers'],
+                    'physicalServers' => $row['physicalServers'],
+                    'serverCareContract' => $row['serverCareContract']
+
+                )
+            );
+
+            $this->template->parse('contracts', 'contractItemBlock', true);
+
+        }
+
+        $this->template->parse('CONTENTS', 'ContractAndNumbersReport', true);
+
+
+        $this->parsePage();
+
+        exit;
     }
 
     /**
