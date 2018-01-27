@@ -3813,13 +3813,20 @@ class CTActivity extends CTCNC
 
                         }
 
-                        if (
-                            $dsCallActivity->getValue('callActTypeID') == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID &&
-                            $durationHours > $dsHeader->getValue('remoteSupportWarnHours')
-                        ) {
-                            $this->formError = true;
-                            $this->userWarned = true;
-                            $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                        if ($dsCallActivity->getValue('callActTypeID') == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
+                            if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
+                                $this->formError = true;
+                                $this->userWarned = true;
+                                $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                            }
+
+                            $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
+
+                            if ($durationHours < $minHours) {
+                                $this->formError = true;
+                                $this->userWarned = true;
+                                $this->dsCallActivity->setMessage('endTime', 'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
+                            }
 
                         }
                     }
