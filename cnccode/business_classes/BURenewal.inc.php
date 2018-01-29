@@ -120,7 +120,8 @@ class BURenewal extends Business
         $hdrs = array(
             'From' => $senderName . " <" . $senderEmail . ">",
             'To' => $toEmail,
-            'Subject' => $subject
+            'Subject' => $subject,
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
@@ -222,7 +223,8 @@ class BURenewal extends Business
         $hdrs = array(
             'From' => $senderName . " <" . $senderEmail . ">",
             'To' => $toEmail,
-            'Subject' => $subject
+            'Subject' => $subject,
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $template = new Template (EMAIL_TEMPLATE_DIR, "remove");

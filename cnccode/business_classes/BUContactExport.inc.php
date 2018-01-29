@@ -282,7 +282,8 @@ class BUContactExport extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => $subject,
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             // add name to top of email

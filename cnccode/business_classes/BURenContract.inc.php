@@ -117,7 +117,8 @@ class BURenContract extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Contract Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -576,7 +577,8 @@ HEREDOC;
             array(
                 'From' => $senderEmail,
                 'Subject' => 'ServiceDesk renewal sales order created for ' . $customerName,
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
 

@@ -420,7 +420,8 @@ class BUExpense extends Business
         $hdrs = array(
             'From' => 'grahaml@cnc-ltd.co.uk',
             'To' => $email_to,
-            'Subject' => 'Your Expenses'
+            'Subject' => 'Your Expenses',
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $crlf = "\r\n";
@@ -756,7 +757,8 @@ class BUExpense extends Business
         $hdrs = array(
             'From' => 'grahaml@cnc-ltd.co.uk',
             'To' => $email_to,
-            'Subject' => 'Your Overtime'
+            'Subject' => 'Your Overtime',
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
 

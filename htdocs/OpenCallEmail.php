@@ -145,7 +145,8 @@ foreach ($engineers as $row) {
 
         $hdrs = array(
             'From' => CONFIG_SALES_MANAGER_EMAIL,
-            'Subject' => $emailSubject
+            'Subject' => $emailSubject,
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $hdrs = $buMail->mime->headers($hdrs);
@@ -263,7 +264,8 @@ foreach ($managers as $managerId => $manager) {
 
         $hdrs = array(
             'From' => CONFIG_SALES_MANAGER_EMAIL,
-            'Subject' => $emailSubject
+            'Subject' => $emailSubject,
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $hdrs = $buMail->mime->headers($hdrs);

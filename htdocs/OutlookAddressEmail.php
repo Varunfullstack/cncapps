@@ -171,7 +171,8 @@ $body = $buMail->mime->get();
 
 $hdrs = array(
     'From' => CONFIG_SALES_EMAIL,
-    'Subject' => 'Outlook Address File'
+    'Subject' => 'Outlook Address File',
+    'Content-Type' => 'text/html; charset=UTF-8'
 );
 
 $hdrs = $buMail->mime->headers($hdrs);

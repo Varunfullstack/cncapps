@@ -90,7 +90,8 @@ class BUPrizewinner extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'CNC Technical Support Questionnaire Feedback',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -191,7 +192,8 @@ class BUPrizewinner extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'CNC Technical Support Questionnaire Feedback',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
 

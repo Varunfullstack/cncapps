@@ -119,7 +119,8 @@ class BURenQuotation extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Quotation Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -173,7 +174,8 @@ class BURenQuotation extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Quotation Renewals Generated in Past 2 Weeks',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>

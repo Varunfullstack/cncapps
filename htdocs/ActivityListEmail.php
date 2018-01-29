@@ -195,7 +195,8 @@ while ($i = mysql_fetch_assoc($result)) {
 $hdrs_array = array(
     'From' => EMAIL_FROM_USER,
     'To' => $send_to_email,
-    'Subject' => EMAIL_SUBJECT
+    'Subject' => EMAIL_SUBJECT,
+    'Content-Type' => 'text/html; charset=UTF-8'
 );
 
 $mime = new Mail_mime($crlf);

@@ -394,7 +394,8 @@ class BUDailyServiceDeskReport extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Daily Service Desk Report',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         echo $body;

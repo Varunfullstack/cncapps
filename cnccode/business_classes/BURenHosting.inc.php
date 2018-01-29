@@ -128,7 +128,8 @@ class BURenHosting extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Hosting Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -361,7 +362,8 @@ class BURenHosting extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Hosting details',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>

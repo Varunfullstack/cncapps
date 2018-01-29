@@ -191,7 +191,8 @@ class CTServiceRequestsByCustomerReport extends CTCNC
             $hdrs = array(
                 'From' => $senderEmail,
                 'Subject' => $subject,
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($body);

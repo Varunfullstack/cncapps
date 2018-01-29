@@ -139,7 +139,8 @@ class BURenDomain extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Domain Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>

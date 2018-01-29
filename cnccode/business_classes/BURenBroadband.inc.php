@@ -122,7 +122,8 @@ class BURenBroadband extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Broadband Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -365,7 +366,8 @@ class BURenBroadband extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Broadband details',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>

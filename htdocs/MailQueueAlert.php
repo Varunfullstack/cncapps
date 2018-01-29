@@ -40,7 +40,8 @@ if ($count > 0) {
 
     $hdrs_array = array(
         'From' => CONFIG_SALES_MANAGER_EMAIL,
-        'Subject' => EMAIL_SUBJECT
+        'Subject' => EMAIL_SUBJECT,
+        'Content-Type' => 'text/html; charset=UTF-8'
     );
 
     $buMail = new BUMail($this);
@@ -51,7 +52,8 @@ if ($count > 0) {
 
     $hdrs = array(
         'From' => CONFIG_SALES_MANAGER_EMAIL,
-        'Subject' => EMAIL_SUBJECT
+        'Subject' => EMAIL_SUBJECT,
+        'Content-Type' => 'text/html; charset=UTF-8'
     );
 
     $hdrs = $buMail->mime->headers($hdrs);

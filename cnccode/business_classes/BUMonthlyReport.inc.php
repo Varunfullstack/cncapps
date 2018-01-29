@@ -173,7 +173,8 @@ class BUMonthlyReport extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $body = '<A HREF="' . $link . '">Monthly Report</A>';

@@ -416,7 +416,8 @@ class BUProblemSLA extends Business
         $hdrs = array(
             'From' => $senderEmail,
             'Subject' => 'Special Attention Period Ends Soon For ' . $customer->cus_name,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -493,7 +494,8 @@ class BUProblemSLA extends Business
                 'To' => $toEmail,
                 'From' => $senderEmail,
                 'Subject' => 'WARNING - SR for ' . $dbeJProblem->getValue('customerName') . 'assigned to ' . $dbeJProblem->getValue('engineerName') . ' close to breaching SLA',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($body);
@@ -627,7 +629,8 @@ class BUProblemSLA extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue('problemID') . ' - Pending Closure on ' . Controller::dateYMDtoDMY($completeDate),
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         $buMail->mime->setHTMLBody($body);

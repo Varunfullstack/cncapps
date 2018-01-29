@@ -317,7 +317,8 @@ class BUActivity extends Business
             'From' => CONFIG_SUPPORT_EMAIL,
             'To' => $emailTo,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $mime = new Mail_mime();
@@ -427,7 +428,8 @@ class BUActivity extends Business
         $hdrs = array(
             'From' => $senderEmail,
             'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Completed Early',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -611,7 +613,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Priority 5 Fixed: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -948,7 +951,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'High Activity Alert: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -1214,6 +1218,7 @@ class BUActivity extends Business
             'To' => $toEmail,
             'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue('problemID') . ' - ' . $subjectSuffix,
             'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -1291,7 +1296,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Special Attention Activity ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -1363,7 +1369,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Critial SR Activity For ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -1427,7 +1434,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Future Visit To ' . $dbeJCallActivity->getValue('customerName') . ' Logged : ' . $dbeJCallActivity->getValue('activityType'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -1499,7 +1507,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -1684,7 +1693,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -2033,7 +2043,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' Has Been Removed From The System',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -3124,7 +3135,8 @@ is currently a balance of ';
             $hdrs = array(
                 'From' => $senderName . " <" . $senderEmail . ">",
                 'To' => $toEmail,
-                'Subject' => $subject
+                'Subject' => $subject,
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($html);
@@ -3444,7 +3456,8 @@ customer with the past 8 hours email to GL
         $hdrs = array(
             'From' => $senderEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -3547,7 +3560,13 @@ customer with the past 8 hours email to GL
         $message = ob_get_contents();
         ob_end_clean();
 
-        $hdrs = array('From' => $senderEmail, 'To' => $toEmail, 'Subject' => 'Unchecked Activities', 'Date' => date("r"));
+        $hdrs = array(
+            'From' => $senderEmail,
+            'To' => $toEmail,
+            'Subject' => 'Unchecked Activities',
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
 
         $buCustomer = new BUCustomer($this);
 
@@ -4132,7 +4151,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -4509,7 +4529,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'New Project Incident ' . $problemID . ' Created for ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -5473,7 +5494,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Priority 1 Reopened: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -5791,7 +5813,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By ' . $fixedBy,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -5995,7 +6018,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -6391,7 +6415,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'On-Site Visit Confirmation for Service Request ' . $callRef,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         if ($cc) {
@@ -6929,7 +6954,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -7082,7 +7108,8 @@ customer with the past 8 hours email to GL
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -7263,7 +7290,8 @@ customer with the past 8 hours email to GL
         $hdrs = array(
             'From' => $senderEmail,
             'Subject' => 'Management Review Summary Added ' . $dbeJProblem->getValue('customerName') . ' SR ' . $problemID,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);

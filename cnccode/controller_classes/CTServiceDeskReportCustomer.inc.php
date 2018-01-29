@@ -69,7 +69,8 @@ class CTServiceDeskReportCustomer extends CTCNC
                     'From' => $senderEmail,
                     'To' => $toEmail,
                     'Subject' => 'Service Desk Report ' . $this->buServiceDeskReport->getPeriod() . ' - ' . $this->buServiceDeskReport->getCustomerName(),
-                    'Date' => date("r")
+                    'Date' => date("r"),
+                    'Content-Type' => 'text/html; charset=UTF-8'
                 );
 
                 $buMail->mime->setHTMLBody($report);

@@ -79,7 +79,8 @@ class CTQuestionnaireReport extends CTCNC
                         'From' => $senderEmail,
                         'To' => $toEmail,
                         'Subject' => 'Questionnaire Report ' . $this->buQuestionnaireReport->getPeriod() . ' - ' . $this->buQuestionnaireReport->getQuestionnaireDescription(),
-                        'Date' => date("r")
+                        'Date' => date("r"),
+                        'Content-Type' => 'text/html; charset=UTF-8'
                     );
 
                     $buMail->mime->setHTMLBody($report);

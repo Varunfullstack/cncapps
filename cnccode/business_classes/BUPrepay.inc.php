@@ -754,7 +754,8 @@ is currently a balance of ';
             $hdrs = array(
                 'From' => $senderName . " <" . $senderEmail . ">",
                 'To' => $toEmail,
-                'Subject' => $subject
+                'Subject' => $subject,
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($html);
