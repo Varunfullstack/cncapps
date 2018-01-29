@@ -7,9 +7,9 @@
         <tagDatabase tag="issue160"/>
     </changeSet>
     <changeSet id="issue160-1517229099-1" author="pavwebdev">
-        <modifyDataType tableName="customer" columnName="cust_name" newDataType="varchar(50)"/>
+        <modifyDataType tableName="customer" columnName="cus_name" newDataType="varchar(50)"/>
         <rollback>
-            <modifyDataType tableName="customer" columnName="cust_name" newDataType="varchar(35)"/>
+            <modifyDataType tableName="customer" columnName="cus_name" newDataType="varchar(35)"/>
         </rollback>
     </changeSet>
 
