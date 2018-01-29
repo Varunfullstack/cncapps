@@ -194,7 +194,6 @@ class BUActivity extends Business
     }
 
 
-
     function search(
         &$dsSearchForm,
         &$dsResults,
@@ -1362,7 +1361,7 @@ class BUActivity extends Business
         $hdrs = array(
             'From' => $senderEmail,
             'To' => $toEmail,
-            'Subject' => 'Critial SR Activity For ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
+            'Subject' => 'Critical SR Activity For ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
             'Date' => date("r")
         );
 
