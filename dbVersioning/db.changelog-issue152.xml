@@ -12,13 +12,13 @@
             <modifyDataType columnName="hdTeamActualFixHours" newDataType="int(3)" tableName="team_performance"/>
         </rollback>
     </changeSet>
-    <changeSet id="issue152-1517227191-1" author="pavwebdev">
+    <changeSet id="issue152-1517227191-2" author="pavwebdev">
         <modifyDataType columnName="esTeamActualFixHours" tableName="team_performance" newDataType="DECIMAL(12,2)"/>
         <rollback>
             <modifyDataType columnName="esTeamActualFixHours" newDataType="int(3)" tableName="team_performance"/>
         </rollback>
     </changeSet>
-    <changeSet id="issue152-1517227191-1" author="pavwebdev">
+    <changeSet id="issue152-1517227191-3" author="pavwebdev">
         <modifyDataType columnName="imTeamActualFixHours" tableName="team_performance" newDataType="DECIMAL(12,2)"/>
         <rollback>
             <modifyDataType columnName="imTeamActualFixHours" newDataType="int(3)" tableName="team_performance"/>
