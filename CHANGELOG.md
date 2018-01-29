@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue 150 - The URI gets too large when working with the timer on and typing notes
+
+
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
 
