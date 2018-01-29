@@ -194,7 +194,6 @@ class BUActivity extends Business
     }
 
 
-
     function search(
         &$dsSearchForm,
         &$dsResults,
@@ -1037,7 +1036,8 @@ class BUActivity extends Business
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'SR ' . $problemID . ' has been updated by another user',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($body);
