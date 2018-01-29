@@ -194,7 +194,6 @@ class BUActivity extends Business
     }
 
 
-
     function search(
         &$dsSearchForm,
         &$dsResults,
@@ -1036,7 +1035,7 @@ class BUActivity extends Business
         $hdrs = array(
             'From' => $senderEmail,
             'To' => $toEmail,
-            'Subject' => 'SR ' . $problemID . ' has been updated by another user',
+            'Subject' => 'Service Request ' . $problemID . ' has been updated by another user',
             'Date' => date("r")
         );
 
