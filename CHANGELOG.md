@@ -3,6 +3,9 @@ This project changes will be shown here.
 
 ## [unreleased]
 
+## [1.0.4] - 2017-01-29
+- Issue 162 - Typo in subject line of email - Critial SR Activity For
+
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
 - Issue 151 - T&M Authorisation Process Error
