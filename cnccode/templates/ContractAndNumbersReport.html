@@ -53,8 +53,40 @@
 
                 $(api.column(4).footer()).html(
                     'AVG £' + costPerUserPerMonthTotalAVG.toFixed(2)
+                );
+
+                var totalServiceDeskUsers = api
+                    .column(2)
+                    .data()
+                    .reduce(function (acc, item) {
+                        return acc + intVal(item);
+                    }, 0);
+
+                $(api.column(2).footer()).html(
+                    'Total: ' + totalServiceDeskUsers
                 )
 
+                var totalPhysicalServers = api
+                    .column(6)
+                    .data()
+                    .reduce(function (acc, item) {
+                        return acc + intVal(item);
+                    }, 0)
+
+                $(api.column(6).footer()).html(
+                    'Total: ' + totalPhysicalServers
+                )
+
+                var totalVirtualServers = api
+                    .column(7)
+                    .data()
+                    .reduce(function (acc, item) {
+                        return acc + intVal(item);
+                    }, 0)
+
+                $(api.column(7).footer()).html(
+                    'Total: ' + totalVirtualServers
+                )
 
             }
         });
