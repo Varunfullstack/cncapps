@@ -48,12 +48,21 @@
                 $(api.column(8).footer()).html(
                     'Total: £' + serverCareTotal
                 );
+
+                var avgTotal = 0;
+
                 var costPerUserPerMonthTotalAVG = api
                     .column(4)
                     .data()
                     .reduce(function (a, b) {
+                        var val = intVal(b);
+
+                        if(val > 0){
+                            avgTotal++;
+                        }
+
                         return intVal(a) + intVal(b);
-                    }, 0) / api.column(4).data().length;
+                    }, 0) / avgTotal;
 
                 $(api.column(4).footer()).html(
                     'AVG £' + costPerUserPerMonthTotalAVG.toFixed(2)
