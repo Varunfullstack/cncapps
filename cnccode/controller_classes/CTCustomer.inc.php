@@ -783,7 +783,7 @@ FROM
                     'customerName' => $row["customerName"],
                     'serviceDeskProduct' => $row['serviceDeskProduct'],
                     'serviceDeskUsers' => $row['serviceDeskUsers'],
-                    'serviceDeskContract' => '£' . $row['serviceDeskContract'],
+                    'serviceDeskContract' => $row['serviceDeskContract'],
                     'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
                     'serverCareProduct' => $row['serverCareProduct'],
                     'virtualServers' => $row['virtualServers'],
