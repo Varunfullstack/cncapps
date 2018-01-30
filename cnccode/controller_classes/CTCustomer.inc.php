@@ -671,8 +671,8 @@ class CTCustomer extends CTCNC
 
 
         $queryString =
-            "
-				SELECT 
+            "SELECT
+  `cus_custno`,
   cus_name AS customerName,
   serviceDeskProduct,
   serviceDeskUsers,
@@ -681,49 +681,55 @@ class CTCustomer extends CTCNC
   serverCareProduct,
   virtualServers,
   physicalServers,
-  serverCareContract 
+  serverCareContract
 FROM
-  (SELECT 
-    `cui_custno` AS customerId,
-    itm_desc AS serviceDeskProduct,
-    custitem.`cui_users` AS serviceDeskUsers,
-    round(custitem.cui_sale_price,0) AS serviceDeskContract,
-    ROUND(custitem.cui_sale_price / custitem.cui_users / 12, 2) AS serviceDeskCostPerUserMonth 
-  FROM
-    custitem 
-    LEFT JOIN item 
-      ON item.`itm_itemno` = custitem.`cui_itemno` 
-  WHERE itm_desc LIKE '%servicedesk%' 
-    AND itm_discontinued <> 'Y' 
-    AND custitem.`declinedFlag` <> 'Y') AS test1 
-  LEFT JOIN 
-    (SELECT 
-      custitem.`cui_custno` AS customerId,
-      item.itm_desc AS serverCareProduct,
-      SUM(
-        serverItem.`itm_desc` LIKE '%virtual%'
-      ) AS virtualServers,
-      SUM(
-        serverItem.itm_desc NOT LIKE '%virtual%'
-      ) AS physicalServers,
-      round(custitem.`cui_sale_price`,0) AS serverCareContract 
-    FROM
-      custitem 
-      LEFT JOIN item 
-        ON item.`itm_itemno` = custitem.`cui_itemno` 
-      LEFT JOIN custitem_contract 
-        ON custitem_contract.`cic_contractcuino` = cui_cuino 
-      LEFT JOIN custitem AS servers 
-        ON custitem_contract.`cic_cuino` = servers.cui_cuino 
-      LEFT JOIN item AS serverItem 
-        ON servers.cui_itemno = serverItem.`itm_itemno` 
-    WHERE item.`itm_desc` LIKE '%servercare%' 
-      AND item.itm_discontinued <> 'Y' 
-      AND custitem.`declinedFlag` <> 'Y' 
-    GROUP BY custitem.`cui_cuino`) test2 
-    ON test1.customerId = test2.customerId 
-  LEFT JOIN customer 
-    ON test1.customerId = customer.`cus_custno` ORDER BY cus_name ASC ";
+  customer
+  LEFT JOIN
+  (SELECT
+     `cui_custno`                      AS customerId,
+     itm_desc                          AS serviceDeskProduct,
+     custitem.`cui_users`              AS serviceDeskUsers,
+     round(custitem.cui_sale_price, 0) AS serviceDeskContract,
+     ROUND(
+         custitem.cui_sale_price / custitem.cui_users / 12,
+         2
+     )                                 AS serviceDeskCostPerUserMonth
+   FROM
+     custitem
+     LEFT JOIN item
+       ON item.`itm_itemno` = custitem.`cui_itemno`
+   WHERE itm_desc LIKE '%servicedesk%'
+         AND itm_discontinued <> 'Y'
+         AND custitem.`declinedFlag` <> 'Y') AS test1
+    ON test1.customerId = customer.`cus_custno`
+  LEFT JOIN
+  (SELECT
+     custitem.`cui_custno`               AS customerId,
+     item.itm_desc                       AS serverCareProduct,
+     SUM(
+         serverItem.`itm_desc` LIKE '%virtual%'
+     )                                   AS virtualServers,
+     SUM(
+         serverItem.itm_desc NOT LIKE '%virtual%'
+     )                                   AS physicalServers,
+     round(custitem.`cui_sale_price`, 0) AS serverCareContract
+   FROM
+     custitem
+     LEFT JOIN item
+       ON item.`itm_itemno` = custitem.`cui_itemno`
+     LEFT JOIN custitem_contract
+       ON custitem_contract.`cic_contractcuino` = cui_cuino
+     LEFT JOIN custitem AS servers
+       ON custitem_contract.`cic_cuino` = servers.cui_cuino
+     LEFT JOIN item AS serverItem
+       ON servers.cui_itemno = serverItem.`itm_itemno`
+   WHERE item.`itm_desc` LIKE '%servercare%'
+         AND item.itm_discontinued <> 'Y'
+         AND custitem.`declinedFlag` <> 'Y'
+   GROUP BY custitem.`cui_cuino`) test2
+    ON customer.cus_custno = test2.customerId
+WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
+ORDER BY cus_name ASC  ";
 
         $db->query($queryString);
         return $db;
@@ -768,7 +774,7 @@ FROM
     function displayContractAndNumbersReport()
     {
 
-        $this->setPageTitle("Contract And Numbers Report");
+        $this->setPageTitle("Service Contracts Ratio");
 
         $this->setTemplateFiles('ContractAndNumbersReport', 'ContractAndNumbersReport');
 
