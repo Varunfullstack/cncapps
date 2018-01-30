@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 122 - CNC015 - Check activity length and flag if remote support and under 5 minutes
 - Issue 131 - CNC023 - When editing customer contacts make the main contact appear in red text
 - Issue 130 - CNC022 - Include Internal Notes that are saved with SSL auto renewals in the service request that’s created.
+- Issue 160 - Increase size of field for customer name
 
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
