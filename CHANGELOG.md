@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 165 - T&M Authorisation Bug
 
 ## [1.0.4] - 2017-01-29
 - Issue 162 - Typo in subject line of email - Critial SR Activity For
