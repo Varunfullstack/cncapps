@@ -738,10 +738,10 @@ FROM
 
         while ($db->next_record()) {
             $row = $db->Record;
-            if(!$headersSet){
-                foreach (array_keys($row) as $key){
-                    if(!is_numeric($key)){
-                        $csv_export.= $key.';';
+            if (!$headersSet) {
+                foreach (array_keys($row) as $key) {
+                    if (!is_numeric($key)) {
+                        $csv_export .= $key . ';';
                     }
                 }
             }
@@ -777,14 +777,13 @@ FROM
         $db = $this->getContractAndNumberData();
 
         while ($db->next_record()) {
-
             $row = $db->Record;
             $this->template->set_var(
                 array(
                     'customerName' => $row["customerName"],
                     'serviceDeskProduct' => $row['serviceDeskProduct'],
                     'serviceDeskUsers' => $row['serviceDeskUsers'],
-                    'serviceDeskContract' => $row['serviceDeskContract'],
+                    'serviceDeskContract' => '£' . $row['serviceDeskContract'],
                     'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
                     'serverCareProduct' => $row['serverCareProduct'],
                     'virtualServers' => $row['virtualServers'],

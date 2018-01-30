@@ -10,7 +10,10 @@
         $('#theTable').DataTable({
             dom: 'Blfrtip',
             buttons: [
-                'csv'
+                {
+                    extend: 'csv',
+                    bom: true
+                }
             ],
             footerCallback: function (tfoot, data, start, end, display) {
                 var api = this.api();
@@ -132,8 +135,8 @@
         <th style="text-align:right">Total</th>
         <th style="text-align:right">Average</th>
         <th></th>
-        <th></th>
-        <th></th>
+        <th style="text-align:right"></th>
+        <th style="text-align:right"></th>
         <th style="text-align:right">Total</th>
     </tr>
     </tfoot>
@@ -150,10 +153,10 @@
             {serviceDeskUsers}
         </td>
         <td style="text-align:right">
-            £{serviceDeskContract}
+            {serviceDeskContract}
         </td>
         <td style="text-align:right">
-            £{serviceDeskCostPerUserMonth}
+            &pound;{serviceDeskCostPerUserMonth}
         </td>
         <td>
             {serverCareProduct}
@@ -165,7 +168,7 @@
             {physicalServers}
         </td>
         <td style="text-align:right">
-            £{serverCareContract}
+            &pound;{serverCareContract}
         </td>
 
     </tr>
