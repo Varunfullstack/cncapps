@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+
+## [1.0.5] - 2017-01-30
 - Issue 165 - T&M Authorisation Bug
 
 ## [1.0.4] - 2017-01-29
