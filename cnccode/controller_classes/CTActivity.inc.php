@@ -344,11 +344,12 @@ class CTActivity extends CTCNC
             $this->buActivity->createSalesOrdersFromActivities($_REQUEST['callActivityID']);
             $urlNext =
                 $this->buildLink(
-                    'Activity.php',
+                    'SalesOrder.php',
                     array(
-                        'action' => 'search'
-                    )
-                );
+                        'action' => 'search',
+                        'orderType' => 'I',
+                        'lineText' => 'consultancy'
+                    ));
 
             header('Location: ' . $urlNext);
         }
