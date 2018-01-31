@@ -3218,7 +3218,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $mime_message = "\r\nThis is a multi-part message in MIME format.\r\n";
         $mime_message .= "\r\n--$mime_boundary\r\n";
         $mime_message .= "Content-Type: text/html;";
-        $mime_message .= " charset=iso-8859-1\n";
+        $mime_message .= " charset=utf-8\n";
         $mime_message .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
         $mime_message .= "$message\r\n"; // text content of email
         $mime_message .= "\r\n--$mime_boundary\r\n";

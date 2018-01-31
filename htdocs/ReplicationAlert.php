@@ -80,8 +80,13 @@ if ($error) {
     $mime = new Mail_mime();
 
     $mime->setTxtBody($error);
-
-    $body = $mime->get();
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset' => 'UTF-8',
+        'html_charset' => 'UTF-8',
+        'head_charset' => 'UTF-8'
+    );
+    $body = $mime->get($mime_params);
 
     $hdrs = $mime->headers($hdrs_array);
 

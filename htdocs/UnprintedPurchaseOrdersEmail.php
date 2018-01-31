@@ -76,12 +76,19 @@ if (!OUTPUT_TO_SCREEN) {
         'From' => CONFIG_SALES_EMAIL,
         'To' => $toEmail,
         'Subject' => 'Unprinted Purchase Orders',
-        'Date' => date("r")
+        'Date' => date("r"),
+        'Content-Type' => 'text/html; charset=UTF-8'
     );
 
     $buMail->mime->setHTMLBody($body);
 
-    $body = $buMail->mime->get();
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset' => 'UTF-8',
+        'html_charset' => 'UTF-8',
+        'head_charset' => 'UTF-8'
+    );
+    $body = $buMail->mime->get($mime_params);
 
     $hdrs = $buMail->mime->headers($hdrs);
 

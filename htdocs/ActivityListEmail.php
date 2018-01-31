@@ -195,7 +195,8 @@ while ($i = mysql_fetch_assoc($result)) {
 $hdrs_array = array(
     'From' => EMAIL_FROM_USER,
     'To' => $send_to_email,
-    'Subject' => EMAIL_SUBJECT
+    'Subject' => EMAIL_SUBJECT,
+    'Content-Type' => 'text/html; charset=UTF-8'
 );
 
 $mime = new Mail_mime($crlf);
@@ -203,7 +204,13 @@ $mime = new Mail_mime($crlf);
 $mime->setHTMLBody($html);
 $mime->addAttachment($csv_attachment, 'text/csv', 'activities.csv', false);
 
-$body = $mime->get();
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset' => 'UTF-8',
+    'html_charset' => 'UTF-8',
+    'head_charset' => 'UTF-8'
+);
+$body = $mime->get($mime_params);
 
 $hdrs = $mime->headers($hdrs_array);
 

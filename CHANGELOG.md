@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 154 - Change the text in a calendar subject item
 - Issue 152 - CNC033 - Add decimal places to team performance fix hours
 - Issue 159 - Email Subject Change for: SR 434149 has been updated by another user
+- Issue 158 - Certain characters are displaying incorrectly in emails
 
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located

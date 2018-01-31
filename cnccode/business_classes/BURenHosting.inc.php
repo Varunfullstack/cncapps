@@ -128,7 +128,8 @@ class BURenHosting extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Hosting Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -154,8 +155,13 @@ class BURenHosting extends Business
         ob_end_clean();
 
         $buMail->mime->setHTMLBody($message);
-
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -361,7 +367,8 @@ class BURenHosting extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Hosting details',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -431,8 +438,13 @@ class BURenHosting extends Business
         ob_end_clean();
 
         $buMail->mime->setHTMLBody($message);
-
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

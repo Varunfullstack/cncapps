@@ -139,7 +139,8 @@ class BURenDomain extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Domain Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -170,7 +171,13 @@ class BURenDomain extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

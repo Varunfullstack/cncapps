@@ -282,7 +282,8 @@ class BUContactExport extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => $subject,
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             // add name to top of email
@@ -290,7 +291,14 @@ class BUContactExport extends Business
 
             $buMail->mime->setHTMLBody($thisBody);
 
-            $thisBody = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+
+            $thisBody = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 

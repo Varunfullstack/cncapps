@@ -323,6 +323,9 @@ class CTActivity extends CTCNC
             case 'updateHistoricUserTimeLogs':
                 $this->updateHistoricUserTimeLogs();
                 break;
+            case 'test':
+                $this->buActivity->sendSalesRequestAlertEmail(387378, null);
+                break;
 
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
