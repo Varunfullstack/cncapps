@@ -6,6 +6,9 @@
 <script type="text/javascript"
         src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
 <script>
+
+    // var jsonData = JSON.parse('{jsonData}');
+
     $(function () {
         $('#theTable').DataTable({
             dom: 'Blfrtip',
@@ -57,7 +60,7 @@
                     .reduce(function (a, b) {
                         var val = intVal(b);
 
-                        if(val > 0){
+                        if (val > 0) {
                             avgTotal++;
                         }
 

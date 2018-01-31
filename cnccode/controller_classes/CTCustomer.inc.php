@@ -675,13 +675,13 @@ class CTCustomer extends CTCNC
   `cus_custno`,
   cus_name AS customerName,
   serviceDeskProduct,
-  serviceDeskUsers,
-  serviceDeskContract,
-  serviceDeskCostPerUserMonth,
+  COALESCE(serviceDeskUsers,0) AS serviceDeskUsers,
+  COALESCE(serviceDeskContract,0) AS serviceDeskContract,
+  COALESCE(serviceDeskCostPerUserMonth,0) AS serviceDeskCostPerUserMonth,
   serverCareProduct,
-  virtualServers,
-  physicalServers,
-  serverCareContract
+  COALESCE(virtualServers,0) AS virtualServers,
+  COALESCE(physicalServers,0) AS physicalServers,
+  COALESCE(serverCareContract,0) AS serverCareContract
 FROM
   customer
   LEFT JOIN
@@ -778,9 +778,11 @@ ORDER BY cus_name ASC  ";
 
         $this->setTemplateFiles('ContractAndNumbersReport', 'ContractAndNumbersReport');
 
-        $this->template->set_block('ContractAndNumbersReport', 'contractItemBlock', 'contracts');
 
         $db = $this->getContractAndNumberData();
+
+
+        $this->template->set_block('ContractAndNumbersReport', 'contractItemBlock', 'contracts');
 
         while ($db->next_record()) {
             $row = $db->Record;
@@ -800,8 +802,8 @@ ORDER BY cus_name ASC  ";
             );
 
             $this->template->parse('contracts', 'contractItemBlock', true);
-
         }
+
 
         $this->template->parse('CONTENTS', 'ContractAndNumbersReport', true);
 
