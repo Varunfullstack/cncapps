@@ -89,7 +89,7 @@ switch ($server_type) {
         define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
         define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
         define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
-        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN. ', xavi@pavilionweb.co.uk');
 //            error_reporting(E_ALL & ~E_STRICT)
         error_reporting(E_ALL & ~E_WARNING);
         ini_set('display_errors', 'on');

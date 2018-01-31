@@ -325,7 +325,14 @@ class BUActivity extends Business
 
         $mime->setHTMLBody($body);
 
-        $body = $mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
 
         $hdrs = $mime->headers($hdrs);
 
@@ -434,7 +441,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -619,7 +633,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -957,7 +978,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1046,7 +1074,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1223,7 +1258,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1302,7 +1344,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1375,7 +1424,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1440,7 +1496,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1513,7 +1576,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -1699,7 +1769,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -2049,7 +2126,14 @@ class BUActivity extends Business
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -3141,7 +3225,14 @@ is currently a balance of ';
 
             $buMail->mime->setHTMLBody($html);
             $buMail->mime->addAttachment($statementFilepath, 'text/html');
-            $body = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+
+            $body = $buMail->mime->get($mime_params);
             $hdrs = $buMail->mime->headers($hdrs);
 
             $buMail->putInQueue(
@@ -3462,7 +3553,14 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -3572,11 +3670,14 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($message);
 
-        // Karim: Don't understand where these =CR things have come from!
-        $body = str_replace('=
-', '', $buMail->mime->get());
-        $body = str_replace('=09', '', $body);
-        //    $body = str_replace('=3D', '=', $body); // don't know wher =3D came from either!
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body =  $buMail->mime->get($mime_params);
+
         $hdrs = $buMail->mime->headers($hdrs);
 
         return $buMail->putInQueue($senderEmail, $toEmail, $hdrs, $body, true);
@@ -4157,7 +4258,13 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -4535,7 +4642,14 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -5500,7 +5614,13 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -5819,7 +5939,13 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -6024,7 +6150,13 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -6403,7 +6535,13 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $bcc =
             $dsCallActivity->getValue('userAccount') . '@cnc-ltd.co.uk' . ',' .
@@ -6960,7 +7098,13 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -7114,7 +7258,14 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -7296,7 +7447,14 @@ customer with the past 8 hours email to GL
 
         $buMail->mime->setHTMLBody($body);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

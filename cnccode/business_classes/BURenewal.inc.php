@@ -149,7 +149,13 @@ class BURenewal extends Business
 
             $template->parse('output', 'page', true);
             $buMail->mime->setHTMLBody($template->get_var('output'));
-            $body = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
             $hdrs = $buMail->mime->headers($hdrs);
 
             $buMail->putInQueue(
@@ -234,7 +240,13 @@ class BURenewal extends Business
 
         $template->parse('output', 'page', true);
         $buMail->mime->setHTMLBody($template->get_var('output'));
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
         $hdrs = $buMail->mime->headers($hdrs);
 
         $buMail->putInQueue(

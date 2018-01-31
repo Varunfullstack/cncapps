@@ -291,7 +291,14 @@ class BUContactExport extends Business
 
             $buMail->mime->setHTMLBody($thisBody);
 
-            $thisBody = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+
+            $thisBody = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 

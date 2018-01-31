@@ -780,7 +780,13 @@ class BUInvoice extends Business
                     $template->parse('output', 'page', true);
 
                     $buMail->mime->setHTMLBody($template->get_var('output'));
-                    $body = $buMail->mime->get();
+                    $mime_params = array(
+                        'text_encoding' => '7bit',
+                        'text_charset' => 'UTF-8',
+                        'html_charset' => 'UTF-8',
+                        'head_charset' => 'UTF-8'
+                    );
+                    $body = $buMail->mime->get($mime_params);
                     $hdrs = $buMail->mime->headers($hdrs);
 
                     $buMail->putInQueue(
@@ -892,7 +898,13 @@ class BUInvoice extends Business
 
             $template->parse('output', 'page', true);
             $buMail->mime->setHTMLBody($template->get_var('output'));
-            $body = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
             $hdrs = $buMail->mime->headers($hdrs);
 
             $buMail->putInQueue(
@@ -922,8 +934,13 @@ class BUInvoice extends Business
         $buMail->mime->addAttachment($fileName, 'Text/csv', 'sales.csv');
         $fileName = SAGE_EXPORT_DIR . '/trans.csv';
         $buMail->mime->addAttachment($fileName, 'Text/csv', 'trans.csv');
-
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
         $hdrs = $buMail->mime->headers($hdrs);
 
         $buMail->putInQueue(

@@ -157,7 +157,13 @@ $buMail = new BUMail($this);
 
 $buMail->mime->setHTMLBody($html);
 
-$body = $buMail->mime->get();
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset' => 'UTF-8',
+    'html_charset' => 'UTF-8',
+    'head_charset' => 'UTF-8'
+);
+$body = $buMail->mime->get($mime_params);
 
 $hdrs = $buMail->mime->headers($hdrs);
 
