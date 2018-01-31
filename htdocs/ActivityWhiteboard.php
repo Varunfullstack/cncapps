@@ -137,7 +137,7 @@ add_to_consultants_array( $result, 'total_mtd' );
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <META HTTP-EQUIV=REFRESH CONTENT=40>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Activities Today</title>
 <link href="screen.css" rel="stylesheet" type="text/css" />
 </head>

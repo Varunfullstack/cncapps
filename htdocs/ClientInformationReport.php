@@ -1,7 +1,7 @@
 <html>
 <head>
 <title><?php echo Controller::htmlDisplayText($dsCustomer->getValue('name')); ?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="form.css" rel="stylesheet" type="text/css">
 </head>
 <body>

@@ -97,7 +97,7 @@ if ( !SC_HTTP::isAjaxTableUpdate() ){
 	<head>
 		<TITLE><?php print SC_String::display($title) ?></TITLE>
 		<link href="mpm.css" rel="stylesheet" type="text/css">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<H1><?php print SC_String::display($title) ?></H1>
 		<SCRIPT language="JavaScript" src=".javascript/ajax.js"></SCRIPT>
 	</head>
