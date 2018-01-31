@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 160 - Increase size of field for customer name
 - Issue 154 - Change the text in a calendar subject item
 - Issue 152 - CNC033 - Add decimal places to team performance fix hours
+- Issue 159 - Email Subject Change for: SR 434149 has been updated by another user
 
 ## [1.0.3] - 2017-01-17
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
