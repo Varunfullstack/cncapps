@@ -318,7 +318,8 @@ class CTMonthlyServiceDeskReport extends CTCNC
             'From' => $senderEmail,
             'To' => $toEmail,
             'Subject' => 'Daily Service Desk Report',
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         echo $body;
@@ -326,7 +327,13 @@ class CTMonthlyServiceDeskReport extends CTCNC
         if ($sendReport) {
             $buMail->mime->setHTMLBody($body);
 
-            $body = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 

@@ -119,6 +119,7 @@ class CTItem extends CTCNC
             exit;
         }
         $this->buItem->getItemsByNameMatch($_REQUEST['itemDescription'], $dsItem, $renewalTypeID);
+
         $this->template->set_var(
             array(
                 'parentIDField' => $_SESSION['itemParentIDField'],

@@ -2,6 +2,17 @@
 This project changes will be shown here.
 
 ## [unreleased]
+- Issue 142 - Pre-pay activity over £100 - where is the email address set?
+- Issue 144 - CNC031 - Contract and numbers report
+- Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
+- Issue 122 - CNC015 - Check activity length and flag if remote support and under 5 minutes
+- Issue 131 - CNC023 - When editing customer contacts make the main contact appear in red text
+- Issue 130 - CNC022 - Include Internal Notes that are saved with SSL auto renewals in the service request that’s created.
+- Issue 160 - Increase size of field for customer name
+- Issue 154 - Change the text in a calendar subject item
+- Issue 152 - CNC033 - Add decimal places to team performance fix hours
+- Issue 159 - Email Subject Change for: SR 434149 has been updated by another user
+- Issue 158 - Certain characters are displaying incorrectly in emails
 
 ## [1.0.5] - 2017-01-30
 - Issue 165 - T&M Authorisation Bug

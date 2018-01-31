@@ -117,7 +117,8 @@ class BURenContract extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Contract Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -143,8 +144,13 @@ class BURenContract extends Business
         ob_end_clean();
 
         $buMail->mime->setHTMLBody($message);
-
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -336,8 +342,18 @@ class BURenContract extends Business
 
                     $dsInput->setValue('etaDate', date('Y-m-d'));
 
-                    $serviceRequestText = '<p>Please check that the above SSL Certificate is still required before renewing</p>' .
-                        '<p style="color: red">PLEASE RENEW FOR 3 YEARS</p>';
+                    $internalNotes = $dsRenContract->getValue('internalNotes');
+                    $internalNotes = nl2br($internalNotes);
+
+                    $renContractId = $dsRenContract->getValue('customerItemID');
+
+                    $serviceRequestText = <<<HEREDOC
+                        <p>$internalNotes</p>
+                        <p>Please update SSL contract item internal notes with the servers that have the SSL installed 
+                        onto: <a href="http://cncapps/RenContract.php?action=edit&ID=$renContractId">Contract</a></p> 
+                        <p>Please check that the above SSL Certificate is still required before renewing</p>
+                        <p style="color: red">PLEASE RENEW FOR 3 YEARS</p>
+HEREDOC;
 
                     $dsInput->setValue('serviceRequestText', $serviceRequestText);
                     $dsInput->setValue('serviceRequestCustomerItemID', '');
@@ -566,7 +582,8 @@ class BURenContract extends Business
             array(
                 'From' => $senderEmail,
                 'Subject' => 'ServiceDesk renewal sales order created for ' . $customerName,
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
 
@@ -587,7 +604,13 @@ class BURenContract extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

@@ -7,6 +7,8 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEHeader extends DBEntity
 {
+    const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
+
     /**
      * calls constructor()
      * @access public
@@ -106,6 +108,7 @@ class DBEHeader extends DBEntity
         $this->addColumn("srPromptContractThresholdHours", DA_FLOAT, DA_NOT_NULL, "hed_sr_prompt_contract_threshold_hours");
 
         $this->addColumn("remoteSupportWarnHours", DA_FLOAT, DA_NOT_NULL, "hed_remote_support_warn_hours");
+        $this->addColumn(self::RemoteSupportMinWarnHours, DA_FLOAT, DA_NOT_NULL, 'hed_remote_support_min_warn_hours');
 
         $this->addColumn("customerContactWarnHours", DA_FLOAT, DA_NOT_NULL, "hed_customer_contact_warn_hours");
         $this->setPK(0);

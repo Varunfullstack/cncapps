@@ -89,7 +89,7 @@ switch ($server_type) {
         define("SCR_DIR", "\\\\cncltd\\cnc\\Company\\scr\\dev");
         define("CUSTOMER_DIR_FROM_BROWSER", "//cncltd/cnc/customer/dev");
         define("CUSTOMER_DIR", "\\\\cncltd\\cnc\\Customer\\dev");
-        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_CATCHALL_EMAIL', 'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN. ', xavi@pavilionweb.co.uk');
 //            error_reporting(E_ALL & ~E_STRICT)
         error_reporting(E_ALL & ~E_WARNING);
         ini_set('display_errors', 'on');
@@ -110,6 +110,7 @@ switch ($server_type) {
         define('CONFIG_SUPPORT_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_PREPAY_EMAIL', CONFIG_CATCHALL_EMAIL);
 
 
         $GLOBALS['request_mail_options'] =
@@ -142,6 +143,7 @@ switch ($server_type) {
         define('CONFIG_SUPPORT_MANAGER_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
         define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', 'SDmanager@' . CONFIG_PUBLIC_DOMAIN);
         define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
+        define('CONFIG_PREPAY_EMAIL', 'PrePayOverFixedAmount@cnc-ltd.co.uk');
         error_reporting(E_ALL & ~E_WARNING & ~E_STRICT);
         ini_set('display_errors', 'off');
 
@@ -188,7 +190,7 @@ switch ($server_type) {
         define('CONFIG_SUPPORT_MANAGER_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_SUPPORT_ADMINISTRATOR_EMAIL', CONFIG_CATCHALL_EMAIL);
         define('CONFIG_HELP_DESK_EMAIL', 'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN);
-
+        define('CONFIG_PREPAY_EMAIL', CONFIG_CATCHALL_EMAIL);
 
         $GLOBALS['request_mail_options'] =
             array(

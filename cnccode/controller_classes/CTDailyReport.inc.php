@@ -223,7 +223,7 @@ class CTDailyReport extends CTCNC
 
             echo $body;
 
-            $emailTo = CONFIG_SUPPORT_ADMINISTRATOR_EMAIL . ',' . CONFIG_SALES_MANAGER_EMAIL;
+            $emailTo = CONFIG_PREPAY_EMAIL;
 
             $this->buDailyReport->sendByEmailTo(
                 $emailTo,

@@ -167,11 +167,18 @@ $buMail->mime->setHTMLBody($html);
 
 $buMail->mime->addAttachment($csv_attachment, 'text/csv', 'addresses.csv', false);
 
-$body = $buMail->mime->get();
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset' => 'UTF-8',
+    'html_charset' => 'UTF-8',
+    'head_charset' => 'UTF-8'
+);
+$body = $buMail->mime->get($mime_params);
 
 $hdrs = array(
     'From' => CONFIG_SALES_EMAIL,
-    'Subject' => 'Outlook Address File'
+    'Subject' => 'Outlook Address File',
+    'Content-Type' => 'text/html; charset=UTF-8'
 );
 
 $hdrs = $buMail->mime->headers($hdrs);
