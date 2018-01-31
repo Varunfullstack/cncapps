@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ##[unreleased]
 
-## [1.0.1]
+## [1.1.0]
 - Issue 142 - Pre-pay activity over £100 - where is the email address set?
 - Issue 144 - CNC031 - Contract and numbers report
 - Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
