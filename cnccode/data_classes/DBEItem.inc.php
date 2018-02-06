@@ -78,7 +78,6 @@ class DBEItem extends DBCNCEntity
             " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
             " ORDER BY " . $this->getDBColumnName('description') .
             " LIMIT 0,200";
-        var_dump($queryString);
         $this->setQueryString($queryString);
 
         $ret = (parent::getRows());
