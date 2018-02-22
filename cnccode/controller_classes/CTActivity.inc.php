@@ -274,10 +274,6 @@ class CTActivity extends CTCNC
                 $this->autoUpdate();
                 break;
 
-            case 'incrementPauseCounter':
-                $this->incrementPauseCounter();
-                break;
-
             case 'gatherFixedInformation':
                 $this->gatherFixedInformation();
                 break;
@@ -3359,7 +3355,6 @@ class CTActivity extends CTCNC
                 'level' => $level,
                 'onSiteFlag' => $onSiteFlag,
                 'allocatedUserID' => $dsCallActivity->getValue('allocatedUserID'),
-                'hdPauseCount' => $dsCallActivity->getValue('hdPauseCount'),
                 'reason' => $dsCallActivity->getValue('reason'),
                 'reasonMessage' => $dsCallActivity->getMessage('reason'),
                 'internalNotes' => $dsCallActivity->getValue('internalNotes'),
@@ -4483,27 +4478,6 @@ class CTActivity extends CTCNC
             $_REQUEST['reason'],
             $_REQUEST['internalNotes']
         );
-
-        header('Content-type: text/plain');
-        echo json_encode($this->buActivity->processCountdown($_REQUEST['callActivityID']));
-    }
-
-    /**
-     * Increments SR pause counter. AJAX call from edit page
-     *
-     */
-    function incrementPauseCounter()
-    {
-        if (!$_REQUEST['problemID']) {
-
-            echo 'problemID not passed';
-
-        }
-
-        $this->buActivity->incrementPauseCounter(
-            $_REQUEST['problemID']
-        );
-
     }
 
     function gatherFixedInformation()
@@ -4882,7 +4856,8 @@ class CTActivity extends CTCNC
         }
 
         $this->buActivity->requestAdditionalTime(
-            $_REQUEST['problemID']
+            $_REQUEST['problemID'],
+            $_REQUEST['reason']
         );
     }
 
