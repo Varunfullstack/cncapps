@@ -55,7 +55,6 @@
 
     <input type="hidden" name="callActivity[1][onSiteFlag]" value="{onSiteFlag}">
     <input type="hidden" name="callActivity[1][allocatedUserID]" value="{allocatedUserID}">
-    <input type="hidden" name="callActivity[1][hdPauseCount]" value="{hdPauseCount}">
 
     <input type="hidden" name="callActivity[1][rootCauseID]" value="{rootCauseID}">
 
@@ -200,11 +199,6 @@
                 </select>
                 <span class="formErrorMessage">{siteNoMessage}</span>
             </td>
-
-            <td colspan="2">
-                <input type="button" id="pauseTimer" value="Pause Timer" title="Pause timer whilst on the phone">
-            </td>
-
             <td class="promptText">Time from</td>
             <td class="fieldText"><input
                     type="text"
@@ -460,8 +454,6 @@
 </form>
 <div id="dialog" title="Alert"><p></p></div>
 <script>
-    var pauseCount = {hdPauseCount}; // number of times count-down timer paused for this SR
-
     var timeout;              // timer
 
     function lPad(number, length) {
@@ -528,23 +520,6 @@
 
                     $('input#requestAdditionalTime').prop('hidden', false);
                     $('input#requestAdditionalTime').prop("style").display = "inline";
-
-                    if (data['timeAlert']) {
-                        $('div#dialog p').html(data['timeAlert']);
-
-                        $(function () {
-                            $("div#dialog").dialog();
-                        });
-                    }
-
-                    /*
-                     If in team level 1 and exceded max pause count do not enable button again
-                     */
-                    if ({level} == 1 && pauseCount < {hdTeamMaxPauseCount}) {
-                        $('input#pauseTimer').prop('hidden', false);
-                        $('input#pauseTimer').prop("style").display = "inline";
-                        $('input#pauseTimer').prop('disabled', false); // enable pause button unless clicked twice already
-                    }
                 }
 
             },
@@ -573,43 +548,7 @@
         ) {
 
             $('div#dialog').hide(); // default
-            /*
-             Only display pause timer button if assigned user in team level 1
-             */
-            if ({level} == 1) {
 
-                /*
-                 Have already exceeded count for this SR previously
-                 */
-                if (pauseCount >= {hdTeamMaxPauseCount}) {
-
-                    $('input#pauseTimer').prop('disabled', true);
-                }
-
-
-                $('input#pauseTimer').click(function () {
-
-                    pauseCount++;
-
-                    $.ajax({
-                        url: 'Activity.php',
-                        data: {
-                            action: "incrementPauseCounter",
-                            problemID: $("INPUT#problemID").val()
-                        }
-                    });
-
-                    $(this).prop('disabled', true); // disable button for duration of pause
-
-                    clearTimeout(timeout);
-
-                    timeout = setTimeout(autoSave, {hdTeamPauseSeconds} * 1000); // seconds to pause for
-                }); // end of click function
-            }
-            else {
-                $('input#pauseTimer').prop('hidden', true);
-
-            }
             $('input#requestAdditionalTime').prop('disabled', false);
             $('input#requestAdditionalTime').prop("style").display = "none";
 
@@ -632,9 +571,6 @@
             }); // end of click function
         } // end if( {status} == 'I' | {status} == 'P' ) & {hiddenPriority} < 5 & '{onSiteFlag}' != 'Y'
         else {
-
-            $('input#pauseTimer').prop('hidden', true);
-            $('input#pauseTimer').prop("style").display = "none";
 
             $('input#requestAdditionalTime').prop('hidden', true);
             $('input#requestAdditionalTime').prop("style").display = "none";

@@ -3335,22 +3335,8 @@ class CTActivity extends CTCNC
 
         $userID = $dsCallActivity->getValue('allocatedUserID');
 
-        $pauseCount = $dsCallActivity->getValue('hdPauseCount');
-
         $level = $this->buActivity->getLevelByUserID($userID);
 
-
-        if ($level == 1) {
-
-            $buHeader = new BUHeader($this);
-            $buHeader->getHeader($dsHeader);
-
-            $hdTeamMaxPauseCount = $dsHeader->getValue('hdTeamMaxPauseCount');
-            $hdTeamPauseSeconds = $dsHeader->getValue('hdTeamPauseSeconds');
-        } else {
-            $hdTeamMaxPauseCount = 0;
-            $hdTeamPauseSeconds = 0;
-        }
 
         if ($dsCallActivity->getValue('onSiteFlag') == 'Y') {
             $onSiteFlag = 'Y';
@@ -3373,8 +3359,6 @@ class CTActivity extends CTCNC
                 'level' => $level,
                 'onSiteFlag' => $onSiteFlag,
                 'allocatedUserID' => $dsCallActivity->getValue('allocatedUserID'),
-                'hdTeamMaxPauseCount' => $hdTeamMaxPauseCount,
-                'hdTeamPauseSeconds' => $hdTeamPauseSeconds,
                 'hdPauseCount' => $dsCallActivity->getValue('hdPauseCount'),
                 'reason' => $dsCallActivity->getValue('reason'),
                 'reasonMessage' => $dsCallActivity->getMessage('reason'),

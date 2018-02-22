@@ -171,15 +171,6 @@ class CTHeader extends CTCNC
 
                 'imTeamLimitHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamLimitHours')),
 
-                'hdTeamMaxPauseCount' => Controller::htmlInputText($dsHeader->getValue('hdTeamMaxPauseCount')),
-
-                'hdTeamMaxPauseCountMessage' => Controller::htmlDisplayText($dsHeader->getMessage('hdTeamMaxPauseCount')),
-
-
-                'hdTeamPauseSeconds' => Controller::htmlInputText($dsHeader->getValue('hdTeamPauseSeconds')),
-
-                'hdTeamPauseSecondsMessage' => Controller::htmlDisplayText($dsHeader->getMessage('hdTeamPauseSeconds')),
-
                 'hdTeamTargetLogPercentage' => Controller::htmlInputText($dsHeader->getValue('hdTeamTargetLogPercentage')),
 
                 'hdTeamTargetSlaPercentage' => Controller::htmlInputText($dsHeader->getValue('hdTeamTargetSlaPercentage')),

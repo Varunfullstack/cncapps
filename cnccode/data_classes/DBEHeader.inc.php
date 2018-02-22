@@ -73,43 +73,23 @@ class DBEHeader extends DBEntity
         $this->addColumn("allowedClientIpPattern", DA_STRING, DA_NOT_NULL, "hed_allowed_client_ip_pattern");
         $this->addColumn("hdTeamLimitHours", DA_FLOAT, DA_NOT_NULL, "hed_hd_team_limit_hours");
         $this->addColumn("esTeamLimitHours", DA_FLOAT, DA_NOT_NULL, "hed_es_team_limit_hours");
-
         $this->addColumn("imTeamLimitHours", DA_FLOAT, DA_NOT_NULL, "hed_im_team_limit_hours");
-
-        $this->addColumn("hdTeamMaxPauseCount", DA_INTEGER, DA_NOT_NULL, "hed_hd_team_max_pause_count");
-        $this->addColumn("hdTeamPauseSeconds", DA_FLOAT, DA_NOT_NULL, "hed_hd_team_pause_seconds");
-
         $this->addColumn("hdTeamTargetLogPercentage", DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_log_percentage");
-
         $this->addColumn("esTeamTargetLogPercentage", DA_FLOAT, DA_NOT_NULL, "hed_es_team_target_log_percentage");
-
         $this->addColumn("imTeamTargetLogPercentage", DA_FLOAT, DA_NOT_NULL, "hed_im_team_target_log_percentage");
-
         $this->addColumn("hdTeamTargetSlaPercentage", DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_sla_percentage");
-
         $this->addColumn("esTeamTargetSlaPercentage", DA_FLOAT, DA_NOT_NULL, "hed_es_team_target_sla_percentage");
-
         $this->addColumn("imTeamTargetSlaPercentage", DA_INTEGER, DA_NOT_NULL, "hed_im_team_target_sla_percentage");
-
         $this->addColumn("hdTeamTargetFixHours", DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_fix_hours");
-
         $this->addColumn("esTeamTargetFixHours", DA_FLOAT, DA_NOT_NULL, "hed_es_team_target_fix_hours");
-
         $this->addColumn("imTeamTargetFixHours", DA_FLOAT, DA_NOT_NULL, "hed_im_team_target_fix_hours");
-
         $this->addColumn("hdTeamTargetFixQtyPerMonth", DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_fix_qty_per_month");
-
         $this->addColumn("esTeamTargetFixQtyPerMonth", DA_INTEGER, DA_NOT_NULL, "hed_es_team_target_fix_qty_per_month");
-
         $this->addColumn("imTeamTargetFixQtyPerMonth", DA_INTEGER, DA_NOT_NULL, "hed_im_team_target_fix_qty_per_month");
-
         $this->addColumn("srAutocompleteThresholdHours", DA_FLOAT, DA_NOT_NULL, "hed_sr_autocomplete_threshold_hours");
-
         $this->addColumn("srPromptContractThresholdHours", DA_FLOAT, DA_NOT_NULL, "hed_sr_prompt_contract_threshold_hours");
-
         $this->addColumn("remoteSupportWarnHours", DA_FLOAT, DA_NOT_NULL, "hed_remote_support_warn_hours");
         $this->addColumn(self::RemoteSupportMinWarnHours, DA_FLOAT, DA_NOT_NULL, 'hed_remote_support_min_warn_hours');
-
         $this->addColumn("customerContactWarnHours", DA_FLOAT, DA_NOT_NULL, "hed_customer_contact_warn_hours");
         $this->setPK(0);
         $this->setAddColumnsOff();

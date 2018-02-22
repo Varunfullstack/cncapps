@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue167-1519296160-0">
+        <tagDatabase tag="issue167"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_team_max_pause_count"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_hd_team_max_pause_count"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_team_pause_seconds"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_hd_team_pause_seconds"/>
+    </changeSet>
+</databaseChangeLog>
