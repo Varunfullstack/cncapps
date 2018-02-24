@@ -18,4 +18,66 @@
         </preConditions>
         <dropColumn tableName="headert" columnName="hed_hd_team_pause_seconds"/>
     </changeSet>
+    <changeSet id="issue167-1519296160-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_hd_remain_hours"/>
+        </preConditions>
+        <renameColumn tableName="problem" oldColumnName="pro_hd_remain_hours" newColumnName="pro_hd_limit_minutes"
+                      columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_es_remain_hours"/>
+        </preConditions>
+        <renameColumn tableName="problem" oldColumnName="pro_es_remain_hours" newColumnName="pro_es_limit_minutes"
+                      columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_im_remain_hours"/>
+        </preConditions>
+        <renameColumn tableName="problem" oldColumnName="pro_im_remain_hours" newColumnName="pro_im_limit_minutes"
+                      columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_team_limit_hours"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_hd_team_limit_hours"
+                      newColumnName="hed_hd_team_limit_minutes" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_es_team_limit_hours"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_es_team_limit_hours"
+                      newColumnName="hed_es_team_limit_minutes" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_im_team_limit_hours"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_im_team_limit_hours"
+                      newColumnName="hed_im_team_limit_minutes" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="time_granted" columnName="hours"/>
+        </preConditions>
+        <sql>
+            update time_granted set hours = hours * 60
+        </sql>
+        <renameColumn tableName="time_granted" oldColumnName="hours"
+                      newColumnName="minutes" columnDataType="int"/>
+        <rollback>
+            <renameColumn tableName="time_granted" newColumnName="hours"
+                          oldColumnName="minutes" columnDataType="decimal(10,2)"/>
+            <sql>
+                update time_granted set hours = hours / 60
+            </sql>
+        </rollback>
+
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -84,6 +84,12 @@ function common_convertHHMMToDecimal($hhMM)
     return common_numberFormat($hours + $minutesAsFraction);
 }
 
+function convertHHMMToMinutes($hhMM)
+{
+    $time = explode(':', $hhMM);
+    return ($time[0] * 60.0 + $time[1] * 1.0);
+}
+
 if (!function_exists('str_split')) {
     function str_split($string, $split_length = 1)
     {

@@ -19,6 +19,32 @@
         }
     }
 
+    // function validateHhMm(value) {
+    //     return /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value);
+    // }
+
+    // function checkDate() {
+    //
+    //     var activityType = $('#contractID').val();
+    //
+    //     console.log();
+    //
+    //     var startTimeElm = $('#startTime');
+    //     var endTimeElm = $('#endTime');
+    //
+    //     //check if the startTime is a valid date
+    //     if (validateHhMm(startTimeElm.val()) && validateHhMm(endTimeElm.val())) {
+    //         // we only care about this if this activity is one that affects the time
+    //
+    //
+    //         var startTime = moment(startTimeElm.val(), 'HH:mm');
+    //         var endTime = moment(endTimeElm.val(), 'HH:mm');
+    //
+    //         console.log(endTime.diff(startTime) / 1000 / 60);
+    //     }
+    //
+    // }
+
     function setFormChanged() {
         formChanged = true;
     }
@@ -187,7 +213,9 @@
                 {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
             </td>
         </tr>
-
+        <tr>
+            <td></td>
+        </tr>
         <tr>
             <td class="promptText">Site</td>
             <td class="fieldText">
@@ -209,7 +237,8 @@
                     size="5"
                     maxlength="8"
                     placeholder="HH:MM"
-                    onchange="setFormChanged();"/>
+                    onchange="setFormChanged();"
+                    id="startTime"/>
                 <span class="formErrorMessage">{startTimeMessage}</span>
                 to <input
                         {DISABLED}
@@ -221,7 +250,8 @@
                         size="5"
                         placeholder="HH:MM"
                         maxlength="8"
-                        onchange="setFormChanged();"/>
+                        onchange="setFormChanged();"
+                />
                 {setTimeNowLink}<span class="formErrorMessage">{endTimeMessage}</span>
             </td>
         </tr>
@@ -479,10 +509,6 @@
     }
 
     function autoSave() {
-        /*
-         Autosave contents of text fields every 10 seconds
-         */
-
         $.ajax({
             url: 'Activity.php',
             data: {
@@ -502,26 +528,6 @@
                 $('td#autoUpdateLabel').html(
                     "Autosaved at " + lPad(tDate.getHours(), 2) + ":" + lPad(tDate.getMinutes(), 2) + ":" + lPad(tDate.getSeconds(), 2)
                 );
-
-                /*
-                 is there an alert to display
-                 */
-                if (
-                    {hiddenPriority} < 5 &
-                    (
-                        '{problemStatus}' == 'I' |
-                        '{problemStatus}' == 'P'
-                    )
-                ) { // exclude fixed and completed
-
-                    $('span#hdRemainMinutes').html('HD:' + data['hdRemainMinutes']);
-                    $('span#esRemainMinutes').html('ES:' + data['esRemainMinutes']);
-                    $('span#imRemainMinutes').html('IM:' + data['imRemainMinutes']);
-
-                    $('input#requestAdditionalTime').prop('hidden', false);
-                    $('input#requestAdditionalTime').prop("style").display = "inline";
-                }
-
             },
 
             complete: function () {
@@ -536,54 +542,25 @@
         // run the first time; all subsequent calls will take care of themselves
         timeout = setTimeout(autoSave, 10000); // 10 seconds
 
-        /*
-         No timer for priority 5
-         */
-        if (
-            ('{problemStatus}' == 'I' | '{problemStatus}' == 'P') &
+        $('input#requestAdditionalTime').click(function () {
 
-            {hiddenPriority} < 5 &
+            var reason = prompt('Please provide your reason to request additional time');
+            if (!reason) {
+                return;
+            }
 
-            '{onSiteFlag}' != 'Y'
-        ) {
-
-            $('div#dialog').hide(); // default
-
-            $('input#requestAdditionalTime').prop('disabled', false);
-            $('input#requestAdditionalTime').prop("style").display = "none";
-
-            $('input#requestAdditionalTime').click(function () {
-
-                if (!confirm('Are you sure you want to request more time to work on this SR?')) {
-                    return;
+            $.ajax({
+                url: 'Activity.php',
+                data: {
+                    action: "requestAdditionalTime",
+                    problemID: $("INPUT#problemID").val(),
+                    reason: reason
                 }
+            });
 
-                $.ajax({
-                    url: 'Activity.php',
-                    data: {
-                        action: "requestAdditionalTime",
-                        problemID: $("INPUT#problemID").val()
-                    }
-                });
+            alert('Additional time has been requested');
 
-                alert('Additional time has been requested');
-
-            }); // end of click function
-        } // end if( {status} == 'I' | {status} == 'P' ) & {hiddenPriority} < 5 & '{onSiteFlag}' != 'Y'
-        else {
-
-            $('input#requestAdditionalTime').prop('hidden', true);
-            $('input#requestAdditionalTime').prop("style").display = "none";
-
-            $('span#hdRemainMinutes').prop('hidden', true);
-            $('span#hdRemainMinutes').prop("style").display = "none";
-
-            $('span#esRemainMinutes').prop('hidden', true);
-            $('span#esRemainMinutes').prop("style").display = "none";
-
-            $('span#imRemainMinutes').prop('hidden', true);
-            $('span#imRemainMinutes').prop("style").display = "none";
-        }
+        });
     });
 </script>
 <!-- End Template: ActivityEdit.inc.html -->

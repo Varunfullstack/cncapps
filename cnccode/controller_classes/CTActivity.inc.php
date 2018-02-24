@@ -1729,7 +1729,7 @@ class CTActivity extends CTCNC
                 'projectChecked' => $_SESSION['context'] == 'project' ? 'CHECKED' : '',
                 'minResponseTime' => $minResponseTime,
                 'totalActivityDurationHours' => $dbeJProblem->getValue('totalActivityDurationHours'),
-                'chargableActivityDurationHours' => $dbeJProblem->getValue('chargableActivityDurationHours'),
+                'chargeableActivityDurationHours' => $dbeJProblem->getValue('chargeableActivityDurationHours'),
                 'currentDocumentsLink' => $currentDocumentsLink,
                 'problemHistoryLink' => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'projectLink' => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
@@ -3350,6 +3350,23 @@ class CTActivity extends CTCNC
             );
         }
 
+        $problemID = $dsCallActivity->getValue('problemID');
+        $hdUsedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
+        $esUsedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
+        $imUsedMinutes = $this->buActivity->getIMTeamUsedTime($problemID);
+        $hdUsedMinutesNotInclusive = $this->buActivity->getHDTeamUsedTime($problemID, $callActivityID);
+        $esUsedMinutesNotInclusive = $this->buActivity->getESTeamUsedTime($problemID, $callActivityID);
+        $imUsedMinutesNotInclusive = $this->buActivity->getIMTeamUsedTime($problemID, $callActivityID);
+
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+        $dbeProblem->getRow();
+
+
+        $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+        $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+
         $this->template->set_var(
             array(
                 'level' => $level,
@@ -3419,11 +3436,20 @@ class CTActivity extends CTCNC
                 'hideFromCustomerFlagChecked' => Controller::htmlChecked($hideFromCustomerFlag),
 
                 'hideFromCustomerDisabled' => $hideFromCustomerDisabled,
-                'hdRemainMinutes' => number_format($dsCallActivity->getValue('hdRemainHours') * 60, 1),
-                'esRemainMinutes' => number_format($dsCallActivity->getValue('esRemainHours') * 60, 1),
-                'imRemainMinutes' => number_format($dsCallActivity->getValue('imRemainHours') * 60, 1),
-                'userWarned' => $this->userWarned
 
+                'hdRemainMinutes' => $hdAssignedMinutes - $hdUsedMinutes,
+                'esRemainMinutes' => $esAssignedMinutes - $esUsedMinutes,
+                'imRemainMinutes' => $imAssignedMinutes - $imUsedMinutes,
+                'hdUsedMinutesNotInclusive' => $hdUsedMinutesNotInclusive,
+                'esUsedMinutesNotInclusive' => $esUsedMinutesNotInclusive,
+                'imUsedMinutesNotInclusive' => $imUsedMinutesNotInclusive,
+                'hdAssignedMinutes' => $hdAssignedMinutes,
+                'hdUsedMinutes' => $hdUsedMinutes,
+                'esAssignedMinutes' => $esAssignedMinutes,
+                'esUsedMinutes' => $esUsedMinutes,
+                'imAssignedMinutes' => $imAssignedMinutes,
+                'imUsedMinutes' => $imUsedMinutes,
+                'userWarned' => $this->userWarned
             )
         );
 
@@ -3682,6 +3708,7 @@ class CTActivity extends CTCNC
         $dsCallActivity->setValue('reason', $_POST['reason']);
         $dsCallActivity->setValue('internalNotes', $_POST['internalNotes']);
         $dsCallActivity->post();
+
         if ($dsCallActivity->getValue('callActTypeID') == 0 || $dsCallActivity->getValue('callActTypeID') == '') {
             $this->formError = true;
             $this->dsCallActivity->setMessage('callActTypeID', 'Required');
@@ -3776,43 +3803,90 @@ class CTActivity extends CTCNC
                         $this->formError = true;
                         $this->dsCallActivity->setMessage('endTime', 'End time must be after start time!');
                     }
-                    /*
-            If we haven't already warned about these then do a check
-            */
-                    if (!$_REQUEST['userWarned']) {
 
-                        $durationHours = common_convertHHMMToDecimal($dsCallActivity->getValue('endTime')) - common_convertHHMMToDecimal($dsCallActivity->getValue('startTime'));
+                    $durationHours = common_convertHHMMToDecimal($dsCallActivity->getValue('endTime')) - common_convertHHMMToDecimal($dsCallActivity->getValue('startTime'));
 
-                        $buHeader = new BUHeader($this);
-                        $buHeader->getHeader($dsHeader);
+                    $durationMinutes = convertHHMMToMinutes($dsCallActivity->getValue('endTime')) - convertHHMMToMinutes($dsCallActivity->getValue('startTime'));
 
-                        if (
-                            $dsCallActivity->getValue('callActTypeID') == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-                            $durationHours > $dsHeader->getValue('customerContactWarnHours')
-                        ) {
-                            $this->formError = true;
-                            $this->userWarned = true;
-                            $this->dsCallActivity->setMessage('endTime', 'Warning: Duration exceeds ' . $dsHeader->getValue('customerContactWarnHours') . ' hours');
 
+                    $activityType = $dsCallActivity->getValue('callActTypeID');
+
+                    if (in_array($activityType, [4, 8, 11, 18])) {
+                        $problemID = $dsCallActivity->getValue('problemID');
+                        $userID = $dsCallActivity->getValue(DBEJCallActivity::userID);
+                        $dbeUser = new DBEUser($this);
+                        $dbeUser->setValue('userID', $userID);
+                        $dbeUser->getRow();
+
+                        $dbeProblem = new DBEProblem($this);
+                        $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+                        $dbeProblem->getRow();
+
+
+                        $teamID = $dbeUser->getValue('teamID');
+
+                        $usedTime = 0;
+                        $allocatedTime = 0;
+
+                        if ($teamID == 1) {
+                            $usedTime = $this->buActivity->getHDTeamUsedTime($problemID, $callActivityID);
+                            $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
                         }
 
-                        if ($dsCallActivity->getValue('callActTypeID') == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-                            if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
+                        if ($teamID == 2) {
+                            $usedTime = $this->buActivity->getESTeamUsedTime($problemID, $callActivityID);
+                            $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                        }
+
+                        if ($teamID == 4) {
+                            $usedTime = $this->buActivity->getIMTeamUsedTime($problemID, $callActivityID);
+                            $allocatedTime = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                        }
+
+                        echo json_encode(['usedTime' => $usedTime, 'durationMinutes' => $durationMinutes, 'alloactedTime' => $allocatedTime]);
+
+                        if ($usedTime + $durationMinutes > $allocatedTime) {
+                            $this->formError = true;
+                            $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than the left over');
+                        }
+
+                    } else {
+                        if (!$_REQUEST['userWarned']) {
+
+
+                            $buHeader = new BUHeader($this);
+                            $buHeader->getHeader($dsHeader);
+
+
+                            if (
+                                $dsCallActivity->getValue('callActTypeID') == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
+                                $durationHours > $dsHeader->getValue('customerContactWarnHours')
+                            ) {
                                 $this->formError = true;
                                 $this->userWarned = true;
-                                $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                                $this->dsCallActivity->setMessage('endTime', 'Warning: Duration exceeds ' . $dsHeader->getValue('customerContactWarnHours') . ' hours');
+
                             }
 
-                            $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
+                            if ($dsCallActivity->getValue('callActTypeID') == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
+                                if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
+                                    $this->formError = true;
+                                    $this->userWarned = true;
+                                    $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                                }
 
-                            if ($durationHours < $minHours) {
-                                $this->formError = true;
-                                $this->userWarned = true;
-                                $this->dsCallActivity->setMessage('endTime', 'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
+                                $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
+
+                                if ($durationHours < $minHours) {
+                                    $this->formError = true;
+                                    $this->userWarned = true;
+                                    $this->dsCallActivity->setMessage('endTime', 'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
+                                }
+
                             }
-
                         }
                     }
+
                 }
             }
         }
@@ -4736,15 +4810,15 @@ class CTActivity extends CTCNC
 
                 if ($_REQUEST['allocatedMinutesCustom']) {
 
-                    $hours = 0.0167 * $_REQUEST['allocatedMinutesCustom'];
+                    $minutes = $_REQUEST['allocatedMinutesCustom'];
                 } else {
-                    $hours = 0.0167 * $_REQUEST['allocatedMinutes'];
+                    $minutes = $_REQUEST['allocatedMinutes'];
                 }
 
                 $this->buActivity->allocateAdditionalTime(
                     $_REQUEST['problemID'],
                     $_REQUEST['teamLevel'],
-                    $hours,
+                    $minutes,
                     $_REQUEST['comments']
                 );
 
