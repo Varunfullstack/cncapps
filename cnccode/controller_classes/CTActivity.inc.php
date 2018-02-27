@@ -3843,8 +3843,6 @@ class CTActivity extends CTCNC
                             $allocatedTime = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
                         }
 
-                        echo json_encode(['usedTime' => $usedTime, 'durationMinutes' => $durationMinutes, 'alloactedTime' => $allocatedTime]);
-
                         if ($usedTime + $durationMinutes > $allocatedTime) {
                             $this->formError = true;
                             $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than the left over');
@@ -4411,8 +4409,6 @@ class CTActivity extends CTCNC
      */
     function uploadFile()
     {
-
-        echo 'this should be called';
         // validate
         if ($_REQUEST['problemID'] == '') {
             $this->setFormErrorMessage('problemID not passed');
@@ -4796,15 +4792,7 @@ class CTActivity extends CTCNC
 
             if (!$_REQUEST['allocatedMinutes'] && !$_REQUEST['allocatedMinutesCustom']) {
                 $error['allocatedMinutes'] = 'Please select';
-
-            } elseif (
-                !$_REQUEST['allocatedMinutes'] &&
-                ($_REQUEST['allocatedMinutesCustom'] > 120 or $_REQUEST['allocatedMinutesCustom'] < 5)
-            ) {
-                $error['allocatedMinutesCustom'] = 'Please enter a value between 5 and 120';
-
             }
-
 
             if (count($error) == 0) {
 
