@@ -866,6 +866,7 @@ class CTCurrentActivityReport extends CTCNC
 
             }
 
+
             if ($dsResults->getValue('alarmDate') && $dsResults->getValue('alarmDate') != '0000-00-00') {
 
                 $alarmDateTimeDisplay = Controller::dateYMDtoDMY($dsResults->getValue('alarmDate')) . ' ' . $dsResults->getValue('alarmTime');
@@ -932,7 +933,31 @@ class CTCurrentActivityReport extends CTCNC
                 $priorityBgColor = self::CONTENT;
             }
 
+
+            $problemID = $dsResults->getValue('problemID');
+            $buActivity = new BUActivity($this);
+
+            $hdUsedMinutes = $buActivity->getHDTeamUsedTime($problemID);
+            $esUsedMinutes = $buActivity->getESTeamUsedTime($problemID);
+            $imUsedMinutes = $buActivity->getIMTeamUsedTime($problemID);
+
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+            $dbeProblem->getRow();
+
+            $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+            $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+            $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+
+            $hdRemaining = $hdAssignedMinutes - $hdUsedMinutes;
+            $esRemaining = $esAssignedMinutes - $esUsedMinutes;
+            $imRemaining = $imAssignedMinutes - $imUsedMinutes;
+
+
+            $timeBudget = "HD:" . $hdRemaining . ' ES:' . $esRemaining . ' IM:' . $imRemaining;
+
             $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
+            $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
                 array(
@@ -943,6 +968,11 @@ class CTCurrentActivityReport extends CTCNC
                     'updatedBgColor' => $updatedBgColor,
                     'priorityBgColor' => $priorityBgColor,
                     'hoursRemainingBgColor' => $hoursRemainingBgColor,
+                    'totalActivityDurationHours' => $totalActivityDurationHours,
+                    'timeBudget' => $timeBudget,
+                    'hdRemaining' => $hdRemaining,
+                    'esRemaining' => $esRemaining,
+                    'imRemaining' => $imRemaining,
                     'urlCustomer' => $urlCustomer,
                     'time' => $dsResults->getValue('lastStartTime'),
                     'date' => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
@@ -956,8 +986,7 @@ class CTCurrentActivityReport extends CTCNC
                     'customerNameDisplayClass'
                     => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'), $dsResults->getValue('specialAttentionEndDate')),
                     'urlViewActivity' => $urlViewActivity,
-                    'linkAllocateAdditionalTime'
-                    => $linkAllocateAdditionalTime,
+                    'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),
                     'priority' => Controller::htmlDisplayText($dsResults->getValue('priority')),
                     'alarmDateTime' => $alarmDateTimeDisplay,
