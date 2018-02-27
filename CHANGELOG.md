@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ##[unreleased]
+- Issue 155 - CNC034 - Profitability Report for PrePay counts as negative
 
 ## [1.1.0]
 - Issue 142 - Pre-pay activity over £100 - where is the email address set?
