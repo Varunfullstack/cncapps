@@ -19,12 +19,20 @@
     </style>
   </head>
   <body>
-   <p>{allocatedUserName} {requestedReason}. Please <A href="{urlAllocateAdditionalTime}">review and consider allocating more time</A></p>
-   
-   <p>Chargeable Hours: {chargeableActivityDurationHours}</p>
 
-   <p>Total Hours: {totalActivityDurationHours}</p>
-  
+  <p>
+      Requested By: {allocatedUserName}
+  </p>
+  <p>
+      Notes: {requestedReason}
+  </p>
+   <p>Chargeable Hours: {chargeableActivityDurationHours}</p>
+   <p>Time spent so far: {totalActivityDurationHours}</p>
+   <p>Time left on budget: {timeLeftOnBudget}</p>
+   <p> . Please <A href="{urlAllocateAdditionalTime}">review and consider allocating more time</A></p>
+
+
+
    <p><A href="{urlLastActivity}">View last activity</A></p>
 
   <table width="100%">

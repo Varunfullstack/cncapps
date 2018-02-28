@@ -3815,6 +3815,7 @@ class CTActivity extends CTCNC
 
                     if (in_array($activityType, [4, 8, 11, 18])) {
                         $problemID = $dsCallActivity->getValue('problemID');
+
                         $userID = $dsCallActivity->getValue(DBEJCallActivity::userID);
                         $dbeUser = new DBEUser($this);
                         $dbeUser->setValue('userID', $userID);
@@ -3824,32 +3825,32 @@ class CTActivity extends CTCNC
                         $dbeProblem->setValue(DBEProblem::problemID, $problemID);
                         $dbeProblem->getRow();
 
-
                         $teamID = $dbeUser->getValue('teamID');
 
-                        $usedTime = 0;
-                        $allocatedTime = 0;
+                        if ($teamID <= 4) {
+                            $usedTime = 0;
+                            $allocatedTime = 0;
 
-                        if ($teamID == 1) {
-                            $usedTime = $this->buActivity->getHDTeamUsedTime($problemID, $callActivityID);
-                            $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                            if ($teamID == 1) {
+                                $usedTime = $this->buActivity->getHDTeamUsedTime($problemID, $callActivityID);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                            }
+
+                            if ($teamID == 2) {
+                                $usedTime = $this->buActivity->getESTeamUsedTime($problemID, $callActivityID);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                            }
+
+                            if ($teamID == 4) {
+                                $usedTime = $this->buActivity->getIMTeamUsedTime($problemID, $callActivityID);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                            }
+
+                            if ($usedTime + $durationMinutes > $allocatedTime) {
+                                $this->formError = true;
+                                $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
+                            }
                         }
-
-                        if ($teamID == 2) {
-                            $usedTime = $this->buActivity->getESTeamUsedTime($problemID, $callActivityID);
-                            $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                        }
-
-                        if ($teamID == 4) {
-                            $usedTime = $this->buActivity->getIMTeamUsedTime($problemID, $callActivityID);
-                            $allocatedTime = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
-                        }
-
-                        if ($usedTime + $durationMinutes > $allocatedTime) {
-                            $this->formError = true;
-                            $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
-                        }
-
                     } else {
                         if (!$_REQUEST['userWarned']) {
 

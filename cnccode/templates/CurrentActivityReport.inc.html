@@ -170,29 +170,29 @@
                 >
             </td>
 
-            <td width="3%" class="content">{escalateButton}</td>
+            <td width="3%">{escalateButton}</td>
 
-            <td width="3%" class="content">{deEscalateButton}</td>
+            <td width="3%">{deEscalateButton}</td>
 
             <td width="1px" style="max-width: 1px" bgcolor="{bgColour}" class="problemId">
                 <A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="3%" bgcolor="{priorityBgColor}">
                 <div align="center">{priority}</div>
             </td>
 
-            <td class="content">{linkAllocateAdditionalTime}</td>
+            <td>{linkAllocateAdditionalTime}</td>
 
             <td width="5%" bgcolor="{hoursRemainingBgColor}"
                 title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
                 <div align="center">{hoursRemaining}</div>
             </td>
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">
+            <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
@@ -202,7 +202,7 @@
                 <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
-            <td width="37%" class="content">
+            <td width="37%">
                 <A
                         href="#"
                         onClick="window.open(
@@ -212,7 +212,7 @@
                 </A>
             </td>
 
-            <td width="10%" valign="center" class="content">
+            <td width="10%" valign="center">
                 <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
             </td>
 
@@ -269,20 +269,20 @@
                 >
             </td>
 
-            <td width="3%" class="content">{escalateButton}</td>
-            <td width="3%" class="content">{deEscalateButton}</td>
+            <td width="3%">{escalateButton}</td>
+            <td width="3%">{deEscalateButton}</td>
             <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="3%" bgcolor="{priorityBgColor}">
                 <div align="center">{priority}</div>
             </td>
 
-            <td class="content">{linkAllocateAdditionalTime}</td>
+            <td>{linkAllocateAdditionalTime}</td>
 
 
             <td width="5%" bgcolor="{hoursRemainingBgColor}"
@@ -291,14 +291,17 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
-                                                 data-problemId="{problemID}">
+            <td width="15%" align="left">
+                <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
-                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
-                    class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
+                </span>
+
+                <span style="color: {hdColor}">HD:{hdRemaining}</span>
+                <span style="color: {esColor}">ES:{esRemaining}</span>
+                <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
-            <td width="37%" class="content">
+            <td width="37%">
                 <A
                         href="#"
                         onClick="window.open(
@@ -308,7 +311,7 @@
                 </A>
             </td>
 
-            <td width="10%" valign="center" class="content">
+            <td width="10%" valign="center">
                 <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
             </td>
 
@@ -365,20 +368,20 @@
                 >
             </td>
 
-            <td width="3%" class="content">{escalateButton}</td>
-            <td width="3%" class="content">{deEscalateButton}</td>
+            <td width="3%">{escalateButton}</td>
+            <td width="3%">{deEscalateButton}</td>
             <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="3%" bgcolor="{priorityBgColor}">
                 <div align="center">{priority}</div>
             </td>
 
-            <td class="content">{linkAllocateAdditionalTime}</td>
+            <td>{linkAllocateAdditionalTime}</td>
 
 
             <td width="5%" bgcolor="{hoursRemainingBgColor}"
@@ -387,15 +390,17 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">
+            <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
-                HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
-                    class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
+
+                <span style="color: {hdColor}">HD:{hdRemaining}</span>
+                <span style="color: {esColor}">ES:{esRemaining}</span>
+                <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
-            <td width="37%" class="content">
+            <td width="37%">
                 <A
                         href="#"
                         onClick="window.open(
@@ -405,7 +410,7 @@
                 </A>
             </td>
 
-            <td width="10%" valign="center" class="content">
+            <td width="10%" valign="center">
                 <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
             </td>
 
@@ -450,6 +455,8 @@
     </tr>
     </thead>
     <tbody>
+
+
     <!-- BEGIN queue4Block -->
     <form name="userForm">
         <tr valign="center">
@@ -462,20 +469,20 @@
                 >
             </td>
 
-            <td width="3%" class="content">{escalateButton}</td>
-            <td width="3%" class="content">{deEscalateButton}</td>
+            <td width="3%">{escalateButton}</td>
+            <td width="3%">{deEscalateButton}</td>
             <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="3%" bgcolor="{priorityBgColor}">
                 <div align="center">{priority}</div>
             </td>
 
-            <td class="content">{linkAllocateAdditionalTime}</td>
+            <td>{linkAllocateAdditionalTime}</td>
 
             <td width="5%" bgcolor="{hoursRemainingBgColor}"
                 title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
@@ -483,14 +490,17 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
-                                                 data-problemId="{problemID}">
+            <td width="15%" align="left">
+                <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
-                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
-                    class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
+                </span>
+
+                <span style="color: {hdColor}">HD:{hdRemaining}</span>
+                <span style="color: {esColor}">ES:{esRemaining}</span>
+                <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
-            <td width="37%" class="content">
+            <td width="37%">
                 <A
                         href="#"
                         onClick="window.open(
@@ -500,7 +510,7 @@
                 </A>
             </td>
 
-            <td width="10%" valign="center" class="content">
+            <td width="10%" valign="center">
                 <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
             </td>
 
@@ -560,19 +570,19 @@
                 >
             </td>
 
-            <td width="3%" class="content">{alarmDateTime}</td>
+            <td width="3%">{alarmDateTime}</td>
             <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="3%" bgcolor="{priorityBgColor}">
                 <div align="center">{priority}</div>
             </td>
 
-            <td class="content">{linkAllocateAdditionalTime}</td>
+            <td>{linkAllocateAdditionalTime}</td>
 
             <td width="5%" bgcolor="{hoursRemainingBgColor}"
                 title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
@@ -580,14 +590,17 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
-                                                 data-problemId="{problemID}">
+            <td width="15%" align="left">
+                <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
-                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
-                    class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
+                </span>
+
+                <span style="color: {hdColor}">HD:{hdRemaining}</span>
+                <span style="color: {esColor}">ES:{esRemaining}</span>
+                <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
-            <td width="40%" class="content">
+            <td width="40%">
                 <A
                         href="#"
                         onClick="window.open(
@@ -597,7 +610,7 @@
                 </A>
             </td>
 
-            <td width="10%" valign="center" class="content">
+            <td width="10%" valign="center">
                 <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
             </td>
 
@@ -653,13 +666,13 @@
                 >
             </td>
 
-            <td width="3%" class="content">{escalateButton}</td>
-            <td width="3%" class="content">{deEscalateButton}</td>
+            <td width="3%">{escalateButton}</td>
+            <td width="3%">{deEscalateButton}</td>
             <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="3%" bgcolor="{priorityBgColor}">
@@ -672,15 +685,18 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
-                                                 data-problemId="{problemID}">
+            <td width="15%" align="left">
+                <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
-                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
-                    class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
+                </span>
+
+                <span style="color: {hdColor}">HD:{hdRemaining}</span>
+                <span style="color: {esColor}">ES:{esRemaining}</span>
+                <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
 
-            <td width="37%" class="content">
+            <td width="37%">
                 <A
                         href="#"
                         onClick="window.open(
@@ -690,7 +706,7 @@
                 </A>
             </td>
 
-            <td width="10%" valign="center" class="content">
+            <td width="10%" valign="center">
                 <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
             </td>
 
@@ -723,20 +739,20 @@
     <form name="userForm">
         <tr valign="center">
 
-            <td width="3%" class="content">&nbsp;</td>
-            <td width="3%" class="content">&nbsp;</td>
+            <td width="3%">&nbsp;</td>
+            <td width="3%">&nbsp;</td>
             <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
 
-            <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
 
             <td width="12%" bgcolor="{priorityBgColor}">
                 <div align="center">{priority}</div>
             </td>
 
-            <td width="40%" class="content">
+            <td width="40%">
                 <A
                         href="#"
                         onClick="window.open(

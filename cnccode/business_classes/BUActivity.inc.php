@@ -6981,7 +6981,7 @@ customer with the past 8 hours email to GL
 
         if ($this->dbeProblem->getValue('userID')) { // if it is allocated
             $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
-            $this->logAllocatedTime($this->dbeProblem->getValue('userID'), $minutes, $comments);
+//            $this->logAllocatedTime($this->dbeProblem->getValue('userID'), $minutes, $comments);
         }
 
         $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');

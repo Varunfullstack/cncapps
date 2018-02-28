@@ -78,7 +78,7 @@ class DBEHeader extends DBEntity
     const customerContactWarnHours = "customerContactWarnHours";
 
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
-    const ImplementationTeamMinutesInADay = "ImplementationTeamMinutesInADay";
+    const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
 
     /**
      * calls constructor()

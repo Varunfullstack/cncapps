@@ -977,9 +977,8 @@ class CTCurrentActivityReport extends CTCNC
                     'time' => $dsResults->getValue('lastStartTime'),
                     'date' => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
                     'problemID' => $dsResults->getValue('problemID'),
-                    'reason' => $this->truncate($dsResults->getValue('reason')),
-                    'urlProblemHistoryPopup'
-                    => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
+                    'reason' => $this->truncate($dsResults->getValue('reason'), 150),
+                    'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
                     'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
                     'engineerName' => $dsResults->getValue('engineerName'),
                     'customerName' => $dsResults->getValue('customerName'),
