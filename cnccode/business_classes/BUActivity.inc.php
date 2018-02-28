@@ -6970,9 +6970,6 @@ customer with the past 8 hours email to GL
             $this->dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutes);
             $this->dbeProblem->setValue(DBEProblem::hdTimeAlertFlag, 'N'); // reset alert flag
         } elseif ($level == 2) {
-            /*
-      Allocated user is in Escalations team
-      */
             $this->dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutes);
             $this->dbeProblem->setValue(DBEProblem::esTimeAlertFlag, 'N');
         } else {
@@ -6982,17 +6979,12 @@ customer with the past 8 hours email to GL
 
         $this->dbeProblem->updateRow();
 
-        /*
-    If SR is allocated then log granted time against user
-    */
         if ($this->dbeProblem->getValue('userID')) { // if it is allocated
             $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
             $this->logAllocatedTime($this->dbeProblem->getValue('userID'), $minutes, $comments);
         }
 
         $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
-
-
     }
 
     private function logAllocatedTime($userID, $minutes, $comments)

@@ -6,19 +6,28 @@
 <br/>
 <script>
     $(function () {
-        console.log('test');
-        $('.remainingColor').each(function () {
-            var elm = $(this);
-            var amount = elm.text();
+        $('.requestAdditionalTime').click(function () {
 
-            if (amount <= 5) {
-                elm.css('color', 'red');
-            } else if (amount >= 6 && amount <= 20) {
-                elm.css('color', 'amber');
-            } else {
-                elm.css('color', 'green');
+            var reason = prompt('Please provide your reason to request additional time');
+            if (!reason) {
+                return;
             }
-        })
+
+            var problemID = ($(this).data()).problemid;
+
+            $.ajax({
+                url: 'Activity.php',
+                data: {
+                    action: "requestAdditionalTime",
+                    problemID: problemID,
+                    reason: reason
+                }
+            });
+
+            alert('Additional time has been requested');
+
+        });
+
     })
 </script>
 <table width="100%">
@@ -165,7 +174,9 @@
 
             <td width="3%" class="content">{deEscalateButton}</td>
 
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="1px" style="max-width: 1px" bgcolor="{bgColour}" class="problemId">
+                <A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
             </td>
@@ -181,8 +192,14 @@
                 <div align="center">{hoursRemaining}</div>
             </td>
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
-                    class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
+            <td width="10%" align="center">
+                <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
+                    <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
+                </span>
+
+                <span style="color: {hdColor}">HD:{hdRemaining}</span>
+                <span style="color: {esColor}">ES:{esRemaining}</span>
+                <span style="color: {imColor}">IM:{imRemaining}</span>
             </td>
 
             <td width="37%" class="content">
@@ -254,7 +271,8 @@
 
             <td width="3%" class="content">{escalateButton}</td>
             <td width="3%" class="content">{deEscalateButton}</td>
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
@@ -273,7 +291,10 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
+            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
+                                                 data-problemId="{problemID}">
+                    <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
+                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
                     class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
             </td>
 
@@ -346,7 +367,8 @@
 
             <td width="3%" class="content">{escalateButton}</td>
             <td width="3%" class="content">{deEscalateButton}</td>
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
@@ -365,7 +387,11 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
+            <td width="10%" align="center">
+                <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
+                    <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
+                </span>
+                HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
                     class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
             </td>
 
@@ -438,7 +464,8 @@
 
             <td width="3%" class="content">{escalateButton}</td>
             <td width="3%" class="content">{deEscalateButton}</td>
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
@@ -456,7 +483,10 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
+            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
+                                                 data-problemId="{problemID}">
+                    <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
+                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
                     class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
             </td>
 
@@ -531,7 +561,8 @@
             </td>
 
             <td width="3%" class="content">{alarmDateTime}</td>
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
@@ -549,7 +580,10 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
+            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
+                                                 data-problemId="{problemID}">
+                    <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
+                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
                     class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
             </td>
 
@@ -621,7 +655,8 @@
 
             <td width="3%" class="content">{escalateButton}</td>
             <td width="3%" class="content">{deEscalateButton}</td>
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>
@@ -637,7 +672,10 @@
             </td>
 
             <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="10%" align="center">HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
+            <td width="10%" align="center"><span style="cursor: pointer" class="requestAdditionalTime"
+                                                 data-problemId="{problemID}">
+                    <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
+                </span> HD:<span class="remainingColor">{hdRemaining}</span> ES:<span
                     class="remainingColor">{esRemaining}</span> IM:<span class="remainingColor">{imRemaining}</span>
             </td>
 
@@ -687,7 +725,8 @@
 
             <td width="3%" class="content">&nbsp;</td>
             <td width="3%" class="content">&nbsp;</td>
-            <td width="7%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A></td>
+            <td width="47px" style="max-width: 47px" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
 
 
             <td width="20%" class="{customerNameDisplayClass}"><A href={urlCustomer} target="_blank">{customerName}</a>

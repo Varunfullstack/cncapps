@@ -3350,6 +3350,8 @@ class CTActivity extends CTCNC
             );
         }
 
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
         $problemID = $dsCallActivity->getValue('problemID');
         $hdUsedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
         $esUsedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
@@ -3845,7 +3847,7 @@ class CTActivity extends CTCNC
 
                         if ($usedTime + $durationMinutes > $allocatedTime) {
                             $this->formError = true;
-                            $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than the left over');
+                            $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
                         }
 
                     } else {
@@ -4790,37 +4792,39 @@ class CTActivity extends CTCNC
 
             $teamLevel = $_REQUEST['teamLevel'];
 
-            if (!$_REQUEST['allocatedMinutes'] && !$_REQUEST['allocatedMinutesCustom']) {
-                $error['allocatedMinutes'] = 'Please select';
+            $minutes = 0;
+
+            switch ($_REQUEST['allocatedTimeAmount']) {
+                case 'minutes':
+                    $minutes = $_REQUEST['allocatedTimeValue'];
+                    break;
+                case 'hours':
+                    $minutes = $_REQUEST['allocatedTimeValue'] * 60;
+                    break;
+                case 'days':
+                    $buHeader = new BUHeader($this);
+                    /** @var $dsHeader DataSet */
+                    $buHeader->getHeader($dsHeader);
+                    $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+                    $minutes = $minutesInADay * $_REQUEST['allocatedTimeValue'];
             }
 
-            if (count($error) == 0) {
+            $this->buActivity->allocateAdditionalTime(
+                $_REQUEST['problemID'],
+                $_REQUEST['teamLevel'],
+                $minutes,
+                $_REQUEST['comments']
+            );
 
-                if ($_REQUEST['allocatedMinutesCustom']) {
-
-                    $minutes = $_REQUEST['allocatedMinutesCustom'];
-                } else {
-                    $minutes = $_REQUEST['allocatedMinutes'];
-                }
-
-                $this->buActivity->allocateAdditionalTime(
-                    $_REQUEST['problemID'],
-                    $_REQUEST['teamLevel'],
-                    $minutes,
-                    $_REQUEST['comments']
+            $nextURL =
+                $this->buildLink(
+                    'CurrentActivityReport.php',
+                    array()
                 );
 
-                $nextURL =
-                    $this->buildLink(
-                        'CurrentActivityReport.php',
-                        array()
-                    );
-
-                header('Location: ' . $nextURL);
-                exit;
-
-            }
-
+            header('Location: ' . $nextURL);
+            exit;
         }// end IF POST
         else {
             if ($dbeFirstActivity->getValue('queueNo') == 1) {
@@ -4867,9 +4871,6 @@ class CTActivity extends CTCNC
                 'problemID' => $_REQUEST['problemID'],
                 'customerID' => $dbeFirstActivity->getValue('customerID'),
                 'customerName' => $dbeFirstActivity->getValue('customerName'),
-                'allocatedMinutesCustom' => $_REQUEST['allocatedMinutesCustom'],
-                'allocatedMinutesMessage' => $error['allocatedMinutes'],
-                'allocatedMinutesCustomMessage' => $error['allocatedMinutesCustom'],
                 'submitURL' => $submitURL,
                 'urlProblemHistoryPopup' => $urlProblemHistoryPopup
             )

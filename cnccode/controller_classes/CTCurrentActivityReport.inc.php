@@ -954,8 +954,6 @@ class CTCurrentActivityReport extends CTCNC
             $imRemaining = $imAssignedMinutes - $imUsedMinutes;
 
 
-            $timeBudget = "HD:" . $hdRemaining . ' ES:' . $esRemaining . ' IM:' . $imRemaining;
-
             $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
@@ -969,10 +967,12 @@ class CTCurrentActivityReport extends CTCNC
                     'priorityBgColor' => $priorityBgColor,
                     'hoursRemainingBgColor' => $hoursRemainingBgColor,
                     'totalActivityDurationHours' => $totalActivityDurationHours,
-                    'timeBudget' => $timeBudget,
                     'hdRemaining' => $hdRemaining,
                     'esRemaining' => $esRemaining,
                     'imRemaining' => $imRemaining,
+                    'hdColor' => $this->pickColor($hdRemaining),
+                    'esColor' => $this->pickColor($esRemaining),
+                    'imColor' => $this->pickColor($imRemaining),
                     'urlCustomer' => $urlCustomer,
                     'time' => $dsResults->getValue('lastStartTime'),
                     'date' => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
@@ -1011,6 +1011,17 @@ class CTCurrentActivityReport extends CTCNC
         );
     } // end render queue
 
+
+    private function pickColor($value)
+    {
+        if ($value <= 5) {
+            return 'red';
+        } else if ($value >= 6 && $value <= 20) {
+            return '#FFBF00';
+        } else {
+            return 'green';
+        }
+    }
 
     /**
      * Return the appropriate background colour for this problem

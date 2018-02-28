@@ -11,12 +11,22 @@
             <columnExists tableName="headert" columnName="hed_hd_team_max_pause_count"/>
         </preConditions>
         <dropColumn tableName="headert" columnName="hed_hd_team_max_pause_count"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_hd_team_max_pause_count" type="int"/>
+            </addColumn>
+        </rollback>
     </changeSet>
     <changeSet id="issue167-1519296160-2" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_hd_team_pause_seconds"/>
         </preConditions>
         <dropColumn tableName="headert" columnName="hed_hd_team_pause_seconds"/>
+        <rollback>
+           <addColumn tableName="headert">
+               <column name="hed_hd_team_pause_seconds" type="int"/>
+           </addColumn>
+        </rollback>
     </changeSet>
     <changeSet id="issue167-1519296160-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
@@ -76,8 +86,24 @@
                 update time_granted set hours = hours / 60
             </sql>
         </rollback>
-
     </changeSet>
-
-
+    <changeSet id="issue167-1519296160-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hed_im_team_minutes_in_a_day"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="hed_im_team_minutes_in_a_day" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue167-1519296160-11" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_im_team_minutes_in_a_day"/>
+        </preConditions>
+        <update tableName="headert">
+            <column name="hed_im_team_minutes_in_a_day" value="480"/>
+        </update>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

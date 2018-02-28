@@ -78,6 +78,7 @@ class DBEHeader extends DBEntity
     const customerContactWarnHours = "customerContactWarnHours";
 
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
+    const ImplementationTeamMinutesInADay = "ImplementationTeamMinutesInADay";
 
     /**
      * calls constructor()
@@ -160,6 +161,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::remoteSupportWarnHours, DA_FLOAT, DA_NOT_NULL, "hed_remote_support_warn_hours");
         $this->addColumn(self::customerContactWarnHours, DA_FLOAT, DA_NOT_NULL, "hed_customer_contact_warn_hours");
         $this->addColumn(self::RemoteSupportMinWarnHours, DA_FLOAT, DA_NOT_NULL, 'hed_remote_support_min_warn_hours');
+        $this->addColumn(self::ImplementationTeamMinutesInADay, DA_INTEGER, DA_NOT_NULL, 'hed_im_team_minutes_in_a_day');
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
