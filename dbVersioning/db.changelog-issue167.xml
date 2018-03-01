@@ -23,9 +23,9 @@
         </preConditions>
         <dropColumn tableName="headert" columnName="hed_hd_team_pause_seconds"/>
         <rollback>
-           <addColumn tableName="headert">
-               <column name="hed_hd_team_pause_seconds" type="int"/>
-           </addColumn>
+            <addColumn tableName="headert">
+                <column name="hed_hd_team_pause_seconds" type="int"/>
+            </addColumn>
         </rollback>
     </changeSet>
     <changeSet id="issue167-1519296160-3" author="pavwebdev">
@@ -106,4 +106,20 @@
         </update>
         <rollback/>
     </changeSet>
+    <changeSet id="issue167-1519296160-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="time_granted"/>
+        </preConditions>
+        <dropTable tableName="time_granted"/>
+        <rollback>
+            <createTable tableName="time_granted">
+                <column name="timeGrantedID" type="int(11) unsigned">
+                    <constraints primaryKey="true" nullable="false"/>
+                </column>
+                <column name="userID" type="int(11) unsigned"/>
+                <column name="grantedDate" type="date"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

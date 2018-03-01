@@ -6978,39 +6978,9 @@ customer with the past 8 hours email to GL
         }
 
         $this->dbeProblem->updateRow();
-
-        if ($this->dbeProblem->getValue('userID')) { // if it is allocated
-            $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
-//            $this->logAllocatedTime($this->dbeProblem->getValue('userID'), $minutes, $comments);
-        }
-
+        
         $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
     }
-
-    private function logAllocatedTime($userID, $minutes, $comments)
-    {
-        global $db;
-
-        $sql =
-            "INSERT INTO time_granted
-          (
-            userID,
-            minutes,
-            grantedDate
-          ) 
-        VALUES 
-          (
-            " . $userID . ",
-            " . $minutes . ",
-            DATE( NOW() )
-          )
-        ON DUPLICATE KEY UPDATE minutes = minutes + " . $minutes;
-
-        $db->query($sql);
-
-        $this->sendTimeAllocatedEmail($minutes, $comments);
-
-    } // end sendTimeAllocatedEmail
 
     /*
   Send email to SD Managers requesting more time to be allocated to SR
