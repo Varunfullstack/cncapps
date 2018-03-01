@@ -6814,13 +6814,11 @@ customer with the past 8 hours email to GL
     }
 
 
-    private function sendRequestAdditionalTimeEmail($reason)
+    private function sendRequestAdditionalTimeEmail($problemID, $reason, $requestorID)
     {
         $buMail = new BUMail($this);
 
-        $problemID = $this->dbeProblem->getValue('problemID');
-
-        $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
+        $this->dbeUser->getRow($requestorID);
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
@@ -6835,7 +6833,34 @@ customer with the past 8 hours email to GL
 
         $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
 
+        $teamID = $this->dbeUser->getValue(DBEUser::teamID);
 
+        $leftOnBudget = null;
+        $usedMinutes = 0;
+        $assignedMinutes = 0;
+
+        $dbeProblem = new DBEJProblem($this);
+        $dbeProblem->getRow($problemID);
+
+        switch ($teamID) {
+            case 1:
+                $usedMinutes = $this->getHDTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                $toEmail = 'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN;
+                break;
+            case 2:
+                $usedMinutes = $this->getESTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
+                break;
+            case 4:
+                $usedMinutes = $this->getIMTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+            default:
+                $toEmail = 'imptimerequest@' . CONFIG_PUBLIC_DOMAIN;
+        }
+
+        $leftOnBudget = $assignedMinutes - $usedMinutes;
         $subject = 'Time Requested: ' . CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName') . ' allocated to ' . $userName;
 
         $requestedReason = $reason;
@@ -6854,15 +6879,14 @@ customer with the past 8 hours email to GL
 
                 'urlLastActivity' => $urlLastActivity,
 
-                'internalNotes' => $this->dbeProblem->getValue('internalNotes'),
+                'internalNotes' => $dbeProblem->getValue('internalNotes'),
 
                 'requestedReason' => $requestedReason,
 
-                'chargeableActivityDurationHours'
-                => $this->dbeProblem->getValue('chargeableActivityDurationHours'),
+                'chargeableActivityDurationHours' => $dbeProblem->getValue('chargeableActivityDurationHours'),
 
-                'totalActivityDurationHours'
-                => $this->dbeProblem->getValue('totalActivityDurationHours')
+                'totalActivityDurationHours' => $dbeProblem->getValue('totalActivityDurationHours'),
+                'timeLeftOnBudget' => $leftOnBudget
             )
         );
 
@@ -6896,17 +6920,6 @@ customer with the past 8 hours email to GL
         $template->parse('output', 'page', true);
 
         $body = $template->get_var('output');
-
-        /*
-    Destination email depends upon queue of SR
-    */
-        if ($this->dbeProblem->getValue('queueNo') == 1) {
-            $toEmail = 'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        } elseif ($this->dbeProblem->getValue('queueNo') == 2) {
-            $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        } else { // default for > queue 2
-            $toEmail = 'imptimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        }
 
         $hdrs = array(
             'From' => $senderEmail,
@@ -6978,7 +6991,7 @@ customer with the past 8 hours email to GL
         }
 
         $this->dbeProblem->updateRow();
-        
+
         $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
     }
 
@@ -7059,14 +7072,17 @@ customer with the past 8 hours email to GL
         );
     }
 
-    public function requestAdditionalTime($problemID, $reason)
+    public function requestAdditionalTime($problemID, $reason, $callActivityID)
     {
-        $this->dbeProblem = new DBEProblem($this);
-        $this->dbeProblem->getRow($problemID);
-        $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
+        if ($callActivityID) {
+            $dbeJCallActivity = new DBEJCallActivity($this);
+            $dbeJCallActivity->getRow($callActivityID);
+            $requesterID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
+        } else {
+            $requesterID = $GLOBALS['auth']->is_authenticated();
+        }
 
-        $this->sendRequestAdditionalTimeEmail($reason);
-
+        $this->sendRequestAdditionalTimeEmail($problemID, $reason, $requesterID);
     }
 
     function getUserPerformanceWeekToDate($userID)

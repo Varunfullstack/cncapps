@@ -4921,7 +4921,8 @@ class CTActivity extends CTCNC
 
         $this->buActivity->requestAdditionalTime(
             $_REQUEST['problemID'],
-            $_REQUEST['reason']
+            $_REQUEST['reason'],
+            $_REQUEST['callActivityID']
         );
     }
 
