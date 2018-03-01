@@ -116,6 +116,7 @@
                 <column name="timeGrantedID" type="int(11) unsigned">
                     <constraints primaryKey="true" nullable="false"/>
                 </column>
+                <column name="minutes" type="int(11)"/>
                 <column name="userID" type="int(11) unsigned"/>
                 <column name="grantedDate" type="date"/>
             </createTable>
