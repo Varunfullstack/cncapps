@@ -12,6 +12,7 @@ require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJOrdhead.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 // Parameters
 define('CTCUSTOMER_VAL_NONE_SELECTED', -1);
 // Actions
@@ -108,6 +109,113 @@ class CTCustomerCRM extends CTCNC
         $this->dsCustomer->addColumn('lastReviewMeetingDateMessage', DA_STRING, DA_ALLOW_NULL);
     }
 
+
+//    /**
+//     * Route to function based upon action passed
+//     */
+//    function defaultAction()
+//    {
+//        switch ($_REQUEST['action']) {
+//            case 'edit':
+//                $this->edit();
+//                break;
+//            case 'delete':
+//                $this->delete();
+//                break;
+//            case 'generate':
+//                $this->generate();
+//                break;
+//            case 'loadFromCsv':
+//                $this->loadFromCsv();
+//                break;
+//
+//            case 'list':
+//                $this->displayList();
+//                break;
+//
+//            case 'search':
+//            default:
+//                $this->search();
+//                break;
+//        }
+//    }
+//
+    function search()
+    {
+
+        $this->setMethodName('search');
+
+        $dsSearchForm = new DSForm($this);
+        $dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
+        $dsSearchForm->setValue('customerID', '');
+//        $this->buCustomer->initialiseSearchForm($dsSearchForm);
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
+
+                $this->setFormErrorOn();
+
+            } else {
+                $this->setCustomerID($dsSearchForm->getValue('customerID'));
+                $link = $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'displayEditForm',
+                        'customerID' => $this->getCustomerID()
+                    )
+                );
+
+                header('Location: ' . $link);
+            }
+
+        } else {
+            $this->setMethodName('displaySearchForm');
+
+            $this->setTemplateFiles(
+                array(
+                    'CustomerCRM' => 'CRMSearch.inc'
+                )
+            );
+
+            $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+
+
+            $this->setPageTitle('Customer CRM');
+
+            if ($dsSearchForm->getValue('customerID')) {
+                $buCustomer = new BUCustomer ($this);
+                $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
+                $customerString = $dsCustomer->getValue('name');
+            }
+
+            $urlCustomerPopup =
+                $this->buildLink(
+                    CTCNC_PAGE_CUSTOMER,
+                    array(
+                        'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                        'htmlFmt' => CT_HTML_FMT_POPUP)
+                );
+
+            $this->template->set_var(
+                array(
+                    'formError' => $this->formError,
+                    'customerID' => $dsSearchForm->getValue('customerID'),
+                    'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
+                    'customerString' => $customerString,
+                    'urlCustomerPopup' => $urlCustomerPopup,
+                    'urlSubmit' => $urlSubmit
+                )
+            );
+
+            $this->template->parse('CONTENTS', 'CustomerCRM', true);
+
+            $this->parsePage();
+        }
+
+
+    } // end search
+
     function initialProcesses()
     {
         $this->retrieveHTMLVars();
@@ -116,10 +224,11 @@ class CTCustomerCRM extends CTCNC
 
     function setContact(&$contactArray)
     {
-        var_dump('set contact is called ');
         if (!is_array($contactArray)) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
+        var_dump($contactArray);
+
         while (list($key, $value) = each($contactArray)) {
             $this->dsContact->setUpdateModeInsert();
             $this->dsContact->setValue('ContactID', $value['contactID']);
@@ -157,6 +266,7 @@ class CTCustomerCRM extends CTCNC
             $this->dsContact->setValue('AutoCloseEmailFlag', $this->getYN($value['autoCloseEmailFlag']));
             $this->dsContact->setValue('FailedLoginCount', $value['failedLoginCount']);
 
+
             if (
                 $value['email'] == '' &&
                 $value[CONFIG_HEADER_SUPPORT_CONTACT_FLAG] == 'Y'
@@ -193,20 +303,20 @@ class CTCustomerCRM extends CTCNC
             $this->dsSite->setValue('SiteNo', $value['siteNo']);
             $this->dsSite->setValue('Add1', $value['add1']);
             if ($this->dsSite->getValue('Add1') == '') {
-                $this->setFormErrorOn();
+//                $this->setFormErrorOn();
                 $this->dsSite->setValue('Add1Class', CTCUSTOMER_CLS_FORM_ERROR);
             }
             $this->dsSite->setValue('Add2', $value['add2']);
             $this->dsSite->setValue('Add3', $value['add3']);
             $this->dsSite->setValue('Town', strtoupper($value['town']));
             if ($this->dsSite->getValue('Town') == '') {
-                $this->setFormErrorOn();
+//                $this->setFormErrorOn();
                 $this->dsSite->setValue('TownClass', CTCUSTOMER_CLS_FORM_ERROR_UC);
             }
             $this->dsSite->setValue('County', $value['county']);
             $this->dsSite->setValue('Postcode', strtoupper($value['postcode']));
             if ($this->dsSite->getValue('Postcode') == '') {
-                $this->setFormErrorOn();
+//                $this->setFormErrorOn();
                 $this->dsSite->setValue('PostcodeClass', CTCUSTOMER_CLS_FORM_ERROR_UC);
             }
             $this->dsSite->setValue('Phone', $value['phone']);
@@ -255,6 +365,7 @@ class CTCustomerCRM extends CTCNC
         if (!is_array($customerArray)) {
             return;
         }
+        var_dump($customerArray);
 
         foreach ($customerArray as $value) {
             $this->dsCustomer->setUpdateModeInsert();
@@ -495,7 +606,8 @@ class CTCustomerCRM extends CTCNC
                 $this->displaySpecialAttentionCustomers();
                 break;
             default:
-                $this->displaySearchForm();
+//                $this->displaySearchForm();
+                $this->search();
                 break;
         }
     }
@@ -806,44 +918,44 @@ class CTCustomerCRM extends CTCNC
         $this->parsePage();
     }
 
-    /**
-     * Search for customers usng customerString
-     * @access private
-     */
-    function search()
-    {
-        $this->setMethodName('search');
-// Parameter validation
-        if (!$this->buCustomer->getCustomersByNameMatch(
-            $this->getContactString(),
-            $this->getPhoneString(),
-            $this->getCustomerString(),
-            $this->getAddress(),
-            $this->convertDateYMD($this->getNewCustomerFromDate()),
-            $this->convertDateYMD($this->getNewCustomerToDate()),
-            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
-            $this->convertDateYMD($this->getDroppedCustomerToDate()),
-            $this->dsCustomer)
-        ) {
-            $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
-        }
-        if (($this->formError) || ($this->dsCustomer->rowCount() > 1)) {
-            $this->displaySearchForm();
-        } else {
-            // reload with this customer
-            $nextURL =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISP_EDIT,
-                        'customerID' => $this->dsCustomer->getValue('CustomerID')
-                    )
-                );
-            header('Location: ' . $nextURL);
-            exit;
-
-        }
-    }
+//    /**
+//     * Search for customers usng customerString
+//     * @access private
+//     */
+//    function search()
+//    {
+//        $this->setMethodName('search');
+//        // Parameter validation
+//        if (!$this->buCustomer->getCustomersByNameMatch(
+//            $this->getContactString(),
+//            $this->getPhoneString(),
+//            $this->getCustomerString(),
+//            $this->getAddress(),
+//            $this->convertDateYMD($this->getNewCustomerFromDate()),
+//            $this->convertDateYMD($this->getNewCustomerToDate()),
+//            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
+//            $this->convertDateYMD($this->getDroppedCustomerToDate()),
+//            $this->dsCustomer)
+//        ) {
+//            $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
+//        }
+//        if (($this->formError) || ($this->dsCustomer->rowCount() > 1)) {
+//            $this->displaySearchForm();
+//        } else {
+//            // reload with this customer
+//            $nextURL =
+//                $this->buildLink(
+//                    $_SERVER['PHP_SELF'],
+//                    array(
+//                        'action' => CTCNC_ACT_DISP_EDIT,
+//                        'customerID' => $this->dsCustomer->getValue('CustomerID')
+//                    )
+//                );
+//            header('Location: ' . $nextURL);
+//            exit;
+//
+//        }
+//    }
 
     /**
      * Form for editing customer details
@@ -852,7 +964,6 @@ class CTCustomerCRM extends CTCNC
     function displayEditForm()
     {
         $this->setMethodName('displayEditForm');
-        var_dump($this->formError);
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
             if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_DISP_SUCCESS)) {   // Not displaying form error page so get customer record
                 if (!$this->buCustomer->getCustomerByID($this->getCustomerID(), $this->dsCustomer)) {
@@ -1739,7 +1850,6 @@ class CTCustomerCRM extends CTCNC
     {
         $this->setMethodName('update');
         $this->setCustomerID($this->dsCustomer->getValue('CustomerID'));
-
         if (!$this->formError) {
             // Update the database
             if ($this->getCustomerID() == 0) {      // New customer
