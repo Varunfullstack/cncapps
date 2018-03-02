@@ -1000,6 +1000,11 @@ class CTCustomerCRM extends CTCNC
                 )
             );
 
+        $site = new DBESite($this);
+        $site->setValue('SiteNo', $this->dsCustomer->getValue('DeliverSiteNo'));
+        $site->setValue('CustomerID', $this->getCustomerID());
+        $site->getRowByCustomerIDSiteNo();
+
         $this->template->set_var(
             array(
                 'urlContactPopup' => $urlContactPopup,
@@ -1072,7 +1077,27 @@ class CTCustomerCRM extends CTCNC
                 'slaP2' => $this->dsCustomer->getValue('slaP2'),
                 'slaP3' => $this->dsCustomer->getValue('slaP3'),
                 'slaP4' => $this->dsCustomer->getValue('slaP4'),
-                'slaP5' => $this->dsCustomer->getValue('slaP5')
+                'slaP5' => $this->dsCustomer->getValue('slaP5'),
+
+                'add1' => $site->getValue("Add1"),
+                'add2' => $site->getValue("Add2"),
+                'add3' => $site->getValue("Add3"),
+//                'townClass' => $site->getValue('TownClass'),
+                'town' => $site->getValue("Town"),
+                'county' => $site->getValue("County"),
+//                'postcodeClass' => $site->getValue('PostcodeClass'),
+                'postcode' => $site->getValue("Postcode"),
+                'sitePhone' => $site->getValue("Phone"),
+                'siteNo' => $site->getValue("SiteNo"),
+                'sageRef' => $site->getValue("SageRef"),
+                'debtorCode' => $site->getValue("DebtorCode"),
+                'maxTravelHours' => $site->getValue("MaxTravelHours"),
+
+                'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $site->getValue('SiteNo')) ? CT_CHECKED : '',
+                'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $site->getValue('SiteNo')) ? CT_CHECKED : '',
+                'activeFlagChecked' => ($site->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
+                'deleteSiteText' => $deleteSiteText,
+                'deleteSiteURL' => $deleteSiteURL
             )
         );
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER)) {                                                      // Only get from DB if not displaying form error(s)
@@ -1323,96 +1348,97 @@ class CTCustomerCRM extends CTCNC
 
         $this->dsSite->initialise();
 
-        while ($this->dsSite->fetchNext()) {
-            if (!$this->formError) {                                                      // Only get from DB if not displaying form error(s)
-                $this->dsSite->setValue('Add1Class', CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
-                $this->dsSite->setValue('TownClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
-                $this->dsSite->setValue('PostcodeClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
-            }
 
-            //      $this->template->set_block('CustomerEdit','contacts', '');
-            $addContactURL =
-                $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMER_ACT_ADDCONTACT,
-                        'customerID' => $this->dsSite->getValue("CustomerID"),
-                        'siteNo' => $this->dsSite->getValue("SiteNo")
-                    )
-                );
-            // If we can delete this site set the link
-            if ($this->buCustomer->canDeleteSite($this->dsSite->getValue("CustomerID"), $this->dsSite->getValue("SiteNo"))) {
-                $deleteSiteURL = $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMER_ACT_DELETESITE,
-                        'customerID' => $this->dsSite->getValue("CustomerID"),
-                        'siteNo' => $this->dsSite->getValue("SiteNo")
-                    )
-                );
-                $deleteSiteText = 'Delete Site';
-            } else {
-                $deleteSiteText = '';
-            }
-            //Horrible hack cause I don't understand why these are empty strings when they should be zero values!
-            if ($this->dsCustomer->getValue('InvoiceSiteNo') == '') $this->dsCustomer->setValue('InvoiceSiteNo', '0');
-            if ($this->dsCustomer->getValue('DeliverSiteNo') == '') $this->dsCustomer->setValue('DeliverSiteNo', '0');
-            $this->template->set_var(
+        if (!$this->formError) {// Only get from DB if not displaying form error(s)
+            $thing = CTCUSTOMER_CLS_TABLE_EDIT_HEADER;
+//            $site->setValue('Add1Class',);
+//            $site->setValue('TownClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
+//            $site->setValue('PostcodeClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
+        }
+
+        //      $this->template->set_block('CustomerEdit','contacts', '');
+        $addContactURL =
+            $this->buildLink($_SERVER['PHP_SELF'],
                 array(
-                    'add1Class' => $this->dsSite->getValue('Add1Class'),
-                    'add1' => $this->dsSite->getValue("Add1"),
-                    'add2' => $this->dsSite->getValue("Add2"),
-                    'add3' => $this->dsSite->getValue("Add3"),
-                    'townClass' => $this->dsSite->getValue('TownClass'),
-                    'town' => $this->dsSite->getValue("Town"),
-                    'county' => $this->dsSite->getValue("County"),
-                    'postcodeClass' => $this->dsSite->getValue('PostcodeClass'),
-                    'postcode' => $this->dsSite->getValue("Postcode"),
-                    'sitePhone' => $this->dsSite->getValue("Phone"),
-                    'siteNo' => $this->dsSite->getValue("SiteNo"),
-                    'customerID' => $this->dsSite->getValue("CustomerID"),
-                    'sageRef' => $this->dsSite->getValue("SageRef"),
-                    'debtorCode' => $this->dsSite->getValue("DebtorCode"),
-                    'maxTravelHours' => $this->dsSite->getValue("MaxTravelHours"),
-
-                    'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $this->dsSite->getValue('SiteNo')) ? CT_CHECKED : '',
-                    'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $this->dsSite->getValue('SiteNo')) ? CT_CHECKED : '',
-                    'activeFlagChecked' => ($this->dsSite->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
-                    'deleteSiteText' => $deleteSiteText,
-                    'deleteSiteURL' => $deleteSiteURL
+                    'action' => CTCUSTOMER_ACT_ADDCONTACT,
+                    'customerID' => $site->getValue("CustomerID"),
+                    'siteNo' => $site->getValue("SiteNo")
                 )
             );
-
-            $this->template->set_block('CustomerEdit', 'invoiceContacts', '');
-
-
-            $this->parseContactSelector(
-                $this->dsSite->getValue('InvoiceContactID'),
-                $this->dsContact,
-                'invoiceContacts',
-                'selectInvoiceContactBlock'
+        // If we can delete this site set the link
+        if ($this->buCustomer->canDeleteSite($site->getValue("CustomerID"), $site->getValue("SiteNo"))) {
+            $deleteSiteURL = $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTCUSTOMER_ACT_DELETESITE,
+                    'customerID' => $site->getValue("CustomerID"),
+                    'siteNo' => $site->getValue("SiteNo")
+                )
             );
-
-            $this->template->set_block('CustomerEdit', 'deliverContacts', '');
-
-            $this->parseContactSelector(
-                $this->dsSite->getValue('DeliverContactID'),
-                $this->dsContact,
-                'deliverContacts',
-                'selectDeliverContactBlock'
-            );
-
-
-            if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER)) {
-                $this->template->set_var(
-                    array(
-                        'addContactText' => CTCUSTOMER_TXT_ADD_CONTACT,
-                        'addContactURL' => $addContactURL
-                    )
-                );
-            }
-
-            $this->template->parse('sites', 'siteBlock', true);
+            $deleteSiteText = 'Delete Site';
+        } else {
+            $deleteSiteText = '';
         }
+        //Horrible hack cause I don't understand why these are empty strings when they should be zero values!
+        if ($this->dsCustomer->getValue('InvoiceSiteNo') == '') $this->dsCustomer->setValue('InvoiceSiteNo', '0');
+        if ($this->dsCustomer->getValue('DeliverSiteNo') == '') $this->dsCustomer->setValue('DeliverSiteNo', '0');
+        $this->template->set_var(
+            array(
+                'add1Class' => $thing,
+                'add1' => $site->getValue("Add1"),
+                'add2' => $site->getValue("Add2"),
+                'add3' => $site->getValue("Add3"),
+//                'townClass' => $site->getValue('TownClass'),
+                'town' => $site->getValue("Town"),
+                'county' => $site->getValue("County"),
+//                'postcodeClass' => $site->getValue('PostcodeClass'),
+                'postcode' => $site->getValue("Postcode"),
+                'sitePhone' => $site->getValue("Phone"),
+                'siteNo' => $site->getValue("SiteNo"),
+                'customerID' => $site->getValue("CustomerID"),
+                'sageRef' => $site->getValue("SageRef"),
+                'debtorCode' => $site->getValue("DebtorCode"),
+                'maxTravelHours' => $site->getValue("MaxTravelHours"),
+
+                'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $site->getValue('SiteNo')) ? CT_CHECKED : '',
+                'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $site->getValue('SiteNo')) ? CT_CHECKED : '',
+                'activeFlagChecked' => ($site->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
+                'deleteSiteText' => $deleteSiteText,
+                'deleteSiteURL' => $deleteSiteURL
+            )
+        );
+
+        $this->template->set_block('CustomerEdit', 'invoiceContacts', '');
+
+
+        $this->parseContactSelector(
+            $site->getValue('InvoiceContactID'),
+            $this->dsContact,
+            'invoiceContacts',
+            'selectInvoiceContactBlock'
+        );
+
+        $this->template->set_block('CustomerEdit', 'deliverContacts', '');
+
+        $this->parseContactSelector(
+            $site->getValue('DeliverContactID'),
+            $this->dsContact,
+            'deliverContacts',
+            'selectDeliverContactBlock'
+        );
+
+
+        if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER)) {
+            $this->template->set_var(
+                array(
+                    'addContactText' => CTCUSTOMER_TXT_ADD_CONTACT,
+                    'addContactURL' => $addContactURL
+                )
+            );
+        }
+
+        $this->template->parse('sites', 'siteBlock', true);
+
         $this->dsContact->initialise();
         $this->dsContact->sortAscending('LastName');
 
