@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ##[unreleased]
+
+##[1.2.0]
 - Issue 167 - CNC033 - Hard limits
 
 ## [1.1.0]
