@@ -6684,6 +6684,7 @@ customer with the past 8 hours email to GL
             $dbeProblem->setValue(DBEProblem::contractCustomerItemID, $contractCustomerItemID);
             $dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes));
             $dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes));
+            $dbeProblem->setValue(DBEProblem::imLimitMinutes, $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
             $dbeProblem->setValue(DBEProblem::userID, '');        // not allocated
             $dbeProblem->insertRow();
 
