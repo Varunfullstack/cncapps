@@ -539,3 +539,7 @@ table#suspended {
     font-weight: bold;
 
 }
+
+table.table-bordered > tr{
+    background-color: rgb(244,244,242)
+}
