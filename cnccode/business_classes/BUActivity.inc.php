@@ -4843,7 +4843,6 @@ customer with the past 8 hours email to GL
             $db->query($queryString);
 
             if ($db->next_record()) {              // find
-
                 if ($db->Record['pro_status'] == 'C') {   // is request completed?
 
                     $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
@@ -5137,8 +5136,9 @@ customer with the past 8 hours email to GL
             $siteNo = $contact['siteNo'];
         }
 
-        $dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dsHeader->getValue(DBEHeader::class));
-        $dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dsHeader->getValue('esTeamLimitHours'));
+        $dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes));
+        $dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes));
+        $dbeProblem->setValue(DBEProblem::imLimitMinutes, $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
         $dbeProblem->setValue(DBEProblem::slaResponseHours, $slaResponseHours);
         $dbeProblem->setValue(DBEProblem::customerID, $customerID);
         $dbeProblem->setValue(DBEProblem::status, 'I');

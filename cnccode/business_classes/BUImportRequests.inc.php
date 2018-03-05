@@ -117,6 +117,7 @@ class BUImportRequests extends Business
 
     protected function processMessage($record, &$errorString)
     {
+
         $processed = false;
 
         return $this->buActivity->processAutomaticRequest($record, $errorString);

@@ -540,6 +540,6 @@ table#suspended {
 
 }
 
-table.table-bordered > tr{
+table.table-bordered  tr{
     background-color: rgb(244,244,242)
 }
