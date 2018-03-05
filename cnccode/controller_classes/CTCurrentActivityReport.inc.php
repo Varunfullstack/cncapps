@@ -534,7 +534,7 @@ class CTCurrentActivityReport extends CTCNC
         $this->renderQueue(3);  // Sales
         $this->renderQueue(4);  //Implementations
         $this->renderQueue(5);  // Managers
-        $this->renderQueue(6);  //Fixed
+//        $this->renderQueue(6);  //Fixed
         $this->renderQueue(7); // Future
 
         $this->template->set_block('CurrentActivityReport', 'userFilterBlock', 'users');
