@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ##[unreleased]
+- Issue 174 - CNC036 - Record backup success as percentage
 
 ## [1.1.0]
 - Issue 142 - Pre-pay activity over £100 - where is the email address set?
