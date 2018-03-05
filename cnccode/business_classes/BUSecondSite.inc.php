@@ -349,9 +349,21 @@ class BUSecondsite extends Business
                     "value" => $this->serverErrorCount,
                 ],
                 [
-
+                    "type" => "i",
+                    "value" => $this->imageErrorCount,
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->suspendedServerCount,
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->imagePassesCount,
+                ],
+                [
+                    "type" => "d",
+                    "value" =>
                 ]
-
 
             ]);
 
