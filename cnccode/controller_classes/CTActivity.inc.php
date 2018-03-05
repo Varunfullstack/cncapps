@@ -274,10 +274,6 @@ class CTActivity extends CTCNC
                 $this->autoUpdate();
                 break;
 
-            case 'incrementPauseCounter':
-                $this->incrementPauseCounter();
-                break;
-
             case 'gatherFixedInformation':
                 $this->gatherFixedInformation();
                 break;
@@ -1733,7 +1729,7 @@ class CTActivity extends CTCNC
                 'projectChecked' => $_SESSION['context'] == 'project' ? 'CHECKED' : '',
                 'minResponseTime' => $minResponseTime,
                 'totalActivityDurationHours' => $dbeJProblem->getValue('totalActivityDurationHours'),
-                'chargableActivityDurationHours' => $dbeJProblem->getValue('chargableActivityDurationHours'),
+                'chargeableActivityDurationHours' => $dbeJProblem->getValue('chargeableActivityDurationHours'),
                 'currentDocumentsLink' => $currentDocumentsLink,
                 'problemHistoryLink' => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'projectLink' => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
@@ -3335,22 +3331,8 @@ class CTActivity extends CTCNC
 
         $userID = $dsCallActivity->getValue('allocatedUserID');
 
-        $pauseCount = $dsCallActivity->getValue('hdPauseCount');
-
         $level = $this->buActivity->getLevelByUserID($userID);
 
-
-        if ($level == 1) {
-
-            $buHeader = new BUHeader($this);
-            $buHeader->getHeader($dsHeader);
-
-            $hdTeamMaxPauseCount = $dsHeader->getValue('hdTeamMaxPauseCount');
-            $hdTeamPauseSeconds = $dsHeader->getValue('hdTeamPauseSeconds');
-        } else {
-            $hdTeamMaxPauseCount = 0;
-            $hdTeamPauseSeconds = 0;
-        }
 
         if ($dsCallActivity->getValue('onSiteFlag') == 'Y') {
             $onSiteFlag = 'Y';
@@ -3368,14 +3350,30 @@ class CTActivity extends CTCNC
             );
         }
 
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $problemID = $dsCallActivity->getValue('problemID');
+        $hdUsedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
+        $esUsedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
+        $imUsedMinutes = $this->buActivity->getIMTeamUsedTime($problemID);
+        $hdUsedMinutesNotInclusive = $this->buActivity->getHDTeamUsedTime($problemID, $callActivityID);
+        $esUsedMinutesNotInclusive = $this->buActivity->getESTeamUsedTime($problemID, $callActivityID);
+        $imUsedMinutesNotInclusive = $this->buActivity->getIMTeamUsedTime($problemID, $callActivityID);
+
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+        $dbeProblem->getRow();
+
+
+        $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+        $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+
         $this->template->set_var(
             array(
                 'level' => $level,
                 'onSiteFlag' => $onSiteFlag,
                 'allocatedUserID' => $dsCallActivity->getValue('allocatedUserID'),
-                'hdTeamMaxPauseCount' => $hdTeamMaxPauseCount,
-                'hdTeamPauseSeconds' => $hdTeamPauseSeconds,
-                'hdPauseCount' => $dsCallActivity->getValue('hdPauseCount'),
                 'reason' => $dsCallActivity->getValue('reason'),
                 'reasonMessage' => $dsCallActivity->getMessage('reason'),
                 'internalNotes' => $dsCallActivity->getValue('internalNotes'),
@@ -3440,11 +3438,20 @@ class CTActivity extends CTCNC
                 'hideFromCustomerFlagChecked' => Controller::htmlChecked($hideFromCustomerFlag),
 
                 'hideFromCustomerDisabled' => $hideFromCustomerDisabled,
-                'hdRemainMinutes' => number_format($dsCallActivity->getValue('hdRemainHours') * 60, 1),
-                'esRemainMinutes' => number_format($dsCallActivity->getValue('esRemainHours') * 60, 1),
-                'imRemainMinutes' => number_format($dsCallActivity->getValue('imRemainHours') * 60, 1),
-                'userWarned' => $this->userWarned
 
+                'hdRemainMinutes' => $hdAssignedMinutes - $hdUsedMinutes,
+                'esRemainMinutes' => $esAssignedMinutes - $esUsedMinutes,
+                'imRemainMinutes' => $imAssignedMinutes - $imUsedMinutes,
+                'hdUsedMinutesNotInclusive' => $hdUsedMinutesNotInclusive,
+                'esUsedMinutesNotInclusive' => $esUsedMinutesNotInclusive,
+                'imUsedMinutesNotInclusive' => $imUsedMinutesNotInclusive,
+                'hdAssignedMinutes' => $hdAssignedMinutes,
+                'hdUsedMinutes' => $hdUsedMinutes,
+                'esAssignedMinutes' => $esAssignedMinutes,
+                'esUsedMinutes' => $esUsedMinutes,
+                'imAssignedMinutes' => $imAssignedMinutes,
+                'imUsedMinutes' => $imUsedMinutes,
+                'userWarned' => $this->userWarned
             )
         );
 
@@ -3703,6 +3710,7 @@ class CTActivity extends CTCNC
         $dsCallActivity->setValue('reason', $_POST['reason']);
         $dsCallActivity->setValue('internalNotes', $_POST['internalNotes']);
         $dsCallActivity->post();
+
         if ($dsCallActivity->getValue('callActTypeID') == 0 || $dsCallActivity->getValue('callActTypeID') == '') {
             $this->formError = true;
             $this->dsCallActivity->setMessage('callActTypeID', 'Required');
@@ -3797,43 +3805,89 @@ class CTActivity extends CTCNC
                         $this->formError = true;
                         $this->dsCallActivity->setMessage('endTime', 'End time must be after start time!');
                     }
-                    /*
-            If we haven't already warned about these then do a check
-            */
-                    if (!$_REQUEST['userWarned']) {
 
-                        $durationHours = common_convertHHMMToDecimal($dsCallActivity->getValue('endTime')) - common_convertHHMMToDecimal($dsCallActivity->getValue('startTime'));
+                    $durationHours = common_convertHHMMToDecimal($dsCallActivity->getValue('endTime')) - common_convertHHMMToDecimal($dsCallActivity->getValue('startTime'));
 
-                        $buHeader = new BUHeader($this);
-                        $buHeader->getHeader($dsHeader);
+                    $durationMinutes = convertHHMMToMinutes($dsCallActivity->getValue('endTime')) - convertHHMMToMinutes($dsCallActivity->getValue('startTime'));
 
-                        if (
-                            $dsCallActivity->getValue('callActTypeID') == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-                            $durationHours > $dsHeader->getValue('customerContactWarnHours')
-                        ) {
-                            $this->formError = true;
-                            $this->userWarned = true;
-                            $this->dsCallActivity->setMessage('endTime', 'Warning: Duration exceeds ' . $dsHeader->getValue('customerContactWarnHours') . ' hours');
 
+                    $activityType = $dsCallActivity->getValue('callActTypeID');
+
+                    if (in_array($activityType, [4, 8, 11, 18])) {
+                        $problemID = $dsCallActivity->getValue('problemID');
+
+                        $userID = $dsCallActivity->getValue(DBEJCallActivity::userID);
+                        $dbeUser = new DBEUser($this);
+                        $dbeUser->setValue('userID', $userID);
+                        $dbeUser->getRow();
+
+                        $dbeProblem = new DBEProblem($this);
+                        $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+                        $dbeProblem->getRow();
+
+                        $teamID = $dbeUser->getValue('teamID');
+
+                        if ($teamID <= 4) {
+                            $usedTime = 0;
+                            $allocatedTime = 0;
+
+                            if ($teamID == 1) {
+                                $usedTime = $this->buActivity->getHDTeamUsedTime($problemID, $callActivityID);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                            }
+
+                            if ($teamID == 2) {
+                                $usedTime = $this->buActivity->getESTeamUsedTime($problemID, $callActivityID);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                            }
+
+                            if ($teamID == 4) {
+                                $usedTime = $this->buActivity->getIMTeamUsedTime($problemID, $callActivityID);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                            }
+
+                            if ($usedTime + $durationMinutes > $allocatedTime) {
+                                $this->formError = true;
+                                $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
+                            }
                         }
+                    } else {
+                        if (!$_REQUEST['userWarned']) {
 
-                        if ($dsCallActivity->getValue('callActTypeID') == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-                            if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
+
+                            $buHeader = new BUHeader($this);
+                            $buHeader->getHeader($dsHeader);
+
+
+                            if (
+                                $dsCallActivity->getValue('callActTypeID') == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
+                                $durationHours > $dsHeader->getValue('customerContactWarnHours')
+                            ) {
                                 $this->formError = true;
                                 $this->userWarned = true;
-                                $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                                $this->dsCallActivity->setMessage('endTime', 'Warning: Duration exceeds ' . $dsHeader->getValue('customerContactWarnHours') . ' hours');
+
                             }
 
-                            $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
+                            if ($dsCallActivity->getValue('callActTypeID') == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
+                                if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
+                                    $this->formError = true;
+                                    $this->userWarned = true;
+                                    $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                                }
 
-                            if ($durationHours < $minHours) {
-                                $this->formError = true;
-                                $this->userWarned = true;
-                                $this->dsCallActivity->setMessage('endTime', 'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
+                                $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
+
+                                if ($durationHours < $minHours) {
+                                    $this->formError = true;
+                                    $this->userWarned = true;
+                                    $this->dsCallActivity->setMessage('endTime', 'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
+                                }
+
                             }
-
                         }
                     }
+
                 }
             }
         }
@@ -4358,8 +4412,6 @@ class CTActivity extends CTCNC
      */
     function uploadFile()
     {
-
-        echo 'this should be called';
         // validate
         if ($_REQUEST['problemID'] == '') {
             $this->setFormErrorMessage('problemID not passed');
@@ -4499,27 +4551,6 @@ class CTActivity extends CTCNC
             $_REQUEST['reason'],
             $_REQUEST['internalNotes']
         );
-
-        header('Content-type: text/plain');
-        echo json_encode($this->buActivity->processCountdown($_REQUEST['callActivityID']));
-    }
-
-    /**
-     * Increments SR pause counter. AJAX call from edit page
-     *
-     */
-    function incrementPauseCounter()
-    {
-        if (!$_REQUEST['problemID']) {
-
-            echo 'problemID not passed';
-
-        }
-
-        $this->buActivity->incrementPauseCounter(
-            $_REQUEST['problemID']
-        );
-
     }
 
     function gatherFixedInformation()
@@ -4762,45 +4793,39 @@ class CTActivity extends CTCNC
 
             $teamLevel = $_REQUEST['teamLevel'];
 
-            if (!$_REQUEST['allocatedMinutes'] && !$_REQUEST['allocatedMinutesCustom']) {
-                $error['allocatedMinutes'] = 'Please select';
+            $minutes = 0;
 
-            } elseif (
-                !$_REQUEST['allocatedMinutes'] &&
-                ($_REQUEST['allocatedMinutesCustom'] > 120 or $_REQUEST['allocatedMinutesCustom'] < 5)
-            ) {
-                $error['allocatedMinutesCustom'] = 'Please enter a value between 5 and 120';
+            switch ($_REQUEST['allocatedTimeAmount']) {
+                case 'minutes':
+                    $minutes = $_REQUEST['allocatedTimeValue'];
+                    break;
+                case 'hours':
+                    $minutes = $_REQUEST['allocatedTimeValue'] * 60;
+                    break;
+                case 'days':
+                    $buHeader = new BUHeader($this);
+                    /** @var $dsHeader DataSet */
+                    $buHeader->getHeader($dsHeader);
+                    $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
+                    $minutes = $minutesInADay * $_REQUEST['allocatedTimeValue'];
             }
 
+            $this->buActivity->allocateAdditionalTime(
+                $_REQUEST['problemID'],
+                $_REQUEST['teamLevel'],
+                $minutes,
+                $_REQUEST['comments']
+            );
 
-            if (count($error) == 0) {
-
-                if ($_REQUEST['allocatedMinutesCustom']) {
-
-                    $hours = 0.0167 * $_REQUEST['allocatedMinutesCustom'];
-                } else {
-                    $hours = 0.0167 * $_REQUEST['allocatedMinutes'];
-                }
-
-                $this->buActivity->allocateAdditionalTime(
-                    $_REQUEST['problemID'],
-                    $_REQUEST['teamLevel'],
-                    $hours,
-                    $_REQUEST['comments']
+            $nextURL =
+                $this->buildLink(
+                    'CurrentActivityReport.php',
+                    array()
                 );
 
-                $nextURL =
-                    $this->buildLink(
-                        'CurrentActivityReport.php',
-                        array()
-                    );
-
-                header('Location: ' . $nextURL);
-                exit;
-
-            }
-
+            header('Location: ' . $nextURL);
+            exit;
         }// end IF POST
         else {
             if ($dbeFirstActivity->getValue('queueNo') == 1) {
@@ -4847,9 +4872,6 @@ class CTActivity extends CTCNC
                 'problemID' => $_REQUEST['problemID'],
                 'customerID' => $dbeFirstActivity->getValue('customerID'),
                 'customerName' => $dbeFirstActivity->getValue('customerName'),
-                'allocatedMinutesCustom' => $_REQUEST['allocatedMinutesCustom'],
-                'allocatedMinutesMessage' => $error['allocatedMinutes'],
-                'allocatedMinutesCustomMessage' => $error['allocatedMinutesCustom'],
                 'submitURL' => $submitURL,
                 'urlProblemHistoryPopup' => $urlProblemHistoryPopup
             )
@@ -4898,7 +4920,9 @@ class CTActivity extends CTCNC
         }
 
         $this->buActivity->requestAdditionalTime(
-            $_REQUEST['problemID']
+            $_REQUEST['problemID'],
+            $_REQUEST['reason'],
+            $_REQUEST['callActivityID']
         );
     }
 

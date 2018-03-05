@@ -183,6 +183,57 @@ class DBEJCallActivity extends DBECallActivity
 {
     var $fromString;
 
+    const itemID = "itemID";
+    const activityType = "activityType";
+    const requireCheckFlag = "requireCheckFlag";
+    const onSiteFlag = "onSiteFlag";
+    const allowExpensesFlag = "allowExpensesFlag";
+    const travelFlag = "travelFlag";
+    const allowSCRFlag = "allowSCRFlag";
+    const userID = "userID";
+    const userName = "userName";
+    const userAccount = "userAccount";
+    const durationMinutes = "durationMinutes";
+    const siteDesc = "siteDesc";
+    const customerID = "customerID";
+    const customerName = "customerName";
+    const contactFirstName = "contactFirstName";
+    const contactName = "contactName";
+    const contactNotes = "contactNotes";
+    const techNotes = "techNotes";
+    const contactEmail = "contactEmail";
+    const workStartedEmailFlag = "workStartedEmailFlag";
+    const autoCloseEmailFlag = "autoCloseEmailFlag";
+    const dateEngineer = "dateEngineer";
+    const contractCustomerItemID = "contractCustomerItemID";
+    const contractItemID = "contractItemID";
+    const contractResponseTime = "contractResponseTime";
+    const contractDescription = "contractDescription";
+    const activityTypeCost = "activityTypeCost";
+    const curValueFlag = "curValueFlag";
+    const projectDescription = "projectDescription";
+    const completedName = "completedName";
+    const priority = "priority";
+    const problemHideFromCustomerFlag = "problemHideFromCustomerFlag";
+    const problemStatus = "problemStatus";
+    const requestAwaitingCustomerResponseFlag = "requestAwaitingCustomerResponseFlag";
+    const internalNotes = "internalNotes";
+    const completeDate = "completeDate";
+    const alarmDate = "alarmDate";
+    const alarmTime = "alarmTime";
+    const rootCauseID = "rootCauseID";
+    const rootCauseDescription = "rootCauseDescription";
+    const projectID = "projectID";
+    const linkedSalesOrderID = "linkedSalesOrderID";
+    const totalActivityDurationHours = "totalActivityDurationHours";
+    const criticalFlag = "criticalFlag";
+    const hdLimitMinutes = "hdLimitMinutes";
+    const esLimitMinutes = "esLimitMinutes";
+    const imLimitMinutes = "imLimitMinutes";
+    const hdPauseCount = "hdPauseCount";
+    const allocatedUserID = "allocatedUserID";
+    const queueNo = "queueNo";
+
     /**
      * calls constructor()
      * @access public
@@ -194,59 +245,55 @@ class DBEJCallActivity extends DBECallActivity
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("itemID", DA_INTEGER, DA_ALLOW_NULL, "cat_itemno");
-        $this->addColumn("activityType", DA_STRING, DA_ALLOW_NULL, "cat_desc");
-        $this->addColumn("requireCheckFlag", DA_YN, DA_NOT_NULL, "cat_req_check_flag");
-        $this->addColumn("onSiteFlag", DA_YN, DA_NOT_NULL, "cat_on_site_flag");
-        $this->addColumn("allowExpensesFlag", DA_YN, DA_ALLOW_NULL, "cat_allow_exp_flag");
-        $this->addColumn("travelFlag", DA_YN, DA_ALLOW_NULL);
-        $this->addColumn("allowSCRFlag", DA_YN, DA_ALLOW_NULL);
-        $this->addColumn("userID", DA_ID, DA_ALLOW_NULL, "consultant.cns_consno");
-        $this->addColumn("userName", DA_STRING, DA_ALLOW_NULL, "CONCAT(consultant.firstName,' ',consultant.lastName)");
-        $this->addColumn("userAccount", DA_STRING, DA_ALLOW_NULL, "consultant.cns_logname");
-        $this->addColumn("durationMinutes", DA_STRING, DA_ALLOW_NULL, "( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 60");
-        $this->addColumn("siteDesc", DA_STRING, DA_ALLOW_NULL, "CONCAT(add_add1,' ',add_add2,' ',add_town)");
-        $this->addColumn("customerID", DA_STRING, DA_ALLOW_NULL, "problem.pro_custno");
-        $this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
-        $this->addColumn("contactFirstName", DA_STRING, DA_ALLOW_NULL, "con_first_name");
-        $this->addColumn("contactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(con_first_name,' ',con_last_name)");
-        $this->addColumn("contactNotes", DA_STRING, DA_ALLOW_NULL, "con_notes");
-        $this->addColumn("techNotes", DA_STRING, DA_ALLOW_NULL, "cus_tech_notes");
-        $this->addColumn("contactEmail", DA_STRING, DA_ALLOW_NULL, "con_email");
-        $this->addColumn("workStartedEmailFlag", DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
-        $this->addColumn("autoCloseEmailFlag", DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
-        $this->addColumn("dateEngineer", DA_STRING, DA_ALLOW_NULL, "CONCAT(DATE_FORMAT(caa_date,'%e/%c/%y'), ' - ', consultant.firstName,' ',consultant.lastName)");
-        $this->addColumn("contractCustomerItemID", DA_ID, DA_ALLOW_NULL, "problem.pro_contract_cuino");
-        $this->addColumn("contractItemID", DA_ID, DA_ALLOW_NULL, "contractitem.itm_itemno");
-        $this->addColumn("contractResponseTime", DA_STRING, DA_ALLOW_NULL, "contractitem.contractResponseTime");
-        $this->addColumn("contractDescription", DA_STRING, DA_ALLOW_NULL, "if (contractitem.itm_desc IS NULL, 'T&M', contractitem.itm_desc)");
-        $this->addColumn("activityTypeCost", DA_STRING, DA_ALLOW_NULL, "activity_type_item.itm_sstk_price");                // per hour cost of this activity
-        $this->addColumn("curValueFlag", DA_YN, DA_ALLOW_NULL);        // is it a Value Type activity?
-        $this->addColumn("projectDescription", DA_STRING, DA_ALLOW_NULL, "if (project.description IS NULL, 'None', project.description)");
-        $this->addColumn("completedName", DA_STRING, DA_ALLOW_NULL, "completed_user.cns_logname");
-        $this->addColumn("priority", DA_INTEGER, DA_ALLOW_NULL, "problem.pro_priority");
-        $this->addColumn("problemHideFromCustomerFlag", DA_YN, DA_ALLOW_NULL, "problem.pro_hide_from_customer_flag");
-        $this->addColumn("problemStatus", DA_STRING, DA_ALLOW_NULL, "problem.pro_status");
-        $this->addColumn("requestAwaitingCustomerResponseFlag", DA_STRING, DA_ALLOW_NULL, "problem.pro_awaiting_customer_response_flag");
-        $this->addColumn("internalNotes", DA_MEMO, DA_ALLOW_NULL, "problem.pro_internal_notes");
-        $this->addColumn("completeDate", DA_DATE, DA_ALLOW_NULL, "problem.pro_complete_date");
-        $this->addColumn("alarmDate", DA_DATE, DA_ALLOW_NULL, "problem.pro_alarm_date");
-        $this->addColumn("alarmTime", DA_TIME, DA_ALLOW_NULL, "problem.pro_alarm_time");
-        $this->addColumn("rootCauseID", DA_INTEGER, DA_ALLOW_NULL, "problem.pro_rootcauseno");
-        $this->addColumn("rootCauseDescription", DA_INTEGER, DA_ALLOW_NULL, "rootcause.rtc_desc");
-        $this->addColumn("projectID", DA_ID, DA_ALLOW_NULL, "problem.pro_projectno");
-        $this->addColumn("linkedSalesOrderID", DA_INTEGER, DA_ALLOW_NULL, "problem.pro_linked_ordno");
-
-        $this->addColumn("totalActivityDurationHours", DA_FLOAT, DA_ALLOW_NULL, "problem.pro_total_activity_duration_hours");
-
-        $this->addColumn("criticalFlag", DA_YN, DA_ALLOW_NULL, "problem.pro_critical_flag");
-        $this->addColumn("hdRemainHours", DA_FLOAT, DA_ALLOW_NULL, "problem.pro_hd_remain_hours");
-        $this->addColumn("esRemainHours", DA_FLOAT, DA_ALLOW_NULL, "problem.pro_es_remain_hours");
-        $this->addColumn("imRemainHours", DA_FLOAT, DA_ALLOW_NULL, "problem.pro_im_remain_hours");
-        $this->addColumn("hdPauseCount", DA_YN, DA_ALLOW_NULL, "problem.pro_hd_pause_count");
-        $this->addColumn("allocatedUserID", DA_ID, DA_NOT_NULL, "problem.pro_consno");
-
-        $this->addColumn("queueNo", DA_INTEGER, DA_NOT_NULL, "problem.pro_queue_no");
+        $this->addColumn(self::itemID, DA_INTEGER, DA_ALLOW_NULL, "cat_itemno");
+        $this->addColumn(self::activityType, DA_STRING, DA_ALLOW_NULL, "cat_desc");
+        $this->addColumn(self::requireCheckFlag, DA_YN, DA_NOT_NULL, "cat_req_check_flag");
+        $this->addColumn(self::onSiteFlag, DA_YN, DA_NOT_NULL, "cat_on_site_flag");
+        $this->addColumn(self::allowExpensesFlag, DA_YN, DA_ALLOW_NULL, "cat_allow_exp_flag");
+        $this->addColumn(self::travelFlag, DA_YN, DA_ALLOW_NULL);
+        $this->addColumn(self::allowSCRFlag, DA_YN, DA_ALLOW_NULL);
+        $this->addColumn(self::userID, DA_ID, DA_ALLOW_NULL, "consultant.cns_consno");
+        $this->addColumn(self::userName, DA_STRING, DA_ALLOW_NULL, "CONCAT(consultant.firstName,' ',consultant.lastName)");
+        $this->addColumn(self::userAccount, DA_STRING, DA_ALLOW_NULL, "consultant.cns_logname");
+        $this->addColumn(self::durationMinutes, DA_STRING, DA_ALLOW_NULL, "( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 60");
+        $this->addColumn(self::siteDesc, DA_STRING, DA_ALLOW_NULL, "CONCAT(add_add1,' ',add_add2,' ',add_town)");
+        $this->addColumn(self::customerID, DA_STRING, DA_ALLOW_NULL, "problem.pro_custno");
+        $this->addColumn(self::customerName, DA_STRING, DA_ALLOW_NULL, "cus_name");
+        $this->addColumn(self::contactFirstName, DA_STRING, DA_ALLOW_NULL, "con_first_name");
+        $this->addColumn(self::contactName, DA_STRING, DA_ALLOW_NULL, "CONCAT(con_first_name,' ',con_last_name)");
+        $this->addColumn(self::contactNotes, DA_STRING, DA_ALLOW_NULL, "con_notes");
+        $this->addColumn(self::techNotes, DA_STRING, DA_ALLOW_NULL, "cus_tech_notes");
+        $this->addColumn(self::contactEmail, DA_STRING, DA_ALLOW_NULL, "con_email");
+        $this->addColumn(self::workStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
+        $this->addColumn(self::autoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
+        $this->addColumn(self::dateEngineer, DA_STRING, DA_ALLOW_NULL, "CONCAT(DATE_FORMAT(caa_date,'%e/%c/%y'), ' - ', consultant.firstName,' ',consultant.lastName)");
+        $this->addColumn(self::contractCustomerItemID, DA_ID, DA_ALLOW_NULL, "problem.pro_contract_cuino");
+        $this->addColumn(self::contractItemID, DA_ID, DA_ALLOW_NULL, "contractitem.itm_itemno");
+        $this->addColumn(self::contractResponseTime, DA_STRING, DA_ALLOW_NULL, "contractitem.contractResponseTime");
+        $this->addColumn(self::contractDescription, DA_STRING, DA_ALLOW_NULL, "if (contractitem.itm_desc IS NULL, 'T&M', contractitem.itm_desc)");
+        $this->addColumn(self::activityTypeCost, DA_STRING, DA_ALLOW_NULL, "activity_type_item.itm_sstk_price");                // per hour cost of this activity
+        $this->addColumn(self::curValueFlag, DA_YN, DA_ALLOW_NULL);        // is it a Value Type activity?
+        $this->addColumn(self::projectDescription, DA_STRING, DA_ALLOW_NULL, "if (project.description IS NULL, 'None', project.description)");
+        $this->addColumn(self::completedName, DA_STRING, DA_ALLOW_NULL, "completed_user.cns_logname");
+        $this->addColumn(self::priority, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_priority");
+        $this->addColumn(self::problemHideFromCustomerFlag, DA_YN, DA_ALLOW_NULL, "problem.pro_hide_from_customer_flag");
+        $this->addColumn(self::problemStatus, DA_STRING, DA_ALLOW_NULL, "problem.pro_status");
+        $this->addColumn(self::requestAwaitingCustomerResponseFlag, DA_STRING, DA_ALLOW_NULL, "problem.pro_awaiting_customer_response_flag");
+        $this->addColumn(self::internalNotes, DA_MEMO, DA_ALLOW_NULL, "problem.pro_internal_notes");
+        $this->addColumn(self::completeDate, DA_DATE, DA_ALLOW_NULL, "problem.pro_complete_date");
+        $this->addColumn(self::alarmDate, DA_DATE, DA_ALLOW_NULL, "problem.pro_alarm_date");
+        $this->addColumn(self::alarmTime, DA_TIME, DA_ALLOW_NULL, "problem.pro_alarm_time");
+        $this->addColumn(self::rootCauseID, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_rootcauseno");
+        $this->addColumn(self::rootCauseDescription, DA_INTEGER, DA_ALLOW_NULL, "rootcause.rtc_desc");
+        $this->addColumn(self::projectID, DA_ID, DA_ALLOW_NULL, "problem.pro_projectno");
+        $this->addColumn(self::linkedSalesOrderID, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_linked_ordno");
+        $this->addColumn(self::totalActivityDurationHours, DA_FLOAT, DA_ALLOW_NULL, "problem.pro_total_activity_duration_hours");
+        $this->addColumn(self::criticalFlag, DA_YN, DA_ALLOW_NULL, "problem.pro_critical_flag");
+        $this->addColumn(self::hdLimitMinutes, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_hd_limit_minutes");
+        $this->addColumn(self::esLimitMinutes, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_es_limit_minutes");
+        $this->addColumn(self::imLimitMinutes, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_im_limit_minutes");
+        $this->addColumn(self::allocatedUserID, DA_ID, DA_NOT_NULL, "problem.pro_consno");
+        $this->addColumn(self::queueNo, DA_INTEGER, DA_NOT_NULL, "problem.pro_queue_no");
 
         $this->setAddColumnsOff();
 

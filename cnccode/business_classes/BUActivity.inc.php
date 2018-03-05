@@ -755,7 +755,7 @@ class BUActivity extends Business
 
         $dbeProblem->setValue('totalTravelActivityDurationHours', $totalTravelHours);
 
-        $dbeProblem->setValue('chargableActivityDurationHours', $chargeableHours);
+        $dbeProblem->setValue('chargeableActivityDurationHours', $chargeableHours);
 
         $dbeProblem->setValue('workingHoursCalculatedToTime', '0000-00-00 00:00:00');
 
@@ -3408,22 +3408,22 @@ is currently a balance of ';
     * Create a new problem
     */
         $dbeProblem = new DBEProblem($this);
-        $dbeProblem->setValue('hdRemainHours', $this->dsHeader->getValue('hdTeamLimitHours'));
-        $dbeProblem->setValue('esRemainHours', $this->dsHeader->getValue('esTeamLimitHours'));
-        $dbeProblem->setValue('imRemainHours', $this->dsHeader->getValue('imTeamLimitHours'));
-        $dbeProblem->setValue('customerID', $_SESSION [$sessionKey] ['customerID']);
-        $dbeProblem->setValue('dateRaised', $dateTimeRaised);
-        $dbeProblem->setValue('userID', $_SESSION [$sessionKey] ['userID']);
-        $dbeProblem->setValue('rootCauseID', $_SESSION [$sessionKey] ['rootCauseID']);
-        $dbeProblem->setValue('status', 'I');
-        $dbeProblem->setValue('slaResponseHours', $slaResponseHours);
-        $dbeProblem->setValue('queueNo', 1); // initial queue number
-        $dbeProblem->setValue('priority', $_SESSION [$sessionKey] ['priority']);
-        $dbeProblem->setValue('hideFromCustomerFlag', $_SESSION [$sessionKey] ['hideFromCustomerFlag']);
-        $dbeProblem->setValue('internalNotes', $_SESSION [$sessionKey] ['internalNotes']);
-        $dbeProblem->setValue('contactID', $_SESSION [$sessionKey] ['contactID']);
-        $dbeProblem->setValue('contractCustomerItemID', $_SESSION [$sessionKey] ['contractCustomerItemID']);
-        $dbeProblem->setValue('projectID', $_SESSION [$sessionKey] ['projectID']);
+        $dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dsHeader->getValue('hdTeamLimitHours'));
+        $dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dsHeader->getValue('esTeamLimitHours'));
+        $dbeProblem->setValue(DBEProblem::imLimitMinutes, $this->dsHeader->getValue('imTeamLimitHours'));
+        $dbeProblem->setValue(DBEProblem::customerID, $_SESSION [$sessionKey] ['customerID']);
+        $dbeProblem->setValue(DBEProblem::dateRaised, $dateTimeRaised);
+        $dbeProblem->setValue(DBEProblem::userID, $_SESSION [$sessionKey] ['userID']);
+        $dbeProblem->setValue(DBEProblem::rootCauseID, $_SESSION [$sessionKey] ['rootCauseID']);
+        $dbeProblem->setValue(DBEProblem::status, 'I');
+        $dbeProblem->setValue(DBEProblem::slaResponseHours, $slaResponseHours);
+        $dbeProblem->setValue(DBEProblem::queueNo, 1); // initial queue number
+        $dbeProblem->setValue(DBEProblem::priority, $_SESSION [$sessionKey] ['priority']);
+        $dbeProblem->setValue(DBEProblem::hideFromCustomerFlag, $_SESSION [$sessionKey] ['hideFromCustomerFlag']);
+        $dbeProblem->setValue(DBEProblem::internalNotes, $_SESSION [$sessionKey] ['internalNotes']);
+        $dbeProblem->setValue(DBEProblem::contactID, $_SESSION [$sessionKey] ['contactID']);
+        $dbeProblem->setValue(DBEProblem::contractCustomerItemID, $_SESSION [$sessionKey] ['contractCustomerItemID']);
+        $dbeProblem->setValue(DBEProblem::projectID, $_SESSION [$sessionKey] ['projectID']);
         $dbeProblem->insertRow();
 
         $endTime = $this->getEndtime($_SESSION [$sessionKey] ['callActTypeID'], $_SESSION [$sessionKey] ['timeRaised']);
@@ -3676,7 +3676,7 @@ customer with the past 8 hours email to GL
             'html_charset' => 'UTF-8',
             'head_charset' => 'UTF-8'
         );
-        $body =  $buMail->mime->get($mime_params);
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -4084,17 +4084,6 @@ customer with the past 8 hours email to GL
     /*
     Create sales order for top-up
   */
-
-    function incrementPauseCounter(
-        $problemID
-    )
-    {
-        $dbeProblem = new DBEProblem($this);
-        $dbeProblem->getRow($problemID);
-        $pauseCount = $dbeProblem->getValue('hdPauseCount');
-        $dbeProblem->setValue('hdPauseCount', $pauseCount + 1);
-        $dbeProblem->updateRow();
-    }
 
     function canEdit($dsCallActivity)
     {
@@ -5148,14 +5137,14 @@ customer with the past 8 hours email to GL
             $siteNo = $contact['siteNo'];
         }
 
-        $dbeProblem->setValue('hdRemainHours', $this->dsHeader->getValue('hdTeamLimitHours'));
-        $dbeProblem->setValue('esRemainHours', $this->dsHeader->getValue('esTeamLimitHours'));
-        $dbeProblem->setValue('slaResponseHours', $slaResponseHours);
-        $dbeProblem->setValue('customerID', $customerID);
-        $dbeProblem->setValue('status', 'I');
-        $dbeProblem->setValue('priority', $record['priority']);
-        $dbeProblem->setValue('dateRaised', date(CONFIG_MYSQL_DATETIME)); // default
-        $dbeProblem->setValue('contactID', $contact['contactID']);
+        $dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dsHeader->getValue(DBEHeader::class));
+        $dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dsHeader->getValue('esTeamLimitHours'));
+        $dbeProblem->setValue(DBEProblem::slaResponseHours, $slaResponseHours);
+        $dbeProblem->setValue(DBEProblem::customerID, $customerID);
+        $dbeProblem->setValue(DBEProblem::status, 'I');
+        $dbeProblem->setValue(DBEProblem::priority, $record['priority']);
+        $dbeProblem->setValue(DBEProblem::dateRaised, date(CONFIG_MYSQL_DATETIME)); // default
+        $dbeProblem->setValue(DBEProblem::contactID, $contact['contactID']);
 
         /* @todo confirm with GL */
         if ($record['sendEmail'] == 'A') {
@@ -6684,18 +6673,18 @@ customer with the past 8 hours email to GL
 
         if (!$callActivityID) {
             /* create new issue */
-            $dbeProblem->setValue('slaResponseHours', $slaResponseHours);
-            $dbeProblem->setValue('customerID', $customerID);
-            $dbeProblem->setValue('status', 'I');
-            $dbeProblem->setValue('priority', $priority);
-            $dbeProblem->setValue('queueNo', 2);
-            $dbeProblem->setValue('dateRaised', date(CONFIG_MYSQL_DATETIME));
-            $dbeProblem->setValue('contactID', $dbeContact->getValue('contactID'));
-            $dbeProblem->setValue('hideFromCustomerFlag', 'Y');
-            $dbeProblem->setValue('contractCustomerItemID', $contractCustomerItemID);
-            $dbeProblem->setValue('hdRemainHours', $this->dsHeader->getValue('hdTeamLimitHours'));
-            $dbeProblem->setValue('esRemainHours', $this->dsHeader->getValue('esTeamLimitHours'));
-            $dbeProblem->setValue('userID', '');        // not allocated
+            $dbeProblem->setValue(DBEProblem::slaResponseHours, $slaResponseHours);
+            $dbeProblem->setValue(DBEProblem::customerID, $customerID);
+            $dbeProblem->setValue(DBEProblem::status, 'I');
+            $dbeProblem->setValue(DBEProblem::priority, $priority);
+            $dbeProblem->setValue(DBEProblem::queueNo, 2);
+            $dbeProblem->setValue(DBEProblem::dateRaised, date(CONFIG_MYSQL_DATETIME));
+            $dbeProblem->setValue(DBEProblem::contactID, $dbeContact->getValue('contactID'));
+            $dbeProblem->setValue(DBEProblem::hideFromCustomerFlag, 'Y');
+            $dbeProblem->setValue(DBEProblem::contractCustomerItemID, $contractCustomerItemID);
+            $dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes));
+            $dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes));
+            $dbeProblem->setValue(DBEProblem::userID, '');        // not allocated
             $dbeProblem->insertRow();
 
             $problemID = $dbeProblem->getPKValue();
@@ -6824,176 +6813,12 @@ customer with the past 8 hours email to GL
 
     }
 
-    /*
-  Reduce time remaining on apropriate clock (depending upon allocated user team)
-  and set a warning if getting near breach
 
-  The ret array is returned directly to the ajax request on the ActivityEdit.inc.html page
-
-  Any value passed back in the timeAlert field is displayed in a pop-up
-  */
-    public function processCountdown($callActivityID)
-    {
-        $ret = array();
-        $this->dbeCallActivity = new DBECallActivity($this);
-        $this->dbeCallActivity->getRow($callActivityID);
-
-        $this->dbeProblem = new DBEProblem($this);
-        $this->dbeProblem->getRow($this->dbeCallActivity->getValue('problemID'));
-
-        if ($this->dbeProblem->getValue('priority') == 5) {
-            return $ret;
-        }
-
-        $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
-
-        $level = $this->getLevelByUserID($this->dbeProblem->getValue('userID'));
-        /*
-    Count down if in any team below managers
-    */
-        if ($level < 4) {
-
-            $previousHdRemainHours = $this->dbeProblem->getValue('hdRemainHours');
-
-            $previousEsRemainHours = $this->dbeProblem->getValue('esRemainHours');
-
-            $previousImRemainHours = $this->dbeProblem->getValue('imRemainHours');
-
-            // reduce time by 10 seconds
-            $tenSeconds = 10 / 3600;
-
-            $timeBreached = false;
-
-            switch ($level) {
-
-                case 1:
-                    /*
-          Allocated user is in Helpdesk team
-          */
-                    if ($previousHdRemainHours > 0) {
-
-                        $newHours = $previousHdRemainHours - $tenSeconds;
-
-                        if ($newHours < 0) {
-                            $newHours = 0;
-                        }
-
-                        $this->dbeProblem->setValue('hdRemainHours', $newHours);
-
-                        if ($newHours < 0.08 & $this->dbeProblem->getValue('hdTimeAlertFlag') == 'N') { // 5 minutes
-                            $ret ['timeAlert'] = 'Less than 5 minutes of allocated time remaining. Do you need to ask the EQ team for technical assistance?';
-                            $this->dbeProblem->setValue('hdTimeAlertFlag', 'Y');
-                        }
-                        if ($previousHdRemainHours > 0 & $newHours == 0) {
-                            $timeBreached = true;
-                        }
-
-                    }
-                    break;
-
-                case 2:
-                    /*
-          Allocated user is in Escalations team
-          */
-                    if ($previousEsRemainHours > 0) {
-
-                        $newHours = $previousEsRemainHours - $tenSeconds;
-
-                        if ($newHours < 0) {
-                            $newHours = 0;
-                        }
-
-                        $this->dbeProblem->setValue('esRemainHours', $newHours);
-
-                        if ($newHours < 0.25 & $this->dbeProblem->getValue('esTimeAlertFlag') == 'N') {
-                            $ret ['timeAlert'] = 'Less than 15 minutes of allocated time remaining. Do you need to seek help from a manager?';
-                            $this->dbeProblem->setValue('esTimeAlertFlag', 'Y');
-                        }
-                        if ($previousEsRemainHours > 0 & $newHours == 0) {
-                            $timeBreached = true;
-                        }
-                    }
-                    break;
-
-                case 3:
-                    /*
-          Allocated user is in Implementations team
-          */
-                    if ($previousImRemainHours > 0) {
-
-                        $newHours = $previousImRemainHours - $tenSeconds;
-
-                        if ($newHours < 0) {
-                            $newHours = 0;
-                        }
-
-                        $this->dbeProblem->setValue('imRemainHours', $newHours);
-
-                        if ($newHours < 0.25 & $this->dbeProblem->getValue('imTimeAlertFlag') == 'N') {
-                            $ret ['timeAlert'] = 'Less than 15 minutes of allocated time remaining. Do you need to seek help from a manager?';
-                            $this->dbeProblem->setValue('imTimeAlertFlag', 'Y');
-                        }
-                        if ($previousImRemainHours > 0 & $newHours == 0) {
-                            $timeBreached = true;
-                        }
-                    }
-                    break;
-            }
-            if ($timeBreached) {
-
-                $this->processTimeBreach();
-                $ret ['timeAlert'] = 'You have breached the time allocated to your team against this SR and a request for more time has been sent to the Helpdesk Managers';
-
-            }
-
-            $this->dbeProblem->updateRow();
-        }
-
-        $ret['hdRemainMinutes'] = number_format($this->dbeProblem->getValue('hdRemainHours') * 60, 1);
-
-        $ret['esRemainMinutes'] = number_format($this->dbeProblem->getValue('esRemainHours') * 60, 1);
-
-        $ret['imRemainMinutes'] = number_format($this->dbeProblem->getValue('imRemainHours') * 60, 1);
-
-        return $ret;
-
-    }
-
-    /*
-  Increment breach counter for user/date
-  */
-    private function processTimeBreach()
-    {
-        global $db;
-
-        $sql =
-            "INSERT INTO time_breach
-          (
-            userID,
-            breachDate,
-            breachCount
-          ) 
-        VALUES 
-          (
-            " . $this->dbeProblem->getValue('userID') . ",
-            DATE( NOW() ),
-            1  
-          )
-        ON DUPLICATE KEY UPDATE breachCount = breachCount + 1";
-
-        $db->query($sql);
-
-        $this->sendRequestAdditionalTimeEmail(true);
-
-    }
-
-    private function sendRequestAdditionalTimeEmail($timeBreached = true)
+    private function sendRequestAdditionalTimeEmail($problemID, $reason, $requestorID)
     {
         $buMail = new BUMail($this);
 
-        $problemID = $this->dbeProblem->getValue('problemID');
-
-        $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
+        $this->dbeUser->getRow($requestorID);
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
@@ -7008,17 +6833,37 @@ customer with the past 8 hours email to GL
 
         $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
 
-        if ($timeBreached) {
+        $teamID = $this->dbeUser->getValue(DBEUser::teamID);
 
-            $subject = 'Time Breached: ' . CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName') . ' allocated to ' . $userName;
+        $leftOnBudget = null;
+        $usedMinutes = 0;
+        $assignedMinutes = 0;
 
-            $requestedReason = 'has now breached the allocated time';
-        } else {
-            $subject = 'Time Requested: ' . CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName') . ' allocated to ' . $userName;
+        $dbeProblem = new DBEJProblem($this);
+        $dbeProblem->getRow($problemID);
 
-            $requestedReason = 'has requested additional time';
+        switch ($teamID) {
+            case 1:
+                $usedMinutes = $this->getHDTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                $toEmail = 'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN;
+                break;
+            case 2:
+                $usedMinutes = $this->getESTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
+                break;
+            case 4:
+                $usedMinutes = $this->getIMTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+            default:
+                $toEmail = 'imptimerequest@' . CONFIG_PUBLIC_DOMAIN;
         }
 
+        $leftOnBudget = $assignedMinutes - $usedMinutes;
+        $subject = 'Time Requested: ' . CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName') . ' allocated to ' . $userName;
+
+        $requestedReason = $reason;
 
         $urlAllocateAdditionalTime = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=allocateAdditionalTime&problemID=' . $problemID;
 
@@ -7034,15 +6879,14 @@ customer with the past 8 hours email to GL
 
                 'urlLastActivity' => $urlLastActivity,
 
-                'internalNotes' => $this->dbeProblem->getValue('internalNotes'),
+                'internalNotes' => $dbeProblem->getValue('internalNotes'),
 
                 'requestedReason' => $requestedReason,
 
-                'chargableActivityDurationHours'
-                => $this->dbeProblem->getValue('chargableActivityDurationHours'),
+                'chargeableActivityDurationHours' => $dbeProblem->getValue('chargeableActivityDurationHours'),
 
-                'totalActivityDurationHours'
-                => $this->dbeProblem->getValue('totalActivityDurationHours')
+                'totalActivityDurationHours' => $dbeProblem->getValue('totalActivityDurationHours'),
+                'timeLeftOnBudget' => $leftOnBudget
             )
         );
 
@@ -7077,17 +6921,6 @@ customer with the past 8 hours email to GL
 
         $body = $template->get_var('output');
 
-        /*
-    Destination email depends upon queue of SR
-    */
-        if ($this->dbeProblem->getValue('queueNo') == 1) {
-            $toEmail = 'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        } elseif ($this->dbeProblem->getValue('queueNo') == 2) {
-            $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        } else { // default for > queue 2
-            $toEmail = 'imptimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        }
-
         $hdrs = array(
             'From' => $senderEmail,
             'To' => $toEmail,
@@ -7116,11 +6949,9 @@ customer with the past 8 hours email to GL
             true
         );
 
-        if ($timeBreached) {
-            $text = 'Time breached';
-        } else {
-            $text = 'Additional time requested';
-        }
+
+        $text = 'Additional time requested';
+
         $this->logOperationalActivity($problemID, $text);
 
     } // end sendServiceReallocatedEmail
@@ -7139,72 +6970,36 @@ customer with the past 8 hours email to GL
      * Add hours to clock of team of allocated user
      *
      * @param mixed $problemID
-     * @param mixed $minutes
+     * @param $level
+     * @param $minutes
+     * @param $comments
      */
-    public function allocateAdditionalTime($problemID, $level, $hours, $comments)
+    public function allocateAdditionalTime($problemID, $level, $minutes, $comments)
     {
         $this->dbeProblem = new DBEProblem($this);
         $this->dbeProblem->getRow($problemID);
 
         if ($level == 1) {
-            $this->dbeProblem->setValue('hdRemainHours', $this->dbeProblem->getValue('hdRemainHours') + $hours);
-            $this->dbeProblem->setValue('hdTimeAlertFlag', 'N'); // reset alert flag
+            $this->dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutes);
+            $this->dbeProblem->setValue(DBEProblem::hdTimeAlertFlag, 'N'); // reset alert flag
         } elseif ($level == 2) {
-            /*
-      Allocated user is in Escalations team
-      */
-            $this->dbeProblem->setValue('esRemainHours', $this->dbeProblem->getValue('esRemainHours') + $hours);
-            $this->dbeProblem->setValue('esTimeAlertFlag', 'N');
+            $this->dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutes);
+            $this->dbeProblem->setValue(DBEProblem::esTimeAlertFlag, 'N');
         } else {
-            $this->dbeProblem->setValue('imRemainHours', $this->dbeProblem->getValue('imRemainHours') + $hours);
-            $this->dbeProblem->setValue('imTimeAlertFlag', 'N');
+            $this->dbeProblem->setValue(DBEProblem::imLimitMinutes, $this->dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutes);
+            $this->dbeProblem->setValue(DBEProblem::imTimeAlertFlag, 'N');
         }
 
         $this->dbeProblem->updateRow();
 
-        /*
-    If SR is allocated then log granted time against user
-    */
-        if ($this->dbeProblem->getValue('userID')) { // if it is allocated
-            $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
-            $this->logAllocatedTime($this->dbeProblem->getValue('userID'), $hours, $comments);
-        }
-
-        $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $hours . ' hours</p><p>' . $comments . '</p>');
-
-
+        $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
     }
-
-    private function logAllocatedTime($userID, $hours, $comments)
-    {
-        global $db;
-
-        $sql =
-            "INSERT INTO time_granted
-          (
-            userID,
-            hours,
-            grantedDate
-          ) 
-        VALUES 
-          (
-            " . $userID . ",
-            " . $hours . ",
-            DATE( NOW() )
-          )
-        ON DUPLICATE KEY UPDATE hours = hours + " . $hours;
-
-        $db->query($sql);
-
-        $this->sendTimeAllocatedEmail($hours, $comments);
-
-    } // end sendTimeAllocatedEmail
 
     /*
   Send email to SD Managers requesting more time to be allocated to SR
   */
 
-    private function sendTimeAllocatedEmail($hours, $comments)
+    private function sendTimeAllocatedEmail($minutes, $comments)
     {
         $buMail = new BUMail($this);
 
@@ -7233,7 +7028,7 @@ customer with the past 8 hours email to GL
                 'reason' => $dbeJCallActivity->getValue('reason'),
                 'customerName' => $dbeJCallActivity->getValue('customerName'),
                 'userName' => $userName,
-                'hours' => round($hours, 2),
+                'minutes' => round($minutes, 2),
                 'comments' => $comments,
                 'urlDisplayActivity' => $urlDisplayActivity,
                 'internalNotes' => $this->dbeProblem->getValue('internalNotes')
@@ -7246,7 +7041,7 @@ customer with the past 8 hours email to GL
 
         $minutes =
 
-        $subject = 'Additional ' . $hours . ' hours Allocated to SR ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName');
+        $subject = 'Additional ' . $minutes . ' minutes Allocated to SR ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName');
 
         $hdrs = array(
             'From' => $senderEmail,
@@ -7277,14 +7072,17 @@ customer with the past 8 hours email to GL
         );
     }
 
-    public function requestAdditionalTime($problemID)
+    public function requestAdditionalTime($problemID, $reason, $callActivityID)
     {
-        $this->dbeProblem = new DBEProblem($this);
-        $this->dbeProblem->getRow($problemID);
-        $this->dbeUser->getRow($this->dbeProblem->getValue('userID'));
+        if ($callActivityID) {
+            $dbeJCallActivity = new DBEJCallActivity($this);
+            $dbeJCallActivity->getRow($callActivityID);
+            $requesterID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
+        } else {
+            $requesterID = $GLOBALS['auth']->is_authenticated();
+        }
 
-        $this->sendRequestAdditionalTimeEmail(false);
-
+        $this->sendRequestAdditionalTimeEmail($problemID, $reason, $requesterID);
     }
 
     function getUserPerformanceWeekToDate($userID)
@@ -7551,6 +7349,42 @@ customer with the past 8 hours email to GL
             $ret[] = $result;
         }
         return $ret;
+    }
+
+    public function getHDTeamUsedTime($problemID, $excludedActivityID = null)
+    {
+        return $this->getUsedTimeForProblemAndTeam($problemID, 1, $excludedActivityID);
+    }
+
+    public function getUsedTimeForProblemAndTeam($problemID, $teamID, $excludedActivityID = null)
+    {
+        global $db;
+
+        $sql =
+            "SELECT sum(time_to_sec(timediff(caa_endtime, caa_starttime)) / 60) AS amountOfTime
+            FROM
+              `problem`
+              LEFT JOIN callactivity ON callactivity.`caa_problemno` = problem.`pro_problemno`
+              LEFT JOIN consultant ON caa_consno = cns_consno
+            WHERE  pro_problemno = $problemID AND teamID = $teamID AND caa_starttime AND caa_endtime and caa_callacttypeno in (4, 8, 11, 18)";
+
+        if ($excludedActivityID) {
+            $sql .= " and caa_callactivityno <> $excludedActivityID";
+        }
+
+        $db->query($sql);
+        $db->next_record();
+        return empty($db->Record['amountOfTime']) ? 0 : $db->Record['amountOfTime'];
+    }
+
+    public function getESTeamUsedTime($problemID, $excludedActivityID = null)
+    {
+        return $this->getUsedTimeForProblemAndTeam($problemID, 2, $excludedActivityID);
+    }
+
+    public function getIMTeamUsedTime($problemID, $excludedActivityID = null)
+    {
+        return $this->getUsedTimeForProblemAndTeam($problemID, 4, $excludedActivityID);
     }
 } // End of class
 ?>
