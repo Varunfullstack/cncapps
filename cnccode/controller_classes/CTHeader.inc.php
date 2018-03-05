@@ -171,15 +171,6 @@ class CTHeader extends CTCNC
 
                 'imTeamLimitHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamLimitHours')),
 
-                'hdTeamMaxPauseCount' => Controller::htmlInputText($dsHeader->getValue('hdTeamMaxPauseCount')),
-
-                'hdTeamMaxPauseCountMessage' => Controller::htmlDisplayText($dsHeader->getMessage('hdTeamMaxPauseCount')),
-
-
-                'hdTeamPauseSeconds' => Controller::htmlInputText($dsHeader->getValue('hdTeamPauseSeconds')),
-
-                'hdTeamPauseSecondsMessage' => Controller::htmlDisplayText($dsHeader->getMessage('hdTeamPauseSeconds')),
-
                 'hdTeamTargetLogPercentage' => Controller::htmlInputText($dsHeader->getValue('hdTeamTargetLogPercentage')),
 
                 'hdTeamTargetSlaPercentage' => Controller::htmlInputText($dsHeader->getValue('hdTeamTargetSlaPercentage')),
@@ -215,6 +206,8 @@ class CTHeader extends CTCNC
                 'imTeamTargetSlaPercentageMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamTargetSlaPercentage')),
 
                 'imTeamTargetFixHours' => Controller::htmlInputText($dsHeader->getValue('imTeamTargetFixHours')),
+
+                'imTeamMinutesInADay' => Controller::htmlDisplayText($dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)),
 
                 'imTeamTargetFixHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamTargetFixHours')),
 

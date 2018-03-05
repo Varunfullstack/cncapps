@@ -866,6 +866,7 @@ class CTCurrentActivityReport extends CTCNC
 
             }
 
+
             if ($dsResults->getValue('alarmDate') && $dsResults->getValue('alarmDate') != '0000-00-00') {
 
                 $alarmDateTimeDisplay = Controller::dateYMDtoDMY($dsResults->getValue('alarmDate')) . ' ' . $dsResults->getValue('alarmTime');
@@ -932,7 +933,29 @@ class CTCurrentActivityReport extends CTCNC
                 $priorityBgColor = self::CONTENT;
             }
 
+
+            $problemID = $dsResults->getValue('problemID');
+            $buActivity = new BUActivity($this);
+
+            $hdUsedMinutes = $buActivity->getHDTeamUsedTime($problemID);
+            $esUsedMinutes = $buActivity->getESTeamUsedTime($problemID);
+            $imUsedMinutes = $buActivity->getIMTeamUsedTime($problemID);
+
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+            $dbeProblem->getRow();
+
+            $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+            $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+            $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+
+            $hdRemaining = $hdAssignedMinutes - $hdUsedMinutes;
+            $esRemaining = $esAssignedMinutes - $esUsedMinutes;
+            $imRemaining = $imAssignedMinutes - $imUsedMinutes;
+
+
             $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
+            $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
                 array(
@@ -943,21 +966,26 @@ class CTCurrentActivityReport extends CTCNC
                     'updatedBgColor' => $updatedBgColor,
                     'priorityBgColor' => $priorityBgColor,
                     'hoursRemainingBgColor' => $hoursRemainingBgColor,
+                    'totalActivityDurationHours' => $totalActivityDurationHours,
+                    'hdRemaining' => $hdRemaining,
+                    'esRemaining' => $esRemaining,
+                    'imRemaining' => $imRemaining,
+                    'hdColor' => $this->pickColor($hdRemaining),
+                    'esColor' => $this->pickColor($esRemaining),
+                    'imColor' => $this->pickColor($imRemaining),
                     'urlCustomer' => $urlCustomer,
                     'time' => $dsResults->getValue('lastStartTime'),
                     'date' => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
                     'problemID' => $dsResults->getValue('problemID'),
-                    'reason' => $this->truncate($dsResults->getValue('reason')),
-                    'urlProblemHistoryPopup'
-                    => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
+                    'reason' => $this->truncate($dsResults->getValue('reason'), 150),
+                    'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
                     'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
                     'engineerName' => $dsResults->getValue('engineerName'),
                     'customerName' => $dsResults->getValue('customerName'),
                     'customerNameDisplayClass'
                     => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'), $dsResults->getValue('specialAttentionEndDate')),
                     'urlViewActivity' => $urlViewActivity,
-                    'linkAllocateAdditionalTime'
-                    => $linkAllocateAdditionalTime,
+                    'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),
                     'priority' => Controller::htmlDisplayText($dsResults->getValue('priority')),
                     'alarmDateTime' => $alarmDateTimeDisplay,
@@ -982,6 +1010,17 @@ class CTCurrentActivityReport extends CTCNC
         );
     } // end render queue
 
+
+    private function pickColor($value)
+    {
+        if ($value <= 5) {
+            return 'red';
+        } else if ($value >= 6 && $value <= 20) {
+            return '#FFBF00';
+        } else {
+            return 'green';
+        }
+    }
 
     /**
      * Return the appropriate background colour for this problem

@@ -1,82 +1,88 @@
 <!-- Template: ServiceRequestFixedEdit.inc.html -->
 <script src="ckeditor/ckeditor.js"></script>
 <script src="CommonJS.js"></script>
+<script>
+    $(function () {
+        $('#teamSelector').change(function () {
+            var elm = $(this);
 
-<FORM  method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE = "off">
-  <input type="hidden" name="problemID"  value="{problemID}">
+            if (elm.val() == 3) {
+                $('#dayOption').show();
+            } else {
+                $('#dayOption').hide();
+            }
+        })
+    })
 
-  <p><A
-          href="#"
-          onClick= "window.open(
+</script>
+
+
+<FORM method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off">
+    <input type="hidden" name="problemID" value="{problemID}">
+
+    <p><A
+            href="#"
+            onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">View SR history
-        </A></p>
-  <table>
-    <tr>
-      <td class="promptText">SR</td>
-      <td colspan="3" class="mainHeadText">{problemID}</td>
-    </tr>
-    <tr>
-      <td class="promptText">Customer</td>
-      <td class="mainHeadText">{customerName}</td>
-    </tr>
+    </A></p>
+    <table>
+        <tr>
+            <td class="promptText">SR</td>
+            <td colspan="3" class="mainHeadText">{problemID}</td>
+        </tr>
+        <tr>
+            <td class="promptText">Customer</td>
+            <td class="mainHeadText">{customerName}</td>
+        </tr>
 
-    <tr>
-      <td class="promptText">Team</td>
-      <td class="mainHeadText"><select
-          name="teamLevel"
-          >
-          <option {teamLevel1Selected} value="1">Helpdesk</option>
-          <option {teamLevel2Selected} value="2">Escalations</option>
-          <option {teamLevel3Selected} value="3">Implementations</option>
-        </select>
-      </td>
-    </tr>
+        <tr>
+            <td class="promptText">Team</td>
+            <td class="mainHeadText">
+                <select name="teamLevel" id="teamSelector">
+                    <option {teamLevel1Selected} value="1">Helpdesk</option>
+                    <option {teamLevel2Selected} value="2">Escalations</option>
+                    <option {teamLevel3Selected} value="3">Implementations</option>
+                </select>
+            </td>
+        </tr>
 
-    <tr>
-      <td class="promptText">Granted Minutes</td>
-      <td class="mainHeadText"><select
-          name="allocatedMinutes"
-          >
-          <!-- BEGIN allocatedMinutesBlock -->
-          <option {selected} value="{minutes}">{minutesDescription}</option>
-          <!-- END allocatedMinutesBlock -->
-          <option value="" >Use custom value below</option>
-        </select>
-        <span class="formErrorMessage">{allocatedMinutesMessage}</span>
-      </td>
-    </tr>
-    <tr>
-      <td class="promptText">Custom</td>
-      <td>
-        <input
-          name="allocatedMinutesCustom"
-          type="text"
-          size="5"
-          value="{allocatedMinutesCustom}"
-        >
-        <span class="formErrorMessage">{allocatedMinutesCustomMessage}</span>
-      </td>
-    </tr>
+        <tr>
+            <td class="promptText">Granted Minutes</td>
+            <td class="mainHeadText">
+                <input style="width: 50px"
+                        name="allocatedTimeValue"
+                        type="text"
+                        value="{allocatedTimeValue}"
+                        required
+                >
+                <span></span>
+                <select name="allocatedTimeAmount" id="allocatedTimeAmountSelector">
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days" id="dayOption" hidden>Days</option>
+                </select>
+            </td>
+        </tr>
 
-    <tr>
-      <td class="promptText" style="vertical-align: top;">Comments</td>
-      <td>
-      <textarea name="comments">{comments}</textarea>
-        <script  type="text/javascript">
-          reason = CKEDITOR.replace( 'comments', { customConfig : '/ckeditor_config.js' } );
-          reason.addCss( 'body { font-size: 10pt; }' );
-        </script>
-      </td>
-    </tr>
-    
-    <tr>
-      <td colspan="2">
-        <input type="submit" name="Submit" value="Save">
-      </td>
-    </tr>
-  </table>
+        <tr>
+            <td class="promptText" style="vertical-align: top;">Comments</td>
+            <td>
+                <textarea name="comments">{comments}</textarea>
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
+                    reason.addCss('body { font-size: 10pt; }');
+                </script>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <input type="submit" name="Submit" value="Save">
+            </td>
+        </tr>
+    </table>
 </FORM>
 
 <!-- End Template: ServiceRequestFixedEdit.inc.html -->
