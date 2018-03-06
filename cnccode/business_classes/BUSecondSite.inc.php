@@ -96,6 +96,8 @@ class BUSecondsite extends Business
 
         $this->serverCount = count($servers);
 
+        $servers = array_slice($servers, 0, 10);
+
         foreach ($servers as $server) {
 
             $error = false;
@@ -362,7 +364,7 @@ class BUSecondsite extends Business
                 ],
                 [
                     "type" => "d",
-                    "value" =>
+                    "value" => ($this->imageCount / $this->imagePassesCount) * 100
                 ]
 
             ]);
