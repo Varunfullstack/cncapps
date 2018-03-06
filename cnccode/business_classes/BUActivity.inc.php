@@ -6994,6 +6994,8 @@ customer with the past 8 hours email to GL
         $this->dbeProblem->updateRow();
 
         $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
+
+        $this->sendTimeAllocatedEmail($minutes, $comments);
     }
 
     /*
@@ -7017,8 +7019,7 @@ customer with the past 8 hours email to GL
 
         $template = new Template(EMAIL_TEMPLATE_DIR, "remove");
         $template->set_file('page', 'ServiceTimeAllocatedEmail.inc.html');
-
-
+        
         $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue('callActivityID');
 
         $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
