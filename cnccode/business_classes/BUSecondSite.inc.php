@@ -17,8 +17,8 @@ class BUSecondsite extends Business
     public $imageErrorCount = 0;
     public $imagePassesCount = 0;
     private $suspendedCheckServers = [];
-    var $delayedCheckServers;
-    var $excludedLocalServers;
+    var $delayedCheckServers = [];
+    var $excludedLocalServers = [];
     var $db;
     /* todo:
     var $imagePassCount;
@@ -96,7 +96,7 @@ class BUSecondsite extends Business
 
         $this->serverCount = count($servers);
 
-        $servers = array_slice($servers, 0, 10);
+        $servers = array_slice($servers, 0, 100);
 
         foreach ($servers as $server) {
 
@@ -151,9 +151,7 @@ class BUSecondsite extends Business
                 } else {
 
                     $networkPath = $server['secondsiteLocationPath'];
-
                     if (!file_exists($networkPath)) {
-
                         $error = 'Location is not available';
 
                         if (!$isSuspended) {
@@ -318,12 +316,13 @@ class BUSecondsite extends Business
             $db = $GLOBALS['db'];
 
             //check if we have already stored information for today
-            $query = "SELECT id FROM backup_performance_log WHERE created_at = date(now())";
+            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now())";
 
             $db->query($query);
-            $data = $db->next_record();
+            $db->next_record();
+            $data = $db->Record;
 
-            if ($data['id']) {
+            if ($data['created_at']) {
                 return;
             }
 
@@ -364,7 +363,7 @@ class BUSecondsite extends Business
                 ],
                 [
                     "type" => "d",
-                    "value" => ($this->imageCount / $this->imagePassesCount) * 100
+                    "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
                 ]
 
             ]);
@@ -414,7 +413,6 @@ class BUSecondsite extends Business
 
     function preg_ls($path = ".", $pat = "/.*/")
     {
-
         // it's going to be used repeatedly, ensure we compile it for speed.
         $pat = preg_replace("|(/.*/[^S]*)|s", "\\1S", $pat);
         //Remove trailing slashes from path

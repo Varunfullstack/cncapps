@@ -160,7 +160,7 @@ class DB_Sql
         $this->Row = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
-        if (!$result) {
+        if ($this->Errno) {
             debug_print_backtrace();
             $this->halt("Invalid SQL: " . $queryString);
         }
