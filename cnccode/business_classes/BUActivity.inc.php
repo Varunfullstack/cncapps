@@ -7009,7 +7009,13 @@ customer with the past 8 hours email to GL
         $problemID = $this->dbeProblem->getValue('problemID');
         $dbeUser = new DBEUser($this);
 
-        $dbeUser->getRow($this->dbeProblem->getValue(DBEProblem::userID));
+        $assignedUser = $this->dbeProblem->getValue(DBEProblem::userID);
+
+        if (!$assignedUser) {
+            return;
+        }
+
+        $dbeUser->getRow($assignedUser);
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
