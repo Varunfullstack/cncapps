@@ -42,5 +42,4 @@
         </update>
         <rollback/>
     </changeSet>
-
 </databaseChangeLog>
