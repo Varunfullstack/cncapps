@@ -19,6 +19,7 @@ class BUSecondsite extends Business
     private $suspendedCheckServers = [];
     var $delayedCheckServers = [];
     var $excludedLocalServers = [];
+    /** @var mysqli $db */
     var $db;
     /* todo:
     var $imagePassCount;
@@ -784,6 +785,44 @@ class BUSecondsite extends Business
         return $ret;
 
     }
+
+    function getPerformanceDataForYear($year = null)
+    {
+
+        if (!$year) {
+            $year = date("Y");
+        }
+
+        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
+            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year'
+) t GROUP BY t.month";
+
+        $result = $this->db->query($query);
+
+        $data = [
+        ];
+
+        for ($i = 0; $i < 12; $i++) {
+            $data[$i + 1] = "N/A";
+        }
+
+        while ($row = $result->fetch_assoc()) {
+            $data[$row['MONTH']] = $row['successRate'] * 100;
+        }
+
+        return $data;
+    }
+
+    function getPerformanceDataAvailableYears()
+    {
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log";
+        $result = $this->db->query($query);
+
+        return array_map(function ($item) {
+            return $item[0];
+        }, $result->fetch_all());
+    }
+
 
 }//End of class
 ?>

@@ -1,156 +1,227 @@
 <!-- Template: CurrentActivityReport.inc.html -->
+<style>
+    .success {
+        color: green;
+    }
+
+    .fail {
+        color: red;
+    }
+
+</style>
+
+<form name="searchForm" method="get" action="{urlSubmit}">
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+
+            <td>
+                <select type="text" name="searchYear" >
+                    <!-- BEGIN availableYearsBlock -->
+                    <option value="{year}" {selectedYear}>{year}</option>
+                    <!-- END availableYearsBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" name="Search" value="Run">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table id="team-performance">
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        <th>Target</th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+        <th>Backup Success Rate %</th>
+        <td>{backupTargetSuccessRate}</td>
+        <td class="{monthSuccessRate1Class}">{monthSuccessRate1}</td>
+        <td class="{monthSuccessRate2Class}">{monthSuccessRate2}</td>
+        <td class="{monthSuccessRate3Class}">{monthSuccessRate3}</td>
+        <td class="{monthSuccessRate4Class}">{monthSuccessRate4}</td>
+        <td class="{monthSuccessRate5Class}">{monthSuccessRate5}</td>
+        <td class="{monthSuccessRate6Class}">{monthSuccessRate6}</td>
+        <td class="{monthSuccessRate7Class}">{monthSuccessRate7}</td>
+        <td class="{monthSuccessRate8Class}">{monthSuccessRate8}</td>
+        <td class="{monthSuccessRate9Class}">{monthSuccessRate9}</td>
+        <td class="{monthSuccessRate10Class}">{monthSuccessRate10}</td>
+        <td class="{monthSuccessRate11Class}">{monthSuccessRate11}</td>
+        <td class="{monthSuccessRate12Class}">{monthSuccessRate12}</td>
+    </tr>
+    </tbody>
+</table>
+
 <h2>Out of date</h2>
 <table class="second-site-image" id="out-of-date" class="table-bordered" width="100%">
-  <thead>
+    <thead>
     <tr>
-      <th width="20%">Customer</th>
-      <th width="10%">Server</th>
-      <th width="8%">Label</th>
-      <th width ="40%">Image</th>
-      <th width="10%">Image Time</th>
-      <th>Age(days)</th>
-      <th>&nbsp;</th>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+        <th width="8%">Label</th>
+        <th width="40%">Image</th>
+        <th width="10%">Image Time</th>
+        <th>Age(days)</th>
+        <th>&nbsp;</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <!-- BEGIN outOfDateBlock -->
     <tr>
-      <td>{customerName}</td>
-      <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
-      <td>{imageName}</td>
-      <td>{imagePath}</td>
-      <td>{imageTime}</td>
-      <td>{imageAgeDays}</td>
-      <td><a href="{urlRunCheck}">Check Now</a></td>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td>{imageName}</td>
+        <td>{imagePath}</td>
+        <td>{imageTime}</td>
+        <td>{imageAgeDays}</td>
+        <td><a href="{urlRunCheck}">Check Now</a></td>
     </tr>
     <!-- END outOfDateBlock -->
-  </tbody>
+    </tbody>
 </table>
 
 <h2>Location not found</h2>
 <table class="second-site-image" id="server-not-found" class="table-bordered" width="100%">
-  <thead>
+    <thead>
     <tr>
-      <th width="20%">Customer</th>
-      <th width="10%">Server</th>
-      <th width="8%">Label</th>
-      <th width ="40%">Path</th>
-      <th>&nbsp;</th>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+        <th width="8%">Label</th>
+        <th width="40%">Path</th>
+        <th>&nbsp;</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <!-- BEGIN serverNotFoundBlock -->
     <tr>
-      <td>{customerName}</td>
-      <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
-      <td>{imageName}</td>
-      <td>{serverPath}</td>
-      <td><a href="{urlRunCheck}">Check Now</a></td>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td>{imageName}</td>
+        <td>{serverPath}</td>
+        <td><a href="{urlRunCheck}">Check Now</a></td>
     </tr>
     <!-- END serverNotFoundBlock -->
-  </tbody>
+    </tbody>
 </table>
 
 <h2>Image not found</h2>
 <table class="second-site-image" id="image-not-found" class="table-bordered" width="100%">
-  <thead>
+    <thead>
     <tr>
-      <th width="20%">Customer</th>
-      <th width="10%">Server</th>
-      <th width="8%">Label</th>
-      <th width ="40%">Path</th>
-      <th>&nbsp;</th>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+        <th width="8%">Label</th>
+        <th width="40%">Path</th>
+        <th>&nbsp;</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <!-- BEGIN imageNotFoundBlock -->
     <tr>
-      <td>{customerName}</td>
-      <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
-      <td>{imageName}</td>
-      <td>{serverPath}</td>
-      <td><a href="{urlRunCheck}">Check Now</a></td>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td>{imageName}</td>
+        <td>{serverPath}</td>
+        <td><a href="{urlRunCheck}">Check Now</a></td>
     </tr>
     <!-- END imageNotFoundBlock -->
-  </tbody>
+    </tbody>
 </table>
 
 <h2>Bad Configuration</h2>
 <table class="second-site-image" id="bad-config" class="table-bordered" width="100%">
-  <thead>
+    <thead>
     <tr>
-      <th width="20%">Customer</th>
-      <th width="10%">Server</th>
-      <th width="8%">Label</th>
-      <th width ="40%">Path</th>
-      <th>&nbsp;</th>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+        <th width="8%">Label</th>
+        <th width="40%">Path</th>
+        <th>&nbsp;</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <!-- BEGIN badConfigBlock -->
     <tr>
-      <td>{customerName}</td>
-      <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
-      <td>{imageName}</td>
-      <td>{serverPath}</td>
-      <td><a href="{urlRunCheck}">Check Now</a></td>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td>{imageName}</td>
+        <td>{serverPath}</td>
+        <td><a href="{urlRunCheck}">Check Now</a></td>
     </tr>
     <!-- END badConfigBlock -->
-  </tbody>
+    </tbody>
 </table>
 
 <h2>Suspended</h2>
 <table class="second-site-image" id="suspended" class="table-bordered" width="100%">
-  <thead>
+    <thead>
     <tr>
-      <th width="20%">Customer</th>
-      <th width="10%">Server</th>
-      <th width="8%">Label</th>
-      <th width ="40%">Image</th>
-      <th width="10%">Image Time</th>
-      <th>Age(days)</th>
-      <th>Suspended Until</th>
-      <th>&nbsp;</th>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+        <th width="8%">Label</th>
+        <th width="40%">Image</th>
+        <th width="10%">Image Time</th>
+        <th>Age(days)</th>
+        <th>Suspended Until</th>
+        <th>&nbsp;</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <!-- BEGIN suspendedBlock -->
     <tr>
-      <td>{customerName}</td>
-      <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
-      <td>{imageName}</td>
-      <td>{imagePath}</td>
-      <td>{imageTime}</td>
-      <td>{imageAgeDays}</td>
-      <td>{suspendedUntil}</td>
-      <td><a href="{urlRunCheck}">{txtRunCheck}</a></td>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td>{imageName}</td>
+        <td>{imagePath}</td>
+        <td>{imageTime}</td>
+        <td>{imageAgeDays}</td>
+        <td>{suspendedUntil}</td>
+        <td><a href="{urlRunCheck}">{txtRunCheck}</a></td>
     </tr>
     <!-- END suspendedBlock -->
-  </tbody>
+    </tbody>
 </table>
 
 <h2>Passed</h2>
 <table class="second-site-image" id="passed" class="table-bordered" width="100%">
-  <thead>
+    <thead>
     <tr>
-      <th width="20%">Customer</th>
-      <th width="10%">Server</th>
-      <th width="8%">Label</th>
-      <th width ="40%">Image</th>
-      <th width="10%">Image Time</th>
-      <th>Age(days)</th>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+        <th width="8%">Label</th>
+        <th width="40%">Image</th>
+        <th width="10%">Image Time</th>
+        <th>Age(days)</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <!-- BEGIN passedBlock -->
     <tr>
-      <td>{customerName}</td>
-      <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
-      <td>{imageName}</td>
-      <td>{imagePath}</td>
-      <td>{imageTime}</td>
-      <td>{imageAgeDays}</td>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td>{imageName}</td>
+        <td>{imagePath}</td>
+        <td>{imageTime}</td>
+        <td>{imageAgeDays}</td>
     </tr>
     <!-- END passedBlock -->
-  </tbody>
+    </tbody>
 </table>

@@ -23,4 +23,24 @@
             <column type="decimal(5,1)" name="success_rate"/>
         </createTable>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue174-1520243164-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hed_backup_target_success_rate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="hed_backup_target_success_rate" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue174-1520243164-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_backup_target_success_rate"/>
+        </preConditions>
+        <update tableName="headert">
+            <column name="hed_backup_target_success_rate" type="int" value="98"/>
+        </update>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>
