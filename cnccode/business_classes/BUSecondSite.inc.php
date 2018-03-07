@@ -10,11 +10,16 @@ class BUSecondsite extends Business
     var $dbeSecondsiteImage;
     var $buActivity;
     var $log;
-    var $serverCount;
-    var $imageCount;
+    var $serverCount = 0;
+    var $imageCount = 0;
+    public $suspendedServerCount = 0;
+    public $serverErrorCount = 0;
+    public $imageErrorCount = 0;
+    public $imagePassesCount = 0;
     private $suspendedCheckServers = [];
-    var $delayedCheckServers;
-    var $excludedLocalServers;
+    var $delayedCheckServers = [];
+    var $excludedLocalServers = [];
+    /** @var mysqli $db */
     var $db;
     /* todo:
     var $imagePassCount;
@@ -49,6 +54,7 @@ class BUSecondsite extends Business
         }
         return $this->buActivity;
     }
+
 
     public function getDelayedCheckServers()
     {
@@ -99,6 +105,10 @@ class BUSecondsite extends Business
 
             $isSuspended = $this->isSuspended($server);
 
+            if ($isSuspended) {
+                $this->suspendedServerCount++;
+            }
+
             if (
                 $server['itm_itemtypeno'] == CONFIG_2NDSITE_LOCAL_ITEMTYPEID &&
                 $server['secondsiteLocalExcludeFlag'] == 'Y'
@@ -128,8 +138,10 @@ class BUSecondsite extends Business
                     count($images) == 0
                 ) {
                     $error = 'Incomplete 2nd Site replication contract information';
-
                     if (!$isSuspended) {
+                        $this->imageCount += count($images);
+                        $this->serverErrorCount++;
+
                         $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' ' . $error, self::LOG_TYPE_ERROR_INCOMPLETE);
 
                         $this->setImageStatusByServer($server['server_cuino'], self::STATUS_BAD_CONFIG);
@@ -138,12 +150,13 @@ class BUSecondsite extends Business
                 } else {
 
                     $networkPath = $server['secondsiteLocationPath'];
-
                     if (!file_exists($networkPath)) {
-
                         $error = 'Location is not available';
 
                         if (!$isSuspended) {
+                            $images = $this->getImagesByServer($server['server_cuino']);
+                            $this->imageCount += count($images);
+                            $this->serverErrorCount++;
 
                             $this->logMessage($server['cus_name'] . ' ' . $networkPath . ' ' . $error, self::LOG_TYPE_ERROR_PATH_MISSING);
 
@@ -177,14 +190,14 @@ class BUSecondsite extends Business
 
                 foreach ($images as $image) {
 
-                    $this->imageCount++;
-
+                    if (!$isSuspended) {
+                        $this->imageCount++;
+                    }
                     if (strlen($image['imageName']) == 1) {
 
                         $pattern = '/' . $server['serverName'] . '_' . $image['imageName'];
                     } else {
                         $pattern = '/' . $image['imageName'];
-
                     }
 
                     $pattern .= '.*(-cd.spi|spf)$/i';
@@ -196,6 +209,7 @@ class BUSecondsite extends Business
                         $allServerImagesPassed = false;
 
                         if (!$isSuspended) {
+                            $this->imageErrorCount++;
                             /*
                             No matching files of any date
                             */
@@ -240,6 +254,7 @@ class BUSecondsite extends Business
                             $allServerImagesPassed = false;
 
                             if (!$isSuspended) {
+                                $this->imageErrorCount++;
 
                                 $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s', $mostRecentFileTime);
                                 $this->logMessage($errorMessage, self::LOG_TYPE_ERROR_NO_IMAGE);
@@ -256,6 +271,7 @@ class BUSecondsite extends Business
                             $this->setImageStatus($image['secondSiteImageID'], $status, $mostRecentFileName, date('Y-m-d H:i:s', $mostRecentFileTime));
 
                         } else {
+                            $this->imagePassesCount++;
                             /*
                             Passed all verification checks.
                             */
@@ -293,6 +309,66 @@ class BUSecondsite extends Business
             } // if not error
 
         } // end foreach contracts
+
+        if (!$customerItemID) {
+            /** @var dbSweetcode $db */
+            $db = $GLOBALS['db'];
+
+            //check if we have already stored information for today
+            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now())";
+
+            $db->query($query);
+            $db->next_record();
+            $data = $db->Record;
+
+            if ($data['created_at']) {
+                return;
+            }
+
+            $query = "INSERT INTO backup_performance_log (
+                      created_at,
+                      servers,
+                      images,
+                      server_errors,
+                      image_errors,
+                      suspended_servers,
+                      passes,
+                      success_rate
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?)";
+            $db->preparedQuery($query, [
+                [
+                    "type" => "i",
+                    "value" => $this->serverCount
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->imageCount
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->serverErrorCount,
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->imageErrorCount,
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->suspendedServerCount,
+                ],
+                [
+                    "type" => "i",
+                    "value" => $this->imagePassesCount,
+                ],
+                [
+                    "type" => "d",
+                    "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                ]
+
+            ]);
+
+
+        }
     }
 
     function isSuspended($server)
@@ -336,7 +412,6 @@ class BUSecondsite extends Business
 
     function preg_ls($path = ".", $pat = "/.*/")
     {
-
         // it's going to be used repeatedly, ensure we compile it for speed.
         $pat = preg_replace("|(/.*/[^S]*)|s", "\\1S", $pat);
         //Remove trailing slashes from path
@@ -708,6 +783,44 @@ class BUSecondsite extends Business
         return $ret;
 
     }
+
+    function getPerformanceDataForYear($year = null)
+    {
+
+        if (!$year) {
+            $year = date("Y");
+        }
+
+        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
+            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year'
+) t GROUP BY t.month";
+
+        $result = $this->db->query($query);
+
+        $data = [
+        ];
+
+        for ($i = 0; $i < 12; $i++) {
+            $data[$i + 1] = "N/A";
+        }
+
+        while ($row = $result->fetch_assoc()) {
+            $data[$row['MONTH']] = $row['successRate'] * 100;
+        }
+
+        return $data;
+    }
+
+    function getPerformanceDataAvailableYears()
+    {
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log";
+        $result = $this->db->query($query);
+
+        return array_map(function ($item) {
+            return $item[0];
+        }, $result->fetch_all());
+    }
+
 
 }//End of class
 ?>

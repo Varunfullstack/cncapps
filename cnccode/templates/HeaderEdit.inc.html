@@ -574,6 +574,22 @@
                 > <span class="formErrorMessage">{allowedClientIpPatternMessage}</span>
             </td>
         </tr>
+
+        <tr>
+            <td class="promptText">Backups target success rate</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][backupTargetSuccessRate]"
+                        value="{backupTargetSuccessRate}"
+                        title="The target % rate of success for backups"
+                        size="5"
+                        maxlength="5"
+                        required
+                > <span class="formErrorMessage">{backupTargetSuccessRateMessage}</span>
+            </td>
+        </tr>
     </table>
     <BR>
     <table>

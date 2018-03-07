@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue 174 - CNC036 - Record backup success as percentage
+
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
 
