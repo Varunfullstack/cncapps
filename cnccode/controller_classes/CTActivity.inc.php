@@ -1279,17 +1279,16 @@ class CTActivity extends CTCNC
         /*
       Show SCR report and visit confirmation links if this activity type allows
       */
+        $urlAddToCalendar =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITY_ACT_ADD_TO_CALENDAR,
+                    'callActivityID' => $callActivityID
+                )
+            );
+        $txtAddToCalendar = 'Calendar';
         if ($dsCallActivity->getValue('allowSCRFlag') == 'Y') {
-
-            $urlAddToCalendar =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTACTIVITY_ACT_ADD_TO_CALENDAR,
-                        'callActivityID' => $callActivityID
-                    )
-                );
-            $txtAddToCalendar = 'Calendar';
 
             $urlSendVistEmail =
                 $this->buildLink(
@@ -1315,8 +1314,6 @@ class CTActivity extends CTCNC
 
 
         } else {
-            $urlAddToCalendar = '';
-            $txtAddToCalendar = '';
             $urlSendVisitEmail = '';
             $txtSendVisitEmail = '';
         }
