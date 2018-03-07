@@ -7007,6 +7007,15 @@ customer with the past 8 hours email to GL
         $buMail = new BUMail($this);
 
         $problemID = $this->dbeProblem->getValue('problemID');
+        $dbeUser = new DBEUser($this);
+
+        $assignedUser = $this->dbeProblem->getValue(DBEProblem::userID);
+
+        if (!$assignedUser) {
+            return;
+        }
+
+        $dbeUser->getRow($assignedUser);
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
@@ -7015,14 +7024,14 @@ customer with the past 8 hours email to GL
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
 
-        $toEmail = $this->dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
+        $toEmail = $dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
 
         $template = new Template(EMAIL_TEMPLATE_DIR, "remove");
         $template->set_file('page', 'ServiceTimeAllocatedEmail.inc.html');
-        
+
         $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue('callActivityID');
 
-        $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
+        $userName = $dbeUser->getValue('firstName') . ' ' . $dbeUser->getValue('lastName');
 
         $template->setVar(
             array(
