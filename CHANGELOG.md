@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue 172 - CNC036 - Sales Order link not shown when editing an activity
+
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
 
