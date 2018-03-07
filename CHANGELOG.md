@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue171: CNC035 - Display Calendar link on all activities
+
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
 
