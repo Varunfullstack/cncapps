@@ -118,7 +118,7 @@ $template->setVar(
         'imageCount' => $buSecondsite->imageCount,
         'imageErrorCount' => $buSecondsite->imageErrorCount,
         'successCount' => $buSecondsite->imagePassesCount,
-        'successRate' => $buSecondsite->imageCount ? $buSecondsite->imagePassesCount / $buSecondsite->imageCount * 100 : 0
+        'successRate' => round($buSecondsite->imageCount ? $buSecondsite->imagePassesCount / $buSecondsite->imageCount * 100 : 0,1)
     )
 );
 
