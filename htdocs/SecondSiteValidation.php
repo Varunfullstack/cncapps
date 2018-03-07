@@ -117,7 +117,8 @@ $template->setVar(
         'suspendedServerCount' => $buSecondsite->suspendedServerCount,
         'imageCount' => $buSecondsite->imageCount,
         'imageErrorCount' => $buSecondsite->imageErrorCount,
-        'successCount' => $buSecondsite->imagePassesCount
+        'successCount' => $buSecondsite->imagePassesCount,
+        'successRate' => $buSecondsite->imageCount ? $buSecondsite->imagePassesCount / $buSecondsite->imageCount * 100 : 0
     )
 );
 
