@@ -5,6 +5,7 @@ This project changes will be shown here.
 - Issue 174 - CNC036 - Record backup success as percentage
 - Issue171: CNC035 - Display Calendar link on all activities
 - Issue 172 - CNC036 - Sales Order link not shown when editing an activity
+- Issue173 - Remove Type field 'required' status from the Activity edit page
 
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
