@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue173 - Remove Type field 'required' status from the Activity edit page
+
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
 
