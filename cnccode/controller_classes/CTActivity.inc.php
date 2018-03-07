@@ -3366,6 +3366,17 @@ class CTActivity extends CTCNC
         $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
         $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
 
+
+        $urlLinkedSalesOrder =
+            $this->buildLink(
+                'Activity.php',
+                array(
+                    'action' => 'editLinkedSalesOrder',
+                    'htmlFmt' => CT_HTML_FMT_POPUP,
+                    'callActivityID' => $callActivityID
+                )
+            );
+
         $this->template->set_var(
             array(
                 'level' => $level,
@@ -3386,8 +3397,7 @@ class CTActivity extends CTCNC
                 'contactPhone' => $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID')),
                 'expenseExportFlag' => $dsCallActivity->getValue('expenseExportFlag'),
                 'customerName' => Controller::htmlDisplayText($dsCallActivity->getValue('customerName')),
-                'customerNameDisplayClass'
-                => $this->getCustomerNameDisplayClass($dsCustomer),
+                'customerNameDisplayClass' => $this->getCustomerNameDisplayClass($dsCustomer),
                 'urlCustomer' => $this->getCustomerUrl($dsCallActivity->getValue('customerID')),
                 'date' => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
                 'dateMessage' => $dsCallActivity->getMessage('date'),
@@ -3411,6 +3421,8 @@ class CTActivity extends CTCNC
                 'renewalsLink' => $renewalsLink,
                 'passwordLink' => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
                 'generatePasswordLink' => $this->getGeneratePasswordLink(),
+                'salesOrderLink' => $this->getSalesOrderLink($dsCallActivity->getValue('linkedSalesOrderID')),
+                'urlLinkedSalesOrder' => $urlLinkedSalesOrder,
                 'problemHistoryLink' => '| ' . $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'projectLink' => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
                 'contractListPopupLink' => $this->getContractListPopupLink($dsCallActivity->getValue('customerID')),
