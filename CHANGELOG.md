@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 173 - Remove Type field 'required' status from the Activity edit page
 - Issue 178 - When updating a activity the activity type limit checks don't work anymore
 - Issue 150 - The URI gets too large when working with the timer on and typing notes
+- Issue 167 - Fix problem with days not showing in allocation time window
 
 ##[1.2.1]
 - Fix issue with time allocated emails not getting sent
