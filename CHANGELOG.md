@@ -4,6 +4,12 @@ This project changes will be shown here.
 ##[unreleased]
 - Issue 174 - CNC036 - Record backup success as percentage
 
+##[1.2.1]
+- Fix issue with time allocated emails not getting sent
+
+##[1.2.0]
+- Issue 167 - CNC033 - Hard limits
+
 ## [1.1.0]
 - Issue 142 - Pre-pay activity over £100 - where is the email address set?
 - Issue 144 - CNC031 - Contract and numbers report
