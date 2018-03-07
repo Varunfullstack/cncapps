@@ -97,8 +97,6 @@ class BUSecondsite extends Business
 
         $this->serverCount = count($servers);
 
-        $servers = array_slice($servers, 0, 100);
-
         foreach ($servers as $server) {
 
             $error = false;
