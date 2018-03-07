@@ -26,39 +26,25 @@ $template->set_file('page', 'secondSiteCompletedEmail.inc.html');
 
 $template->set_block('page', 'logBlock', 'logs');
 
-$errorCount = 0;
-$successCount = 0;
-
 foreach ($buSecondsite->log as $logEntry) {
 
     if ($logEntry['type'] == BUSecondsite::LOG_TYPE_SUCCESS) {
-        $successCount++;
         continue; // don't report successes in detail
     }
 
     switch ($logEntry['type']) {
 
         case BUSecondsite::LOG_TYPE_ERROR_INCOMPLETE:
-            $errorCount++;
             $class = 'incomplete';
             break;
 
         case BUSecondsite::LOG_TYPE_ERROR_PATH_MISSING:
-            $errorCount++;
             $class = 'pathMissing';
             break;
 
         case BUSecondsite::LOG_TYPE_ERROR_NO_IMAGE:
-            $errorCount++;
             $class = 'noImage';
             break;
-
-        /* Not required in report
-            case BUSecondsite::LOG_TYPE_SUCCESS:
-              $successCount++;
-              $class = 'success';
-              break;
-        */
     }
 
     $template->set_var(
@@ -74,7 +60,6 @@ foreach ($buSecondsite->log as $logEntry) {
 $template->set_block('page', 'delayedCheckServerBlock', 'delayedServers');
 
 $servers = $buSecondsite->getDelayedCheckServers();
-
 foreach ($servers as $server) {
 
     $template->set_var(
@@ -128,9 +113,12 @@ foreach ($servers as $server) {
 $template->setVar(
     array(
         'serverCount' => $buSecondsite->serverCount,
+        'serverErrorCount' => $buSecondsite->serverErrorCount,
+        'suspendedServerCount' => $buSecondsite->suspendedServerCount,
         'imageCount' => $buSecondsite->imageCount,
-        'errorCount' => $errorCount,
-        'successCount' => $successCount
+        'imageErrorCount' => $buSecondsite->imageErrorCount,
+        'successCount' => $buSecondsite->imagePassesCount,
+        'successRate' => round($buSecondsite->imageCount ? $buSecondsite->imagePassesCount / $buSecondsite->imageCount * 100 : 0,1)
     )
 );
 

@@ -58,6 +58,14 @@
         }
         return;
     }
+    function linkedSalesOrderPopup() {
+        window.open(
+            '{urlLinkedSalesOrder}',
+            'salesOrder',
+            'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
+        );
+
+    }
 </script>
 <table width="100%">
     <tr>
@@ -150,7 +158,6 @@
                     onchange="setFormChanged();"
                     id="contractID"
                     name="callActivity[1][callActTypeID]"
-                    required
             >
                 <option value="">Please Select</option>
                 <!-- BEGIN activityTypeBlock -->
@@ -513,6 +520,8 @@
     function autoSave() {
         $.ajax({
             url: 'Activity.php',
+            type: 'POST',
+            // contentType: 'multipart/form-data; charset=UTF-8',
             data: {
                 action: "autoUpdate",
                 callActivityID: $("INPUT#callActivityID").val(),

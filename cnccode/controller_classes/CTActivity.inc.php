@@ -1279,17 +1279,16 @@ class CTActivity extends CTCNC
         /*
       Show SCR report and visit confirmation links if this activity type allows
       */
+        $urlAddToCalendar =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITY_ACT_ADD_TO_CALENDAR,
+                    'callActivityID' => $callActivityID
+                )
+            );
+        $txtAddToCalendar = 'Calendar';
         if ($dsCallActivity->getValue('allowSCRFlag') == 'Y') {
-
-            $urlAddToCalendar =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTACTIVITY_ACT_ADD_TO_CALENDAR,
-                        'callActivityID' => $callActivityID
-                    )
-                );
-            $txtAddToCalendar = 'Calendar';
 
             $urlSendVistEmail =
                 $this->buildLink(
@@ -1315,8 +1314,6 @@ class CTActivity extends CTCNC
 
 
         } else {
-            $urlAddToCalendar = '';
-            $txtAddToCalendar = '';
             $urlSendVisitEmail = '';
             $txtSendVisitEmail = '';
         }
@@ -3369,6 +3366,17 @@ class CTActivity extends CTCNC
         $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
         $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
 
+
+        $urlLinkedSalesOrder =
+            $this->buildLink(
+                'Activity.php',
+                array(
+                    'action' => 'editLinkedSalesOrder',
+                    'htmlFmt' => CT_HTML_FMT_POPUP,
+                    'callActivityID' => $callActivityID
+                )
+            );
+
         $this->template->set_var(
             array(
                 'level' => $level,
@@ -3389,8 +3397,7 @@ class CTActivity extends CTCNC
                 'contactPhone' => $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID')),
                 'expenseExportFlag' => $dsCallActivity->getValue('expenseExportFlag'),
                 'customerName' => Controller::htmlDisplayText($dsCallActivity->getValue('customerName')),
-                'customerNameDisplayClass'
-                => $this->getCustomerNameDisplayClass($dsCustomer),
+                'customerNameDisplayClass' => $this->getCustomerNameDisplayClass($dsCustomer),
                 'urlCustomer' => $this->getCustomerUrl($dsCallActivity->getValue('customerID')),
                 'date' => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
                 'dateMessage' => $dsCallActivity->getMessage('date'),
@@ -3414,6 +3421,8 @@ class CTActivity extends CTCNC
                 'renewalsLink' => $renewalsLink,
                 'passwordLink' => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
                 'generatePasswordLink' => $this->getGeneratePasswordLink(),
+                'salesOrderLink' => $this->getSalesOrderLink($dsCallActivity->getValue('linkedSalesOrderID')),
+                'urlLinkedSalesOrder' => $urlLinkedSalesOrder,
                 'problemHistoryLink' => '| ' . $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'projectLink' => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
                 'contractListPopupLink' => $this->getContractListPopupLink($dsCallActivity->getValue('customerID')),
@@ -3851,9 +3860,8 @@ class CTActivity extends CTCNC
                                 $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
                             }
                         }
-                    } else {
-                        if (!$_REQUEST['userWarned']) {
 
+                        if (!$_REQUEST['userWarned']) {
 
                             $buHeader = new BUHeader($this);
                             $buHeader->getHeader($dsHeader);

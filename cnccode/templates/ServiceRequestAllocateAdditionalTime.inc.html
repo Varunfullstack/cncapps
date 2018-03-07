@@ -3,7 +3,14 @@
 <script src="CommonJS.js"></script>
 <script>
     $(function () {
-        $('#teamSelector').change(function () {
+        var teamSelector = $('#teamSelector');
+
+        if (teamSelector.val() == 3) {
+            $('#dayOption').show();
+        } else {
+            $('#dayOption').hide();
+        }
+        teamSelector.change(function () {
             var elm = $(this);
 
             if (elm.val() == 3) {
@@ -52,10 +59,10 @@
             <td class="promptText">Granted Minutes</td>
             <td class="mainHeadText">
                 <input style="width: 50px"
-                        name="allocatedTimeValue"
-                        type="text"
-                        value="{allocatedTimeValue}"
-                        required
+                       name="allocatedTimeValue"
+                       type="text"
+                       value="{allocatedTimeValue}"
+                       required
                 >
                 <span></span>
                 <select name="allocatedTimeAmount" id="allocatedTimeAmountSelector">
