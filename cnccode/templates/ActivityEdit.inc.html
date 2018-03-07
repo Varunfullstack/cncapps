@@ -520,6 +520,8 @@
     function autoSave() {
         $.ajax({
             url: 'Activity.php',
+            type: 'POST',
+            // contentType: 'multipart/form-data; charset=UTF-8',
             data: {
                 action: "autoUpdate",
                 callActivityID: $("INPUT#callActivityID").val(),
