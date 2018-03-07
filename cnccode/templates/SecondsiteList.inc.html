@@ -9,22 +9,25 @@
     }
 
 </style>
+<script>
+    $(function () {
+        $('#yearSelector').change(function () {
+            $('#searchForm').submit();
+        })
+    })
+</script>
 
-<form name="searchForm" method="get" action="{urlSubmit}">
+
+<form name="searchForm" method="get" action="{urlSubmit}" id="searchForm">
     <table width="500px" border="0" cellspacing="0" cellpadding="1">
         <tr>
 
             <td>
-                <select type="text" name="searchYear" >
+                <select name="searchYear" id="yearSelector">
                     <!-- BEGIN availableYearsBlock -->
                     <option value="{year}" {selectedYear}>{year}</option>
                     <!-- END availableYearsBlock -->
                 </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input type="submit" name="Search" value="Run">
             </td>
         </tr>
     </table>
