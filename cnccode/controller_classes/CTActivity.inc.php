@@ -3860,9 +3860,8 @@ class CTActivity extends CTCNC
                                 $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
                             }
                         }
-                    } else {
-                        if (!$_REQUEST['userWarned']) {
 
+                        if (!$_REQUEST['userWarned']) {
 
                             $buHeader = new BUHeader($this);
                             $buHeader->getHeader($dsHeader);
