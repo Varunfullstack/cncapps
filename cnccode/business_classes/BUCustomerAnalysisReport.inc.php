@@ -103,7 +103,6 @@ class BUCustomerAnalysisReport extends Business
         if ($customerID) {
             $sql .= " AND pro_custno = $customerID";
         }
-
         return $this->db->query($sql)->fetch_array();
     }
 
@@ -232,12 +231,11 @@ class BUCustomerAnalysisReport extends Business
                     $item['ID']
                 );
 
-
             $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
 
             $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
             if ($item['Contract'] === 'Pre-Pay Contract') {
-                $sales = round($hourlyLabourCharge * $labourHoursRow[0],2);
+                $sales = round($hourlyLabourCharge * $labourHoursRow[0], 2);
             }
 
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
@@ -297,6 +295,7 @@ class BUCustomerAnalysisReport extends Business
         return $results;
 
     }
+
 
     function getMonthsBetweenYearMonths($startYearMonth, $endYearMonth)
     {
