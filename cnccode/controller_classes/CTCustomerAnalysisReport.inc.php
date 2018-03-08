@@ -110,15 +110,16 @@ class CTCustomerAnalysisReport extends CTCNC
 
                     $this->template->set_block('CustomerAnalysisReport', 'contractsBlock', 'contracts');
 
-                        $reportUrl =
-                            $this->buildLink(
-                                'CustomerAnalysisReport.php',
-                                array(
-                                    'searchForm[1][customerID]' => $_REQUEST ['searchForm'][1]['customerID'],
-                                    'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
-                                    'searchForm[1][endYearMonth]' => $_REQUEST ['searchForm'][1]['endYearMonth'],
-                                )
-                            );foreach ($results as $contractName => $row) {
+                    $reportUrl =
+                        $this->buildLink(
+                            'CustomerAnalysisReport.php',
+                            array(
+                                'searchForm[1][customerID]' => $_REQUEST ['searchForm'][1]['customerID'],
+                                'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
+                                'searchForm[1][endYearMonth]' => $_REQUEST ['searchForm'][1]['endYearMonth'],
+                            )
+                        );
+                    foreach ($results as $contractName => $row) {
 
                         if ($row['profit'] <= 0) {
                             $profitAlertClass = 'profitAlert';
