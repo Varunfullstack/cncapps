@@ -117,7 +117,8 @@ class BUContractAnalysisReport extends Business
           `salePrice`  * `qty` / 12 AS salePrice,
           `costPrice`  * `qty` / 12  AS costPrice,
           `itm_sstk_price` / 12 AS itemSalePrice,
-          `itm_sstk_cost` / 12  AS itemCostPrice
+          `itm_sstk_cost` / 12  AS itemCostPrice,
+          itm_desc as contract
         FROM
           custitem
           JOIN item ON itm_itemno = cui_itemno
@@ -166,7 +167,6 @@ class BUContractAnalysisReport extends Business
         $buHeader->getHeader($dsHeader);
 
         $contracts = $searchForm->getValue('contracts');
-
         $startYearMonth = $searchForm->getValue('startYearMonth');
         $endYearMonth = $searchForm->getValue('endYearMonth');
 
@@ -202,6 +202,7 @@ class BUContractAnalysisReport extends Business
             $customersArray[] = $row;
         }
 
+
         foreach ($customersArray as $customer) {
             /*
             Sales
@@ -219,14 +220,22 @@ class BUContractAnalysisReport extends Business
                     $customer['customerID'],
                     $contractItemIDs
                 );
+
             $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
 
             $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
 
-
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
 
+            $prepayValues = $this->getPrepayValues($startYearMonth, $endYearMonth, $customer['customerID'], $contractItemIDs);
+
+            $sales = round($sales + $prepayValues['sales'], 2);
+//            $labourCost = round($labourCost + $prepayValues['labourCost'], 2);
+
             $profit = $sales - $cost - $labourCost;
+
+            //get prepay data
+
 
             if ($sales > 0) {
                 $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
@@ -249,6 +258,65 @@ class BUContractAnalysisReport extends Business
 
         return $results;
 
+    }
+
+    function getPrepayValues($startYearMonth, $endYearMonth, $customerId, $contractItemIDs = null)
+    {
+        $query = "SELECT
+                  hourlyLabourCharge * hours AS sales,
+                  hourlyLabourCost * hours   AS labourCost
+                FROM
+                  (SELECT
+                     (SELECT hed_hourly_labour_cost
+                      FROM
+                        headert
+                      LIMIT 1)                                        AS hourlyLabourCost,
+                     (SELECT itm_sstk_price
+                      FROM
+                        item
+                      WHERE itm_itemno = 2237)                        AS hourlyLabourCharge,
+                     itm_desc                                         AS contract,
+                     cui_itemno,
+                     (SELECT SUM(
+                                 pro_total_activity_duration_hours
+                             ) AS hours
+                      FROM
+                        problem
+                        JOIN custitem a
+                          ON a.cui_cuino = pro_contract_cuino
+                      WHERE pro_total_activity_duration_hours IS NOT NULL
+                            AND problem.pro_date_raised BETWEEN '$startYearMonth-01'
+                            AND '$endYearMonth-31'
+                            AND a.cui_itemno = custitem.`cui_itemno`
+                            and pro_custno = $customerId) AS hours
+                   FROM
+                     custitem
+                     JOIN item
+                       ON itm_itemno = cui_itemno
+                   WHERE custitem.cui_custno = $customerId
+                         AND renewalTypeID <> 0
+                         AND declinedFlag = 'N'
+                         AND itm_desc = 'Pre-Pay Contract') AS prepay";
+
+        if ($contractItemIDs) {
+            $query .=
+                " where cui_itemno IN ( $contractItemIDs )";
+        }
+
+        $rows = $this->db->query($query);
+
+        $sales = 0;
+        $labourCost = 0;
+
+        while ($row = $rows->fetch_array()) {
+            $sales += $row['sales'];
+            $labourCost += $row['labourCost'];
+        }
+
+        return array(
+            "sales" => $sales,
+            "labourCost" => $labourCost
+        );
     }
 
     function getMonthsBetweenYearMonths($startYearMonth, $endYearMonth)

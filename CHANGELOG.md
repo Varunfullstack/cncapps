@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+
+##[1.4.0] - 2018-03-08
+- Issue 175 - CNC037 - tidy up imported emails
+- Issue 155 - CNC034 - Profitability Report for PrePay counts as negative
+
 ##[1.3.0] - 2018-03-07
 - Issue 174 - CNC036 - Record backup success as percentage
 - Issue 171 - CNC035 - Display Calendar link on all activities
