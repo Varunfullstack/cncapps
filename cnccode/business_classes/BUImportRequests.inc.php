@@ -55,6 +55,8 @@ class BUImportRequests extends Business
 
         $db->query($sql);
 
+        $toDelete = [];
+
         while ($db->next_record()) {
 
             $automatedRequestID = $db->Record['automatedRequestID'];
@@ -65,7 +67,7 @@ class BUImportRequests extends Business
 
                 echo $automatedRequestID . " processed successfully<BR/>";
 
-                $this->setImportedFlag($automatedRequestID);
+                $toDelete[] = $db->Record['automatedRequestID'];
 
                 $processedMessages++;
             } else {
@@ -79,6 +81,15 @@ class BUImportRequests extends Business
         } // end while
 
         echo $processedMessages . " requests imported<BR/>";
+
+        if (count($toDelete)) {
+            echo 'Deleting successfully imported requests';
+
+            $sql = "delete FROM automated_request
+                    WHERE automatedRequestId in ($toDelete)";
+            $db->query($sql);
+        }
+
 
         echo "End<BR/>";
 

@@ -1,5 +1,7 @@
 # Changelog
 This project changes will be shown here.
+##[unreleased]
+- Issue 175 - CNC037 - tidy up imported emails
 
 ##[1.3.0] - 2018-03-07
 - Issue 174 - CNC036 - Record backup success as percentage
