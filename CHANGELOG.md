@@ -1,5 +1,7 @@
 # Changelog
 This project changes will be shown here.
+##[unreleased]
+- Issue 175 - CNC037 - tidy up imported emails
 
 ##[unreleased]
 - Issue 155 - CNC034 - Profitability Report for PrePay counts as negative
