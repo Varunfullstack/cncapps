@@ -330,7 +330,7 @@ class CTCustomerReviewMeeting extends CTCNC
             $_REQUEST['meetingDateYmd']
         );
 
-        $this->search();  // redisplays text
+//        $this->search();  // redisplays text
 
     }
 

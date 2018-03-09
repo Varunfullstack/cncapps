@@ -240,40 +240,42 @@ class BUCustomerReviewMeeting extends Business
 
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-        /*
-            require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
 
-            $dompdf = new DOMPDF();
-            $dompdf->set_paper( 'A4', 'portrait' );
+        require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
 
-            $dompdf->set_option( 'enable_remote', true);
+        $dompdf = new DOMPDF();
+        $dompdf->set_paper('A4', 'portrait');
 
-            $dompdf->set_base_path( BASE_DRIVE . '/htdocs' );   // so we can get the images and css
+        $dompdf->set_option('enable_remote', true);
 
-            $dompdf->load_html( $htmlPage );
+        $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
-            $dompdf->render();
-          */
+        $dompdf->load_html($htmlPage);
+
+        var_dump($htmlPage);
+        return;
+        $dompdf->render();
+
         $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
 
-        /*
-            $dompdf->add_info('Title',  'Agenda ' . $meetingDateDmy );
 
-            $dompdf->add_info('Author', 'CNC Ltd' );
+        $dompdf->add_info('Title', 'Agenda ' . $meetingDateDmy);
 
-            $dompdf->add_info('Subject', 'Renewal Report' );
+        $dompdf->add_info('Author', 'CNC Ltd');
 
-            $pdfString = $dompdf->output();
+        $dompdf->add_info('Subject', 'Renewal Report');
 
-            $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
-        */
+        $pdfString = $dompdf->output();
 
-        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
+        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
+
+
+//        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
 
         $handle = fopen($filePath, 'w');
 
-//    fwrite( $handle, $pdfString );
-        fwrite($handle, $htmlPage);
+        fwrite($handle, $pdfString);
+//        fwrite($handle, $htmlPage);
 
     }
 
