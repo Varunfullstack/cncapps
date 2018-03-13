@@ -277,7 +277,6 @@ class DBEContact extends DBCNCEntity
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;
         }
-
         $this->setQueryString($sql);
 
         return (parent::getRows());

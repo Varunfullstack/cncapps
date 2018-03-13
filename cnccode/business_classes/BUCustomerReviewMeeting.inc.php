@@ -14,6 +14,8 @@ require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
+use Dompdf\Dompdf;
+
 class BUCustomerReviewMeeting extends Business
 {
 
@@ -241,23 +243,21 @@ class BUCustomerReviewMeeting extends Business
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
 
-        require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+        require_once BASE_DRIVE . '/vendor/autoload.php';
 
-        $dompdf = new DOMPDF();
-        $dompdf->set_paper('A4', 'portrait');
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($options);
 
-        $dompdf->set_option('enable_remote', true);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+        $dompdf->loadHtml($htmlPage);
 
-        $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
-
-        $dompdf->load_html($htmlPage);
-
+        echo '<br>';
         var_dump($htmlPage);
-        return;
         $dompdf->render();
 
         $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
-
 
         $dompdf->add_info('Title', 'Agenda ' . $meetingDateDmy);
 
@@ -462,16 +462,17 @@ class BUCustomerReviewMeeting extends Business
 
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-        require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+        require_once BASE_DRIVE . '/vendor/autoload.php';
 
-        $dompdf = new DOMPDF();
-        $dompdf->set_paper('A4', 'portrait');
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($options);
 
-        $dompdf->set_option('enable_remote', true);
+        $dompdf->setPaper('A4', 'portrait');
 
-        $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+        $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
-        $dompdf->load_html($htmlPage);
+        $dompdf->loadHtml($htmlPage);
 
         $dompdf->render();
 

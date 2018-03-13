@@ -11,9 +11,11 @@
     });
     var state = 'none'; // display status
     var savedCustomerString
+
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -28,11 +30,13 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
@@ -137,13 +141,12 @@
 
     <script type="text/javascript">
         reason = CKEDITOR.replace('meetingText', {
-//      customConfig : '/ckeditor_config.js' }
-                height: '800px'
+                height: '800px',
+                extraAllowedContent: true,
+                allowedContent: true
             }
         );
-        reason
     </script>
-
     <input type="submit" name="Search" value="Create Pdfs" onClick="submit();">
 </form>
 

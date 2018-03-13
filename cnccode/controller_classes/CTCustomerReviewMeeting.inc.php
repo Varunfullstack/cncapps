@@ -93,30 +93,36 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP5' => $dsCustomer->getValue('slaP5')
                     )
                 );
-                /*
-                Support contacts
-                */
-                $textTemplate->set_block('page', 'supportContactBlock', 'supportContacts');
+
 
                 $buContact->getSupportContacts($dsSupportContact, $dsSearchForm->getValue('customerID'));
 
+                $supportContacts = [];
 
                 while ($dsSupportContact->fetchNext()) {
-
-                    $textTemplate->set_var(
-                        array(
-                            'supportContactName' => $dsSupportContact->getValue('firstName') . ' ' . $dsSupportContact->getValue('lastName')
-                        )
-                    );
-
-                    $textTemplate->parse('supportContacts', 'supportContactBlock', true);
+                    $supportContacts[] = [
+                        "firstName" => $dsSupportContact->getValue('firstName'),
+                        "lastName" => $dsSupportContact->getValue('lastName')
+                    ];
                 }
-                /*
-                End support contacts
-                */
-                /*
-                SR Performance Statistics
-                */
+
+                // we need to know how many contacts are there
+
+                $supportContactInfo = "";
+
+
+                for ($i = 0; $i < count($supportContacts); $i += 4) {
+                    $supportContactInfo .= "<tr>";
+
+                    for ($j = 0; $j < 4; $j++) {
+                        if (isset($supportContacts[$i + $j])) {
+                            $supportContactInfo .= "<td>" . $supportContacts[$i + $j]['firstName'] . ' ' . $supportContacts[$i + $j]['lastName'] . "</td>";
+                        }
+                    }
+                }
+
+                $textTemplate->set_var("supportContactInfo", $supportContactInfo);
+
                 $textTemplate->set_block('page', 'srStatsBlock', 'stats');
 
                 $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
@@ -250,7 +256,9 @@ class CTCustomerReviewMeeting extends CTCNC
                     $textTemplate->parse('rootCauses', 'rootCauseBlock', true);
 
                 }
-
+                $buHeader = new BUHeader($this);
+                $buHeader->getHeader($dsHeader);
+                $textTemplate->set_var('customerReviewMeetingText', $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
 
                 $textTemplate->parse('output', 'page', true);
 
@@ -323,12 +331,12 @@ class CTCustomerReviewMeeting extends CTCNC
             $_REQUEST['meetingDateYmd']
         );
 
-        $this->buCustomerReviewMeeting->generateSalesPdf(
-            $_REQUEST['customerID'],
-            $_REQUEST['startYearMonth'],
-            $_REQUEST['endYearMonth'],
-            $_REQUEST['meetingDateYmd']
-        );
+//        $this->buCustomerReviewMeeting->generateSalesPdf(
+//            $_REQUEST['customerID'],
+//            $_REQUEST['startYearMonth'],
+//            $_REQUEST['endYearMonth'],
+//            $_REQUEST['meetingDateYmd']
+//        );
 
 //        $this->search();  // redisplays text
 
