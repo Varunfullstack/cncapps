@@ -102,6 +102,21 @@ class BUCustomerItem extends Business
         $this->getData($dbeJContract, $dsResults);
     }
 
+    function getServerCareValidContractsByCustomerID($customerID, &$dsResults)
+    {
+        $this->setMethodName('getServerCareValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getServerCareContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
+    }
+
+    function getServerWatchContractByCustomerID($customerID, &$dsResults){
+        $this->setMethodName('getServerCareValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getServerWatchContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
+    }
+
     function getContractDescriptionsByCustomerItemId($customerItemID)
     {
         $this->setMethodName('getContractsByCustomerID');
@@ -437,6 +452,22 @@ class BUCustomerItem extends Business
         }// end while
 
         return $ret;
+    }
+
+    public function getServiceDeskValidContractsByCustomerID($customerID, &$dsResults)
+    {
+        $this->setMethodName('getServiceDeskValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getServiceDeskContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
+    }
+
+    public function getPrepayContractByCustomerID($customerID, &$dsResults)
+    {
+        $this->setMethodName('getServiceDeskValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getPrePayContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
     }
 }// End of class
 ?>
