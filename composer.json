@@ -2,6 +2,7 @@
   "require" : {
     "doctrine/orm": "^2.5",
     "doctrine/migrations": "^1.5",
-    "dompdf/dompdf": "^0.8.2"
+    "dompdf/dompdf": "^0.8.2",
+    "jpgraph/jpgraph": "^4.0"
   }
 }
