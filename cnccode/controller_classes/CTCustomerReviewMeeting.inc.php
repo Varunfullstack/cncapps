@@ -444,14 +444,12 @@ class CTCustomerReviewMeeting extends CTCNC
         $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
 
         $serverCareContract = null;
-        $datasetContracts->fetchNext();
 
-        $serverCareItemID = $datasetContracts->getValue("customerItemID");
-
-        if (!$serverCareItemID) {
+        if (!$datasetContracts->rowCount()) {
             return $serverCareContractBody = "Server Care: None";
         }
-
+        $datasetContracts->fetchNext();
+        $serverCareItemID = $datasetContracts->getValue("customerItemID");
         $serverCareContractsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
 
         $serverCareContractsTemplate->set_file('serverCareContracts', 'CustomerReviewMeetingServerCare.html');
@@ -520,13 +518,11 @@ class CTCustomerReviewMeeting extends CTCNC
         /** @var DataSet $datasetContracts */
         $datasetContracts = null;
         $BUCustomerItem->getServiceDeskValidContractsByCustomerID($customerId, $datasetContracts);
-        $datasetContracts->fetchNext();
 
-        $serviceDeskItemID = $datasetContracts->getValue("customerItemID");
-
-        if (!$serviceDeskItemID) {
+        if (!$datasetContracts->rowCount()) {
             return "User Support Contract: None";
         }
+        $datasetContracts->fetchNext();
         $users = $datasetContracts->getValue('users');
         $description = $datasetContracts->getValue('itemDescription');
         $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate');
@@ -539,13 +535,10 @@ class CTCustomerReviewMeeting extends CTCNC
         /** @var DataSet $datasetContracts */
         $datasetContracts = null;
         $BUCustomerItem->getPrepayContractByCustomerID($customerId, $datasetContracts);
-        $datasetContracts->fetchNext();
-
-        $prePayContractItemID = $datasetContracts->getValue("customerItemID");
-
-        if (!$prePayContractItemID) {
+        if (!$datasetContracts->rowCount()) {
             return "Pre-Pay Contract: T&M User Support Only";
         }
+        $datasetContracts->fetchNext();
         $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate');
         return "<p>Pre-Pay Contract: Pre-Pay Contract</p><p>next Invoice: $invoicePeriod</p>";
     }
