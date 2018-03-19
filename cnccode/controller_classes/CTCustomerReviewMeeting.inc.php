@@ -144,7 +144,7 @@ class CTCustomerReviewMeeting extends CTCNC
                             'otherP1to3FixHours' => number_format($row['otherHoursFix'], 1),
                             'otherP4Count' => $row['otherCount4'],
                             'totalP1to3Count' => $row['otherCount1And3'] + $row['serviceDeskCount1And3'] + $row['serverCareCount1And3'],
-                            'totalP4Count' => $row['otherCount4'] + $row['serviceDeskCount4'] + $row['serverCareCount4']
+                            'totalP4Count' => $row['otherCount4'] + $row['serviceDeskCount4']+ $row['prepayCount4'] + $row['serverCareCount4']
                         )
                     );
 
