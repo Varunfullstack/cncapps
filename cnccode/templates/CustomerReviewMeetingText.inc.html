@@ -53,228 +53,133 @@
         border: none;
     }
 
-</style>
+    .test {
+        display: block;
+    }
 
-<div class="container">
+    .test td {
+        display: inline-block;
+    }
+
+</style>
+<div class="pageSize">
+    <h1>{customerName} - Review Meeting {meetingDate}</h1>
+
+    <h2>Support</h2>
+
+    <h3>Service Level Agreement</h3>
+    <table style="width: 40%" class="invisible">
+        <tr>
+            <th style="text-align: left;">SR Priority</th>
+            <td style="text-align: center;">1</td>
+            <td style="text-align: center;">2</td>
+            <td style="text-align: center;">3</td>
+            <td style="text-align: center;">4</td>
+            <td style="text-align: center;">5</td>
+        </tr>
+
+        <tr>
+            <th style="text-align: left;">Response Hours</th>
+            <td style="text-align: center;">{slaP1}</td>
+            <td style="text-align: center;">{slaP2}</td>
+            <td style="text-align: center;">{slaP3}</td>
+            <td style="text-align: center;">{slaP4}</td>
+            <td style="text-align: center;">{slaP5}</td>
+        </tr>
+    </table>
+
+
+    <h3>Supported Users</h3>
+    <table style="width: 60%" class="invisible test">
+        {supportContactInfo}
+    </table>
+
+    <section>
+        <h3>Service Request Count</h3>
+        <table class="visible test" style="width: 60%">
+            <tbody>
+            <tr>
+                <!-- BEGIN userBlock -->
+                <td style="width: 120px">
+                    <div>
+                        {srUserName}
+                    </div>
+                    <div>
+                        {srCount}
+                    </div>
+                </td>
+                <!-- END userBlock -->
+            </tr>
+            </tbody>
+        </table>
+        <table class="visible test" style="width: 60%">
+            <tbody>
+            <tr>
+                <!-- BEGIN rootCauseBlock -->
+                <td style="width: 220px">
+                    <div>
+                        {srRootCauseDescription}
+                    </div>
+                    <div>
+                        {srCount}
+                    </div>
+                </td>
+                <!-- END rootCauseBlock -->
+            </tr>
+            </tbody>
+        </table>
+
+    </section>
+
+    <table class="invisible">
+        <tbody>
+        <tr>
+            <td style="vertical-align: top">
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <section>
+        {contracts}
+    </section>
+
+    <section>
+        {24HourFlag}
+    </section>
+
+    <section>
+        <h3>Service Request Stats</h3>
+        {chart}
+    </section>
+
+    <section>
+        <h2>P1 Incidents in the Last Month</h2>
+        {p1Incidents}
+    </section>
+    <section>
+        <h2>Starters and Leavers</h2>
+        {startersAndLeavers}
+    </section>
+    <section>
+        {thirdPartyServerAccess}
+    </section>
+    <section>
+        {reviewMeetingFrequency}
+    </section>
+
+    {customerReviewMeetingText}
+
+    <h2>New Offices / Office Moves</h2>
+
+    <p>Are you planning to open any new or relocate offices in the next 6 months?</p>
+
+    <!-- BEGIN managementReviewBlock -->
+    <h2><a href="http://cncapps/{urlServiceRequest}" target="_blank">{reviewHeading}</a></h2>
+    <h2>{managementReviewText}</h2>
+    <!-- END managementReviewBlock -->
+
+    <h2>A.O.B.</h2>
 
 </div>
-
-<h1>{customerName} - Review Meeting {meetingDate}</h1>
-
-<h2>Support</h2>
-
-<h3>Service Level Agreement</h3>
-<table style="width: 40%" class="invisible">
-    <tr>
-        <th style="text-align: left;">SR Priority</th>
-        <td style="text-align: center;">1</td>
-        <td style="text-align: center;">2</td>
-        <td style="text-align: center;">3</td>
-        <td style="text-align: center;">4</td>
-        <td style="text-align: center;">5</td>
-    </tr>
-
-    <tr>
-        <th style="text-align: left;">Response Hours</th>
-        <td style="text-align: center;">{slaP1}</td>
-        <td style="text-align: center;">{slaP2}</td>
-        <td style="text-align: center;">{slaP3}</td>
-        <td style="text-align: center;">{slaP4}</td>
-        <td style="text-align: center;">{slaP5}</td>
-    </tr>
-</table>
-
-
-<h3>Supported Users</h3>
-<table style="width: 40%" class="invisible">
-    {supportContactInfo}
-</table>
-
-
-<h3>Service Request Count</h3>
-<table class="invisible">
-    <tbody>
-    <tr>
-        <td style="vertical-align: top">
-            <table class="visible">
-                <thead>
-                <tr>
-                    <th>By User</th>
-                    <th>No.</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- BEGIN userBlock -->
-                <tr>
-                    <td>{srUserName}</td>
-                    <td>{srCount}</td>
-                </tr>
-                <!-- END userBlock -->
-                </tbody>
-            </table>
-
-        </td>
-        <td style="vertical-align: top">
-            <table class="visible">
-                <thead>
-                <tr>
-                    <th>By Root Cause</th>
-                    <th>No.</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- BEGIN rootCauseBlock -->
-                <tr>
-                    <td>{srRootCauseDescription}</td>
-                    <td>{srCount}</td>
-                </tr>
-                <!-- END rootCauseBlock -->
-                </tbody>
-            </table>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<section>
-    {contracts}
-</section>
-
-<section>
-    {24HourFlag}
-</section>
-
-<h3>Service Request Stats</h3>
-
-<table style="width: 100%" class="visible">
-    <thead>
-    <tr>
-        <th>&nbsp;</th>
-        <th colspan="3">ServerCare</th>
-        <th colspan="3">Service-Desk/Pre-Pay</th>
-        <th colspan="3">Other Contracts</th>
-        <th colspan="2">Total SRs</th>
-    </tr>
-    <tr>
-        <th>&nbsp;</th>
-        <th>Server SRs</th>
-        <th>Avg Response</th>
-        <th>Changes</th>
-        <th>User SRs</th>
-        <th>Avg Response</th>
-        <th>Changes</th>
-        <th>Other SRs</th>
-        <th>Avg Response</th>
-        <th>Changes</th>
-        <th>Priority 1-3</th>
-        <th>Priority 4</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN srStatsBlock -->
-    <tr>
-        <td style="text-align: right;">{monthName}-{year}</td>
-        <td style="text-align: right;">{scP1to3Count}</td>
-        <td style="text-align: right;">{scP1to3ResponseHours}</td>
-        <td style="text-align: right;">{scP4Count}</td>
-        <td style="text-align: right;">{sdP1to3Count}</td>
-        <td style="text-align: right;">{sdP1to3ResponseHours}</td>
-        <td style="text-align: right;">{sdP4Count}</td>
-        <td style="text-align: right;">{otherP1to3Count}</td>
-        <td style="text-align: right;">{otherP1to3ResponseHours}</td>
-        <td style="text-align: right;">{otherP4Count}</td>
-        <td style="text-align: right;">{totalP1to3Count}</td>
-        <td style="text-align: right;">{totalP4Count}</td>
-    </tr>
-    <!-- END srStatsBlock -->
-    </tbody>
-</table>
-
-<section>
-    <h2>P1 Incidents in the Last Month</h2>
-    {p1Incidents}
-</section>
-<section>
-    <h2>Starters and Leavers</h2>
-    {startersAndLeavers}
-</section>
-<section>
-    {thirdPartyServerAccess}
-</section>
-<section>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-
-        // Load the Visualization API and the corechart package.
-        google.charts.load('current', {'packages': ['corechart']});
-
-        // Set a callback to run when the Google Visualization API is loaded.
-        google.charts.setOnLoadCallback(drawChart);
-
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
-        function drawChart() {
-
-            // Create the data table.
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Topping');
-            data.addColumn('number', 'Slices');
-            data.addRows([
-                ['Mushrooms', 3],
-                ['Onions', 1],
-                ['Olives', 1],
-                ['Zucchini', 1],
-                ['Pepperoni', 2]
-            ]);
-
-            // Set chart options
-            var options = {
-                'title': 'How Much Pizza I Ate Last Night',
-                'width': 400,
-                'height': 300
-            };
-
-            // Instantiate and draw our chart, passing in some options.
-            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-            chart.draw(data, options);
-        }
-    </script>
-    <div id="chart_div"></div>
-</section>
-
-{customerReviewMeetingText}
-
-<h2>Server Replacement</h2>
-<table class="visible">
-    <thead>
-    <tr>
-        <th>Server Details</th>
-        <th>Tag No.</th>
-        <th>Server Name</th>
-        <th>Purchase Date</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <!-- BEGIN serverBlock -->
-    <tr>
-        <td>{itemDescription}</td>
-        <td>{serialNo}</td>
-        <td>{serverName}</td>
-        <td>{purchaseDate}</td>
-    </tr>
-    <!-- END serverBlock -->
-    </tbody>
-</table>
-
-<h2>New Offices / Office Moves</h2>
-
-<p>Are you planning to open any new or relocate offices in the next 6 months?</p>
-
-<!-- BEGIN managementReviewBlock -->
-<h2><a href="http://cncapps/{urlServiceRequest}" target="_blank">{reviewHeading}</a></h2>
-<h2>{managementReviewText}</h2>
-<!-- END managementReviewBlock -->
-
-<h2>A.O.B.</h2>

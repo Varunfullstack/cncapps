@@ -63,6 +63,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 generate default contents of edit box
 
                 */
+
+
                 $customerId = $dsSearchForm->getValue('customerID');
                 $buCustomerItem = new BUCustomerItem($this);
 
@@ -86,6 +88,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $textTemplate->set_file('page', 'CustomerReviewMeetingText.inc.html');
 
+
                 $textTemplate->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue('name'),
@@ -98,133 +101,22 @@ class CTCustomerReviewMeeting extends CTCNC
                     )
                 );
 
+                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                    $dsSearchForm->getValue('customerID'),
+                    $dsSearchForm->getValue('startYearMonth'),
+                    $dsSearchForm->getValue('endYearMonth')
+                );
 
-                $buContact->getSupportContacts($dsSupportContact, $dsSearchForm->getValue('customerID'));
+                $textTemplate->set_var('chart', $this->generateCharts($results));
 
-                $supportContacts = [];
+                $supportedUsersData = $this->getSupportedUsersData($buContact, $customerId, $dsCustomer->getValue('name'));
 
-                $duplicates = [];
-                $userMap = [];
-
-                while ($dsSupportContact->fetchNext()) {
-
-                    $firstName = $dsSupportContact->getValue('firstName');
-                    $lastName = $dsSupportContact->getValue('lastName');
-                    $userId = $dsSupportContact->getValue('contactID');
-                    $key = strtolower($firstName . $lastName);
-                    if (isset($userMap[$key])) {
-
-                        if (!isset($duplicates[$userMap[$key]['id']])) {
-                            $duplicates[$userMap[$key]['id']] = $userMap[$key];
-                        }
-
-                        $duplicates[$userId] = [
-                            "firstName" => $firstName,
-                            "lastName" => $lastName,
-                            "id" => $userId,
-                            "customerId" => $customerId
-                        ];
-                    } else {
-                        $userMap[$key] = [
-                            "firstName" => $firstName,
-                            "lastName" => $lastName,
-                            "id" => $userId,
-                            "customerId" => $customerId
-                        ];
-                    }
-
-
-                    $supportContacts[] = [
-                        "firstName" => $firstName,
-                        "lastName" => $lastName
-                    ];
-                }
-
-                if (count($duplicates)) {
-                    // send email to sales@cnc-ltd.co.uk with the list of duplicates
-                    $buMail = new BUMail($this);
-
-                    $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-                    $senderName = 'CNC Support Department';
-
-                    $toEmail = 'sales@cnc-ltd.co.uk';
-
-                    $template = new Template($cfg["path_templates"], "remove");
-                    $template->set_file('page', 'CustomerReviewMeetingContactDuplicates.html');
-
-                    $template->set_var('customerName', $dsCustomer->getValue('name'));
-
-                    $template->set_block('page', 'contactBlock', 'contacts');
-
-                    foreach ($duplicates as $key => $row) {
-
-                        $template->set_var(
-                            array(
-                                'contactID' => $row['id'],
-                                'contactFirstName' => $row['firstName'],
-                                'contactLastName' => $row['lastName'],
-
-                            )
-                        );
-
-                        $template->parse('contacts', 'contactBlock', true);
-                    }
-
-                    $template->parse('output', 'page', true);
-
-                    $body = $template->get_var('output');
-
-                    $subject = 'Possible duplicated customer contacts';
-
-                    $hdrs = array(
-                        'From' => $senderEmail,
-                        'Subject' => $subject,
-                        'Date' => date("r"),
-                        'Content-Type' => 'text/html; charset=UTF-8'
-                    );
-
-                    $buMail->mime->setHTMLBody($body);
-
-                    $mime_params = array(
-                        'text_encoding' => '7bit',
-                        'text_charset' => 'UTF-8',
-                        'html_charset' => 'UTF-8',
-                        'head_charset' => 'UTF-8'
-                    );
-                    $body = $buMail->mime->get($mime_params);
-
-                    $hdrs = $buMail->mime->headers($hdrs);
-
-                    $buMail->putInQueue(
-                        $senderEmail,
-                        $toEmail,
-                        $hdrs,
-                        $body,
-                        true
-                    );
-
-                }
-                // we need to know how many contacts are there
-                $supportContactInfo = "";
-
-
-                for ($i = 0; $i < count($supportContacts); $i += 4) {
-                    $supportContactInfo .= "<tr>";
-
-                    for ($j = 0; $j < 4; $j++) {
-                        if (isset($supportContacts[$i + $j])) {
-                            $supportContactInfo .= "<td>" . $supportContacts[$i + $j]['firstName'] . ' ' . $supportContacts[$i + $j]['lastName'] . "</td>";
-                        }
-                    }
-                }
-
-                $textTemplate->set_var("supportContactInfo", $supportContactInfo);
+                $textTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
                 $contractsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
                 $contractsTemplate->set_file('contracts', 'CustomerReviewMeetingContractsSection.html');
 
-                $contractsTemplate->set_var("serverContract", $this->getServerCareContractBody($customerId, count($supportContacts)));
+                $contractsTemplate->set_var("serverContract", $this->getServerCareContractBody($customerId, $supportedUsersData['count']));
                 $contractsTemplate->set_var("serviceDeskContract", $this->getServiceDeskContractBody($customerId));
                 $contractsTemplate->set_var('prepayContract', $this->getPrepayContractBody($customerId));
 
@@ -233,48 +125,12 @@ class CTCustomerReviewMeeting extends CTCNC
                 $contractsBody = $contractsTemplate->get_var('output');
 
                 $textTemplate->set_var('contracts', $contractsBody);
-
                 $textTemplate->set_var('24HourFlag', $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
-
-                $textTemplate->set_block('page', 'srStatsBlock', 'stats');
-
                 $textTemplate->set_var('p1Incidents', $this->getP1IncidentsBody($customerId));
-
                 $textTemplate->set_var('startersAndLeavers', $this->getStartersAndLeaversBody($customerId));
-
-
                 $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
+                $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
 
-                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
-                    $dsSearchForm->getValue('customerID'),
-                    $dsSearchForm->getValue('startYearMonth'),
-                    $dsSearchForm->getValue('endYearMonth')
-                );
-
-                foreach ($results as $key => $row) {
-
-                    $textTemplate->set_var(
-                        array(
-                            'monthName' => $row['monthName'],
-                            'year' => $row['year'],
-                            'period' => $row['period'],
-                            'scP1to3Count' => $row['serverCareCount1And3'],
-                            'scP1to3ResponseHours' => number_format($row['serverCareHoursResponded'], 1),
-                            'scP4Count' => $row['serverCareCount4'],
-                            'sdP1to3Count' => $row['serviceDeskCount1And3'] + $row['prepayCount1And3'],
-                            'sdP1to3ResponseHours' => number_format($row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'], 1),
-                            'sdP4Count' => $row['serviceDeskCount4'] + $row['prepayCount4'],
-                            'otherP1to3Count' => $row['otherCount1And3'],
-                            'otherP1to3ResponseHours' => number_format($row['otherHoursResponded'], 1),
-                            'otherP1to3FixHours' => number_format($row['otherHoursFix'], 1),
-                            'otherP4Count' => $row['otherCount4'],
-                            'totalP1to3Count' => $row['otherCount1And3'] + $row['serviceDeskCount1And3'] + $row['serverCareCount1And3'],
-                            'totalP4Count' => $row['otherCount4'] + $row['serviceDeskCount4'] + $row['serverCareCount4']
-                        )
-                    );
-
-                    $textTemplate->parse('stats', 'srStatsBlock', true);
-                }
                 /*
                 End SR Performance Statistics
                 */
@@ -302,6 +158,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     $textTemplate->parse('servers', 'serverBlock', true);
 
                 } // end while
+
 
                 $textTemplate->set_block('page', 'managementReviewBlock', 'reviews');
 
@@ -458,29 +315,31 @@ class CTCustomerReviewMeeting extends CTCNC
         $serverCareContractsTemplate->set_var('usersCount', $supportContactsCount);
 
         $serverCareContractsTemplate->set_block('serverCareContracts', 'contractItemsBlock', 'items');
-        /** @var DataSet $items */
-        $items = null;
+        /** @var DataSet $dsServer */
+        $dsServer = null;
 
-        $BUCustomerItem->getCustomerItemsByContractID($serverCareItemID, $items);
+        $BUCustomerItem->getServersByCustomerID($customerId, $dsServer);
 
-        while ($items->fetchNext()) {
+        while ($dsServer->fetchNext()) {
 
-            $description = $items->getValue('itemDescription');
-
-            if ($items->getValue('serverName')) {
-                $description .= '(' . $items->getValue('serverName') . ')';
+            if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
+                $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
+            } else {
+                $purchaseDate = '';
             }
 
             $serverCareContractsTemplate->set_var(
-                [
-                    'name' => $description,
-                    'serialNumber' => $items->getValue('serialNo'),
-                ]
+                array(
+                    'itemDescription' => $dsServer->getValue('itemDescription'),
+                    'serialNo' => $dsServer->getValue('serialNo'),
+                    'serverName' => $dsServer->getValue('serverName'),
+                    'purchaseDate' => $purchaseDate,
+                )
             );
 
             $serverCareContractsTemplate->parse('items', 'contractItemsBlock', true);
-        }
 
+        } // end while
         $serverCareContractsTemplate->parse('output', 'serverCareContracts', true);
 
         return $serverCareContractsTemplate->get_var('output');
@@ -520,7 +379,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $BUCustomerItem->getServiceDeskValidContractsByCustomerID($customerId, $datasetContracts);
 
         if (!$datasetContracts->rowCount()) {
-            return "User Support Contract: None";
+            return $this->getPrepayContractBody($customerId);
         }
         $datasetContracts->fetchNext();
         $users = $datasetContracts->getValue('users');
@@ -536,7 +395,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $datasetContracts = null;
         $BUCustomerItem->getPrepayContractByCustomerID($customerId, $datasetContracts);
         if (!$datasetContracts->rowCount()) {
-            return "Pre-Pay Contract: T&M User Support Only";
+            return "T&M User Support Only";
         }
         $datasetContracts->fetchNext();
         $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate');
@@ -650,14 +509,342 @@ class CTCustomerReviewMeeting extends CTCNC
         $thirdPartyServerAccess = null;
 
         if ($datasetContracts->rowCount()) {
-            $BUCustomerItem->getServerWatchContractByCustomerID($customerId, $datasetServerWatch);
-            if (!$datasetServerWatch->rowCount()) {
-                $thirdPartyServerAccess = "<h2>Third-Party Server Access";
+            $test = new BUCustomerItem($this);
+            $test->getServerWatchContractByCustomerID($customerId, $datasetServerWatch);
+            if ($datasetServerWatch->rowCount()) {
+                $thirdPartyServerAccess = "<h2>Third-Party Server Access</h2>";
             }
 
         }
         return $thirdPartyServerAccess;
     }
 
+    private function generateCharts($data)
+    {
+
+        $dataX = [];
+
+        $serverCareIncidents = [
+            "title" => "ServerCare Incidents",
+            "plots" => [
+                "serverSR" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Server SRs',
+                ],
+                "avgResponse" => [
+                    "data" => [],
+                    "2ndAxis" => true,
+                    "legend" => 'Avg. response',
+                ],
+                "changes" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Changes',
+                    "color" => "black"
+                ],
+            ]
+        ];
+
+        $serviceDesk = [
+            "title" => "ServiceDesk/Pre-Pay Incidents",
+            "plots" => [
+                "userSR" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'User SR\'s',
+                ],
+                "avgResponse" => [
+                    "data" => [],
+                    "2ndAxis" => true,
+                    "legend" => 'Avg. response',
+                ],
+                "changes" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Changes',
+                    "color" => "black"
+                ],
+            ]
+        ];
+
+        $otherContracts = [
+            "title" => "Other Contract Incidents",
+            "plots" => [
+                "otherSr" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Other SR\'s',
+                ],
+                "avgResponse" => [
+                    "data" => [],
+                    "2ndAxis" => true,
+                    "legend" => 'Avg. response',
+                ],
+                "changes" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Changes',
+                    "color" => "black"
+                ],
+            ]
+        ];
+
+        $totalSR = [
+            "title" => "Total SR's",
+            "plots" => [
+                "p1-3" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Priority 1-3',
+                ],
+                "p4" => [
+                    "data" => [],
+                    "2ndAxis" => false,
+                    "legend" => 'Priority 4',
+                ],
+            ]
+        ];
+
+        foreach ($data as $row) {
+
+            $dataX[] = $row['monthName'] . "-" . $row['year'];
+            $serverCareIncidents["plots"]["serverSR"]["data"][] = $row['serverCareCount1And3'];
+            $serverCareIncidents["plots"]["avgResponse"]["data"][] = number_format($row['serverCareHoursResponded'], 1);
+            $serverCareIncidents["plots"]['changes']["data"][] = $row['serverCareCount4'];
+
+            $serviceDesk["plots"]['userSR']["data"][] = $row['serviceDeskCount1And3'] + $row['prepayCount1And3'];
+            $serviceDesk["plots"]['avgResponse']["data"][] = number_format($row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'], 1);
+            $serviceDesk["plots"]['changes']["data"][] = $row['serviceDeskCount4'] + $row['prepayCount4'];
+
+            $otherContracts["plots"]["otherSr"]["data"][] = $row['otherCount1And3'];
+            $otherContracts["plots"]["avgResponse"]["data"][] = number_format($row['otherHoursResponded'], 1);
+            $otherContracts["plots"]["changes"]["data"][] = $row['otherCount4'];
+
+            $totalSR["plots"]["p1-3"]["data"][] = $row['otherCount1And3'] + $row['serviceDeskCount1And3'] + $row['serverCareCount1And3'];
+            $totalSR["plots"]["p4"]["data"][] = $row['otherCount4'] + $row['serviceDeskCount4'] + $row['serverCareCount4'];
+
+        }
+
+
+        return '<img src="' . $this->generateGraph($serverCareIncidents, $dataX) . '">
+        <img src="' . $this->generateGraph($serviceDesk, $dataX) . '">
+        <img src="' . $this->generateGraph($otherContracts, $dataX) . '">
+        <img src="' . $this->generateGraph($totalSR, $dataX) . '">';
+    }
+
+    private function generateGraph($data, $dataX)
+    {
+        JpGraph\JpGraph::load();
+        JpGraph\JpGraph::module('line');
+        $graph = new Graph(400, 400);
+        $graph->img->SetAntiAliasing(false);
+        $graph->title->Set($data['title']);
+        $graph->title->SetFont(FF_ARIAL, FS_BOLD, 12);
+        $graph->title->SetColor('white');
+        $graph->SetScale("textlin");
+        $graph->SetMargin(80, 70, 60, 80);
+        $graph->xaxis->setTickLabels($dataX);
+        $graph->xaxis->setLabelAngle(45);
+
+// Make sure that the X-axis is always at the bottom of the scale
+// (By default the X-axis is alwys positioned at Y=0 so if the scale
+// doesn't happen to include 0 the axis will not be shown)
+        $graph->xaxis->SetPos('min');
+
+// Use Times font
+        $graph->xaxis->SetFont(FF_TIMES, FS_NORMAL, 11);
+        $graph->yaxis->SetFont(FF_TIMES, FS_NORMAL, 9);
+//
+//// Set colors for axis
+        $graph->xaxis->SetColor('black');
+        $graph->yaxis->SetColor('black');
+// Show ticks outwards
+        $graph->xaxis->SetTickSide(SIDE_DOWN);
+        $graph->xaxis->SetLabelMargin(6);
+        $graph->yaxis->SetTickSide(SIDE_LEFT);
+
+// Setup a filled y-grid
+//$graph->ygrid->SetFill(true,'darkgray:1.55@0.7','darkgray:1.6@0.7');
+//        $graph->ygrid->SetStyle('dotted');
+//        $graph->xgrid->SetStyle('dashed');
+
+// Create the plot line
+        $secondY = false;
+        foreach ($data["plots"] as $key => $plot) {
+
+            $p1 = new LinePlot($plot["data"]);
+            $p1->SetWeight(20000);
+            $p1->SetLegend($plot["legend"]);
+            $p1->SetStyle('solid');
+            if ($plot["2ndAxis"]) {
+                $secondY = true;
+                $graph->AddY2($p1);
+            } else {
+                $graph->Add($p1);
+            }
+        }
+
+        if ($secondY) {
+            $graph->SetY2Scale("lin");
+            $graph->y2axis->SetColor('black');
+        }
+
+        $graph->legend->SetPos(0.5, 0.05, 'center');
+
+        $img = $graph->Stroke('__handle');
+        ob_start();
+        imagejpeg($img);
+        $image_data = ob_get_contents();
+        ob_end_clean();
+        $dataUri = "data:image/jpeg;base64," . base64_encode($image_data);
+        return $dataUri;
+    }
+
+    private function getSupportedUsersData(BUContact $buContact, $customerId, $customerName)
+    {
+        /** @var DataSet $dsSupportContact */
+        $dsSupportContact = null;
+        $buContact->getSupportContacts($dsSupportContact, $customerId);
+
+        $supportContacts = [];
+
+        $duplicates = [];
+        $userMap = [];
+
+        while ($dsSupportContact->fetchNext()) {
+
+            $firstName = $dsSupportContact->getValue('firstName');
+            $lastName = $dsSupportContact->getValue('lastName');
+            $userId = $dsSupportContact->getValue('contactID');
+            $key = strtolower($firstName . $lastName);
+            if (isset($userMap[$key])) {
+
+                if (!isset($duplicates[$userMap[$key]['id']])) {
+                    $duplicates[$userMap[$key]['id']] = $userMap[$key];
+                }
+
+                $duplicates[$userId] = [
+                    "firstName" => $firstName,
+                    "lastName" => $lastName,
+                    "id" => $userId,
+                    "customerId" => $customerId
+                ];
+            } else {
+                $userMap[$key] = [
+                    "firstName" => $firstName,
+                    "lastName" => $lastName,
+                    "id" => $userId,
+                    "customerId" => $customerId
+                ];
+            }
+
+
+            $supportContacts[] = [
+                "firstName" => $firstName,
+                "lastName" => $lastName
+            ];
+        }
+
+        if (count($duplicates)) {
+            // send email to sales@cnc-ltd.co.uk with the list of duplicates
+            $buMail = new BUMail($this);
+
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+            $senderName = 'CNC Support Department';
+
+            $toEmail = 'sales@cnc-ltd.co.uk';
+
+            $template = new Template($GLOBALS ["cfg"]["path_templates"], "remove");
+            $template->set_file('page', 'CustomerReviewMeetingContactDuplicates.html');
+
+            $template->set_var('customerName', $customerName);
+
+            $template->set_block('page', 'contactBlock', 'contacts');
+
+            foreach ($duplicates as $key => $row) {
+
+                $template->set_var(
+                    array(
+                        'contactID' => $row['id'],
+                        'contactFirstName' => $row['firstName'],
+                        'contactLastName' => $row['lastName'],
+
+                    )
+                );
+
+                $template->parse('contacts', 'contactBlock', true);
+            }
+
+            $template->parse('output', 'page', true);
+
+            $body = $template->get_var('output');
+
+            $subject = 'Possible duplicated customer contacts';
+
+            $hdrs = array(
+                'From' => $senderEmail,
+                'Subject' => $subject,
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body,
+                true
+            );
+
+        }
+        // we need to know how many contacts are there
+        $supportContactInfo = "";
+        $supportContactInfo .= "<tr>";
+        for ($i = 0; $i < count($supportContacts); $i++) {
+            $supportContactInfo .= "<td style='width: 130px'>" . $supportContacts[$i]['firstName'] . ' ' . $supportContacts[$i]['lastName'] . "</td>";
+        }
+        $supportContactInfo .= "</tr>";
+        return [
+            "data" => $supportContactInfo,
+            "count" => count($supportContacts)
+        ];
+    }
+
+    private function getReviewMeetingFrequencyBody($dsCustomer)
+    {
+        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
+
+        switch ($value) {
+            case 3:
+                $frequency = 'Quarterly';
+                break;
+            case 6:
+                $frequency = 'Six-monthly';
+                break;
+            case 12:
+                $frequency = 'Annually';
+                break;
+            default:
+                $frequency = 'N/A';
+        }
+
+        return "Review Meeting Frequency – " . $frequency;
+    }
+
 } // end of class
 ?>
+
