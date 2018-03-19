@@ -147,7 +147,7 @@ class DBEJContract extends DBECustomerItem
 	  		cui_custno = " . $customerID .
             " AND cui_itemno = " . $dsHeader->getValue('gscItemID') .
             " AND cui_expiry_date >= now()" . // and is not expired
-            " AND	cui_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+            " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
 
         $this->setQueryString($queryString);
 
@@ -207,6 +207,7 @@ class DBEJContract extends DBECustomerItem
                 " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
         }
         $this->setQueryString($queryString);
+        return (parent::getRows());
     }
 }
 
