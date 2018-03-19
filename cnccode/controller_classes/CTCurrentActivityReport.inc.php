@@ -28,7 +28,7 @@ class CTCurrentActivityReport extends CTCNC
     const RED = '#F8A5B6';
     const GREEN = '#BDF8BA';
     const BLUE = '#b2daff';
-    const CONTENT = '#F4f4f2';
+    const CONTENT = null;
     const PURPLE = '#dcbdff';
     const ORANGE = '#FFE6AB';
 
