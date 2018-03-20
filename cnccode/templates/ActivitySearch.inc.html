@@ -62,7 +62,7 @@
     -->
 </style>
 
-<P class="formErrorMessage">{formError}</P>
+<!--<P class="formErrorMessage">{formError} test</P>-->
 <form name="searchForm" id="searchForm" method="get" action="{urlSubmit}">
     <input type="hidden" name="action" value="search">
     <table width="500px" border="0" cellspacing="0" cellpadding="1">
@@ -82,8 +82,8 @@
                     value="{customerString}" onFocus="javascript:saveCustomerString()"
                     onBlur="javascript:validateCustomerString()"
                     onKeypress="javascript:validateCustomerStringOnReturn()" size="50"
-                    maxlength="50"> <font class="formErrorMessage">
-                {customerStringMessage} </font></td>
+                    maxlength="50">
+                <p class="formErrorMessage"> {customerStringMessage}</p></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -93,12 +93,12 @@
                        name="activity[1][project]" value="{project}"></td>
         </tr>
         <tr>
-        <td class="promptText">
-        <div align="right">Activity ID</div>
-        </td>
-        <td><input type="text" onKeypress="javascript:submitOnReturn()"
-        name="activity[1][callActivityID]" value="{callActivityID}">
-        <font class="formErrorMessage">{callActivityIDMessage}</font></td>
+            <td class="promptText">
+                <div align="right">Activity ID</div>
+            </td>
+            <td><input type="text" onKeypress="javascript:submitOnReturn()"
+                       name="activity[1][callActivityID]" value="{callActivityID}">
+                <font class="formErrorMessage">{callActivityIDMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">

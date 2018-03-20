@@ -319,10 +319,6 @@ class CTActivity extends CTCNC
             case 'updateHistoricUserTimeLogs':
                 $this->updateHistoricUserTimeLogs();
                 break;
-            case 'test':
-                $this->buActivity->sendSalesRequestAlertEmail(387378, null);
-                break;
-
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -410,7 +406,6 @@ class CTActivity extends CTCNC
 
         $this->setMethodName('search');
         $this->buActivity->initialiseSearchForm($this->dsSearchForm);
-
         /* Special Case */
         if (isset($_REQUEST['linkedSalesOrderID'])) {
             $this->dsSearchForm->setUpdateModeUpdate();
@@ -419,15 +414,18 @@ class CTActivity extends CTCNC
             $this->dsSearchForm->post();
         } elseif (isset($_REQUEST['activity'])) {
             if (!$this->dsSearchForm->populateFromArray($_REQUEST['activity'])) {
+
                 $this->setFormErrorOn();
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
             } else {
                 if (
-                    $this->countParamsSet($_REQUEST['activity']) == 2 AND
-                    $this->dsSearchForm->getValue('customerID') AND
+                    $this->countParamsSet($_REQUEST['activity']) < 2 AND
+                    empty($this->dsSearchForm->getValue('customerID')) AND
                     $this->dsSearchForm->getValue('contractCustomerItemID') == '99'
                 ) {
+                    $this->formErrorMessage = 'Please provide at least 1 piece of data';
+                    $this->setFormErrorOn();
                     $this->displaySearchForm();
                     exit;
                 }
@@ -460,7 +458,6 @@ class CTActivity extends CTCNC
                 $_SESSION['sortDirection'] = 'ASC';
             }
         }
-
         $this->buActivity->search(
             $this->dsSearchForm,
             $this->dsSearchResults,
@@ -919,7 +916,7 @@ class CTActivity extends CTCNC
         $count = 0;
         $elements = $array[1];
         foreach ($elements as $key => $element) {
-            if ($element > '') {
+            if (!empty($element)) {
                 $count++;
             }
         }
