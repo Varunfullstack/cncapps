@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ##[unreleased]
+- Issue 179 - Uploading a document in an activity has the same affect as clicking the 'update' button
 
 ##[1.4.0] - 2018-03-08
 - Issue 175 - CNC037 - tidy up imported emails
