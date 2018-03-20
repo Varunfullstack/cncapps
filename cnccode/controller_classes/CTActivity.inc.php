@@ -424,7 +424,7 @@ class CTActivity extends CTCNC
                     empty($this->dsSearchForm->getValue('customerID')) AND
                     $this->dsSearchForm->getValue('contractCustomerItemID') == '99'
                 ) {
-                    $this->formErrorMessage = 'Please provide at least 1 piece of data';
+                    $this->formErrorMessage = 'you have not selected any filtering criteria for your search, this is not allowed';
                     $this->setFormErrorOn();
                     $this->displaySearchForm();
                     exit;
