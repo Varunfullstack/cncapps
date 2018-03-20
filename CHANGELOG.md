@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ##[unreleased]
+- Issue 183 - Add the ability to add time to a service request when in the managers queue
 
 ##[1.4.0] - 2018-03-08
 - Issue 175 - CNC037 - tidy up imported emails
