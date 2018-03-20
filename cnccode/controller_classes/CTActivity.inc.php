@@ -4439,7 +4439,7 @@ class CTActivity extends CTCNC
                 $this->redirectToFixed($_REQUEST['callActivityID']);
             }
 
-            $this->displayActivity();
+            $this->editActivity();
             exit;
         }
         $this->buActivity->uploadDocumentFile(
@@ -4452,7 +4452,7 @@ class CTActivity extends CTCNC
             $this->redirectToFixed($_REQUEST['callActivityID']);
         }
 
-        $this->redirectToDisplay($_REQUEST['callActivityID']);
+        $this->redirectToEdit($_REQUEST['callActivityID']);
     }
 
     /**
