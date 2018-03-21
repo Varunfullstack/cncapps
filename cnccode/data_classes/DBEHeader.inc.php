@@ -38,6 +38,7 @@ class DBEHeader extends DBEntity
     const mailshot8FlagDef = "mailshot8FlagDef";
     const mailshot9FlagDef = "mailshot9FlagDef";
     const mailshot10FlagDef = "mailshot10FlagDef";
+    const mailshot11FlagDef = "mailshot11FlagDef";
     const mailshot1FlagDesc = "mailshot1FlagDesc";
     const mailshot2FlagDesc = "mailshot2FlagDesc";
     const mailshot3FlagDesc = "mailshot3FlagDesc";
@@ -48,6 +49,7 @@ class DBEHeader extends DBEntity
     const mailshot8FlagDesc = "mailshot8FlagDesc";
     const mailshot9FlagDesc = "mailshot9FlagDesc";
     const mailshot10FlagDesc = "mailshot10FlagDesc";
+    const mailshot11FlagDesc = "mailshot11FlagDesc";
     const helpDeskProblems = "helpDeskProblems";
     const hourlyLabourCost = "hourlyLabourCost";
     const highActivityAlertCount = "highActivityAlertCount";
@@ -76,7 +78,6 @@ class DBEHeader extends DBEntity
     const srPromptContractThresholdHours = "srPromptContractThresholdHours";
     const remoteSupportWarnHours = "remoteSupportWarnHours";
     const customerContactWarnHours = "customerContactWarnHours";
-
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
     const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
@@ -123,6 +124,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::mailshot8FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg8_def");
         $this->addColumn(self::mailshot9FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg9_def");
         $this->addColumn(self::mailshot10FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg10_def");
+        $this->addColumn(self::mailshot11FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg11_def");
         $this->addColumn(self::mailshot1FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg1_desc");
         $this->addColumn(self::mailshot2FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg2_desc");
         $this->addColumn(self::mailshot3FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg3_desc");
@@ -133,6 +135,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::mailshot8FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg8_desc");
         $this->addColumn(self::mailshot9FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg9_desc");
         $this->addColumn(self::mailshot10FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg10_desc");
+        $this->addColumn(self::mailshot11FlagDesc, DA_STRING, DA_NOT_NULL, "hed_mailflg11_desc");
         $this->addColumn(self::helpDeskProblems, DA_MEMO, DA_NOT_NULL, "hed_helpdesk_problems");
         $this->addColumn(self::hourlyLabourCost, DA_FLOAT, DA_NOT_NULL, "hed_hourly_labour_cost");
         $this->addColumn(self::highActivityAlertCount, DA_FLOAT, DA_NOT_NULL, "hed_high_activity_alert_count");

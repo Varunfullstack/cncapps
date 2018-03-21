@@ -252,6 +252,7 @@
             <td class='tableHeader'>{mailshot8FlagDesc}</td>
             <td class='tableHeader'>{mailshot9FlagDesc}</td>
             <td class='tableHeader'>{mailshot10FlagDesc}</td>
+            <td class="tableHeader">{mailshot11FlagDesc}</td>
         </tr>
         <tr>
             <td colspan="22"><a href="{addContactURL}">{addContactText}</a></td>
@@ -348,8 +349,14 @@
                        {mailshot8FlagChecked}></td>
             <td><input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot9Flag]" value="Y"
                        {mailshot9FlagChecked}></td>
-            <td><input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot10Flag]" value="Y"
-                       {mailshot10FlagChecked}></td>
+            <td>
+                <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot10Flag]" value="Y"
+                       {mailshot10FlagChecked}>
+            </td>
+            <td>
+                <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot11Flag]" value="Y"
+                       {mailshot11FlagChecked}>
+            </td>
         </tr>
         <!-- END contactBlock -->
         <!-- END siteBlock -->
