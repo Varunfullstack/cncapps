@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-##[unreleased]
+##[1.5.0]
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 
 ##[1.4.0] - 2018-03-08
