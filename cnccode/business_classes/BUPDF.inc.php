@@ -5,7 +5,8 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
+//require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
+require_once(PDF_DIR . '/fpdf_protection.php');
 
 define('FPDF_FONTPATH', PDF_DIR . '/font/');    // Used by fpdf class
 define('BUPDF_A4_WIDTH', 595);
@@ -61,8 +62,8 @@ class BUPDF extends BaseObject
             return FALSE;
         }
 //		$this->pdf = pdf_new();
-        $this->pdf = new FPDF();
-
+        $this->pdf = new FPDF_Protection();
+        $this->pdf->SetProtection(['print'], '', '[V.^DW_uA^2~vER$');
 //        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
 //        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
