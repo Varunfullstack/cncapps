@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ##[unreleased]
+- Issue 184 - Request 038 - Daily Open SR Report for customers
 
 ##[1.4.0] - 2018-03-08
 - Issue 175 - CNC037 - tidy up imported emails
