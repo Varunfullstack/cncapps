@@ -45,6 +45,7 @@ class DBEContact extends DBCNCEntity
         $this->addColumn("Mailshot8Flag", DA_YN, DA_ALLOW_NULL, "con_mailflag8");
         $this->addColumn("Mailshot9Flag", DA_YN, DA_ALLOW_NULL, "con_mailflag9");
         $this->addColumn("Mailshot10Flag", DA_YN, DA_ALLOW_NULL, "con_mailflag10");
+        $this->addColumn("mailshot10Flag")
         $this->addColumn("Notes", DA_STRING, DA_ALLOW_NULL, "con_notes");
         $this->addColumn("WorkStartedEmailFlag", DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
         $this->addColumn("AutoCloseEmailFlag", DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");

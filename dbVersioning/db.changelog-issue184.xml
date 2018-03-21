@@ -18,7 +18,14 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet id="issue184-1521625475-1" author="pavwebdev">
+    <changeSet id="issue184-1521625475-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg11_def"/>
+        </preConditions>
+        <sql>update headert set hed_mailflg11_def = 'N'</sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue184-1521625475-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="headert" columnName="hed_mailflg11_desc"/>
@@ -30,4 +37,12 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="issue184-1521625475-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg11_desc"/>
+        </preConditions>
+        <sql>update headert set hed_mailflg11_desc = 'SR Rep'</sql>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>
