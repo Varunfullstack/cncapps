@@ -9,11 +9,23 @@
     <changeSet id="issue184-1521625475-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="headert" columnName="hed_remote_support_min_warn_hours"/>
+                <columnExists tableName="headert" columnName="hed_mailflg11_def"/>
             </not>
         </preConditions>
         <addColumn tableName="headert">
-            <column type="float" name="hed_remote_support_min_warn_hours">
+            <column type="varchar(4)" name="hed_mailflg11_def">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue184-1521625475-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hed_mailflg11_desc"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column type="varchar(50)" name="hed_mailflg11_desc">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
