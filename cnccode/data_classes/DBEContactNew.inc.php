@@ -312,6 +312,7 @@ class DBEContact extends DBCNCEntity
         );
         return (parent::getRows());
     }
+
 }
 
 ?>

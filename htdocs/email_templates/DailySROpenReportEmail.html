@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Report</title>
+</head>
+<body>
+<div>
+    Dear {contactName}
+</div>
+<br>
+<div>
+    The list below shows the status of all the requests that are open with our Service Desk team.
+    Please don’t reply to this email as it won’t be processed by our system, but if you wish to add an update please use
+    the link for the service request that will take you to our portal.
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>Service Request</th>
+        <th>Raised By</th>
+        <th>Raised On</th>
+        <th>Status</th>
+        <th>Details</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN openSRBlock -->
+    <tr>
+        <td><a href="{srLinkToPortal}">{srNumber}</a></td>
+        <td>{srRaisedByName}</td>
+        <td>{srRaisedOnDate}</td>
+        <td>{srStatus}</td>
+        <td>{srDetails}</td>
+    </tr>
+    <!-- END openSRBlock -->
+    </tbody>
+</table>
+
+Regards
+
+</body>
+</html>

@@ -370,6 +370,8 @@ define('CONFIG_HEADER_SUPPORT_CONTACT_FLAG', 'mailshot5Flag');
 define('CONFIG_HEADER_TECHNICAL_MAILSHOT_CONTACT_FLAG', 'mailshot6Flag');
 
 define('CONFIG_HEADER_INVOICE_CONTACT', 'mailshot2Flag');     // Customer contact to send invoices to
+
+define('CONFIG_HEADER_DAILY_OPEN_SR_REPORT', 'mailshot11Flag');
 // Phone numbers
 define('CONFIG_IT_SUPPORT_PHONE', '0845 070 0582');
 define('CONFIG_PHONE_SYSTEM_SUPPORT_PHONE', '0845 070 0583');

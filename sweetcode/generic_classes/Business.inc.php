@@ -13,7 +13,9 @@ define("BUSINESS_NT_PSD", "not passed");    // ext for fk ref integrity error co
 
 class Business extends BaseObject
 {
-
+    /**
+     * @var mysqli $db
+     */
     protected $db;
 
     function __construct(&$owner)
