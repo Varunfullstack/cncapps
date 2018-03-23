@@ -912,11 +912,11 @@ WHERE pro_priority = 5
 
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
 
-//            $this->sendByEmailTo(
-//                $contactsDatum['email'],
-//                $subject,
-//                $body
-//            );
+            $this->sendByEmailTo(
+                $contactsDatum['email'],
+                $subject,
+                $body
+            );
 
             echo $body;
 
