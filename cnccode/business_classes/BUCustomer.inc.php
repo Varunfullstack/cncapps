@@ -223,8 +223,17 @@ class BUCustomer extends Business
      */
     function getCustomerLeadStatuses(&$dsResults)
     {
-       $this->dbeCustomerLeadStatuses->getRows('name');
+        $this->dbeCustomerLeadStatuses->getRows('name');
         return ($this->getData($this->dbeCustomerLeadStatuses, $dsResults));
+    }
+
+    /**
+     * @param null $leadStatusID
+     * @return DBEContact
+     */
+    function getMainContactsByLeadStatus($leadStatusID = null)
+    {
+        return $this->dbeContact->getMainContactsByLeadStatus($leadStatusID);
     }
 
     /**

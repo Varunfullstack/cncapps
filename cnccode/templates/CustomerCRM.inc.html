@@ -729,16 +729,18 @@
                 <td class="content">
                     <div class="content">Lead Status</div>
                 </td>
-                <td class="content"><select
-                        name="form[customer][{customerID}][customerLeadStatusID]">
-                    <option>-- Pick an Option --</option>
-                    <!-- BEGIN customerLeadStatusBlock -->
-                    <option {customerLeadStatusSelected}
-                            value="{customerLeadStatusID}">
-                        {customerLeadStatusName}
-                    </option>
-                    <!-- END customerLeadStatusBlock -->
-                </select></td>
+                <td class="content">
+                    <select
+                            name="form[customer][{customerID}][customerLeadStatusID]">
+                        <option>-- Pick an Option --</option>
+                        <!-- BEGIN customerLeadStatusBlock -->
+                        <option {customerLeadStatusSelected}
+                                value="{customerLeadStatusID}">
+                            {customerLeadStatusName}
+                        </option>
+                        <!-- END customerLeadStatusBlock -->
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td class="content">

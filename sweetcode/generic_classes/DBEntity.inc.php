@@ -43,9 +43,9 @@ class DBEntity extends DataAccess
     var $db = "";            // Initialised PHPLib database object
     var $queryString = "";// SQL query statement
     var $tableName = "";    // RDBMS table name
-    var $showSQL = true;    // For debug puposes - TRUE causes all SQL statements to be output
+    var $showSQL = false;    // For debug puposes - TRUE causes all SQL statements to be output
     // MUST be N in production systems!!!
-    var $logSQL = FALSE;    // For debug puposes - TRUE causes all SQL statements to be output
+    var $logSQL = false;    // For debug puposes - TRUE causes all SQL statements to be output
     var $rowBefore = '';        // For comparison during update
     var $arrayRowBefore = '';    // For comparison during update
     var $rowCount = 0;

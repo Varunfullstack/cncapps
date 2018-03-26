@@ -40,8 +40,11 @@ define('CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC', 'tableEditHeaderUC');
 define('CTCUSTOMER_TXT_ADD_SITE', 'Add site');
 define('CTCUSTOMER_TXT_ADD_CONTACT', 'Add contact');
 
+
 class CTCustomerCRM extends CTCNC
 {
+
+    const CTCUSTOMER_ACT_SEARCH_LEAD = 'searchLead';
     var $customerID = '';
     var $customerString = '';                      // Used when searching for an entity by string
     var $contactString = '';                      // Used when searching for an entity by string
@@ -197,6 +200,31 @@ class CTCustomerCRM extends CTCNC
                         'htmlFmt' => CT_HTML_FMT_POPUP)
                 );
 
+            $this->template->set_block('CustomerCRM', 'customerLeadStatusBlock', 'customerleadstatuses');
+            /**
+             * @var DataSet $dsCustomerLeadStatuses
+             */
+            $this->buCustomer->getCustomerLeadStatuses($dsCustomerLeadStatuses);
+
+            while ($dsCustomerLeadStatuses->fetchNext()) {
+                $this->template->set_var(
+                    array(
+                        'customerLeadStatusID' => $dsCustomerLeadStatuses->getValue("customerLeadStatusID"),
+                        'customerLeadStatusName' => $dsCustomerLeadStatuses->getValue("name"),
+                        'customerLeadStatusSelected' => ($dsCustomerLeadStatuses->getValue('customerLeadStatusID') == $this->dsCustomer->getValue('CustomerLeadStatusID')) ? CT_SELECTED : ''
+                    )
+                );
+                $this->template->parse('customerleadstatuses', 'customerLeadStatusBlock', true);
+            }
+
+            $linkURL =
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'searchLead'
+                    )
+                );
+
             $this->template->set_var(
                 array(
                     'formError' => $this->formError,
@@ -204,7 +232,8 @@ class CTCustomerCRM extends CTCNC
                     'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
                     'customerString' => $customerString,
                     'urlCustomerPopup' => $urlCustomerPopup,
-                    'urlSubmit' => $urlSubmit
+                    'urlSubmit' => $urlSubmit,
+                    'ajaxURL' => $linkURL,
                 )
             );
 
@@ -213,6 +242,54 @@ class CTCustomerCRM extends CTCNC
             $this->parsePage();
         }
 
+
+    } // end search
+
+    function searchLead()
+    {
+
+        $customerLeadID = $_POST['customerLeadID'];
+        // in the post we should find the id of the status we are searching for
+        /** @var DBEContact $results */
+        $results = $this->buCustomer->getMainContactsByLeadStatus($customerLeadID);
+        $data = [];
+
+        $customers = [];
+
+        while ($results->fetchNext()) {
+            $customerID = $results->getValue(DBEContact::CustomerID);
+
+            if (!isset($customers[$customerID])) {
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($results->getValue(DBEContact::CustomerID));
+
+                $link = $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'displayEditForm',
+                        'customerID' => $customerID
+                    )
+                );
+
+                $customers[$customerID] = [
+                    "customerName" => $dbeCustomer->getValue(DBECustomer::Name),
+                    "customerLink" => $link,
+                    "customerReviewDate" => $dbeCustomer->getValue(DBECustomer::reviewDate)
+                ];
+
+            }
+
+            $contactData = [
+                "contactName" => $results->getValue(DBEContact::FirstName) . " " . $results->getValue(DBEContact::LastName),
+                "jobTitle" => $results->getValue(DBEContact::Position)
+            ];
+            $data[] = array_merge($contactData, $customers[$customerID]);
+
+
+        }
+
+        header('Content-Type: application/json;charset=utf-8');
+        return json_encode($data);
 
     } // end search
 
@@ -227,7 +304,6 @@ class CTCustomerCRM extends CTCNC
         if (!is_array($contactArray)) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
-        var_dump($contactArray);
 
         while (list($key, $value) = each($contactArray)) {
             $this->dsContact->setUpdateModeInsert();
@@ -365,7 +441,6 @@ class CTCustomerCRM extends CTCNC
         if (!is_array($customerArray)) {
             return;
         }
-        var_dump($customerArray);
 
         foreach ($customerArray as $value) {
             $this->dsCustomer->setUpdateModeInsert();
@@ -568,6 +643,9 @@ class CTCustomerCRM extends CTCNC
                 break;
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
+                break;
+            case self::CTCUSTOMER_ACT_SEARCH_LEAD:
+                echo $this->searchLead();
                 break;
             case CTCNC_ACT_DISP_EDIT:
                 $this->displayEditForm();
