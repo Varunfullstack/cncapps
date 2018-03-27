@@ -16,11 +16,12 @@
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{urlCustomerPopup}&customerString=' +
+                var newWindow = window.open('{urlCustomerPopup}&customerString=' +
                     escape(document.getElementById("customerString").value) +
                     '&parentIDField=customerID' +
                     '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0');
+                newWindow.doNotSubmit = true;
             }
         }
         else {
@@ -36,7 +37,7 @@
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
-            document.searchForm.submit();
+            // document.searchForm.submit();
         }
     }
 
