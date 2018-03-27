@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue 179 - Uploading a document in an activity has the same affect as clicking the 'update' button
+
 ##[1.5.0]
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 
