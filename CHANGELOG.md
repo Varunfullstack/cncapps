@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue 189 - Add version number to menu
+
 ##[1.5.1]
 - Issue 188 - New P5 SR for SSL hardcoded change
 
