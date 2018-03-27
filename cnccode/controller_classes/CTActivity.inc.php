@@ -532,8 +532,6 @@ class CTActivity extends CTCNC
             array(
                 'formError' => $this->formError,
                 'customerID' => $dsSearchForm->getValue('customerID'),
-                'linkedSalesOrderID' => $dsSearchForm->getValue('linkedSalesOrderID'),
-                'project' => $dsSearchForm->getValue('project'),
                 'customerString' => $customerString,
                 'problemID' => Controller::htmlDisplayText($dsSearchForm->getValue('problemID')),
                 'problemIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('problemID')),
@@ -617,7 +615,7 @@ class CTActivity extends CTCNC
             $this->template->set_var('txtExpand', 'show/hide latest actvity');
             $customerNameCol = $dsSearchResults->columnExists('customerName');
             $callActivityIDCol = $dsSearchResults->columnExists('callActivityID');
-            $projectDescriptionCol = $dsSearchResults->columnExists('projectDescription');
+//            $projectDescriptionCol = $dsSearchResults->columnExists('projectDescription');
             $customerIDCol = $dsSearchResults->columnExists('customerID');
             $statusCol = $dsSearchResults->columnExists('status');
             $reasonCol = $dsSearchResults->columnExists('reason');
@@ -691,7 +689,7 @@ class CTActivity extends CTCNC
                     array(
                         'listCustomerName' => $dsSearchResults->getValue($customerNameCol),
                         'listContractDescription' => $dsSearchResults->getValue($contractDescriptionCol),
-                        'listProjectDescription' => $dsSearchResults->getValue($projectDescriptionCol),
+//                        'listProjectDescription' => $dsSearchResults->getValue($projectDescriptionCol),
                         'listCallURL' => $displayActivityURL,
                         'listCallActivityID' => $dsSearchResults->getValue($callActivityIDCol),
                         'listProblemID' => $problemID,
