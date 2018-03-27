@@ -1,4 +1,7 @@
 <?php
+
+use Syonix\ChangelogViewer\Factory\ViewerFactory;
+
 /**
  * Controller base class
  * Provides generic functionality to process HTML requests.
@@ -487,6 +490,9 @@ class Controller extends BaseObject
     {
         $this->template->set_var("STYLESHEET", $this->cfg["stylesheet"]);
         $this->template->set_var("pageTitle", $this->getPageTitle());
+
+
+
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var("environmentTag", 'bgcolor="#FAE8EF"');
         }

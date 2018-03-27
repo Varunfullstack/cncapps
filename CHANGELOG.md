@@ -1,20 +1,25 @@
 # Changelog
 This project changes will be shown here.
 
-##[unreleased]
+## [unreleased]
+### Fixed
 - Issue 189 - Add version number to menu
 
-##[1.5.1]
+## [v1.5.1] - 2018-03-27
+### Fixed
 - Issue 188 - New P5 SR for SSL hardcoded change
 
-##[1.5.0]
+## [v1.5.0] - 2018-03-20
+### Fixed
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 
-##[1.4.0] - 2018-03-08
+## [v1.4.0] - 2018-03-08
+### Fixed
 - Issue 175 - CNC037 - tidy up imported emails
 - Issue 155 - CNC034 - Profitability Report for PrePay counts as negative
 
-##[1.3.0] - 2018-03-07
+## [v1.3.0] - 2018-03-07
+### Fixed
 - Issue 174 - CNC036 - Record backup success as percentage
 - Issue 171 - CNC035 - Display Calendar link on all activities
 - Issue 172 - CNC036 - Sales Order link not shown when editing an activity
@@ -23,13 +28,16 @@ This project changes will be shown here.
 - Issue 150 - The URI gets too large when working with the timer on and typing notes
 - Issue 167 - Fix problem with days not showing in allocation time window
 
-##[1.2.1]
+## [v1.2.1]
+### Fixed
 - Fix issue with time allocated emails not getting sent
 
-##[1.2.0]
+## [v1.2.0]
+### Fixed
 - Issue 167 - CNC033 - Hard limits
 
-## [1.1.0]
+## [v1.1.0]
+### Fixed
 - Issue 142 - Pre-pay activity over £100 - where is the email address set?
 - Issue 144 - CNC031 - Contract and numbers report
 - Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
@@ -42,27 +50,31 @@ This project changes will be shown here.
 - Issue 159 - Email Subject Change for: SR 434149 has been updated by another user
 - Issue 158 - Certain characters are displaying incorrectly in emails
 
-## [1.0.5] - 2017-01-30
+## [v1.0.5] - 2017-01-30
+### Fixed
 - Issue 165 - T&M Authorisation Bug
 
-## [1.0.4] - 2017-01-29
+## [v1.0.4] - 2017-01-29
+### Fixed
 - Issue 162 - Typo in subject line of email - Critial SR Activity For
 
-## [1.0.3] - 2017-01-17
+## [v1.0.3] - 2017-01-17
+### Fixed
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
 - Issue 151 - T&M Authorisation Process Error
 - Issue 120 - CNC013 - Allow searching for activities based on time spent
 
-## [1.0.2] - 2017-12-21
+## [v1.0.2] - 2017-12-21
+### Fixed
 - Issue 125 - CNC017 - New SR from SO to Imt queue
 - Issue 56  - CNC004
 - Issue 149 - Create a Daily Report for P5 with sales orders to be sent to nosales@
 - Issue 129 - CNC021
 
-## [1.0.1] - 2017-12-14
+## [v1.0.1] - 2017-12-14
 - Copy Username in password List.
 
-## [1.0.0] - 2017-07-15
+## [v1.0.0] - 2017-07-15
 ### Fixed
 - Issue 143 - CNC030
 - Issue 115 - CNC008

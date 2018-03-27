@@ -6,8 +6,8 @@
     <link href="/screen.css" rel="stylesheet" type="text/css">
     <script src="/moment/moment.min.js"></script>
     <script src="/jquery/jquery.min.js"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <SCRIPT TYPE="text/javascript">
-        <!--
         function popup(mylink, windowname) {
             if (!window.focus) return true;
             var href;
@@ -16,12 +16,78 @@
             else
                 href = mylink.href;
             window.open(href, windowname, 'width=400,height=400,scrollbars=yes, resizable=yes');
-//return false;
         }
 
-        //-->
+        var modal;
+        var wrapper;
+        var modalOpen;
+
+        $(function () {
+            modal = $("#changemodal");
+            wrapper = $("#changemodal-wrapper");
+            modalOpen = false;
+
+            $("#close-button").on("click", function (event) {
+                closeChangelogModal();
+            });
+
+        });
+
+
+        function listener(evt) {
+            evt = evt || window.event;
+            if (evt.keyCode == 27 && modalOpen) {
+                closeChangelogModal();
+            }
+        }
+
+        function openChangelogModal() {
+            setTimeout(function () {
+                modalOpen = true;
+            }, 300);
+            wrapper.css("display", 'block');
+            modal.css("display", 'block');
+            wrapper.attr("class", "animated fadeIn");
+            modal.attr("class", "animated zoomIn");
+            window.addEventListener('keyup', listener, false);
+        }
+
+        function closeChangelogModal() {
+            setTimeout(function () {
+                wrapper.css("display", 'none');
+                modal.css("display", 'none');
+                modalOpen = false;
+            }, 300);
+            wrapper.attr("class", "animated fadeOut");
+            modal.attr("class", "animated zoomOut");
+            window.removeEventListener('keyup', listener, false);
+        }
+
+        function toggleChangelogModal() {
+            if (modalOpen) {
+                closeChangelogModal();
+            } else {
+                openChangelogModal();
+            }
+        }
+
+        (function () {
+            document.addEventListener('keyup', listener, false);
+            document.addEventListener("click", function (e) {
+                var level = 0;
+                for (var element = e.target; element; element = element.parentNode) {
+                    if (element.id === 'changemodal') {
+                        return;
+                    }
+                    level++;
+                }
+                if (modalOpen) closeChangelogModal();
+            });
+        })();
+
     </script>
     {javaScript}
+
 </HEAD>
 <BODY {bodyTagExtras} {environmentTag}>
 <TABLE width="100%" border="0">
@@ -44,6 +110,11 @@
                 {screenRenewals}
                 {screenAccounts}
                 {screenMaintenance}
+                <tr>
+                    <td onclick="openChangelogModal()" align="left">
+                        About
+                    </td>
+                </tr>
                 <TR>
                     <TD align="left" class='userName'>
                         <HR/>
@@ -61,6 +132,7 @@
         </TD>
     </TR>
 </TABLE>
+{changeLogStuff}
 </BODY>
 </HTML>
 <!-- End template: screen.inc.html -->
