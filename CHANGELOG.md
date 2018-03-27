@@ -5,6 +5,7 @@ This project changes will be shown here.
 - Issue 179 - Uploading a document in an activity has the same affect as clicking the 'update' button
 - Issue 183 - Add the ability to add time to a service request when in the managers queue
 - Issue 187 - Special Attention customers are not showing as a red background
+- Issue 181 - Prevent a search all!
 
 ##[1.5.0]
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE

@@ -58,9 +58,14 @@ class DBECallActivitySearch extends DBEntity
         $this->addColumn("workingHours", DA_INTEGER, DA_ALLOW_NULL, "pro_working_hours");
         $this->addColumn("activityDurationHours", DA_INTEGER, DA_ALLOW_NULL, "pro_total_activity_duration_hours");
         $this->addColumn("rootCause", DA_STRING, DA_ALLOW_NULL, "rootcause.rtc_desc");
-        $this->addColumn("fixEngineer", DA_STRING, DA_ALLOW_NULL, "CONCAT( fix_consultant.firstName, ' ', fix_consultant.lastName )");
-        $this->addColumn("activityCount", DA_INTEGER, DA_ALLOW_NULL, "( SELECT COUNT(*) FROM callactivity AS cac WHERE cac.caa_problemno = callactivity.caa_problemno )");
-        $this->addColumn("linkedSalesOrderID", DA_INTEGER, DA_ALLOW_NULL, "pro_linked_ordno");
+        $this->addColumn("fixEngineer",
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "CONCAT( fix_consultant.firstName, ' ', fix_consultant.lastName )");
+        $this->addColumn("activityCount",
+                         DA_INTEGER,
+                         DA_ALLOW_NULL,
+                         "( SELECT COUNT(*) FROM callactivity AS cac WHERE cac.caa_problemno = callactivity.caa_problemno )");
         $this->addColumn("managementReviewReason", DA_MEMO, DA_ALLOW_NULL, "pro_management_review_reason");
 
         $this->setPK(0);
@@ -80,7 +85,6 @@ class DBECallActivitySearch extends DBEntity
         $callActivityID,
         $problemID,
         $customerID,
-        $project,
         $userID,
         $status,
         $rootCauseID,
@@ -88,23 +92,21 @@ class DBECallActivitySearch extends DBEntity
         $activityText,
         $serviceRequestSpentTime,
         $individualActivitySpentTime,
-        $fromDate,                        // raised dates
+        $fromDate,
         $toDate,
         $contractCustomerItemID,
         $callActTypeID,
-        $linkedSalesOrderID,
         $managementReviewOnly = 'N',
         $breachedSlaOption = '',
         $sortColumn = false,
         $sortDirection = 'ASC',
-        $limit = true                // limit rows to 500 max
+        $limit = true
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
             "
-            
             FROM
           callactivity 
           LEFT JOIN callacttype 
@@ -113,11 +115,11 @@ class DBECallActivitySearch extends DBEntity
             ON callactivity.caa_cuino = custitem.cui_cuino 
           LEFT JOIN problem 
             ON problem.pro_problemno = callactivity.caa_problemno 
-          LEFT JOIN project 
-            ON project.projectID = problem.pro_projectno 
           LEFT JOIN item 
             ON custitem.cui_itemno = item.itm_itemno 
-          LEFT JOIN item AS activityItem 
+          LEFT JOIN project 
+            ON project.projectID = problem.pro_projectno  
+          LEFT JOIN item AS activityItem
             ON callacttype.cat_itemno = activityItem.itm_itemno 
           LEFT JOIN custitem AS contract 
             ON problem.pro_contract_cuino = contract.cui_cuino 
@@ -170,11 +172,6 @@ class DBECallActivitySearch extends DBEntity
                 " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
         }
 
-        if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
-            $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName('linkedSalesOrderID') . "=" . $linkedSalesOrderID;
-        }
-
         if ($userID != '' AND $userID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName('userID') . "=" . $userID;
@@ -200,7 +197,8 @@ class DBECallActivitySearch extends DBEntity
             }
 
             $whereParameters .=
-                " and pro_total_activity_duration_hours " . mysqli_real_escape_string($this->db->link_id(), $serviceRequestSpentTime);
+                " and pro_total_activity_duration_hours " . mysqli_real_escape_string($this->db->link_id(),
+                                                                                      $serviceRequestSpentTime);
         }
 
         if ($individualActivitySpentTime != '' && $this->testSpentTimeSearchString($individualActivitySpentTime)) {
@@ -209,15 +207,10 @@ class DBECallActivitySearch extends DBEntity
             }
 
             $whereParameters .=
-                " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string($this->db->link_id(), $individualActivitySpentTime);
+                " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string($this->db->link_id(),
+                                                                                                                   $individualActivitySpentTime);
         }
 
-        if ($project != '') {
-            $project = strtoupper($project);
-            $whereParameters .=
-                " AND (project.description LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $project) . "%'" .
-                " OR project.projectID = '" . mysqli_real_escape_string($this->db->link_id(), $project) . "')";
-        }
 
         switch ($status) {
             case 'INITIAL':

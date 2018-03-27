@@ -27,9 +27,11 @@ class BUContractCosts extends Business
         $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
         $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');                                                                            // all
+        $dsData->setValue('customerID',
+                          '');                                                                            // all
         $dsData->setValue('fromDate', date('y-m-d', strtotime('-5 days')));    // 5 days ago
-        $dsData->setValue('toDate', '');                                                                                    // today
+        $dsData->setValue('toDate',
+                          '');                                                                                    // today
     }
 
     function search(&$dsSearchForm, &$dsResults)

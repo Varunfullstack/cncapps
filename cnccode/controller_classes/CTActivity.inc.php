@@ -319,10 +319,6 @@ class CTActivity extends CTCNC
             case 'updateHistoricUserTimeLogs':
                 $this->updateHistoricUserTimeLogs();
                 break;
-            case 'test':
-                $this->buActivity->sendSalesRequestAlertEmail(387378, null);
-                break;
-
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -410,7 +406,6 @@ class CTActivity extends CTCNC
 
         $this->setMethodName('search');
         $this->buActivity->initialiseSearchForm($this->dsSearchForm);
-
         /* Special Case */
         if (isset($_REQUEST['linkedSalesOrderID'])) {
             $this->dsSearchForm->setUpdateModeUpdate();
@@ -419,15 +414,18 @@ class CTActivity extends CTCNC
             $this->dsSearchForm->post();
         } elseif (isset($_REQUEST['activity'])) {
             if (!$this->dsSearchForm->populateFromArray($_REQUEST['activity'])) {
+
                 $this->setFormErrorOn();
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
             } else {
                 if (
-                    $this->countParamsSet($_REQUEST['activity']) == 2 AND
-                    $this->dsSearchForm->getValue('customerID') AND
+                    $this->countParamsSet($_REQUEST['activity']) < 2 AND
+                    empty($this->dsSearchForm->getValue('customerID')) AND
                     $this->dsSearchForm->getValue('contractCustomerItemID') == '99'
                 ) {
+                    $this->formErrorMessage = 'you have not selected any filtering criteria for your search, this is not allowed';
+                    $this->setFormErrorOn();
                     $this->displaySearchForm();
                     exit;
                 }
@@ -460,7 +458,6 @@ class CTActivity extends CTCNC
                 $_SESSION['sortDirection'] = 'ASC';
             }
         }
-
         $this->buActivity->search(
             $this->dsSearchForm,
             $this->dsSearchResults,
@@ -535,8 +532,6 @@ class CTActivity extends CTCNC
             array(
                 'formError' => $this->formError,
                 'customerID' => $dsSearchForm->getValue('customerID'),
-                'linkedSalesOrderID' => $dsSearchForm->getValue('linkedSalesOrderID'),
-                'project' => $dsSearchForm->getValue('project'),
                 'customerString' => $customerString,
                 'problemID' => Controller::htmlDisplayText($dsSearchForm->getValue('problemID')),
                 'problemIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('problemID')),
@@ -620,7 +615,7 @@ class CTActivity extends CTCNC
             $this->template->set_var('txtExpand', 'show/hide latest actvity');
             $customerNameCol = $dsSearchResults->columnExists('customerName');
             $callActivityIDCol = $dsSearchResults->columnExists('callActivityID');
-            $projectDescriptionCol = $dsSearchResults->columnExists('projectDescription');
+//            $projectDescriptionCol = $dsSearchResults->columnExists('projectDescription');
             $customerIDCol = $dsSearchResults->columnExists('customerID');
             $statusCol = $dsSearchResults->columnExists('status');
             $reasonCol = $dsSearchResults->columnExists('reason');
@@ -694,7 +689,7 @@ class CTActivity extends CTCNC
                     array(
                         'listCustomerName' => $dsSearchResults->getValue($customerNameCol),
                         'listContractDescription' => $dsSearchResults->getValue($contractDescriptionCol),
-                        'listProjectDescription' => $dsSearchResults->getValue($projectDescriptionCol),
+//                        'listProjectDescription' => $dsSearchResults->getValue($projectDescriptionCol),
                         'listCallURL' => $displayActivityURL,
                         'listCallActivityID' => $dsSearchResults->getValue($callActivityIDCol),
                         'listProblemID' => $problemID,
@@ -919,7 +914,7 @@ class CTActivity extends CTCNC
         $count = 0;
         $elements = $array[1];
         foreach ($elements as $key => $element) {
-            if ($element > '') {
+            if (!empty($element)) {
                 $count++;
             }
         }
