@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+##[unreleased]
+- Issue 187 - Special Attention customers are not showing as a red background
+
 ##[1.5.0]
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 
