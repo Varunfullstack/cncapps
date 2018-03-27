@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ##[unreleased]
+- Issue 161 - Customer Review Meeting Total SRs potential adding up issue
 - Issue 179 - Uploading a document in an activity has the same affect as clicking the 'update' button
 - Issue 183 - Add the ability to add time to a service request when in the managers queue
 - Issue 187 - Special Attention customers are not showing as a red background
