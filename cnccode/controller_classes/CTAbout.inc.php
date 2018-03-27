@@ -51,7 +51,7 @@ class CTAbout extends CTCNC
 
         $changelog = ViewerFactory::createMarkdownHtmlViewer(__DIR__ . '/../../CHANGELOG.md')
             ->frame(false)
-            ->styles(true)
+            ->styles(false)
             ->downloadLinks(false)
 //            ->modal(true)
             ->scripts(false)

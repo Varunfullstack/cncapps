@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [unreleased] 
 ### Fixed
 - Issue 189 - Add version number to menu
 
