@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ##[unreleased]
 - Issue 179 - Uploading a document in an activity has the same affect as clicking the 'update' button
+- Issue 183 - Add the ability to add time to a service request when in the managers queue
 
 ##[1.5.0]
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE

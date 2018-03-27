@@ -755,8 +755,6 @@ class CTCurrentActivityReport extends CTCNC
                     );
 
                 $linkAllocateAdditionalTime = '<a href="' . $urlAllocateAdditionalTime . '" title="Allocate additional time"><img src="/images/clock.png" width="20px">';
-            } else {
-                $urlAllocateAdditionalTime = '';
             }
 
             $javascript = '<script language="JavaScript">
