@@ -896,7 +896,7 @@ WHERE pro_priority = 5
                         "srLinkToPortal" => $urlRequest,
                         "srNumber" => $SR['id'],
                         "srRaisedByName" => $SR['raisedBy'],
-                        "srRaisedOnDate" => $SR['raisedOn'],
+                        "srRaisedOnDate" => (new \DateTime($SR['raisedOn']))->format('d-m-Y h:i'),
                         "srStatus" => $SR['status'],
                         "srDetails" => $this->getFirstLinesDetails($SR['details'], 150),
                     )
@@ -970,7 +970,7 @@ WHERE pro_priority = 5
                     AND callactivity.`caa_callacttypeno` = 51 
                   LEFT JOIN contact AS reporter 
                     ON problem.`pro_contno` = reporter.`con_contno` 
-                WHERE problem.`pro_status` <> 'C' ";
+                WHERE problem.`pro_status` <> 'C' and problem.`pro_hide_from_customer_flag` <> 'Y'";
         return $this->db->query($sql);
 
     }
