@@ -2,7 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased] 
-### Fixed
+### Added 
 - Issue 189 - Add version number to menu
 
 ## [v1.5.1] - 2018-03-27
