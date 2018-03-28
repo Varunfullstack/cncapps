@@ -970,7 +970,10 @@ WHERE pro_priority = 5
                     AND callactivity.`caa_callacttypeno` = 51 
                   LEFT JOIN contact AS reporter 
                     ON problem.`pro_contno` = reporter.`con_contno` 
-                WHERE problem.`pro_status` <> 'C' and problem.`pro_hide_from_customer_flag` <> 'Y'";
+                WHERE problem.`pro_status` <> 'C' 
+                and problem.`pro_hide_from_customer_flag` <> 'Y'
+                and problem.pro_priority >= 1 and problem.pro_priority <= 4
+                 ORDER BY pro_date_raised";
         return $this->db->query($sql);
 
     }
