@@ -164,7 +164,9 @@ class CTCurrentActivityReport extends CTCNC
             case 'deescalate':
                 $this->deescalate();
                 break;
-
+            case 'changeQueue':
+                $this->changeQueue();
+                break;
             case 'toggleDisplayFixedPendingClosureFlag':
                 $this->checkPermissions(PHPLIB_PERM_SUPERVISOR);
                 $this->toggleDisplayFixedPendingClosureFlag();
@@ -682,6 +684,17 @@ class CTCurrentActivityReport extends CTCNC
 
         }
 
+        $queueOptions = [
+            '<option>-</option>',
+            '<option value="1">H</option>',
+            '<option value="2">E</option>',
+            '<option value="3">I</option>',
+            '<option value="4">S</option>',
+            '<option value="5">M</option>'
+        ];
+
+        unset($queueOptions[$queueNo]);
+
         $blockName = 'queue' . $queueNo . 'Block';
 
         $this->template->set_block('CurrentActivityReport', $blockName, 'requests' . $queueNo);
@@ -954,13 +967,13 @@ class CTCurrentActivityReport extends CTCNC
             $imRemaining = $imAssignedMinutes - $imUsedMinutes;
 
 
-            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
+            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
+                                            1);
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
                 array(
-                    'escalateButton' => $escalateButton,
-                    'deEscalateButton' => $deEscalateButton,
+                    'queueOptions' => implode($queueOptions),
                     'workOnClick' => $workOnClick,
                     'hoursRemaining' => $hoursRemaining,
                     'updatedBgColor' => $updatedBgColor,
@@ -979,11 +992,13 @@ class CTCurrentActivityReport extends CTCNC
                     'problemID' => $dsResults->getValue('problemID'),
                     'reason' => $this->truncate($dsResults->getValue('reason'), 150),
                     'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
-                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
+                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'),
+                                                                          $dsResults->getValue('userID')),
                     'engineerName' => $dsResults->getValue('engineerName'),
                     'customerName' => $dsResults->getValue('customerName'),
                     'customerNameDisplayClass'
-                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'), $dsResults->getValue('specialAttentionEndDate')),
+                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'),
+                                                          $dsResults->getValue('specialAttentionEndDate')),
                     'urlViewActivity' => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),
@@ -1166,6 +1181,23 @@ class CTCurrentActivityReport extends CTCNC
         $customerproblemno = $_REQUEST['cpr_customerproblemno'];
 
         $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
+        $urlNext =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array()
+            );
+        header('Location: ' . $urlNext);
+        exit;
+
+    }
+
+    function changeQueue()
+    {
+        $problemID = $_REQUEST['problemID'];
+        $newQueue = $_REQUEST['queue'];
+
+        $this->buActivity->escalateProblemByProblemID($problemID, $newQueue);
+
         $urlNext =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],

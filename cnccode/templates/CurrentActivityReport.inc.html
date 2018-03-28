@@ -28,6 +28,19 @@
 
         });
 
+        $('.queueSelector').change(function (event) {
+            console.log(this.value);
+            var problemID = ($(this).data()).problemid;
+
+            var answer = confirm('Are you sure you want to change this Service Request queue?');
+
+            if (!answer) {
+                return;
+            }
+
+            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value
+        })
+
     })
 </script>
 <table width="100%">
@@ -129,7 +142,7 @@
 <table id="queue1" class="table-bordered" width="100%">
     <thead>
     <tr valign="center">
-        <th class="listHeadText" colspan="5" width="34%">
+        <th class="listHeadText" colspan="4" width="34%">
             <div align="left">{queue1Name} ({queue1Count})</div>
         </th>
         <th class="listHeadText" width="1%">
@@ -170,9 +183,11 @@
                 >
             </td>
 
-            <td width="3%">{escalateButton}</td>
-
-            <td width="3%">{deEscalateButton}</td>
+            <td width="6%">
+                <select class="queueSelector" data-problemId="{problemID}">
+                    {queueOptions}
+                </select>
+            </td>
 
             <td width="2%" bgcolor="{bgColour}" class="problemId">
                 <A href="{urlViewActivity}" target="_blank">{problemID}</A>
@@ -269,8 +284,11 @@
                 >
             </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
+            <td width="6%">
+                <select class="queueSelector" data-problemId="{problemID}">
+                    {queueOptions}
+                </select>
+            </td>
             <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
@@ -368,8 +386,11 @@
                 >
             </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
+            <td width="6%">
+                <select class="queueSelector" data-problemId="{problemID}">
+                    {queueOptions}
+                </select>
+            </td>
             <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
@@ -469,8 +490,11 @@
                 >
             </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
+            <td width="6%">
+                <select class="queueSelector" data-problemId="{problemID}">
+                    {queueOptions}
+                </select>
+            </td>
             <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
@@ -666,8 +690,11 @@
                 >
             </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
+            <td width="6%">
+                <select class="queueSelector" data-problemId="{problemID}">
+                    {queueOptions}
+                </select>
+            </td>
             <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
             </td>
 
@@ -721,51 +748,51 @@
 </table>
 
 <!--<table id="queue6" class="table-bordered" width="100%">-->
-    <!--<thead>-->
-    <!--<tr valign="center">-->
-        <!--<th class="listHeadText" colspan="4">-->
-            <!--<div align="left">Fixed Pending Closure ({queue6Count})</div>-->
-        <!--</th>-->
-        <!--<th class="listHeadText">-->
-            <!--<div align="left">Priority</div>-->
-        <!--</th>-->
-        <!--<th class="listHeadText">-->
-            <!--<div align="left">Description</div>-->
-        <!--</th>-->
-    <!--</tr>-->
-    <!--</thead>-->
-    <!--<tbody>-->
-    <!--&lt;!&ndash; BEGIN queue6Block &ndash;&gt;-->
-    <!--<form name="userForm">-->
-        <!--<tr valign="center">-->
+<!--<thead>-->
+<!--<tr valign="center">-->
+<!--<th class="listHeadText" colspan="4">-->
+<!--<div align="left">Fixed Pending Closure ({queue6Count})</div>-->
+<!--</th>-->
+<!--<th class="listHeadText">-->
+<!--<div align="left">Priority</div>-->
+<!--</th>-->
+<!--<th class="listHeadText">-->
+<!--<div align="left">Description</div>-->
+<!--</th>-->
+<!--</tr>-->
+<!--</thead>-->
+<!--<tbody>-->
+<!--&lt;!&ndash; BEGIN queue6Block &ndash;&gt;-->
+<!--<form name="userForm">-->
+<!--<tr valign="center">-->
 
-            <!--<td width="3%">&nbsp;</td>-->
-            <!--<td width="3%">&nbsp;</td>-->
-            <!--<td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>-->
-            <!--</td>-->
+<!--<td width="3%">&nbsp;</td>-->
+<!--<td width="3%">&nbsp;</td>-->
+<!--<td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>-->
+<!--</td>-->
 
 
-            <!--<td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>-->
-            <!--</td>-->
+<!--<td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>-->
+<!--</td>-->
 
-            <!--<td width="12%" bgcolor="{priorityBgColor}">-->
-                <!--<div align="center">{priority}</div>-->
-            <!--</td>-->
+<!--<td width="12%" bgcolor="{priorityBgColor}">-->
+<!--<div align="center">{priority}</div>-->
+<!--</td>-->
 
-            <!--<td width="40%">-->
-                <!--<A-->
-                        <!--href="#"-->
-                        <!--onClick="window.open(-->
-          <!--'{urlProblemHistoryPopup}',-->
-          <!--'reason',-->
-          <!--'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}-->
-                <!--</A>-->
-            <!--</td>-->
+<!--<td width="40%">-->
+<!--<A-->
+<!--href="#"-->
+<!--onClick="window.open(-->
+<!--'{urlProblemHistoryPopup}',-->
+<!--'reason',-->
+<!--'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}-->
+<!--</A>-->
+<!--</td>-->
 
-        <!--</tr>-->
-    <!--</form>-->
-    <!--&lt;!&ndash; END queue6Block &ndash;&gt;-->
-    <!--</tbody>-->
+<!--</tr>-->
+<!--</form>-->
+<!--&lt;!&ndash; END queue6Block &ndash;&gt;-->
+<!--</tbody>-->
 <!--</table>-->
 
 
