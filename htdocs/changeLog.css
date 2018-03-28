@@ -1,5 +1,5 @@
 body {
-    
+
 }
 
 #changemodal-wrapper {
@@ -14,7 +14,7 @@ body {
 #changemodal {
     font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: 300;
-    
+
     line-height: 1.6;
     color: #777;
     -webkit-animation-duration: 300ms;
@@ -41,7 +41,7 @@ body {
 }
 
 #changemodal #changemodal-frame #close-button {
-    
+
     display: block;
     position: absolute;
     top: 8px;
@@ -59,14 +59,14 @@ body {
 }
 
 #changemodal h1 {
-    
+
     font-weight: 100;
     margin: 1rem 0;
     text-transform: uppercase;
 }
 
 #changemodal h2 {
-    
+
     font-weight: bold;
     margin: 1.2rem 0 0 0;
 }
@@ -77,10 +77,9 @@ body {
 }
 
 #changemodal h3 {
-    
+    font-size: 0.9em;
     font-weight: 100;
     margin: 0 0 1.2rem 0;
-    text-transform: uppercase;
 }
 
 #changemodal h3 a {
@@ -142,7 +141,7 @@ body {
     font-weight: bold;
     margin-right: 1rem;
     text-align: center;
-    width: 8rem;
+    width: 6rem;
     padding: 2px 0;
     font-style: normal;
     content: attr(data-label);
@@ -167,6 +166,6 @@ body {
     white-space: pre-wrap;
 }
 
-#changemodal h3.title{
+#changemodal .title {
     font-size: 1.00em;
 }
