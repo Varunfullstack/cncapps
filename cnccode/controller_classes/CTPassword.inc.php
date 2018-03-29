@@ -126,13 +126,7 @@ class CTPassword extends CTCNC
             $customerID = $_REQUEST['customerID'];
         }
         if (empty($customerID)) {
-
-            $urlAdd =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    []
-                );
-            header('Location: ' . $urlAdd);
+            $this->raiseError('Please search for a customer by typing and then pressing tab');
             exit;
         }
 
