@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+
+### Fixed
+- Issue 191 - Amend the value of the hours spent on critical SR activity email
+
 ##[1.5.1]
 - Issue 188 - New P5 SR for SSL hardcoded change
 
