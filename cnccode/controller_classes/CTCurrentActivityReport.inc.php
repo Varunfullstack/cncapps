@@ -28,7 +28,7 @@ class CTCurrentActivityReport extends CTCNC
     const RED = '#F8A5B6';
     const GREEN = '#BDF8BA';
     const BLUE = '#b2daff';
-    const CONTENT = '#F4f4f2';
+    const CONTENT = null;
     const PURPLE = '#dcbdff';
     const ORANGE = '#FFE6AB';
 
@@ -632,26 +632,8 @@ class CTCurrentActivityReport extends CTCNC
                 array('action' => 'showMineOnly')
             );
 
-        $urlAllocateUser =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'allocateUser'
-                )
-            );
-        $javascript = '
-      <script language="JavaScript">
-        function allocateUser( form ) { 
-          var newIndex = form.userID.selectedIndex; 
-          cururl = \'' . $urlAllocateUser . '\' + form.userID.options[ newIndex ].value; 
-          window.location.assign( cururl ); 
-        } 
-      </script>';
-
         $this->template->set_var(
-
             array(
-                'javaScript' => $javascript,
                 'urlResetFilter' => $urlResetFilter,
                 'urlShowMineOnly' => $urlShowMineOnly,
                 'urlSetFilter' => $urlSetFilter
@@ -1114,13 +1096,32 @@ class CTCurrentActivityReport extends CTCNC
         // user selection
         $userSelected = ($selectedID == 0) ? CT_SELECTED : '';
 
-        $string .= '<option ' . $userSelected . ' value="&userID=0&problemID=' . $problemID . '"></option>';
+        $urlAllocateUser =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'allocateUser',
+                    'userID' => '0',
+                    'problemID' => $problemID
+                )
+            );
+        $string = '';
+        $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
 
         foreach ($this->allocatedUser as $key => $value) {
 
             $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : '';
+            $urlAllocateUser =
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'allocateUser',
+                        'userID' => $value['userID'],
+                        'problemID' => $problemID
+                    )
+                );
 
-            $string .= '<option ' . $userSelected . ' value="&userID=' . $value['userID'] . '&problemID=' . $problemID . '">' . $value['userName'] . '</option>';
+            $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '">' . $value['userName'] . '</option>';
 
         }
 

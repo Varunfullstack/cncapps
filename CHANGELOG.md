@@ -12,6 +12,9 @@ This project changes will be shown here.
 - Issue 187 - Special Attention customers are not showing as a red background
 - Issue 181 - Prevent a search all!
 
+### Changed
+- Issue 176 - Change background colours on service request page
+
 ## [v1.5.1] - 2018-03-27
 ### Fixed
 - Issue 188 - New P5 SR for SSL hardcoded change
