@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 181 - Prevent a search all!
 - Issue 186 - Time limit request bug with IMT team
 - Issue 191 - Amend the value of the hours spent on critical SR activity email
+- Issue 192 - Passwords page crashes when incomplete customer name is used
 
 ### Changed
 - Issue 176 - Change background colours on service request page
