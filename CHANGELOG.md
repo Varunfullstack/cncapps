@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 187 - Special Attention customers are not showing as a red background
 - Issue 181 - Prevent a search all!
 - Issue 186 - Time limit request bug with IMT team
+- Issue 191 - Amend the value of the hours spent on critical SR activity email
 
 ### Changed
 - Issue 176 - Change background colours on service request page

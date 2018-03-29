@@ -1418,7 +1418,7 @@ class BUActivity extends Business
                 'activityRef' => $activityRef,
                 'urlActivity' => $urlActivity,
                 'userName' => $dbeJCallActivity->getValue('userName'),
-                'durationHours' => $durationHours,
+                'durationHours' => round($durationHours, 2),
                 'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
                 'awaitingCustomerResponse'
                 => $awaitingCustomerResponse,
