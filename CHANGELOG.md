@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+
+### Fixed
+- Issue 192 - Passwords page crashes when incomplete customer name is used
+
 ##[1.5.1]
 - Issue 188 - New P5 SR for SSL hardcoded change
 
