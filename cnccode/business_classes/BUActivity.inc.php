@@ -485,16 +485,23 @@ class BUActivity extends Business
         return ($this->getData($this->dbeJCallActivity, $dsResults));
     } // end sendSpecialAttentionEmail
 
-    function escalateProblemByProblemID($problemID)
+    function escalateProblemByProblemID($problemID, $newQueueNo = null)
     {
 
         $dbeProblem = new DBEProblem($this, $problemID);
 
         $oldQueueNo = $dbeProblem->getValue('queueNo');
 
+        if (!$newQueueNo) {
+            $newQueueNo = $dbeProblem->getValue('queueNo') + 1;
+        }
+
+        if ($newQueueNo < $oldQueueNo) {
+            return $this->deEscalateProblemByProblemID($problemID, $newQueueNo);
+        }
+
         if ($oldQueueNo < 5) {
 
-            $newQueueNo = $dbeProblem->getValue('queueNo') + 1;
 
             $dbeProblem->setValue('queueNo', $newQueueNo);
 
@@ -536,16 +543,23 @@ class BUActivity extends Business
         $dbeCallActivity->insertRow();
     } // end sendFutureVisitEmail
 
-    function deEscalateProblemByProblemID($problemID)
+    function deEscalateProblemByProblemID($problemID, $newQueueNo = null)
     {
 
         $dbeProblem = new DBEProblem($this, $problemID);
 
         $oldQueueNo = $dbeProblem->getValue('queueNo');
 
+        if (!$newQueueNo) {
+            $newQueueNo = $oldQueueNo - 1;
+        }
+
+        if ($newQueueNo > $oldQueueNo) {
+            return $this->escalateProblemByProblemID($problemID, $newQueueNo);
+        }
+
         if ($oldQueueNo > 1) {
 
-            $newQueueNo = $oldQueueNo - 1;
 
             $dbeProblem->setValue('queueNo', $newQueueNo);
 
