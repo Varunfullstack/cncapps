@@ -5,7 +5,7 @@
 <a href="Activity.php?action=activityCreate1">Log New Request</a>
 
 <style>
-    .oddRows tr:nth-child(4n) {
+    .oddRows tr:nth-child(odd) {
         background-color: rgb(250, 250, 250) !important;
     }
 
@@ -34,7 +34,12 @@
 
         });
 
+        $('.userAllocation').change(function () {
+            window.location = this.value;
+        })
     })
+
+
 </script>
 <table width="100%">
     <tr>
@@ -164,70 +169,68 @@
     </thead>
     <tbody>
     <!-- BEGIN queue1Block -->
-    <form name="userForm">
-        <tr valign="center">
+    <tr valign="center">
 
-            <td width="3%" bgColor="{workBgColor}">
-                <INPUT
-                        type="button"
-                        value="Work"
-                        title="Log activity against this SR"
-                        onClick="{workOnClick}"
-                >
-            </td>
+        <td width="3%" bgColor="{workBgColor}">
+            <INPUT
+                    type="button"
+                    value="Work"
+                    title="Log activity against this SR"
+                    onClick="{workOnClick}"
+            >
+        </td>
 
-            <td width="3%">{escalateButton}</td>
+        <td width="3%">{escalateButton}</td>
 
-            <td width="3%">{deEscalateButton}</td>
+        <td width="3%">{deEscalateButton}</td>
 
-            <td width="2%" bgcolor="{bgColour}" class="problemId">
-                <A href="{urlViewActivity}" target="_blank">{problemID}</A>
-            </td>
+        <td width="2%" bgcolor="{bgColour}" class="problemId">
+            <A href="{urlViewActivity}" target="_blank">{problemID}</A>
+        </td>
 
-            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
-            </td>
+        <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+        </td>
 
-            <td width="3%" bgcolor="{priorityBgColor}">
-                <div align="center">{priority}</div>
-            </td>
+        <td width="3%" bgcolor="{priorityBgColor}">
+            <div align="center">{priority}</div>
+        </td>
 
-            <td>{linkAllocateAdditionalTime}</td>
+        <td>{linkAllocateAdditionalTime}</td>
 
-            <td width="5%" bgcolor="{hoursRemainingBgColor}"
-                title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
-                <div align="center">{hoursRemaining}</div>
-            </td>
-            <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="15%" align="left">
+        <td width="5%" bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
+            <div align="center">{hoursRemaining}</div>
+        </td>
+        <td width="5%" align="center">{totalActivityDurationHours}</td>
+        <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
 
-                <span style="color: {hdColor}">HD:{hdRemaining}</span>
-                <span style="color: {esColor}">ES:{esRemaining}</span>
-                <span style="color: {imColor}">IM:{imRemaining}</span>
-            </td>
+            <span style="color: {hdColor}">HD:{hdRemaining}</span>
+            <span style="color: {esColor}">ES:{esRemaining}</span>
+            <span style="color: {imColor}">IM:{imRemaining}</span>
+        </td>
 
-            <td width="37%">
-                <A
-                        href="#"
-                        onClick="window.open(
+        <td width="37%">
+            <A
+                    href="#"
+                    onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
-                </A>
-            </td>
+            </A>
+        </td>
 
-            <td width="10%" valign="center">
-                <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
-            </td>
+        <td width="10%" valign="center">
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
 
-            <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}"
-                title="Purple = Updated by another user OR has an alarm date in past">{date} {time}
-            </td>
+        <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}"
+            title="Purple = Updated by another user OR has an alarm date in past">{date} {time}
+        </td>
 
-        </tr>
-    </form>
+    </tr>
     <!-- END queue1Block -->
     </tbody>
 </table>
@@ -264,69 +267,69 @@
     </thead>
     <tbody>
     <!-- BEGIN queue2Block -->
-    <form name="userForm">
-        <tr valign="center">
-            <td width="3%" bgColor="{workBgColor}">
-                <INPUT
-                        type="button"
-                        value="Work"
-                        title="Log activity against this SR"
-                        onClick="{workOnClick}"
-                >
-            </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
-            <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
-            </td>
+    <tr valign="center">
+        <td width="3%" bgColor="{workBgColor}">
+            <INPUT
+                    type="button"
+                    value="Work"
+                    title="Log activity against this SR"
+                    onClick="{workOnClick}"
+            >
+        </td>
 
-
-            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
-            </td>
-
-            <td width="3%" bgcolor="{priorityBgColor}">
-                <div align="center">{priority}</div>
-            </td>
-
-            <td>{linkAllocateAdditionalTime}</td>
+        <td width="3%">{escalateButton}</td>
+        <td width="3%">{deEscalateButton}</td>
+        <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+        </td>
 
 
-            <td width="5%" bgcolor="{hoursRemainingBgColor}"
-                title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
-                <div align="center">{hoursRemaining}</div>
-            </td>
+        <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+        </td>
 
-            <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="15%" align="left">
+        <td width="3%" bgcolor="{priorityBgColor}">
+            <div align="center">{priority}</div>
+        </td>
+
+        <td>{linkAllocateAdditionalTime}</td>
+
+
+        <td width="5%" bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
+            <div align="center">{hoursRemaining}</div>
+        </td>
+
+        <td width="5%" align="center">{totalActivityDurationHours}</td>
+        <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
 
-                <span style="color: {hdColor}">HD:{hdRemaining}</span>
-                <span style="color: {esColor}">ES:{esRemaining}</span>
-                <span style="color: {imColor}">IM:{imRemaining}</span>
-            </td>
+            <span style="color: {hdColor}">HD:{hdRemaining}</span>
+            <span style="color: {esColor}">ES:{esRemaining}</span>
+            <span style="color: {imColor}">IM:{imRemaining}</span>
+        </td>
 
-            <td width="37%">
-                <A
-                        href="#"
-                        onClick="window.open(
+        <td width="37%">
+            <A
+                    href="#"
+                    onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
-                </A>
-            </td>
+            </A>
+        </td>
 
-            <td width="10%" valign="center">
-                <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
-            </td>
+        <td width="10%" valign="center">
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
 
-            <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
-                {time}
-            </td>
+        <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
+            {time}
+        </td>
 
-        </tr>
-    </form>
+    </tr>
+
     <!-- END queue2Block -->
     </tbody>
 </table>
@@ -363,69 +366,69 @@
     </thead>
     <tbody>
     <!-- BEGIN queue3Block -->
-    <form name="userForm">
-        <tr valign="center">
-            <td width="3%" bgColor="{workBgColor}">
-                <INPUT
-                        type="button"
-                        value="Work"
-                        title="Log activity against this SR"
-                        onClick="{workOnClick}"
-                >
-            </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
-            <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
-            </td>
+    <tr valign="center">
+        <td width="3%" bgColor="{workBgColor}">
+            <INPUT
+                    type="button"
+                    value="Work"
+                    title="Log activity against this SR"
+                    onClick="{workOnClick}"
+            >
+        </td>
 
-
-            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
-            </td>
-
-            <td width="3%" bgcolor="{priorityBgColor}">
-                <div align="center">{priority}</div>
-            </td>
-
-            <td>{linkAllocateAdditionalTime}</td>
+        <td width="3%">{escalateButton}</td>
+        <td width="3%">{deEscalateButton}</td>
+        <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+        </td>
 
 
-            <td width="5%" bgcolor="{hoursRemainingBgColor}"
-                title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
-                <div align="center">{hoursRemaining}</div>
-            </td>
+        <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+        </td>
 
-            <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="15%" align="left">
+        <td width="3%" bgcolor="{priorityBgColor}">
+            <div align="center">{priority}</div>
+        </td>
+
+        <td>{linkAllocateAdditionalTime}</td>
+
+
+        <td width="5%" bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
+            <div align="center">{hoursRemaining}</div>
+        </td>
+
+        <td width="5%" align="center">{totalActivityDurationHours}</td>
+        <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
 
-                <span style="color: {hdColor}">HD:{hdRemaining}</span>
-                <span style="color: {esColor}">ES:{esRemaining}</span>
-                <span style="color: {imColor}">IM:{imRemaining}</span>
-            </td>
+            <span style="color: {hdColor}">HD:{hdRemaining}</span>
+            <span style="color: {esColor}">ES:{esRemaining}</span>
+            <span style="color: {imColor}">IM:{imRemaining}</span>
+        </td>
 
-            <td width="37%">
-                <A
-                        href="#"
-                        onClick="window.open(
+        <td width="37%">
+            <A
+                    href="#"
+                    onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
-                </A>
-            </td>
+            </A>
+        </td>
 
-            <td width="10%" valign="center">
-                <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
-            </td>
+        <td width="10%" valign="center">
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
 
-            <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
-                {time}
-            </td>
+        <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
+            {time}
+        </td>
 
-        </tr>
-    </form>
+    </tr>
+
     <!-- END queue3Block -->
     </tbody>
 </table>
@@ -464,68 +467,68 @@
 
 
     <!-- BEGIN queue4Block -->
-    <form name="userForm">
-        <tr valign="center">
-            <td width="3%" bgColor="{workBgColor}">
-                <INPUT
-                        type="button"
-                        value="Work"
-                        title="Log activity against this SR"
-                        onClick="{workOnClick}"
-                >
-            </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
-            <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
-            </td>
+    <tr valign="center">
+        <td width="3%" bgColor="{workBgColor}">
+            <INPUT
+                    type="button"
+                    value="Work"
+                    title="Log activity against this SR"
+                    onClick="{workOnClick}"
+            >
+        </td>
+
+        <td width="3%">{escalateButton}</td>
+        <td width="3%">{deEscalateButton}</td>
+        <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+        </td>
 
 
-            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
-            </td>
+        <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+        </td>
 
-            <td width="3%" bgcolor="{priorityBgColor}">
-                <div align="center">{priority}</div>
-            </td>
+        <td width="3%" bgcolor="{priorityBgColor}">
+            <div align="center">{priority}</div>
+        </td>
 
-            <td>{linkAllocateAdditionalTime}</td>
+        <td>{linkAllocateAdditionalTime}</td>
 
-            <td width="5%" bgcolor="{hoursRemainingBgColor}"
-                title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
-                <div align="center">{hoursRemaining}</div>
-            </td>
+        <td width="5%" bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
+            <div align="center">{hoursRemaining}</div>
+        </td>
 
-            <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="15%" align="left">
+        <td width="5%" align="center">{totalActivityDurationHours}</td>
+        <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
 
-                <span style="color: {hdColor}">HD:{hdRemaining}</span>
-                <span style="color: {esColor}">ES:{esRemaining}</span>
-                <span style="color: {imColor}">IM:{imRemaining}</span>
-            </td>
+            <span style="color: {hdColor}">HD:{hdRemaining}</span>
+            <span style="color: {esColor}">ES:{esRemaining}</span>
+            <span style="color: {imColor}">IM:{imRemaining}</span>
+        </td>
 
-            <td width="37%">
-                <A
-                        href="#"
-                        onClick="window.open(
+        <td width="37%">
+            <A
+                    href="#"
+                    onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
-                </A>
-            </td>
+            </A>
+        </td>
 
-            <td width="10%" valign="center">
-                <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
-            </td>
+        <td width="10%" valign="center">
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
 
-            <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
-                {time}
-            </td>
+        <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
+            {time}
+        </td>
 
-        </tr>
-    </form>
+    </tr>
+
     <!-- END queue4Block -->
     </tbody>
 </table>
@@ -564,67 +567,67 @@
     </thead>
     <tbody>
     <!-- BEGIN queue7Block -->
-    <form name="userForm">
-        <tr valign="center">
-            <td width="3%" bgColor="{workBgColor}">
-                <INPUT
-                        type="button"
-                        value="Work"
-                        title="Log activity against this SR"
-                        onClick="{workOnClick}"
-                >
-            </td>
 
-            <td width="3%">{alarmDateTime}</td>
-            <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
-            </td>
+    <tr valign="center">
+        <td width="3%" bgColor="{workBgColor}">
+            <INPUT
+                    type="button"
+                    value="Work"
+                    title="Log activity against this SR"
+                    onClick="{workOnClick}"
+            >
+        </td>
+
+        <td width="3%">{alarmDateTime}</td>
+        <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+        </td>
 
 
-            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
-            </td>
+        <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+        </td>
 
-            <td width="3%" bgcolor="{priorityBgColor}">
-                <div align="center">{priority}</div>
-            </td>
+        <td width="3%" bgcolor="{priorityBgColor}">
+            <div align="center">{priority}</div>
+        </td>
 
-            <td>{linkAllocateAdditionalTime}</td>
+        <td>{linkAllocateAdditionalTime}</td>
 
-            <td width="5%" bgcolor="{hoursRemainingBgColor}"
-                title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
-                <div align="center">{hoursRemaining}</div>
-            </td>
+        <td width="5%" bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
+            <div align="center">{hoursRemaining}</div>
+        </td>
 
-            <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="15%" align="left">
+        <td width="5%" align="center">{totalActivityDurationHours}</td>
+        <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
 
-                <span style="color: {hdColor}">HD:{hdRemaining}</span>
-                <span style="color: {esColor}">ES:{esRemaining}</span>
-                <span style="color: {imColor}">IM:{imRemaining}</span>
-            </td>
+            <span style="color: {hdColor}">HD:{hdRemaining}</span>
+            <span style="color: {esColor}">ES:{esRemaining}</span>
+            <span style="color: {imColor}">IM:{imRemaining}</span>
+        </td>
 
-            <td width="40%">
-                <A
-                        href="#"
-                        onClick="window.open(
+        <td width="40%">
+            <A
+                    href="#"
+                    onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
-                </A>
-            </td>
+            </A>
+        </td>
 
-            <td width="10%" valign="center">
-                <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
-            </td>
+        <td width="10%" valign="center">
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
 
-            <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
-                {time}
-            </td>
+        <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
+            {time}
+        </td>
 
-        </tr>
-    </form>
+    </tr>
+
     <!-- END queue7Block -->
     </tbody>
 </table>
@@ -660,67 +663,67 @@
     </thead>
     <tbody>
     <!-- BEGIN queue5Block -->
-    <form name="userForm">
-        <tr valign="center">
-            <td width="3%" bgColor="{workBgColor}">
-                <INPUT
-                        type="button"
-                        value="Work"
-                        title="Log activity against this SR"
-                        onClick="{workOnClick}"
-                >
-            </td>
 
-            <td width="3%">{escalateButton}</td>
-            <td width="3%">{deEscalateButton}</td>
-            <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
-            </td>
+    <tr valign="center">
+        <td width="3%" bgColor="{workBgColor}">
+            <INPUT
+                    type="button"
+                    value="Work"
+                    title="Log activity against this SR"
+                    onClick="{workOnClick}"
+            >
+        </td>
+
+        <td width="3%">{escalateButton}</td>
+        <td width="3%">{deEscalateButton}</td>
+        <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+        </td>
 
 
-            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
-            </td>
+        <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+        </td>
 
-            <td width="3%" bgcolor="{priorityBgColor}">
-                <div align="center">{priority}</div>
-            </td>
+        <td width="3%" bgcolor="{priorityBgColor}">
+            <div align="center">{priority}</div>
+        </td>
 
-            <td width="5%" bgcolor="{hoursRemainingBgColor}"
-                title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
-                <div align="center">{hoursRemaining}</div>
-            </td>
+        <td width="5%" bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started">
+            <div align="center">{hoursRemaining}</div>
+        </td>
 
-            <td width="5%" align="center">{totalActivityDurationHours}</td>
-            <td width="15%" align="left">
+        <td width="5%" align="center">{totalActivityDurationHours}</td>
+        <td width="15%" align="left">
                 <span style="cursor: pointer" class="requestAdditionalTime" data-problemId="{problemID}">
                     <img src="images/clock.gif" alt="Clock" width="24" height="25" title="Request Time">
                 </span>
 
-                <span style="color: {hdColor}">HD:{hdRemaining}</span>
-                <span style="color: {esColor}">ES:{esRemaining}</span>
-                <span style="color: {imColor}">IM:{imRemaining}</span>
-            </td>
+            <span style="color: {hdColor}">HD:{hdRemaining}</span>
+            <span style="color: {esColor}">ES:{esRemaining}</span>
+            <span style="color: {imColor}">IM:{imRemaining}</span>
+        </td>
 
 
-            <td width="37%">
-                <A
-                        href="#"
-                        onClick="window.open(
+        <td width="37%">
+            <A
+                    href="#"
+                    onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
           'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
-                </A>
-            </td>
+            </A>
+        </td>
 
-            <td width="10%" valign="center">
-                <select name="userID" onchange="javascript:allocateUser( this.form )">{engineerDropDown}</select>
-            </td>
+        <td width="10%" valign="center">
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
 
-            <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
-                {time}
-            </td>
+        <td width="10%" nowrap="nowrap" bgcolor="{updatedBgColor}" title="Purple = Updated by another user">{date}
+            {time}
+        </td>
 
-        </tr>
-    </form>
+    </tr>
+
     <!-- END queue5Block -->
     </tbody>
 </table>
