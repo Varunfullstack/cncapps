@@ -4,8 +4,108 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f3a17846817df972c9db17a7264bdd0c",
+    "content-hash": "84a383f37a6fda8536e63a013abb3e2f",
     "packages": [
+        {
+            "name": "crossjoin/css",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/crossjoin/Css.git",
+                "reference": "7b50ca94c4bdad60d01cfa327f00b7a600d6f9f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/crossjoin/Css/zipball/7b50ca94c4bdad60d01cfa327f00b7a600d6f9f3",
+                "reference": "7b50ca94c4bdad60d01cfa327f00b7a600d6f9f3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Crossjoin\\Css\\": "src/Crossjoin/Css/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christoph Ziegenberg",
+                    "email": "ziegenberg@crossjoin.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "CSS reader and writer with full CSS3 support, already supporting huge parts of the current CSS4 spec. It supports media queries, comments, value optimization and more... It offers full Unicode support and can handle also large CSS sources. Requires PHP 5.4+.",
+            "homepage": "https://github.com/crossjoin/Css",
+            "keywords": [
+                "css",
+                "css parser",
+                "css reader",
+                "css writer",
+                "php"
+            ],
+            "time": "2015-09-29T15:38:43+00:00"
+        },
+        {
+            "name": "crossjoin/pre-mailer",
+            "version": "v1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/crossjoin/PreMailer.git",
+                "reference": "e1fbd426a9f3ba2d5d00f6641b2509c72bf4f561"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/crossjoin/PreMailer/zipball/e1fbd426a9f3ba2d5d00f6641b2509c72bf4f561",
+                "reference": "e1fbd426a9f3ba2d5d00f6641b2509c72bf4f561",
+                "shasum": ""
+            },
+            "require": {
+                "crossjoin/css": "^1.0.3",
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.4.0",
+                "symfony/css-selector": "^2.7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Crossjoin\\PreMailer\\": "src/Crossjoin/PreMailer/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christoph Ziegenberg",
+                    "email": "ziegenberg@crossjoin.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Crossjoin\\PreMailer converts CSS in a given HTML source to inline styles and optimizes it for sending it via e-mail. It also creates a text version of the HTML source. Requires PHP 5.4+.",
+            "homepage": "https://github.com/crossjoin/PreMailer",
+            "keywords": [
+                "css",
+                "e-mail",
+                "html",
+                "inline",
+                "mail",
+                "php",
+                "premailer",
+                "styles",
+                "text"
+            ],
+            "time": "2015-12-26T15:44:38+00:00"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.4.0",
@@ -983,6 +1083,59 @@
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
             "time": "2017-11-12T16:53:41+00:00"
+        },
+        {
+            "name": "symfony/css-selector",
+            "version": "v2.8.36",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/css-selector.git",
+                "reference": "99a4b2c2f1757d62d081b5f9f14128f23504897d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/99a4b2c2f1757d62d081b5f9f14128f23504897d",
+                "reference": "99a4b2c2f1757d62d081b5f9f14128f23504897d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\CssSelector\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jean-François Simon",
+                    "email": "jeanfrancois.simon@sensiolabs.com"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony CssSelector Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-02-03T14:55:47+00:00"
         },
         {
             "name": "symfony/debug",
