@@ -7048,7 +7048,7 @@ customer with the past 8 hours email to GL
         );
 
 
-        $text = 'Additional time requested';
+        $text = 'Additional time requested - Reason: ' . $reason;
 
         $this->logOperationalActivity($problemID, $text);
 
