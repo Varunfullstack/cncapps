@@ -597,6 +597,10 @@ class BUDailyReport extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
+        $preMailer = new \Crossjoin\PreMailer\HtmlString($body);
+
+        $body = $preMailer->getHtml();
+
         $buMail->mime->setHTMLBody($body);
 
         if ($attachment) {
@@ -911,6 +915,8 @@ WHERE pro_priority = 5
             $body = $template->get_var('output');
 
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
+
+
 
             $this->sendByEmailTo(
                 $contactsDatum['email'],
