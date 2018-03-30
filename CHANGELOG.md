@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+
+### Changed
+- Issue 194 - Old tables in the database that aren't used?
+
+
 ##[1.5.1]
 - Issue 188 - New P5 SR for SSL hardcoded change
 
