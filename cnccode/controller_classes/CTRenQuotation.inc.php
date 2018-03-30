@@ -76,15 +76,6 @@ class CTRenQuotation extends CTCNC
         $this->setMethodName('displayList');
         $this->setPageTitle('Renewals');
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            if ($_REQUEST['dateGenerated']) {
-
-
-            }
-
-        }
-
         $this->setTemplateFiles(
             array('RenQuotationList' => 'RenQuotationList.inc')
         );

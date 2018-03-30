@@ -196,7 +196,7 @@ class CTCNC extends Controller
         if (!$this->isRunningFromCommandLine()) {
             $allow = FALSE;
             if (is_array($levels)) {
-                while (list ($key, $val) = each($levels)) {
+                foreach ($levels as $key => $val) {
                     $allow = ($allow | $GLOBALS ['perm']->have_perm($val));
                 }
             } elseif (isset($GLOBALS ['perm'])) {

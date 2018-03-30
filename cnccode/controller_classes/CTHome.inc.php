@@ -10,7 +10,6 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESalesOrderTotals.inc.php');
 require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
-require_once($cfg['path_bu'] . '/BUStaffAvailable.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -36,10 +35,6 @@ class CTHome extends CTCNC
     function defaultAction()
     {
         switch ($_REQUEST['action']) {
-            case 'updateServiceDetails':
-                $this->updateServiceDetails();
-                break;
-
             default:
                 $this->display();
                 break;
@@ -79,12 +74,6 @@ class CTHome extends CTCNC
         }
 
         $this->displayProjects();
-        /*
-                if ( $this->hasPermissions(PHPLIB_PERM_MAINTENANCE) ||  $this->hasPermissions(PHPLIB_PERM_SUPERVISOR )){
-
-                    $this->displayStaffAvailability();
-                }
-        */
 
         $this->displayTeamPerformanceReport();
 
@@ -159,98 +148,6 @@ class CTHome extends CTCNC
     }
 
     /**
-     * Not called but left here for possible future use as per Adrian Cragg
-     *
-     */
-    function displayStaffAvailability()
-    {
-        $this->setTemplateFiles(
-            array('StaffAvailableList' => 'StaffAvailableList.inc')
-        );
-
-        $buStaffAvailable = new BUStaffAvailable($this);
-        $buStaffAvailable->createRecordsForToday($dsStaffAvailable);
-
-        $buStaffAvailable->getAllStaffAvailable($dsStaffAvailable);
-
-
-        $urlUpdate =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'updateServiceDetails'
-                )
-            );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsStaffAvailable->rowCount() > 0) {
-
-            $this->template->set_block('StaffAvailableList', 'staffAvailableBlock', 'staffAvailables');
-
-            while ($dsStaffAvailable->fetchNext()) {
-
-                $this->template->set_var(
-                    array(
-                        'staffAvailableID' => $dsStaffAvailable->getValue('staffAvailableID'),
-                        'firstName' => Controller::htmlDisplayText($dsStaffAvailable->getValue('firstName')),
-                        'lastName' => Controller::htmlDisplayText($dsStaffAvailable->getValue('lastName')),
-                        'amChecked' => $dsStaffAvailable->getValue('am') > 0 ? CT_CHECKED : '',
-                        'pmChecked' => $dsStaffAvailable->getValue('pm') > 0 ? CT_CHECKED : '',
-                        'urlUpdate' => $urlUpdate
-                    )
-                );
-
-                $this->template->parse('staffAvailables', 'staffAvailableBlock', true);
-
-            }//while $dsStaffAvailable->fetchNext()
-
-            $this->template->set_var(
-                array(
-                    'helpDeskProblems' => Controller::htmlInputText($this->dsHeader->getValue('helpDeskProblems'))
-                )
-            );
-        }
-
-        $this->template->parse('CONTENTS', 'StaffAvailableList', true);
-
-    }
-
-    /**
-     * Update details
-     *
-     * The data comes from the form in an array
-     *
-     * array(
-     *    staffavailableID => value
-     *    am => value,
-     *    pm =>value
-     * )
-     *
-     * @access private
-     */
-    function updateServiceDetails()
-    {
-        $this->setMethodName('updateServiceDetails');
-
-        $buStaffAvailable = new BUStaffAvailable($this);
-        $buStaffAvailable->updateStaffAvailable($_REQUEST['staffAvailable']);
-
-        $buHeader = new BUHeader($this);
-
-        $buHeader->updateHelpDesk($_REQUEST['header']);
-
-        $urlNext =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array()
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
      * Displays list of customers to review
      *
      */
@@ -320,11 +217,11 @@ class CTHome extends CTCNC
 
             $editProjectLink =
                 $this->buildLink('Project.php',
-                    array(
-                        'action' => 'edit',
-                        'projectID' => $project['projectID'],
-                        'backToHome' => true
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'projectID' => $project['projectID'],
+                                     'backToHome' => true
+                                 )
                 );
 
 
@@ -377,17 +274,20 @@ class CTHome extends CTCNC
 
             if (round($result['esTeamActualSlaPercentage']) < $result['esTeamTargetSlaPercentage']) {
 
-                $this->template->set_var('esTeamActualSlaPercentage' . $result['quarter'] . 'Class', 'performance-warn');
+                $this->template->set_var('esTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                                         'performance-warn');
             }
 
             if (round($result['hdTeamActualSlaPercentage']) < $result['hdTeamTargetSlaPercentage']) {
 
-                $this->template->set_var('hdTeamActualSlaPercentage' . $result['quarter'] . 'Class', 'performance-warn');
+                $this->template->set_var('hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                                         'performance-warn');
             }
 
             if (round($result['imTeamActualSlaPercentage']) < $result['imTeamTargetSlaPercentage']) {
 
-                $this->template->set_var('imTeamActualSlaPercentage' . $result['quarter'] . 'Class', 'performance-warn');
+                $this->template->set_var('imTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                                         'performance-warn');
             }
 
             if ($result['esTeamActualFixQty'] < $result['esTeamTargetFixQty']) {
@@ -422,19 +322,22 @@ class CTHome extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'esTeamActualSlaPercentage' . $result['quarter'] => number_format($result['esTeamActualSlaPercentage'], 0),
+                    'esTeamActualSlaPercentage' . $result['quarter'] => number_format($result['esTeamActualSlaPercentage'],
+                                                                                      0),
 
                     'esTeamActualFixHours' . $result['quarter'] => number_format($result['esTeamActualFixHours'], 2),
 
                     'esTeamActualFixQty' . $result['quarter'] => $result['esTeamActualFixQty'],
 
-                    'imTeamActualSlaPercentage' . $result['quarter'] => number_format($result['imTeamActualSlaPercentage'], 0),
+                    'imTeamActualSlaPercentage' . $result['quarter'] => number_format($result['imTeamActualSlaPercentage'],
+                                                                                      0),
 
                     'imTeamActualFixHours' . $result['quarter'] => number_format($result['imTeamActualFixHours'], 2),
 
                     'imTeamActualFixQty' . $result['quarter'] => $result['imTeamActualFixQty'],
 
-                    'hdTeamActualSlaPercentage' . $result['quarter'] => number_format($result['hdTeamActualSlaPercentage'], 0),
+                    'hdTeamActualSlaPercentage' . $result['quarter'] => number_format($result['hdTeamActualSlaPercentage'],
+                                                                                      0),
 
                     'hdTeamActualFixHours' . $result['quarter'] => number_format($result['hdTeamActualFixHours'], 2),
                     'hdTeamActualFixQty' . $result['quarter'] => $result['hdTeamActualFixQty']

@@ -12,4 +12,23 @@
         </preConditions>
         <dropTable tableName="audit_trail"/>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="deshead"/>
+        </preConditions>
+        <dropTable tableName="deshead"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="desline"/>
+        </preConditions>
+        <dropTable tableName="desline"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="domain-import"/>
+        </preConditions>
+        <dropTable tableName="domain-import"/>
+    </changeSet>
+
 </databaseChangeLog>

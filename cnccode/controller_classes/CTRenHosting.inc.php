@@ -347,7 +347,6 @@ class CTRenHosting extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenHosting->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenHosting->getValue('totalInvoiceMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenHosting->getValue('totalInvoiceMonths')),
                 'notes' => Controller::htmlInputText($dsRenHosting->getValue('notes')),
                 'notesMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('notes')),
                 'hostingCompany' => Controller::htmlInputText($dsRenHosting->getValue('hostingCompany')),

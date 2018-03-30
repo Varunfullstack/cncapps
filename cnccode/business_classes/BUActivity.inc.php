@@ -12,6 +12,7 @@ require_once($cfg ["path_dbe"] . "/DBEJContract.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerCallActivityMonth.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECurrentActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItemType.inc.php");
@@ -19,6 +20,7 @@ require_once($cfg ["path_dbe"] . "/DBEJProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivitySearch.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActType.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg ["path_dbe"] . "/DBEProject.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEEscalation.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerNew.inc.php");
@@ -30,8 +32,6 @@ require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEFutureAction.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEFurtherAction.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESiteNew.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
@@ -364,7 +364,12 @@ class BUActivity extends Business
         $dsCallActivity->setValue('endTime', '');
         $dsCallActivity->setValue('status', 'O');
         $dsCallActivity->setValue('reason', '');
-        $dsCallActivity->setValue('siteDesc', $dsSite->getValue('add1'), ' ', $dsSite->getValue('add2'), ' ', $dsSite->getValue('town'));
+        $dsCallActivity->setValue('siteDesc',
+                                  $dsSite->getValue('add1'),
+                                  ' ',
+                                  $dsSite->getValue('add2'),
+                                  ' ',
+                                  $dsSite->getValue('town'));
         $dsCallActivity->post();
     } // end sendServiceReallocatedEmail
 
@@ -503,7 +508,8 @@ class BUActivity extends Business
 
             $dbeProblem->updateRow();
 
-            $this->logOperationalActivity($problemID, 'Escalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo]);
+            $this->logOperationalActivity($problemID,
+                                          'Escalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo]);
         }
 
     } // end sendCritcalEmail
@@ -550,7 +556,8 @@ class BUActivity extends Business
 
             $dbeProblem->updateRow();
 
-            $this->logOperationalActivity($problemID, 'Deescalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo]);
+            $this->logOperationalActivity($problemID,
+                                          'Deescalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo]);
 
         }
     }
@@ -738,7 +745,8 @@ class BUActivity extends Business
         $oldPriority = $dbeProblem->getValue('priority');
         $oldProblemStatus = $dbeProblem->getValue('status');
 
-        $dbeProblem->setValue('awaitingCustomerResponseFlag', $dsCallActivity->getValue('awaitingCustomerResponseFlag'));
+        $dbeProblem->setValue('awaitingCustomerResponseFlag',
+                              $dsCallActivity->getValue('awaitingCustomerResponseFlag'));
         $dbeProblem->setValue('contractCustomerItemID', $dsCallActivity->getValue('contractCustomerItemID'));
         $dbeProblem->setValue('internalNotes', $dsCallActivity->getValue('internalNotes'));
         $dbeProblem->setValue('completeDate', $dsCallActivity->getValue('completeDate'));
@@ -761,7 +769,8 @@ class BUActivity extends Business
 
         // if amended initial call activity date/time then set the problem date raised field to match
         if ($dsCallActivity->getValue('callActTypeID') == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
-            $dbeProblem->setValue('dateRaised', $dsCallActivity->getValue('date') . ' ' . $dsCallActivity->getValue('startTime'));
+            $dbeProblem->setValue('dateRaised',
+                                  $dsCallActivity->getValue('date') . ' ' . $dsCallActivity->getValue('startTime'));
         }
 
         $dbeProblem->updateRow();
@@ -829,7 +838,8 @@ class BUActivity extends Business
                 )
             );
 
-            $this->logOperationalActivity($dsCallActivity->getValue('problemID'), 'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue('priority'));
+            $this->logOperationalActivity($dsCallActivity->getValue('problemID'),
+                                          'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue('priority'));
         }
         /*
     Send emails UNLESS this is an escalation or change request activity type
@@ -2483,7 +2493,11 @@ class BUActivity extends Business
                     $dsOrdhead->setValue('partInvoice', 'N');
                     $dsOrdhead->setValue('payMethod', CONFIG_PAYMENT_TERMS_30_DAYS);
                     $dsOrdhead->post();
-                    $buSalesOrder->updateHeader($dsOrdhead->getValue('ordheadID'), $dsOrdhead->getValue('custPORef'), $dsOrdhead->getValue('payMethod'), $dsOrdhead->getValue('partInvoice'), $dsOrdhead->getValue('addItem'));
+                    $buSalesOrder->updateHeader($dsOrdhead->getValue('ordheadID'),
+                                                $dsOrdhead->getValue('custPORef'),
+                                                $dsOrdhead->getValue('payMethod'),
+                                                $dsOrdhead->getValue('partInvoice'),
+                                                $dsOrdhead->getValue('addItem'));
 
                     $ordheadID = $dsOrdhead->getValue('ordheadID');
                     /*
@@ -2866,12 +2880,21 @@ class BUActivity extends Business
                     fclose($htmlFileHandle); // close previous html file
 
 
-                    $this->postRowToSummaryFile($lastRecord, $dsResults, $dsStatementContact, $newBalance, $topupValue, $dsData->getValue('endDate'));
+                    $this->postRowToSummaryFile($lastRecord,
+                                                $dsResults,
+                                                $dsStatementContact,
+                                                $newBalance,
+                                                $topupValue,
+                                                $dsData->getValue('endDate'));
 
                     $dsStatementContact->initialise();
 
                     if ($update) {
-                        $this->sendGSCStatement($filepath . '.html', $dsStatementContact, $newBalance, $dsData->getValue('endDate'), $topupValue);
+                        $this->sendGSCStatement($filepath . '.html',
+                                                $dsStatementContact,
+                                                $newBalance,
+                                                $dsData->getValue('endDate'),
+                                                $topupValue);
                     }
                     fclose($csvFileHandle); // close previous csv file
                 } // end if( $last_custno != '9999' )
@@ -2880,7 +2903,9 @@ class BUActivity extends Business
                 $this->totalCost = 0; // reset cost
 
 
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr($db->Record ['cus_name'], 0, 10) . $dsData->getValue('endDate');
+                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr($db->Record ['cus_name'],
+                                                              0,
+                                                              10) . $dsData->getValue('endDate');
 
                 $csvFileHandle = fopen($filepath . '.csv', 'wb');
                 if (!$csvFileHandle) {
@@ -2897,7 +2922,9 @@ class BUActivity extends Business
                 $this->template->set_file('page', 'GSCReport.inc.html');
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
-                $buCustomer->getSiteByCustomerIDSiteNo($dsStatementContact->getValue('customerID'), $dsStatementContact->getValue('siteNo'), $dsSite);
+                $buCustomer->getSiteByCustomerIDSiteNo($dsStatementContact->getValue('customerID'),
+                                                       $dsStatementContact->getValue('siteNo'),
+                                                       $dsSite);
 
                 // Set header fields
                 $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $db->Record ['cui_cuino'], 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')), 'add1' => $dsSite->getValue('add1'), 'add2' => $dsSite->getValue('add2'), 'add3' => $dsSite->getValue('add3'), 'town' => $dsSite->getValue('town'), 'county' => $dsSite->getValue('county'), 'postcode' => $dsSite->getValue('postcode'), 'cnc_name' => $this->dsHeader->getValue('name'), 'cnc_add1' => $this->dsHeader->getValue('add1'), 'cnc_add2' => $this->dsHeader->getValue('add2'), 'cnc_add3' => $this->dsHeader->getValue('add3'), 'cnc_town' => $this->dsHeader->getValue('town'), 'cnc_county' => $this->dsHeader->getValue('county'), 'cnc_postcode' => $this->dsHeader->getValue('postcode'), 'cnc_phone' => $this->dsHeader->getValue('phone')));
@@ -2914,9 +2941,11 @@ class BUActivity extends Business
             $posted = FALSE;
 
             if ($db->Record ['curValueFlag'] == 'Y') { // This is a monetary value activity such as top-up or adjustment
-                $this->postRowToPrePayExportFile($csvFileHandle, 'M', // Type = Monetary
-                    $db->Record, 1, // set hours = 1 for calculation
-                    $db->Record ['curValue']);
+                $this->postRowToPrePayExportFile($csvFileHandle,
+                                                 'M', // Type = Monetary
+                                                 $db->Record,
+                                                 1, // set hours = 1 for calculation
+                                                 $db->Record ['curValue']);
                 $posted = TRUE;
             } else {
 
@@ -2927,29 +2956,55 @@ class BUActivity extends Business
                     $max_hours = 0;
                 }
 
-                getRatesAndHours($db->Record ['caa_date'], $db->Record ['caa_starttime'], $db->Record ['caa_endtime'], $db->Record ['cat_min_hours'], $max_hours, $db->Record ['cat_ooh_multiplier'], $db->Record ['cat_itemno'], 'Y', // under contract
-                    $dsHeader, $normalHours, $beforeHours, $afterHours, $outOfHoursRate, $normalRate, 'N');
+                getRatesAndHours($db->Record ['caa_date'],
+                                 $db->Record ['caa_starttime'],
+                                 $db->Record ['caa_endtime'],
+                                 $db->Record ['cat_min_hours'],
+                                 $max_hours,
+                                 $db->Record ['cat_ooh_multiplier'],
+                                 $db->Record ['cat_itemno'],
+                                 'Y', // under contract
+                                 $dsHeader,
+                                 $normalHours,
+                                 $beforeHours,
+                                 $afterHours,
+                                 $outOfHoursRate,
+                                 $normalRate,
+                                 'N');
 
                 if ($beforeHours > 0) {
-                    $this->postRowToPrePayExportFile($csvFileHandle, 'O', // out of hours
-                        $db->Record, $beforeHours, $outOfHoursRate);
+                    $this->postRowToPrePayExportFile($csvFileHandle,
+                                                     'O', // out of hours
+                                                     $db->Record,
+                                                     $beforeHours,
+                                                     $outOfHoursRate);
                     $posted = TRUE;
                 }
                 if ($normalHours > 0) {
-                    $this->postRowToPrePayExportFile($csvFileHandle, 'I', // in hours
-                        $db->Record, $normalHours, $normalRate);
+                    $this->postRowToPrePayExportFile($csvFileHandle,
+                                                     'I', // in hours
+                                                     $db->Record,
+                                                     $normalHours,
+                                                     $normalRate);
                     $posted = TRUE;
                 }
                 if ($afterHours > 0) {
-                    $this->postRowToPrePayExportFile($csvFileHandle, 'O', // out of hours
-                        $db->Record, $afterHours, $outOfHoursRate);
+                    $this->postRowToPrePayExportFile($csvFileHandle,
+                                                     'O', // out of hours
+                                                     $db->Record,
+                                                     $afterHours,
+                                                     $outOfHoursRate);
                     $posted = TRUE;
                 }
             }
 
             if ($posted == FALSE) { // No hours to post but need a line
                 $this->postRowToPrePayExportFile( // e.g. for top-up activity or value activity
-                    $csvFileHandle, 'I', $db->Record, 0, 0);
+                    $csvFileHandle,
+                    'I',
+                    $db->Record,
+                    0,
+                    0);
             }
 
             if ($update) {
@@ -2963,10 +3018,6 @@ class BUActivity extends Business
             }
             $lastRecord = $db->Record;
         }
-        while ($db->next_record())
-            ;
-        //close file
-
 
         if ($ret == TRUE) {
             fclose($csvFileHandle);
@@ -2978,11 +3029,20 @@ class BUActivity extends Business
             fwrite($htmlFileHandle, $this->template->get_var('output'));
             fclose($htmlFileHandle);
 
-            $this->postRowToSummaryFile($lastRecord, $dsResults, $dsStatementContact, $newBalance, $topupValue, $dsData->getValue('endDate'));
+            $this->postRowToSummaryFile($lastRecord,
+                                        $dsResults,
+                                        $dsStatementContact,
+                                        $newBalance,
+                                        $topupValue,
+                                        $dsData->getValue('endDate'));
 
             if ($update) {
                 $dsStatementContact->initialise();
-                $this->sendGSCStatement($filepath . '.html', $dsStatementContact, $newBalance, $dsData->getValue('endDate'), $topupValue);
+                $this->sendGSCStatement($filepath . '.html',
+                                        $dsStatementContact,
+                                        $newBalance,
+                                        $dsData->getValue('endDate'),
+                                        $topupValue);
             }
         }
 
@@ -3019,10 +3079,14 @@ class BUActivity extends Business
                 $db->next_record();
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
-                $buCustomer->getSiteByCustomerIDSiteNo($dsStatementContact->getValue('customerID'), $dsStatementContact->getValue('siteNo'), $dsSite);
+                $buCustomer->getSiteByCustomerIDSiteNo($dsStatementContact->getValue('customerID'),
+                                                       $dsStatementContact->getValue('siteNo'),
+                                                       $dsSite);
 
                 // set up new html file template
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr($db->Record ['cus_name'], 0, 10) . $dsData->getValue('endDate');
+                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr($db->Record ['cus_name'],
+                                                              0,
+                                                              10) . $dsData->getValue('endDate');
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
                     $this->raiseError("Unable to open html file " . $filepath);
@@ -3046,10 +3110,19 @@ class BUActivity extends Business
                 $dsStatementContact->initialise();
                 $topupValue = $this->doTopUp($db->Record, $update);
 
-                $this->postRowToSummaryFile($db->Record, $dsResults, $dsStatementContact, $db->Record ['curGSCBalance'], $topupValue, $dsData->getValue('endDate'));
+                $this->postRowToSummaryFile($db->Record,
+                                            $dsResults,
+                                            $dsStatementContact,
+                                            $db->Record ['curGSCBalance'],
+                                            $topupValue,
+                                            $dsData->getValue('endDate'));
 
                 if ($update) {
-                    $this->sendGSCStatement($filepath . '.html', $dsStatementContact, $db->Record ['curGSCBalance'], $dsData->getValue('endDate'), $topupValue);
+                    $this->sendGSCStatement($filepath . '.html',
+                                            $dsStatementContact,
+                                            $db->Record ['curGSCBalance'],
+                                            $dsData->getValue('endDate'),
+                                            $topupValue);
                 }
             }
         }
@@ -3111,7 +3184,11 @@ class BUActivity extends Business
         $dsOrdhead->setValue('partInvoice', 'N');
         $dsOrdhead->setValue('payMethod', CONFIG_PAYMENT_TERMS_30_DAYS);
         $dsOrdhead->post();
-        $buSalesOrder->updateHeader($dsOrdhead->getValue('ordheadID'), $dsOrdhead->getValue('custPORef'), $dsOrdhead->getValue('payMethod'), $dsOrdhead->getValue('partInvoice'), $dsOrdhead->getValue('addItem'));
+        $buSalesOrder->updateHeader($dsOrdhead->getValue('ordheadID'),
+                                    $dsOrdhead->getValue('custPORef'),
+                                    $dsOrdhead->getValue('payMethod'),
+                                    $dsOrdhead->getValue('partInvoice'),
+                                    $dsOrdhead->getValue('addItem'));
 
         $ordheadID = $dsOrdhead->getValue('ordheadID');
         $sequenceNo = 1;
@@ -3149,10 +3226,11 @@ class BUActivity extends Business
             $contacts .= $dsStatementContact->getValue('firstName') . ' ' . $dsStatementContact->getValue('lastName');
         }
         // to CSV file
-        fwrite($this->csvSummaryFileHandle, '"' . $Record ['cus_name'] . '",' . '"' . $Record ['curGSCBalance'] . '",' . // previous balance
-            '"' . common_numberFormat($newBalance) . '",' . // hours
-            '"' . common_numberFormat($topupAmount) . '"' . // value
-            "\r\n");
+        fwrite($this->csvSummaryFileHandle,
+               '"' . $Record ['cus_name'] . '",' . '"' . $Record ['curGSCBalance'] . '",' . // previous balance
+               '"' . common_numberFormat($newBalance) . '",' . // hours
+               '"' . common_numberFormat($topupAmount) . '"' . // value
+               "\r\n");
         $webFileLink = 'export/PP_' . substr($Record ['cus_name'], 0, 10) . $endDate . '.html';
 
         $dsResults->setUpdateModeInsert();
@@ -3269,11 +3347,12 @@ is currently a balance of ';
         $contacts = trim($Record ['cns_name']) . '/' . trim($Record ['con_first_name']) . ' ' . trim($Record ['con_last_name']);
 
         // to CSV file
-        fwrite($csvFileHandle, '"' . $Record ['cus_name'] . '",' . '"' . $Record ['activityDate'] . '",' . '"' . $Record ['add_postcode'] . '",' . '"' . $Record ['caa_callactivityno'] . '",' . '"' . $details . '",' . '"' . $contacts . '",' . '"' . trim($Record ['cat_desc']) . '",' . // type
-            '"' . common_numberFormat($hours) . '",' . // hours
-            '"",' . // empty string
-            '"' . common_numberFormat($value) . '"' . // value
-            "\r\n");
+        fwrite($csvFileHandle,
+               '"' . $Record ['cus_name'] . '",' . '"' . $Record ['activityDate'] . '",' . '"' . $Record ['add_postcode'] . '",' . '"' . $Record ['caa_callactivityno'] . '",' . '"' . $details . '",' . '"' . $contacts . '",' . '"' . trim($Record ['cat_desc']) . '",' . // type
+               '"' . common_numberFormat($hours) . '",' . // hours
+               '"",' . // empty string
+               '"' . common_numberFormat($value) . '"' . // value
+               "\r\n");
 
         if ($timeFrameFlag == 'M') { // Monetary value like topup
             $contacts = '';
@@ -3402,7 +3481,8 @@ is currently a balance of ';
 
         $dateTimeRaised = $_SESSION [$sessionKey] ['dateRaised'] . ' ' . $_SESSION [$sessionKey] ['timeRaised'] . ':00';
 
-        $slaResponseHours = $this->getSlaResponseHours($_SESSION [$sessionKey] ['priority'], $_SESSION [$sessionKey] ['customerID']);
+        $slaResponseHours = $this->getSlaResponseHours($_SESSION [$sessionKey] ['priority'],
+                                                       $_SESSION [$sessionKey] ['customerID']);
 
         /*
     * Create a new problem
@@ -3744,7 +3824,10 @@ customer with the past 8 hours email to GL
         if ($dbeCustomerItem->getGSCRow($customerID)) {
             $reason = 'Prepay Adjustment';
 
-            $callActivityID = $this->createActivityFromCustomerID($customerID, false, 'C', $dbeCustomerItem->getValue('customerItemID'));
+            $callActivityID = $this->createActivityFromCustomerID($customerID,
+                                                                  false,
+                                                                  'C',
+                                                                  $dbeCustomerItem->getValue('customerItemID'));
 
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->getRow($callActivityID);
@@ -3801,7 +3884,10 @@ customer with the past 8 hours email to GL
         $this->getData($dbeCustomerCallActivity, $dsServiceDesk);
 
         $dbeCustomerCallActivity->getMonthyActivityByContract(false, // t and m
-            $customerID, $userID, $fromDate, $toDate);
+                                                              $customerID,
+                                                              $userID,
+                                                              $fromDate,
+                                                              $toDate);
 
         $this->getData($dbeCustomerCallActivity, $dsTAndM);
 
@@ -6096,9 +6182,7 @@ customer with the past 8 hours email to GL
                 => CONFIG_SERVICE_REQUEST_DESC,
                 'priority' => $this->priorityArray[$dbeJProblem->getValue('priority')],
                 'reason' => $dbeFirstActivity->getValue('reason'),
-                'lastActivityReason'
-                => $dbeLastActivity->getValue('reason'),
-                'contactFirstName' => $dbeLastActivity->getValue('contactFirstName'),
+                'lastActivityReason' => $dbeLastActivity->getValue('reason'),
                 'responseDetails' => strtolower($this->getResponseDetails($dbeFirstActivity, $buCustomerItem)),
                 'technicianResponsible'
                 => $dbeJProblem->getValue('engineerName')
@@ -6633,7 +6717,12 @@ customer with the past 8 hours email to GL
             $details .= '<ul>' . $image . '</ul>';
         }
 
-        $this->createSecondsiteSR($customerID, $contractCustomerItemID, $detailsWithoutDriveLetters, $details, $serverName, $serverCustomerItemID);
+        $this->createSecondsiteSR($customerID,
+                                  $contractCustomerItemID,
+                                  $detailsWithoutDriveLetters,
+                                  $details,
+                                  $serverName,
+                                  $serverCustomerItemID);
     }
 
     function createSecondsiteSR(
@@ -6766,7 +6855,12 @@ customer with the past 8 hours email to GL
     {
         $details = '<p><strong>Image Location ' . $networkPath . ' cannot be found for ' . $serverName . '</p>';
 
-        $this->createSecondsiteSR($customerID, $contractCustomerItemID, $details, $details, $serverName, $serverCustomerItemID);
+        $this->createSecondsiteSR($customerID,
+                                  $contractCustomerItemID,
+                                  $details,
+                                  $details,
+                                  $serverName,
+                                  $serverCustomerItemID);
     }
 
     public function updateLinkedSalesOrder($callActivityID, $salesOrderID)
@@ -6854,6 +6948,7 @@ customer with the past 8 hours email to GL
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
                 break;
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 4:
                 $usedMinutes = $this->getIMTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
@@ -6907,7 +7002,6 @@ customer with the past 8 hours email to GL
                     'activityType' => $dsActivities->getValue('activityType'),
                     'contactName' => $dsActivities->getValue('contactName'),
                     'duration' => number_format($dsActivities->getValue('durationMinutes') / 60, 2),
-                    'contactName' => $dsActivities->getValue('contactName'),
                     'userName' => $dsActivities->getValue('userName'),
                 )
             );
@@ -6981,19 +7075,23 @@ customer with the past 8 hours email to GL
         $this->dbeProblem->getRow($problemID);
 
         if ($level == 1) {
-            $this->dbeProblem->setValue(DBEProblem::hdLimitMinutes, $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutes);
+            $this->dbeProblem->setValue(DBEProblem::hdLimitMinutes,
+                                        $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutes);
             $this->dbeProblem->setValue(DBEProblem::hdTimeAlertFlag, 'N'); // reset alert flag
         } elseif ($level == 2) {
-            $this->dbeProblem->setValue(DBEProblem::esLimitMinutes, $this->dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutes);
+            $this->dbeProblem->setValue(DBEProblem::esLimitMinutes,
+                                        $this->dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutes);
             $this->dbeProblem->setValue(DBEProblem::esTimeAlertFlag, 'N');
         } else {
-            $this->dbeProblem->setValue(DBEProblem::imLimitMinutes, $this->dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutes);
+            $this->dbeProblem->setValue(DBEProblem::imLimitMinutes,
+                                        $this->dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutes);
             $this->dbeProblem->setValue(DBEProblem::imTimeAlertFlag, 'N');
         }
 
         $this->dbeProblem->updateRow();
 
-        $this->logOperationalActivity($problemID, '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
+        $this->logOperationalActivity($problemID,
+                                      '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>');
 
         $this->sendTimeAllocatedEmail($minutes, $comments);
     }

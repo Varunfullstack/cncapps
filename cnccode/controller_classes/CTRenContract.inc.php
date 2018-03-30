@@ -365,7 +365,6 @@ class CTRenContract extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenContract->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenContract->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenContract->getValue('totalInvoiceMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenContract->getValue('totalInvoiceMonths')),
                 'curUnitCost' => $dsRenContract->getValue('curUnitCost'),
                 'curUnitSale' => $dsRenContract->getValue('curUnitSale'),
                 'notes' => Controller::htmlInputText($dsRenContract->getValue('notes')),

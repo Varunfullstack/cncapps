@@ -10,7 +10,7 @@ require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_bu"] . "/BUItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenBroadband.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenBroadband.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenBroadband extends Business
