@@ -841,6 +841,9 @@ class BUActivity extends Business
             $this->logOperationalActivity($dsCallActivity->getValue('problemID'),
                                           'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue('priority'));
         }
+
+        $this->sendMonitoringEmails($dbeCallActivity->getValue('callActivityID'));
+
         /*
     Send emails UNLESS this is an escalation or change request activity type
     */
@@ -883,7 +886,7 @@ class BUActivity extends Business
                 $this->sendCriticalEmail($dbeCallActivity->getValue('callActivityID'));
             }
 
-            $this->sendMonitoringEmails($dbeCallActivity->getValue('callActivityID'));
+
 
 
             /*
