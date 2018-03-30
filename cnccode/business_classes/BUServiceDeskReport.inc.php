@@ -275,7 +275,7 @@ class BUServiceDeskReport extends Business
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
           COUNT(*) AS count
         FROM
-          problem
+          probleml
           JOIN contact ON con_contno = pro_contno";
 
         $sql .=

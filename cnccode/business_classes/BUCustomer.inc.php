@@ -411,6 +411,7 @@ class BUCustomer extends Business
         $dsContact->setValue('Mailshot8Flag', $this->dsHeader->getValue("mailshot8FlagDef"));
         $dsContact->setValue('Mailshot9Flag', $this->dsHeader->getValue("mailshot9FlagDef"));
         $dsContact->setValue('Mailshot10Flag', $this->dsHeader->getValue("mailshot10FlagDef"));
+        $dsContact->setValue('Mailshot11Flag', $this->dsHeader->getValue("mailshot11FlagDef"));
         $dsContact->post();
         $this->updateModify($dsContact->getValue('CustomerID'));
         return TRUE;

@@ -145,6 +145,7 @@ class CTCustomer extends CTCNC
             $this->dsContact->setValue('Mailshot8Flag', $this->getYN($value['mailshot8Flag']));
             $this->dsContact->setValue('Mailshot9Flag', $this->getYN($value['mailshot9Flag']));
             $this->dsContact->setValue('Mailshot10Flag', $this->getYN($value['mailshot10Flag']));
+            $this->dsContact->setValue('Mailshot11Flag', $this->getYN($value['mailshot11Flag']));
             $this->dsContact->setValue('WorkStartedEmailFlag', $this->getYN($value['workStartedEmailFlag']));
             $this->dsContact->setValue('AutoCloseEmailFlag', $this->getYN($value['autoCloseEmailFlag']));
             $this->dsContact->setValue('FailedLoginCount', $value['failedLoginCount']);
@@ -1217,6 +1218,7 @@ ORDER BY cus_name ASC  ";
                 'mailshot8FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
                 'mailshot9FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
                 'mailshot10FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot10FlagDesc"),
+                'mailshot11FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot11FlagDesc"),
                 'submitURL' => $submitURL,
                 'renewalLink' => $renewalLink,
                 'passwordLink' => $passwordLink,
@@ -1644,6 +1646,7 @@ ORDER BY cus_name ASC  ";
                     'mailshot8FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot8Flag")),
                     'mailshot9FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot9Flag")),
                     'mailshot10FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot10Flag")),
+                    'mailshot11FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot11Flag")),
                     'workStartedEmailFlagChecked' => $this->getChecked($this->dsContact->getValue('WorkStartedEmailFlag')),
                     'autoCloseEmailFlagChecked' => $this->getChecked($this->dsContact->getValue('AutoCloseEmailFlag')),
                     'clientFormURL' => $clientFormURL,

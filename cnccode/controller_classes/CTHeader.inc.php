@@ -146,6 +146,8 @@ class CTHeader extends CTCNC
                 'mailshot9FlagDefChecked' => $this->getChecked($dsHeader->getValue('mailshot9FlagDef')),
                 'mailshot10FlagDesc' => Controller::htmlInputText($dsHeader->getValue('mailshot10FlagDesc')),
                 'mailshot10FlagDefChecked' => $this->getChecked($dsHeader->getValue('mailshot10FlagDef')),
+                'mailshot11FlagDesc' => Controller::htmlInputText($dsHeader->getValue('mailshot11FlagDesc')),
+                'mailshot11FlagDefChecked' => $this->getChecked($dsHeader->getValue('mailshot11FlagDef')),
                 'priority1Desc' => Controller::htmlInputText($dsHeader->getValue('priority1Desc')),
                 'priority1DescMessage' => Controller::htmlDisplayText($dsHeader->getMessage('priority1Desc')),
                 'priority2Desc' => Controller::htmlInputText($dsHeader->getValue('priority2Desc')),

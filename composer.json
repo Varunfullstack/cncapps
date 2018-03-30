@@ -3,6 +3,7 @@
     "dompdf/dompdf" : "0.6.*",
     "doctrine/orm": "^2.5",
     "doctrine/migrations": "^1.5",
-    "syonix/changelog-viewer": "^0.1.7"
+    "syonix/changelog-viewer": "^0.1.7",
+    "crossjoin/pre-mailer": "^1.0"
   }
 }

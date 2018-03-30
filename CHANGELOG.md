@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 189 - Add version number to menu
 - Issue 183 - Add the ability to add time to a service request when in the managers queue
 - Issue 186 - Time limit request bug with IMT team
+- Issue 184 - Request 038 - Daily Open SR Report for customers
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
