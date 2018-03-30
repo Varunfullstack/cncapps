@@ -887,8 +887,6 @@ class BUActivity extends Business
             }
 
 
-
-
             /*
       If this is a future on-site visit then send notification email( issue #8750 )
       */
@@ -7510,8 +7508,6 @@ customer with the past 8 hours email to GL
 
     private function sendMonitoringEmails($callActivityID)
     {
-
-
         $buMail = new BUMail($this);
 
         $dbeJCallActivity = new DBEJCallActivity($this);
@@ -7562,6 +7558,7 @@ customer with the past 8 hours email to GL
                 'activityDate' => $dbeJCallActivity->getValue(DBEJCallActivity::date),
                 'activityStartTime' => $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
                 'activityEndTime' => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
+                'activityTypeName' => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
                 'urlActivity' => $urlActivity,
                 'userName' => $dbeJCallActivity->getValue('userName'),
                 'durationHours' => $durationHours,
@@ -7617,7 +7614,7 @@ customer with the past 8 hours email to GL
     {
         global $db;
 
-        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID";
+        $sql = "SELECT * FROM problem_monitoring left join consultant on problem_monitoring.cons_no = consultant.cns_consno WHERE problemId = $problemID";
 
 
         $db->query($sql);
