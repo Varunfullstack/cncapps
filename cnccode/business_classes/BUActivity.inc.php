@@ -5820,7 +5820,8 @@ customer with the past 8 hours email to GL
         $dbeProblem->updateRow();
 
         $this->createFixedActivity($problemID, $resolutionSummary);
-
+        
+        $this->sendMonitoringEmails($this->getLastActivityInProblem($problemID));
         if ($dbeProblem->getValue('escalatedUserID')) {
 
             $this->sendNotifyEscalatorUserEmail($problemID);
