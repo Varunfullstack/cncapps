@@ -24,11 +24,29 @@
         </preConditions>
         <dropTable tableName="desline"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue194-1522396685-3">
+    <changeSet author="pavwebdev" id="issue194-1522396685-4">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="domain-import"/>
         </preConditions>
         <dropTable tableName="domain-import"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-5">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="date_xref"/>
+        </preConditions>
+        <dropTable tableName="date_xref"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-6">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="futher_action"/>
+        </preConditions>
+        <dropTable tableName="futher_action"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-6">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="future_action"/>
+        </preConditions>
+        <dropTable tableName="future_action"/>
     </changeSet>
 
 </databaseChangeLog>
