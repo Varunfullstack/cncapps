@@ -8,11 +8,11 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenContract.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenDomain.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenBroadband.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenQuotation.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenHosting.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenContract.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenDomain.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenBroadband.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenQuotation.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenHosting.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
