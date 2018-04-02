@@ -7561,7 +7561,7 @@ customer with the past 8 hours email to GL
                 'activityTypeName' => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
                 'urlActivity' => $urlActivity,
                 'userName' => $dbeJCallActivity->getValue('userName'),
-                'durationHours' => $durationHours,
+                'durationHours' => round($durationHours, 2),
                 'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
                 'awaitingCustomerResponse' => $awaitingCustomerResponse,
                 'customerName' => $dbeJCallActivity->getValue('customerName'),

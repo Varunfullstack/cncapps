@@ -22,14 +22,13 @@
     </style>
 </head>
 <body>
-<p>New activity logged by {userName} against monitoring SR for {customerName}</p>
+<p>New activity logged by {userName} against monitored SR <A href="{urlActivity}">{activityRef}</A></p>
 <p>{requestStatus}</p>
 <p>Date: {activityDate}</p>
 <p>Start Time: {activityStartTime}</p>
 <p>End Time: {activityEndTime}</p>
 <p>Activity Type: {activityTypeName}</p>
 <p>{awaitingCustomerResponse}</p>
-<p>{CONFIG_SERVICE_REQUEST_DESC} <A href="{urlActivity}">{activityRef}</A></p>
 <p>{reason}.</p>
 <p>{durationHours} hours spent.</p>
 </body>
