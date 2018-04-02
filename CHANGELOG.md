@@ -1,13 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
-##[1.5.1]
-- Issue 188 - New P5 SR for SSL hardcoded change
-
 ## [unreleased]
 
 ### Added
 - Issue 195 - Graph to show user productivity
+
+##[1.5.1]
+- Issue 188 - New P5 SR for SSL hardcoded change
+
 
 ##[1.5.0]
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
