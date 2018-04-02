@@ -42,11 +42,18 @@
         </preConditions>
         <dropTable tableName="futher_action"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue194-1522396685-6">
+    <changeSet author="pavwebdev" id="issue194-1522396685-7">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="future_action"/>
         </preConditions>
         <dropTable tableName="future_action"/>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-8">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="staffavailable"/>
+        </preConditions>
+        <dropTable tableName="staffavailable"/>
+    </changeSet>
+
 
 </databaseChangeLog>
