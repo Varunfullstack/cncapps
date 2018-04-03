@@ -1,5 +1,6 @@
 <!-- Template: PasswordSearch.inc.html -->
 <script language='JavaScript' src="CommonJS.js"></script>
+<link rel="stylesheet" href="/font-awesome/css/font-awesome.css"/>
 <script type="text/javascript">
 
 
@@ -24,13 +25,19 @@
         }
     }
 </script>
+<style>
+    input[type=text], select { padding: 5px; width: 230px; font-size: 14px }
+    button { padding: 5px 9px; font-size: 14px; }
+    hr { margin-top: 20px;}
+</style>
+
 <H2>{customerName}</H2>
 
 <form name="search" id="search" method="post" action="{urlSubmit}">
     <input type="hidden" name="action" value="search">
     <table width="500px" border="0" cellspacing="0" cellpadding="1">
         <tr>
-            <td width="100" class="promptText">
+            <td width="130" class="promptText">
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -44,13 +51,13 @@
                     type="text" id="customerString" name="customerString"
                     value="{customerString}" onFocus="javascript:saveCustomerString()"
                     onBlur="javascript:validateCustomerString()"
-                    maxlength="50"> <font class="formErrorMessage">
-                {customerStringMessage} </font></td>
+                    maxlength="50">
+                <button>search <i class="fa fa-search" aria-hidden="true"></i></button></td>
         </tr>
         <tr>
-            <td></td>
-            <td><input type="submit" name="submit" value="search"></td>
-
+            <td><font class="formErrorMessage">
+                {customerStringMessage} </font></td>
+        </tr>
     </table>
 
 </form>
@@ -59,11 +66,10 @@
 <input type="hidden" name="action" value="search">
 <table width="500px" border="0" cellspacing="0" cellpadding="1">
     <tr>
-        <td width="100" class="promptText">
+        <td width="130" class="promptText">
             <div align="right">Lead Status Search</div>
         </td>
         <td>
-        <td class="content">
             <select id="customerLeadSelector">
                 <option value="">-- Search All --</option>
                 <!-- BEGIN customerLeadStatusBlock -->
@@ -73,14 +79,11 @@
                 </option>
                 <!-- END customerLeadStatusBlock -->
             </select>
-        </td>
+            <button onclick="searchCustomers()">search <i class="fa fa-search" aria-hidden="true"></i></button>
         </td>
     </tr>
-    <tr>
-        <td></td>
-        <td><input type="button" name="submit" value="search" onclick="searchCustomers()"></td>
 </table>
-
+<hr />
 
 <link rel="stylesheet" type="text/css"
       href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>

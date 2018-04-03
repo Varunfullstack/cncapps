@@ -265,6 +265,13 @@
     #customerNoteModifiedText {
         display: inline-block;
     }
+    #textareas { float: left; min-width: 500px; width: 1060px; }
+    #textareas .textarea { float: left; margin-right: 20px; min-height: 50px; width: 500px; max-width: 530px; }
+    .cke { width: 500px !important; margin-bottom: 15px; }
+    .textarea .label { line-height: 26px; font-size: 14px; }
+    @media screen and (max-width: 1600px) {
+        #textareas { width: 530px; }
+    }
 </style>
 
 <span class="formError">{errorMessage}</span>
@@ -803,51 +810,52 @@
                 </td>
             </tr>
         </table>
-        <center>
-            <button {disabled} name="Go" style="padding: 5px 10px; margin-top: 20px; font-size: 16px;"><i
-                    class="fa fa-floppy-o" aria-hidden="true"></i> Save
-            </button>
-        </center>
     </div>
 
-    <div id="col2">
+    <div id="textareas">
 
-
-        <div class="content label">
-            Comments
+        <div class="textarea">
+            <div class="content label">
+                Comments
+            </div>
+            <textarea name="form[customer][{customerID}][CrmComments]" id="crmComments">{CrmComments}</textarea>
+            <script type="text/javascript">
+                reason = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
+            </script>
         </div>
-        <textarea name="form[customer][{customerID}][CrmComments]" id="crmComments">{CrmComments}</textarea>
-        <script type="text/javascript">
-            reason = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
-        </script>
-        <div class="content label">
-            Company Background
+        <div class="textarea">
+            <div class="content label">
+                Company Background
+            </div>
+            <textarea name="form[customer][{customerID}][CompanyBackground]"
+                      id="CompanyBackground">{CompanyBackground}</textarea>
+            <script type="text/javascript">
+                reason = CKEDITOR.replace('CompanyBackground', {customConfig: '/ckeditor_config.js'});
+            </script>
         </div>
-        <textarea name="form[customer][{customerID}][CompanyBackground]"
-                  id="CompanyBackground">{CompanyBackground}</textarea>
-        <script type="text/javascript">
-            reason = CKEDITOR.replace('CompanyBackground', {customConfig: '/ckeditor_config.js'});
-        </script>
-    </div>
-
-    <div id="col3">
-        <div class="content label">
-            Decision Maker Background
+        <div class="textarea">
+            <div class="content label">
+                Decision Maker Background
+            </div>
+            <textarea name="form[customer][{customerID}][DecisionMakerBackground]"
+                      id="DecisionMakerBackground">{DecisionMakerBackground}</textarea>
+            <script type="text/javascript">
+                reason = CKEDITOR.replace('DecisionMakerBackground', {customConfig: '/ckeditor_config.js'});
+            </script>
         </div>
-        <textarea name="form[customer][{customerID}][DecisionMakerBackground]"
-                  id="DecisionMakerBackground">{DecisionMakerBackground}</textarea>
-        <script type="text/javascript">
-            reason = CKEDITOR.replace('DecisionMakerBackground', {customConfig: '/ckeditor_config.js'});
-        </script>
-
-        <div class="content label">
-            Opportunity Deal
+        <div class="textarea">
+            <div class="content label">
+                Opportunity Deal
+            </div>
+            <textarea name="form[customer][{customerID}][OpportunityDeal]"
+                      id="OpportunityDeal">{OpportunityDeal}</textarea>
+            <script type="text/javascript">
+                reason = CKEDITOR.replace('OpportunityDeal', {customConfig: '/ckeditor_config.js'});
+            </script>
         </div>
-        <textarea name="form[customer][{customerID}][OpportunityDeal]"
-                  id="OpportunityDeal">{OpportunityDeal}</textarea>
-        <script type="text/javascript">
-            reason = CKEDITOR.replace('OpportunityDeal', {customConfig: '/ckeditor_config.js'});
-        </script>
+        <button {disabled} name="Go" style="padding: 5px 10px; font-size: 16px;"><i
+                class="fa fa-floppy-o" aria-hidden="true"></i> Save Changes
+        </button>
     </div>
 
 </form>
