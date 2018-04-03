@@ -25,7 +25,7 @@
     }
 
     h1 {
-        font-size: 14pt;
+        font-size: 16pt; font-weight: bold; text-decoration: underline; margin: 0 auto 20px auto; display: inline-block;
     }
 
     h2 {
@@ -39,6 +39,8 @@
     table {
         border-collapse: collapse;
         padding: 10px;
+        alignment: center;
+        margin: 5px auto;
     }
 
     table, th, td {
@@ -48,6 +50,11 @@
     .pageBreak {
         page-break-after: always;
     }
+
+    table.collapse {
+        border-collapse: collapse; margin: 0 auto; border: 1px solid #666;
+    }
+    table.collapse td { padding: 3px; }
 
     table.invisible, table.invisible th, table.invisible td {
         border: none;
@@ -60,15 +67,23 @@
     .test td {
         display: inline-block;
     }
+    .graph {
+        display: block; margin: 20px auto;
+    }
+    .ul3 { margin: 0 auto; padding: 0; max-width: 800px; display: block }
+    .ul3 li { width: 33%; list-style-type: none; float: left; display: inline-block; }
+
+    .break { display: block; width: 100%; clear: both }
 
 </style>
 <div class="pageSize">
-    <h1>{customerName} - Review Meeting {meetingDate}</h1>
+    <center><p><img src="/images/CNC-Logo.png" alt="" /></p>
+        <br />
+    <h1>{customerName} - Review Meeting {meetingDate}</h1></center>
 
     <h2>Support</h2>
 
-    <h3>Service Level Agreement</h3>
-    <table style="width: 40%" class="invisible">
+    <table class="collapse">
         <tr>
             <th style="text-align: left;">SR Priority</th>
             <td style="text-align: center;">1</td>
@@ -88,50 +103,47 @@
         </tr>
     </table>
 
+    <div id="charts">
+    {chart}
+    </div>
 
     <h3>Supported Users</h3>
-    <table style="width: 60%" class="invisible test">
+    <ul class="ul3">
         {supportContactInfo}
+    </ul>
+
+    <div class="break"></div>
+
+
+        <table class="collapse" style="width: 600px">
+            <tbody><!-- BEGIN rootCauseBlock -->
+            <tr>
+
+                <td>{srRootCauseDescription}</td>
+                <td>{srCount}</td>
+
+            </tr><!-- END rootCauseBlock -->
+            </tbody>
+        </table>
+
+    <h3>Service Request Count</h3>
+    <table class="collapse" style="width: 450px;">
+        <tbody>
+        <!-- BEGIN userBlock -->
+        <tr>
+            <td>
+                {srUserName}
+            </td>
+            <td>
+                {srCount}
+            </td>
+        </tr>
+        <!-- END userBlock -->
+        </tbody>
     </table>
 
-    <section>
-        <h3>Service Request Count</h3>
-        <table class="visible test" style="width: 60%">
-            <tbody>
-            <tr>
-                <!-- BEGIN userBlock -->
-                <td style="width: 120px">
-                    <div>
-                        {srUserName}
-                    </div>
-                    <div>
-                        {srCount}
-                    </div>
-                </td>
-                <!-- END userBlock -->
-            </tr>
-            </tbody>
-        </table>
-        <table class="visible test" style="width: 60%">
-            <tbody>
-            <tr>
-                <!-- BEGIN rootCauseBlock -->
-                <td style="width: 220px">
-                    <div>
-                        {srRootCauseDescription}
-                    </div>
-                    <div>
-                        {srCount}
-                    </div>
-                </td>
-                <!-- END rootCauseBlock -->
-            </tr>
-            </tbody>
-        </table>
 
-    </section>
-
-    <table class="invisible">
+    <table class="collapse">
         <tbody>
         <tr>
             <td style="vertical-align: top">
@@ -151,7 +163,7 @@
 
     <section>
         <h3>Service Request Stats</h3>
-        {chart}
+
     </section>
 
     <section>
