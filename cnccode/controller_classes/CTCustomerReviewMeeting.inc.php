@@ -534,7 +534,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 ],
                 "avgResponse" => [
                     "data" => [],
-                    "2ndAxis" => true,
+                    "2ndAxis" => false,
                     "legend" => 'Avg. response',
                 ],
                 "changes" => [
@@ -556,7 +556,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 ],
                 "avgResponse" => [
                     "data" => [],
-                    "2ndAxis" => true,
+                    "2ndAxis" => false,
                     "legend" => 'Avg. response',
                 ],
                 "changes" => [
@@ -578,7 +578,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 ],
                 "avgResponse" => [
                     "data" => [],
-                    "2ndAxis" => true,
+                    "2ndAxis" => false,
                     "legend" => 'Avg. response',
                 ],
                 "changes" => [
@@ -608,7 +608,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
         foreach ($data as $row) {
 
-            $dataX[] = $row['monthName'] . "-" . $row['year'];
+            $dataX[] = substr($row['monthName'], 0, 3) . "-" . $row['year'];
             $serverCareIncidents["plots"]["serverSR"]["data"][] = $row['serverCareCount1And3'];
             $serverCareIncidents["plots"]["avgResponse"]["data"][] = number_format($row['serverCareHoursResponded'], 1);
             $serverCareIncidents["plots"]['changes']["data"][] = $row['serverCareCount4'];
@@ -627,17 +627,17 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
 
-        return '<img src="' . $this->generateGraph($serverCareIncidents, $dataX) . '">
-        <img src="' . $this->generateGraph($serviceDesk, $dataX) . '">
-        <img src="' . $this->generateGraph($otherContracts, $dataX) . '">
-        <img src="' . $this->generateGraph($totalSR, $dataX) . '">';
+        return '<img class="graph" src="' . $this->generateGraph($serverCareIncidents, $dataX) . '">
+        <img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '">
+        <img class="graph" src="' . $this->generateGraph($otherContracts, $dataX) . '">
+        <img class="graph" src="' . $this->generateGraph($totalSR, $dataX) . '">';
     }
 
     private function generateGraph($data, $dataX)
     {
         JpGraph\JpGraph::load();
         JpGraph\JpGraph::module('line');
-        $graph = new Graph(400, 400);
+        $graph = new Graph(700, 400);
         $graph->img->SetAntiAliasing(false);
         $graph->title->Set($data['title']);
         $graph->title->SetFont(FF_ARIAL, FS_BOLD, 12);
@@ -653,8 +653,8 @@ class CTCustomerReviewMeeting extends CTCNC
         $graph->xaxis->SetPos('min');
 
 // Use Times font
-        $graph->xaxis->SetFont(FF_TIMES, FS_NORMAL, 11);
-        $graph->yaxis->SetFont(FF_TIMES, FS_NORMAL, 9);
+        $graph->xaxis->SetFont(FF_ARIAL, FS_NORMAL, 8);
+        $graph->yaxis->SetFont(FF_ARIAL, FS_NORMAL, 9);
 //
 //// Set colors for axis
         $graph->xaxis->SetColor('black');
@@ -674,7 +674,7 @@ class CTCustomerReviewMeeting extends CTCNC
         foreach ($data["plots"] as $key => $plot) {
 
             $p1 = new LinePlot($plot["data"]);
-            $p1->SetWeight(20000);
+            $p1->SetWeight(10);
             $p1->SetLegend($plot["legend"]);
             $p1->SetStyle('solid');
             if ($plot["2ndAxis"]) {
@@ -691,7 +691,7 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
         $graph->legend->SetPos(0.5, 0.05, 'center');
-
+        $graph->img->SetAntiAliasing(true);
         $img = $graph->Stroke('__handle');
         ob_start();
         imagejpeg($img);
@@ -813,11 +813,9 @@ class CTCustomerReviewMeeting extends CTCNC
         }
         // we need to know how many contacts are there
         $supportContactInfo = "";
-        $supportContactInfo .= "<tr>";
         for ($i = 0; $i < count($supportContacts); $i++) {
-            $supportContactInfo .= "<td style='width: 130px'>" . $supportContacts[$i]['firstName'] . ' ' . $supportContacts[$i]['lastName'] . "</td>";
+            $supportContactInfo .= "<li>" . $supportContacts[$i]['firstName'] . ' ' . $supportContacts[$i]['lastName'] . "</li>";
         }
-        $supportContactInfo .= "</tr>";
         return [
             "data" => $supportContactInfo,
             "count" => count($supportContacts)
