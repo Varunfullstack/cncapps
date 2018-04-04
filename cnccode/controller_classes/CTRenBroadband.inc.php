@@ -360,7 +360,6 @@ class CTRenBroadband extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenBroadband->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenBroadband->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenBroadband->getValue('totalInvoiceMonths')),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenBroadband->getMessage('totalInvoiceMonths')),
                 'adslPhone' => Controller::htmlInputText($dsRenBroadband->getValue('adslPhone')),
                 'adslPhoneMessage' => Controller::htmlDisplayText($dsRenBroadband->getMessage('adslPhone')),
                 'macCode' => Controller::htmlInputText($dsRenBroadband->getValue('macCode')),

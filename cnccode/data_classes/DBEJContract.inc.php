@@ -93,29 +93,6 @@ class DBEJContract extends DBECustomerItem
     }
 
     /**
-     * Get servercare contracts about to exipire
-     * @param Integer $numberOfMonths expiring within
-     * @return bool : Success
-     * @access public
-     */
-    function getExpiringServerCareRowsWithinMonths($numberOfMonths)
-    {
-        $this->setMethodName('getExpiringServerCareRowsWithinMonths');
-        if ($numberOfMonths == '') {
-            $this->raiseError('numberOfMonths not passed');
-        }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno" .
-            " AND " . $this->getDBColumnName('expiryDate') . ">=  DATE_SUB( CURRENT_DATE(), INTERVAL 2 MONTH ) ";
-        " AND itm_desc LIKE '%ServerCare%'";
-
-        $this->setQueryString($queryString);
-        return (parent::getRows());
-    }
-
-    /**
      * Get prepay contracts
      * @return bool : Success
      * @access public

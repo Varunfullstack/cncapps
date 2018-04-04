@@ -10,7 +10,7 @@ require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenContract.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenContract.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEWarranty.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
@@ -438,20 +438,6 @@ HEREDOC;
 
     }
 
-    /**
-     * Generate health check activities for any ServerCare contracts that are going to
-     * expire in the next 2 months
-     */
-    function createHealthCheckActivities()
-    {
-        // get all contracts about to expire
-        $buCustomerItem = new BUCustomerItem($this);
-        $buCustomerItem->getExpiringServerCareContracts(2, $dsContract); // number of months
-
-        while ($dsContract->fetchNext()) {
-            $this->generateServerCareActivities($dsContract);
-        }
-    }
 
     function generateServerCareActivities($dsContract)
     {

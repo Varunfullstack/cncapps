@@ -123,21 +123,6 @@ class BUCustomerItem extends Business
     }
 
     /**
-     * Return dataset of servercare contracts about to exipire
-     * @param Integer $numberOfMonths expiring within
-     * @param DataSet &$dsResults results
-     * @return bool : Success
-     * @access public
-     */
-    function getExpiringServerCareContracts($numberOfMonths, &$dsResults)
-    {
-        $this->setMethodName('getExpiringServerCareContracts');
-        $dbeJContract = new DBEJContract($this);
-        $dbeJContract->getExpiringServerCareRowsWithinMonths($numberOfMonths);
-        $this->getData($dbeJContract, $dsResults);
-    }
-
-    /**
      * Create a new dataset containing defaults for new item row
      * @parameter DataSet &$dsResults results
      * @return bool : Success

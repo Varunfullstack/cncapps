@@ -1,0 +1,59 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue194-1522396685-0">
+        <tagDatabase tag="issue194"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-1">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="audit_trail"/>
+        </preConditions>
+        <dropTable tableName="audit_trail"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="deshead"/>
+        </preConditions>
+        <dropTable tableName="deshead"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="desline"/>
+        </preConditions>
+        <dropTable tableName="desline"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-4">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="domain-import"/>
+        </preConditions>
+        <dropTable tableName="domain-import"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-5">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="date_xref"/>
+        </preConditions>
+        <dropTable tableName="date_xref"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-6">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="futher_action"/>
+        </preConditions>
+        <dropTable tableName="futher_action"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-7">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="future_action"/>
+        </preConditions>
+        <dropTable tableName="future_action"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue194-1522396685-8">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="staffavailable"/>
+        </preConditions>
+        <dropTable tableName="staffavailable"/>
+    </changeSet>
+
+
+</databaseChangeLog>

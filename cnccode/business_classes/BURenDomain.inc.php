@@ -9,7 +9,7 @@ require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenDomain.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenDomain.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEArecord.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 

@@ -34,7 +34,7 @@ class BUPDFSupportContract extends BaseObject
     var $_dsCustomer = '';
     var $_buActivity = '';
     var $_dsSite = '';
-    var $_titleLine = '';
+    var $_titleLine = 0;
     var $_renewalTypeID = '';
     var $_customerHasServiceDeskContract;
 

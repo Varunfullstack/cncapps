@@ -1,16 +1,18 @@
-<?php /*
-* portal document table
-* @authors Karim Ahmed
-* @access public
-*/
-require_once($cfg["path_dbe"] . '/DBESalesOrderDocumentWithoutFile.php');
+<?php
+/**
+ * Created by PhpStorm.
+ * User: fizdalf
+ * Date: 30/03/2018
+ * Time: 11:22
+ */
+require_once($cfg["path_dbe"] . '/DBEPortalCustomerDocumentWithoutFile.inc.php');
 
-class DBESalesOrderDocument extends DBESalesOrderDocumentWithoutFile
+class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
 {
     /**
      * portals constructor()
      * @access public
-     * @param  void
+     * @param $owner
      * @see constructor()
      */
     function __construct(&$owner)
@@ -24,5 +26,3 @@ class DBESalesOrderDocument extends DBESalesOrderDocumentWithoutFile
         $this->setAddColumnsOff();
     }
 }
-
-?>

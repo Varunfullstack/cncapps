@@ -3,11 +3,6 @@
  * Action Alert Email controller
  * CNC Ltd
  *
- *    Sends emails to internal email addresses when future actions on the
- * future_actions table become due.
- *
- * The rows are then deleted.
- *
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */

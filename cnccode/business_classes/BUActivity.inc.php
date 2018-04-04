@@ -12,6 +12,7 @@ require_once($cfg ["path_dbe"] . "/DBEJContract.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerCallActivityMonth.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECurrentActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEItemType.inc.php");
@@ -19,6 +20,7 @@ require_once($cfg ["path_dbe"] . "/DBEJProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivitySearch.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActType.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg ["path_dbe"] . "/DBEProject.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEEscalation.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerNew.inc.php");
@@ -30,8 +32,6 @@ require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEFutureAction.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEFurtherAction.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESiteNew.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
@@ -3030,10 +3030,6 @@ class BUActivity extends Business
             }
             $lastRecord = $db->Record;
         }
-        while ($db->next_record())
-            ;
-        //close file
-
 
         if ($ret == TRUE) {
             fclose($csvFileHandle);
@@ -6197,9 +6193,7 @@ customer with the past 8 hours email to GL
                 => CONFIG_SERVICE_REQUEST_DESC,
                 'priority' => $this->priorityArray[$dbeJProblem->getValue('priority')],
                 'reason' => $dbeFirstActivity->getValue('reason'),
-                'lastActivityReason'
-                => $dbeLastActivity->getValue('reason'),
-                'contactFirstName' => $dbeLastActivity->getValue('contactFirstName'),
+                'lastActivityReason' => $dbeLastActivity->getValue('reason'),
                 'responseDetails' => strtolower($this->getResponseDetails($dbeFirstActivity, $buCustomerItem)),
                 'technicianResponsible'
                 => $dbeJProblem->getValue('engineerName')
@@ -6965,6 +6959,7 @@ customer with the past 8 hours email to GL
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
                 break;
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 4:
                 $usedMinutes = $this->getIMTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
@@ -7018,7 +7013,6 @@ customer with the past 8 hours email to GL
                     'activityType' => $dsActivities->getValue('activityType'),
                     'contactName' => $dsActivities->getValue('contactName'),
                     'duration' => number_format($dsActivities->getValue('durationMinutes') / 60, 2),
-                    'contactName' => $dsActivities->getValue('contactName'),
                     'userName' => $dsActivities->getValue('userName'),
                 )
             );

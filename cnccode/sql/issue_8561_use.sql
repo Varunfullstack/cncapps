@@ -1,1 +1,0 @@
-LOAD DATA LOCAL INFILE 'C:\\Sites\\cncappsdev\\cnccode\\sql\\issue_8561.csv' INTO TABLE `custitem` FIELDS ESCAPED BY '\\' TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' (`cui_custno`, `cui_siteno`, `cui_itemno`, `cui_cust_ref`); 

@@ -157,48 +157,36 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::hdTeamTargetFixHours, DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_fix_hours");
         $this->addColumn(self::esTeamTargetFixHours, DA_FLOAT, DA_NOT_NULL, "hed_es_team_target_fix_hours");
         $this->addColumn(self::imTeamTargetFixHours, DA_FLOAT, DA_NOT_NULL, "hed_im_team_target_fix_hours");
-        $this->addColumn(self::hdTeamTargetFixQtyPerMonth, DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_fix_qty_per_month");
-        $this->addColumn(self::esTeamTargetFixQtyPerMonth, DA_INTEGER, DA_NOT_NULL, "hed_es_team_target_fix_qty_per_month");
-        $this->addColumn(self::imTeamTargetFixQtyPerMonth, DA_INTEGER, DA_NOT_NULL, "hed_im_team_target_fix_qty_per_month");
-        $this->addColumn(self::srAutocompleteThresholdHours, DA_FLOAT, DA_NOT_NULL, "hed_sr_autocomplete_threshold_hours");
-        $this->addColumn(self::srPromptContractThresholdHours, DA_FLOAT, DA_NOT_NULL, "hed_sr_prompt_contract_threshold_hours");
+        $this->addColumn(self::hdTeamTargetFixQtyPerMonth,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "hed_hd_team_target_fix_qty_per_month");
+        $this->addColumn(self::esTeamTargetFixQtyPerMonth,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "hed_es_team_target_fix_qty_per_month");
+        $this->addColumn(self::imTeamTargetFixQtyPerMonth,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "hed_im_team_target_fix_qty_per_month");
+        $this->addColumn(self::srAutocompleteThresholdHours,
+                         DA_FLOAT,
+                         DA_NOT_NULL,
+                         "hed_sr_autocomplete_threshold_hours");
+        $this->addColumn(self::srPromptContractThresholdHours,
+                         DA_FLOAT,
+                         DA_NOT_NULL,
+                         "hed_sr_prompt_contract_threshold_hours");
         $this->addColumn(self::remoteSupportWarnHours, DA_FLOAT, DA_NOT_NULL, "hed_remote_support_warn_hours");
         $this->addColumn(self::customerContactWarnHours, DA_FLOAT, DA_NOT_NULL, "hed_customer_contact_warn_hours");
         $this->addColumn(self::RemoteSupportMinWarnHours, DA_FLOAT, DA_NOT_NULL, 'hed_remote_support_min_warn_hours');
-        $this->addColumn(self::ImplementationTeamMinutesInADay, DA_INTEGER, DA_NOT_NULL, 'hed_im_team_minutes_in_a_day');
+        $this->addColumn(self::ImplementationTeamMinutesInADay,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         'hed_im_team_minutes_in_a_day');
         $this->addColumn(self::backupTargetSuccessRate, DA_INTEGER, DA_NOT_NULL, "hed_backup_target_success_rate");
         $this->setPK(0);
         $this->setAddColumnsOff();
-    }
-}
-
-class DBEJHeader extends DBEHeader
-{
-    /**
-     * calls constructor()
-     * @access public
-     * @return void
-     * @param  void
-     * @see constructor()
-     */
-    function __construct(&$owner)
-    {
-        parent::__construct($owner);
-        $this->setAddColumnsOn();
-        $this->addColumn("gscItemDescription", DA_STRING, DA_NOT_NULL, "itm_desc");
-        $this->setAddColumnsOff();
-    }
-
-    function getRow()
-    {
-        $this->setMethodName("getRow");
-        $ret = FALSE;
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON hed_gensup_itemno = itm_itemno"
-        );
-        return (parent::getRow());
     }
 }
 

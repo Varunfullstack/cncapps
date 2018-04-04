@@ -1,1 +1,0 @@
-ALTER TABLE `password` CHANGE `pas_username` `pas_username` CHAR(50) CHARSET latin1 COLLATE latin1_swedish_ci NULL, CHANGE `pas_service` `pas_service` CHAR(60) CHARSET latin1 COLLATE latin1_swedish_ci NULL, CHANGE `pas_password` `pas_password` CHAR(30) CHARSET latin1 COLLATE latin1_swedish_ci NULL; 

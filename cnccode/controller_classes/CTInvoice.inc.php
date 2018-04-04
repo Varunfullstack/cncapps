@@ -801,7 +801,6 @@ class CTInvoice extends CTCNC
                             'curUnitCost' => Controller::formatNumber($dsInvline->getValue('curUnitCost')),
                             'curCostTotal' => Controller::formatNumber($curCostTotal),
                             'curUnitSale' => Controller::formatNumber($dsInvline->getValue('curUnitSale')),
-                            'curUnitSale' => Controller::formatNumber($dsInvline->getValue('curUnitSale')),
                             'curSaleTotal' => Controller::formatNumber($curSaleTotal),
                             'orderLineClass' => 'orderLineClass'
                         )

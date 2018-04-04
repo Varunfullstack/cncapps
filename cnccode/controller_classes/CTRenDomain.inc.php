@@ -338,7 +338,6 @@ class CTRenDomain extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenDomain->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenDomain->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenDomain->getValue('totalInvoiceMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenDomain->getValue('totalInvoiceMonths')),
                 'notes' => Controller::htmlInputText($dsRenDomain->getValue('notes')),
                 'notesMessage' => Controller::htmlDisplayText($dsRenDomain->getMessage('notes')),
                 'urlUpdate' => $urlUpdate,

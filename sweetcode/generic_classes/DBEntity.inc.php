@@ -477,57 +477,6 @@ class DBEntity extends DataAccess
             case DA_MODE_UPDATE:
                 if ($this->getRowBefore() != $this->getColumnValuesAsString()) {            // Only apply update if the row has been changed.
                     $result = $this->updateRow();
-                    /*
-                    Log each column value change to audit trail
-
-                    $excludedColumns =
-                      array(
-                        'internalNotes',
-                        'reason'
-                      );
-
-                    for( $ixCol=0; $ixCol < $this->colCount(); $ixCol++ ){
-
-                      $columnName = $this->dbColName[ $ixCol ];
-
-                      if ( in_array( $columnName, $excludedColumns ) ){
-                        continue;
-                      }
-
-                      if (
-                          ($this->arrayRowBefore[ $ixCol ] != '0000-00-00' AND $this->getValueByColumnNumber( $ixCol ) != '' ) &
-                          ($this->arrayRowBefore[ $ixCol ] != $this->getValueByColumnNumber( $ixCol ) )
-                      ){
-                        if( isset( $GLOBALS ['auth'] )){
-                          $userID = $GLOBALS ['auth']->is_authenticated ();
-                        }
-                        else{
-                          $userID = USER_SYSTEM;
-                        }
-
-                        $this->pkdb->query(
-                          "INSERT INTO
-                            audit_trail(
-                              tableName,
-                              colName,
-                              primaryKey,
-                              oldValue,
-                              newValue,
-                              userID,
-                              modifyDate
-                            )
-                            VALUES(
-                              '" . $this->getTableName() . "',
-                              '" . $columnName . "',
-                              '" . $this->getPKValue() . "',
-                              '" . $this->arrayRowBefore[ $ixCol ] . "',
-                              '" . $this->getValueByColumnNumber( $ixCol ) . "',
-                              '" . $userID . "',
-                              NOW()
-                            )");
-                      }
-                    }
-                    */
                 } else {
                     $this->resetQueryString();
                     $result = TRUE;
@@ -579,8 +528,8 @@ class DBEntity extends DataAccess
                 }
             }
             $this->setQueryString("SELECT " . $this->getDBColumnNamesAsString() .
-                " FROM " . $this->getTableName() .
-                " WHERE " . $this->getPKWhere()
+                                  " FROM " . $this->getTableName() .
+                                  " WHERE " . $this->getPKWhere()
             );
         }
         if (!$this->runQuery()) {

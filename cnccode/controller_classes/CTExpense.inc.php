@@ -262,7 +262,6 @@ class CTExpense extends CTCNC
                 'vatFlagChecked' => Controller::htmlChecked($dsExpense->getValue('vatFlag')),
                 'userID' => $dsExpense->getValue('userID'), // hidden field on form
                 'activityUserName' => $dsCallActivity->getValue('userName'),
-                'value' => Controller::htmlInputText($dsExpense->getValue('value')),
                 'urlUpdateExpense' => $urlUpdateExpense,
                 'exportedFlag' => $dsExpense->getValue('exportedFlag'),
                 'urlDisplayExpenses' => $urlDisplayExpenses
