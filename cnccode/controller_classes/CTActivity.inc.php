@@ -320,6 +320,13 @@ class CTActivity extends CTCNC
             case 'updateHistoricUserTimeLogs':
                 $this->updateHistoricUserTimeLogs();
                 break;
+            case 'test':
+                $this->buActivity->sendSalesRequestAlertEmail(387378, null);
+                break;
+
+            case 'toggleMonitoringFlag':
+                $this->toggleMonitoringFlag();
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -1461,6 +1468,15 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $urlToggleMonitoringFlag =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'toggleMonitoringFlag',
+                    'callActivityID' => $callActivityID
+                )
+            );
+
         $urlToggleIncludeTravel =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -1693,9 +1709,9 @@ class CTActivity extends CTCNC
                 'urlToggleOperationalTasks' => $urlToggleOperationalTasks,
 
                 'urlToggleCriticalFlag' => $urlToggleCriticalFlag,
-
                 'criticalFlagChecked' => $dsCallActivity->getValue('criticalFlag') == 'Y' ? 'CHECKED' : '',
-
+                'urlToggleMonitoringFlag' => $urlToggleMonitoringFlag,
+                'monitoringFlagChecked' => $this->checkMonitoring($dsCallActivity->getValue('problemID')) ? 'CHECKED' : '',
                 'includeOperationalTasksChecked' => $_SESSION['includeOperationalTasks'] ? 'CHECKED' : '',
 
                 'urlToggleIncludeServerGuardUpdates' => $urlToggleIncludeServerGuardUpdates,
@@ -5418,6 +5434,26 @@ class CTActivity extends CTCNC
             );
         header('Location: ' . $urlNext);
         exit;
+    }
+
+    private function toggleMonitoringFlag()
+    {
+        if (!$_REQUEST['callActivityID']) {
+
+            echo 'callActivityID not passed';
+
+        }
+        $this->buActivity->getActivityByID($_REQUEST['callActivityID'], $dsActivity);
+
+        $this->buActivity->toggleMonitoringFlag($dsActivity->getValue('problemID'));
+
+        $this->redirectToDisplay($_REQUEST['callActivityID']);
+
+    }
+
+    private function checkMonitoring($problemID)
+    {
+        return $this->buActivity->checkMonitoringFlag($problemID);
     }
 }
 

@@ -9,6 +9,35 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 class DBECallActivity extends DBEntity
 {
 
+    const callActivityID = "callActivityID";
+    const siteNo = "siteNo";
+    const contactID = "contactID";
+    const sequenceNo = "sequenceNo";
+    const callActTypeID = "callActTypeID";
+    const problemID = "problemID";
+    const date = "date";
+    const startTime = "startTime";
+    const endTime = "endTime";
+    const status = "status";
+    const expenseExportFlag = "expenseExportFlag";
+    const reason = "reason";
+    const internalNotes = "internalNotes";
+    const curValue = "curValue";
+    const statementYearMonth = "statementYearMonth";
+    const customerItemID = "customerItemID";
+    const underContractFlag = "underContractFlag";
+    const authorisedFlag = "authorisedFlag";
+    const userID = "userID";
+    const serverGuard = "serverGuard";
+    const parentCallActivityID = "parentCallActivityID";
+    const awaitingCustomerResponseFlag = "awaitingCustomerResponseFlag";
+    const loggingErrorFlag = "loggingErrorFlag";
+    const escalationID = "escalationID";
+    const escalationAcceptedFlag = "escalationAcceptedFlag";
+    const hideFromCustomerFlag = "hideFromCustomerFlag";
+    const secondsiteErrorServer = "secondsiteErrorServer";
+    const secondsiteErrorCustomerItemID = "secondsiteErrorCustomerItemID";
+
     /**
      * calls constructor()
      * @access public
@@ -20,38 +49,37 @@ class DBECallActivity extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("callactivity");
-        $this->addColumn("callActivityID", DA_ID, DA_NOT_NULL, "caa_callactivityno");
-// 		$this->addColumn("customerID", DA_ID, DA_NOT_NULL, "caa_custno");
-        $this->addColumn("siteNo", DA_INTEGER, DA_NOT_NULL, "caa_siteno");
-        $this->addColumn("contactID", DA_INTEGER, DA_NOT_NULL, "caa_contno");        // customer contact
-        $this->addColumn("sequenceNo", DA_INTEGER, DA_ALLOW_NULL, "caa_item");
-        $this->addColumn("callActTypeID", DA_ID, DA_NOT_NULL, "caa_callacttypeno");
-        $this->addColumn("problemID", DA_ID, DA_ALLOW_NULL, 'callactivity.caa_problemno');
-        $this->addColumn("date", DA_DATE, DA_NOT_NULL, "caa_date");
-        $this->addColumn("startTime", DA_TIME, DA_NOT_NULL, "caa_starttime");
-        $this->addColumn("endTime", DA_TIME, DA_ALLOW_NULL, "caa_endtime");
-        $this->addColumn("status", DA_STRING, DA_NOT_NULL, "caa_status");
-        $this->addColumn("expenseExportFlag", DA_YN, DA_NOT_NULL, "caa_expexport_flag");
-        $this->addColumn("reason", DA_TEXT, DA_ALLOW_NULL);
-        $this->addColumn("internalNotes", DA_TEXT, DA_ALLOW_NULL);
-        $this->addColumn("curValue", DA_FLOAT, DA_ALLOW_NULL);
-        $this->addColumn("statementYearMonth", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("customerItemID", DA_ID, DA_ALLOW_NULL, "caa_cuino");    // Customer Item
-        $this->addColumn("underContractFlag", DA_YN, DA_ALLOW_NULL, "caa_under_contract");
-        $this->addColumn("authorisedFlag", DA_YN, DA_ALLOW_NULL, "caa_authorised");
-        $this->addColumn("userID", DA_ID, DA_NOT_NULL, "caa_consno");
-// 		$this->addColumn("overtimeExportedFlag", DA_YN, DA_NULL, "caa_ot_exp_flag");
-        $this->addColumn("serverGuard", DA_YN, DA_ALLOW_NULL, "caa_serverguard");
-        $this->addColumn("parentCallActivityID", DA_ID, DA_ALLOW_NULL, "caa_parent_callactivityno");
-        $this->addColumn("awaitingCustomerResponseFlag", DA_YN, DA_ALLOW_NULL, "caa_awaiting_customer_response_flag");
-        $this->addColumn("loggingErrorFlag", DA_YN, DA_ALLOW_NULL, "caa_logging_error_flag");
-        $this->addColumn("escalationID", DA_ID, DA_ALLOW_NULL);
-        $this->addColumn("escalationAcceptedFlag", DA_YN, DA_ALLOW_NULL);
-        $this->addColumn("hideFromCustomerFlag", DA_YN, DA_ALLOW_NULL, 'caa_hide_from_customer_flag');
-
-        $this->addColumn("secondsiteErrorServer", DA_STRING, DA_ALLOW_NULL, 'caa_secondsite_error_server');
-
-        $this->addColumn("secondsiteErrorCustomerItemID", DA_INTEGER, DA_ALLOW_NULL, 'caa_secondsite_error_cuino');
+        $this->addColumn(self::callActivityID, DA_ID, DA_NOT_NULL, "caa_callactivityno");
+        $this->addColumn(self::siteNo, DA_INTEGER, DA_NOT_NULL, "caa_siteno");
+        $this->addColumn(self::contactID, DA_INTEGER, DA_NOT_NULL, "caa_contno");        // customer contact
+        $this->addColumn(self::sequenceNo, DA_INTEGER, DA_ALLOW_NULL, "caa_item");
+        $this->addColumn(self::callActTypeID, DA_ID, DA_NOT_NULL, "caa_callacttypeno");
+        $this->addColumn(self::problemID, DA_ID, DA_ALLOW_NULL, 'callactivity.caa_problemno');
+        $this->addColumn(self::date, DA_DATE, DA_NOT_NULL, "caa_date");
+        $this->addColumn(self::startTime, DA_TIME, DA_NOT_NULL, "caa_starttime");
+        $this->addColumn(self::endTime, DA_TIME, DA_ALLOW_NULL, "caa_endtime");
+        $this->addColumn(self::status, DA_STRING, DA_NOT_NULL, "caa_status");
+        $this->addColumn(self::expenseExportFlag, DA_YN, DA_NOT_NULL, "caa_expexport_flag");
+        $this->addColumn(self::reason, DA_TEXT, DA_ALLOW_NULL);
+        $this->addColumn(self::internalNotes, DA_TEXT, DA_ALLOW_NULL);
+        $this->addColumn(self::curValue, DA_FLOAT, DA_ALLOW_NULL);
+        $this->addColumn(self::statementYearMonth, DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(self::customerItemID, DA_ID, DA_ALLOW_NULL, "caa_cuino");    // Customer Item
+        $this->addColumn(self::underContractFlag, DA_YN, DA_ALLOW_NULL, "caa_under_contract");
+        $this->addColumn(self::authorisedFlag, DA_YN, DA_ALLOW_NULL, "caa_authorised");
+        $this->addColumn(self::userID, DA_ID, DA_NOT_NULL, "caa_consno");
+        $this->addColumn(self::serverGuard, DA_YN, DA_ALLOW_NULL, "caa_serverguard");
+        $this->addColumn(self::parentCallActivityID, DA_ID, DA_ALLOW_NULL, "caa_parent_callactivityno");
+        $this->addColumn(self::awaitingCustomerResponseFlag,
+                         DA_YN,
+                         DA_ALLOW_NULL,
+                         "caa_awaiting_customer_response_flag");
+        $this->addColumn(self::loggingErrorFlag, DA_YN, DA_ALLOW_NULL, "caa_logging_error_flag");
+        $this->addColumn(self::escalationID, DA_ID, DA_ALLOW_NULL);
+        $this->addColumn(self::escalationAcceptedFlag, DA_YN, DA_ALLOW_NULL);
+        $this->addColumn(self::hideFromCustomerFlag, DA_YN, DA_ALLOW_NULL, 'caa_hide_from_customer_flag');
+        $this->addColumn(self::secondsiteErrorServer, DA_STRING, DA_ALLOW_NULL, 'caa_secondsite_error_server');
+        $this->addColumn(self::secondsiteErrorCustomerItemID, DA_INTEGER, DA_ALLOW_NULL, 'caa_secondsite_error_cuino');
 
         $this->setPK(0);
         $this->setAddColumnsOff();

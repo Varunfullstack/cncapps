@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 183 - Add the ability to add time to a service request when in the managers queue
 - Issue 186 - Time limit request bug with IMT team
 - Issue 184 - Request 038 - Daily Open SR Report for customers
+- Issue 193 - Monitor SR feature to receive updates automatically
 
 ### Changed
 - Issue 176 - Change background colours on service request page

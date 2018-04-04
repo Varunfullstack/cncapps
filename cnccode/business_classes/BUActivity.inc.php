@@ -853,6 +853,9 @@ class BUActivity extends Business
             $this->logOperationalActivity($dsCallActivity->getValue('problemID'),
                                           'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue('priority'));
         }
+
+        $this->sendMonitoringEmails($dbeCallActivity->getValue('callActivityID'));
+
         /*
     Send emails UNLESS this is an escalation or change request activity type
     */
@@ -894,6 +897,7 @@ class BUActivity extends Business
             if ($dbeProblem->getValue('criticalFlag') == 'Y') {
                 $this->sendCriticalEmail($dbeCallActivity->getValue('callActivityID'));
             }
+
 
             /*
       If this is a future on-site visit then send notification email( issue #8750 )
@@ -5824,6 +5828,7 @@ customer with the past 8 hours email to GL
 
         $this->createFixedActivity($problemID, $resolutionSummary);
 
+        $this->sendMonitoringEmails($this->getLastActivityInProblem($problemID)->getValue(DBEJCallActivity::callActivityID));
         if ($dbeProblem->getValue('escalatedUserID')) {
 
             $this->sendNotifyEscalatorUserEmail($problemID);
@@ -7505,6 +7510,153 @@ customer with the past 8 hours email to GL
     public function getIMTeamUsedTime($problemID, $excludedActivityID = null)
     {
         return $this->getUsedTimeForProblemAndTeam($problemID, 4, $excludedActivityID);
+    }
+
+    private function sendMonitoringEmails($callActivityID)
+    {
+        $buMail = new BUMail($this);
+
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivityID);
+
+        $validActivityTypeIDs = [
+            4,
+            7,
+            8,
+            11,
+            18,
+            57,
+            55,
+            59,
+        ];
+
+        if (!in_array($dbeJCallActivity->getValue("callActTypeID"), $validActivityTypeIDs)) {
+            return;
+        }
+
+        $monitoringPeople = $this->getPeopleMonitoringProblem($dbeJCallActivity->getValue('problemID'));
+
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $senderName = 'CNC Support Department';
+
+        $activityRef = $dbeJCallActivity->getValue('problemID') . ' ' . $dbeJCallActivity->getValue('customerName');
+
+        $template = new Template(EMAIL_TEMPLATE_DIR, "remove");
+        $template->set_file('page', 'MonitoringEmail.inc.html');
+
+        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue();
+
+        $durationHours = common_convertHHMMToDecimal($dbeJCallActivity->getValue('endTime')) - common_convertHHMMToDecimal($dbeJCallActivity->getValue('startTime'));
+
+        $awaitingCustomerResponse = '';
+
+        if ($dbeJCallActivity->getValue('requestAwaitingCustomerResponseFlag') == 'Y') {
+            $awaitingCustomerResponse = 'Awaiting Customer';
+        } else {
+            $awaitingCustomerResponse = 'Awaiting CNC';
+        }
+
+
+        $template->setVar(
+            array(
+                'activityRef' => $activityRef,
+                'activityDate' => $dbeJCallActivity->getValue(DBEJCallActivity::date),
+                'activityStartTime' => $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
+                'activityEndTime' => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
+                'activityTypeName' => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
+                'urlActivity' => $urlActivity,
+                'userName' => $dbeJCallActivity->getValue('userName'),
+                'durationHours' => round($durationHours, 2),
+                'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
+                'awaitingCustomerResponse' => $awaitingCustomerResponse,
+                'customerName' => $dbeJCallActivity->getValue('customerName'),
+                'reason' => $dbeJCallActivity->getValue('reason'),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
+            )
+        );
+
+        $template->parse('output', 'page', true);
+
+        $body = $template->get_var('output');
+
+        foreach ($monitoringPeople as $monitoringPerson) {
+            $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
+
+            $hdrs = array(
+                'From' => $senderEmail,
+                'To' => $toEmail,
+                'Subject' => 'Monitored SR ' . $dbeJCallActivity->getValue('problemID') . ' For ' . $dbeJCallActivity->getValue('customerName'),
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body,
+                true
+            );
+        }
+
+
+    }
+
+    private function getPeopleMonitoringProblem($problemID)
+    {
+        global $db;
+
+        $sql = "SELECT * FROM problem_monitoring left join consultant on problem_monitoring.cons_no = consultant.cns_consno WHERE problemId = $problemID";
+
+
+        $db->query($sql);
+        $data = [];
+        while ($db->next_record()) {
+            $data[] = $db->Record;
+        }
+        return $data;
+    }
+
+    public function toggleMonitoringFlag($problemID)
+    {
+        global $db;
+        $userID = $this->loggedInUserID;
+        if (!self::checkMonitoringFlag($problemID)) {
+            //we need to enable it
+            $db->query("insert into problem_monitoring(problemId, cons_no) values ($problemID, $userID)");
+            return;
+        }
+
+        //we need to disable it
+        $db->query("delete from problem_monitoring where problemId = $problemID and cons_no = $userID");
+    }
+
+
+    public function checkMonitoringFlag($problemID)
+    {
+        global $db;
+
+        $userID = $this->loggedInUserID;
+
+        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
+
+
+        $db->query($sql);
+        return !!$db->num_rows();
     }
 } // End of class
 ?>
