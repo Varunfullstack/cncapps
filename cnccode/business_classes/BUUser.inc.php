@@ -208,6 +208,30 @@ class BUUser extends Business
         return $db->Record[0];
     }
 
+    function test()
+    {
+        global $db;
+
+        $db->query("SELECT 
+  teamLevel,
+  SUM(loggedHours) AS loggedHours,
+  SUM(dayHours) AS dayHours,
+  (SUM(loggedHours) / SUM(dayHours)) * 100 AS performancePercentage 
+FROM
+  user_time_log 
+  JOIN consultant 
+    ON cns_consno = userID 
+WHERE loggedDate >= DATE_SUB(DATE(NOW()), INTERVAL 7 DAY) 
+  AND loggedDate < DATE(NOW()) 
+  AND teamLevel = 2
+  GROUP BY loggedDate, teamLevel");
+        $rows = [];
+        while ($db->next_record()) {
+            $rows[] = $db->Record;
+        }
+        return $rows;
+    }
+
     /*
     Activity logging performance for past number of days by user
     */

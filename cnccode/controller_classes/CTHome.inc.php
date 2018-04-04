@@ -39,7 +39,10 @@ class CTHome extends CTCNC
             case 'updateServiceDetails':
                 $this->updateServiceDetails();
                 break;
-
+            case 'lastWeekHelpDesk':
+                $this->showLastWeekHelpDeskData();
+                echo json_encode($this->showLastWeekHelpDeskData());
+                break;
             default:
                 $this->display();
                 break;
@@ -94,6 +97,8 @@ class CTHome extends CTCNC
         } else {
             $this->displayUserPerformanceReport();
         }
+
+        $this->displayCharts();
 
 
         $this->parsePage();
@@ -320,11 +325,11 @@ class CTHome extends CTCNC
 
             $editProjectLink =
                 $this->buildLink('Project.php',
-                    array(
-                        'action' => 'edit',
-                        'projectID' => $project['projectID'],
-                        'backToHome' => true
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'projectID' => $project['projectID'],
+                                     'backToHome' => true
+                                 )
                 );
 
 
@@ -377,17 +382,20 @@ class CTHome extends CTCNC
 
             if (round($result['esTeamActualSlaPercentage']) < $result['esTeamTargetSlaPercentage']) {
 
-                $this->template->set_var('esTeamActualSlaPercentage' . $result['quarter'] . 'Class', 'performance-warn');
+                $this->template->set_var('esTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                                         'performance-warn');
             }
 
             if (round($result['hdTeamActualSlaPercentage']) < $result['hdTeamTargetSlaPercentage']) {
 
-                $this->template->set_var('hdTeamActualSlaPercentage' . $result['quarter'] . 'Class', 'performance-warn');
+                $this->template->set_var('hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                                         'performance-warn');
             }
 
             if (round($result['imTeamActualSlaPercentage']) < $result['imTeamTargetSlaPercentage']) {
 
-                $this->template->set_var('imTeamActualSlaPercentage' . $result['quarter'] . 'Class', 'performance-warn');
+                $this->template->set_var('imTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                                         'performance-warn');
             }
 
             if ($result['esTeamActualFixQty'] < $result['esTeamTargetFixQty']) {
@@ -422,19 +430,22 @@ class CTHome extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'esTeamActualSlaPercentage' . $result['quarter'] => number_format($result['esTeamActualSlaPercentage'], 0),
+                    'esTeamActualSlaPercentage' . $result['quarter'] => number_format($result['esTeamActualSlaPercentage'],
+                                                                                      0),
 
                     'esTeamActualFixHours' . $result['quarter'] => number_format($result['esTeamActualFixHours'], 2),
 
                     'esTeamActualFixQty' . $result['quarter'] => $result['esTeamActualFixQty'],
 
-                    'imTeamActualSlaPercentage' . $result['quarter'] => number_format($result['imTeamActualSlaPercentage'], 0),
+                    'imTeamActualSlaPercentage' . $result['quarter'] => number_format($result['imTeamActualSlaPercentage'],
+                                                                                      0),
 
                     'imTeamActualFixHours' . $result['quarter'] => number_format($result['imTeamActualFixHours'], 2),
 
                     'imTeamActualFixQty' . $result['quarter'] => $result['imTeamActualFixQty'],
 
-                    'hdTeamActualSlaPercentage' . $result['quarter'] => number_format($result['hdTeamActualSlaPercentage'], 0),
+                    'hdTeamActualSlaPercentage' . $result['quarter'] => number_format($result['hdTeamActualSlaPercentage'],
+                                                                                      0),
 
                     'hdTeamActualFixHours' . $result['quarter'] => number_format($result['hdTeamActualFixHours'], 2),
                     'hdTeamActualFixQty' . $result['quarter'] => $result['hdTeamActualFixQty']
@@ -655,6 +666,18 @@ class CTHome extends CTCNC
 
         $this->template->parse('CONTENTS', 'DashboardAllUsersPerformanceReport', true);
 
+    }
+
+    private function displayCharts()
+    {
+        $this->setTemplateFiles('HomeCharts', 'HomeCharts');
+        $this->template->parse('CONTENTS', 'HomeCharts', true);
+
+    }
+
+    private function showLastWeekHelpDeskData()
+    {
+        $this->buUser->test();
     } // end displayUserLoggingPerformanceReport
 }// end of class
 ?>
