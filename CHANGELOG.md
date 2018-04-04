@@ -1,12 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
-##[unreleased]
+## [unreleased]
 ### Added 
 - Issue 189 - Add version number to menu
 - Issue 183 - Add the ability to add time to a service request when in the managers queue
 - Issue 186 - Time limit request bug with IMT team
 - Issue 184 - Request 038 - Daily Open SR Report for customers
+
+### Changed
+- Issue 176 - Change background colours on service request page
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
@@ -17,15 +20,14 @@ This project changes will be shown here.
 - Issue 191 - Amend the value of the hours spent on critical SR activity email
 - Issue 192 - Passwords page crashes when incomplete customer name is used
 
-### Changed
-- Issue 176 - Change background colours on service request page
+
 
 ## [v1.5.1] - 2018-03-27
-### Fixed
+### Added
 - Issue 188 - New P5 SR for SSL hardcoded change
 
 ## [v1.5.0] - 2018-03-20
-### Fixed
+### Added
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 
 ## [v1.4.0] - 2018-03-08
@@ -34,9 +36,13 @@ This project changes will be shown here.
 - Issue 155 - CNC034 - Profitability Report for PrePay counts as negative
 
 ## [v1.3.0] - 2018-03-07
-### Fixed
+### Added
 - Issue 174 - CNC036 - Record backup success as percentage
+
+### Changed
 - Issue 171 - CNC035 - Display Calendar link on all activities
+
+### Fixed
 - Issue 172 - CNC036 - Sales Order link not shown when editing an activity
 - Issue 173 - Remove Type field 'required' status from the Activity edit page
 - Issue 178 - When updating a activity the activity type limit checks don't work anymore
@@ -48,20 +54,24 @@ This project changes will be shown here.
 - Fix issue with time allocated emails not getting sent
 
 ## [v1.2.0]
-### Fixed
+### Added
 - Issue 167 - CNC033 - Hard limits
 
 ## [v1.1.0]
-### Fixed
-- Issue 142 - Pre-pay activity over £100 - where is the email address set?
+### Added
 - Issue 144 - CNC031 - Contract and numbers report
-- Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
 - Issue 122 - CNC015 - Check activity length and flag if remote support and under 5 minutes
 - Issue 131 - CNC023 - When editing customer contacts make the main contact appear in red text
 - Issue 130 - CNC022 - Include Internal Notes that are saved with SSL auto renewals in the service request that’s created.
+
+## Changed
 - Issue 160 - Increase size of field for customer name
 - Issue 154 - Change the text in a calendar subject item
 - Issue 152 - CNC033 - Add decimal places to team performance fix hours
+
+### Fixed
+- Issue 142 - Pre-pay activity over £100 - where is the email address set?
+- Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
 - Issue 159 - Email Subject Change for: SR 434149 has been updated by another user
 - Issue 158 - Certain characters are displaying incorrectly in emails
 
@@ -74,46 +84,56 @@ This project changes will be shown here.
 - Issue 162 - Typo in subject line of email - Critial SR Activity For
 
 ## [v1.0.3] - 2017-01-17
+### Added
+- Issue 120 - CNC013 - Allow searching for activities based on time spent
+
 ### Fixed
 - Issue 164 - Create a system where a log of the scheduled tasks runs are located
 - Issue 151 - T&M Authorisation Process Error
-- Issue 120 - CNC013 - Allow searching for activities based on time spent
 
 ## [v1.0.2] - 2017-12-21
-### Fixed
-- Issue 125 - CNC017 - New SR from SO to Imt queue
-- Issue 56  - CNC004
+### Added
 - Issue 149 - Create a Daily Report for P5 with sales orders to be sent to nosales@
-- Issue 129 - CNC021
+
+### Changed
+- Issue 125 - CNC017 - New SR from SO to Imt queue
+- Issue 129 - CNC021 - Add who fixed the SR to escalated email
+
+### Fixed
+- Issue 56  - CNC004 
 
 ## [v1.0.1] - 2017-12-14
+### Added
 - Copy Username in password List.
 
 ## [v1.0.0] - 2017-07-15
+### Added
+- Issue 115 - CNC008 - Open SR Activities report for managers
+- Issue 126 - CNC018 - upload a file when in an activity or on the fixed screen
+- Issue 116 - CNC009 - Copy to clipboard button for the passwords
+- Issue 114 - CNC007 - On home page no link to projects
+- Issue 54 - CNC002 - Email link within activity add subject
+ 
+### Changed
+- Issue 143 - CNC030 - Customer Analysis Report row layout
+- Issue 117 - CNC010 - Customer or contact notes should be visible when logging the SR
+- Issue 133 - CNC025 - Within customer contacts, only allow 1 statements contact
+
 ### Fixed
-- Issue 143 - CNC030
-- Issue 115 - CNC008
-- Issue 117 - CNC010
-- Issue 126 - CNC018
-- Issue 133 - CNC025
-- Issue 136 - CNC028
-- Issue 116 - CNC009
-- Issue 139
-- Issue 138
-- Issue 115 - CNC008
-- Issue 114 - CNC007
-- Issue 110
-- Issue 108 
-- Issue 109 
-- Issue 60
-- Issue 59 
-- Issue 58
-- Issue 57
-- Issue 55 - CNC003
-- Issue 54 - CNC002
-- Issue 53 - CNC001
-- Issue 52
-- Issue 51
-- Issue 50
-- Issue 49
-- Issue 48
+- Issue 136 - CNC028 - Change Request emails arriving incorrectly
+- Issue 139 - Issue with despatching
+- Issue 138 - Selecting Site on Add Customer Item 
+- Issue 110 - The renewal report no longer group together the heading like Internet Service, PC Application Software
+- Issue 108 - Purchase Invoice Authorisation VAT calculation
+- Issue 109 - Suppliers Contact lookup 
+- Issue 60 - The Date Icon do not work on the Sales Order Page in IE
+- Issue 59 - Contracts menu shows errors
+- Issue 58 - Invoices menu show errors, some file missing
+- Issue 57 - Warnings and errors show after login in
+- Issue 55 - CNC003 - Time breaching emails from HD not sending/working
+- Issue 53 - CNC001 - Remove activity number from search screen
+- Issue 52 - PurchaseOrder page the select date button doesn't work
+- Issue 51 - Customer Page the notes don't show right away
+- Issue 50 - SalesOrder ticking the box to toggle all related checkboxes won't toggle them
+- Issue 49 - SalesOrder Page shows errors
+- Issue 48 - F5 Toggle Doesn't Work anymore
