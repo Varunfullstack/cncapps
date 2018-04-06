@@ -5,50 +5,99 @@
     google.charts.load('current', {'packages': ['corechart']});
 
     // Set a callback to run when the Google Visualization API is loaded.
+
     google.charts.setOnLoadCallback(drawChart);
+
+    needToFetch = false;
+
+    membersOptions = {};
+
+    days = 30;
+    team = 1;
+    var data = $.ajax(
+        {
+            url: '?action=lastWeekHelpDesk',
+            dataType: 'json',
+            data: {days: days, team: team}
+        }
+    );
+    $(function () {
+        $('#daysSelector').change(function () {
+            console.log($(this).val());
+
+            data = $.ajax(
+                {
+                    url: '?action=lastWeekHelpDesk',
+                    dataType: 'json',
+                    data: {days: $(this).val(), team: team}
+                }
+            );
+            drawChart();
+        });
+
+        $('#membersSelectors input').change(function () {
+            console.log('changed ' + this);
+        })
+    });
 
     // Callback that creates and populates a data table,
     // instantiates the pie chart, passes in the data and
     // draws it.
     function drawChart() {
 
-        $(function () {
 
-            $.ajax(
-                {
-                    url: '?action=lastWeekHelpDesk',
-                    dataType: 'json'
+        data.then(function (result) {
+            var membersSelectors = $('#membersSelectors');
+            membersSelectors.html('');
+
+            Object.keys(result.members).forEach(function (memberKey) {
+
+                if (membersOptions[memberKey] == null) {
+                    membersOptions[memberKey] = true;
                 }
-            ).then(function (result) {
-                console.log(result);
+
+                membersSelectors.append('<div><label>' + result.members[memberKey] +
+                    '</label><input type="checkbox" id="' + memberKey + '" ' + (membersOptions[memberKey] ? 'checked' : '') + '></div>')
             });
 
-            // Create the data table.
-            var data = new google.visualization.arrayToDataTable(
-                [
-                    ['Year', 'Sales', 'Expenses'],
-                    ['2004', 1000, 400],
-                    ['2005', 1170, 460],
-                    ['2006', 660, 1120],
-                    ['2007', 1030, 540]
-                ]);
+            var data = new google.visualization.DataTable(result.data);
 
             // Set chart options
             var options = {
                 'title': 'How Much Pizza I Ate Last Night',
-                'width': 400,
-                'height': 300
+                'width': 800,
+                'height': 600,
+                series: {
+                    0: {lineDashStyle: [1, 1], lineWidth: 6},
+                    1: {lineWidth: 8}
+                }
             };
 
             // Instantiate and draw our chart, passing in some options.
             var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
             chart.draw(data, options);
-        })
 
+        });
 
+        // Create the data table
     }
 
 
 </script>
+<div>
+    Members:
+    <div id="membersSelectors">
+
+    </div>
+</div>
+<div>
+    <select name="days" id="daysSelector">
+        <option value="7">last 7 Days</option>
+        <option value="30" selected>last 30 Days</option>
+        <option value="180">last 6 Months</option>
+        <option value="365">last Year</option>
+    </select>
+</div>
+
 <div id="chart_div"></div>
 {test}

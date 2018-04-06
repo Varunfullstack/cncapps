@@ -208,27 +208,30 @@ class BUUser extends Business
         return $db->Record[0];
     }
 
-    function test()
+    function teamMembersPerformanceData($teamLevel, $days)
     {
         global $db;
 
         $db->query("SELECT 
-  teamLevel,
+  loggedDate,
   SUM(loggedHours) AS loggedHours,
   SUM(dayHours) AS dayHours,
-  (SUM(loggedHours) / SUM(dayHours)) * 100 AS performancePercentage 
+  (SUM(loggedHours) / SUM(dayHours)) * 100 AS performancePercentage,
+  user_time_log.`userID`,
+  CONCAT(consultant.`firstName` ,' ', LEFT(consultant.`lastName`,1)) AS userLabel
 FROM
   user_time_log 
   JOIN consultant 
     ON cns_consno = userID 
-WHERE loggedDate >= DATE_SUB(DATE(NOW()), INTERVAL 7 DAY) 
+WHERE loggedDate >= DATE_SUB(DATE(NOW()), INTERVAL $days DAY) 
   AND loggedDate < DATE(NOW()) 
-  AND teamLevel = 2
-  GROUP BY loggedDate, teamLevel");
+  AND teamLevel = $teamLevel
+  GROUP BY loggedDate, cns_consno");
         $rows = [];
-        while ($db->next_record()) {
+        while ($db->next_record(1)) {
             $rows[] = $db->Record;
         }
+
         return $rows;
     }
 

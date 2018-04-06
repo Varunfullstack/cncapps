@@ -40,8 +40,14 @@ class CTHome extends CTCNC
                 $this->updateServiceDetails();
                 break;
             case 'lastWeekHelpDesk':
-                $this->showLastWeekHelpDeskData();
-                echo json_encode($this->showLastWeekHelpDeskData());
+
+                $days = $_REQUEST['days'];
+                if (!$days) {
+                    $days = 30;
+                }
+                $team = 1;
+
+                echo json_encode($this->showLastWeekHelpDeskData($team, $days), JSON_NUMERIC_CHECK);
                 break;
             default:
                 $this->display();
@@ -675,9 +681,72 @@ class CTHome extends CTCNC
 
     }
 
-    private function showLastWeekHelpDeskData()
+    private function showLastWeekHelpDeskData($team, $days)
     {
-        $this->buUser->test();
+        $target = null;
+        switch ($team) {
+            case 1:
+                $target = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+                break;
+            case 2:
+                $target = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+                break;
+            case 3:
+                $target = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
+                break;
+            default:
+                throw new Exception('Team not valid');
+        }
+
+        $test = [
+            "cols" => [
+                ["id" => "dates", "label" => "Dates", "type" => 'string'],
+                ["id" => "accumulation", "label" => "Team", "type" => 'number'],
+                ["id" => "target", "label" => "Target", "type" => 'number']
+            ],
+            "rows" => [
+
+            ]
+        ];
+        $results = $this->buUser->teamMembersPerformanceData($team, $days);
+//        var_dump($results);
+        $accumulations = [];
+
+        $columnsSet = [];
+
+        foreach ($results as $result) {
+            //for each result we need a column
+            if (!isset($columnsSet[$result['userID']])) {
+                $test["cols"][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
+                $columnsSet[$result['userID']] = $result['userLabel'];
+            }
+
+            if (!isset($accumulations[$result['loggedDate']])) {
+                $accumulations[$result['loggedDate']] = ['accumulation' => ['loggedHours' => 0, 'dayHours' => 0]];
+            }
+            $accumulationItem = $accumulations[$result['loggedDate']];
+            $accumulationItem[$result['userID']] = $result['performancePercentage'];
+
+            $accumulationItem['accumulation']['loggedHours'] += $result['loggedHours'];
+            $accumulationItem['accumulation']['dayHours'] += $result['dayHours'];
+            $accumulationItem['accumulation']['performance'] = $accumulationItem['accumulation']['dayHours'] ?
+                $accumulationItem['accumulation']['loggedHours'] /
+                $accumulationItem['accumulation']['dayHours'] * 100 : 0;
+
+            $accumulations[$result['loggedDate']] = $accumulationItem;
+        }
+
+        foreach ($accumulations as $key => $accumulation) {
+            $cell = ["c" => [["v" => $key], ["v" => $accumulation['accumulation']['performance']], ["v" => $target]]];
+
+            unset($accumulation['accumulation']);
+            foreach ($accumulation as $userId => $data) {
+                $cell["c"][] = ["v" => $data];
+            }
+            $test['rows'][] = $cell;
+        }
+
+        return ["members" => $columnsSet, "data" => $test];
     } // end displayUserLoggingPerformanceReport
 }// end of class
 ?>
