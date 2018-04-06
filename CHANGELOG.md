@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 2-197 - Add Awaiting Completed to technical Menu
+
 ##[1.5.1]
 - Issue 188 - New P5 SR for SSL hardcoded change
 
