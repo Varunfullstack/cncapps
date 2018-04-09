@@ -12,6 +12,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 176 - Change background colours on service request page
 - Issue 194 - Old tables in the database that aren't used?
+- Issue 2-197 - Add Awaiting Completed to technical Menu
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
