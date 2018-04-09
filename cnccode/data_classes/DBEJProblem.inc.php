@@ -52,12 +52,24 @@ class DBEJProblem extends DBEProblem
         $this->addColumn(self::dateRaisedDMY, DA_STRING, DA_ALLOW_NULL, "DATE_FORMAT(pro_date_raised, '%d/%m/%Y')");
         $this->addColumn(self::timeRaised, DA_STRING, DA_ALLOW_NULL, "TIME_FORMAT(pro_date_raised, '%H:%i')");
         $this->addColumn(self::totalActivityHours, DA_STRING, DA_ALLOW_NULL, "pro_total_activity_duration_hours");
-        $this->addColumn(self::hoursElapsed, DA_STRING, DA_ALLOW_NULL, "TIME_FORMAT(TIMEDIFF(NOW(), pro_date_raised), '%H:%i')");
-        $this->addColumn(self::engineerName, DA_STRING, DA_ALLOW_NULL, "CONCAT(consultant.firstName,' ',consultant.lastName)");
+        $this->addColumn(self::hoursElapsed,
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "TIME_FORMAT(TIMEDIFF(NOW(), pro_date_raised), '%H:%i')");
+        $this->addColumn(self::engineerName,
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "CONCAT(consultant.firstName,' ',consultant.lastName)");
         $this->addColumn(self::teamID, DA_ID, DA_ALLOW_NULL, "consultant.teamID");
         $this->addColumn(self::engineerLogname, DA_STRING, DA_ALLOW_NULL, "consultant.cns_logname");
-        $this->addColumn(self::engineerInitials, DA_STRING, DA_ALLOW_NULL, "CONCAT(SUBSTRING(consultant.firstName, 1, 1) ,SUBSTRING(consultant.lastName, 1, 1 ) )");
-        $this->addColumn(self::slaDueHours, DA_DATETIME, DA_ALLOW_NULL, "TIME_FORMAT( TIMEDIFF( pro_working_hours, pro_sla_response_hours ), '%H:%i')");
+        $this->addColumn(self::engineerInitials,
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "CONCAT(SUBSTRING(consultant.firstName, 1, 1) ,SUBSTRING(consultant.lastName, 1, 1 ) )");
+        $this->addColumn(self::slaDueHours,
+                         DA_DATETIME,
+                         DA_ALLOW_NULL,
+                         "TIME_FORMAT( TIMEDIFF( pro_working_hours, pro_sla_response_hours ), '%H:%i')");
         $this->addColumn(self::callActivityID, DA_INTEGER, DA_ALLOW_NULL, 'initial.caa_callactivityno');
         $this->addColumn(self::serverGuard, DA_YN, DA_ALLOW_NULL, 'initial.caa_serverguard');
         $this->addColumn(self::reason, DA_STRING, DA_ALLOW_NULL, 'initial.reason');
@@ -68,8 +80,14 @@ class DBEJProblem extends DBEProblem
         $this->addColumn(self::lastStartTime, DA_INTEGER, DA_ALLOW_NULL, "last.caa_starttime");
         $this->addColumn(self::lastUserID, DA_INTEGER, DA_ALLOW_NULL, "last.caa_consno");
         $this->addColumn(self::lastDate, DA_INTEGER, DA_ALLOW_NULL, "last.caa_date");
-        $this->addColumn(self::lastAwaitingCustomerResponseFlag, DA_INTEGER, DA_ALLOW_NULL, "last.caa_awaiting_customer_response_flag");
-        $this->addColumn(self::dashboardSortColumn, DA_FLOAT, DA_ALLOW_NULL, "pro_sla_response_hours - pro_working_hours ");
+        $this->addColumn(self::lastAwaitingCustomerResponseFlag,
+                         DA_INTEGER,
+                         DA_ALLOW_NULL,
+                         "last.caa_awaiting_customer_response_flag");
+        $this->addColumn(self::dashboardSortColumn,
+                         DA_FLOAT,
+                         DA_ALLOW_NULL,
+                         "pro_sla_response_hours - pro_working_hours ");
 
         $this->setAddColumnsOff();
         $this->setPK(0);
@@ -282,7 +300,7 @@ class DBEJProblem extends DBEProblem
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
           pro_custno = $customerID" .
-            " AND " . $this->getDBColumnName(self::dateRaised) . " BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()" .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date)  BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()" .
             " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
             " and " . $this->getDBColumnName(self::priority) . " = 1";
 
@@ -314,12 +332,42 @@ class DBEJProblem extends DBEProblem
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
           pro_custno = $customerID" .
-            " AND " . $this->getDBColumnName(self::dateRaised) . " BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" .
             " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
             " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
 
         $sql .= " ORDER BY pro_date_raised DESC";
+        $this->setQueryString($sql);
 
+        return parent::getRows();
+    }
+
+    public function getStartersSRByCustomerIDInDateRange($customerID, $startYearMonth, $endYearMonth)
+    {
+        $sql =
+            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
+            " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            ) 
+           LEFT JOIN consultant ON cns_consno = pro_consno
+        WHERE
+          pro_custno = $customerID" .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '$startYearMonth-01' AND  '$endYearMonth-31' " .
+            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
+            " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
+
+        $sql .= " ORDER BY pro_date_raised DESC";
         $this->setQueryString($sql);
 
         return parent::getRows();
@@ -346,7 +394,39 @@ class DBEJProblem extends DBEProblem
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
           pro_custno = $customerID" .
-            " AND " . $this->getDBColumnName(self::dateRaised) . " BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN CURDATE() - INTERVAL 12 month AND CURDATE()" .
+            " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
+            " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
+
+        $sql .= " ORDER BY pro_date_raised DESC";
+
+        $this->setQueryString($sql);
+
+        return parent::getRows();
+    }
+
+    public function getLeaversSRByCustomerIDInDateRange($customerID, $startYearMonth, $endYearMonth)
+    {
+        $sql =
+            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
+            " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            ) 
+           LEFT JOIN consultant ON cns_consno = pro_consno
+        WHERE
+          pro_custno = $customerID" .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '$startYearMonth-01' AND  '$endYearMonth-31' " .
             " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
             " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
 

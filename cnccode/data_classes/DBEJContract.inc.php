@@ -25,15 +25,24 @@ class DBEJContract extends DBECustomerItem
         $this->addColumn("renewalType", DA_STRING, DA_ALLOW_NULL, "renewalType.description");
         $this->addColumn("postcode", DA_STRING, DA_ALLOW_NULL, "add_postcode");
         $this->addColumn("adslPhone", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("invoiceFromDate", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')");
-        $this->addColumn("invoiceToDate", DA_DATE, DA_NOT_NULL, "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')");
+        $this->addColumn("invoiceFromDate",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')");
+        $this->addColumn("invoiceToDate",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')");
 
-        $this->addColumn("invoiceFromDateYMD", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
+        $this->addColumn("invoiceFromDateYMD",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
 
-        $this->addColumn("invoiceToDateYMD", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
+        $this->addColumn("invoiceToDateYMD",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
         $this->setAddColumnsOff();
     }
 

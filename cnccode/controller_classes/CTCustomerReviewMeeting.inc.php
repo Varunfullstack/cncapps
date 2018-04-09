@@ -69,7 +69,6 @@ class CTCustomerReviewMeeting extends CTCNC
                 $buCustomerItem = new BUCustomerItem($this);
 
                 $buCustomer = new BUCustomer($this);
-
                 $buActivity = new BUActivity($this);
 
                 $buServiceDeskReport = new BUServiceDeskReport($this);
@@ -107,16 +106,20 @@ class CTCustomerReviewMeeting extends CTCNC
                     $dsSearchForm->getValue('endYearMonth')
                 );
 
-                $textTemplate->set_var('chart', $this->generateCharts($results));
+                $textTemplate->set_var('chart', $this->generateCharts($results, $customerId));
 
-                $supportedUsersData = $this->getSupportedUsersData($buContact, $customerId, $dsCustomer->getValue('name'));
+                $supportedUsersData = $this->getSupportedUsersData($buContact,
+                                                                   $customerId,
+                                                                   $dsCustomer->getValue('name'));
 
                 $textTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
                 $contractsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
                 $contractsTemplate->set_file('contracts', 'CustomerReviewMeetingContractsSection.html');
 
-                $contractsTemplate->set_var("serverContract", $this->getServerCareContractBody($customerId, $supportedUsersData['count']));
+                $contractsTemplate->set_var("serverContract",
+                                            $this->getServerCareContractBody($customerId,
+                                                                             $supportedUsersData['count']));
                 $contractsTemplate->set_var("serviceDeskContract", $this->getServiceDeskContractBody($customerId));
                 $contractsTemplate->set_var('prepayContract', $this->getPrepayContractBody($customerId));
 
@@ -125,9 +128,15 @@ class CTCustomerReviewMeeting extends CTCNC
                 $contractsBody = $contractsTemplate->get_var('output');
 
                 $textTemplate->set_var('contracts', $contractsBody);
-                $textTemplate->set_var('24HourFlag', $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
+                $textTemplate->set_var('24HourFlag',
+                                       $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
                 $textTemplate->set_var('p1Incidents', $this->getP1IncidentsBody($customerId));
-                $textTemplate->set_var('startersAndLeavers', $this->getStartersAndLeaversBody($customerId));
+                $textTemplate->set_var('startersAndLeavers',
+                                       $this->getStartersAndLeaversBody(
+                                           $customerId,
+                                           $dsSearchForm->getValue('startYearMonth'),
+                                           $dsSearchForm->getValue('endYearMonth')
+                                       ));
                 $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
                 $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
 
@@ -232,9 +241,32 @@ class CTCustomerReviewMeeting extends CTCNC
                     $textTemplate->parse('rootCauses', 'rootCauseBlock', true);
 
                 }
+
+
+                $mainContacts = $buCustomer->getMainSupportContacts($customerId);
+                $string = '';
+                for ($i = 0; $i < count($mainContacts); $i++) {
+                    if ($i > 0) {
+                        //we have to append the comma ..or the "and" if this is the last one
+                        if ($i === count($mainContacts) - 1) {
+                            $string .= ' and ';
+                        } else {
+                            $string .= ', ';
+                        }
+
+                    }
+
+                    $string .= $mainContacts[$i]['firstName'] . ' ' . $mainContacts[$i]['lastName'];
+
+                }
+
+
+                $textTemplate->set_var('mainContacts', $string);
+
                 $buHeader = new BUHeader($this);
                 $buHeader->getHeader($dsHeader);
-                $textTemplate->set_var('customerReviewMeetingText', $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
+                $textTemplate->set_var('customerReviewMeetingText',
+                                       $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
 
                 $textTemplate->parse('output', 'page', true);
 
@@ -251,7 +283,8 @@ class CTCustomerReviewMeeting extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -311,7 +344,8 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $serverCareContractsTemplate->set_file('serverCareContracts', 'CustomerReviewMeetingServerCare.html');
         $serverCareContractsTemplate->set_var("contractDescription", $datasetContracts->getValue('itemDescription'));
-        $serverCareContractsTemplate->set_var("nextInvoice", $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
+        $serverCareContractsTemplate->set_var("nextInvoice",
+                                              $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
         $serverCareContractsTemplate->set_var('usersCount', $supportContactsCount);
 
         $serverCareContractsTemplate->set_block('serverCareContracts', 'contractItemsBlock', 'items');
@@ -398,8 +432,7 @@ class CTCustomerReviewMeeting extends CTCNC
             return "T&M User Support Only";
         }
         $datasetContracts->fetchNext();
-        $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate');
-        return "<p>Pre-Pay Contract: Pre-Pay Contract</p><p>next Invoice: $invoicePeriod</p>";
+        return "<p>Pre-Pay Contract</p>";
     }
 
     private function getP1IncidentsBody($customerId)
@@ -443,13 +476,13 @@ class CTCustomerReviewMeeting extends CTCNC
         return $p1IncidentsTemplate->get_var('output');
     }
 
-    private function getStartersAndLeaversBody($customerId)
+    private function getStartersAndLeaversBody($customerId, $startYearMonth, $endYearMonth)
     {
         $starterSR = new DBEJProblem($this);
-        $starterSR->getStartersSRByCustomerIDLast12Months($customerId);
+        $starterSR->getStartersSRByCustomerIDInDateRange($customerId, $startYearMonth, $endYearMonth);
 
         $leaverSR = new DBEJProblem($this);
-        $leaverSR->getLeaversSRByCustomerIDLast12Months($customerId);
+        $leaverSR->getLeaversSRByCustomerIDInDateRange($customerId, $startYearMonth, $endYearMonth);
 
         if (!$starterSR->rowCount() && !$leaverSR->rowCount()) {
             return "None";
@@ -467,10 +500,9 @@ class CTCustomerReviewMeeting extends CTCNC
             $startersAndLeaversTemplate->set_var('startersQty', $starterSR->rowCount());
             $workingHours = 0;
             while ($starterSR->fetchNext()) {
-                $workingHours += $starterSR->getValue(DBEJProblem::workingHours);
+                $workingHours += $starterSR->getValue(DBEJProblem::totalActivityDurationHours);
             }
             $avgHours = $workingHours / $starterSR->rowCount();
-            $startersAndLeaversTemplate->set_var('startersAvgHours', round($avgHours, 2));
             $startersAndLeaversTemplate->set_var('startersAvgMinutes', round($avgHours * 60, 2));
 
             $startersAndLeaversTemplate->parse('items', 'startersBlock', true);
@@ -484,10 +516,9 @@ class CTCustomerReviewMeeting extends CTCNC
             $startersAndLeaversTemplate->set_var('leaversQty', $leaverSR->rowCount());
             $workingHours = 0;
             while ($leaverSR->fetchNext()) {
-                $workingHours += $leaverSR->getValue(DBEJProblem::workingHours);
+                $workingHours += $leaverSR->getValue(DBEJProblem::totalActivityDurationHours);
             }
             $avgHours = $workingHours / $leaverSR->rowCount();
-            $startersAndLeaversTemplate->set_var('leaversAvgHours', round($avgHours, 2));
             $startersAndLeaversTemplate->set_var('leaversAvgMinutes', round($avgHours * 60, 2));
 
             $startersAndLeaversTemplate->parse('leaversItems', 'leaversBlock', true);
@@ -511,7 +542,7 @@ class CTCustomerReviewMeeting extends CTCNC
         if ($datasetContracts->rowCount()) {
             $test = new BUCustomerItem($this);
             $test->getServerWatchContractByCustomerID($customerId, $datasetServerWatch);
-            if ($datasetServerWatch->rowCount()) {
+            if (!$datasetServerWatch->rowCount()) {
                 $thirdPartyServerAccess = "<h2>Third-Party Server Access</h2>";
             }
 
@@ -519,7 +550,7 @@ class CTCustomerReviewMeeting extends CTCNC
         return $thirdPartyServerAccess;
     }
 
-    private function generateCharts($data)
+    private function generateCharts($data, $customerId)
     {
 
         $dataX = [];
@@ -606,15 +637,20 @@ class CTCustomerReviewMeeting extends CTCNC
             ]
         ];
 
+
         foreach ($data as $row) {
+
 
             $dataX[] = substr($row['monthName'], 0, 3) . "-" . $row['year'];
             $serverCareIncidents["plots"]["serverSR"]["data"][] = $row['serverCareCount1And3'];
             $serverCareIncidents["plots"]["avgResponse"]["data"][] = number_format($row['serverCareHoursResponded'], 1);
             $serverCareIncidents["plots"]['changes']["data"][] = $row['serverCareCount4'];
 
+
             $serviceDesk["plots"]['userSR']["data"][] = $row['serviceDeskCount1And3'] + $row['prepayCount1And3'];
-            $serviceDesk["plots"]['avgResponse']["data"][] = number_format($row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'], 1);
+            $serviceDesk["plots"]['avgResponse']["data"][] = number_format(
+                $row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'],
+                1);
             $serviceDesk["plots"]['changes']["data"][] = $row['serviceDeskCount4'] + $row['prepayCount4'];
 
             $otherContracts["plots"]["otherSr"]["data"][] = $row['otherCount1And3'];
@@ -625,12 +661,24 @@ class CTCustomerReviewMeeting extends CTCNC
             $totalSR["plots"]["p4"]["data"][] = $row['otherCount4'] + $row['serviceDeskCount4'] + $row['serverCareCount4'];
 
         }
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
 
+        $serverCareContract = null;
 
-        return '<img class="graph" src="' . $this->generateGraph($serverCareIncidents, $dataX) . '">
-        <img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '">
+        $toReturn = '';
+
+        if ($datasetContracts->rowCount()) {
+            $toReturn = '<img class="graph" src="' . $this->generateGraph($serverCareIncidents, $dataX) . '">';
+        }
+
+        $toReturn .=
+            '<img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '">
         <img class="graph" src="' . $this->generateGraph($otherContracts, $dataX) . '">
         <img class="graph" src="' . $this->generateGraph($totalSR, $dataX) . '">';
+        return $toReturn;
     }
 
     private function generateGraph($data, $dataX)
@@ -841,6 +889,11 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
         return "Review Meeting Frequency – " . $frequency;
+    }
+
+    private function getMainContacts(BUContact $buContact)
+    {
+        $buContact->getMainContacts();
     }
 
 } // end of class
