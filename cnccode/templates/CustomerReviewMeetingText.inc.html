@@ -25,7 +25,11 @@
     }
 
     h1 {
-        font-size: 16pt; font-weight: bold; text-decoration: underline; margin: 0 auto 20px auto; display: inline-block;
+        font-size: 16pt;
+        font-weight: bold;
+        text-decoration: underline;
+        margin: 0 auto 20px auto;
+        display: inline-block;
     }
 
     h2 {
@@ -52,9 +56,14 @@
     }
 
     table.collapse {
-        border-collapse: collapse; margin: 0 auto; border: 1px solid #666;
+        border-collapse: collapse;
+        margin: 0 auto;
+        border: 1px solid #666;
     }
-    table.collapse td { padding: 3px; }
+
+    table.collapse td {
+        padding: 3px;
+    }
 
     table.invisible, table.invisible th, table.invisible td {
         border: none;
@@ -67,19 +76,37 @@
     .test td {
         display: inline-block;
     }
-    .graph {
-        display: block; margin: 20px auto;
-    }
-    .ul3 { margin: 0 auto; padding: 0; max-width: 800px; display: block }
-    .ul3 li { width: 33%; list-style-type: none; float: left; display: inline-block; }
 
-    .break { display: block; width: 100%; clear: both }
+    .graph {
+        display: block;
+        margin: 20px auto;
+    }
+
+    .ul3 {
+        margin: 0 auto;
+        padding: 0;
+        max-width: 800px;
+        display: block
+    }
+
+    .ul3 li {
+        width: 33%;
+        list-style-type: none;
+        float: left;
+        display: inline-block;
+    }
+
+    .break {
+        display: block;
+        width: 100%;
+        clear: both
+    }
 
 </style>
 <div class="pageSize">
-    <center><p><img src="/images/CNC-Logo.png" alt="" /></p>
-        <br />
-    <h1>{customerName} - Review Meeting {meetingDate}</h1></center>
+    <center><p><img src="/images/CNC-Logo.png" alt=""/></p>
+        <br/>
+        <h1>{customerName} - Review Meeting {meetingDate}</h1></center>
 
     <h2>Support</h2>
 
@@ -104,7 +131,7 @@
     </table>
 
     <div id="charts">
-    {chart}
+        {chart}
     </div>
 
     <h3>Supported Users</h3>
@@ -115,16 +142,16 @@
     <div class="break"></div>
 
 
-        <table class="collapse" style="width: 600px">
-            <tbody><!-- BEGIN rootCauseBlock -->
-            <tr>
+    <table class="collapse" style="width: 600px">
+        <tbody><!-- BEGIN rootCauseBlock -->
+        <tr>
 
-                <td>{srRootCauseDescription}</td>
-                <td>{srCount}</td>
+            <td>{srRootCauseDescription}</td>
+            <td>{srCount}</td>
 
-            </tr><!-- END rootCauseBlock -->
-            </tbody>
-        </table>
+        </tr><!-- END rootCauseBlock -->
+        </tbody>
+    </table>
 
     <h3>Service Request Count</h3>
     <table class="collapse" style="width: 450px;">
@@ -141,6 +168,12 @@
         <!-- END userBlock -->
         </tbody>
     </table>
+
+    <h3>Client Portal/Main Contact(s)</h3>
+
+    <div>
+        {mainContacts}
+    </div>
 
     <div>
         {contracts}
