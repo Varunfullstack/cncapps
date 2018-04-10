@@ -686,7 +686,6 @@ class CTCustomerReviewMeeting extends CTCNC
         JpGraph\JpGraph::load();
         JpGraph\JpGraph::module('line');
         $graph = new Graph(700, 400);
-        $graph->img->SetAntiAliasing(false);
         $graph->title->Set($data['title']);
         $graph->title->SetFont(FF_ARIAL, FS_BOLD, 12);
         $graph->title->SetColor('white');
@@ -722,7 +721,6 @@ class CTCustomerReviewMeeting extends CTCNC
         foreach ($data["plots"] as $key => $plot) {
 
             $p1 = new LinePlot($plot["data"]);
-            $p1->SetWeight(10);
             $p1->SetLegend($plot["legend"]);
             $p1->SetStyle('solid');
             if ($plot["2ndAxis"]) {
@@ -731,6 +729,7 @@ class CTCustomerReviewMeeting extends CTCNC
             } else {
                 $graph->Add($p1);
             }
+            $p1->SetWeight(5);
         }
 
         if ($secondY) {
@@ -739,7 +738,7 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
         $graph->legend->SetPos(0.5, 0.05, 'center');
-        $graph->img->SetAntiAliasing(true);
+        $graph->img->SetAntiAliasing(false);
         $img = $graph->Stroke('__handle');
         ob_start();
         imagejpeg($img);

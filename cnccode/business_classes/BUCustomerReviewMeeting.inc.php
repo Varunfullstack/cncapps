@@ -15,6 +15,7 @@ require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 use Dompdf\Dompdf;
+use mikehaertl\shellcommand\Command;
 
 class BUCustomerReviewMeeting extends Business
 {
@@ -253,11 +254,19 @@ class BUCustomerReviewMeeting extends Business
         $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
         $dompdf->loadHtml($htmlPage);
 
-        echo '<br>';
-        var_dump($htmlPage);
+        file_put_contents('c:\\test.html', $htmlPage);
         $dompdf->render();
 
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+
+        $chrome = new \dawood\phpChrome\Chrome(null,
+                                               '"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"');
+
+        $chrome->useHtmlFile('c:\\test.html');
+
+
+        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
+                                                                                                       0,
+                                                                                                       4);
 
         $dompdf->add_info('Title', 'Agenda ' . $meetingDateDmy);
 
@@ -267,7 +276,33 @@ class BUCustomerReviewMeeting extends Business
 
         $pdfString = $dompdf->output();
 
-        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
+        $path = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy;
+        $filePath = $path . '.pdf';
+        $chromePath = $path . '-chrome.pdf';
+
+        $descriptors = array(
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'a'),
+        );
+        $command = "c: && cd \"C:\\Program Files (x86)\\Google\\Chrome\\Application\" && chrome --print-to-pdf=\"$chromePath\" --headless --disable-gpu --incognito --enable-viewport file://c:\\test.html";
+        $process = proc_open($command, $descriptors, $pipes);
+
+        if (is_resource($process)) {
+            $_stdOut = stream_get_contents($pipes[1]);
+            $_stdErr = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $_exitCode = proc_close($process);
+
+            if ($_exitCode !== 0) {
+                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
+            }
+        }
+        if ($_error) {
+            echo '<h1>Failed to generate files: ' . $_error . '</h1>';
+        } else {
+            echo '<h1>Generated Files Successfully</h1>';
+        }
 
 
 //        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
@@ -476,7 +511,9 @@ class BUCustomerReviewMeeting extends Business
 
         $dompdf->render();
 
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
+                                                                                                       0,
+                                                                                                       4);
 
         $dompdf->add_info('Title', 'Renewal Report ' . $meetingDateDmy);
 
