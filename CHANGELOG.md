@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.5.2] 2018-04-11
+### Changed
+- Issue 210 - Request time pop up box text change
+
 ##[1.5.1]
 - Issue 188 - New P5 SR for SSL hardcoded change
 
