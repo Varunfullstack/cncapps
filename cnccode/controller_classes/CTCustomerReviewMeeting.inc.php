@@ -729,7 +729,7 @@ class CTCustomerReviewMeeting extends CTCNC
             } else {
                 $graph->Add($p1);
             }
-            $p1->SetWeight(5);
+            $p1->SetWeight(2);
         }
 
         if ($secondY) {
@@ -738,7 +738,7 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
         $graph->legend->SetPos(0.5, 0.05, 'center');
-        $graph->img->SetAntiAliasing(false);
+        $graph->img->SetAntiAliasing(true);
         $img = $graph->Stroke('__handle');
         ob_start();
         imagejpeg($img);
