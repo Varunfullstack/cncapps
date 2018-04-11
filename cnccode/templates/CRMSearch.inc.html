@@ -26,9 +26,20 @@
     }
 </script>
 <style>
-    input[type=text], select { padding: 5px; width: 230px; font-size: 14px }
-    button { padding: 5px 9px; font-size: 14px; }
-    hr { margin-top: 20px;}
+    input[type=text], select {
+        padding: 5px;
+        width: 230px;
+        font-size: 14px
+    }
+
+    button {
+        padding: 5px 9px;
+        font-size: 14px;
+    }
+
+    hr {
+        margin-top: 20px;
+    }
 </style>
 
 <H2>{customerName}</H2>
@@ -50,9 +61,10 @@
                 > <input
                     type="text" id="customerString" name="customerString"
                     value="{customerString}" onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()"
+                    onBlur="javascript:validateCustomerString()" required
                     maxlength="50">
-                <button>search <i class="fa fa-search" aria-hidden="true"></i></button></td>
+                <button>search <i class="fa fa-search" aria-hidden="true"></i></button>
+            </td>
         </tr>
         <tr>
             <td><font class="formErrorMessage">
@@ -83,7 +95,7 @@
         </td>
     </tr>
 </table>
-<hr />
+<hr/>
 
 <link rel="stylesheet" type="text/css"
       href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>

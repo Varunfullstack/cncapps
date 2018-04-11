@@ -149,16 +149,11 @@ class CTCustomerCRM extends CTCNC
         $this->setMethodName('search');
 
         $dsSearchForm = new DSForm($this);
-        $dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsSearchForm->setValue('customerID', '');
-//        $this->buCustomer->initialiseSearchForm($dsSearchForm);
+        $dsSearchForm->addColumn('customerID', DA_STRING, DA_NOT_NULL);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-
                 $this->setFormErrorOn();
-
             } else {
                 $this->setCustomerID($dsSearchForm->getValue('customerID'));
                 $link = $this->buildLink(
@@ -327,8 +322,10 @@ class CTCustomerCRM extends CTCNC
             $this->dsContact->setValue('PortalPassword', $value['portalPassword']);
             $this->dsContact->setValue('AccountsFlag', $this->getYN($value['accountsFlag']));
             $this->dsContact->setValue('DiscontinuedFlag', $value['discontinuedFlag']);
-            $this->dsContact->setValue('SendMailshotFlag', $this->getYN($value['sendMailshotFlag']));// Use getYN() because HTML POST does not send a FALSE value
-            $this->dsContact->setValue('Mailshot1Flag', $this->getYN($value['mailshot1Flag']));// Use getYN() because HTML POST does not send a FALSE value
+            $this->dsContact->setValue('SendMailshotFlag',
+                                       $this->getYN($value['sendMailshotFlag']));// Use getYN() because HTML POST does not send a FALSE value
+            $this->dsContact->setValue('Mailshot1Flag',
+                                       $this->getYN($value['mailshot1Flag']));// Use getYN() because HTML POST does not send a FALSE value
             $this->dsContact->setValue('Mailshot2Flag', $this->getYN($value['mailshot2Flag']));
             $this->dsContact->setValue('Mailshot3Flag', $this->getYN($value['mailshot3Flag']));
             $this->dsContact->setValue('Mailshot4Flag', $this->getYN($value['mailshot4Flag']));
@@ -455,7 +452,8 @@ class CTCustomerCRM extends CTCNC
             }
             $this->dsCustomer->setValue('MailshotFlag', $this->getYN($value['mailshotFlag']));
             $this->dsCustomer->setValue('reviewDate', $this->convertDateYMD($value['reviewDate']));
-            $this->dsCustomer->setValue('reviewMeetingEmailSentFlag', $this->getYN($value['reviewMeetingEmailSentFlag']));
+            $this->dsCustomer->setValue('reviewMeetingEmailSentFlag',
+                                        $this->getYN($value['reviewMeetingEmailSentFlag']));
             $this->dsCustomer->setValue('reviewAction', $value['reviewAction']);
             $this->dsCustomer->setValue('reviewUserID', $value['reviewUserID']);
             $this->dsCustomer->setValue('reviewTime', $value['reviewTime']);
@@ -468,11 +466,13 @@ class CTCustomerCRM extends CTCNC
             $this->dsCustomer->setValue(DBECustomer::DateMeetingConfirmed, $value['dateMeetingConfirmedDate']);
             $this->dsCustomer->setValue(DBECustomer::MeetingDateTime, $value['meetingDateTime']);
             $this->dsCustomer->setValue(DBECustomer::InviteSent, $this->getTrueFalse($value[DBECustomer::InviteSent]));
-            $this->dsCustomer->setValue(DBECustomer::ReportProcessed, $this->getTrueFalse($value[DBECustomer::ReportProcessed]));
+            $this->dsCustomer->setValue(DBECustomer::ReportProcessed,
+                                        $this->getTrueFalse($value[DBECustomer::ReportProcessed]));
             $this->dsCustomer->setValue(DBECustomer::ReportSent, $this->getTrueFalse($value[DBECustomer::ReportSent]));
             $this->dsCustomer->setValue(DBECustomer::CrmComments, $value[DBECustomer::CrmComments]);
             $this->dsCustomer->setValue(DBECustomer::CompanyBackground, $value[DBECustomer::CompanyBackground]);
-            $this->dsCustomer->setValue(DBECustomer::DecisionMakerBackground, $value[DBECustomer::DecisionMakerBackground]);
+            $this->dsCustomer->setValue(DBECustomer::DecisionMakerBackground,
+                                        $value[DBECustomer::DecisionMakerBackground]);
             $this->dsCustomer->setValue(DBECustomer::OpportunityDeal, $value[DBECustomer::OpportunityDeal]);
             $this->dsCustomer->setValue(DBECustomer::Rating, $value[DBECustomer::Rating]);
             $this->dsCustomer->post();
@@ -614,7 +614,10 @@ class CTCustomerCRM extends CTCNC
     {
         if ($dateDMY != '') {
             $dateArray = explode('/', $dateDMY);
-            return ($dateArray[2] . '-' . str_pad($dateArray[1], 2, '0', STR_PAD_LEFT) . '-' . str_pad($dateArray[0], 2, '0', STR_PAD_LEFT));
+            return ($dateArray[2] . '-' . str_pad($dateArray[1], 2, '0', STR_PAD_LEFT) . '-' . str_pad($dateArray[0],
+                                                                                                       2,
+                                                                                                       '0',
+                                                                                                       STR_PAD_LEFT));
         } else {
             return '';
         }
@@ -1091,10 +1094,10 @@ class CTCustomerCRM extends CTCNC
         }
         $addSiteURL =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMER_ACT_ADDSITE,
-                    'customerID' => $this->getCustomerID(),
-                )
+                             array(
+                                 'action' => CTCUSTOMER_ACT_ADDSITE,
+                                 'customerID' => $this->getCustomerID(),
+                             )
             );
         if (!$this->formError) {              // Not displaying form error page so get customer record
             $this->dsCustomer->setValue('NameClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
@@ -1130,10 +1133,10 @@ class CTCustomerCRM extends CTCNC
         } else {
             $urlCreateCustomerFolder =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'createCustomerFolder',
-                        'customerID' => $this->getCustomerID(),
-                    )
+                                 array(
+                                     'action' => 'createCustomerFolder',
+                                     'customerID' => $this->getCustomerID(),
+                                 )
                 );
             $customerFolderLink =
                 '<a href="http:' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
@@ -1164,19 +1167,19 @@ class CTCustomerCRM extends CTCNC
 
         $showInactiveContactsURL =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'dispEdit',
-                    'customerID' => $this->getCustomerID(),
-                    'showInactiveContacts' => '1'
-                )
+                             array(
+                                 'action' => 'dispEdit',
+                                 'customerID' => $this->getCustomerID(),
+                                 'showInactiveContacts' => '1'
+                             )
             );
         $showInactiveSitesURL =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'dispEdit',
-                    'customerID' => $this->getCustomerID(),
-                    'showInactiveSites' => '1'
-                )
+                             array(
+                                 'action' => 'dispEdit',
+                                 'customerID' => $this->getCustomerID(),
+                                 'showInactiveSites' => '1'
+                             )
             );
         $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
 
@@ -1449,7 +1452,9 @@ class CTCustomerCRM extends CTCNC
             )
         );
 
-        $this->template->set_block('CustomerEdit', 'projectBlock', 'projects');      // have to declare innermost block first
+        $this->template->set_block('CustomerEdit',
+                                   'projectBlock',
+                                   'projects');      // have to declare innermost block first
 
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
 
@@ -1460,10 +1465,10 @@ class CTCustomerCRM extends CTCNC
                 if ($buProject->canDelete($dsProject->getValue('projectID'))) {
                     $deleteProjectLink =
                         $this->buildLink('Project.php',
-                            array(
-                                'action' => 'delete',
-                                'projectID' => $dsProject->getValue('projectID')
-                            )
+                                         array(
+                                             'action' => 'delete',
+                                             'projectID' => $dsProject->getValue('projectID')
+                                         )
                         );
                     $deleteProjectText = 'delete';
                 } else {
@@ -1473,10 +1478,10 @@ class CTCustomerCRM extends CTCNC
 
                 $editProjectLink =
                     $this->buildLink('Project.php',
-                        array(
-                            'action' => 'edit',
-                            'projectID' => $dsProject->getValue('projectID')
-                        )
+                                     array(
+                                         'action' => 'edit',
+                                         'projectID' => $dsProject->getValue('projectID')
+                                     )
                     );
 
                 $this->template->set_var(
@@ -1519,12 +1524,18 @@ class CTCustomerCRM extends CTCNC
 
         $this->template->set_block('CustomerEdit', 'selectSiteBlock', 'selectSites');
 
-        $this->template->set_block('CustomerEdit', 'contactBlock', 'contacts');      // have to declare innermost block first
+        $this->template->set_block('CustomerEdit',
+                                   'contactBlock',
+                                   'contacts');      // have to declare innermost block first
 
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) & ($this->getAction() != CTCUSTOMER_ACT_DISP_SUCCESS)) {                                                      // Only get from DB if not displaying form error(s)
-            $this->buCustomer->getSitesByCustomerID($this->dsCustomer->getValue('CustomerID'), $this->dsSite, $_REQUEST['showInactiveSites']);
+            $this->buCustomer->getSitesByCustomerID($this->dsCustomer->getValue('CustomerID'),
+                                                    $this->dsSite,
+                                                    $_REQUEST['showInactiveSites']);
 
-            $this->buCustomer->getContactsByCustomerID($this->dsCustomer->getValue('CustomerID'), $this->dsContact, $_REQUEST['showInactiveContacts']);
+            $this->buCustomer->getContactsByCustomerID($this->dsCustomer->getValue('CustomerID'),
+                                                       $this->dsContact,
+                                                       $_REQUEST['showInactiveContacts']);
 
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {
                 $this->buCustomer->addNewContactRow($this->dsContact, $this->getCustomerID(), $this->getSiteNo());
@@ -1548,11 +1559,11 @@ class CTCustomerCRM extends CTCNC
         //      $this->template->set_block('CustomerEdit','contacts', '');
         $addContactURL =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMER_ACT_ADDCONTACT,
-                    'customerID' => $site->getValue("CustomerID"),
-                    'siteNo' => $site->getValue("SiteNo")
-                )
+                             array(
+                                 'action' => CTCUSTOMER_ACT_ADDCONTACT,
+                                 'customerID' => $site->getValue("CustomerID"),
+                                 'siteNo' => $site->getValue("SiteNo")
+                             )
             );
         // If we can delete this site set the link
         if ($this->buCustomer->canDeleteSite($site->getValue("CustomerID"), $site->getValue("SiteNo"))) {
@@ -1971,7 +1982,15 @@ class CTCustomerCRM extends CTCNC
     function displayCustomerSelectPopup()
     {
         $this->setMethodName('displayCustomerSelectPopup');
-        $this->buCustomer->getCustomersByNameMatch('', '', $this->getCustomerString(), '', '', '', '', '', $this->dsCustomer);
+        $this->buCustomer->getCustomersByNameMatch('',
+                                                   '',
+                                                   $this->getCustomerString(),
+                                                   '',
+                                                   '',
+                                                   '',
+                                                   '',
+                                                   '',
+                                                   $this->dsCustomer);
         if ($this->dsCustomer->rowCount() == 1) {
             $this->setTemplateFiles('CustomerSelect', 'CustomerSelectOne.inc');
         }
