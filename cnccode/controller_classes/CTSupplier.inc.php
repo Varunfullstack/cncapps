@@ -167,14 +167,20 @@ class CTSupplier extends CTCNC
         unset($_SESSION['supplierParentDescField']);
         $submitURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
         $createURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SUPPLIER_ADD));
+        $supplierPopup = $this->buildLink(CTCNC_PAGE_SUPPLIER,
+                                          array(
+                                              'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                                              'htmlFmt' => CT_HTML_FMT_POPUP
+                                          )
+        );
         $this->template->set_var(
             array(
                 'supplierString' => $_REQUEST['supplierString'],
                 'address' => $_REQUEST['address'],
                 'supplierStringMessage' => $GLOBALS['supplierStringMessage'],
                 'submitURL' => $submitURL,
-                'createURL' => $createURL
-            )
+                'createURL' => $createURL,
+                'urlSupplierPopup' => $supplierPopup)
         );
         if (is_object($this->dsSupplier)) {
             $this->template->set_block('SupplierSearch', 'supplierBlock', 'suppliers');
