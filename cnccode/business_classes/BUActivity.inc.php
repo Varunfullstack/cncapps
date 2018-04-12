@@ -4269,10 +4269,8 @@ customer with the past 8 hours email to GL
         /*
     Send an email to the new person new user is not "unallocated" user
     */
-        if ($userID > 0 && $userID != USER_SYSTEM) { // not deallocating
-
+        if ($userID > 0) { // not deallocating
             $this->sendServiceReallocatedEmail($problemID, $userID, $allocatedBy);
-
         }
 
         $this->dbeProblem->setValue('userID', $userID);

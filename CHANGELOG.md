@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 194 - Old tables in the database that aren't used?
 - Issue 2-197 - Add Awaiting Completed to technical Menu
 - Issue 200 - Amend Unprinted Purchase Orders email
+- Issue 203 - Assigning a service request to qsysytem user does not record who assigned it
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
