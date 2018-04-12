@@ -25,6 +25,7 @@ This project changes will be shown here.
 - Issue 186 - Time limit request bug with IMT team
 - Issue 191 - Amend the value of the hours spent on critical SR activity email
 - Issue 192 - Passwords page crashes when incomplete customer name is used
+- Issue 206 - Goods In supplier tab out does not work
 
 ## [v1.5.2] - 2018-04-11
 ### Changed
