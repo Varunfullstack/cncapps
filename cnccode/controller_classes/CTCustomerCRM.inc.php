@@ -1072,8 +1072,8 @@ class CTCustomerCRM extends CTCNC
             $this->buCustomer->addNewCustomerRow($this->dsCustomer);
         }
         $this->setTemplateFiles('CustomerEdit', 'CustomerCRM.inc');
+
 // Parameters
-        $this->setPageTitle("Customer");
         if ($_REQUEST['save_page']) {
             $_SESSION['save_page'] = $_REQUEST['save_page'];
         } else {
@@ -1105,6 +1105,7 @@ class CTCustomerCRM extends CTCNC
             $this->dsCustomer->setValue('DeliverSiteMessage', CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
         }
 
+        $this->setPageTitle("Customer - " . $this->dsCustomer->getValue('Name'));
         /*
         Get the list of custom letter template file names from the custom letter directory
         */

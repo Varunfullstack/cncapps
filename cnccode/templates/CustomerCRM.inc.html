@@ -1,9 +1,6 @@
 <!-- Template: CustomerEdit.inc.html -->
 <script language='JavaScript' src='.javascript/ajax.js'></script>
 <script src="ckeditor/ckeditor.js"></script>
-<style>
-
-</style>
 <script type="text/JavaScript">
 
     $(function () {
@@ -265,12 +262,35 @@
     #customerNoteModifiedText {
         display: inline-block;
     }
-    #textareas { float: left; min-width: 500px; width: 1060px; }
-    #textareas .textarea { float: left; margin-right: 20px; min-height: 50px; width: 500px; max-width: 530px; }
-    .cke { width: 500px !important; margin-bottom: 15px; }
-    .textarea .label { line-height: 26px; font-size: 14px; }
+
+    #textareas {
+        float: left;
+        min-width: 500px;
+        width: 1060px;
+    }
+
+    #textareas .textarea {
+        float: left;
+        margin-right: 20px;
+        min-height: 50px;
+        width: 500px;
+        max-width: 530px;
+    }
+
+    .cke {
+        width: 500px !important;
+        margin-bottom: 15px;
+    }
+
+    .textarea .label {
+        line-height: 26px;
+        font-size: 14px;
+    }
+
     @media screen and (max-width: 1600px) {
-        #textareas { width: 530px; }
+        #textareas {
+            width: 530px;
+        }
     }
 </style>
 
