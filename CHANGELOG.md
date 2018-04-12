@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+- Issue 208 - Remove blank space from display of phone numbers
+
 ## [v1.5.2] 2018-04-11
 ### Changed
 - Issue 210 - Request time pop up box text change
