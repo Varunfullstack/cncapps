@@ -127,6 +127,8 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
+
+
         $urlLogout = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_LOGOUT));
         // if new session then username not set yet
         if ($userName == '') {
@@ -136,35 +138,55 @@ class CTCNC extends Controller
             $userName = $dbeUser->getValue('name');
         }
 
+        $screenSalesTemplate = 'ScreenSales.inc';
+        $screenAccountsTemplate = 'ScreenAccounts.inc';
+        $screenTechnicalTemplate = 'ScreenTechnical.inc';
+        $screenRenewalsTemplate = 'ScreenRenewals.inc';
+        $screenMaintenanceTemplate = 'ScreenMaintenance.inc';
+        $screenReportsTemplate = 'ScreenReports.inc';
+        $screenCustomerTemplate = 'ScreenCustomer.inc';
+
+
+        if (isset($_REQUEST['oldMenu'])) {
+            $screenSalesTemplate = 'ScreenSalesOld.inc';
+            $screenAccountsTemplate = 'ScreenAccountsOld.inc';
+            $screenTechnicalTemplate = 'ScreenTechnicalOld.inc';
+            $screenRenewalsTemplate = 'ScreenRenewalsOld.inc';
+            $screenMaintenanceTemplate = 'ScreenMaintenanceOld.inc';
+            $screenReportsTemplate = 'ScreenReportsOld.inc';
+            $screenCustomerTemplate = 'ScreenCustomerOld.inc';
+        }
+
         $this->template->set_var(array('userName' => $userName, 'fromDate' => '', 'urlLogout' => $urlLogout));
         // display correct menus despending upon permission levels for this user
         if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
-            $this->setTemplateFiles(array('ScreenSales' => 'ScreenSales.inc'));
+
+            $this->setTemplateFiles(array('ScreenSales' => $screenSalesTemplate));
             $this->template->parse('screenSales', 'ScreenSales', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
-            $this->setTemplateFiles(array('ScreenAccounts' => 'ScreenAccounts.inc'));
+            $this->setTemplateFiles(array('ScreenAccounts' => $screenAccountsTemplate));
             $this->template->parse('screenAccounts', 'ScreenAccounts', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
-            $this->setTemplateFiles(array('ScreenTechnical' => 'ScreenTechnical.inc'));
+            $this->setTemplateFiles(array('ScreenTechnical' => $screenTechnicalTemplate));
             $this->template->parse('screenTechnical', 'ScreenTechnical', true);
 
         }
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $this->setTemplateFiles(array('ScreenRenewals' => 'ScreenRenewals.inc'));
+            $this->setTemplateFiles(array('ScreenRenewals' => $screenRenewalsTemplate));
             $this->template->parse('screenRenewals', 'ScreenRenewals', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
-            $this->setTemplateFiles(array('ScreenMaintenance' => 'ScreenMaintenance.inc'));
+            $this->setTemplateFiles(array('ScreenMaintenance' => $screenMaintenanceTemplate));
             $this->template->parse('screenMaintenance', 'ScreenMaintenance', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_REPORTS)) {
-            $this->setTemplateFiles(array('ScreenReports' => 'ScreenReports.inc'));
+            $this->setTemplateFiles(array('ScreenReports' => $screenReportsTemplate));
             $this->template->parse('screenReports', 'ScreenReports', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $this->setTemplateFiles(array('ScreenCustomer' => 'ScreenCustomer.inc'));
+            $this->setTemplateFiles(array('ScreenCustomer' => $screenCustomerTemplate));
             $this->template->parse('screenCustomer', 'ScreenCustomer', true);
         }
 
