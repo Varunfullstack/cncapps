@@ -9,6 +9,24 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBESite extends DBCNCEntity
 {
+
+    const CustomerID = "CustomerID";
+    const SiteNo = "SiteNo";
+    const Add1 = "Add1";
+    const Add2 = "Add2";
+    const Add3 = "Add3";
+    const Town = "Town";
+    const County = "County";
+    const Postcode = "Postcode";
+    const InvoiceContactID = "InvoiceContactID";
+    const DeliverContactID = "DeliverContactID";
+    const DebtorCode = "DebtorCode";
+    const SageRef = "SageRef";
+    const Phone = "Phone";
+    const MaxTravelHours = "MaxTravelHours";
+    const ActiveFlag = "ActiveFlag";
+    const NonUKFlag = "NonUKFlag";
+
     /**
      * calls constructor()
      * @access public
@@ -20,21 +38,22 @@ class DBESite extends DBCNCEntity
     {
         parent::__construct($owner);
         $this->setTableName("Address");
-        $this->addColumn("CustomerID", DA_ID, DA_NOT_NULL, "add_custno");
-        $this->addColumn("SiteNo", DA_ID, DA_ALLOW_NULL, "add_siteno");
-        $this->addColumn("Add1", DA_STRING, DA_NOT_NULL, "add_add1");
-        $this->addColumn("Add2", DA_STRING, DA_ALLOW_NULL, "add_add2");
-        $this->addColumn("Add3", DA_STRING, DA_ALLOW_NULL, "add_add3");
-        $this->addColumn("Town", DA_STRING, DA_NOT_NULL, "add_town");
-        $this->addColumn("County", DA_STRING, DA_ALLOW_NULL, "add_county");
-        $this->addColumn("Postcode", DA_STRING, DA_NOT_NULL, "add_postcode");
-        $this->addColumn("InvoiceContactID", DA_ID, DA_ALLOW_NULL, "add_inv_contno");
-        $this->addColumn("DeliverContactID", DA_ID, DA_ALLOW_NULL, "add_del_contno");
-        $this->addColumn("DebtorCode", DA_STRING, DA_ALLOW_NULL, "add_debtor_code");
-        $this->addColumn("SageRef", DA_STRING, DA_ALLOW_NULL, "add_sage_ref");
-        $this->addColumn("Phone", DA_STRING, DA_ALLOW_NULL, "add_phone");
-        $this->addColumn("MaxTravelHours", DA_INTEGER, DA_ALLOW_NULL, "add_max_travel_hours");
-        $this->addColumn("ActiveFlag", DA_YN, DA_ALLOW_NULL, "add_active_flag");
+        $this->addColumn(self::CustomerID, DA_ID, DA_NOT_NULL, "add_custno");
+        $this->addColumn(self::SiteNo, DA_ID, DA_ALLOW_NULL, "add_siteno");
+        $this->addColumn(self::Add1, DA_STRING, DA_NOT_NULL, "add_add1");
+        $this->addColumn(self::Add2, DA_STRING, DA_ALLOW_NULL, "add_add2");
+        $this->addColumn(self::Add3, DA_STRING, DA_ALLOW_NULL, "add_add3");
+        $this->addColumn(self::Town, DA_STRING, DA_NOT_NULL, "add_town");
+        $this->addColumn(self::County, DA_STRING, DA_ALLOW_NULL, "add_county");
+        $this->addColumn(self::Postcode, DA_STRING, DA_NOT_NULL, "add_postcode");
+        $this->addColumn(self::InvoiceContactID, DA_ID, DA_ALLOW_NULL, "add_inv_contno");
+        $this->addColumn(self::DeliverContactID, DA_ID, DA_ALLOW_NULL, "add_del_contno");
+        $this->addColumn(self::DebtorCode, DA_STRING, DA_ALLOW_NULL, "add_debtor_code");
+        $this->addColumn(self::SageRef, DA_STRING, DA_ALLOW_NULL, "add_sage_ref");
+        $this->addColumn(self::Phone, DA_STRING, DA_ALLOW_NULL, "add_phone");
+        $this->addColumn(self::MaxTravelHours, DA_INTEGER, DA_ALLOW_NULL, "add_max_travel_hours");
+        $this->addColumn(self::ActiveFlag, DA_YN, DA_ALLOW_NULL, "add_active_flag");
+        $this->addColumn(self::NonUKFlag, DA_YN, DA_ALLOW_NULL, "add_non_uk_flag");
         $this->setPK(1);        // NOTE: This is not really the PK, just the second element
         $this->setAddColumnsOff();
         $this->setNewRowValue(-9);        // This allows for fact that first siteNo is zero. Used in DataAccess->replicate()

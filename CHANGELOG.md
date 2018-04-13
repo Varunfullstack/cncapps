@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 202 - UK National Holiday notification for Non UK customers
+
 ## [v1.5.2] 2018-04-11
 ### Changed
 - Issue 210 - Request time pop up box text change
