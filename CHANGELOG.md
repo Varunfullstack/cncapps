@@ -17,6 +17,7 @@ This project changes will be shown here.
 - Issue 200 - Amend Unprinted Purchase Orders email
 - Issue 203 - Assigning a service request to qsysytem user does not record who assigned it
 - Issue 112 - CNC005
+- Issue 208 - Remove blank space from display of phone numbers
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue

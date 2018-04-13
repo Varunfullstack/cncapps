@@ -488,13 +488,19 @@ class BUCustomer extends Business
         $dsContact->fetchNext();
 
         if ($dsSite->getValue('phone') != '') {
-            $contactPhone = '<a href="tel:' . $dsSite->getValue('phone') . '">' . $dsSite->getValue('phone') . '</a>';
+            $contactPhone = '<a href="tel:' . str_replace(' ',
+                                                          '',
+                                                          $dsSite->getValue('phone')) . '">' . $dsSite->getValue('phone') . '</a>';
         }
         if ($dsContact->getValue('phone') != '') {
-            $contactPhone .= ' DDI: <a href="tel:' . $dsContact->getValue('phone') . '">' . $dsContact->getValue('phone') . '</a>';
+            $contactPhone .= ' DDI: <a href="tel:' . str_replace(' ',
+                                                                 '',
+                                                                 $dsContact->getValue('phone')) . '">' . $dsContact->getValue('phone') . '</a>';
         }
         if ($dsContact->getValue('mobilePhone') != '') {
-            $contactPhone .= ' Mobile: <a href="tel:' . $dsContact->getValue('mobilePhone') . '">' . $dsContact->getValue('mobilePhone') . '</a>';
+            $contactPhone .= ' Mobile: <a href="tel:' . str_replace(' ',
+                                                                    '',
+                                                                    $dsContact->getValue('mobilePhone')) . '">' . $dsContact->getValue('mobilePhone') . '</a>';
         }
         return $contactPhone;
     }
