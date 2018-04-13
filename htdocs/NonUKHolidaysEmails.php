@@ -38,7 +38,43 @@ if (!in_array($dateToTest, $bankHolidays)) {
 
 echo 'The date tested is a bank holiday... proceed';
 
+if (!$db1 = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
+    echo 'Could not connect to mysql host ' . DB_HOST;
+    exit;
+}
+$db1->select_db(DB_NAME);
 
+
+$sender_name = "System";
+$sender_email = CONFIG_SALES_EMAIL;
+$headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/html";
+
+/*
+Unprinted purchase orders email to Gary
+*/
+$query =
+    "SELECT 
+      con_email,
+      con_first_name,
+      con_last_name
+    FROM
+      contact 
+      LEFT JOIN address 
+        ON address.`add_custno` = con_custno 
+        AND address.`add_siteno` = con_siteno 
+    WHERE contact.`con_mailflag5` = 'Y' 
+      AND address.`add_active_flag` = 'Y'
+      AND address.add_non_uk_flag = 'Y'";
+
+
+$result = $db1->query($query);
+
+
+foreach ($result->fetch_assoc() as $row){
+
+}
 
 //
 //
