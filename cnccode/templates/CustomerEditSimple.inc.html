@@ -829,10 +829,23 @@
                         </td>
                     </tr>
                     <tr>
+                        <td class="content">Non UK</td>
+                        <td class="content">
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[site][{customerID}{siteNo}][nonUKFlag]"
+                                   title="Check to show this site is overseas and not in the UK"
+                                   value="Y" {nonUKFlagChecked}/>
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="content">Active</td>
                         <td class="content">
-                            <input {disabled} type="checkbox" name="form[site][{customerID}{siteNo}][activeFlag]"
-                                   value="Y" {activeFlagChecked}/>
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[site][{customerID}{siteNo}][activeFlag]"
+                                   value="Y"
+                                   {activeFlagChecked}/>
                         </td>
                     </tr>
                     <tr>
