@@ -1,0 +1,179 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="Issue112-1515523724-0">
+        <tagDatabase tag="Issue112"/>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerLeadStatus"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerLeadStatus">
+            <column name="id" type="int(10)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <tableIsEmpty tableName="customerLeadStatus"/>
+        </preConditions>
+        <sql>
+            insert into customerLeadStatus(id, name) values
+            (1, 'Open'),
+            (2, 'Identified DM'),
+            (3, 'Long Term Prospect'),
+            (4, 'No Match'),
+            (5, 'Unqualified'),
+            (6, 'Qualified Prospect'),
+            (7, 'Converted to appointment!!!'),
+            (8, 'Duplicate'),
+            (9, 'Influencer Identified'),
+            (10, 'Referred Prospect'),
+            (11, 'Not Interested'),
+            (12, 'Do Not Call' )
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="customer_lead_status_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="customer_lead_status_id" type="int(10)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="date_meeting_confirmed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="date_meeting_confirmed" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="meeting_datetime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="meeting_datetime" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="invite_sent"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="invite_sent" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="report_processed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="report_processed" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="report_sent"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="report_sent" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="crm_comments"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="crm_comments" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="company_background"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="company_background" type="clob">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-11" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="decision_maker_background"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="decision_maker_background" type="clob">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="opportunity_deal"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="opportunity_deal" type="clob">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Issue112-1515523724-13" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="rating"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="rating" type="int">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+</databaseChangeLog>

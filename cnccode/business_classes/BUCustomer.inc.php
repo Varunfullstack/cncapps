@@ -9,6 +9,7 @@ require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
+require_once($cfg["path_dbe"] . "/DBECustomerLeadStatus.php");
 require_once($cfg["path_dbe"] . "/DBELeadStatus.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 define('BUCUSTOMER_NAME_STR_NT_PASD', 'No name string passed');
@@ -18,7 +19,15 @@ class BUCustomer extends Business
     var $dbeCustomer = "";
     var $dbeSite = "";
     var $dbeContact = "";
-    var $dbeCustomerType = "";
+    /**
+     * @var DBECustomerType
+     */
+    var $dbeCustomerType;
+
+    /**
+     * @var DBECustomerLeadStatus
+     */
+    protected $dbeCustomerLeadStatuses;
     var $buHeader = '';
     var $dsHeader = '';
 
@@ -34,6 +43,7 @@ class BUCustomer extends Business
         $this->dbeSite = new DBESite($this);
         $this->dbeContact = new DBEContact($this);
         $this->dbeCustomerType = new DBECustomerType($this);
+        $this->dbeCustomerLeadStatuses = new DBECustomerLeadStatus($this);
         $this->buHeader = new BUHeader($this);
         $this->buHeader->getHeader($this->dsHeader);
         $this->dsHeader->fetchNext();
@@ -196,6 +206,7 @@ class BUCustomer extends Business
     /**
      * Get all customer types
      * @parameter DataSet &$dsResults results
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -204,6 +215,25 @@ class BUCustomer extends Business
         $this->setMethodName('getCustomerTypes');
         $this->dbeCustomerType->getRows('description');
         return ($this->getData($this->dbeCustomerType, $dsResults));
+    }
+
+    /**
+     * @param DataSet $dsResults
+     * @return bool
+     */
+    function getCustomerLeadStatuses(&$dsResults)
+    {
+        $this->dbeCustomerLeadStatuses->getRows('name');
+        return ($this->getData($this->dbeCustomerLeadStatuses, $dsResults));
+    }
+
+    /**
+     * @param null $leadStatusID
+     * @return DBEContact
+     */
+    function getMainContactsByLeadStatus($leadStatusID = null)
+    {
+        return $this->dbeContact->getMainContactsByLeadStatus($leadStatusID);
     }
 
     /**
@@ -233,10 +263,10 @@ class BUCustomer extends Business
             $this->raiseError('Customer Name is empty!');
             exit;
         }
-        if ($dsData->getValue('sectorID') == 0) {
-            $this->raiseError('Sector not set set!');
-            exit;
-        }
+//        if ($dsData->getValue('sectorID') == 0) {
+//            $this->raiseError('Sector not set set!');
+//            exit;
+//        }
         $dsData->setValue('modifyDate', date('Y-m-d H:i:s'));
         $dsData->setValue('modifyUserID', $GLOBALS ['auth']->is_authenticated());
 
