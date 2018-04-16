@@ -18,6 +18,7 @@ This project changes will be shown here.
 - Issue 203 - Assigning a service request to qsysytem user does not record who assigned it
 - Issue 112 - CNC005
 - Issue 208 - Remove blank space from display of phone numbers
+- Issue 212 - Remove old items from menu
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
