@@ -78,7 +78,7 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
     $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
     $template->set_file('page', 'NonUKHolidaysEmail.html');
 
-    $template->set_var('contactName', $row['con_first_name'] . ' ' . $row['con_last_name']);
+    $template->set_var('contactName', $row['con_first_name']);
 
     $template->set_var('date', Date('l jS F', strtotime($dateToTest)));
 
