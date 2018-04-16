@@ -22,13 +22,13 @@ $dateToTest = @$_REQUEST['testDate'];
 
 $error = false;
 
-$bankHolidays = common_getUKBankHolidays(date('Y'));
+
 
 if (!$dateToTest) {
     $dateToTest = Date('Y-m-d', strtotime("+3 days"));
 }
 
-
+$bankHolidays = common_getUKBankHolidays((new DateTime($dateToTest))->format('Y'));
 // Exclude bank holidays and weekends
 
 if (!in_array($dateToTest, $bankHolidays)) {
