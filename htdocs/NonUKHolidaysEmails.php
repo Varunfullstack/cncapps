@@ -70,9 +70,49 @@ $query =
 
 
 $result = $db1->query($query);
+$subject = "UK National Holiday - CNC ServiceDesk Availability";
+
+foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
 
 
-foreach ($result->fetch_assoc() as $row){
+    $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+    $template->set_file('page', 'NonUKHolidaysEmail.html');
+
+    $template->set_var('contactName', $row['con_first_name'] . ' ' . $row['con_last_name']);
+
+    $template->set_var('date', Date('l jS F', strtotime($dateToTest)));
+
+    $template->parse('output', 'page', true);
+
+    $body = $template->get_var('output');
+
+    $buMail = new BUMail($this);
+
+    $buMail->mime->setHTMLBody($body);
+
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset' => 'UTF-8',
+        'html_charset' => 'UTF-8',
+        'head_charset' => 'UTF-8'
+    );
+    $body = $buMail->mime->get($mime_params);
+
+    $hdrs = array(
+        'From' => CONFIG_SUPPORT_EMAIL,
+        'Subject' => $subject,
+        'Content-Type' => 'text/html; charset=UTF-8'
+    );
+
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    $sent = $buMail->putInQueue(
+        CONFIG_SUPPORT_EMAIL,
+        $row['con_email'],
+        $hdrs,
+        $body,
+        true
+    );
 
 }
 
