@@ -31,6 +31,7 @@ This project changes will be shown here.
 - Issue 192 - Passwords page crashes when incomplete customer name is used
 - Issue 206 - Goods In supplier tab out does not work
 - Issue 207 - Export Prepay Service Request calendar incorrectly linked
+- Issue 209 - Current Documentation Folder & Open Folder does not open when using Chrome
 
 ## [v1.5.2] - 2018-04-11
 ### Changed

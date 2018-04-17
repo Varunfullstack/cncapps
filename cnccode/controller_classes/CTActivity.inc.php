@@ -1518,11 +1518,11 @@ class CTActivity extends CTCNC
             );
 
 
-        if ($buCustomer->customerFolderExists($dsCallActivity->getValue('customerID'))) {
-            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($dsCallActivity->getValue('customerID'));
-
-            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Current Documentation Folder">Current Documentation Folder</a>';
-        }
+//        if ($buCustomer->customerFolderExists($dsCallActivity->getValue('customerID'))) {
+//            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($dsCallActivity->getValue('customerID'));
+//
+//            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Current Documentation Folder">Current Documentation Folder</a>';
+//        }
 
         $buCustomerItem = new BUCustomerItem($this);
         $minResponseTime = $buCustomerItem->getMinResponseTime($dsCallActivity->getValue('customerID'));
@@ -1878,7 +1878,7 @@ class CTActivity extends CTCNC
             );
 
 
-        $renewalsLink = '| <a href="' . $renewalsLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
+        $renewalsLink = '<a href="' . $renewalsLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         return $renewalsLink;
     }// end displayProjects
@@ -2501,16 +2501,17 @@ class CTActivity extends CTCNC
             $buCustomer = new BUCustomer($this);
         }
 
-        if ($buCustomer->customerFolderExists($customerID)) {
+//        if ($buCustomer->customerFolderExists($customerID)) {
+//
+//            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($customerID);
+//
+//            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Current Documentation Folder">Current Documentation Folder</a>';
+//        } else {
+//            $currentDocumentsLink = '';
+//        }
 
-            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($customerID);
-
-            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Current Documentation Folder">Current Documentation Folder</a>';
-        } else {
-            $currentDocumentsLink = '';
-        }
-
-        return $currentDocumentsLink;
+        return null;
+//        return $currentDocumentsLink;
 
     }
 
