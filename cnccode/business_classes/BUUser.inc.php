@@ -211,8 +211,7 @@ class BUUser extends Business
     function teamMembersPerformanceData($teamLevel, $days)
     {
         global $db;
-
-        $db->query("SELECT 
+        $query = "SELECT 
   loggedDate,
   SUM(loggedHours) AS loggedHours,
   SUM(dayHours) AS dayHours,
@@ -226,7 +225,10 @@ FROM
 WHERE loggedDate >= DATE_SUB(DATE(NOW()), INTERVAL $days DAY) 
   AND loggedDate < DATE(NOW()) 
   AND teamLevel = $teamLevel
-  GROUP BY loggedDate, cns_consno");
+  GROUP BY loggedDate, cns_consno";
+        $db->query($query);
+
+
         $rows = [];
         while ($db->next_record(1)) {
             $rows[] = $db->Record;

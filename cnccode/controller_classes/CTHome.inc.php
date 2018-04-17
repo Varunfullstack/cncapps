@@ -47,6 +47,11 @@ class CTHome extends CTCNC
                 }
                 $team = 1;
 
+                if (isset($_REQUEST['team'])) {
+                    $team = $_REQUEST['team'];
+                }
+
+
                 echo json_encode($this->showLastWeekHelpDeskData($team, $days), JSON_NUMERIC_CHECK);
                 break;
             default:
@@ -709,7 +714,6 @@ class CTHome extends CTCNC
             ]
         ];
         $results = $this->buUser->teamMembersPerformanceData($team, $days);
-//        var_dump($results);
         $accumulations = [];
 
         $columnsSet = [];
