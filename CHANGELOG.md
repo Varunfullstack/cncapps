@@ -2,7 +2,18 @@
 This project changes will be shown here.
 
 ##[unreleased]
+### Changed
 - Issue 169 - CNC034 - Review Meeting Automation
+
+## [v1.5.2] 2018-04-11
+### Changed
+- Issue 210 - Request time pop up box text change
+
+##[1.5.1]
+- Issue 188 - New P5 SR for SSL hardcoded change
+
+##[1.5.0]
+- Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 
 ##[1.4.0] - 2018-03-08
 - Issue 175 - CNC037 - tidy up imported emails
