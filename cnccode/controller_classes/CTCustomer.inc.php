@@ -210,6 +210,7 @@ class CTCustomer extends CTCNC
             $this->dsSite->setValue('DeliverContactID', $value['deliverContactID']);
             $this->dsSite->setValue('SageRef', $value['sageRef']);
             $this->dsSite->setValue('DebtorCode', $value['debtorCode']);
+            $this->dsSite->setValue(DBESite::NonUKFlag, $this->getYN($value['nonUKFlag']));
             $this->dsSite->setValue('ActiveFlag', $this->getYN($value['activeFlag']));
             $this->dsSite->post();
         }
@@ -1545,6 +1546,7 @@ ORDER BY cus_name ASC  ";
                     'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $this->dsSite->getValue('SiteNo')) ? CT_CHECKED : '',
                     'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $this->dsSite->getValue('SiteNo')) ? CT_CHECKED : '',
                     'activeFlagChecked' => ($this->dsSite->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
+                    'nonUKFlagChecked' => ($this->dsSite->getValue(DBESite::NonUKFlag) == 'Y') ? CT_CHECKED : '',
                     'deleteSiteText' => $deleteSiteText,
                     'deleteSiteURL' => $deleteSiteURL
                 )

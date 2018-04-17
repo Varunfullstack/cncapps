@@ -341,8 +341,10 @@ class BUCustomer extends Business
     function updateSite(&$dsData)
     {
         $this->setMethodName('updateSite');
+
         $this->dbeSite->setCallbackMethod(DA_AFTER_COLUMNS_CREATED, $this, 'setCustomerID');
         $ret = ($this->updateDataaccessObject($dsData, $this->dbeSite));
+
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
         $this->updateModify($dsData->getValue('CustomerID'));
         return $ret;

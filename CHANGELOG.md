@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 184 - Request 038 - Daily Open SR Report for customers
 - Issue 193 - Monitor SR feature to receive updates automatically
 - Issue 201 - Create items not yet received process
+- Issue 202 - UK National Holiday notification for Non UK customers
 
 ### Changed
 - Issue 176 - Change background colours on service request page
