@@ -1,4 +1,8 @@
-<style media="screen" type="text/css">
+<style type="text/css">
+    @page {
+        padding: 20px 20px;
+        size: A4;
+    }
     html {
         height: 100%
     }
@@ -65,10 +69,6 @@
         padding: 3px;
     }
 
-    table.invisible, table.invisible th, table.invisible td {
-        border: none;
-    }
-
     .test {
         display: block;
     }
@@ -102,7 +102,47 @@
         clear: both
     }
 
+    @page {
+        margin: 0; size: auto;
+    }
+    html {
+        height: 100%;
+    }
+
+    body {
+        /*display: flex;*/
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        font-size: 10pt;
+    }
+
+    .container {
+        max-height: 150px;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    table {
+        border-collapse: collapse;
+        padding: 10px;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    }
+
+    .pageBreak {
+        page-break-after: always;
+    }
+
+    table.invisible, table.invisible th, table.invisible td {
+        border: none;
+    }
+
 </style>
+
 <div class="pageSize">
     <center>
         <!--<p>-->

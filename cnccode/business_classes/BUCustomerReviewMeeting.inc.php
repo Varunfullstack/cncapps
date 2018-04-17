@@ -245,13 +245,16 @@ class BUCustomerReviewMeeting extends Business
 
         require_once BASE_DRIVE . '/vendor/autoload.php';
 
-        file_put_contents('c:\\test.html', $htmlPage);
+        $fileId = uniqid();
+        $tempFilePath = 'c:\\Temp\\' . $fileId . '.html';
+
+        file_put_contents($tempFilePath, $htmlPage);
 
         echo $htmlPage;
 
         $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
-                                                                                                       0,
-                                                                                                       4);
+                0,
+                4);
         $path = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy;
         $filePath = $path . '.pdf';
 
@@ -259,7 +262,8 @@ class BUCustomerReviewMeeting extends Business
             1 => array('pipe', 'w'),
             2 => array('pipe', 'a'),
         );
-        $command = "c: && cd \"C:\\Program Files (x86)\\Google\\Chrome\\Application\" && chrome --print-to-pdf=\"$filePath\" --headless --disable-gpu --incognito --enable-viewport file://c:\\test.html";
+
+        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\" ";
         $process = proc_open($command, $descriptors, $pipes);
 
         if (is_resource($process)) {
@@ -277,6 +281,7 @@ class BUCustomerReviewMeeting extends Business
             echo '<h1>Failed to generate files: ' . $_error . '</h1>';
         } else {
             echo '<h1>Generated Files Successfully</h1>';
+            unlink($tempFilePath);
         }
     }
 
@@ -478,8 +483,8 @@ class BUCustomerReviewMeeting extends Business
         $dompdf->render();
 
         $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
-                                                                                                       0,
-                                                                                                       4);
+                0,
+                4);
 
         $dompdf->add_info('Title', 'Renewal Report ' . $meetingDateDmy);
 
