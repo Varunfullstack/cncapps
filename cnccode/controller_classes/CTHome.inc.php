@@ -703,7 +703,7 @@ class CTHome extends CTCNC
                 throw new Exception('Team not valid');
         }
 
-        $test = [
+        $dataStructure = [
             "cols" => [
                 ["id" => "dates", "label" => "Dates", "type" => 'string'],
                 ["id" => "accumulation", "label" => "Team", "type" => 'number'],
@@ -721,36 +721,38 @@ class CTHome extends CTCNC
         foreach ($results as $result) {
             //for each result we need a column
             if (!isset($columnsSet[$result['userID']])) {
-                $test["cols"][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
+                $dataStructure["cols"][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
                 $columnsSet[$result['userID']] = $result['userLabel'];
             }
 
-            if (!isset($accumulations[$result['loggedDate']])) {
-                $accumulations[$result['loggedDate']] = ['accumulation' => ['loggedHours' => 0, 'dayHours' => 0]];
+            if (!isset($accumulations[$result['endOfWeek']])) {
+                $accumulations[$result['endOfWeek']] = ['accumulation' => ['actualWeekHours' => 0, 'potentialWeekHours' => 0]];
             }
-            $accumulationItem = $accumulations[$result['loggedDate']];
-            $accumulationItem[$result['userID']] = $result['performancePercentage'];
+            $accumulationItem = $accumulations[$result['endOfWeek']];
+            $accumulationItem[$result['userID']] = $result['pctWeekHours'];
 
-            $accumulationItem['accumulation']['loggedHours'] += $result['loggedHours'];
-            $accumulationItem['accumulation']['dayHours'] += $result['dayHours'];
-            $accumulationItem['accumulation']['performance'] = $accumulationItem['accumulation']['dayHours'] ?
-                $accumulationItem['accumulation']['loggedHours'] /
-                $accumulationItem['accumulation']['dayHours'] * 100 : 0;
+            $accumulationItem['accumulation']['actualWeekHours'] += $result['actualWeekHours'];
+            $accumulationItem['accumulation']['potentialWeekHours'] += $result['potentialWeekHours'];
+            $accumulationItem['accumulation']['performance'] = $accumulationItem['accumulation']['potentialWeekHours'] ?
+                $accumulationItem['accumulation']['actualWeekHours'] /
+                $accumulationItem['accumulation']['potentialWeekHours'] * 100 : 0;
 
-            $accumulations[$result['loggedDate']] = $accumulationItem;
+            $accumulations[$result['endOfWeek']] = $accumulationItem;
         }
 
         foreach ($accumulations as $key => $accumulation) {
             $cell = ["c" => [["v" => $key], ["v" => $accumulation['accumulation']['performance']], ["v" => $target]]];
 
             unset($accumulation['accumulation']);
+            $testing = [];
             foreach ($accumulation as $userId => $data) {
+                $testing[] = $userId;
                 $cell["c"][] = ["v" => $data];
             }
-            $test['rows'][] = $cell;
+            $dataStructure['rows'][] = $cell;
         }
 
-        return ["members" => $columnsSet, "data" => $test];
+        return ["members" => $columnsSet, "data" => $dataStructure];
     } // end displayUserLoggingPerformanceReport
 }// end of class
 ?>

@@ -3,12 +3,11 @@
                    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-    <include file="db.changelog-1.0.xml"/>
-    <include file="db.changelog-issue164.xml"/>
-    <include file="db.changelog-issue122.xml"/>
-    <include file="db.changelog-issue160.xml"/>
-    <include file="db.changelog-issue152.xml"/>
-    <include file="db.changelog-issue167.xml"/>
-    <include file="db.changelog-issue174.xml"/>
-    <include file="db.changelog-issue195.xml"/>
+    <changeSet author="pavwebdev" id="issue195-1524127856-0">
+        <tagDatabase tag="issue174"/>
+    </changeSet>
+    <changeSet id="issue195-1524127856-1" author="pavwebdev">
+    </changeSet>
 </databaseChangeLog>
+
+excludeFromStatsFlag

@@ -38,6 +38,7 @@ class DBEUser extends DBEntity
     CONST appearInQueueFlag = "appearInQueueFlag";
     CONST standardDayHours = "standardDayHours";
     CONST changeApproverFlag = "changeApproverFlag";
+    const excludeFromStatsFlag = "excludeFromStatsFlag";
 
     /**
      * calls constructor()
@@ -70,7 +71,10 @@ class DBEUser extends DBEntity
         $this->addColumn(self::lastName, DA_STRING, DA_NOT_NULL);
         $this->addColumn(self::activeFlag, DA_YN, DA_NOT_NULL, 'consultant.activeFlag');
         $this->addColumn(self::weekdayOvertimeFlag, DA_YN, DA_NOT_NULL); // does user get overtime in weekdays
-        $this->addColumn(self::helpdeskFlag, DA_YN, DA_NOT_NULL, 'cns_helpdesk_flag'); // does user get overtime in weekdays
+        $this->addColumn(self::helpdeskFlag,
+                         DA_YN,
+                         DA_NOT_NULL,
+                         'cns_helpdesk_flag'); // does user get overtime in weekdays
         $this->addColumn(self::customerID, DA_ID, DA_ALLOW_NULL);
         $this->addColumn(self::hourlyPayRate, DA_FLOAT, DA_ALLOW_NULL, "cns_hourly_pay_rate");
         $this->addColumn(self::teamID, DA_ID, DA_ALLOW_NULL, 'consultant.teamID');
@@ -79,6 +83,7 @@ class DBEUser extends DBEntity
         $this->addColumn(self::appearInQueueFlag, DA_YN, DA_NOT_NULL);
         $this->addColumn(self::standardDayHours, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::changeApproverFlag, DA_YN, DA_NOT_NULL);
+//        $this->addColumn(self::excludeFromStatsFlag, DA_YN, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

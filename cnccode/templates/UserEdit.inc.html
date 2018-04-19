@@ -1,320 +1,351 @@
 <!-- Template: UserEdit.inc.html -->
 <script type="text/javascript">
-function validateCustomer(){
-	if (document.getElementById("customer").checked == true){
-		document.getElementById("maintenance").checked = false;
-		document.getElementById("accounts").checked = false;
-		document.getElementById("technical").checked = false;
-		document.getElementById("service").checked = false;
-		document.getElementById("sales").checked = false;
-		document.getElementById("reports").checked = false;
-		document.getElementById("customerID").disabled = 0;
-	}
-	else{
-		document.getElementById("customerID").disabled = 1;
-		document.getElementById("customerID").selectedIndex = 0;
-	}
-}
+    function validateCustomer() {
+        if (document.getElementById("customer").checked == true) {
+            document.getElementById("maintenance").checked = false;
+            document.getElementById("accounts").checked = false;
+            document.getElementById("technical").checked = false;
+            document.getElementById("service").checked = false;
+            document.getElementById("sales").checked = false;
+            document.getElementById("reports").checked = false;
+            document.getElementById("customerID").disabled = 0;
+        }
+        else {
+            document.getElementById("customerID").disabled = 1;
+            document.getElementById("customerID").selectedIndex = 0;
+        }
+    }
 </script>
 <TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+    </TR>
 </table>
-<FORM  method="post" action="{urlUpdate}" name="user" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="user[1][userID]"
-			value="{userID}"
-		>
-		<tr> 
-			<td class="promptText">Name</td>
-			<td class="fieldText"> <input
-					{DISABLED}
-					name="user[1][name]"
-					type="text" value="{name}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{nameMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Salutation</td>
-			<td class="fieldText"> <input
-					{DISABLED}
-					name="user[1][salutation]"
-					type="text" value="{salutation}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{salutationMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Manager</td>
-			<td class="fieldText"> <select
-					{DISABLED}
-					type="text"
-					name="user[1][managerID]"
-				>
-					<option value="0">None</option>
-					<!-- BEGIN managerBlock -->
-					<option {managerSelected} value="{managerID}">{managerName}</option>
-					<!-- END managerBlock -->
-				</select> </td>
-		</tr>
-    <tr> 
-      <td class="promptText">Team</td>
-      <td class="fieldText">
-        <select
-          {DISABLED}
-          type="text"
-          name="user[1][teamID]"
+<FORM method="post" action="{urlUpdate}" name="user" AUTOCOMPLETE="OFF">
+    <table width="700px" border="0">
+        <input
+                type="hidden"
+                name="user[1][userID]"
+                value="{userID}"
         >
-          <!-- BEGIN teamBlock -->
-          <option {teamSelected} value="{teamID}">{teamName}</option>
-          <!-- END teamBlock -->
-        </select> </td>
-    </tr>
-		<tr> 
-			<td width="20%" class="promptText">Address</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][add1]"
-					value="{add1}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{add1Message}</span> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][add2]"
-					value="{add2}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{add2Message}</span> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][add3]"
-					value="{add3}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{add3Message}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Town</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][town]"
-					value="{town}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{townMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">County</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][county]"
-					value="{county}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{countyMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Postcode</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][postcode]"
-					value="{postcode}"
-					size="20"
-					maxlength="20"
-				> <span class="formErrorMessage">{postcodeMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Username</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][username]"
-					value="{username}"
-					size="20"
-					maxlength="20"
-				> <span class="formErrorMessage">{usernameMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Employee No</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][employeeNo]"
-					value="{employeeNo}"
-					size="20"
-					maxlength="20"
-				> <span class="formErrorMessage">{employeeNoMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Petrol Rate</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][petrolRate]"
-					value="{petrolRate}"
-					size="10"
-					maxlength="10"
-				> <span class="formErrorMessage">{petrolRateMessage}</span> </td>
-		</tr>
+        <tr>
+            <td class="promptText">Name</td>
+            <td class="fieldText"><input
+                    {DISABLED}
+                    name="user[1][name]"
+                    type="text" value="{name}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{nameMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Salutation</td>
+            <td class="fieldText"><input
+                    {DISABLED}
+                    name="user[1][salutation]"
+                    type="text" value="{salutation}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{salutationMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Manager</td>
+            <td class="fieldText"><select
+                    {DISABLED}
+                    type="text"
+                    name="user[1][managerID]"
+            >
+                <option value="0">None</option>
+                <!-- BEGIN managerBlock -->
+                <option {managerSelected} value="{managerID}">{managerName}</option>
+                <!-- END managerBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">Team</td>
+            <td class="fieldText">
+                <select
+                        {DISABLED}
+                        type="text"
+                        name="user[1][teamID]"
+                >
+                    <!-- BEGIN teamBlock -->
+                    <option {teamSelected} value="{teamID}">{teamName}</option>
+                    <!-- END teamBlock -->
+                </select></td>
+        </tr>
+        <tr>
+            <td width="20%" class="promptText">Address</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][add1]"
+                    value="{add1}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{add1Message}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][add2]"
+                    value="{add2}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{add2Message}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][add3]"
+                    value="{add3}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{add3Message}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Town</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][town]"
+                    value="{town}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{townMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">County</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][county]"
+                    value="{county}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{countyMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Postcode</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][postcode]"
+                    value="{postcode}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{postcodeMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Username</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][username]"
+                    value="{username}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{usernameMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Employee No</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][employeeNo]"
+                    value="{employeeNo}"
+                    size="20"
+                    maxlength="20"
+            > <span class="formErrorMessage">{employeeNoMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Petrol Rate</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][petrolRate]"
+                    value="{petrolRate}"
+                    size="10"
+                    maxlength="10"
+            > <span class="formErrorMessage">{petrolRateMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Hourly Pay Rate</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="user[1][hourlyPayRate]"
-          value="{hourlyPayRate}"
-          size="10"
-          maxlength="10"
-        > <span class="formErrorMessage">{hourlyPayRateMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Hourly Pay Rate</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][hourlyPayRate]"
+                    value="{hourlyPayRate}"
+                    size="10"
+                    maxlength="10"
+            > <span class="formErrorMessage">{hourlyPayRateMessage}</span></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Hours In Standard Day</td>
-      <td class="field"> <input
-          {DISABLED}
-          type="text"
-          name="user[1][standardDayHours]"
-          value="{standardDayHours}"
-          size="10"
-          maxlength="10"
-        > <span class="formErrorMessage">{standardDayHoursMessage}</span> </td>
-    </tr>
+        <tr>
+            <td class="promptText">Hours In Standard Day</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][standardDayHours]"
+                    value="{standardDayHours}"
+                    size="10"
+                    maxlength="10"
+            > <span class="formErrorMessage">{standardDayHoursMessage}</span></td>
+        </tr>
 
-		<tr> 
-			<td class="promptText">Signature File</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][signatureFilename]"
-					value="{signatureFilename}"
-					size="10"
-					maxlength="10"
-				> <span class="formErrorMessage">{signatureFilenameMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Job Title</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][jobTitle]"
-					value="{jobTitle}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{jobTitleMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">First Name</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][firstName]"
-					value="{firstName}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{firstNameMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Last Name</td>
-			<td class="field"> <input
-					{DISABLED}
-					type="text"
-					name="user[1][lastName]"
-					value="{lastName}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{lastNameMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Overtime on Weekdays </td>
-				<td class="fieldText"><input name="user[1][weekdayOvertimeFlag]" type="checkbox" id="user[1][weekdayOvertimeFlag]" value="Y" {DISABLED} {weekdayOvertimeFlagChecked} />
-				</td>
-		</tr>
-    <tr>
-      <td class="promptText">Helpdesk</td>
-      <td class="fieldText"><input name="user[1][helpdeskFlag]" type="checkbox" id="user[1][weekdayOvertimeFlag]" value="Y" {DISABLED} {helpdeskFlagChecked} />
-      </td>
-    </tr>
-    <tr> 
-      <td class="promptText">SD Manager</td>
-      <td class="fieldText"> <INPUT name="user[1][receiveSdManagerEmailFlag]" {DISABLED} type="checkbox" value="Y" title="Allocate time from dashboard and display staff performance on user's home page" {receiveSdManagerEmailFlagChecked}></td>
-    </tr>
-    <tr> 
-      <td class="promptText">Change SR Priority</td>
-      <td class="fieldText"> <INPUT name="user[1][changePriorityFlag]" {DISABLED} type="checkbox" value="Y" {changePriorityFlagChecked}></td>
-    </tr>
+        <tr>
+            <td class="promptText">Signature File</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][signatureFilename]"
+                    value="{signatureFilename}"
+                    size="10"
+                    maxlength="10"
+            > <span class="formErrorMessage">{signatureFilenameMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Job Title</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][jobTitle]"
+                    value="{jobTitle}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{jobTitleMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">First Name</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][firstName]"
+                    value="{firstName}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{firstNameMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Last Name</td>
+            <td class="field"><input
+                    {DISABLED}
+                    type="text"
+                    name="user[1][lastName]"
+                    value="{lastName}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{lastNameMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Overtime on Weekdays</td>
+            <td class="fieldText"><input name="user[1][weekdayOvertimeFlag]" type="checkbox"
+                                         id="user[1][weekdayOvertimeFlag]" value="Y" {DISABLED}
+                                         {weekdayOvertimeFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Helpdesk</td>
+            <td class="fieldText"><input name="user[1][helpdeskFlag]" type="checkbox" id="user[1][weekdayOvertimeFlag]"
+                                         value="Y" {DISABLED} {helpdeskFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">SD Manager</td>
+            <td class="fieldText"><INPUT name="user[1][receiveSdManagerEmailFlag]" {DISABLED} type="checkbox" value="Y"
+                                         title="Allocate time from dashboard and display staff performance on user's home page"
+                                         {receiveSdManagerEmailFlagChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">Change SR Priority</td>
+            <td class="fieldText"><INPUT name="user[1][changePriorityFlag]" {DISABLED} type="checkbox" value="Y"
+                                         {changePriorityFlagChecked}></td>
+        </tr>
 
-    <tr>
-      <td class="promptText">Change Approver</td>
-      <td class="fieldText"><input name="user[1][changeApproverFlag]" type="checkbox" id="user[1][changeApproverFlag]" value="Y" {DISABLED} {changeApproverFlagChecked} />
-      </td>
-    </tr>
+        <tr>
+            <td class="promptText">Change Approver</td>
+            <td class="fieldText"><input name="user[1][changeApproverFlag]" type="checkbox"
+                                         id="user[1][changeApproverFlag]" value="Y" {DISABLED}
+                                         {changeApproverFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Exclude from Stats</td>
+            <td class="fieldText"><input name="user[1][excludeFromStatsFlag]" type="checkbox"
+                                         id="user[1][excludeFromStatsFlag]" value="Y" {DISABLED}
+                                         {excludeFromStatsFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">&nbsp;</td>
+            <td class="fieldText">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="promptText">Active</td>
+            <td class="fieldText"><INPUT name="user[1][activeFlag]" {DISABLED} type="checkbox" value="Y"
+                                         {activeFlagChecked}></td>
+        </tr>
 
-		<tr>
-				<td class="promptText">&nbsp;</td>
-				<td class="fieldText">&nbsp;</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Active</td>
-			<td class="fieldText"> <INPUT name="user[1][activeFlag]" {DISABLED} type="checkbox" value="Y" {activeFlagChecked}>			</td>
-		</tr>
+        <tr>
+            <td class="promptText">Appear in Queue</td>
+            <td class="fieldText"><INPUT name="user[1][appearInQueueFlag]" {DISABLED} type="checkbox" value="Y"
+                                         title="Does this user appear on the SR queue filter?"
+                                         {appearInQueueFlagChecked}></td>
+        </tr>
 
-    <tr> 
-      <td class="promptText">Appear in Queue</td>
-      <td class="fieldText"> <INPUT name="user[1][appearInQueueFlag]" {DISABLED} type="checkbox" value="Y" title="Does this user appear on the SR queue filter?" {appearInQueueFlagChecked}></td>
-    </tr>
+        <tr>
+            <td class="promptText" title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenence">Sales
+            </td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="sales" type="checkbox" value="sales"
+                                         {salesChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Purchase Invoices, Pre-pay Export, Expenses and Overtime, Sage Export, User Maintenence, Amendment of Completed Sales Orders">
+                Accounts
+            </td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="accounts" type="checkbox" value="accounts"
+                                         {accountsChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText" title="Customer Items and the Despatch process">Technical</td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="technical" type="checkbox" value="technical"
+                                         {technicalChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Completion of Service Requests, Set Logging Problem flag, Setting Activities to Checked, Service Request Master Dashboard">
+                Supervisor
+            </td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="supervisor" type="checkbox" value="supervisor"
+                                         {supervisorChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText" title="Access to Reports Menu">Reports</td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="reports" type="checkbox" value="reports"
+                                         {reportsChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText" title="Access to Maintenance Menu">Maintenance</td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="maintenance" type="checkbox" value="maintenance"
+                                         {maintenanceChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText" title="Access to Renewals Menu">Renewals</td>
+            <td class="fieldText"><INPUT name="perms[]" {DISABLED} id="renewals" type="checkbox" value="renewals"
+                                         {renewalsChecked}></td>
+        </tr>
 
-		<tr> 
-			<td class="promptText" title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenence">Sales</td>
-			<td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="sales" type="checkbox" value="sales" {salesChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText" title="Purchase Invoices, Pre-pay Export, Expenses and Overtime, Sage Export, User Maintenence, Amendment of Completed Sales Orders">Accounts</td>
-			<td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="accounts" type="checkbox" value="accounts" {accountsChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText" title="Customer Items and the Despatch process">Technical</td>
-			<td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="technical" type="checkbox" value="technical" {technicalChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText" title="Completion of Service Requests, Set Logging Problem flag, Setting Activities to Checked, Service Request Master Dashboard">Supervisor</td>
-			<td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="supervisor" type="checkbox" value="supervisor" {supervisorChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText"  title="Access to Reports Menu">Reports</td>
-			<td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="reports" type="checkbox" value="reports" {reportsChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText"  title="Access to Maintenance Menu">Maintenance</td>
-			<td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="maintenance" type="checkbox" value="maintenance" {maintenanceChecked}>			</td>
-		</tr>
-    <tr> 
-      <td class="promptText"  title="Access to Renewals Menu">Renewals</td>
-      <td class="fieldText"> <INPUT name="perms[]" {DISABLED} id="renewals" type="checkbox" value="renewals" {renewalsChecked}>      </td>
-    </tr>
-
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: UserEdit.inc.html -->

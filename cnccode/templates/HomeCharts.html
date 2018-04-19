@@ -1,7 +1,33 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src=".javascript/handlebars-v4.0.11.js"></script>
+<script type="text/javascript" src=".javascript/mustache.min.js"></script>
+<script id="member-item-template" type="text/template">
+    <div class="memberItem">
+        <div class="name">
+            {% name %}
+        </div>
+        <div class="selectors">
+            <div class="selector">
+                <div class="item">
+                    Data
+                </div>
+                <input type="checkbox" data-type="data" class="item" data-id="{% id %}" {% #data %} checked {% /data %}
+                >
+            </div>
+            <div class="selector">
+                <div class="item">
+                    Trend
+                </div>
+                <input type="checkbox" class="item" data-type="trend" data-id="{% id %}" {% #trend %} checked
+                       {% /trend %}>
+            </div>
+        </div>
+</script>
 <script type="text/javascript">
     // Load the Visualization API and the corechart package.
     google.charts.load('current', {'packages': ['corechart']});
+
+    Mustache.tags = ['{%', '%}'];
 
     function chartSystem(id, team) {
         // Set a callback to run when the Google Visualization API is loaded.
@@ -58,24 +84,37 @@
         });
 
         this.membersSelectors.on('change', 'input', function () {
-            that.membersOptions[this.id] = !that.membersOptions[this.id];
+            console.log(this);
+            var datum = $(this).data();
+            that.membersOptions[datum.id][datum.type] = !that.membersOptions[datum.id][datum.type];
             hideColumns();
         });
+
+        var source = document.getElementById("member-item-template").innerHTML;
         // Callback that creates and populates a data table,
         // instantiates the pie chart, passes in the data and
         // draws it.
         function drawChart() {
             return that.data.then(function (result) {
                 that.membersSelectors.html('');
-
+                window.dataToAnalyze = result;
                 Object.keys(result.members).forEach(function (memberKey) {
 
                     if (that.membersOptions[memberKey] == null) {
-                        that.membersOptions[memberKey] = true;
+                        that.membersOptions[memberKey] = {data: true, trend: false};
                     }
 
-                    that.membersSelectors.append('<div ><label>' + result.members[memberKey] +
-                        '</label><input type="checkbox" id="' + memberKey + '" ' + (that.membersOptions[memberKey] ? 'checked' : '') + '></div>')
+                    var context = {
+                        name: result.members[memberKey],
+                        id: memberKey,
+                        data: !!that.membersOptions[memberKey].data,
+                        trend: !!that.membersOptions[memberKey].trend
+                    };
+                    console.log(context);
+                    var html = Mustache.to_html(source, context);
+                    var test = '<div class="memberItem" ><label>' + result.members[memberKey] +
+                        '</label><input type="checkbox" id="' + memberKey + '" ' + (that.membersOptions[memberKey] ? 'checked' : '') + '></div>';
+                    that.membersSelectors.append(html);
                 });
 
                 that.storedData = new google.visualization.DataTable(result.data);
@@ -117,6 +156,34 @@
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        justify-content: space-evenly;
+    }
+
+    .memberItem {
+        display: flex;
+        width: 160px;
+        flex-direction: row;
+        height: 50px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .memberItem .name {
+        flex: 0 0 50%;
+    }
+
+    .memberItem .selectors {
+        flex: 0 0 50%;
+    }
+
+    .memberItem .selector {
+        flex-direction: row;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .memberItem .selector .item {
+        flex: 0 0 50%;
     }
 </style>
 <div id="helpDeskChart">
@@ -134,6 +201,7 @@
             <select name="days" class="daysSelector">
                 <option value="7">last 7 Days</option>
                 <option value="30" selected>last 30 Days</option>
+                <option value="90">Last 3 Months</option>
                 <option value="180">last 6 Months</option>
                 <option value="365">last Year</option>
             </select>
@@ -157,6 +225,7 @@
             <select name="days" class="daysSelector">
                 <option value="7">last 7 Days</option>
                 <option value="30" selected>last 30 Days</option>
+                <option value="90">Last 3 Months</option>
                 <option value="180">last 6 Months</option>
                 <option value="365">last Year</option>
             </select>
@@ -180,6 +249,7 @@
             <select name="days" class="daysSelector">
                 <option value="7">last 7 Days</option>
                 <option value="30" selected>last 30 Days</option>
+                <option value="90">Last 3 Months</option>
                 <option value="180">last 6 Months</option>
                 <option value="365">last Year</option>
             </select>
