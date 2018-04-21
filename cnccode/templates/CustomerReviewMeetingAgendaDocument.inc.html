@@ -1,6 +1,152 @@
 <html>
 <head>
+    <style type="text/css">
+        @page {
+            padding: 20px 20px;
+            size: A4;
+        }
 
+        html {
+            height: 100%
+        }
+
+        body {
+            /*display: flex;*/
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .flex-column {
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 0 auto 20px auto;
+            display: inline-block;
+        }
+
+        h2 {
+            font-size: 12pt;
+        }
+
+        h3 {
+            font-size: 10pt;
+        }
+
+        table {
+            border-collapse: collapse;
+            padding: 10px;
+            alignment: center;
+            margin: 5px auto;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        .pageBreak {
+            page-break-after: always;
+        }
+
+        table.collapse {
+            border-collapse: collapse;
+            margin: 0 auto;
+            border: 1px solid #666;
+        }
+
+        table.collapse td {
+            padding: 3px;
+        }
+
+        .test {
+            display: block;
+        }
+
+        .test td {
+            display: inline-block;
+        }
+
+        .graph {
+            display: block;
+            margin: 20px auto;
+        }
+
+        .ul3 {
+            margin: 0 auto;
+            padding: 0;
+            max-width: 800px;
+            display: block
+        }
+
+        .ul3 li {
+            width: 33%;
+            list-style-type: none;
+            float: left;
+            display: inline-block;
+        }
+
+        .break {
+            display: block;
+            width: 100%;
+            clear: both
+        }
+
+        @page {
+            margin: 0;
+            size: auto;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            /*display: flex;*/
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        .container {
+            max-height: 150px;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        table {
+            border-collapse: collapse;
+            padding: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        .pageBreak {
+            page-break-after: always;
+        }
+
+        table.invisible, table.invisible th, table.invisible td {
+            border: none;
+        }
+
+    </style>
 
 </head>
 <body>

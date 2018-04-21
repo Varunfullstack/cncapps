@@ -85,10 +85,15 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $textTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
 
-                $textTemplate->set_file('page', 'CustomerReviewMeetingText.inc.html');
+                $nonEditableTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+                $nonEditableTemplate->set_file('page', 'CustomerReviewMeetingNonEditable.html');
 
 
-                $textTemplate->set_var(
+                $textTemplate->set_file('page', 'CustomerReviewMeetingEditable.html');
+
+
+                $nonEditableTemplate->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue('name'),
                         'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
@@ -106,20 +111,20 @@ class CTCustomerReviewMeeting extends CTCNC
                     $dsSearchForm->getValue('endYearMonth')
                 );
 
-                $textTemplate->set_var('chart', $this->generateCharts($results, $customerId));
+                $nonEditableTemplate->set_var('chart', $this->generateCharts($results, $customerId));
 
                 $supportedUsersData = $this->getSupportedUsersData($buContact,
-                                                                   $customerId,
-                                                                   $dsCustomer->getValue('name'));
+                    $customerId,
+                    $dsCustomer->getValue('name'));
 
-                $textTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
+                $nonEditableTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
                 $contractsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
                 $contractsTemplate->set_file('contracts', 'CustomerReviewMeetingContractsSection.html');
 
                 $contractsTemplate->set_var("serverContract",
-                                            $this->getServerCareContractBody($customerId,
-                                                                             $supportedUsersData['count']));
+                    $this->getServerCareContractBody($customerId,
+                        $supportedUsersData['count']));
                 $contractsTemplate->set_var("serviceDeskContract", $this->getServiceDeskContractBody($customerId));
                 $contractsTemplate->set_var('prepayContract', $this->getPrepayContractBody($customerId));
 
@@ -129,44 +134,44 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $textTemplate->set_var('contracts', $contractsBody);
                 $textTemplate->set_var('24HourFlag',
-                                       $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
+                    $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
                 $textTemplate->set_var('p1Incidents', $this->getP1IncidentsBody($customerId));
                 $textTemplate->set_var('startersAndLeavers',
-                                       $this->getStartersAndLeaversBody(
-                                           $customerId,
-                                           $dsSearchForm->getValue('startYearMonth'),
-                                           $dsSearchForm->getValue('endYearMonth')
-                                       ));
+                    $this->getStartersAndLeaversBody(
+                        $customerId,
+                        $dsSearchForm->getValue('startYearMonth'),
+                        $dsSearchForm->getValue('endYearMonth')
+                    ));
                 $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
                 $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
 
-                /*
-                End SR Performance Statistics
-                */
-                $textTemplate->set_block('page', 'serverBlock', 'servers');
-
-                $buCustomerItem->getServersByCustomerID($dsSearchForm->getValue('customerID'), $dsServer);
-
-                while ($dsServer->fetchNext()) {
-
-                    if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
-                        $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
-                    } else {
-                        $purchaseDate = '';
-                    }
-
-                    $textTemplate->set_var(
-                        array(
-                            'itemDescription' => $dsServer->getValue('itemDescription'),
-                            'serialNo' => $dsServer->getValue('serialNo'),
-                            'serverName' => $dsServer->getValue('serverName'),
-                            'purchaseDate' => $purchaseDate,
-                        )
-                    );
-
-                    $textTemplate->parse('servers', 'serverBlock', true);
-
-                } // end while
+//                /*
+//                End SR Performance Statistics
+//                */
+//                $textTemplate->set_block('page', 'serverBlock', 'servers');
+//
+//                $buCustomerItem->getServersByCustomerID($dsSearchForm->getValue('customerID'), $dsServer);
+//
+//                while ($dsServer->fetchNext()) {
+//
+//                    if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
+//                        $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
+//                    } else {
+//                        $purchaseDate = '';
+//                    }
+//
+//                    $textTemplate->set_var(
+//                        array(
+//                            'itemDescription' => $dsServer->getValue('itemDescription'),
+//                            'serialNo' => $dsServer->getValue('serialNo'),
+//                            'serverName' => $dsServer->getValue('serverName'),
+//                            'purchaseDate' => $purchaseDate,
+//                        )
+//                    );
+//
+//                    $textTemplate->parse('servers', 'serverBlock', true);
+//
+//                } // end while
 
 
                 $textTemplate->set_block('page', 'managementReviewBlock', 'reviews');
@@ -211,34 +216,34 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $srCountByUser = $buServiceDeskReport->getIncidentsGroupedByUser();
 
-                $textTemplate->set_block('page', 'userBlock', 'users');
+                $nonEditableTemplate->set_block('page', 'userBlock', 'users');
 
                 while ($row = $srCountByUser->fetch_object()) {
 
-                    $textTemplate->set_var(
+                    $nonEditableTemplate->set_var(
                         array(
                             'srUserName' => $row->name,
                             'srCount' => $row->count
                         )
                     );
 
-                    $textTemplate->parse('users', 'userBlock', true);
+                    $nonEditableTemplate->parse('users', 'userBlock', true);
                 }
 
                 $srCountByRootCause = $buServiceDeskReport->getIncidentsGroupedByRootCause();
 
-                $textTemplate->set_block('page', 'rootCauseBlock', 'rootCauses');
+                $nonEditableTemplate->set_block('page', 'rootCauseBlock', 'rootCauses');
 
                 while ($row = $srCountByRootCause->fetch_object()) {
 
-                    $textTemplate->set_var(
+                    $nonEditableTemplate->set_var(
                         array(
                             'srRootCauseDescription' => $row->rootCauseDescription,
                             'srCount' => $row->count
                         )
                     );
 
-                    $textTemplate->parse('rootCauses', 'rootCauseBlock', true);
+                    $nonEditableTemplate->parse('rootCauses', 'rootCauseBlock', true);
 
                 }
 
@@ -266,11 +271,15 @@ class CTCustomerReviewMeeting extends CTCNC
                 $buHeader = new BUHeader($this);
                 $buHeader->getHeader($dsHeader);
                 $textTemplate->set_var('customerReviewMeetingText',
-                                       $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
+                    $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
 
                 $textTemplate->parse('output', 'page', true);
 
-                $meetingText = $textTemplate->get_var('output');
+                $nonEditableTemplate->parse('output', 'page', true);
+
+                $editableText = $textTemplate->get_var('output');
+
+                $nonEditableText = $nonEditableTemplate->get_var('output');
             }
 
         } else {
@@ -279,12 +288,14 @@ class CTCustomerReviewMeeting extends CTCNC
                 $dsSearchForm->setValue('startYearMonth', $_REQUEST['startYearMonth']);
                 $dsSearchForm->setValue('endYearMonth', $_REQUEST['endYearMonth']);
                 $dsSearchForm->setValue('meetingDate', $_REQUEST['meetingDateYmd']);
-                $meetingText = $_REQUEST['meetingText'];
+                $nonEditableText = $_REQUEST['nonEditableText'];
+                $editableText = $_REQUEST['editableText'];
+
             }
         }
 
         $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -316,7 +327,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
                 'meetingDateYmd' => $dsSearchForm->getValue('meetingDate'),
                 'urlCustomerPopup' => $urlCustomerPopup,
-                'meetingText' => $meetingText,
+                'editableText' => $editableText,
+                'nonEditableText' => $nonEditableText,
                 'urlSubmit' => $urlSubmit,
                 'urlGeneratePdf' => $urlGeneratePdf,
             )
@@ -345,7 +357,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $serverCareContractsTemplate->set_file('serverCareContracts', 'CustomerReviewMeetingServerCare.html');
         $serverCareContractsTemplate->set_var("contractDescription", $datasetContracts->getValue('itemDescription'));
         $serverCareContractsTemplate->set_var("nextInvoice",
-                                              $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
+            $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
         $serverCareContractsTemplate->set_var('usersCount', $supportContactsCount);
 
         $serverCareContractsTemplate->set_block('serverCareContracts', 'contractItemsBlock', 'items');
@@ -388,9 +400,22 @@ class CTCustomerReviewMeeting extends CTCNC
     function generatePdf()
     {
 
+        $text = $_REQUEST['editableText'] . $_REQUEST['nonEditableText'];
+
+        $agendaTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+        $agendaTemplate->set_file('page', 'CustomerReviewMeetingAgendaDocument.inc.html');
+
+        $agendaTemplate->set_var('htmlBody', $text);
+
+        $agendaTemplate->parse('output', 'page', true);
+
+
+        $html = $agendaTemplate->get_var('output');
+
         $this->buCustomerReviewMeeting->generateAgendaPdf(
             $_REQUEST['customerID'],
-            $_REQUEST['meetingText'],
+            $html,
             $_REQUEST['meetingDateYmd']
         );
 

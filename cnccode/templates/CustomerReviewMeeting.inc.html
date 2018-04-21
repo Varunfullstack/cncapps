@@ -127,22 +127,21 @@
     </table>
 </form>
 
+
 <form name="textForm" method="post" action="{urlGeneratePdf}">
-
     <input type="hidden" name="customerID" value="{customerID}">
-
     <input type="hidden" name="startYearMonth" value="{startYearMonth}">
-
     <input type="hidden" name="endYearMonth" value="{endYearMonth}">
-
     <input type="hidden" name="meetingDateYmd" value="{meetingDateYmd}">
 
-    <textarea name="meetingText">{meetingText}</textarea>
+    <div id="reportContent">{nonEditableText}</div>
+
+    <textarea name="editableText">{editableText}</textarea>
 
     <script type="text/javascript">
-        reason = CKEDITOR.replace('meetingText', {
+        reason = CKEDITOR.replace('editableText', {
                 height: '800px',
-            width: '1200px',
+                width: '1200px',
                 extraAllowedContent: true,
                 allowedContent: true,
                 script: true
