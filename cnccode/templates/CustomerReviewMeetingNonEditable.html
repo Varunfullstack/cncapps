@@ -1,0 +1,75 @@
+<div class="reportSection">
+    <center>
+        <!--<p>-->
+        <!--<img src="/images/CNC-Logo.png" alt=""/>-->
+        <!--</p>-->
+        <br/>
+        <h1>{customerName} - Review Meeting {meetingDate}</h1>
+    </center>
+</div>
+
+
+<div class="reportSection">
+    <h2>Support</h2>
+
+    <table class="collapse">
+        <tr>
+            <th style="text-align: left;">SR Priority</th>
+            <td style="text-align: center;">1</td>
+            <td style="text-align: center;">2</td>
+            <td style="text-align: center;">3</td>
+            <td style="text-align: center;">4</td>
+            <td style="text-align: center;">5</td>
+        </tr>
+
+        <tr>
+            <th style="text-align: left;">Response Hours</th>
+            <td style="text-align: center;">{slaP1}</td>
+            <td style="text-align: center;">{slaP2}</td>
+            <td style="text-align: center;">{slaP3}</td>
+            <td style="text-align: center;">{slaP4}</td>
+            <td style="text-align: center;">{slaP5}</td>
+        </tr>
+    </table>
+</div>
+
+
+<div id="charts" class="reportSection">
+    {chart}
+</div>
+
+
+<div class="reportSection">
+    <h3>Supported Users</h3>
+    <ul class="ul3">
+        {supportContactInfo}
+    </ul>
+</div>
+
+<div class="reportSection">
+    <h3>Root Cause</h3>
+    <table class="collapse" style="width: 600px">
+        <tbody><!-- BEGIN rootCauseBlock -->
+        <tr>
+
+            <td>{srRootCauseDescription}</td>
+            <td>{srCount}</td>
+
+        </tr><!-- END rootCauseBlock -->
+        </tbody>
+    </table>
+</div>
+
+<div class="reportSection">
+    <h3>Service Request Count</h3>
+    <table class="collapse" style="width: 450px;">
+        <tbody>
+        <!-- BEGIN userBlock -->
+        <tr>
+            <td>{srUserName}</td>
+            <td>{srCount}</td>
+        </tr>
+        <!-- END userBlock -->
+        </tbody>
+    </table>
+</div>
