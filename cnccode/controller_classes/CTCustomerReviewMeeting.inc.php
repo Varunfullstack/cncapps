@@ -700,9 +700,9 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
         $toReturn .=
-            '<img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '">
-        <img class="graph" src="' . $this->generateGraph($otherContracts, $dataX) . '">
-        <img class="graph" src="' . $this->generateGraph($totalSR, $dataX) . '">';
+            '<div class="reportSection"><img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '"></div>
+        <div class="reportSection"><img class="graph" src="' . $this->generateGraph($otherContracts, $dataX) . '"></div>
+        <div class="reportSection"><img class="graph" src="' . $this->generateGraph($totalSR, $dataX) . '"></div>';
         return $toReturn;
     }
 

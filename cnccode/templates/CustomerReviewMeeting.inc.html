@@ -1,13 +1,11 @@
 <!-- Template: CustomerReviewMeeting.inc.html -->
 <script language='JavaScript' src="CommonJS.js"></script>
-
 <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
-
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-
 <script language='JavaScript'>
     $(function () {
         window.meetingDate = $('#meetingDate').get(0);
+
     });
     var state = 'none'; // display status
     var savedCustomerString
@@ -42,7 +40,89 @@
             validateCustomerString();
         }
     }
+
+    $(function() {
+        $('#create-pdf').click(function() {
+            //loop through sections looking for large tables
+            var tableID = 1;
+            $('.reportSection table').each(function() {
+                if(!$(this).hasClass('overflow')) {
+                    var rowCount = $('tr', $(this)).length;
+                    console.log(rowCount);
+                    if (rowCount > 20) {
+                        $(this).addClass('overflow').attr('id', 'table'+tableID); var leftCol = 'table'+tableID; tableID++;
+                        $(this).clone().appendTo($(this).parent()).attr('id', 'table'+tableID); var rightCol = 'table'+tableID; tableID++;
+
+                        var split = Math.floor(rowCount/2);
+                        console.log('split: '+split);
+                        $("tr:lt("+(split+1)+")", '#'+leftCol).remove();
+                        $("tr:gt("+split+")", '#'+rightCol).remove();
+                    }
+                }
+            })
+
+            var height = 0;
+            //1305 px is page height including margins
+            $('.reportSection').each(function() {
+                if((height + $(this).outerHeight()) > 1305) {
+                    //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
+                    $(this).prepend('<div class="pageBreak"></div>');
+                    height = 0;
+                }
+                height += $(this).outerHeight();
+                console.log(height)
+            })
+
+            $(this).attr('disabled', true);
+            var result = $('#reportContent').html() + CKEDITOR.instances['editableText'].getData();
+            CKEDITOR.instances['editableText'].setData(result);
+            $('#reportContent').attr('disabled', true);
+            //$('#textForm').submit();
+        })
+    })
+
 </script>
+
+<style>
+    h2, h3 { text-align: left; }
+    #reportContent {
+        width: 810px; float: left; background: #FFF; padding: 30px 40px; text-align: center;
+    }
+    .pageBreak { page-break-after: always; border-bottom: 2px dotted #333; margin-bottom: 30px; }
+
+    .rootCause { width: 600px; margin: 0 auto; }
+    .requestCount { width: 450px; margin: 0 auto; }
+
+    .collapse { padding: 0; width:  }
+    .collapse li { list-style-type: none; display: block}
+    .collapse li div:first-child { width:90%; display: inline-block; float: left }
+    .collapse li div:nth-child(2) { width:10%; display: inline-block; float: left }
+
+    .reportSection table { margin: 0 auto; }
+    .reportSection img { margin: 0 auto; display: inline-block }
+
+    .overflow:nth-child(even) { width:48%; float: right; margin: 0 !important; }
+    .overflow:nth-child(odd) { width:48%; float: left; margin: 0 !important; }
+
+    .reportSection { float: left; width: 100%; min-height: 50px; padding-bottom: 40px; display: inline-block; }
+    .reportSection img { margin: 0 auto; display: inline-block; float: none }
+    .reportSection table { border-collapse: collapse }
+    .reportSection td, .reportSection th {border: 1px solid #666; padding: 2px; }
+
+    #create-pdf {
+        margin-top: 30px;
+        line-height: 28px;
+        height: 35px;
+        width: 150px;
+        background: #0d2c52;
+        color: #FFF;
+        border-radius: 6px;
+        border: none;
+        font-size: 15px;
+    }
+</style>
+
+
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm" method="get" action="{urlSubmit}">
     <table width="500px" border="0" cellspacing="0" cellpadding="1">
@@ -122,13 +202,14 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Generate" onClick="submit();">
+                <input type="submit" name="Search" value="Generate">
         </tr>
     </table>
 </form>
 
+<!-- A4 PAGE WITH MARGINS 890px WIDE BY 1305px HIGH -->
 
-<form name="textForm" method="post" action="{urlGeneratePdf}">
+<form name="textForm" id="textForm" method="post" action="{urlGeneratePdf}">
     <input type="hidden" name="customerID" value="{customerID}">
     <input type="hidden" name="startYearMonth" value="{startYearMonth}">
     <input type="hidden" name="endYearMonth" value="{endYearMonth}">
@@ -136,19 +217,19 @@
 
     <div id="reportContent">{nonEditableText}</div>
 
-    <textarea name="editableText">{editableText}</textarea>
+    <textarea id="editableText" name="editableText">{editableText}</textarea>
 
     <script type="text/javascript">
         reason = CKEDITOR.replace('editableText', {
                 height: '800px',
-                width: '1200px',
+                width: '890px',
                 extraAllowedContent: true,
                 allowedContent: true,
                 script: true
             }
         );
     </script>
-    <input type="submit" name="Search" value="Create Pdfs" onClick="submit();">
+    <input type="button" name="create-pdf" id="create-pdf" value="Create PDF">
 </form>
 
 <!-- End Template: CustomerReviewMeeting.inc.html -->

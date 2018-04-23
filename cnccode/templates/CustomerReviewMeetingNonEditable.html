@@ -33,11 +33,7 @@
     </table>
 </div>
 
-
-<div id="charts" class="reportSection">
     {chart}
-</div>
-
 
 <div class="reportSection">
     <h3>Supported Users</h3>
@@ -48,21 +44,21 @@
 
 <div class="reportSection">
     <h3>Root Cause</h3>
-    <table class="collapse" style="width: 600px">
-        <tbody><!-- BEGIN rootCauseBlock -->
+    <table class="collapse rootCause">
+        <!-- BEGIN rootCauseBlock -->
         <tr>
 
             <td>{srRootCauseDescription}</td>
             <td>{srCount}</td>
 
-        </tr><!-- END rootCauseBlock -->
-        </tbody>
+        <!-- END rootCauseBlock -->
+        </tr>
     </table>
 </div>
 
 <div class="reportSection">
     <h3>Service Request Count</h3>
-    <table class="collapse" style="width: 450px;">
+    <table class="collapse requestCount">
         <tbody>
         <!-- BEGIN userBlock -->
         <tr>
