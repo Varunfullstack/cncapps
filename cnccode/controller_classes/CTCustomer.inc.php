@@ -84,7 +84,7 @@ class CTCustomer extends CTCNC
             "reports"
         ];
 
-        if (!self::canAccess($roles)) {
+        if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }

@@ -21,7 +21,7 @@ class CTMonthlyServiceDeskReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        if (!self::canAccess($roles)) {
+        if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }

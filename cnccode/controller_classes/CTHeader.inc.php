@@ -25,7 +25,7 @@ class CTHeader extends CTCNC
         $roles = [
             "accounts",
         ];
-        if (!self::canAccess($roles)) {
+        if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }

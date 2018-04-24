@@ -217,22 +217,19 @@ class CTCNC extends Controller
 
     function hasPermissions($levels)
     {
-
-        if (!$this->isRunningFromCommandLine()) {
-            $allow = FALSE;
-            if (is_array($levels)) {
-                while (list ($key, $val) = each($levels)) {
-                    $allow = ($allow | $GLOBALS ['perm']->have_perm($val));
-                }
-            } elseif (isset($GLOBALS ['perm'])) {
-                $allow = $GLOBALS ['perm']->have_perm($levels);
-            } else {
-                $allow = true;
-            }
-        } else {
-            $allow = true;
+        if ($this->isRunningFromCommandLine()) {
+            return true;
         }
-        return $allow;
+
+        $permissions = explode(",", self::getDbeUser()->getValue('perms'));
+        if (is_array($levels)) {
+            return array_intersect($levels, $permissions);
+        }
+
+        if ($this->userID) {
+            return in_array($levels, $permissions);
+        }
+        return true;
     }
 
     function teamLevelIs($level)
