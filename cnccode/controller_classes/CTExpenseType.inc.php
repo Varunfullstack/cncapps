@@ -24,6 +24,13 @@ class CTExpenseType extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buExpenseType = new BUExpenseType($this);
         $this->dsExpenseType = new DSForm($this);
         $this->dsExpenseType->copyColumnsFrom($this->buExpenseType->dbeExpenseType);
@@ -217,10 +224,10 @@ class CTExpenseType extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'expenseTypeID' => $this->dsExpenseType->getValue('expenseTypeID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'expenseTypeID' => $this->dsExpenseType->getValue('expenseTypeID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

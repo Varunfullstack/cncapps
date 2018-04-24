@@ -19,6 +19,13 @@ class CTIncidentAnalysisReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buIncidentAnalysisReport = new BUIncidentAnalysisReport ($this);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsResults = new DataSet ($this);

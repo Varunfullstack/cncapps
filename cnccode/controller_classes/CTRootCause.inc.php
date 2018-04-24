@@ -24,6 +24,13 @@ class CTROOTCAUSE extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRootCause = new BURootCause($this);
         $this->dsRootCause = new DSForm($this);
         $this->dsRootCause->copyColumnsFrom($this->buRootCause->dbeRootCause);
@@ -231,10 +238,10 @@ class CTROOTCAUSE extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'rootCauseID' => $this->dsRootCause->getValue('rootCauseID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'rootCauseID' => $this->dsRootCause->getValue('rootCauseID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

@@ -24,6 +24,13 @@ class CTFURTHERACTION extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buFurtherAction = new BUFurtherAction($this);
         $this->dsFurtherAction = new DSForm($this);
         $this->dsFurtherAction->copyColumnsFrom($this->buFurtherAction->dbeFurtherAction);
@@ -224,10 +231,10 @@ class CTFURTHERACTION extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'furtherActionID' => $this->dsFurtherAction->getValue('furtherActionID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'furtherActionID' => $this->dsFurtherAction->getValue('furtherActionID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

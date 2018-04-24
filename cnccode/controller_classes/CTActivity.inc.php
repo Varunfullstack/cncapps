@@ -25,6 +25,7 @@ require_once($cfg['path_bu'] . '/BUSecurityApp.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_bu'] . '/BUUser.inc.php');
 
 require_once("Mail.php");
 require_once("Mail/mime.php");
@@ -126,6 +127,21 @@ class CTActivity extends CTCNC
         $this->dsCallActivity->setNull('siteNo', DA_ALLOW_NULL);
         $this->dsCallActivity->setNull('contactID', DA_ALLOW_NULL);
         $this->dsCallActivity->setNull('callActTypeID', DA_ALLOW_NULL);
+
+        $roles = [
+            "sales",
+            "accounts",
+            "technical",
+            "supervisor",
+            "reports",
+            "maintenance",
+            "renewals"
+        ];
+
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
     }
 
     /**
@@ -362,9 +378,9 @@ class CTActivity extends CTCNC
         if ($this->contactID && !(array_key_exists('contactID', $params))) {
 
             $url = $this->addParametersToLink($url,
-                array(
-                    'contactID' => $this->contactID
-                )
+                                              array(
+                                                  'contactID' => $this->contactID
+                                              )
             );
         }
 
@@ -945,13 +961,18 @@ class CTActivity extends CTCNC
                 $this->dsSearchResults->getExcelValue('startTime') . "," .
                 $this->dsSearchResults->getExcelValue('endTime') . "," .
                 number_format($this->dsSearchResults->getExcelValue('duration') / 60 / 60, 2) . "," .
-                number_format($this->dsSearchResults->getExcelValue('duration') / 60 / 60, 2) * $this->dsSearchResults->getValue('salePrice') . "," .
+                number_format($this->dsSearchResults->getExcelValue('duration') / 60 / 60,
+                              2) * $this->dsSearchResults->getValue('salePrice') . "," .
                 $this->dsSearchResults->getExcelValue('activityType') . "," .
                 $this->dsSearchResults->getExcelValue('userName') . "," .
                 $this->dsSearchResults->getExcelValue('projectDescription') . "," .
                 $this->dsSearchResults->getExcelValue('contractDescription') . "," .
-                str_replace(',', '\'', addslashes(common_stripEverything($this->dsSearchResults->getValue('reason')))) . "," .
-                str_replace(',', '\'', addslashes(common_stripEverything($this->dsSearchResults->getValue('internalNotes')))) . "," .
+                str_replace(',',
+                            '\'',
+                            addslashes(common_stripEverything($this->dsSearchResults->getValue('reason')))) . "," .
+                str_replace(',',
+                            '\'',
+                            addslashes(common_stripEverything($this->dsSearchResults->getValue('internalNotes')))) . "," .
                 $this->dsSearchResults->getExcelValue('managementReviewReason') . "," .
                 $this->dsSearchResults->getExcelValue('rootCause') .
                 "\n";
@@ -2437,7 +2458,8 @@ class CTActivity extends CTCNC
         $this->template->set_var(
             array(
                 'customerName' => $_SESSION[$this->sessionKey]['customerName'],
-                'currentDocumentsLink' => $this->getCurrentDocumentsLink($_SESSION[$this->sessionKey]['customerID'], $buCustomer),
+                'currentDocumentsLink' => $this->getCurrentDocumentsLink($_SESSION[$this->sessionKey]['customerID'],
+                                                                         $buCustomer),
                 'renewalsLink' => $this->getRenewalsLink($_SESSION[$this->sessionKey]['customerID']),
                 'curValue' => $_SESSION[$this->sessionKey]['curValue'],
                 'curValueMessage' => $error['curValue'],
@@ -2801,7 +2823,8 @@ class CTActivity extends CTCNC
                 'customerName' => $_SESSION[$this->sessionKey]['customerName'],
                 'customerNameDisplayClass'
                 => $_SESSION[$this->sessionKey]['customerNameDisplayClass'],
-                'currentDocumentsLink' => $this->getCurrentDocumentsLink($_SESSION[$this->sessionKey]['customerID'], $buCustomer),
+                'currentDocumentsLink' => $this->getCurrentDocumentsLink($_SESSION[$this->sessionKey]['customerID'],
+                                                                         $buCustomer),
                 'renewalsLink' => $this->getRenewalsLink($_SESSION[$this->sessionKey]['customerID']),
                 'projectLink' => $this->getCurrentProjectLink($_SESSION[$this->sessionKey]['customerID']), 'contractListPopupLink' => $this->getContractListPopupLink($_SESSION[$this->sessionKey]['customerID']),
                 'dateRaised' => Controller::dateYMDtoDMY($_SESSION[$this->sessionKey]['dateRaised']),
@@ -3473,7 +3496,9 @@ class CTActivity extends CTCNC
         $this->priorityDropdown($dsCallActivity->getValue("priority"), 'ActivityEdit');
 
         if ($dsCallActivity->getValue("siteNo") != '') {
-            $this->contactDropdown('ActivityEdit', $dsCallActivity->getValue('customerID'), $dsCallActivity->getValue("contactID"));
+            $this->contactDropdown('ActivityEdit',
+                                   $dsCallActivity->getValue('customerID'),
+                                   $dsCallActivity->getValue("contactID"));
         }
         // user selection
         $dbeUser = new DBEUser($this);
@@ -3753,8 +3778,10 @@ class CTActivity extends CTCNC
                 }
             }
             if (isset($_REQUEST['Fixed'])) {
-                if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID'), $callActivityID) > 0) {
-                    $this->dsCallActivity->setMessage('problemStatus', 'Can not fix, there are open activities on this request');
+                if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID'),
+                                                                    $callActivityID) > 0) {
+                    $this->dsCallActivity->setMessage('problemStatus',
+                                                      'Can not fix, there are open activities on this request');
                     $this->formError = true;
                 }
             }
@@ -3857,7 +3884,8 @@ class CTActivity extends CTCNC
 
                             if ($usedTime + $durationMinutes > $allocatedTime) {
                                 $this->formError = true;
-                                $this->dsCallActivity->setMessage('endTime', 'You cannot assign more time than left over');
+                                $this->dsCallActivity->setMessage('endTime',
+                                                                  'You cannot assign more time than left over');
                             }
                         }
 
@@ -3873,7 +3901,8 @@ class CTActivity extends CTCNC
                             ) {
                                 $this->formError = true;
                                 $this->userWarned = true;
-                                $this->dsCallActivity->setMessage('endTime', 'Warning: Duration exceeds ' . $dsHeader->getValue('customerContactWarnHours') . ' hours');
+                                $this->dsCallActivity->setMessage('endTime',
+                                                                  'Warning: Duration exceeds ' . $dsHeader->getValue('customerContactWarnHours') . ' hours');
 
                             }
 
@@ -3881,7 +3910,8 @@ class CTActivity extends CTCNC
                                 if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
                                     $this->formError = true;
                                     $this->userWarned = true;
-                                    $this->dsCallActivity->setMessage('endTime', 'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
+                                    $this->dsCallActivity->setMessage('endTime',
+                                                                      'Warning: Activity duration exceeds ' . $dsHeader->getValue('remoteSupportWarnHours') . ' hours');
                                 }
 
                                 $minHours = $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours);
@@ -3889,7 +3919,8 @@ class CTActivity extends CTCNC
                                 if ($durationHours < $minHours) {
                                     $this->formError = true;
                                     $this->userWarned = true;
-                                    $this->dsCallActivity->setMessage('endTime', 'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
+                                    $this->dsCallActivity->setMessage('endTime',
+                                                                      'Remote support under ' . (floor($minHours * 60)) . ' minutes, should this be Customer Contact instead?”.');
                                 }
 
                             }
@@ -4651,7 +4682,9 @@ class CTActivity extends CTCNC
                 )
             );
 
-        $this->documents($_REQUEST['callActivityID'], $dsCallActivity->getValue('problemID'), 'ServiceRequestFixedEdit');
+        $this->documents($_REQUEST['callActivityID'],
+                         $dsCallActivity->getValue('problemID'),
+                         'ServiceRequestFixedEdit');
 
         $uploadURL =
             $this->buildLink(
@@ -4885,7 +4918,9 @@ class CTActivity extends CTCNC
             )
         );
 
-        $this->allocatedMinutesDropdown($_REQUEST['allocatedMinutes'], 'ServiceRequestAllocateAdditionalTime', 'allocatedMinutesBlock');
+        $this->allocatedMinutesDropdown($_REQUEST['allocatedMinutes'],
+                                        'ServiceRequestAllocateAdditionalTime',
+                                        'allocatedMinutesBlock');
 
         $this->template->parse('CONTENTS', 'ServiceRequestAllocateAdditionalTime', true);
 
@@ -5221,7 +5256,10 @@ class CTActivity extends CTCNC
 
     function secsToText($time)
     {
-        return str_pad((int)floor($time / 3600), 2, 0, STR_PAD_LEFT) . ':' . str_pad((int)floor($time / 60) % 60, 2, 0, STR_PAD_LEFT);
+        return str_pad((int)floor($time / 3600), 2, 0, STR_PAD_LEFT) . ':' . str_pad((int)floor($time / 60) % 60,
+                                                                                     2,
+                                                                                     0,
+                                                                                     STR_PAD_LEFT);
     }
 
     function parseWarrantySelector($warrantyID)

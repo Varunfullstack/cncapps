@@ -24,6 +24,13 @@ class CTPaymentTerms extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPaymentTerms = new BUPaymentTerms($this);
         $this->dsPaymentTerms = new DSForm($this);
         $this->dsPaymentTerms->copyColumnsFrom($this->buPaymentTerms->dbePaymentTerms);
@@ -205,10 +212,10 @@ class CTPaymentTerms extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'paymentTermsID' => $this->dsPaymentTerms->getValue('paymentTermsID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'paymentTermsID' => $this->dsPaymentTerms->getValue('paymentTermsID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

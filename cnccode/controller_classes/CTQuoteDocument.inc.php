@@ -48,7 +48,8 @@ define('CTSALESORDER_CLS_ORDER_TOTAL_ITEM', 'orderTotalItem');
 define('CTSALESORDER_CLS_ORDER_TOTAL_LOSS', 'orderTotalLoss');
 // Notepad key types
 define('CTSALESORDER_NOTEPAD_ITEM', 'IT');
-define('CTSALESORDER_TXT_INTRODUCTION', 'With reference to our recent telephone conversation I have great pleasure in providing you with the following prices:');
+define('CTSALESORDER_TXT_INTRODUCTION',
+       'With reference to our recent telephone conversation I have great pleasure in providing you with the following prices:');
 //define('CTSALESORDER_TXT_EMAIL_SUBJECT_START', 'Your Quotation Ref:');
 define('CTSALESORDER_TXT_SEND', 'Send');
 define('CTSALESORDER_TXT_DELETE', 'Delete');
@@ -80,7 +81,6 @@ class CTSalesOrder extends CTCNC
     var $lineText = '';
     var $fromDate = '';
     var $toDate = '';
-    var $userID = '';
     var $salutation = '';
     var $dsUser = '';
     var $introduction = '';
@@ -96,6 +96,10 @@ class CTSalesOrder extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomer = new BUCustomer($this);
         $this->buSalesOrder = new BUSalesOrder($this);
         $this->buNotepad = new BUNotepad($this);
@@ -250,7 +254,10 @@ class CTSalesOrder extends CTCNC
     {
         if ($dateDMY != '') {
             $dateArray = explode('/', $dateDMY);
-            return ($dateArray[2] . '-' . str_pad($dateArray[1], 2, '0', STR_PAD_LEFT) . '-' . str_pad($dateArray[0], 2, '0', STR_PAD_LEFT));
+            return ($dateArray[2] . '-' . str_pad($dateArray[1], 2, '0', STR_PAD_LEFT) . '-' . str_pad($dateArray[0],
+                                                                                                       2,
+                                                                                                       '0',
+                                                                                                       STR_PAD_LEFT));
         } else {
             return '';
         }
@@ -573,7 +580,10 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_ORDHEADID_NOT_PASSED);
             return;
         }
-        if (!$this->buSalesOrder->getOrderWithCustomerName($this->getOrdheadID(), $dsOrdhead, $dsOrdline, $dsDeliveryContact)) {
+        if (!$this->buSalesOrder->getOrderWithCustomerName($this->getOrdheadID(),
+                                                           $dsOrdhead,
+                                                           $dsOrdline,
+                                                           $dsDeliveryContact)) {
             $this->displayFatalError(CTSALESORDER_ORDER_NOT_FND);
             return;
         }
@@ -677,7 +687,8 @@ class CTSalesOrder extends CTCNC
                             'orderLineCostTotalClass' => CTSALESORDER_CLS_ORDER_LINE_COMMENT,
                             'orderLineClass' => CTSALESORDER_CLS_ORDER_LINE_COMMENT,
                             'sequenceNo' => $dsOrdline->getValue("sequenceNo"),
-                            'orderLineChecked' => ($this->dsSelectedOrderLine->search('sequenceNo', $dsOrdline->getValue("sequenceNo"))) ? CT_CHECKED : ''
+                            'orderLineChecked' => ($this->dsSelectedOrderLine->search('sequenceNo',
+                                                                                      $dsOrdline->getValue("sequenceNo"))) ? CT_CHECKED : ''
                         )
                     );
                 } else {                                                                                                // Item line
@@ -706,7 +717,8 @@ class CTSalesOrder extends CTCNC
                             'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                             'orderLineClass' => CTSALESORDER_CLS_ORDER_LINE_ITEM,
                             'sequenceNo' => $dsOrdline->getValue("sequenceNo"),
-                            'orderLineChecked' => ($this->dsSelectedOrderLine->search('sequenceNo', $dsOrdline->getValue("sequenceNo"))) ? CT_CHECKED : ''
+                            'orderLineChecked' => ($this->dsSelectedOrderLine->search('sequenceNo',
+                                                                                      $dsOrdline->getValue("sequenceNo"))) ? CT_CHECKED : ''
                         )
                     );
                     $curSaleGrandTotal += $curSaleTotal;
@@ -767,26 +779,26 @@ class CTSalesOrder extends CTCNC
                 do {
                     $displayQuoteURL =
                         $this->buildLink($_SERVER['PHP_SELF'],
-                            array(
-                                'action' => CTSALESORDER_ACT_DISPLAY_QUOTE,
-                                'quotationID' => $this->dsQuotation->getValue("quotationID")
-                            )
+                                         array(
+                                             'action' => CTSALESORDER_ACT_DISPLAY_QUOTE,
+                                             'quotationID' => $this->dsQuotation->getValue("quotationID")
+                                         )
                         );
                     $quoteSent = ($this->dsQuotation->getValue("sentDateTime") != '0000-00-00 00:00:00');
                     if (!$quoteSent) {
                         $sendQuoteURL =
                             $this->buildLink($_SERVER['PHP_SELF'],
-                                array(
-                                    'action' => CTSALESORDER_ACT_SEND_QUOTE,
-                                    'quotationID' => $this->dsQuotation->getValue("quotationID")
-                                )
+                                             array(
+                                                 'action' => CTSALESORDER_ACT_SEND_QUOTE,
+                                                 'quotationID' => $this->dsQuotation->getValue("quotationID")
+                                             )
                             );
                         $deleteQuoteURL =
                             $this->buildLink($_SERVER['PHP_SELF'],
-                                array(
-                                    'action' => CTSALESORDER_ACT_DELETE_QUOTE_DOC,
-                                    'quotationID' => $this->dsQuotation->getValue("quotationID")
-                                )
+                                             array(
+                                                 'action' => CTSALESORDER_ACT_DELETE_QUOTE_DOC,
+                                                 'quotationID' => $this->dsQuotation->getValue("quotationID")
+                                             )
                             );
                         $txtDelete = CTSALESORDER_TXT_DELETE;
                         $txtSend = CTSALESORDER_TXT_SEND;
@@ -796,7 +808,8 @@ class CTSalesOrder extends CTCNC
                         $deleteQuoteURL = '';
                         $txtDelete = '';
                         $txtSend = '';
-                        $quoteSentDateTime = date("j/n/Y H:i:s", strtotime($this->dsQuotation->getValue("sentDateTime")));
+                        $quoteSentDateTime = date("j/n/Y H:i:s",
+                                                  strtotime($this->dsQuotation->getValue("sentDateTime")));
                     }
                     $this->template->set_var(
                         array(
@@ -874,7 +887,10 @@ class CTSalesOrder extends CTCNC
             exit;
         }
         // Insert into database
-        if (!$this->buSalesOrder->getOrderWithCustomerName($this->getOrdheadID(), $dsOrdhead, $dsOrdline, $dsDeliveryContact)) {
+        if (!$this->buSalesOrder->getOrderWithCustomerName($this->getOrdheadID(),
+                                                           $dsOrdhead,
+                                                           $dsOrdline,
+                                                           $dsDeliveryContact)) {
             $this->displayFatalError(CTSALESORDER_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
@@ -988,7 +1004,10 @@ class CTSalesOrder extends CTCNC
      */
     function sendPDFEmailQuote()
     {
-        if (!$this->buSalesOrder->getOrderWithCustomerName($this->dsQuotation->getValue('ordheadID'), $dsOrdhead, $dsOrdline, $dsDeliveryContact)) {
+        if (!$this->buSalesOrder->getOrderWithCustomerName($this->dsQuotation->getValue('ordheadID'),
+                                                           $dsOrdhead,
+                                                           $dsOrdline,
+                                                           $dsDeliveryContact)) {
             $this->displayFatalError(CTSALESORDER_ORDER_NOT_FND);
         }
         $quoteFile = 'quotes/' . $this->dsQuotation->getValue('ordheadID') . '_' . $this->dsQuotation->getValue('versionNo') . '.pdf';
@@ -1030,7 +1049,8 @@ class CTSalesOrder extends CTCNC
         $mime_message .= "Content-Type: application/pdf; name=\"$filename\"\r\n";
         $mime_message .= "Content-Transfer-Encoding: base64\r\n";
         $mime_message .= "Content-Disposition: attachment; filename=\"$filename\"\r\n\r\n";
-        $mime_message .= chunk_split(base64_encode(file_get_contents($quoteFile)), 60) . "\r\n"; // split attachment to email
+        $mime_message .= chunk_split(base64_encode(file_get_contents($quoteFile)),
+                                     60) . "\r\n"; // split attachment to email
         $mime_message .= "\r\n--$mime_boundary--";
         return (mail($dsOrdhead->getValue('delContactEmail'), $subject, $mime_message, $headers));
     }
@@ -1059,7 +1079,10 @@ class CTSalesOrder extends CTCNC
 
     function buildQuote()
     {
-        if (!$this->buSalesOrder->getOrderWithCustomerName($this->getOrdheadID(), $dsOrdhead, $dsOrdline, $dsDeliveryContact)) {
+        if (!$this->buSalesOrder->getOrderWithCustomerName($this->getOrdheadID(),
+                                                           $dsOrdhead,
+                                                           $dsOrdline,
+                                                           $dsDeliveryContact)) {
             $this->displayFatalError(CTSALESORDER_ORDER_NOT_FND);
         }
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());

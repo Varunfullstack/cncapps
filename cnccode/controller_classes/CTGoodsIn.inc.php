@@ -47,6 +47,14 @@ class CTGoodsIn extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "accounts"
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->buGoodsIn = new BUGoodsIn($this);
         $this->dsPorhead = new DSForm($this);
@@ -109,10 +117,10 @@ class CTGoodsIn extends CTCNC
             $this->dsPorhead->fetchNext();
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
-                        'porheadID' => $this->dsPorhead->getValue('porheadID')
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
+                                     'porheadID' => $this->dsPorhead->getValue('porheadID')
+                                 )
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -227,9 +235,13 @@ class CTGoodsIn extends CTCNC
             If the customer is an internal stock location then update the appropriate stock level
             */
             if ($dsPorhead->getValue('supplierID') == CONFIG_SALES_STOCK_SUPPLIERID) {
-                $this->buGoodsIn->getInitialStockReceieveQtys(CONFIG_SALES_STOCK_CUSTOMERID, $dsPorline, $this->dsGoodsIn);
+                $this->buGoodsIn->getInitialStockReceieveQtys(CONFIG_SALES_STOCK_CUSTOMERID,
+                                                              $dsPorline,
+                                                              $this->dsGoodsIn);
             } else if ($dsPorhead->getValue('supplierID') == CONFIG_MAINT_STOCK_SUPPLIERID) {
-                $this->buGoodsIn->getInitialStockReceieveQtys(CONFIG_MAINT_STOCK_CUSTOMERID, $dsPorline, $this->dsGoodsIn);
+                $this->buGoodsIn->getInitialStockReceieveQtys(CONFIG_MAINT_STOCK_CUSTOMERID,
+                                                              $dsPorline,
+                                                              $this->dsGoodsIn);
             } else {
                 $this->buGoodsIn->getInitialReceieveQtys($dsPorline, $this->dsGoodsIn, $addCustomerItems);
             }

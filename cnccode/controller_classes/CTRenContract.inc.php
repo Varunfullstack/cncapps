@@ -27,6 +27,13 @@ class CTRenContract extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "renewals"
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenContract = new BURenContract($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenContract = new DSForm($this);
@@ -497,10 +504,10 @@ class CTRenContract extends CTCNC
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID' => $this->dsRenContract->getValue('customerItemID')
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'ID' => $this->dsRenContract->getValue('customerItemID')
+                                 )
                 );
 
         }

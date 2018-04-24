@@ -21,6 +21,13 @@ class CTCustomerServiceReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerServiceReport = new BUCustomerServiceReport($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsResults = new DataSet($this);

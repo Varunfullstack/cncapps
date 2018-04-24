@@ -22,6 +22,13 @@ class CTHeader extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buHeader = new BUHeader($this);
         $this->dsHeader = new DSForm($this);
         $this->dsHeader->copyColumnsFrom($this->buHeader->dbeJHeader);
@@ -282,9 +289,9 @@ class CTHeader extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -353,9 +360,9 @@ class CTHeader extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'editHelpDesk'
-                )
+                             array(
+                                 'action' => 'editHelpDesk'
+                             )
             );
         header('Location: ' . $urlNext);
     }

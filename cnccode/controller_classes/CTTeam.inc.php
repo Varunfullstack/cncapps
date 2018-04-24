@@ -24,6 +24,13 @@ class CTTEAM extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buTeam = new BUTeam($this);
         $this->dsTeam = new DSForm($this);
         $this->dsTeam->copyColumnsFrom($this->buTeam->dbeTeam);
@@ -252,10 +259,10 @@ class CTTEAM extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'teamID' => $this->dsTeam->getValue('teamID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'teamID' => $this->dsTeam->getValue('teamID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

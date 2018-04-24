@@ -13,6 +13,14 @@ class CTSecondSite extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "technical",
+            "reports"
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buSecondsite = new buSecondsite($this);
         $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
@@ -247,9 +255,9 @@ class CTSecondSite extends CTCNC
 
         foreach ($years as $year) {
             $this->template->set_var([
-                "year" => $year,
-                "selectedYear" => $year == $selectedYear ? 'selected' : ''
-            ]);
+                                         "year" => $year,
+                                         "selectedYear" => $year == $selectedYear ? 'selected' : ''
+                                     ]);
             $this->template->parse('availableYears', 'availableYearsBlock', true);
         };
 
@@ -573,7 +581,8 @@ class CTSecondSite extends CTCNC
             }
 
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink(
             $_SERVER ['PHP_SELF'],

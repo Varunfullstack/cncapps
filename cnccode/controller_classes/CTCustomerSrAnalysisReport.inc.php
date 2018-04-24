@@ -20,6 +20,13 @@ class CTCustomerSrAnalysisReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerSrAnalysisReport = new BUCustomerSrAnalysisReport ($this);
     }
 

@@ -24,6 +24,10 @@ class CTPortalCustomerDocument extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPortalCustomerDocument = new BUPortalCustomerDocument($this);
         $this->dsPortalCustomerDocument = new DSForm($this);
         $this->dsPortalCustomerDocument->copyColumnsFrom($this->buPortalCustomerDocument->dbePortalCustomerDocument);
@@ -62,7 +66,8 @@ class CTPortalCustomerDocument extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
-                $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'], $dsPortalCustomerDocument);
+                $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'],
+                                                                 $dsPortalCustomerDocument);
                 $portalCustomerDocumentID = $_REQUEST['portalCustomerDocumentID'];
             } else {                                                                    // creating new
                 $dsPortalCustomerDocument->initialise();
@@ -202,7 +207,8 @@ class CTPortalCustomerDocument extends CTCNC
     {
         $this->setMethodName('delete');
 
-        $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'], $dsPortalCustomerDocument);
+        $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'],
+                                                         $dsPortalCustomerDocument);
 
         if (!$this->buPortalCustomerDocument->deleteDocument($_REQUEST['portalCustomerDocumentID'])) {
             $this->displayFatalError('Cannot delete this document');

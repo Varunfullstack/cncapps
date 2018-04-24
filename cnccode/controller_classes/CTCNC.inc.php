@@ -11,6 +11,7 @@ require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
+require_once($cfg['path_bu'] . '/BUUser.inc.php');
 
 define('CTCNC_ACT_DISP_CUST_POPUP', 'dispCustPopup');
 define('CTCNC_ACT_DISP_ITEM_POPUP', 'dispItemPopup');
@@ -68,6 +69,7 @@ class CTCNC extends Controller
     var $userID = '';
     var $dbeUser;
     var $dbeTeam;
+    private $user;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -77,7 +79,22 @@ class CTCNC extends Controller
             $this->userID = CONFIG_SCHEDULED_TASK_USER_ID;
         }
 
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->getRow();
+
+        $this->user = new BUUser($this);
+
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+    }
+
+    function canAccess($roles)
+    {
+        $perms = explode(',', $this->dbeUser->getValue(DBEUser::perms));
+        $array = array_intersect($perms, $roles);
+
+        return !!count($array);
+
     }
 
     function getDbeUser()
@@ -86,6 +103,11 @@ class CTCNC extends Controller
             $this->dbeUser = new DBEUser ($this);
         }
         return $this->dbeUser;
+    }
+
+    function getUser()
+    {
+
     }
 
     function getDbeTeam()
@@ -176,6 +198,9 @@ class CTCNC extends Controller
         if ($_REQUEST ['htmlFmt'] != '') {
             $this->setHTMLFmt($_REQUEST ['htmlFmt']);
         }
+
+        $user = self::getDbeUser();
+
         switch ($_REQUEST ['action']) {
             case CTCNC_ACT_LOGOUT :
                 $this->logout();

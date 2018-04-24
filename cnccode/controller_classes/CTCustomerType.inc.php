@@ -24,6 +24,13 @@ class CTCUSTOMERTYPE extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerType = new BUCustomerType($this);
         $this->dsCustomerType = new DSForm($this);
         $this->dsCustomerType->copyColumnsFrom($this->buCustomerType->dbeCustomerType);
@@ -229,10 +236,10 @@ class CTCUSTOMERTYPE extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'customerTypeID' => $this->dsCustomerType->getValue('customerTypeID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'customerTypeID' => $this->dsCustomerType->getValue('customerTypeID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

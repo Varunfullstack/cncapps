@@ -30,6 +30,10 @@ class CTTestHours extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buActivity = new BUActivity($this);
         $this->buCustomerItem = new BUCustomerItem($this);
 
@@ -131,7 +135,8 @@ class CTTestHours extends CTCNC
                         'aMinResponseHours' => $minResponseHours,
                         'aElapsedHours' => $elapsedHours,
                         'aProblemID' => $dsResults->getValue('problemID'),
-                        'aEngineerDropDown' => $this->getEngineerList($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
+                        'aEngineerDropDown' => $this->getEngineerList($dsResults->getValue('problemID'),
+                                                                      $dsResults->getValue('userID')),
                         'aCustomerName' => $dsResults->getValue('customerName'),
                         'aUrlCreateFollowon' => $urlCreateFollowon,
                         'aUrlRejectAllocation' => $urlRejectAllocation,
@@ -192,7 +197,8 @@ class CTTestHours extends CTCNC
                         'pProblemID' => $dsResults->getValue('problemID'),
                         'pReason' => $this->truncate($dbeFirstActivity->getValue('reason')),
                         'pUrlReasonPopup' => $urlReasonPopup,
-                        'pEngineerDropDown' => $this->getEngineerList($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
+                        'pEngineerDropDown' => $this->getEngineerList($dsResults->getValue('problemID'),
+                                                                      $dsResults->getValue('userID')),
                         'pElapsedHours' => $elapsedHours,
                         'pEngineerName' => $dsResults->getValue('engineerName'),
                         'pCustomerName' => $dsResults->getValue('customerName'),

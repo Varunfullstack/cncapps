@@ -25,6 +25,13 @@ class CTSTANDARDTEXT extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buStandardText = new BUStandardText($this);
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom($this->buStandardText->dbeStandardText);
@@ -255,10 +262,10 @@ class CTSTANDARDTEXT extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'stt_standardtextno' => $this->dsStandardText->getValue('stt_standardtextno'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'stt_standardtextno' => $this->dsStandardText->getValue('stt_standardtextno'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

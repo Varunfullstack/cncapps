@@ -36,6 +36,14 @@ class CTCurrentActivityReport extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
 
+        $roles = [
+            "technical",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+
         $this->buActivity = new BUActivity($this);
 
         $this->buCustomerItem = new BUCustomerItem($this);
@@ -954,7 +962,8 @@ class CTCurrentActivityReport extends CTCNC
             $imRemaining = $imAssignedMinutes - $imUsedMinutes;
 
 
-            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
+            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
+                                            1);
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
@@ -979,11 +988,13 @@ class CTCurrentActivityReport extends CTCNC
                     'problemID' => $dsResults->getValue('problemID'),
                     'reason' => $this->truncate($dsResults->getValue('reason'), 150),
                     'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
-                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
+                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'),
+                                                                          $dsResults->getValue('userID')),
                     'engineerName' => $dsResults->getValue('engineerName'),
                     'customerName' => $dsResults->getValue('customerName'),
                     'customerNameDisplayClass'
-                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'), $dsResults->getValue('specialAttentionEndDate')),
+                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'),
+                                                          $dsResults->getValue('specialAttentionEndDate')),
                     'urlViewActivity' => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),

@@ -17,6 +17,10 @@ class CTSalesByCustomerReport extends CTCNC
     function CTSalesReport($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buSalesByCustomerReport = new BUSalesByCustomer($this);
     }
 

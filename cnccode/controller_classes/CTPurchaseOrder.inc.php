@@ -56,6 +56,13 @@ class CTPurchaseOrder extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->dsPorhead = new DSForm($this);
         $this->dsPorline = new DSForm($this);
@@ -228,10 +235,10 @@ class CTPurchaseOrder extends CTCNC
             $this->dsPorhead->fetchNext();
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_PO,
-                        'porheadID' => $this->dsPorhead->getValue('porheadID') // if this is set then will show
-                    )                                                                                                                    // remaining POs for SO
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_PO,
+                                     'porheadID' => $this->dsPorhead->getValue('porheadID') // if this is set then will show
+                                 )                                                                                                                    // remaining POs for SO
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -742,12 +749,16 @@ class CTPurchaseOrder extends CTCNC
         }
         if (!$this->formError) {
             if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
-                if (!$this->buPurchaseOrder->getOrdlineByIDSeqNo($_REQUEST['porheadID'], $_REQUEST['sequenceNo'], $this->dsPorline)) {
+                if (!$this->buPurchaseOrder->getOrdlineByIDSeqNo($_REQUEST['porheadID'],
+                                                                 $_REQUEST['sequenceNo'],
+                                                                 $this->dsPorline)) {
                     $this->displayFatalError(CTPURCHASEORDER_MSG_ORDLINE_NOT_FND);
                     return;
                 }
             } else {
-                $this->buPurchaseOrder->initialiseNewOrdline($_REQUEST['porheadID'], $_REQUEST['sequenceNo'], $this->dsPorline);
+                $this->buPurchaseOrder->initialiseNewOrdline($_REQUEST['porheadID'],
+                                                             $_REQUEST['sequenceNo'],
+                                                             $this->dsPorline);
             }
         }
         $this->setTemplateFiles(
@@ -788,24 +799,24 @@ class CTPurchaseOrder extends CTCNC
         if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
             $urlSubmit =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTPURCHASEORDER_ACT_UPDATE_ORDLINE
-                    )
+                                 array(
+                                     'action' => CTPURCHASEORDER_ACT_UPDATE_ORDLINE
+                                 )
                 );
         } else {
             $urlSubmit =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTPURCHASEORDER_ACT_INSERT_ORDLINE
-                    )
+                                 array(
+                                     'action' => CTPURCHASEORDER_ACT_INSERT_ORDLINE
+                                 )
                 );
         }
         $urlCancel =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'porheadID' => $this->dsPorhead->getValue('porheadID'),
-                    'action' => CTCNC_ACT_DISPLAY_PO
-                )
+                             array(
+                                 'porheadID' => $this->dsPorhead->getValue('porheadID'),
+                                 'action' => CTCNC_ACT_DISPLAY_PO
+                             )
             );
         $urlItemPopup =
             $this->buildLink(
@@ -864,10 +875,10 @@ class CTPurchaseOrder extends CTCNC
         }
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'porheadID' => $this->dsPorline->getValue('porheadID'),
-                    'action' => CTCNC_ACT_DISPLAY_PO
-                )
+                             array(
+                                 'porheadID' => $this->dsPorline->getValue('porheadID'),
+                                 'action' => CTCNC_ACT_DISPLAY_PO
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -884,10 +895,10 @@ class CTPurchaseOrder extends CTCNC
         $this->buPurchaseOrder->moveOrderLineUp($_REQUEST['porheadID'], $_REQUEST['sequenceNo']);
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'porheadID' => $_REQUEST['porheadID'],
-                    'action' => CTCNC_ACT_DISPLAY_PO
-                )
+                             array(
+                                 'porheadID' => $_REQUEST['porheadID'],
+                                 'action' => CTCNC_ACT_DISPLAY_PO
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -904,10 +915,10 @@ class CTPurchaseOrder extends CTCNC
         $this->buPurchaseOrder->moveOrderLineDown($_REQUEST['porheadID'], $_REQUEST['sequenceNo']);
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'porheadID' => $_REQUEST['porheadID'],
-                    'action' => CTCNC_ACT_DISPLAY_PO
-                )
+                             array(
+                                 'porheadID' => $_REQUEST['porheadID'],
+                                 'action' => CTCNC_ACT_DISPLAY_PO
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -924,10 +935,10 @@ class CTPurchaseOrder extends CTCNC
         $this->buPurchaseOrder->deleteOrderLine($_REQUEST['porheadID'], $_REQUEST['sequenceNo']);
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'porheadID' => $_REQUEST['porheadID'],
-                    'action' => CTCNC_ACT_DISPLAY_PO
-                )
+                             array(
+                                 'porheadID' => $_REQUEST['porheadID'],
+                                 'action' => CTCNC_ACT_DISPLAY_PO
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -953,10 +964,10 @@ class CTPurchaseOrder extends CTCNC
 
         $urlNext =                        // default action
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCNC_ACT_SEARCH,
-                    'ordheadID' => $this->dsPorhead->getValue('ordheadID') // if this is set then will show
-                )                                                                                                                    // remaining POs for SO
+                             array(
+                                 'action' => CTCNC_ACT_SEARCH,
+                                 'ordheadID' => $this->dsPorhead->getValue('ordheadID') // if this is set then will show
+                             )                                                                                                                    // remaining POs for SO
             );
         if ($this->dsPorhead->getValue('ordheadID') <> '') {
             $buSalesOrder = new BUSalesOrder($this);
@@ -998,10 +1009,10 @@ class CTPurchaseOrder extends CTCNC
             $this->buPurchaseOrder->updateHeader($dsPorhead);
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'porheadID' => $_REQUEST['porheadID'],
-                        'action' => CTCNC_ACT_DISPLAY_PO
-                    )
+                                 array(
+                                     'porheadID' => $_REQUEST['porheadID'],
+                                     'action' => CTCNC_ACT_DISPLAY_PO
+                                 )
                 );
             header('Location: ' . $urlNext);
         }

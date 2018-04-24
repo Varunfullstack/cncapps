@@ -20,6 +20,13 @@ class CTQuestionnaire extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buQuestionnaire = new BUQuestionnaire($this);
         $this->dsQuestionnaire = new DSForm($this);
         $this->dsQuestionnaire->copyColumnsFrom($this->buQuestionnaire->dbeQuestionnaire);
@@ -268,10 +275,10 @@ class CTQuestionnaire extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestionnaire->getValue('questionnaireID'),
-                    'action' => 'view'
-                )
+                             array(
+                                 'questionnaireID' => $this->dsQuestionnaire->getValue('questionnaireID'),
+                                 'action' => 'view'
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -534,10 +541,10 @@ class CTQuestionnaire extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestion->getValue('questionnaireID'),
-                    'action' => 'displayQuestionList'
-                )
+                             array(
+                                 'questionnaireID' => $this->dsQuestion->getValue('questionnaireID'),
+                                 'action' => 'displayQuestionList'
+                             )
             );
         header('Location: ' . $urlNext);
     }

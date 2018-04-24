@@ -11,6 +11,7 @@ require_once("config.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
+
 define('EMAIL_FROM_USER', 'sales@cnc-ltd.co.uk');
 define('EMAIL_SUBJECT', 'Outlook address file');
 define('FORMAT_MYSQL_UK_DATE', '%e/%c/%Y');

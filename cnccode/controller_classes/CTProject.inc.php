@@ -24,6 +24,10 @@ class CTProject extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buProject = new BUProject($this);
         $this->dsProject = new DSForm($this);
         $this->dsProject->copyColumnsFrom($this->buProject->dbeProject);

@@ -41,6 +41,13 @@ class CTPurchaseInv extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPurchaseInv = new BUPurchaseInv($this);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->dsPorhead = new DSForm($this);
@@ -100,10 +107,10 @@ class CTPurchaseInv extends CTCNC
             $this->dsPorhead->fetchNext();
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTPURCHASEINV_ACT_DISPLAY,
-                        'porheadID' => $this->dsPorhead->getValue('porheadID')
-                    )
+                                 array(
+                                     'action' => CTPURCHASEINV_ACT_DISPLAY,
+                                     'porheadID' => $this->dsPorhead->getValue('porheadID')
+                                 )
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -301,7 +308,10 @@ class CTPurchaseInv extends CTCNC
                         'qtyOS' => number_format($this->dsPurchaseInv->getValue("qtyOS"), 1, '.', ''),
                         'curPOUnitCost' => number_format($this->dsPurchaseInv->getValue("curPOUnitCost"), 2, '.', ''),
                         'curInvUnitCost' => number_format($this->dsPurchaseInv->getValue("curInvUnitCost"), 2, '.', ''),
-                        'curInvTotalCost' => number_format($this->dsPurchaseInv->getValue("curInvTotalCost"), 2, '.', ''),
+                        'curInvTotalCost' => number_format($this->dsPurchaseInv->getValue("curInvTotalCost"),
+                                                           2,
+                                                           '.',
+                                                           ''),
                         'itemID' => $this->dsPurchaseInv->getValue("itemID"),
                         'qtyToInvoice' => $this->dsPurchaseInv->getValue("qtyToInvoice"),
                         'partNo' => Controller::htmlDisplayText($this->dsPurchaseInv->getValue("partNo")),
@@ -425,17 +435,17 @@ class CTPurchaseInv extends CTCNC
         if ($dsPorhead->getValue('type') == 'A') {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
+                                 )
                 );
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
-                        'porheadID' => $_REQUEST['porheadID']
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
+                                     'porheadID' => $_REQUEST['porheadID']
+                                 )
                 );
         }
         header('Location: ' . $urlNext);

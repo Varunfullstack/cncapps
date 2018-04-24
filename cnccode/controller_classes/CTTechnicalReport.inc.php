@@ -30,6 +30,10 @@ class CTCustomerActivityExport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buActivity = new BUActivity($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsTAndM = new DataSet($this);
@@ -206,7 +210,9 @@ class CTCustomerActivityExport extends CTCNC
                 if ($dataString) {
                     $dataString .= '|';
                 }
-                $dataString .= number_format($serverCare[$monthName], 2) . ',' . number_format($serviceDesk[$monthName], 2) . ',' . number_format($tAndM[$monthName], 2);
+                $dataString .= number_format($serverCare[$monthName], 2) . ',' . number_format($serviceDesk[$monthName],
+                                                                                               2) . ',' . number_format($tAndM[$monthName],
+                                                                                                                        2);
             }
 
             $urlChart =

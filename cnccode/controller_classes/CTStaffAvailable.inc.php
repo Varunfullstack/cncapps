@@ -19,6 +19,10 @@ class CTStaffAvailable extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::canAccess($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buStaffAvailable = new BUStaffAvailable($this);
     }
 
@@ -114,9 +118,9 @@ class CTStaffAvailable extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTSTAFF_AVAILABLE_ACT_DISPLAY_LIST
-                )
+                             array(
+                                 'action' => CTSTAFF_AVAILABLE_ACT_DISPLAY_LIST
+                             )
             );
         header('Location: ' . $urlNext);
     }
