@@ -3581,7 +3581,7 @@ class CTActivity extends CTCNC
             $this->template->parse('activities', 'activityTypeBlock', true);
         }
 
-        if (!$foundCurrent) {
+        if (!$foundCurrent && $callActTypeID) {
             $this->template->set_var(
                 array(
                     'activityTypeSelected' => 'selected',
