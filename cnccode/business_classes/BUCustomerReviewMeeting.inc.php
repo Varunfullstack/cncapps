@@ -263,7 +263,7 @@ class BUCustomerReviewMeeting extends Business
             2 => array('pipe', 'a'),
         );
 
-        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\" ";
+        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
         $process = proc_open($command, $descriptors, $pipes);
 
         if (is_resource($process)) {

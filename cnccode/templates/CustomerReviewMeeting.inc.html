@@ -8,7 +8,9 @@
 
     });
     var state = 'none'; // display status
-    var savedCustomerString
+    var savedCustomerString;
+
+    var data = {data};
 
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
@@ -41,30 +43,34 @@
         }
     }
 
-    $(function() {
-        $('#create-pdf').click(function() {
+    $(function () {
+        $('#create-pdf').click(function () {
             //loop through sections looking for large tables
             var tableID = 1;
-            $('.reportSection table').each(function() {
-                if(!$(this).hasClass('overflow')) {
+            $('.reportSection table').each(function () {
+                if (!$(this).hasClass('overflow')) {
                     var rowCount = $('tr', $(this)).length;
                     console.log(rowCount);
                     if (rowCount > 20) {
-                        $(this).addClass('overflow').attr('id', 'table'+tableID); var leftCol = 'table'+tableID; tableID++;
-                        $(this).clone().appendTo($(this).parent()).attr('id', 'table'+tableID); var rightCol = 'table'+tableID; tableID++;
+                        $(this).addClass('overflow').attr('id', 'table' + tableID);
+                        var leftCol = 'table' + tableID;
+                        tableID++;
+                        $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                        var rightCol = 'table' + tableID;
+                        tableID++;
 
-                        var split = Math.floor(rowCount/2);
-                        console.log('split: '+split);
-                        $("tr:lt("+(split+1)+")", '#'+leftCol).remove();
-                        $("tr:gt("+split+")", '#'+rightCol).remove();
+                        var split = Math.floor(rowCount / 2);
+                        console.log('split: ' + split);
+                        $("tr:lt(" + (split + 1) + ")", '#' + leftCol).remove();
+                        $("tr:gt(" + split + ")", '#' + rightCol).remove();
                     }
                 }
             })
 
             var height = 0;
             //1305 px is page height including margins
-            $('.reportSection').each(function() {
-                if((height + $(this).outerHeight()) > 1305) {
+            $('.reportSection').each(function () {
+                if ((height + $(this).outerHeight()) > 1305) {
                     //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
                     $(this).prepend('<div class="pageBreak"></div>');
                     height = 0;
@@ -77,37 +83,106 @@
             var result = $('#reportContent').html() + CKEDITOR.instances['editableText'].getData();
             CKEDITOR.instances['editableText'].setData(result);
             $('#reportContent').attr('disabled', true);
-            //$('#textForm').submit();
+            $('#textForm').submit();
         })
     })
 
 </script>
 
 <style>
-    h2, h3 { text-align: left; }
-    #reportContent {
-        width: 810px; float: left; background: #FFF; padding: 30px 40px; text-align: center;
+    h2, h3 {
+        text-align: left;
     }
-    .pageBreak { page-break-after: always; border-bottom: 2px dotted #333; margin-bottom: 30px; }
 
-    .rootCause { width: 600px; margin: 0 auto; }
-    .requestCount { width: 450px; margin: 0 auto; }
+    #reportContent {
+        width: 810px;
+        float: left;
+        background: #FFF;
+        padding: 30px 40px;
+        text-align: center;
+    }
 
-    .collapse { padding: 0; width:  }
-    .collapse li { list-style-type: none; display: block}
-    .collapse li div:first-child { width:90%; display: inline-block; float: left }
-    .collapse li div:nth-child(2) { width:10%; display: inline-block; float: left }
+    .pageBreak {
+        page-break-after: always;
+        border-bottom: 2px dotted #333;
+        margin-bottom: 30px;
+    }
 
-    .reportSection table { margin: 0 auto; }
-    .reportSection img { margin: 0 auto; display: inline-block }
+    .rootCause {
+        width: 600px;
+        margin: 0 auto;
+    }
 
-    .overflow:nth-child(even) { width:48%; float: right; margin: 0 !important; }
-    .overflow:nth-child(odd) { width:48%; float: left; margin: 0 !important; }
+    .requestCount {
+        width: 450px;
+        margin: 0 auto;
+    }
 
-    .reportSection { float: left; width: 100%; min-height: 50px; padding-bottom: 40px; display: inline-block; }
-    .reportSection img { margin: 0 auto; display: inline-block; float: none }
-    .reportSection table { border-collapse: collapse }
-    .reportSection td, .reportSection th {border: 1px solid #666; padding: 2px; }
+    .collapse {
+        padding: 0;
+        width:
+    }
+
+    .collapse li {
+        list-style-type: none;
+        display: block
+    }
+
+    .collapse li div:first-child {
+        width: 90%;
+        display: inline-block;
+        float: left
+    }
+
+    .collapse li div:nth-child(2) {
+        width: 10%;
+        display: inline-block;
+        float: left
+    }
+
+    .reportSection table {
+        margin: 0 auto;
+    }
+
+    .reportSection img {
+        margin: 0 auto;
+        display: inline-block
+    }
+
+    .overflow:nth-child(even) {
+        width: 48%;
+        float: right;
+        margin: 0 !important;
+    }
+
+    .overflow:nth-child(odd) {
+        width: 48%;
+        float: left;
+        margin: 0 !important;
+    }
+
+    .reportSection {
+        float: left;
+        width: 100%;
+        min-height: 50px;
+        padding-bottom: 40px;
+        display: inline-block;
+    }
+
+    .reportSection img {
+        margin: 0 auto;
+        display: inline-block;
+        float: none
+    }
+
+    .reportSection table {
+        border-collapse: collapse
+    }
+
+    .reportSection td, .reportSection th {
+        border: 1px solid #666;
+        padding: 2px;
+    }
 
     #create-pdf {
         margin-top: 30px;
@@ -215,21 +290,24 @@
     <input type="hidden" name="endYearMonth" value="{endYearMonth}">
     <input type="hidden" name="meetingDateYmd" value="{meetingDateYmd}">
 
-    <div id="reportContent">{nonEditableText}</div>
+    <div style="width: 920px; float: left">
+        <div id="reportContent">{nonEditableText}</div>
 
-    <textarea id="editableText" name="editableText">{editableText}</textarea>
+        <textarea id="editableText" name="editableText">{editableText}</textarea>
 
-    <script type="text/javascript">
-        reason = CKEDITOR.replace('editableText', {
-                height: '800px',
-                width: '890px',
-                extraAllowedContent: true,
-                allowedContent: true,
-                script: true
-            }
-        );
-    </script>
-    <input type="button" name="create-pdf" id="create-pdf" value="Create PDF">
+        <script type="text/javascript">
+            reason = CKEDITOR.replace('editableText', {
+                    height: '800px',
+                    width: '890px',
+                    extraAllowedContent: true,
+                    allowedContent: true,
+                    script: true
+                }
+            );
+        </script>
+        <input type="button" name="create-pdf" id="create-pdf" value="Create PDF">
+    </div>
+    <textarea id="reportBuild" name="reportBuild"></textarea>
 </form>
 
 <!-- End Template: CustomerReviewMeeting.inc.html -->

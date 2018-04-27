@@ -111,6 +111,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     $dsSearchForm->getValue('endYearMonth')
                 );
 
+
                 $nonEditableTemplate->set_var('chart', $this->generateCharts($results, $customerId));
 
                 $supportedUsersData = $this->getSupportedUsersData($buContact,
@@ -280,6 +281,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 $editableText = $textTemplate->get_var('output');
 
                 $nonEditableText = $nonEditableTemplate->get_var('output');
+                $something = $this->generateCharts($results, $customerId);
+
             }
 
         } else {
@@ -331,6 +334,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 'nonEditableText' => $nonEditableText,
                 'urlSubmit' => $urlSubmit,
                 'urlGeneratePdf' => $urlGeneratePdf,
+                "data" => json_encode($something)
             )
         );
 
@@ -703,7 +707,7 @@ class CTCustomerReviewMeeting extends CTCNC
             '<div class="reportSection"><img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '"></div>
         <div class="reportSection"><img class="graph" src="' . $this->generateGraph($otherContracts, $dataX) . '"></div>
         <div class="reportSection"><img class="graph" src="' . $this->generateGraph($totalSR, $dataX) . '"></div>';
-        return $toReturn;
+        return ["serviceDesk" => $serviceDesk, "otherContract" => $otherContracts, "total" => $totalSR, "dataX" => $dataX];
     }
 
     private function generateGraph($data, $dataX)
