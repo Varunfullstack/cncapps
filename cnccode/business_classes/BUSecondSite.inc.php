@@ -175,7 +175,7 @@ class BUSecondsite extends Business
                 }
             }
 
-            if ($error && !$customerItemID && !$isSuspended) {
+            if ($error && !$customerItemID && !$isSuspended && !$testRun) {
                 $this->sendBadConfigurationEmail($server, $error, $networkPath);
 
             }
