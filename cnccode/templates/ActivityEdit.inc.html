@@ -58,6 +58,7 @@
         }
         return;
     }
+
     function linkedSalesOrderPopup() {
         window.open(
             '{urlLinkedSalesOrder}',
@@ -153,17 +154,18 @@
             <td></td>
             <td></td>
             <td class="promptText">Type</td>
-            <td class="fieldText"><select
-                    {INITIAL_DISABLED}
-                    onchange="setFormChanged();"
-                    id="contractID"
-                    name="callActivity[1][callActTypeID]"
-            >
-                <option value="">Please Select</option>
-                <!-- BEGIN activityTypeBlock -->
-                <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
-                <!-- END activityTypeBlock -->
-            </select>
+            <td class="fieldText">
+                <select
+                        {INITIAL_DISABLED} {typeDisabled}
+                        onchange="setFormChanged();"
+                        id="contractID"
+                        name="callActivity[1][callActTypeID]"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN activityTypeBlock -->
+                    <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
+                    <!-- END activityTypeBlock -->
+                </select>
                 <span class="formErrorMessage">{callActTypeIDMessage}</span>
             </td>
 

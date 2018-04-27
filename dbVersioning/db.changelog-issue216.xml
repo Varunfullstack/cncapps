@@ -13,7 +13,7 @@
             </not>
         </preConditions>
         <addColumn tableName="callacttype">
-            <column name="cat_visible_in_sr_flag" defaultValue="'N'"/>
+            <column name="cat_visible_in_sr_flag" defaultValue="N" type="char(1)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

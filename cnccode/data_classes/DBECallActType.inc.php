@@ -86,6 +86,19 @@ class DBECallActType extends DBEntity
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
+
+    function getActiveAndVisibleRows($onlyVisibleInSR = false)
+    {
+        $statement =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE activeFlag = 'Y'" .
+            ($onlyVisibleInSR ? ' and cat_visible_in_sr_flag = "Y" ' : '') .
+            " ORDER BY cat_desc";
+        $this->setQueryString($statement);
+        $ret = (parent::getRows());
+    }
+
 }
 
 class DBEJCallActType extends DBECallActType
