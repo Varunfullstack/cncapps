@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+### [unreleased]
+### Changed
+- Issue 216 - Change list of activity types that are visible in SRs
+
 ## [v1.5.2] 2018-04-11
 ### Changed
 - Issue 210 - Request time pop up box text change
