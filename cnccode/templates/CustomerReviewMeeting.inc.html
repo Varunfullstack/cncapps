@@ -2,6 +2,7 @@
 <script language='JavaScript' src="CommonJS.js"></script>
 <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+{data}
 <script language='JavaScript'>
     $(function () {
         window.meetingDate = $('#meetingDate').get(0);
@@ -10,7 +11,6 @@
     var state = 'none'; // display status
     var savedCustomerString;
 
-    var data = {data};
 
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
@@ -45,6 +45,7 @@
 
     $(function () {
         $('#create-pdf').click(function () {
+            $(this).attr('disabled', true);
             //loop through sections looking for large tables
             var tableID = 1;
             $('.reportSection table').each(function () {
@@ -67,6 +68,14 @@
                 }
             })
 
+            $('#reportContent').append(CKEDITOR.instances['editableText'].getData());
+
+            var sections = 1;
+            $('h2').each(function() {
+                $(this).prepend(sections+'. ');
+                sections++;
+            })
+
             var height = 0;
             //1305 px is page height including margins
             $('.reportSection').each(function () {
@@ -79,11 +88,29 @@
                 console.log(height)
             })
 
-            $(this).attr('disabled', true);
-            var result = $('#reportContent').html() + CKEDITOR.instances['editableText'].getData();
-            CKEDITOR.instances['editableText'].setData(result);
-            $('#reportContent').attr('disabled', true);
-            $('#textForm').submit();
+            var result = $('#reportContent').html();
+
+            var data = {
+                html: result,
+                customerID: "{customerID}",
+                startYearMonth: "{startYearMonth}",
+                endYearMonth: "{endYearMonth}",
+                meetingDateYmd: "{meetingDateYmd}"
+            };
+
+            $.ajax({
+                url: '{urlGeneratePdf}',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: data
+            }).then(function (result) {
+                if (result.status == 'error') {
+                    alert(result.description);
+                } else {
+                    alert('Successfully created files. Thank you for your money');
+                }
+            })
         })
     })
 
@@ -283,31 +310,21 @@
 </form>
 
 <!-- A4 PAGE WITH MARGINS 890px WIDE BY 1305px HIGH -->
+<div style="width: 920px; float: left">
+    <div id="reportContent">{nonEditableText}</div>
+    <textarea id="editableText" name="editableText">{editableText}</textarea>
+    <input type="button" name="create-pdf" id="create-pdf" value="Create PDF">
+    <script type="text/javascript">
+        reason = CKEDITOR.replace('editableText', {
+                height: '800px',
+                width: '890px',
+                extraAllowedContent: true,
+                allowedContent: true,
+                script: true
+            }
+        );
+    </script>
+</div>
 
-<form name="textForm" id="textForm" method="post" action="{urlGeneratePdf}">
-    <input type="hidden" name="customerID" value="{customerID}">
-    <input type="hidden" name="startYearMonth" value="{startYearMonth}">
-    <input type="hidden" name="endYearMonth" value="{endYearMonth}">
-    <input type="hidden" name="meetingDateYmd" value="{meetingDateYmd}">
-
-    <div style="width: 920px; float: left">
-        <div id="reportContent">{nonEditableText}</div>
-
-        <textarea id="editableText" name="editableText">{editableText}</textarea>
-
-        <script type="text/javascript">
-            reason = CKEDITOR.replace('editableText', {
-                    height: '800px',
-                    width: '890px',
-                    extraAllowedContent: true,
-                    allowedContent: true,
-                    script: true
-                }
-            );
-        </script>
-        <input type="button" name="create-pdf" id="create-pdf" value="Create PDF">
-    </div>
-    <textarea id="reportBuild" name="reportBuild"></textarea>
-</form>
 
 <!-- End Template: CustomerReviewMeeting.inc.html -->

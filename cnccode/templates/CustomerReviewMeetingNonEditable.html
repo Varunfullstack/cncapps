@@ -1,3 +1,46 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    if (!window.googleChartsLoaded) {
+        google.charts.load('current', {'packages': ['corechart']});
+        google.charts.setOnLoadCallback(drawCharts);
+        window.googleChartsLoaded = true;
+    }
+
+    function drawCharts() {
+        graphData['renderServerCare'] ? drawChart('serverCareIncidents') : '';
+        drawChart('serviceDesk');
+        drawChart('otherContracts');
+        drawChart('totalSR');
+    }
+
+    function drawChart(chartName) {
+
+        var data = new google.visualization.DataTable();
+        graphData[chartName]['columns'].forEach(function (columnName, id) {
+            var type = "number";
+            if (id === 0) {
+                type = "string";
+            }
+            data.addColumn(type, columnName);
+        });
+
+        data.addRows(graphData[chartName]['data']);
+
+
+        var options = {
+            title: graphData[chartName]['title'],
+            legend: {position: 'bottom'},
+            height: 500,
+            width:1000
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById(chartName));
+
+        chart.draw(data, options);
+
+    }
+</script>
+
 <div class="reportSection">
     <center>
         <!--<p>-->
@@ -33,17 +76,31 @@
     </table>
 </div>
 
-    {chart}
+<div class="reportSection">
+    <div id="serverCareIncidents"></div>
+</div>
 
 <div class="reportSection">
-    <h3>Supported Users</h3>
+    <div id="serviceDesk"></div>
+</div>
+
+<div class="reportSection">
+    <div id="otherContracts"></div>
+</div>
+
+<div class="reportSection">
+    <div id="totalSR"></div>
+</div>
+
+<div class="reportSection">
+    <h2>Supported Users</h2>
     <ul class="ul3">
         {supportContactInfo}
     </ul>
 </div>
 
 <div class="reportSection">
-    <h3>Root Cause</h3>
+    <h2>Root Cause</h2>
     <table class="collapse rootCause">
         <!-- BEGIN rootCauseBlock -->
         <tr>
@@ -51,13 +108,13 @@
             <td>{srRootCauseDescription}</td>
             <td>{srCount}</td>
 
-        <!-- END rootCauseBlock -->
+            <!-- END rootCauseBlock -->
         </tr>
     </table>
 </div>
 
 <div class="reportSection">
-    <h3>Service Request Count</h3>
+    <h2>Service Request Count</h2>
     <table class="collapse requestCount">
         <tbody>
         <!-- BEGIN userBlock -->

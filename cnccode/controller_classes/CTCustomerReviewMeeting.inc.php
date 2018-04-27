@@ -33,7 +33,7 @@ class CTCustomerReviewMeeting extends CTCNC
         switch ($_REQUEST['action']) {
 
             case 'generatePdf':
-                $this->generatePdf();
+                echo json_encode($this->generatePdf());
                 break;
 
             default:
@@ -112,8 +112,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
 
-                $nonEditableTemplate->set_var('chart', $this->generateCharts($results, $customerId));
-
+//                $nonEditableTemplate->set_var('chart', json_encode($this->generateCharts($results, $customerId)));
+//
                 $supportedUsersData = $this->getSupportedUsersData($buContact,
                     $customerId,
                     $dsCustomer->getValue('name'));
@@ -281,7 +281,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $editableText = $textTemplate->get_var('output');
 
                 $nonEditableText = $nonEditableTemplate->get_var('output');
-                $something = $this->generateCharts($results, $customerId);
+                $graphData = $this->generateCharts($results, $customerId);
 
             }
 
@@ -318,6 +318,8 @@ class CTCustomerReviewMeeting extends CTCNC
             $customerString = $dsCustomer->getValue('name');
         }
 
+        echo "<script> var graphData = " . json_encode($graphData, JSON_NUMERIC_CHECK) . "</script>";
+
         $this->template->set_var(
             array(
                 'customerID' => $dsSearchForm->getValue('customerID'),
@@ -334,7 +336,6 @@ class CTCustomerReviewMeeting extends CTCNC
                 'nonEditableText' => $nonEditableText,
                 'urlSubmit' => $urlSubmit,
                 'urlGeneratePdf' => $urlGeneratePdf,
-                "data" => json_encode($something)
             )
         );
 
@@ -404,7 +405,7 @@ class CTCustomerReviewMeeting extends CTCNC
     function generatePdf()
     {
 
-        $text = $_REQUEST['editableText'] . $_REQUEST['nonEditableText'];
+        $text = $_REQUEST['html'];
 
         $agendaTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
 
@@ -417,11 +418,17 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $html = $agendaTemplate->get_var('output');
 
-        $this->buCustomerReviewMeeting->generateAgendaPdf(
+        $result = $this->buCustomerReviewMeeting->generateAgendaPdf(
             $_REQUEST['customerID'],
             $html,
             $_REQUEST['meetingDateYmd']
         );
+
+        if (!$result) {
+            return ["status" => "error", "description" => "Failed to generate files"];
+        }
+
+        return ["status" => "ok"];
 
 //        $this->buCustomerReviewMeeting->generateSalesPdf(
 //            $_REQUEST['customerID'],
@@ -582,132 +589,75 @@ class CTCustomerReviewMeeting extends CTCNC
     private function generateCharts($data, $customerId)
     {
 
-        $dataX = [];
-
         $serverCareIncidents = [
             "title" => "ServerCare Incidents",
-            "plots" => [
-                "serverSR" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Server SRs',
-                ],
-                "avgResponse" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Avg. response',
-                ],
-                "changes" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Changes',
-                    "color" => "black"
-                ],
-            ]
+            "columns" => ["dates", "serverSR", "avgResponse", "changes"],
+            "data" => []
         ];
 
         $serviceDesk = [
             "title" => "ServiceDesk/Pre-Pay Incidents",
-            "plots" => [
-                "userSR" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'User SR\'s',
-                ],
-                "avgResponse" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Avg. response',
-                ],
-                "changes" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Changes',
-                    "color" => "black"
-                ],
-            ]
+            "columns" => ["dates", "userSR", "avgResponse", "changes",],
+            "data" => []
         ];
 
         $otherContracts = [
             "title" => "Other Contract Incidents",
-            "plots" => [
-                "otherSr" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Other SR\'s',
-                ],
-                "avgResponse" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Avg. response',
-                ],
-                "changes" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Changes',
-                    "color" => "black"
-                ],
-            ]
+            "columns" => ["dates", "otherSr", "avgResponse", "changes",],
+            "data" => []
         ];
 
         $totalSR = [
             "title" => "Total SR's",
-            "plots" => [
-                "p1-3" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Priority 1-3',
-                ],
-                "p4" => [
-                    "data" => [],
-                    "2ndAxis" => false,
-                    "legend" => 'Priority 4',
-                ],
-            ]
+            "columns" => ["dates", "p1-3", "p4",],
+            "data" => []
         ];
 
 
-        foreach ($data as $row) {
+        foreach ($data as $datum) {
 
 
-            $dataX[] = substr($row['monthName'], 0, 3) . "-" . $row['year'];
-            $serverCareIncidents["plots"]["serverSR"]["data"][] = $row['serverCareCount1And3'];
-            $serverCareIncidents["plots"]["avgResponse"]["data"][] = number_format($row['serverCareHoursResponded'], 1);
-            $serverCareIncidents["plots"]['changes']["data"][] = $row['serverCareCount4'];
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['serverCareCount1And3'],
+                number_format($datum['serverCareHoursResponded'], 1),
+                $datum['serverCareCount4']
+            ];
 
+            $serverCareIncidents['data'][] = $row;
 
-            $serviceDesk["plots"]['userSR']["data"][] = $row['serviceDeskCount1And3'] + $row['prepayCount1And3'];
-            $serviceDesk["plots"]['avgResponse']["data"][] = number_format(
-                $row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'],
-                1);
-            $serviceDesk["plots"]['changes']["data"][] = $row['serviceDeskCount4'] + $row['prepayCount4'];
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
+                number_format($datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'], 1),
+                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
+            ];
 
-            $otherContracts["plots"]["otherSr"]["data"][] = $row['otherCount1And3'];
-            $otherContracts["plots"]["avgResponse"]["data"][] = number_format($row['otherHoursResponded'], 1);
-            $otherContracts["plots"]["changes"]["data"][] = $row['otherCount4'];
+            $serviceDesk['data'][] = $row;
 
-            $totalSR["plots"]["p1-3"]["data"][] = $row['otherCount1And3'] + $row['serviceDeskCount1And3'] + $row['serverCareCount1And3'];
-            $totalSR["plots"]["p4"]["data"][] = $row['otherCount4'] + $row['serviceDeskCount4'] + $row['serverCareCount4'];
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['otherCount1And3'],
+                number_format($datum['otherHoursResponded'], 1),
+                $datum['otherCount4'],
+            ];
 
+            $otherContracts['data'][] = $row;
+
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $totalSR['data'][] = $row;
         }
         $BUCustomerItem = new BUCustomerItem($this);
         /** @var DataSet $datasetContracts */
         $datasetContracts = null;
         $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
 
-        $serverCareContract = null;
-
-        $toReturn = '';
-
-        if ($datasetContracts->rowCount()) {
-            $toReturn = '<img class="graph" src="' . $this->generateGraph($serverCareIncidents, $dataX) . '">';
-        }
-
-        $toReturn .=
-            '<div class="reportSection"><img class="graph" src="' . $this->generateGraph($serviceDesk, $dataX) . '"></div>
-        <div class="reportSection"><img class="graph" src="' . $this->generateGraph($otherContracts, $dataX) . '"></div>
-        <div class="reportSection"><img class="graph" src="' . $this->generateGraph($totalSR, $dataX) . '"></div>';
-        return ["serviceDesk" => $serviceDesk, "otherContract" => $otherContracts, "total" => $totalSR, "dataX" => $dataX];
+        return ["serverCareIncidents" => $serverCareIncidents, "serviceDesk" => $serviceDesk, "otherContracts" => $otherContracts, "totalSR" => $totalSR, "renderServerCare" => !!$datasetContracts->rowCount()];
     }
 
     private function generateGraph($data, $dataX)

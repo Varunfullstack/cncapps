@@ -250,8 +250,6 @@ class BUCustomerReviewMeeting extends Business
 
         file_put_contents($tempFilePath, $htmlPage);
 
-        echo $htmlPage;
-
         $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
                 0,
                 4);
@@ -278,10 +276,10 @@ class BUCustomerReviewMeeting extends Business
             }
         }
         if ($_error) {
-            echo '<h1>Failed to generate files: ' . $_error . '</h1>';
-        } else {
-            echo '<h1>Generated Files Successfully</h1>';
             unlink($tempFilePath);
+            return false;
+        } else {
+            return true;
         }
     }
 
