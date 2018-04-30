@@ -83,8 +83,9 @@ class BUSecondsite extends Business
      * raise error SRs or skip suspended server.
      *
      * @param mixed $customerItemID
+     * @param bool $testRun
      */
-    function validateBackups($customerItemID = false)
+    function validateBackups($customerItemID = false, $testRun = false)
     {
 
         $defaultTimeToLookFrom = strtotime('yesterday ' . self::START_IMAGE_TIME);
@@ -119,9 +120,7 @@ class BUSecondsite extends Business
             } else {
 
                 if (!$isSuspended && $server['secondsiteValidationSuspendUntilDate']) {
-
                     $this->resetSuspendedUntilDate($server['server_cuino']);
-
                 }
 
                 if ($server['secondsiteImageDelayDays']) {
@@ -162,7 +161,7 @@ class BUSecondsite extends Business
 
                             $this->setImageStatusByServer($server['server_cuino'], self::STATUS_SERVER_NOT_FOUND);
 
-                            if (!$customerItemID) {
+                            if (!$customerItemID && !$testRun) {
                                 $buActivity = $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
                                     $server['custno'],
                                     $server['serverName'],
@@ -176,7 +175,7 @@ class BUSecondsite extends Business
                 }
             }
 
-            if ($error && !$customerItemID && !$isSuspended) {
+            if ($error && !$customerItemID && !$isSuspended && !$testRun) {
                 $this->sendBadConfigurationEmail($server, $error, $networkPath);
 
             }
@@ -294,7 +293,7 @@ class BUSecondsite extends Business
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID) {
+                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
 
                     $buActivity = $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
                         $server['custno'],
@@ -310,7 +309,7 @@ class BUSecondsite extends Business
 
         } // end foreach contracts
 
-        if (!$customerItemID) {
+        if (!$customerItemID && !$testRun) {
             /** @var dbSweetcode $db */
             $db = $GLOBALS['db'];
 

@@ -9,11 +9,13 @@
 require_once("config.inc.php");
 GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUSecondsite.inc.php');
+
+$testRun = !!@$_REQUEST['testRun'];
 $buSecondsite = new BUSecondsite($this);
 
 set_time_limit(0); // unlimited execution time
 
-$buSecondsite->validateBackups();
+$buSecondsite->validateBackups(null, $testRun);
 
 $template = new Template(EMAIL_TEMPLATE_DIR, "remove");
 
@@ -120,8 +122,12 @@ $template->setVar(
 $template->parse('output', 'page', true);
 
 $html = $template->get_var('output');
-
 $subject = '2nd Site Validation Completed';
+
+if($testRun){
+    $subject = '2nd Site Test Run Completed';
+}
+
 
 $senderEmail = CONFIG_SUPPORT_EMAIL;
 $senderName = 'CNC Support Department';

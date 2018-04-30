@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 202 - UK National Holiday notification for Non UK customers
 - Issue 221 - Fixed pending closure on Service Request page
 - Issue 219 - Implement CNCAPPS security
+- Issue 217 - 2nd Site Validation test run
 
 ### Changed
 - Issue 176 - Change background colours on service request page
