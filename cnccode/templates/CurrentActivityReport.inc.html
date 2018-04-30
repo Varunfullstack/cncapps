@@ -754,6 +754,55 @@
     </tbody>
 </table>
 
+<table id="queue6" class="table-bordered" width="100%">
+    <thead>
+    <tr valign="center">
+        <th class="listHeadText" colspan="4">
+            <div align="left">Fixed Pending Closure ({queue6Count})</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Priority</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Description</div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN queue6Block -->
+    <form name="userForm">
+        <tr valign="center">
+
+            <td width="3%">&nbsp;</td>
+            <td width="3%">&nbsp;</td>
+            <td width="2%" bgcolor="{bgColour}"><A href="{urlViewActivity}" target="_blank">{problemID}</A>
+            </td>
+
+
+            <td width="20%"><A href={urlCustomer} target="_blank">{customerName}</a>
+            </td>
+
+            <td width="12%" bgcolor="{priorityBgColor}">
+                <div align="center">{priority}</div>
+            </td>
+
+            <td width="40%">
+                <A
+                        href="#"
+                        onClick="window.open(
+          '{urlProblemHistoryPopup}',
+          'reason',
+          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">{reason}
+                </A>
+            </td>
+
+        </tr>
+    </form>
+    <!-- END queue6Block -->
+    </tbody>
+</table>
+
+
 <script>
     $(document).ready(function () {
 

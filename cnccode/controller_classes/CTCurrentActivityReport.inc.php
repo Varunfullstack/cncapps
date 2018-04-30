@@ -536,7 +536,52 @@ class CTCurrentActivityReport extends CTCNC
         $this->renderQueue(3);  // Sales
         $this->renderQueue(4);  //Implementations
         $this->renderQueue(5);  // Managers
-//        $this->renderQueue(6);  //Fixed
+
+        if ($_SESSION['selectedCustomerID']) {
+            $this->renderQueue(6);  //Fixed
+        } else {
+            $this->template->set_block('CurrentActivityReport', 'queue6Block', 'requests6');
+            $this->template->set_var(
+
+                array(
+
+                    'workOnClick' => '',
+                    'hoursRemaining' => '',
+                    'updatedBgColor' => '',
+                    'priorityBgColor' => '',
+                    'hoursRemainingBgColor' => '',
+                    'totalActivityDurationHours' => '',
+                    'hdRemaining' => '',
+                    'esRemaining' => '',
+                    'imRemaining' => '',
+                    'hdColor' => '',
+                    'esColor' => '',
+                    'imColor' => '',
+                    'urlCustomer' => '',
+                    'time' => '',
+                    'date' => '',
+                    'problemID' => '',
+                    'reason' => '',
+                    'urlProblemHistoryPopup' => '',
+                    'engineerDropDown' => '',
+                    'engineerName' => '',
+                    'customerName' => '',
+                    'customerNameDisplayClass' => '',
+                    'urlViewActivity' => '',
+                    'linkAllocateAdditionalTime' => '',
+                    'slaResponseHours' => '',
+                    'priority' => '',
+                    'alarmDateTime' => '',
+                    'bgColour' => '',
+                    'workBgColor' => '',
+
+                )
+
+            );
+            $this->template->parse('requests6', 'queue6Block', true);
+
+        }
+
         $this->renderQueue(7); // Future
 
         $this->template->set_block('CurrentActivityReport', 'userFilterBlock', 'users');
