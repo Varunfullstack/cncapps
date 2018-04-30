@@ -3563,14 +3563,23 @@ class CTActivity extends CTCNC
 
     private function activityTypeDropdown($callActTypeID)
     {
-        $dbeJCallActType = new DBEJCallActType($this);
-        $dbeJCallActType->getActiveRows('description');
+        $dbeJCallActType = new DBECallActType($this);
+        $buUser = new BUUser($this);
+        $dbeJCallActType->getActiveAndVisibleRows(!$buUser->isSdManager($this->userID));
+        $current = new DBECallActType($this);
+        $current->getRow($callActTypeID);
+
         $this->template->set_block('ActivityEdit', 'activityTypeBlock', 'activities');
 
+        $foundCurrent = false;
         while ($dbeJCallActType->fetchNext()) {
 
             $activityTypeSelected = ($callActTypeID == $dbeJCallActType->getValue('callActTypeID')
             ) ? CT_SELECTED : '';
+
+            if ($activityTypeSelected == CT_SELECTED) {
+                $foundCurrent = true;
+            }
 
             $this->template->set_var(
                 array(
@@ -3581,6 +3590,20 @@ class CTActivity extends CTCNC
             );
 
             $this->template->parse('activities', 'activityTypeBlock', true);
+        }
+
+        if (!$foundCurrent && $callActTypeID) {
+            $this->template->set_var(
+                array(
+                    'activityTypeSelected' => 'selected',
+                    'callActTypeID' => $current->getValue("callActTypeID"),
+                    'activityTypeDesc' => $current->getValue("description")
+                )
+            );
+
+            $this->template->parse('activities', 'activityTypeBlock', true);
+
+            $this->template->set_var("typeDisabled", 'disabled');
         }
     }
 

@@ -128,6 +128,7 @@ class CTActivityType extends CTCNC
                         'travelFlag' => $dsCallActType->getValue('travelFlag'),
                         'onSiteFlag' => $dsCallActType->getValue('onSiteFlag'),
                         'portalDisplayFlag' => $dsCallActType->getValue('portalDisplayFlag'),
+                        'visibleInSRFlag' => $dsCallActType->getValue(DBECallActType::visibleInSRFlag),
                         'urlEdit' => $urlEdit,
                         'txtEdit' => $txtEdit
                     )
@@ -241,6 +242,7 @@ class CTActivityType extends CTCNC
                 'portalDisplayFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('portalDisplayFlag')),
                 'travelFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('travelFlag')),
                 'onSiteFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('onSiteFlag')),
+                'visibleInSRFlagChecked' => Controller::htmlChecked($dsCallActType->getValue(DBECallActType::visibleInSRFlag)),
                 'urlUpdate' => $urlUpdate,
                 'urlDelete' => $urlDelete,
                 'txtDelete' => $txtDelete,
@@ -276,10 +278,10 @@ class CTActivityType extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'callActTypeID' => $this->dsCallActType->getValue('callActTypeID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'callActTypeID' => $this->dsCallActType->getValue('callActTypeID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

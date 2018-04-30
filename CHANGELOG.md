@@ -20,6 +20,7 @@ This project changes will be shown here.
 - Issue 112 - CNC005
 - Issue 208 - Remove blank space from display of phone numbers
 - Issue 212 - Remove old items from menu
+- Issue 216 - Change list of activity types that are visible in SRs
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
