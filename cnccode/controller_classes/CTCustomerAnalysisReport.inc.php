@@ -17,6 +17,13 @@ class CTCustomerAnalysisReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerAnalysisReport = new BUCustomerAnalysisReport ($this);
     }
 
@@ -170,7 +177,8 @@ class CTCustomerAnalysisReport extends CTCNC
                             'totalCost' => number_format($totalCost, 2),
                             'totalLabour' => number_format($totalLabour, 2),
                             'totalProfit' => number_format($totalSales - $totalCost - $totalLabour, 2),
-                            'totalProfitPercent' => number_format($totalSales > 0 ? 100 - (($totalCost + $totalLabour) / $totalSales) * 100 : 0, 2),
+                            'totalProfitPercent' => number_format($totalSales > 0 ? 100 - (($totalCost + $totalLabour) / $totalSales) * 100 : 0,
+                                                                  2),
                             'totalLabourHours' => number_format($totalLabourHours, 2),
                         )
                     );
@@ -179,8 +187,10 @@ class CTCustomerAnalysisReport extends CTCNC
                             'grandTotalSales' => number_format($grandTotalSales, 2),
                             'grandTotalCost' => number_format($grandTotalCost, 2),
                             'grandTotalLabour' => number_format($grandTotalLabour, 2),
-                            'grandTotalProfit' => number_format($grandTotalSales - $grandTotalCost - $grandTotalLabour, 2),
-                            'grandTotalProfitPercent' => number_format($grandTotalSales > 0 ? 100 - (($grandTotalCost + $grandTotalLabour) / $grandTotalSales) * 100 : 0, 2),
+                            'grandTotalProfit' => number_format($grandTotalSales - $grandTotalCost - $grandTotalLabour,
+                                                                2),
+                            'grandTotalProfitPercent' => number_format($grandTotalSales > 0 ? 100 - (($grandTotalCost + $grandTotalLabour) / $grandTotalSales) * 100 : 0,
+                                                                       2),
                             'grandTotalLabourHours' => number_format($grandTotalLabourHours, 2),
                         )
                     );
@@ -191,7 +201,8 @@ class CTCustomerAnalysisReport extends CTCNC
 
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 

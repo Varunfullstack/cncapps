@@ -36,6 +36,14 @@ class CTCurrentActivityReport extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
 
+        $roles = [
+            "technical",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+
         $this->buActivity = new BUActivity($this);
 
         $this->buCustomerItem = new BUCustomerItem($this);

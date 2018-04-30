@@ -24,6 +24,13 @@ class CTActivityType extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buActivityType = new BUActivityType($this);
         $this->dsCallActType = new DSForm($this);
         $this->dsCallActType->copyColumnsFrom($this->buActivityType->dbeCallActType);

@@ -13,9 +13,14 @@ require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
 class CTReviewList extends CTCNC
 {
 
-    function CTHome($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+
     }
 
     /**

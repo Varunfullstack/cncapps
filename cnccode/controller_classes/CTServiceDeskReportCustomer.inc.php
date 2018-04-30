@@ -21,6 +21,13 @@ class CTServiceDeskReportCustomer extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buServiceDeskReport = new BUServiceDeskReport($this);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
@@ -126,7 +133,8 @@ class CTServiceDeskReportCustomer extends CTCNC
             $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
             $customerString = $dsCustomer->getValue('name');
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $this->template->set_var(
             array(

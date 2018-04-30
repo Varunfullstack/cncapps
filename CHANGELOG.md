@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 201 - Create items not yet received process
 - Issue 202 - UK National Holiday notification for Non UK customers
 - Issue 221 - Fixed pending closure on Service Request page
+- Issue 219 - Implement CNCAPPS security
 
 ### Changed
 - Issue 176 - Change background colours on service request page

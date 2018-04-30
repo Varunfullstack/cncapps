@@ -11,6 +11,7 @@ require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
+require_once($cfg['path_bu'] . '/BUUser.inc.php');
 
 define('CTCNC_ACT_DISP_CUST_POPUP', 'dispCustPopup');
 define('CTCNC_ACT_DISP_ITEM_POPUP', 'dispItemPopup');
@@ -68,6 +69,7 @@ class CTCNC extends Controller
     var $userID = '';
     var $dbeUser;
     var $dbeTeam;
+    private $user;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -77,7 +79,22 @@ class CTCNC extends Controller
             $this->userID = CONFIG_SCHEDULED_TASK_USER_ID;
         }
 
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->getRow();
+
+        $this->user = new BUUser($this);
+
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+    }
+
+    function canAccess($roles)
+    {
+        $perms = explode(',', $this->dbeUser->getValue(DBEUser::perms));
+        $array = array_intersect($perms, $roles);
+
+        return !!count($array);
+
     }
 
     function getDbeUser()
@@ -86,6 +103,11 @@ class CTCNC extends Controller
             $this->dbeUser = new DBEUser ($this);
         }
         return $this->dbeUser;
+    }
+
+    function getUser()
+    {
+
     }
 
     function getDbeTeam()
@@ -198,6 +220,9 @@ class CTCNC extends Controller
         if ($_REQUEST ['htmlFmt'] != '') {
             $this->setHTMLFmt($_REQUEST ['htmlFmt']);
         }
+
+        $user = self::getDbeUser();
+
         switch ($_REQUEST ['action']) {
             case CTCNC_ACT_LOGOUT :
                 $this->logout();
@@ -214,22 +239,19 @@ class CTCNC extends Controller
 
     function hasPermissions($levels)
     {
-
-        if (!$this->isRunningFromCommandLine()) {
-            $allow = FALSE;
-            if (is_array($levels)) {
-                foreach ($levels as $key => $val) {
-                    $allow = ($allow | $GLOBALS ['perm']->have_perm($val));
-                }
-            } elseif (isset($GLOBALS ['perm'])) {
-                $allow = $GLOBALS ['perm']->have_perm($levels);
-            } else {
-                $allow = true;
-            }
-        } else {
-            $allow = true;
+        if ($this->isRunningFromCommandLine()) {
+            return true;
         }
-        return $allow;
+
+        $permissions = explode(",", self::getDbeUser()->getValue('perms'));
+        if (is_array($levels)) {
+            return array_intersect($levels, $permissions);
+        }
+
+        if ($this->userID) {
+            return in_array($levels, $permissions);
+        }
+        return true;
     }
 
     function teamLevelIs($level)

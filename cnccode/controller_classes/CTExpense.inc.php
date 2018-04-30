@@ -30,6 +30,13 @@ class CTExpense extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buExpense = new BUExpense($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsSearchResults = new DSForm($this);
@@ -90,10 +97,10 @@ class CTExpense extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'expenseID' => $expenseID,
-                    'action' => CTEXPENSE_ACT_EDIT_EXPENSE
-                )
+                             array(
+                                 'expenseID' => $expenseID,
+                                 'action' => CTEXPENSE_ACT_EDIT_EXPENSE
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -305,10 +312,10 @@ class CTExpense extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $this->dsExpense->getValue('callActivityID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'callActivityID' => $this->dsExpense->getValue('callActivityID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -378,8 +385,10 @@ class CTExpense extends CTCNC
             $this->exportExpenseForm(); //redisplay with errors
         } else {
             // do export
-            $overtimeExported = $this->buExpense->exportEngineerOvertime($this->dsExpenseExport, $_REQUEST['exportType']);
-            $expensesExported = $this->buExpense->exportEngineerExpenses($this->dsExpenseExport, $_REQUEST['exportType']);
+            $overtimeExported = $this->buExpense->exportEngineerOvertime($this->dsExpenseExport,
+                                                                         $_REQUEST['exportType']);
+            $expensesExported = $this->buExpense->exportEngineerExpenses($this->dsExpenseExport,
+                                                                         $_REQUEST['exportType']);
 
             if ($_REQUEST['exportType'] == 'Export') {
 

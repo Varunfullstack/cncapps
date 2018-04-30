@@ -69,6 +69,13 @@ class CTInvoice extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buInvoice = new BUInvoice($this);
         $this->dsInvline = new DSForm($this);
         $this->dsInvline->copyColumnsFrom($this->buInvoice->dbeJInvline);
@@ -926,12 +933,16 @@ class CTInvoice extends CTCNC
         }
         if (!$this->formError) {
             if ($_REQUEST['action'] == CTINVOICE_ACT_EDIT_LINE) {
-                if (!$this->buInvoice->getInvlineByIDSeqNo($_REQUEST['invheadID'], $_REQUEST['sequenceNo'], $this->dsInvline)) {
+                if (!$this->buInvoice->getInvlineByIDSeqNo($_REQUEST['invheadID'],
+                                                           $_REQUEST['sequenceNo'],
+                                                           $this->dsInvline)) {
                     $this->displayFatalError(CTINVOICE_MSG_LINE_NOT_FND);
                     return;
                 }
             } else {
-                $this->buInvoice->initialiseNewInvline($_REQUEST['invheadID'], $_REQUEST['sequenceNo'], $this->dsInvline);
+                $this->buInvoice->initialiseNewInvline($_REQUEST['invheadID'],
+                                                       $_REQUEST['sequenceNo'],
+                                                       $this->dsInvline);
             }
         }
         $this->setTemplateFiles(
@@ -967,24 +978,24 @@ class CTInvoice extends CTCNC
         if ($_REQUEST['action'] == CTINVOICE_ACT_EDIT_LINE) {
             $urlSubmit =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTINVOICE_ACT_UPDATE_LINE
-                    )
+                                 array(
+                                     'action' => CTINVOICE_ACT_UPDATE_LINE
+                                 )
                 );
         } else {
             $urlSubmit =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTINVOICE_ACT_INSERT_LINE
-                    )
+                                 array(
+                                     'action' => CTINVOICE_ACT_INSERT_LINE
+                                 )
                 );
         }
         $urlCancel =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'invheadID' => $this->dsInvhead->getValue('invheadID'),
-                    'action' => CTCNC_ACT_DISPLAY_INVOICE
-                )
+                             array(
+                                 'invheadID' => $this->dsInvhead->getValue('invheadID'),
+                                 'action' => CTCNC_ACT_DISPLAY_INVOICE
+                             )
             );
         $this->template->set_var(
             array(
@@ -1132,10 +1143,10 @@ class CTInvoice extends CTCNC
             if ($this->buInvoice->countInvoicesByOrdheadID($dsInvhead->getValue('ordheadID')) > 0) {
                 $urlNext =                        // there is still one or more invoices so display it/them
                     $this->buildLink($_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTCNC_ACT_SEARCH,
-                            'ordheadID' => $dsInvhead->getValue('ordheadID') // if this is set then will show
-                        )                                                                                                                    // remaining invoices for SO
+                                     array(
+                                         'action' => CTCNC_ACT_SEARCH,
+                                         'ordheadID' => $dsInvhead->getValue('ordheadID') // if this is set then will show
+                                     )                                                                                                                    // remaining invoices for SO
                     );
             } else {                                        // no more invoices for order so display order
                 $urlNext =
@@ -1150,9 +1161,9 @@ class CTInvoice extends CTCNC
         } else {                                        // not attached to sales order so display invoice search page
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTINVOICE_ACT_DISP_SEARCH
-                    )
+                                 array(
+                                     'action' => CTINVOICE_ACT_DISP_SEARCH
+                                 )
                 );
         }
         header('Location: ' . $urlNext);

@@ -30,6 +30,13 @@ class CTRenHosting extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "renewals"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenHosting = new BURenHosting($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenHosting = new DSForm($this);
@@ -422,10 +429,10 @@ class CTRenHosting extends CTCNC
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID' => $this->dsRenHosting->getValue('customerItemID')
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'ID' => $this->dsRenHosting->getValue('customerItemID')
+                                 )
                 );
 
         }

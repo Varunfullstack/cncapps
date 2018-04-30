@@ -46,6 +46,10 @@ class CTDespatch extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->dsOrdhead = new Dataset($this);
         $this->dsDespatch = new DSForm($this);
     }
@@ -115,10 +119,10 @@ class CTDespatch extends CTCNC
             $this->dsOrdhead->fetchNext();
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_DESPATCH,
-                        'ordheadID' => $this->dsOrdhead->getValue('ordheadID')
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_DESPATCH,
+                                     'ordheadID' => $this->dsOrdhead->getValue('ordheadID')
+                                 )
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -365,8 +369,14 @@ class CTDespatch extends CTCNC
                         array(
                             'stockcat' => $dsOrdline->getValue("stockcat"),
                             'qtyOrdered' => number_format($dsOrdline->getValue("qtyOrdered"), 2, '.', ''),
-                            'qtyOutstanding' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"), 2, '.', ''),
-                            'qtyOutstandingHide' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"), 2, '.', ''),
+                            'qtyOutstanding' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"),
+                                                              2,
+                                                              '.',
+                                                              ''),
+                            'qtyOutstandingHide' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"),
+                                                                  2,
+                                                                  '.',
+                                                                  ''),
                             'qtyToDespatch' => 0,
                             'renewalLink' => $renewalLink,
                             'orderLineClass' => CTDESPATCH_CLS_ORDER_LINE_ITEM
@@ -456,13 +466,16 @@ class CTDespatch extends CTCNC
             $this->displayDespatch();
             exit;
         } else {
-            $deliveryNoteFile = $buDespatch->despatch($_REQUEST['ordheadID'], $_REQUEST['deliveryMethodID'], $dsDespatch, $_REQUEST['onlyCreateDespatchNote']);
+            $deliveryNoteFile = $buDespatch->despatch($_REQUEST['ordheadID'],
+                                                      $_REQUEST['deliveryMethodID'],
+                                                      $dsDespatch,
+                                                      $_REQUEST['onlyCreateDespatchNote']);
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_DESPATCH,
-                        'ordheadID' => $_REQUEST['ordheadID']
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_DESPATCH,
+                                     'ordheadID' => $_REQUEST['ordheadID']
+                                 )
                 );
             header('Location: ' . $urlNext);
             exit;

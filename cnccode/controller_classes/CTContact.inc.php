@@ -35,6 +35,10 @@ class CTContact extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buContact = new BUContact($this);
         $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
         $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);

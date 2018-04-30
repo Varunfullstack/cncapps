@@ -27,6 +27,7 @@ require_once($cfg['path_bu'] . '/BUSecurityApp.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_bu'] . '/BUUser.inc.php');
 
 require_once("Mail.php");
 require_once("Mail/mime.php");
@@ -127,6 +128,21 @@ class CTActivity extends CTCNC
         $this->dsCallActivity->setNull('siteNo', DA_ALLOW_NULL);
         $this->dsCallActivity->setNull('contactID', DA_ALLOW_NULL);
         $this->dsCallActivity->setNull('callActTypeID', DA_ALLOW_NULL);
+
+        $roles = [
+            "sales",
+            "accounts",
+            "technical",
+            "supervisor",
+            "reports",
+            "maintenance",
+            "renewals"
+        ];
+
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
     }
 
     /**

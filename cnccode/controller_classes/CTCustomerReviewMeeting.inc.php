@@ -22,6 +22,14 @@ class CTCustomerReviewMeeting extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerReviewMeeting = new BUCustomerReviewMeeting ($this);
     }
 
@@ -137,7 +145,8 @@ class CTCustomerReviewMeeting extends CTCNC
                             'scP1to3ResponseHours' => number_format($row['serverCareHoursResponded'], 1),
                             'scP4Count' => $row['serverCareCount4'],
                             'sdP1to3Count' => $row['serviceDeskCount1And3'] + $row['prepayCount1And3'],
-                            'sdP1to3ResponseHours' => number_format($row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'], 1),
+                            'sdP1to3ResponseHours' => number_format($row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'],
+                                                                    1),
                             'sdP4Count' => $row['serviceDeskCount4'] + $row['prepayCount4'],
                             'otherP1to3Count' => $row['otherCount1And3'],
                             'otherP1to3ResponseHours' => number_format($row['otherHoursResponded'], 1),
@@ -267,7 +276,8 @@ class CTCustomerReviewMeeting extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 

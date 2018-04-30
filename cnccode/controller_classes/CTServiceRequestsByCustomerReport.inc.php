@@ -19,6 +19,13 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buActivity = new BUActivity($this);
     }
 
@@ -73,7 +80,8 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         }
 
         $urlSubmit = $this->buildLink(
-            $_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH)
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
         );
 
         $this->setPageTitle('Service Requests By Customer Report');

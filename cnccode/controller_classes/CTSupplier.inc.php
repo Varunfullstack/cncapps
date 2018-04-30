@@ -35,6 +35,13 @@ class CTSupplier extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buSupplier = new BUSupplier($this);
         $this->dsSupplier = new DSForm($this);    // new specialised dataset with form message support
         $this->dsSupplier->copyColumnsFrom($this->buSupplier->dbeJSupplier);
