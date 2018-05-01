@@ -31,7 +31,7 @@
             title: graphData[chartName]['title'],
             legend: {position: 'bottom'},
             height: 500,
-            width:1000
+            width: 1000
         };
 
         var chart = new google.visualization.LineChart(document.getElementById(chartName));
@@ -40,17 +40,14 @@
 
     }
 </script>
-
 <div class="reportSection">
-    <center>
-        <!--<p>-->
-        <!--<img src="/images/CNC-Logo.png" alt=""/>-->
-        <!--</p>-->
-        <br/>
-        <h1>{customerName} - Review Meeting {meetingDate}</h1>
-    </center>
+    <table class="invisible" style="width: 100%;">
+        <tr>
+            <td style="width: 90%">&nbsp;<h1>{customerName} - Review Meeting {meetingDate}</h1> </td>
+            <td><img src="http://cncapps/images/cnclogo.jpg" style="width:100px"></td>
+        </tr>
+    </table>
 </div>
-
 
 <div class="reportSection">
     <h2>Support</h2>

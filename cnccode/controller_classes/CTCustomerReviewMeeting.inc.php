@@ -428,14 +428,13 @@ class CTCustomerReviewMeeting extends CTCNC
             return ["status" => "error", "description" => "Failed to generate files"];
         }
 
+        $this->buCustomerReviewMeeting->generateSalesPdf(
+            $_REQUEST['customerID'],
+            $_REQUEST['startYearMonth'],
+            $_REQUEST['endYearMonth'],
+            $_REQUEST['meetingDateYmd']
+        );
         return ["status" => "ok"];
-
-//        $this->buCustomerReviewMeeting->generateSalesPdf(
-//            $_REQUEST['customerID'],
-//            $_REQUEST['startYearMonth'],
-//            $_REQUEST['endYearMonth'],
-//            $_REQUEST['meetingDateYmd']
-//        );
 
 //        $this->search();  // redisplays text
 
@@ -455,7 +454,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $users = $datasetContracts->getValue('users');
         $description = $datasetContracts->getValue('itemDescription');
         $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate');
-        return "<p>User Support Contract: $description for $users users</p><p>next Invoice: $invoicePeriod</p>";
+        return "<p>User Support Contract: $description for $users users</p><p>Next Invoice: $invoicePeriod</p>";
     }
 
     private function getPrepayContractBody($customerId)
@@ -591,25 +590,25 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $serverCareIncidents = [
             "title" => "ServerCare Incidents",
-            "columns" => ["dates", "serverSR", "avgResponse", "changes"],
+            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
             "data" => []
         ];
 
         $serviceDesk = [
             "title" => "ServiceDesk/Pre-Pay Incidents",
-            "columns" => ["dates", "userSR", "avgResponse", "changes",],
+            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
             "data" => []
         ];
 
         $otherContracts = [
             "title" => "Other Contract Incidents",
-            "columns" => ["dates", "otherSr", "avgResponse", "changes",],
+            "columns" => ["Dates", "OtherSr", "AvgResponse", "Changes",],
             "data" => []
         ];
 
         $totalSR = [
             "title" => "Total SR's",
-            "columns" => ["dates", "p1-3", "p4",],
+            "columns" => ["Dates", "P1-3", "P4",],
             "data" => []
         ];
 
@@ -866,7 +865,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $frequency = 'N/A';
         }
 
-        return "Review Meeting Frequency – " . $frequency;
+        return "<h2>Review Meeting Frequency - " . $frequency."</h2>";
     }
 
     private function getMainContacts(BUContact $buContact)
