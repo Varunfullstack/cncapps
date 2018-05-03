@@ -250,9 +250,9 @@ class BUCustomerReviewMeeting extends Business
 
         file_put_contents($tempFilePath, $htmlPage);
 
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
-                0,
-                4);
+        $meetingDate = new \DateTime($meetingDate);
+
+        $meetingDateDmy = $meetingDate->format('d-m-Y');
         $path = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy;
         $filePath = $path . '.pdf';
 
@@ -476,6 +476,8 @@ class BUCustomerReviewMeeting extends Business
 
         $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
+        $htmlPage = mb_convert_encoding($htmlPage, 'HTML-ENTITIES', 'UTF-8');
+
         $dompdf->loadHtml($htmlPage);
 
         $dompdf->render();
@@ -491,6 +493,10 @@ class BUCustomerReviewMeeting extends Business
         $dompdf->add_info('Subject', 'Renewal Report');
 
         $pdfString = $dompdf->output();
+
+        $meetingDate = new \DateTime($meetingDate);
+
+        $meetingDateDmy = $meetingDate->format('d-m-Y');
 
         $filePath = $reviewMeetingFolderPath . '/Renewal Report ' . $meetingDateDmy . '.pdf';
 

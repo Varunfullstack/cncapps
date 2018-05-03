@@ -1,5 +1,7 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <style type="text/css">
 
@@ -56,6 +58,10 @@
             padding: 10px;
             margin: 5px auto;
             float: left;
+        }
+
+        p:nth-child(2) {
+            text-align: center;
         }
 
         table, th, td {
@@ -118,8 +124,15 @@
         .overflow:nth-child(odd) { width:48%; float: right; margin: 0 !important; }
         .overflow:nth-child(even) { width:48%; float: left; margin: 0 !important; }
 
+        .thirdTable { width:32%; float: left; margin: 0 2% 0 0 !important; }
+        .thirdTable:nth-child(2) { margin: 0 !important; }
+
         table.invisible, table.invisible th, table.invisible td {
             border: none;
+        }
+
+        .ckeditorContent td, .ckeditorContent th {
+            text-align: center;
         }
 
     </style>

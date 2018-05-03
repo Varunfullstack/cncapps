@@ -48,8 +48,42 @@
             $(this).attr('disabled', true);
             //loop through sections looking for large tables
             var tableID = 1;
+
             $('.reportSection table').each(function () {
-                if (!$(this).hasClass('overflow')) {
+                if (!$(this).hasClass('overflow') && !$(this).hasClass('thirdTable')) {
+                    var rowCount = $('tr', $(this)).length;
+                    console.log(rowCount);
+                    if (rowCount > 50) {
+                        $(this).addClass('thirdTable').attr('id', 'table' + tableID);
+                        var firstCol = 'table' + tableID;
+                        tableID++;
+                        $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                        var secondCol = 'table' + tableID;
+                        tableID++;
+                        $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                        var thirdCol = 'table' + tableID;
+                        tableID++;
+
+                        var split1 = Math.ceil(rowCount / 3); var remainder = rowCount - split1;
+                        var split2 = Math.ceil(remainder / 2)+split1;
+
+                        console.log('total:'+rowCount);
+                        console.log('split1:'+split1);
+                        console.log('split2:'+split2);
+
+                        remainder = remainder - split2;
+                        $("tr:gt(" + (split1+1) + ")", '#' + firstCol).remove();
+                        //First remove the final 3rd then the first third
+                        $("tr:gt(" + (split2+1) + ")", '#' + secondCol).remove();
+                        $("tr:lt(" + split1 + ")", '#' + secondCol).remove();
+
+                        $("tr:lt(" + (split2) + ")", '#' + thirdCol).remove();
+                    }
+                }
+            })
+
+            $('.reportSection table').each(function () {
+                if (!$(this).hasClass('overflow') && !$(this).hasClass('thirdTable')) {
                     var rowCount = $('tr', $(this)).length;
                     console.log(rowCount);
                     if (rowCount > 20) {
@@ -68,7 +102,7 @@
                 }
             })
 
-            $('#reportContent').append(CKEDITOR.instances['editableText'].getData());
+            $('#reportContent').append('<div class="ckeditorContent">'+CKEDITOR.instances['editableText'].getData()+'</div>');
 
             var sections = 1;
             $('h2').each(function() {
