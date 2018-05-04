@@ -594,7 +594,23 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->template->set_block('CurrentActivityReport', 'userFilterBlock', 'users');
 
-        foreach ($this->filterUser as $key => $value) {
+        $loggedInUserID = $this->userID;
+
+        usort($this->filterUser,
+            function ($a, $b) use ($loggedInUserID) {
+
+                if ($a['userID'] == $loggedInUserID) {
+                    return -1;
+                }
+
+                if ($b['userID'] == $loggedInUserID) {
+                    return 1;
+                }
+                return strcasecmp($a['fullName'], $b['fullName']);
+            }
+        );
+
+        foreach ($this->filterUser as $value) {
 
             if ($value['userID'] == $_SESSION['selectedUserID']) {
                 $userSelected = 'SELECTED';
@@ -1158,6 +1174,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function getAllocatedUserDropdown($problemID, $selectedID)
     {
+
         // user selection
         $userSelected = ($selectedID == 0) ? CT_SELECTED : '';
 
@@ -1173,7 +1190,7 @@ class CTCurrentActivityReport extends CTCNC
         $string = '';
         $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
 
-        foreach ($this->allocatedUser as $key => $value) {
+        foreach ($this->allocatedUser as $value) {
 
             $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : '';
             $urlAllocateUser =

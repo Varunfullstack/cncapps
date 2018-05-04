@@ -24,6 +24,7 @@ This project changes will be shown here.
 - Issue 208 - Remove blank space from display of phone numbers
 - Issue 212 - Remove old items from menu
 - Issue 216 - Change list of activity types that are visible in SRs
+- Issue 224 - Change order of engineer list in drop down on Current Service Requests
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue
