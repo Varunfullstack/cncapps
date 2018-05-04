@@ -37,6 +37,9 @@ This project changes will be shown here.
 - Issue 207 - Export Prepay Service Request calendar incorrectly linked
 - Issue 209 - Current Documentation Folder & Open Folder does not open when using Chrome
 
+### Removed
+- Issue 223 - Remove Comment link from Activity Page
+
 ## [v1.5.2] - 2018-04-11
 ### Changed
 - Issue 210 - Request time pop up box text change
@@ -45,7 +48,7 @@ This project changes will be shown here.
 ### Added
 - Issue 188 - New P5 SR for SSL hardcoded change
 
-## [v1.5.0] - 2018-03-20
+##[v1.5.0]- 2018-03-20
 ### Added
 - Issue 185 - Make change so that all pdf's generated are only PRINTABLE
 

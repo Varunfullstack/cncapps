@@ -1200,48 +1200,48 @@ class CTActivity extends CTCNC
             $deleteLink = '';
 
         }
-        /*
-      Allow certain named users to add managers comments
-      */
-        if (in_array($this->userID, $GLOBALS['can_add_manager_comment'])) {
-
-            $urlManagerComment =
-                $this->buildLink(
-                    'Activity.php',
-                    array(
-                        'action' => 'managerCommentPopup',
-                        'problemID' => $problemID,
-                        'htmlFmt' => CT_HTML_FMT_POPUP
-                    )
-                );
-
-            if (
-            $this->buActivity->getManagerComment($problemID)
-            ) {
-
-                $txtManagerComment = '<div class="navigateLinkCustomerNoteExists">Comment</div>';
-            } else {
-                $txtManagerComment = 'Comment';
-
-            }
-        } else {
-            $urlManagerComment = '';
-            $txtManagerComment = '';
-        }
-
-        $this->template->set_var(
-            array(
-                'urlManagerComment' => $urlManagerComment,
-                'txtManagerComment' => $txtManagerComment
-            )
-        );
-
-        $this->template->set_var(
-            array(
-                'urlManagerComment' => $urlManagerComment,
-                'txtManagerComment' => $txtManagerComment
-            )
-        );
+//        /*
+//      Allow certain named users to add managers comments
+//      */
+//        if (in_array($this->userID, $GLOBALS['can_add_manager_comment'])) {
+//
+//            $urlManagerComment =
+//                $this->buildLink(
+//                    'Activity.php',
+//                    array(
+//                        'action' => 'managerCommentPopup',
+//                        'problemID' => $problemID,
+//                        'htmlFmt' => CT_HTML_FMT_POPUP
+//                    )
+//                );
+//
+//            if (
+//            $this->buActivity->getManagerComment($problemID)
+//            ) {
+//
+//                $txtManagerComment = '<div class="navigateLinkCustomerNoteExists">Comment</div>';
+//            } else {
+//                $txtManagerComment = 'Comment';
+//
+//            }
+//        } else {
+//            $urlManagerComment = '';
+//            $txtManagerComment = '';
+//        }
+//
+//        $this->template->set_var(
+//            array(
+//                'urlManagerComment' => $urlManagerComment,
+//                'txtManagerComment' => $txtManagerComment
+//            )
+//        );
+//
+//        $this->template->set_var(
+//            array(
+//                'urlManagerComment' => $urlManagerComment,
+//                'txtManagerComment' => $txtManagerComment
+//            )
+//        );
         /*
       allow move of activity/Problem to another Problem
       */
