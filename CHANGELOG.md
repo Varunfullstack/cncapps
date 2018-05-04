@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+
 ## [v1.7.5] - 2018-06-06
 ### Fixed
 - Issue 265 - Daily Report sending some customer data to wrong people
