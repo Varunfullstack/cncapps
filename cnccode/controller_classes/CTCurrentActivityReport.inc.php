@@ -539,7 +539,23 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->template->set_block('CurrentActivityReport', 'userFilterBlock', 'users');
 
-        foreach ($this->filterUser as $key => $value) {
+        $loggedInUserID = $this->userID;
+
+        usort($this->filterUser,
+            function ($a, $b) use ($loggedInUserID) {
+
+                if ($a['userID'] == $loggedInUserID) {
+                    return -1;
+                }
+
+                if ($b['userID'] == $loggedInUserID) {
+                    return 1;
+                }
+                return strcasecmp($a['fullName'], $b['fullName']);
+            }
+        );
+
+        foreach ($this->filterUser as $value) {
 
             if ($value['userID'] == $_SESSION['selectedUserID']) {
                 $userSelected = 'SELECTED';
@@ -954,7 +970,8 @@ class CTCurrentActivityReport extends CTCNC
             $imRemaining = $imAssignedMinutes - $imUsedMinutes;
 
 
-            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
+            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
+                                            1);
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
@@ -979,11 +996,13 @@ class CTCurrentActivityReport extends CTCNC
                     'problemID' => $dsResults->getValue('problemID'),
                     'reason' => $this->truncate($dsResults->getValue('reason'), 150),
                     'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
-                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
+                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'),
+                                                                          $dsResults->getValue('userID')),
                     'engineerName' => $dsResults->getValue('engineerName'),
                     'customerName' => $dsResults->getValue('customerName'),
                     'customerNameDisplayClass'
-                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'), $dsResults->getValue('specialAttentionEndDate')),
+                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'),
+                                                          $dsResults->getValue('specialAttentionEndDate')),
                     'urlViewActivity' => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),
@@ -1110,12 +1129,13 @@ class CTCurrentActivityReport extends CTCNC
      */
     function getAllocatedUserDropdown($problemID, $selectedID)
     {
+
         // user selection
         $userSelected = ($selectedID == 0) ? CT_SELECTED : '';
 
         $string .= '<option ' . $userSelected . ' value="&userID=0&problemID=' . $problemID . '"></option>';
 
-        foreach ($this->allocatedUser as $key => $value) {
+        foreach ($this->allocatedUser as $value) {
 
             $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : '';
 
