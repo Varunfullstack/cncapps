@@ -15,7 +15,6 @@ require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 use Dompdf\Dompdf;
-use mikehaertl\shellcommand\Command;
 
 class BUCustomerReviewMeeting extends Business
 {
@@ -504,6 +503,23 @@ class BUCustomerReviewMeeting extends Business
 
         fwrite($handle, $pdfString);
 
+        $this->pdfEncrypt($filePath, $filePath, 'RenewalOwner2018', 'CNCShoreham2018');
+    }
+
+    function pdfEncrypt ($origFile, $destFile, $owner_password=null, $user_password=null, $permissions = ['print']){
+        $pdf = new \setasign\FpdiProtection\FpdiProtection();
+        $pagecount = $pdf->setSourceFile($origFile);
+        // copy all pages from the old unprotected pdf in the new one
+        for ($loop = 1; $loop <= $pagecount; $loop++) {
+            $tplidx = $pdf->importPage($loop);
+            $pdf->addPage();
+            $dim = $pdf->useTemplate($tplidx);
+            //var_dump($dim);exit;
+        }
+        // Allow for array('print', 'modify', 'copy', 'annot-forms');
+        $pdf->SetProtection($permissions,$user_password, $owner_password);
+        $pdf->Output($destFile,'F'); // F write, D download
+        return $destFile;
     }
 }
 

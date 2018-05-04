@@ -538,7 +538,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $workingHours += $starterSR->getValue(DBEJProblem::totalActivityDurationHours);
             }
             $avgHours = $workingHours / $starterSR->rowCount();
-            $startersAndLeaversTemplate->set_var('startersAvgMinutes', round($avgHours * 60, 2));
+            $startersAndLeaversTemplate->set_var('startersAvgMinutes', round($avgHours * 60, 0));
 
             $startersAndLeaversTemplate->parse('items', 'startersBlock', true);
         }
@@ -554,7 +554,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $workingHours += $leaverSR->getValue(DBEJProblem::totalActivityDurationHours);
             }
             $avgHours = $workingHours / $leaverSR->rowCount();
-            $startersAndLeaversTemplate->set_var('leaversAvgMinutes', round($avgHours * 60, 2));
+            $startersAndLeaversTemplate->set_var('leaversAvgMinutes', round($avgHours * 60, 0));
 
             $startersAndLeaversTemplate->parse('leaversItems', 'leaversBlock', true);
         }
@@ -602,7 +602,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $otherContracts = [
             "title" => "Other Contract Incidents",
-            "columns" => ["Dates", "OtherSr", "AvgResponse", "Changes",],
+            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
             "data" => []
         ];
 
