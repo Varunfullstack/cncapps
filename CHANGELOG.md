@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+
 ## [v1.8.0] 
 ### Added
 - Issue 195 - Graph to show user productivity
