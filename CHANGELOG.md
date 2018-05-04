@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+
 ## [v1.8.2] - 2018-06-28
 ### Fixed
 - Issue 289 - Fix issues 
