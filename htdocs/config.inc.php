@@ -249,7 +249,7 @@ define("USER_SYSTEM", 67);
 List of userIDs that can add managers comments to service requests
 */
 $GLOBALS['can_add_manager_comment'] =
-    array(USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA);
+    array(USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA, 110);
 
 /* 
 When automated emails coming in from unrecognised email addresses with these domains,
