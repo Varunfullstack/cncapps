@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+
+## [unreleased]
+### Changed
+- Issue 225 - Record absence, force absent time to overwrite
+
 ## [v1.5.2] 2018-04-11
 ### Changed
 - Issue 210 - Request time pop up box text change

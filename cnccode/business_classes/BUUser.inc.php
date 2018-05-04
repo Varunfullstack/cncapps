@@ -167,7 +167,7 @@ class BUUser extends Business
         global $db;
 
         $sql =
-            "INSERT IGNORE INTO user_time_log
+            "replace INTO user_time_log
         (
         `userID`,
         `teamLevel`,
