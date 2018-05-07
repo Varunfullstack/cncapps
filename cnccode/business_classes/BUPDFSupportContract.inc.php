@@ -65,7 +65,7 @@ class BUPDFSupportContract extends BaseObject
      * If no invoices are found then return FALSE
      * @return String PDF disk file name or FALSE
      */
-    function generateFile()
+    function generateFile($encrypted = true)
     {
         $this->_dsContract->initialise();
         $this->_dsContract->fetchNext();
@@ -77,7 +77,8 @@ class BUPDFSupportContract extends BaseObject
             date('d/m/Y'),
             'CNC Ltd',
             'Contract Schedule',
-            'A4'
+            'A4',
+            $encrypted
         );
         $this->produceContract();
         $this->_buPDF->close();
