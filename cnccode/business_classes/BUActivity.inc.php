@@ -5297,9 +5297,12 @@ customer with the past 8 hours email to GL
 
         $testTime = (new \DateTime($record['createDateTime']))->format('H:i');
 
-
         $startTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hBegin);
         $endTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hEnd);
+        echo '<br>test time is : ' . $testTime;
+        echo '<br>startTime is : ' . $startTime;
+        echo '<br>endTime is : ' . $endTime;
+
 
         if ($testTime < $startTime || $testTime > $endTime) {
             $has24HourSupport = $dsCustomer->getValue("support24HourFlag") == 'Y';
