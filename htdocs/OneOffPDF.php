@@ -203,7 +203,7 @@ $signingPDF->pdf->Cell(40, 20, "Your Name: {text:signer1:Your+Name}");
 $signingPDF->pdf->Ln();
 $signingPDF->pdf->Cell(40, 20, "Job Title: {text:signer1:Job+Title}");
 $signingPDF->pdf->Ln();
-$signingPDF->pdf->Cell(60, 20, "I am authorised to sign on behalf of the company {check:signer1:Please+Tick}");
+$signingPDF->pdf->Cell(60, 20, "By signing this document I confirm I have authority within my organisation to agree to and accept Computer & Network Consultant Limited’s Terms and Conditions relating to the attached schedule of contracts. {check:signer1:Please+Tick}");
 $signingPDF->pdf->Ln();
 $signingPDF->pdf->Cell(50, 20, "Signature: {signature,w100,h100:signer1:Sign+Here}");
 $signingPDF->close();
