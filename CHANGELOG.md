@@ -1,6 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
+
 ## [unreleased]
 ### Added 
 - Issue 189 - Add version number to menu
@@ -25,6 +26,7 @@ This project changes will be shown here.
 - Issue 212 - Remove old items from menu
 - Issue 216 - Change list of activity types that are visible in SRs
 - Issue 224 - Change order of engineer list in drop down on Current Service Requests
+- Issue 225 - Record absence, force absent time to overwrite
 
 ### Fixed
 - Issue 161 - Customer Review Meeting Total SRs potential adding up issue

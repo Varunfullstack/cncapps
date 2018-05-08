@@ -142,8 +142,6 @@ class BUUser extends Business
 
         while ($loggedDayCount < $days) {
 
-            $dayCount++;
-
             $uDateToTry = strtotime($startDate . ' +' . $dayCount . ' day'); //UNIX
 
             $dayOfWeek = date('N', $uDateToTry);
@@ -158,6 +156,7 @@ class BUUser extends Business
 
                 $this->logAbsentDate($userID, $teamLevel, $standardDayHours, $dateToTry);
             }
+            $dayCount++;
         }
 
     }
@@ -167,7 +166,7 @@ class BUUser extends Business
         global $db;
 
         $sql =
-            "INSERT IGNORE INTO user_time_log
+            "replace INTO user_time_log
         (
         `userID`,
         `teamLevel`,
