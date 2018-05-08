@@ -15,5 +15,4 @@
     <include file="db.changelog-issue112.xml"/>
     <include file="db.changelog-issue202.xml"/>
     <include file="db.changelog-issue216.xml"/>
-    <include file="db.changelog-issue219.xml"/>
 </databaseChangeLog>
