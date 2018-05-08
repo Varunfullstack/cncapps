@@ -5315,7 +5315,6 @@ customer with the past 8 hours email to GL
             } else {
                 $template = 'ServiceLoggedEmailNot24h';
             }
-
         }
 
         $this->sendEmailToCustomer(
@@ -6133,9 +6132,7 @@ customer with the past 8 hours email to GL
                 !isset($parameters ['overrideServerGuard'])
             )
         ) {
-
             return; // no email to customer for this request
-
         }
         /*
     See whether to copy in the main contact
@@ -6269,6 +6266,8 @@ customer with the past 8 hours email to GL
         $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
+
+        echo 'should put in queue ';
 
         $buMail->putInQueue(
             $senderEmail,
