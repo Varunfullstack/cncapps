@@ -5288,11 +5288,7 @@ customer with the past 8 hours email to GL
             $fields['submittedTo'] = 'Service Desk';
         }
 
-        $buCustomer = new BUCustomer($this);
-
-        $dsCustomer = new DataSet($this);
-        $dsCustomer->setIgnoreNULLOn();
-        $dsCustomer->copyColumnsFrom($buCustomer->dbeCustomer);
+        $dsCustomer = new DBECustomer($this);
         $dsCustomer->setValue('CustomerID', $customerID);
         $dsCustomer->fetchNext();
 
