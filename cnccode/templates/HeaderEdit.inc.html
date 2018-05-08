@@ -137,6 +137,33 @@
             </select></td>
         </tr>
         <tr>
+            <td class="promptText">SD 24x7 notification option begin</td>
+            <td class="field">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][serviceDeskNotification24hBegin]"
+                        value="{serviceDeskNotification24hBegin}"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{serviceDeskNotification24hBeginMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">SD 24x7 notification option end</td>
+            <td class="field">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][serviceDeskNotification24hEnd]"
+                        value="{serviceDeskNotification24hEnd}"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{serviceDeskNotification24hEndMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
             <td class="promptText">Billing Start Time</td>
             <td class="field"><input
                     {DISABLED} required
