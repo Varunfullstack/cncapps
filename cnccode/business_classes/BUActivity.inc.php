@@ -5305,16 +5305,21 @@ customer with the past 8 hours email to GL
 
 
         if ($testTime < $startTime || $testTime > $endTime) {
+            echo '<div>Should be special email</div>';
             $has24HourSupport = $dsCustomer->getValue("support24HourFlag") == 'Y';
             $buCustomerItem = new BUCustomerItem($this);
 
             $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($customerID);
 
             if ($has24HourSupport || $hasServiceDesk) {
+                echo '<div>does have 24h support</div>';
                 $template = 'ServiceLoggedEmail24h';
             } else {
+                echo '<div>does NOT have 24h support</div>';
                 $template = 'ServiceLoggedEmailNot24h';
             }
+        } else {
+            echo '<div>Should be normal email</div>';
         }
 
         $this->sendEmailToCustomer(
@@ -6266,8 +6271,6 @@ customer with the past 8 hours email to GL
         $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
-
-        echo 'should put in queue ';
 
         $buMail->putInQueue(
             $senderEmail,
