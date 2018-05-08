@@ -46,17 +46,28 @@ function addPages(\setasign\Fpdi\Fpdi $mainPDF, $contracts)
     while ($contracts->fetchNext()) {
 
         $continue = true;
+
+//        if ($contracts->getValue('renewalTypeID') === 3) {
+//            //this is a renewal ignore
+//            continue;
+//        }
+
         foreach ($validItems as $item) {
-            if (strpos($item, $contracts->getValue('itemTypeDescription')) >= 0) {
+            if (strpos($item, $contracts->getValue('itemTypeDescription')) !== false) {
                 $continue = false;
             }
         }
+
         if ($continue) {
             continue;
         }
-        // Validation and setting of variables
-        $buCustomerItem = new BUCustomerItem($this);
 
+
+        echo '<br>contract: ' . $contracts->getValue("customerItemID") . " of type " . $contracts->getValue('itemTypeDescription');
+
+        // Validation and setting of variables
+
+        $buCustomerItem = new BUCustomerItem($this);
         $buCustomerItem->getCustomerItemByID($contracts->getValue("customerItemID"), $dsContract);
         $buCustomerItem->getCustomerItemsByContractID($contracts->getValue("customerItemID"), $dsCustomerItem);
 
@@ -170,10 +181,6 @@ $dbeJRenHosting = new DBEJRenHosting($this);
 $dbeJRenHosting->getRowsByCustomerID($customerID);
 addPages($mainPDF, $dbeJRenHosting);
 
-$dbeJRenQuotation = new DBEJRenQuotation($this);
-$dbeJRenQuotation->getRowsByCustomerID($customerID);
-addPages($mainPDF, $dbeJRenQuotation);
-
 //$buExternalItem = new BUExternalItem($this);
 //$buExternalItem->getExternalItemsByCustomerID($customerID, $dsExternalItem);
 //addPages($mainPDF, $buExternalItem);
@@ -192,13 +199,13 @@ $signingPDF = new BUPDF($thing, 'signing.pdf', 'cncapps', 'signing', 'signing', 
 $signingPDF->startPage();
 $signingPDF->setFontSize(10);
 $signingPDF->setFont();
-$signingPDF->printStringAt(12,
-                           "Your Name: {text:signer1:Your+Name}
-Do you agree with these terms? {check:signer1:Please+Tick}
-Signature: {signature:signer1:Sign+Here}
-Date: {date:signer1:Date+Here}"
-);
-
+$signingPDF->pdf->Cell(40, 20, "Your Name: {text:signer1:Your+Name}");
+$signingPDF->pdf->Ln();
+$signingPDF->pdf->Cell(40, 20, "Job Title: {text:signer1:Job+Title}");
+$signingPDF->pdf->Ln();
+$signingPDF->pdf->Cell(60, 20, "I am authorised to sign on behalf of the company {check:signer1:Please+Tick}");
+$signingPDF->pdf->Ln();
+$signingPDF->pdf->Cell(50, 20, "Signature: {signature,w100,h100:signer1:Sign+Here}");
 $signingPDF->close();
 
 $pageCount = $mainPDF->setSourceFile('signing.pdf');
@@ -210,15 +217,19 @@ for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 }
 
 
-$mainPDF->Output('I', 'test.pdf');
+$mainPDF->Output('F', 'test.pdf');
+
+generateEnvelope("test.pdf");
 
 //header('Pragma: public');
-//header('Expires: 0');
-//header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-//header('Content-Type: application/pdf');
-//header('Content-Disposition: attachment; filename=contract.pdf;');
-//header('Content-Transfer-Encoding: binary');
-//header('Content-Length: ' . filesize('test.pdf'));
-//readfile('test.pdf');
-unlink('test.pdf');
-exit();
+////header('Expires: 0');
+////header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+////header('Content-Type: application/pdf');
+////header('Content-Disposition: attachment; filename=contract.pdf;');
+////header('Content-Transfer-Encoding: binary');
+////header('Content-Length: ' . filesize('test.pdf'));
+////readfile('test.pdf');
+////unlink('test.pdf');
+?>
+<a href="/test.pdf">Link</a>
+
