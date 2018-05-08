@@ -43,5 +43,7 @@
             <column name="id" value="1"/>
             <column name="name" value="Admin"/>
         </insert>
+        <rollback>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
