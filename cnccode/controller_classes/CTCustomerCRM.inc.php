@@ -242,7 +242,6 @@ class CTCustomerCRM extends CTCNC
 
     function searchLead()
     {
-
         $customerLeadID = $_POST['customerLeadID'];
         // in the post we should find the id of the status we are searching for
         /** @var DBEContact $results */
@@ -250,6 +249,12 @@ class CTCustomerCRM extends CTCNC
         $data = [];
 
         $customers = [];
+
+        $this->buCustomer->getCustomerLeadStatuses($dsCustomerLeadStatuses);
+        $leadStatuses = [];
+        while ($dsCustomerLeadStatuses->fetchNext()) {
+            $leadStatuses[$dsCustomerLeadStatuses->getValue("customerLeadStatusID")] = $dsCustomerLeadStatuses->getValue("name");
+        }
 
         while ($results->fetchNext()) {
             $customerID = $results->getValue(DBEContact::CustomerID);
@@ -265,11 +270,11 @@ class CTCustomerCRM extends CTCNC
                         'customerID' => $customerID
                     )
                 );
-
                 $customers[$customerID] = [
                     "customerName" => $dbeCustomer->getValue(DBECustomer::Name),
                     "customerLink" => $link,
-                    "customerReviewDate" => $dbeCustomer->getValue(DBECustomer::reviewDate)
+                    "customerReviewDate" => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                    "bluestoneLeadStatus" => $leadStatuses[+$dbeCustomer->getValue(DBECustomer::CustomerLeadStatusID)]
                 ];
 
             }
