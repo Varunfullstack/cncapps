@@ -76,28 +76,33 @@ class OneOffPDF
             $mainPDF->AddPage($s['orientation'], $s);
             $mainPDF->useImportedPage($pageId);
         }
+        $descriptors = array(
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'a'),
+        );
 
 
-        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
-        $process = proc_open($command, $descriptors, $pipes);
 
-        if (is_resource($process)) {
-            $_stdOut = stream_get_contents($pipes[1]);
-            $_stdErr = stream_get_contents($pipes[2]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            $_exitCode = proc_close($process);
-
-            if ($_exitCode !== 0) {
-                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
-            }
-        }
-        if ($_error) {
-            unlink($tempFilePath);
-            return false;
-        } else {
-            return true;
-        }
+//        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
+//        $process = proc_open($command, $descriptors, $pipes);
+//
+//        if (is_resource($process)) {
+//            $_stdOut = stream_get_contents($pipes[1]);
+//            $_stdErr = stream_get_contents($pipes[2]);
+//            fclose($pipes[1]);
+//            fclose($pipes[2]);
+//            $_exitCode = proc_close($process);
+//
+//            if ($_exitCode !== 0) {
+//                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
+//            }
+//        }
+//        if ($_error) {
+//            unlink($tempFilePath);
+//            return false;
+//        } else {
+//            return true;
+//        }
 
 
         $signingPDF = new BUPDF($this, 'signing.pdf', 'cncapps', 'signing', 'signing', 'signing', 'A4', false);
@@ -118,6 +123,7 @@ class OneOffPDF
 //                               "accept Computer & Network Consultant Limited’s Terms and Conditions relating to the attached schedule of contracts. {check:signer1:Please+Tick}");
         $signingPDF->pdf->Ln();
         $signingPDF->pdf->Cell(50, 20, "Signature: {signature,w100,h100:signer1:Sign+Here}");
+        var_dump($GLOBALS['cfg']['cncaddress_path']);
         $signingPDF->placeImageAt($GLOBALS['cfg']['cncaddress_path'], 'PNG', 6, 200);
         $signingPDF->close();
 
