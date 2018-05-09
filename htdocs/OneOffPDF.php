@@ -69,65 +69,7 @@ class OneOffPDF
 //addPages($mainPDF, $buExternalItem);
 
 
-        $pageCount = $mainPDF->setSourceFile('Terms & Conditions April 2018.pdf');
-        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-            $pageId = $mainPDF->importPage($pageNo);
-            $s = $mainPDF->getTemplatesize($pageId);
-            $mainPDF->AddPage($s['orientation'], $s);
-            $mainPDF->useImportedPage($pageId);
-        }
-        $descriptors = array(
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'a'),
-        );
-
-
-
-//        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
-//        $process = proc_open($command, $descriptors, $pipes);
-//
-//        if (is_resource($process)) {
-//            $_stdOut = stream_get_contents($pipes[1]);
-//            $_stdErr = stream_get_contents($pipes[2]);
-//            fclose($pipes[1]);
-//            fclose($pipes[2]);
-//            $_exitCode = proc_close($process);
-//
-//            if ($_exitCode !== 0) {
-//                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
-//            }
-//        }
-//        if ($_error) {
-//            unlink($tempFilePath);
-//            return false;
-//        } else {
-//            return true;
-//        }
-
-
-        $signingPDF = new BUPDF($this, 'signing.pdf', 'cncapps', 'signing', 'signing', 'signing', 'A4', false);
-        $signingPDF->startPage();
-        $signingPDF->setFontSize(10);
-        $signingPDF->setFont();
-        $signingPDF->pdf->Cell(40, 20, "Your Name: {text:signer1:Your+Name}");
-        $signingPDF->pdf->Ln();
-        $signingPDF->pdf->Cell(40, 20, "Job Title: {text:signer1:Job+Title}");
-        $signingPDF->pdf->Ln();
-        $signingPDF->pdf->Write(40,
-                                "By signing this document I confirm I have authority within my organisation to agree to and accept Computer & Network Consultant Limited’s Terms and Conditions relating to the attached schedule of contracts. {check:signer1:Please+Tick}");
-//        $signingPDF->pdf->Cell(60,
-//                               20,
-//                               "By signing this document I confirm I have authority within my organisation to agree to and ");
-//        $signingPDF->pdf->Cell(60,
-//                               20,
-//                               "accept Computer & Network Consultant Limited’s Terms and Conditions relating to the attached schedule of contracts. {check:signer1:Please+Tick}");
-        $signingPDF->pdf->Ln();
-        $signingPDF->pdf->Cell(50, 20, "Signature: {signature,w100,h100:signer1:Sign+Here}");
-        var_dump($GLOBALS['cfg']['cncaddress_path']);
-        $signingPDF->placeImageAt($GLOBALS['cfg']['cncaddress_path'], 'PNG', 6, 200);
-        $signingPDF->close();
-
-        $pageCount = $mainPDF->setSourceFile('signing.pdf');
+        $pageCount = $mainPDF->setSourceFile(__DIR__ . '/PDF-resources/Terms & Conditions April 2018 branded.pdf');
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
             $pageId = $mainPDF->importPage($pageNo);
             $s = $mainPDF->getTemplatesize($pageId);
@@ -135,10 +77,17 @@ class OneOffPDF
             $mainPDF->useImportedPage($pageId);
         }
 
+        $pageCount = $mainPDF->setSourceFile(__DIR__ . '/PDF-resources/lastPage.pdf');
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $pageId = $mainPDF->importPage($pageNo);
+            $s = $mainPDF->getTemplatesize($pageId);
+            $mainPDF->AddPage($s['orientation'], $s);
+            $mainPDF->useImportedPage($pageId);
+        }
 
         $mainPDF->Output('F', 'test.pdf');
 
-//generateEnvelope("test.pdf");
+        $this->generateEnvelope("test.pdf");
 
 //header('Pragma: public');
 ////header('Expires: 0');
