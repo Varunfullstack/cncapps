@@ -72,9 +72,9 @@
                         console.log('split2:'+split2);
 
                         remainder = remainder - split2;
-                        $("tr:gt(" + (split1+1) + ")", '#' + firstCol).remove();
+                        $("tr:gt(" + (split1-1) + ")", '#' + firstCol).remove();
                         //First remove the final 3rd then the first third
-                        $("tr:gt(" + (split2+1) + ")", '#' + secondCol).remove();
+                        $("tr:gt(" + (split2-1) + ")", '#' + secondCol).remove();
                         $("tr:lt(" + split1 + ")", '#' + secondCol).remove();
 
                         $("tr:lt(" + (split2) + ")", '#' + thirdCol).remove();
@@ -144,6 +144,7 @@
                 } else {
                     alert('PDF created successfully');
                 }
+
             })
         })
     })
@@ -256,6 +257,9 @@
         border: none;
         font-size: 15px;
     }
+
+    .thirdTable { width:32%; float: left; margin: 0 2% 0 0 !important; }
+    .thirdTable:nth-child(4) { margin: 0 !important; }
 </style>
 
 
