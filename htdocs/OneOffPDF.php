@@ -78,6 +78,28 @@ class OneOffPDF
         }
 
 
+        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
+        $process = proc_open($command, $descriptors, $pipes);
+
+        if (is_resource($process)) {
+            $_stdOut = stream_get_contents($pipes[1]);
+            $_stdErr = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $_exitCode = proc_close($process);
+
+            if ($_exitCode !== 0) {
+                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
+            }
+        }
+        if ($_error) {
+            unlink($tempFilePath);
+            return false;
+        } else {
+            return true;
+        }
+
+
         $signingPDF = new BUPDF($this, 'signing.pdf', 'cncapps', 'signing', 'signing', 'signing', 'A4', false);
         $signingPDF->startPage();
         $signingPDF->setFontSize(10);
