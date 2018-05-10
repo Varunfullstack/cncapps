@@ -32,7 +32,7 @@ $returnArray = array();
 
 class OneOffPDF
 {
-    function runIt($customerID)
+    function runIt($customerID, $firstName, $lastName, $emailAddress)
     {
         $mainPDF = new \setasign\Fpdi\Fpdi();
         $buCustomerItem = new BUCustomerItem($this);
@@ -43,9 +43,6 @@ class OneOffPDF
 
 
         $this->addPages($mainPDF, $dbeJRenContract);
-
-
-//http://cncapps/CustomerItem.php?action=printContract&customerItemID=36745
 
 // Domains
         $dbeJRenDomain = new DBEJRenDomain($this);
@@ -85,9 +82,12 @@ class OneOffPDF
             $mainPDF->useImportedPage($pageId);
         }
 
-        $mainPDF->Output('F', 'test.pdf');
+        $fileName = 'GDPR Documents/' . $customerID . '-GDPR.pdf';
 
-        $this->generateEnvelope("test.pdf");
+        $mainPDF->Output('F', $fileName);
+
+
+//        $this->generateEnvelope($fileName, $firstName, $lastName, $emailAddress, $customerID);
 
 //header('Pragma: public');
 ////header('Expires: 0');
@@ -99,7 +99,17 @@ class OneOffPDF
 ////readfile('test.pdf');
 ////unlink('test.pdf');
         ?>
-        <a href="/test.pdf">Link</a>
+        <div>
+            First Name: <?= $firstName ?>
+        </div>
+        <div>
+            Last Name: <?= $lastName ?>
+        </div>
+        <div>
+            Email: <?= $emailAddress ?>
+        </div>
+
+        <a href="<?= $fileName ?>">Link</a>
         <?php
     }
 
@@ -175,17 +185,17 @@ class OneOffPDF
     }
 
 
-    function generateEnvelope($fileName)
+    function generateEnvelope($fileName, $firstName, $lastName, $email, $customerID)
     {
         \Signable\ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
 
         $envDocs = [];
 
         $envelopeDocument = new DocumentWithoutTemplate(
-            'GDPR document',
+            'CNC Contracts with Terms & Conditions',
             null,
             base64_encode(file_get_contents($fileName)),
-            "contracts.pdf"
+            "CNCContractsTCs.pdf"
         );
 
         $envDocs[] = $envelopeDocument;
@@ -193,8 +203,8 @@ class OneOffPDF
         $envelopeParties = [];
 
         $envelopeParty = new Party(
-            'client name',
-            'AdrianC@cnc-ltd.co.uk',
+            $firstName . ' ' . $lastName,
+            $email,
             'signer1',
             'Please sign here',
             'no',
@@ -204,7 +214,7 @@ class OneOffPDF
 
 
         $response = Envelopes::createNewWithoutTemplate(
-            "Document ##" . uniqid(),
+            "Document #" . $customerID . "_" . uniqid(),
             $envDocs,
             $envelopeParties,
             null,
@@ -217,7 +227,7 @@ class OneOffPDF
 
         if ($response && $response->http == 202) {
             //all went alright!! store the envelope fingerprint
-            echo 'Creation of evenlop successful';
+            echo 'Creation of envelope successful';
         } else {
             echo 'creation of envelope failed';
         }
@@ -225,8 +235,15 @@ class OneOffPDF
 }
 
 $test = new OneOffPDF();
-$customerID = 2554;
-$test->runIt($customerID);
+$csv = fopen('c:/Temp/gdpr-data.csv', 'r');
+
+$firstLine = fgetcsv($csv);
+
+while ($row = fgetcsv($csv)) {
+    $test->runIt($row[0], $row[2], $row[3], $row[11]);
+}
+
+
 
 
 
