@@ -103,11 +103,12 @@
                 }
             })
 
-            var editableText = '<div class="reportSection">' + CKEDITOR.instances['editableText'].getData() + "</div>";
-
-            editableText = editableText.replace('<h2>', '</div><div class="reportSection"><h2>');
+            var editableText = '<div class="ckeditorContent">' + CKEDITOR.instances['editableText'].getData() + "</div>";
 
             $('#reportContent').append(editableText);
+
+            $('.ckeditorContent h2').wrap("<div class='reportSection'></div>");
+            $('.ckeditorContent table').wrap("<div class='reportSection'></div>");
 
             var sections = 1;
             $('h2').each(function () {
@@ -231,8 +232,6 @@
     .reportSection {
         float: left;
         width: 100%;
-        min-height: 50px;
-        padding-bottom: 40px;
         display: inline-block;
     }
 
