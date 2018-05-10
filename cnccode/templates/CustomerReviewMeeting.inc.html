@@ -102,7 +102,7 @@
                 }
             })
 
-            $('#reportContent').append('<div class="ckeditorContent reportSection">'+CKEDITOR.instances['editableText'].getData()+'</div>');
+            $('#reportContent').append(CKEDITOR.instances['editableText'].getData());
 
             var sections = 1;
             $('h2').each(function() {
