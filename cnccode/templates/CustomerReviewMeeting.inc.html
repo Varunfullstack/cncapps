@@ -64,17 +64,18 @@
                         var thirdCol = 'table' + tableID;
                         tableID++;
 
-                        var split1 = Math.ceil(rowCount / 3); var remainder = rowCount - split1;
-                        var split2 = Math.ceil(remainder / 2)+split1;
+                        var split1 = Math.ceil(rowCount / 3);
+                        var remainder = rowCount - split1;
+                        var split2 = Math.ceil(remainder / 2) + split1;
 
-                        console.log('total:'+rowCount);
-                        console.log('split1:'+split1);
-                        console.log('split2:'+split2);
+                        console.log('total:' + rowCount);
+                        console.log('split1:' + split1);
+                        console.log('split2:' + split2);
 
                         remainder = remainder - split2;
-                        $("tr:gt(" + (split1-1) + ")", '#' + firstCol).remove();
+                        $("tr:gt(" + (split1 - 1) + ")", '#' + firstCol).remove();
                         //First remove the final 3rd then the first third
-                        $("tr:gt(" + (split2-1) + ")", '#' + secondCol).remove();
+                        $("tr:gt(" + (split2 - 1) + ")", '#' + secondCol).remove();
                         $("tr:lt(" + split1 + ")", '#' + secondCol).remove();
 
                         $("tr:lt(" + (split2) + ")", '#' + thirdCol).remove();
@@ -102,11 +103,15 @@
                 }
             })
 
-            $('#reportContent').append(CKEDITOR.instances['editableText'].getData());
+            var editableText = '<div class="reportSection>' + CKEDITOR.instances['editableText'].getData() + "</div>";
+
+            editableText = editableText.replace('<h2>', '</div><div class="reportSection"><h2>');
+
+            $('#reportContent').append(editableText);
 
             var sections = 1;
-            $('h2').each(function() {
-                $(this).prepend(sections+'. ');
+            $('h2').each(function () {
+                $(this).prepend(sections + '. ');
                 sections++;
             })
 
@@ -262,8 +267,15 @@
         page-break-inside: avoid !important;
     }
 
-    .thirdTable { width:32%; float: left; margin: 0 2% 0 0 !important; }
-    .thirdTable:nth-child(4) { margin: 0 !important; }
+    .thirdTable {
+        width: 32%;
+        float: left;
+        margin: 0 2% 0 0 !important;
+    }
+
+    .thirdTable:nth-child(4) {
+        margin: 0 !important;
+    }
 </style>
 
 
