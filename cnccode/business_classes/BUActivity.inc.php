@@ -5290,7 +5290,6 @@ customer with the past 8 hours email to GL
 
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($customerID);
-        $dsCustomer->fetchNext();
 
         $template = 'ServiceLoggedEmail';
 
