@@ -152,8 +152,10 @@ class DBEContact extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%'" .
-            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%')" .
+            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
+                                                                                                     $match) . "%'" .
+            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
+                                                                                                  $match) . "%')" .
             " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
             " AND " . $this->getDBColumnName('supplierID') . " = " . $this->getFormattedValue('supplierID') .
             " ORDER BY " . $this->getDBColumnName('lastName') . "," . $this->getDBColumnName('firstName')
@@ -187,8 +189,10 @@ class DBEContact extends DBCNCEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%'" .
-            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $match) . "%')" .
+            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
+                                                                                                     $match) . "%'" .
+            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
+                                                                                                  $match) . "%')" .
             " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
             " AND " . $this->getDBColumnName('customerID') . " = " . $this->getFormattedValue('customerID');
 
@@ -258,12 +262,12 @@ class DBEContact extends DBCNCEntity
         if ($customerID == '') {
             $this->raiseError('customerID not set');
         }
-        $this->setQueryString(
+        $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_MAIN_CONTACT_FLAG) . " = 'Y'" .
-            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID
-        );
+            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID;
+        $this->setQueryString($sql);
         return (parent::getRows());
     }
 
@@ -277,7 +281,6 @@ class DBEContact extends DBCNCEntity
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;
         }
-
         $this->setQueryString($sql);
 
         return (parent::getRows());
@@ -307,6 +310,21 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_INVOICE_CONTACT) . " = 'Y'" .
+            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID
+
+        );
+        return (parent::getRows());
+    }
+
+    function getMainContacts($customerID)
+    {
+        if ($customerID == '') {
+            $this->raiseError('customerID not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName("mailshot10Flag") . " = 'Y'" .
             " AND " . $this->getDBColumnName('customerID') . " = " . $customerID
 
         );

@@ -41,7 +41,7 @@ class CTCustomerReviewMeeting extends CTCNC
         switch ($_REQUEST['action']) {
 
             case 'generatePdf':
-                $this->generatePdf();
+                echo json_encode($this->generatePdf());
                 break;
 
             default:
@@ -60,7 +60,6 @@ class CTCustomerReviewMeeting extends CTCNC
         $dsResults = new DataSet ($this);
 
         $this->buCustomerReviewMeeting->initialiseSearchForm($dsSearchForm);
-
         $this->setTemplateFiles(array('CustomerReviewMeeting' => 'CustomerReviewMeeting.inc'));
 
         if (isset($_REQUEST ['searchForm'])) {
@@ -72,10 +71,12 @@ class CTCustomerReviewMeeting extends CTCNC
                 generate default contents of edit box
 
                 */
+
+
+                $customerId = $dsSearchForm->getValue('customerID');
                 $buCustomerItem = new BUCustomerItem($this);
 
                 $buCustomer = new BUCustomer($this);
-
                 $buActivity = new BUActivity($this);
 
                 $buServiceDeskReport = new BUServiceDeskReport($this);
@@ -84,13 +85,23 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $buContact = new BUContact($this);
 
+                /** @var DBECustomer $dsCustomer */
+                $dsCustomer = null;
+
                 $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
+
 
                 $textTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
 
-                $textTemplate->set_file('page', 'CustomerReviewMeetingText.inc.html');
+                $nonEditableTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
 
-                $textTemplate->set_var(
+                $nonEditableTemplate->set_file('page', 'CustomerReviewMeetingNonEditable.html');
+
+
+                $textTemplate->set_file('page', 'CustomerReviewMeetingEditable.html');
+
+
+                $nonEditableTemplate->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue('name'),
                         'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
@@ -101,31 +112,6 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP5' => $dsCustomer->getValue('slaP5')
                     )
                 );
-                /*
-                Support contacts
-                */
-                $textTemplate->set_block('page', 'supportContactBlock', 'supportContacts');
-
-                $buContact->getSupportContacts($dsSupportContact, $dsSearchForm->getValue('customerID'));
-
-
-                while ($dsSupportContact->fetchNext()) {
-
-                    $textTemplate->set_var(
-                        array(
-                            'supportContactName' => $dsSupportContact->getValue('firstName') . ' ' . $dsSupportContact->getValue('lastName')
-                        )
-                    );
-
-                    $textTemplate->parse('supportContacts', 'supportContactBlock', true);
-                }
-                /*
-                End support contacts
-                */
-                /*
-                SR Performance Statistics
-                */
-                $textTemplate->set_block('page', 'srStatsBlock', 'stats');
 
                 $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
                     $dsSearchForm->getValue('customerID'),
@@ -134,58 +120,68 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
 
-                foreach ($results as $key => $row) {
+//                $nonEditableTemplate->set_var('chart', json_encode($this->generateCharts($results, $customerId)));
+//
+                $supportedUsersData = $this->getSupportedUsersData($buContact,
+                    $customerId,
+                    $dsCustomer->getValue('name'));
 
-                    $textTemplate->set_var(
-                        array(
-                            'monthName' => $row['monthName'],
-                            'year' => $row['year'],
-                            'period' => $row['period'],
-                            'scP1to3Count' => $row['serverCareCount1And3'],
-                            'scP1to3ResponseHours' => number_format($row['serverCareHoursResponded'], 1),
-                            'scP4Count' => $row['serverCareCount4'],
-                            'sdP1to3Count' => $row['serviceDeskCount1And3'] + $row['prepayCount1And3'],
-                            'sdP1to3ResponseHours' => number_format($row['serviceDeskHoursResponded'] + $row['prepayHoursResponded'],
-                                                                    1),
-                            'sdP4Count' => $row['serviceDeskCount4'] + $row['prepayCount4'],
-                            'otherP1to3Count' => $row['otherCount1And3'],
-                            'otherP1to3ResponseHours' => number_format($row['otherHoursResponded'], 1),
-                            'otherP1to3FixHours' => number_format($row['otherHoursFix'], 1),
-                            'otherP4Count' => $row['otherCount4'],
-                            'totalP1to3Count' => $row['otherCount1And3'] + $row['serviceDeskCount1And3'] + $row['serverCareCount1And3'],
-                            'totalP4Count' => $row['otherCount4'] + $row['serviceDeskCount4']+ $row['prepayCount4'] + $row['serverCareCount4']
-                        )
-                    );
+                $nonEditableTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
-                    $textTemplate->parse('stats', 'srStatsBlock', true);
-                }
-                /*
-                End SR Performance Statistics
-                */
-                $textTemplate->set_block('page', 'serverBlock', 'servers');
+                $contractsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+                $contractsTemplate->set_file('contracts', 'CustomerReviewMeetingContractsSection.html');
 
-                $buCustomerItem->getServersByCustomerID($dsSearchForm->getValue('customerID'), $dsServer);
+                $contractsTemplate->set_var("serverContract",
+                    $this->getServerCareContractBody($customerId,
+                        $supportedUsersData['count']));
+                $contractsTemplate->set_var("serviceDeskContract", $this->getServiceDeskContractBody($customerId));
+                $contractsTemplate->set_var('prepayContract', $this->getPrepayContractBody($customerId));
 
-                while ($dsServer->fetchNext()) {
+                $contractsTemplate->parse('output', 'contracts', true);
 
-                    if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
-                        $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
-                    } else {
-                        $purchaseDate = '';
-                    }
+                $contractsBody = $contractsTemplate->get_var('output');
 
-                    $textTemplate->set_var(
-                        array(
-                            'itemDescription' => $dsServer->getValue('itemDescription'),
-                            'serialNo' => $dsServer->getValue('serialNo'),
-                            'serverName' => $dsServer->getValue('serverName'),
-                            'purchaseDate' => $purchaseDate,
-                        )
-                    );
+                $textTemplate->set_var('contracts', $contractsBody);
+                $textTemplate->set_var('24HourFlag',
+                    $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
+                $textTemplate->set_var('p1Incidents', $this->getP1IncidentsBody($customerId));
+                $textTemplate->set_var('startersAndLeavers',
+                    $this->getStartersAndLeaversBody(
+                        $customerId,
+                        $dsSearchForm->getValue('startYearMonth'),
+                        $dsSearchForm->getValue('endYearMonth')
+                    ));
+                $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
+                $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
 
-                    $textTemplate->parse('servers', 'serverBlock', true);
+//                /*
+//                End SR Performance Statistics
+//                */
+//                $textTemplate->set_block('page', 'serverBlock', 'servers');
+//
+//                $buCustomerItem->getServersByCustomerID($dsSearchForm->getValue('customerID'), $dsServer);
+//
+//                while ($dsServer->fetchNext()) {
+//
+//                    if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
+//                        $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
+//                    } else {
+//                        $purchaseDate = '';
+//                    }
+//
+//                    $textTemplate->set_var(
+//                        array(
+//                            'itemDescription' => $dsServer->getValue('itemDescription'),
+//                            'serialNo' => $dsServer->getValue('serialNo'),
+//                            'serverName' => $dsServer->getValue('serverName'),
+//                            'purchaseDate' => $purchaseDate,
+//                        )
+//                    );
+//
+//                    $textTemplate->parse('servers', 'serverBlock', true);
+//
+//                } // end while
 
-                } // end while
 
                 $textTemplate->set_block('page', 'managementReviewBlock', 'reviews');
 
@@ -229,41 +225,72 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $srCountByUser = $buServiceDeskReport->getIncidentsGroupedByUser();
 
-                $textTemplate->set_block('page', 'userBlock', 'users');
+                $nonEditableTemplate->set_block('page', 'userBlock', 'users');
 
                 while ($row = $srCountByUser->fetch_object()) {
 
-                    $textTemplate->set_var(
+                    $nonEditableTemplate->set_var(
                         array(
                             'srUserName' => $row->name,
                             'srCount' => $row->count
                         )
                     );
 
-                    $textTemplate->parse('users', 'userBlock', true);
+                    $nonEditableTemplate->parse('users', 'userBlock', true);
                 }
 
                 $srCountByRootCause = $buServiceDeskReport->getIncidentsGroupedByRootCause();
 
-                $textTemplate->set_block('page', 'rootCauseBlock', 'rootCauses');
+                $nonEditableTemplate->set_block('page', 'rootCauseBlock', 'rootCauses');
 
                 while ($row = $srCountByRootCause->fetch_object()) {
 
-                    $textTemplate->set_var(
+                    $nonEditableTemplate->set_var(
                         array(
                             'srRootCauseDescription' => $row->rootCauseDescription,
                             'srCount' => $row->count
                         )
                     );
 
-                    $textTemplate->parse('rootCauses', 'rootCauseBlock', true);
+                    $nonEditableTemplate->parse('rootCauses', 'rootCauseBlock', true);
 
                 }
 
 
+                $mainContacts = $buCustomer->getMainSupportContacts($customerId);
+                $string = '';
+                for ($i = 0; $i < count($mainContacts); $i++) {
+                    if ($i > 0) {
+                        //we have to append the comma ..or the "and" if this is the last one
+                        if ($i === count($mainContacts) - 1) {
+                            $string .= ' and ';
+                        } else {
+                            $string .= ', ';
+                        }
+
+                    }
+
+                    $string .= $mainContacts[$i]['firstName'] . ' ' . $mainContacts[$i]['lastName'];
+
+                }
+
+
+                $textTemplate->set_var('mainContacts', $string);
+
+                $buHeader = new BUHeader($this);
+                $buHeader->getHeader($dsHeader);
+                $textTemplate->set_var('customerReviewMeetingText',
+                    $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
+
                 $textTemplate->parse('output', 'page', true);
 
-                $meetingText = $textTemplate->get_var('output');
+                $nonEditableTemplate->parse('output', 'page', true);
+
+                $editableText = $textTemplate->get_var('output');
+
+                $nonEditableText = $nonEditableTemplate->get_var('output');
+                $graphData = $this->generateCharts($results, $customerId);
+
             }
 
         } else {
@@ -272,12 +299,13 @@ class CTCustomerReviewMeeting extends CTCNC
                 $dsSearchForm->setValue('startYearMonth', $_REQUEST['startYearMonth']);
                 $dsSearchForm->setValue('endYearMonth', $_REQUEST['endYearMonth']);
                 $dsSearchForm->setValue('meetingDate', $_REQUEST['meetingDateYmd']);
-                $meetingText = $_REQUEST['meetingText'];
+                $nonEditableText = $_REQUEST['nonEditableText'];
+                $editableText = $_REQUEST['editableText'];
+
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -297,6 +325,8 @@ class CTCustomerReviewMeeting extends CTCNC
             $customerString = $dsCustomer->getValue('name');
         }
 
+        echo "<script> var graphData = " . json_encode($graphData, JSON_NUMERIC_CHECK) . "</script>";
+
         $this->template->set_var(
             array(
                 'customerID' => $dsSearchForm->getValue('customerID'),
@@ -309,7 +339,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
                 'meetingDateYmd' => $dsSearchForm->getValue('meetingDate'),
                 'urlCustomerPopup' => $urlCustomerPopup,
-                'meetingText' => $meetingText,
+                'editableText' => $editableText,
+                'nonEditableText' => $nonEditableText,
                 'urlSubmit' => $urlSubmit,
                 'urlGeneratePdf' => $urlGeneratePdf,
             )
@@ -317,6 +348,60 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $this->template->parse('CONTENTS', 'CustomerReviewMeeting', true);
         $this->parsePage();
+    }
+
+    private function getServerCareContractBody($customerId, $supportContactsCount)
+    {
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
+
+        $serverCareContract = null;
+
+        if (!$datasetContracts->rowCount()) {
+            return $serverCareContractBody = "Server Care: None";
+        }
+        $datasetContracts->fetchNext();
+        $serverCareItemID = $datasetContracts->getValue("customerItemID");
+        $serverCareContractsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+        $serverCareContractsTemplate->set_file('serverCareContracts', 'CustomerReviewMeetingServerCare.html');
+        $serverCareContractsTemplate->set_var("contractDescription", $datasetContracts->getValue('itemDescription'));
+        $serverCareContractsTemplate->set_var("nextInvoice",
+            $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
+        $serverCareContractsTemplate->set_var('usersCount', $supportContactsCount);
+
+        $serverCareContractsTemplate->set_block('serverCareContracts', 'contractItemsBlock', 'items');
+        /** @var DataSet $dsServer */
+        $dsServer = null;
+
+        $BUCustomerItem->getServersByCustomerID($customerId, $dsServer);
+
+        while ($dsServer->fetchNext()) {
+
+            if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
+                $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
+            } else {
+                $purchaseDate = '';
+            }
+
+            $serverCareContractsTemplate->set_var(
+                array(
+                    'itemDescription' => $dsServer->getValue('itemDescription'),
+                    'serialNo' => $dsServer->getValue('serialNo'),
+                    'serverName' => $dsServer->getValue('serverName'),
+                    'purchaseDate' => $purchaseDate,
+                )
+            );
+
+            $serverCareContractsTemplate->parse('items', 'contractItemsBlock', true);
+
+        } // end while
+        $serverCareContractsTemplate->parse('output', 'serverCareContracts', true);
+
+        return $serverCareContractsTemplate->get_var('output');
+
     }
 
     /**
@@ -327,11 +412,28 @@ class CTCustomerReviewMeeting extends CTCNC
     function generatePdf()
     {
 
-        $this->buCustomerReviewMeeting->generateAgendaPdf(
+        $text = $_REQUEST['html'];
+
+        $agendaTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+        $agendaTemplate->set_file('page', 'CustomerReviewMeetingAgendaDocument.inc.html');
+
+        $agendaTemplate->set_var('htmlBody', $text);
+
+        $agendaTemplate->parse('output', 'page', true);
+
+
+        $html = $agendaTemplate->get_var('output');
+
+        $result = $this->buCustomerReviewMeeting->generateAgendaPdf(
             $_REQUEST['customerID'],
-            $_REQUEST['meetingText'],
+            $html,
             $_REQUEST['meetingDateYmd']
         );
+
+        if (!$result) {
+            return ["status" => "error", "description" => "Failed to generate files"];
+        }
 
         $this->buCustomerReviewMeeting->generateSalesPdf(
             $_REQUEST['customerID'],
@@ -339,10 +441,445 @@ class CTCustomerReviewMeeting extends CTCNC
             $_REQUEST['endYearMonth'],
             $_REQUEST['meetingDateYmd']
         );
+        return ["status" => "ok"];
 
-        $this->search();  // redisplays text
+//        $this->search();  // redisplays text
 
+    }
+
+    private function getServiceDeskContractBody($customerId)
+    {
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServiceDeskValidContractsByCustomerID($customerId, $datasetContracts);
+
+        if (!$datasetContracts->rowCount()) {
+            return $this->getPrepayContractBody($customerId);
+        }
+        $datasetContracts->fetchNext();
+        $users = $datasetContracts->getValue('users');
+        $description = $datasetContracts->getValue('itemDescription');
+        $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate');
+        return "<p>User Support Contract: $description for $users users</p><p>Next Invoice: $invoicePeriod</p>";
+    }
+
+    private function getPrepayContractBody($customerId)
+    {
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getPrepayContractByCustomerID($customerId, $datasetContracts);
+        if (!$datasetContracts->rowCount()) {
+            return "T&M User Support Only";
+        }
+        $datasetContracts->fetchNext();
+        return "<p>Pre-Pay Contract</p>";
+    }
+
+    private function getP1IncidentsBody($customerId)
+    {
+        $dbeProblem = new DBEJProblem($this);
+
+        $dbeProblem->getP1byCustomerIdLast30Days($customerId);
+
+
+        if (!$dbeProblem->rowCount()) {
+            return "None";
+        }
+
+        $p1IncidentsTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+        $p1IncidentsTemplate->set_file('p1Incidents', 'CustomerReviewMeetingP1Incidents.html');
+
+        $p1IncidentsTemplate->set_block('p1Incidents', 'incidentsBlock', 'items');
+
+        while ($dbeProblem->fetchNext()) {
+
+            $dateRaised = $dbeProblem->getValue(DBEJProblem::dateRaised);
+            $dateFixed = $dbeProblem->getValue(DBEJProblem::fixedDate);
+            $slaResponse = $dbeProblem->getValue(DBEJProblem::slaResponseHours);
+            $respondedHours = $dbeProblem->getValue(DBEJProblem::respondedHours);
+
+            $p1IncidentsTemplate->set_var(
+                [
+                    "id" => $dbeProblem->getValue(DBEJProblem::problemID),
+                    "summary" => $dbeProblem->getValue(DBEJProblem::reason),
+                    "outcome" => $dbeProblem->getValue(DBEJProblem::lastReason),
+                    "SLA" => $respondedHours > $slaResponse ? "Not Achieved" : "Achieved",
+                ]
+            );
+
+            $p1IncidentsTemplate->parse('items', 'incidentsBlock', true);
+        }
+
+        $p1IncidentsTemplate->parse('output', 'p1Incidents', true);
+
+        return $p1IncidentsTemplate->get_var('output');
+    }
+
+    private function getStartersAndLeaversBody($customerId, $startYearMonth, $endYearMonth)
+    {
+        $starterSR = new DBEJProblem($this);
+        $starterSR->getStartersSRByCustomerIDInDateRange($customerId, $startYearMonth, $endYearMonth);
+
+        $leaverSR = new DBEJProblem($this);
+        $leaverSR->getLeaversSRByCustomerIDInDateRange($customerId, $startYearMonth, $endYearMonth);
+
+        if (!$starterSR->rowCount() && !$leaverSR->rowCount()) {
+            return "None";
+        }
+
+        $startersAndLeaversTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+
+        $startersAndLeaversTemplate->set_file('startersAndLeavers', 'CustomerReviewMeetingStartersAndLeavers.html');
+
+        $startersAndLeaversTemplate->set_block('startersAndLeavers', 'startersBlock', 'items');
+
+        if (!$starterSR->rowCount()) {
+            $startersAndLeaversTemplate->parse('items', 'startersBlock', true);
+        } else {
+            $startersAndLeaversTemplate->set_var('startersQty', $starterSR->rowCount());
+            $workingHours = 0;
+            while ($starterSR->fetchNext()) {
+                $workingHours += $starterSR->getValue(DBEJProblem::totalActivityDurationHours);
+            }
+            $avgHours = $workingHours / $starterSR->rowCount();
+            $startersAndLeaversTemplate->set_var('startersAvgMinutes', round($avgHours * 60, 0));
+
+            $startersAndLeaversTemplate->parse('items', 'startersBlock', true);
+        }
+
+        $startersAndLeaversTemplate->set_block('startersAndLeavers', 'leaversBlock', 'leaversItems');
+
+        if (!$leaverSR->rowCount()) {
+            $startersAndLeaversTemplate->parse('leaversItems', 'leaversBlock', true);
+        } else {
+            $startersAndLeaversTemplate->set_var('leaversQty', $leaverSR->rowCount());
+            $workingHours = 0;
+            while ($leaverSR->fetchNext()) {
+                $workingHours += $leaverSR->getValue(DBEJProblem::totalActivityDurationHours);
+            }
+            $avgHours = $workingHours / $leaverSR->rowCount();
+            $startersAndLeaversTemplate->set_var('leaversAvgMinutes', round($avgHours * 60, 0));
+
+            $startersAndLeaversTemplate->parse('leaversItems', 'leaversBlock', true);
+        }
+
+
+        $startersAndLeaversTemplate->parse('output', 'startersAndLeavers', true);
+
+        return $startersAndLeaversTemplate->get_var('output');
+    }
+
+    private function getThirdPartyServerAccessBody($customerId)
+    {
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
+
+        $thirdPartyServerAccess = null;
+
+        if ($datasetContracts->rowCount()) {
+            $test = new BUCustomerItem($this);
+            $test->getServerWatchContractByCustomerID($customerId, $datasetServerWatch);
+            if (!$datasetServerWatch->rowCount()) {
+                $thirdPartyServerAccess = "<h2>Third-Party Server Access</h2>";
+            }
+
+        }
+        return $thirdPartyServerAccess;
+    }
+
+    private function generateCharts($data, $customerId)
+    {
+
+        $serverCareIncidents = [
+            "title" => "ServerCare Incidents",
+            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
+            "data" => []
+        ];
+
+        $serviceDesk = [
+            "title" => "ServiceDesk/Pre-Pay Incidents",
+            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
+            "data" => []
+        ];
+
+        $otherContracts = [
+            "title" => "Other Contract Incidents",
+            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
+            "data" => []
+        ];
+
+        $totalSR = [
+            "title" => "Total SR's",
+            "columns" => ["Dates", "P1-3", "P4",],
+            "data" => []
+        ];
+
+
+        foreach ($data as $datum) {
+
+
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['serverCareCount1And3'],
+                number_format($datum['serverCareHoursResponded'], 1),
+                $datum['serverCareCount4']
+            ];
+
+            $serverCareIncidents['data'][] = $row;
+
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
+                number_format($datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'], 1),
+                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
+            ];
+
+            $serviceDesk['data'][] = $row;
+
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['otherCount1And3'],
+                number_format($datum['otherHoursResponded'], 1),
+                $datum['otherCount4'],
+            ];
+
+            $otherContracts['data'][] = $row;
+
+            $row = [
+                substr($datum['monthName'], 0, 3) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $totalSR['data'][] = $row;
+        }
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
+
+        return ["serverCareIncidents" => $serverCareIncidents, "serviceDesk" => $serviceDesk, "otherContracts" => $otherContracts, "totalSR" => $totalSR, "renderServerCare" => !!$datasetContracts->rowCount()];
+    }
+
+    private function generateGraph($data, $dataX)
+    {
+        JpGraph\JpGraph::load();
+        JpGraph\JpGraph::module('line');
+        $graph = new Graph(700, 400);
+        $graph->title->Set($data['title']);
+        $graph->title->SetFont(FF_ARIAL, FS_BOLD, 12);
+        $graph->title->SetColor('white');
+        $graph->SetScale("textlin");
+        $graph->SetMargin(80, 70, 60, 80);
+        $graph->xaxis->setTickLabels($dataX);
+        $graph->xaxis->setLabelAngle(45);
+
+// Make sure that the X-axis is always at the bottom of the scale
+// (By default the X-axis is alwys positioned at Y=0 so if the scale
+// doesn't happen to include 0 the axis will not be shown)
+        $graph->xaxis->SetPos('min');
+
+// Use Times font
+        $graph->xaxis->SetFont(FF_ARIAL, FS_NORMAL, 8);
+        $graph->yaxis->SetFont(FF_ARIAL, FS_NORMAL, 9);
+//
+//// Set colors for axis
+        $graph->xaxis->SetColor('black');
+        $graph->yaxis->SetColor('black');
+// Show ticks outwards
+        $graph->xaxis->SetTickSide(SIDE_DOWN);
+        $graph->xaxis->SetLabelMargin(6);
+        $graph->yaxis->SetTickSide(SIDE_LEFT);
+
+// Setup a filled y-grid
+//$graph->ygrid->SetFill(true,'darkgray:1.55@0.7','darkgray:1.6@0.7');
+//        $graph->ygrid->SetStyle('dotted');
+//        $graph->xgrid->SetStyle('dashed');
+
+// Create the plot line
+        $secondY = false;
+        foreach ($data["plots"] as $key => $plot) {
+
+            $p1 = new LinePlot($plot["data"]);
+            $p1->SetLegend($plot["legend"]);
+            $p1->SetStyle('solid');
+            if ($plot["2ndAxis"]) {
+                $secondY = true;
+                $graph->AddY2($p1);
+            } else {
+                $graph->Add($p1);
+            }
+            $p1->SetWeight(2);
+        }
+
+        if ($secondY) {
+            $graph->SetY2Scale("lin");
+            $graph->y2axis->SetColor('black');
+        }
+
+        $graph->legend->SetPos(0.5, 0.05, 'center');
+        $graph->img->SetAntiAliasing(true);
+        $img = $graph->Stroke('__handle');
+        ob_start();
+        imagejpeg($img);
+        $image_data = ob_get_contents();
+        ob_end_clean();
+        $dataUri = "data:image/jpeg;base64," . base64_encode($image_data);
+        return $dataUri;
+    }
+
+    private function getSupportedUsersData(BUContact $buContact, $customerId, $customerName)
+    {
+        /** @var DataSet $dsSupportContact */
+        $dsSupportContact = null;
+        $buContact->getSupportContacts($dsSupportContact, $customerId);
+
+        $supportContacts = [];
+
+        $duplicates = [];
+        $userMap = [];
+
+        while ($dsSupportContact->fetchNext()) {
+
+            $firstName = $dsSupportContact->getValue('firstName');
+            $lastName = $dsSupportContact->getValue('lastName');
+            $userId = $dsSupportContact->getValue('contactID');
+            $key = strtolower($firstName . $lastName);
+            if (isset($userMap[$key])) {
+
+                if (!isset($duplicates[$userMap[$key]['id']])) {
+                    $duplicates[$userMap[$key]['id']] = $userMap[$key];
+                }
+
+                $duplicates[$userId] = [
+                    "firstName" => $firstName,
+                    "lastName" => $lastName,
+                    "id" => $userId,
+                    "customerId" => $customerId
+                ];
+            } else {
+                $userMap[$key] = [
+                    "firstName" => $firstName,
+                    "lastName" => $lastName,
+                    "id" => $userId,
+                    "customerId" => $customerId
+                ];
+            }
+
+
+            $supportContacts[] = [
+                "firstName" => $firstName,
+                "lastName" => $lastName
+            ];
+        }
+
+        if (count($duplicates)) {
+            // send email to sales@cnc-ltd.co.uk with the list of duplicates
+            $buMail = new BUMail($this);
+
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+            $senderName = 'CNC Support Department';
+
+            $toEmail = 'sales@cnc-ltd.co.uk';
+
+            $template = new Template($GLOBALS ["cfg"]["path_templates"], "remove");
+            $template->set_file('page', 'CustomerReviewMeetingContactDuplicates.html');
+
+            $template->set_var('customerName', $customerName);
+
+            $template->set_block('page', 'contactBlock', 'contacts');
+
+            foreach ($duplicates as $key => $row) {
+
+                $template->set_var(
+                    array(
+                        'contactID' => $row['id'],
+                        'contactFirstName' => $row['firstName'],
+                        'contactLastName' => $row['lastName'],
+
+                    )
+                );
+
+                $template->parse('contacts', 'contactBlock', true);
+            }
+
+            $template->parse('output', 'page', true);
+
+            $body = $template->get_var('output');
+
+            $subject = 'Possible duplicated customer contacts';
+
+            $hdrs = array(
+                'From' => $senderEmail,
+                'Subject' => $subject,
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body,
+                true
+            );
+
+        }
+        // we need to know how many contacts are there
+        $supportContactInfo = "";
+        for ($i = 0; $i < count($supportContacts); $i++) {
+            $supportContactInfo .= "<li>" . $supportContacts[$i]['firstName'] . ' ' . $supportContacts[$i]['lastName'] . "</li>";
+        }
+        return [
+            "data" => $supportContactInfo,
+            "count" => count($supportContacts)
+        ];
+    }
+
+    private function getReviewMeetingFrequencyBody($dsCustomer)
+    {
+        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
+
+        switch ($value) {
+            case 3:
+                $frequency = 'Quarterly';
+                break;
+            case 6:
+                $frequency = 'Six-monthly';
+                break;
+            case 12:
+                $frequency = 'Annually';
+                break;
+            default:
+                $frequency = 'N/A';
+        }
+
+        return "<h2>Review Meeting Frequency - " . $frequency."</h2>";
+    }
+
+    private function getMainContacts(BUContact $buContact)
+    {
+        $buContact->getMainContacts();
     }
 
 } // end of class
 ?>
+

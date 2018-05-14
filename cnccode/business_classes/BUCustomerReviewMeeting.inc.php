@@ -14,6 +14,8 @@ require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
+use Dompdf\Dompdf;
+
 class BUCustomerReviewMeeting extends Business
 {
 
@@ -240,41 +242,44 @@ class BUCustomerReviewMeeting extends Business
 
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-        /*
-            require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+        require_once BASE_DRIVE . '/vendor/autoload.php';
 
-            $dompdf = new DOMPDF();
-            $dompdf->set_paper( 'A4', 'portrait' );
+        $fileId = uniqid();
+        $tempFilePath = 'c:\\Temp\\' . $fileId . '.html';
 
-            $dompdf->set_option( 'enable_remote', true);
+        file_put_contents($tempFilePath, $htmlPage);
 
-            $dompdf->set_base_path( BASE_DRIVE . '/htdocs' );   // so we can get the images and css
+        $meetingDate = new \DateTime($meetingDate);
 
-            $dompdf->load_html( $htmlPage );
+        $meetingDateDmy = $meetingDate->format('d-m-Y');
+        $path = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy;
+        $filePath = $path . '.pdf';
 
-            $dompdf->render();
-          */
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+        $descriptors = array(
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'a'),
+        );
 
-        /*
-            $dompdf->add_info('Title',  'Agenda ' . $meetingDateDmy );
+        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
+        $process = proc_open($command, $descriptors, $pipes);
 
-            $dompdf->add_info('Author', 'CNC Ltd' );
+        if (is_resource($process)) {
+            $_stdOut = stream_get_contents($pipes[1]);
+            $_stdErr = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $_exitCode = proc_close($process);
 
-            $dompdf->add_info('Subject', 'Renewal Report' );
-
-            $pdfString = $dompdf->output();
-
-            $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
-        */
-
-        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
-
-        $handle = fopen($filePath, 'w');
-
-//    fwrite( $handle, $pdfString );
-        fwrite($handle, $htmlPage);
-
+            if ($_exitCode !== 0) {
+                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
+            }
+        }
+        if ($_error) {
+            unlink($tempFilePath);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -460,20 +465,25 @@ class BUCustomerReviewMeeting extends Business
 
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-        require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+        require_once BASE_DRIVE . '/vendor/autoload.php';
 
-        $dompdf = new DOMPDF();
-        $dompdf->set_paper('A4', 'portrait');
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($options);
 
-        $dompdf->set_option('enable_remote', true);
+        $dompdf->setPaper('A4', 'portrait');
 
-        $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+        $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
-        $dompdf->load_html($htmlPage);
+        $htmlPage = mb_convert_encoding($htmlPage, 'HTML-ENTITIES', 'UTF-8');
+
+        $dompdf->loadHtml($htmlPage);
 
         $dompdf->render();
 
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
+                0,
+                4);
 
         $dompdf->add_info('Title', 'Renewal Report ' . $meetingDateDmy);
 
@@ -483,12 +493,33 @@ class BUCustomerReviewMeeting extends Business
 
         $pdfString = $dompdf->output();
 
+        $meetingDate = new \DateTime($meetingDate);
+
+        $meetingDateDmy = $meetingDate->format('d-m-Y');
+
         $filePath = $reviewMeetingFolderPath . '/Renewal Report ' . $meetingDateDmy . '.pdf';
 
         $handle = fopen($filePath, 'w');
 
         fwrite($handle, $pdfString);
 
+        $this->pdfEncrypt($filePath, $filePath, 'RenewalOwner2018', 'CNCShoreham2018');
+    }
+
+    function pdfEncrypt ($origFile, $destFile, $owner_password=null, $user_password=null, $permissions = ['print']){
+        $pdf = new \setasign\FpdiProtection\FpdiProtection();
+        $pagecount = $pdf->setSourceFile($origFile);
+        // copy all pages from the old unprotected pdf in the new one
+        for ($loop = 1; $loop <= $pagecount; $loop++) {
+            $tplidx = $pdf->importPage($loop);
+            $pdf->addPage();
+            $dim = $pdf->useTemplate($tplidx);
+            //var_dump($dim);exit;
+        }
+        // Allow for array('print', 'modify', 'copy', 'annot-forms');
+        $pdf->SetProtection($permissions,$user_password, $owner_password);
+        $pdf->Output($destFile,'F'); // F write, D download
+        return $destFile;
     }
 }
 

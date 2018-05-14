@@ -565,6 +565,30 @@ class BUCustomer extends Business
 
     }
 
+    /**
+     * @param $customerID
+     * @return array
+     */
+    function getMainSupportContacts($customerID)
+    {
+        $this->setMethodName('getMainSupportContacts');
+
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+
+        $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
+        $contacts = [];
+        while ($this->dbeContact->fetchNext()) {
+            $contacts[] = [
+                "firstName" => $this->dbeContact->getValue('firstName'),
+                "lastName" => $this->dbeContact->getValue('lastName')
+            ];
+        }
+
+        return $contacts;
+    }
+
     function createCustomerFolder($customerID)
     {
 

@@ -298,22 +298,21 @@ class CTRenewalReport extends CTCNC
 
             $output = $this->template->get("CONTENTS");
 
-            /*
-            Generate the PDF
-            */
-// include DOMPDF's default configuration
-            require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+            require_once BASE_DRIVE . '/vendor/autoload.php';
 
-            $dompdf = new DOMPDF();
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+            $dompdf = new \Dompdf\Dompdf($options);
+
 
             /* @todo: set template dir */
-            $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+            $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
-            $dompdf->load_html($output);
+            $dompdf->loadHtml($output);
 
             set_time_limit(120);                           // it may take some time!
 
-            $dompdf->set_paper('a4', 'landscape');
+            $dompdf->setPaper('a4', 'landscape');
 
             $dompdf->render();
 

@@ -873,5 +873,6 @@ class BUCustomer extends Business
         return ($dbePortalCustomerDocument->insertRow());
     }
 
+
 }// End of class
 ?>

@@ -4421,6 +4421,26 @@ customer with the past 8 hours email to GL
         $dsResults->replicate($dsAssignedResults);
     }
 
+    function getProblemsByCustomerID($customerID, $priority = 1, $days = 30){
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getRowsByQueueNo($priority, true); // unassigned first
+
+        $this->getData($dbeJProblem, $dsResults);
+
+        $dsResults->sortAscending('dashboardSortColumn', SORT_NUMERIC);
+
+        $dbeJProblem->getRowsByQueueNo($priority);       // then assigned
+
+        $this->getData($dbeJProblem, $dsAssignedResults);
+
+        $dsAssignedResults->sortAscending('dashboardSortColumn', SORT_NUMERIC);
+
+        $dsResults->setClearRowsBeforeReplicateOff();
+
+        $dsResults->replicate($dsAssignedResults);
+    }
+
     /**
      * Get critical problems
      *

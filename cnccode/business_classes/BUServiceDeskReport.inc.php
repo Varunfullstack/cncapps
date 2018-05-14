@@ -280,7 +280,7 @@ class BUServiceDeskReport extends Business
 
         $sql .=
             " WHERE
-          DATE(pro_date_raised) BETWEEN '" . $this->startDate . "' AND '" . $this->endDate . "'";
+          DATE(pro_date_raised) BETWEEN '" . $this->startDate . "' AND '" . $this->endDate . "' and con_contno <> 0";
 
         $sql .= " AND pro_status =  'C'";
 
@@ -293,7 +293,6 @@ class BUServiceDeskReport extends Business
           pro_contno
         ORDER BY
           count DESC";
-
 
         return $this->db->query($sql);
 
@@ -457,59 +456,80 @@ class BUServiceDeskReport extends Business
         $fields['totalIncidentsMissedSla'] = $this->getCountIncidents(array('sla' => 'Y', 'withinSla' => 'N'));
         $fields['totalIncidentsMissedSlaYtd'] = $this->getCountIncidents(array('sla' => 'Y', 'withinSla' => 'N', 'ytd' => true));
 
-        $fields['percentIncidentsMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsMissedSla'], $fields['totalIncidentsSla']);
-        $fields['percentIncidentsMissedSlaYtd'] = BUServiceDeskReport::getPercent($fields['totalIncidentsMissedSla'], $fields['totalIncidentsSla']);
+        $fields['percentIncidentsMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsMissedSla'],
+                                                                               $fields['totalIncidentsSla']);
+        $fields['percentIncidentsMissedSlaYtd'] = BUServiceDeskReport::getPercent($fields['totalIncidentsMissedSla'],
+                                                                                  $fields['totalIncidentsSla']);
 
-        $fields['percentIncidentsWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsWithinSla'], $fields['totalIncidentsSla']);
-        $fields['percentIncidentsWithinSlaYtd'] = BUServiceDeskReport::getPercent($fields['totalIncidentsWithinSlaYtd'], $fields['totalIncidentsSlaYtd']);
+        $fields['percentIncidentsWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsWithinSla'],
+                                                                               $fields['totalIncidentsSla']);
+        $fields['percentIncidentsWithinSlaYtd'] = BUServiceDeskReport::getPercent($fields['totalIncidentsWithinSlaYtd'],
+                                                                                  $fields['totalIncidentsSlaYtd']);
 
-        $fields['aveResponseHours'] = BUServiceDeskReport::getAve($this->getResponseHours(array('sla' => 'Y')), $fields['totalIncidentsSla']);
-        $fields['aveResponseHoursYtd'] = BUServiceDeskReport::getAve($this->getResponseHours(array('sla' => 'Y', 'ytd' => true)), $fields['totalIncidentsSlaYtd']);
+        $fields['aveResponseHours'] = BUServiceDeskReport::getAve($this->getResponseHours(array('sla' => 'Y')),
+                                                                  $fields['totalIncidentsSla']);
+        $fields['aveResponseHoursYtd'] = BUServiceDeskReport::getAve($this->getResponseHours(array('sla' => 'Y', 'ytd' => true)),
+                                                                     $fields['totalIncidentsSlaYtd']);
 
-        $fields['aveFixHours'] = BUServiceDeskReport::getAve($this->getFixHours(array('sla' => 'Y')), $fields['totalIncidentsSla']);
-        $fields['aveFixHoursYtd'] = BUServiceDeskReport::getAve($this->getFixHours(array('sla' => 'Y', 'ytd' => true)), $fields['totalIncidentsSlaYtd']);
+        $fields['aveFixHours'] = BUServiceDeskReport::getAve($this->getFixHours(array('sla' => 'Y')),
+                                                             $fields['totalIncidentsSla']);
+        $fields['aveFixHoursYtd'] = BUServiceDeskReport::getAve($this->getFixHours(array('sla' => 'Y', 'ytd' => true)),
+                                                                $fields['totalIncidentsSlaYtd']);
 
         $fields['firstTimeFix'] = $this->getCountFirstTimeFix(array());
         $fields['firstTimeFixYtd'] = $this->getCountFirstTimeFix(array('ytd' => true));
 
-        $fields['percentFirstTimeFix'] = BUServiceDeskReport::getPercent($fields['firstTimeFix'], $fields['totalIncidents']);
-        $fields['percentFirstTimeFixYtd'] = BUServiceDeskReport::getPercent($fields['firstTimeFixYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentFirstTimeFix'] = BUServiceDeskReport::getPercent($fields['firstTimeFix'],
+                                                                         $fields['totalIncidents']);
+        $fields['percentFirstTimeFixYtd'] = BUServiceDeskReport::getPercent($fields['firstTimeFixYtd'],
+                                                                            $fields['totalIncidentsYtd']);
 
         $fields['escalations'] = $this->getCountEscalations(array());
         $fields['escalationsYtd'] = $this->getCountEscalations(array('ytd' => true));
 
-        $fields['percentEscalations'] = BUServiceDeskReport::getPercent($fields['escalations'], $fields['totalIncidents']);
-        $fields['percentEscalationsYtd'] = BUServiceDeskReport::getPercent($fields['escalationsYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentEscalations'] = BUServiceDeskReport::getPercent($fields['escalations'],
+                                                                        $fields['totalIncidents']);
+        $fields['percentEscalationsYtd'] = BUServiceDeskReport::getPercent($fields['escalationsYtd'],
+                                                                           $fields['totalIncidentsYtd']);
 
         $fields['reopened'] = $this->getCountReopened(array());
         $fields['reopenedYtd'] = $this->getCountReopened(array('ytd' => true));
 
         $fields['percentReopened'] = BUServiceDeskReport::getPercent($fields['reopened'], $fields['totalIncidents']);
-        $fields['percentReopenedYtd'] = BUServiceDeskReport::getPercent($fields['reopenedYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentReopenedYtd'] = BUServiceDeskReport::getPercent($fields['reopenedYtd'],
+                                                                        $fields['totalIncidentsYtd']);
 
         $fields['severityOne'] = $this->getCountIncidents(array('priority' => 1));
         $fields['severityOneYtd'] = $this->getCountIncidents(array('priority' => 1, 'ytd' => true));
 
-        $fields['percentSeverityOne'] = BUServiceDeskReport::getPercent($fields['severityOne'], $fields['totalIncidents']);
-        $fields['percentSeverityOneYtd'] = BUServiceDeskReport::getPercent($fields['severityOneYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentSeverityOne'] = BUServiceDeskReport::getPercent($fields['severityOne'],
+                                                                        $fields['totalIncidents']);
+        $fields['percentSeverityOneYtd'] = BUServiceDeskReport::getPercent($fields['severityOneYtd'],
+                                                                           $fields['totalIncidentsYtd']);
 
         $fields['severityTwo'] = $this->getCountIncidents(array('priority' => 2));
         $fields['severityTwoYtd'] = $this->getCountIncidents(array('priority' => 2, 'ytd' => true));
 
-        $fields['percentSeverityTwo'] = BUServiceDeskReport::getPercent($fields['severityTwo'], $fields['totalIncidents']);
-        $fields['percentSeverityTwoYtd'] = BUServiceDeskReport::getPercent($fields['severityTwoYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentSeverityTwo'] = BUServiceDeskReport::getPercent($fields['severityTwo'],
+                                                                        $fields['totalIncidents']);
+        $fields['percentSeverityTwoYtd'] = BUServiceDeskReport::getPercent($fields['severityTwoYtd'],
+                                                                           $fields['totalIncidentsYtd']);
 
         $fields['severityThree'] = $this->getCountIncidents(array('priority' => 3));
         $fields['severityThreeYtd'] = $this->getCountIncidents(array('priority' => 3, 'ytd' => true));
 
-        $fields['percentSeverityThree'] = BUServiceDeskReport::getPercent($fields['severityThree'], $fields['totalIncidents']);
-        $fields['percentSeverityThreeYtd'] = BUServiceDeskReport::getPercent($fields['severityThreeYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentSeverityThree'] = BUServiceDeskReport::getPercent($fields['severityThree'],
+                                                                          $fields['totalIncidents']);
+        $fields['percentSeverityThreeYtd'] = BUServiceDeskReport::getPercent($fields['severityThreeYtd'],
+                                                                             $fields['totalIncidentsYtd']);
 
         $fields['severityFour'] = $this->getCountIncidents(array('priority' => 4));
         $fields['severityFourYtd'] = $this->getCountIncidents(array('priority' => 4, 'ytd' => true));
 
-        $fields['percentSeverityFour'] = BUServiceDeskReport::getPercent($fields['severityFour'], $fields['totalIncidents']);
-        $fields['percentSeverityFourYtd'] = BUServiceDeskReport::getPercent($fields['severityFourYtd'], $fields['totalIncidentsYtd']);
+        $fields['percentSeverityFour'] = BUServiceDeskReport::getPercent($fields['severityFour'],
+                                                                         $fields['totalIncidents']);
+        $fields['percentSeverityFourYtd'] = BUServiceDeskReport::getPercent($fields['severityFourYtd'],
+                                                                            $fields['totalIncidentsYtd']);
 
         foreach ($fields as $key => $value) {
 
@@ -696,105 +716,157 @@ class BUServiceDeskReport extends Business
         $fields['totalIncidentsPpMissedSla'] = $this->getCountIncidents(array('contractKey' => 'PP', 'sla' => 'Y', 'withinSla' => 'N'));
         $fields['totalIncidentsTmMissedSla'] = $this->getCountIncidents(array('contractKey' => 'TM', 'sla' => 'Y', 'withinSla' => 'N'));
 
-        $fields['percentIncidentsSdMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsSdMissedSla'], $fields['totalIncidentsSdSla']);
-        $fields['percentIncidentsScMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsScMissedSla'], $fields['totalIncidentsScSla']);
-        $fields['percentIncidentsPpMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsPpMissedSla'], $fields['totalIncidentsPpSla']);
-        $fields['percentIncidentsTmMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsTmMissedSla'], $fields['totalIncidentsTmSla']);
+        $fields['percentIncidentsSdMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsSdMissedSla'],
+                                                                                 $fields['totalIncidentsSdSla']);
+        $fields['percentIncidentsScMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsScMissedSla'],
+                                                                                 $fields['totalIncidentsScSla']);
+        $fields['percentIncidentsPpMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsPpMissedSla'],
+                                                                                 $fields['totalIncidentsPpSla']);
+        $fields['percentIncidentsTmMissedSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsTmMissedSla'],
+                                                                                 $fields['totalIncidentsTmSla']);
 
-        $fields['percentIncidentsSdWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsSdWithinSla'], $fields['totalIncidentsSdSla']);
-        $fields['percentIncidentsScWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsScWithinSla'], $fields['totalIncidentsScSla']);
-        $fields['percentIncidentsPpWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsPpWithinSla'], $fields['totalIncidentsPpSla']);
-        $fields['percentIncidentsTmWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsTmWithinSla'], $fields['totalIncidentsTmSla']);
+        $fields['percentIncidentsSdWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsSdWithinSla'],
+                                                                                 $fields['totalIncidentsSdSla']);
+        $fields['percentIncidentsScWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsScWithinSla'],
+                                                                                 $fields['totalIncidentsScSla']);
+        $fields['percentIncidentsPpWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsPpWithinSla'],
+                                                                                 $fields['totalIncidentsPpSla']);
+        $fields['percentIncidentsTmWithinSla'] = BUServiceDeskReport::getPercent($fields['totalIncidentsTmWithinSla'],
+                                                                                 $fields['totalIncidentsTmSla']);
 
-        $fields['aveResponseHoursSdSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SD', 'sla' => 'Y')), $fields['totalIncidentsSdSla']);
-        $fields['aveResponseHoursScSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SC', 'sla' => 'Y')), $fields['totalIncidentsScSla']);
-        $fields['aveResponseHoursPpSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'PP', 'sla' => 'Y')), $fields['totalIncidentsPpSla']);
-        $fields['aveResponseHoursTmSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'TM', 'sla' => 'Y')), $fields['totalIncidentsTmSla']);
+        $fields['aveResponseHoursSdSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SD', 'sla' => 'Y')),
+                                                                       $fields['totalIncidentsSdSla']);
+        $fields['aveResponseHoursScSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SC', 'sla' => 'Y')),
+                                                                       $fields['totalIncidentsScSla']);
+        $fields['aveResponseHoursPpSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'PP', 'sla' => 'Y')),
+                                                                       $fields['totalIncidentsPpSla']);
+        $fields['aveResponseHoursTmSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'TM', 'sla' => 'Y')),
+                                                                       $fields['totalIncidentsTmSla']);
 
-        $fields['aveResponseHoursSdNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SD', 'sla' => 'N')), $fields['totalIncidentsSdNonSla']);
-        $fields['aveResponseHoursScNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SC', 'sla' => 'N')), $fields['totalIncidentsScNonSla']);
-        $fields['aveResponseHoursPpNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'PP', 'sla' => 'N')), $fields['totalIncidentsPpNonSla']);
-        $fields['aveResponseHoursTmNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'TM', 'sla' => 'N')), $fields['totalIncidentsTmNonSla']);
+        $fields['aveResponseHoursSdNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SD', 'sla' => 'N')),
+                                                                          $fields['totalIncidentsSdNonSla']);
+        $fields['aveResponseHoursScNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'SC', 'sla' => 'N')),
+                                                                          $fields['totalIncidentsScNonSla']);
+        $fields['aveResponseHoursPpNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'PP', 'sla' => 'N')),
+                                                                          $fields['totalIncidentsPpNonSla']);
+        $fields['aveResponseHoursTmNonSla'] = BUServiceDeskReport::getAve($this->getResponseHours(array('contractKey' => 'TM', 'sla' => 'N')),
+                                                                          $fields['totalIncidentsTmNonSla']);
 
-        $fields['aveFixHoursSdSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SD', 'sla' => 'Y')), $fields['totalIncidentsSdSla']);
-        $fields['aveFixHoursScSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SC', 'sla' => 'Y')), $fields['totalIncidentsScSla']);
-        $fields['aveFixHoursPpSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'PP', 'sla' => 'Y')), $fields['totalIncidentsPpSla']);
-        $fields['aveFixHoursTmSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'TM', 'sla' => 'Y')), $fields['totalIncidentsTmSla']);
+        $fields['aveFixHoursSdSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SD', 'sla' => 'Y')),
+                                                                  $fields['totalIncidentsSdSla']);
+        $fields['aveFixHoursScSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SC', 'sla' => 'Y')),
+                                                                  $fields['totalIncidentsScSla']);
+        $fields['aveFixHoursPpSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'PP', 'sla' => 'Y')),
+                                                                  $fields['totalIncidentsPpSla']);
+        $fields['aveFixHoursTmSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'TM', 'sla' => 'Y')),
+                                                                  $fields['totalIncidentsTmSla']);
 
-        $fields['aveFixHoursSdNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SD', 'sla' => 'N')), $fields['totalIncidentsSdNonSla']);
-        $fields['aveFixHoursScNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SC', 'sla' => 'N')), $fields['totalIncidentsScNonSla']);
-        $fields['aveFixHoursPpNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'PP', 'sla' => 'N')), $fields['totalIncidentsPpNonSla']);
-        $fields['aveFixHoursTmNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'TM', 'sla' => 'N')), $fields['totalIncidentsTmNonSla']);
+        $fields['aveFixHoursSdNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SD', 'sla' => 'N')),
+                                                                     $fields['totalIncidentsSdNonSla']);
+        $fields['aveFixHoursScNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'SC', 'sla' => 'N')),
+                                                                     $fields['totalIncidentsScNonSla']);
+        $fields['aveFixHoursPpNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'PP', 'sla' => 'N')),
+                                                                     $fields['totalIncidentsPpNonSla']);
+        $fields['aveFixHoursTmNonSla'] = BUServiceDeskReport::getAve($this->getFixHours(array('contractKey' => 'TM', 'sla' => 'N')),
+                                                                     $fields['totalIncidentsTmNonSla']);
 
         $fields['firstTimeFixSd'] = $this->getCountFirstTimeFix(array('contractKey' => 'SD'));
         $fields['firstTimeFixSc'] = $this->getCountFirstTimeFix(array('contractKey' => 'SC'));
         $fields['firstTimeFixPp'] = $this->getCountFirstTimeFix(array('contractKey' => 'PP'));
         $fields['firstTimeFixTm'] = $this->getCountFirstTimeFix(array('contractKey' => 'TM'));
 
-        $fields['percentFirstTimeFixSd'] = BUServiceDeskReport::getPercent($fields['firstTimeFixSd'], $fields['totalIncidentsSd']);
-        $fields['percentFirstTimeFixSc'] = BUServiceDeskReport::getPercent($fields['firstTimeFixSc'], $fields['totalIncidentsSc']);
-        $fields['percentFirstTimeFixPp'] = BUServiceDeskReport::getPercent($fields['firstTimeFixPp'], $fields['totalIncidentsPp']);
-        $fields['percentFirstTimeFixTm'] = BUServiceDeskReport::getPercent($fields['firstTimeFixTm'], $fields['totalIncidentsTm']);
+        $fields['percentFirstTimeFixSd'] = BUServiceDeskReport::getPercent($fields['firstTimeFixSd'],
+                                                                           $fields['totalIncidentsSd']);
+        $fields['percentFirstTimeFixSc'] = BUServiceDeskReport::getPercent($fields['firstTimeFixSc'],
+                                                                           $fields['totalIncidentsSc']);
+        $fields['percentFirstTimeFixPp'] = BUServiceDeskReport::getPercent($fields['firstTimeFixPp'],
+                                                                           $fields['totalIncidentsPp']);
+        $fields['percentFirstTimeFixTm'] = BUServiceDeskReport::getPercent($fields['firstTimeFixTm'],
+                                                                           $fields['totalIncidentsTm']);
 
         $fields['escalationsSd'] = $this->getCountEscalations(array('contractKey' => 'SD'));
         $fields['escalationsSc'] = $this->getCountEscalations(array('contractKey' => 'SC'));
         $fields['escalationsPp'] = $this->getCountEscalations(array('contractKey' => 'PP'));
         $fields['escalationsTm'] = $this->getCountEscalations(array('contractKey' => 'TM'));
 
-        $fields['percentEscalationsSd'] = BUServiceDeskReport::getPercent($fields['escalationsSd'], $fields['totalIncidentsSd']);
-        $fields['percentEscalationsSc'] = BUServiceDeskReport::getPercent($fields['escalationsSc'], $fields['totalIncidentsSc']);
-        $fields['percentEscalationsPp'] = BUServiceDeskReport::getPercent($fields['escalationsPp'], $fields['totalIncidentsPp']);
-        $fields['percentEscalationsTm'] = BUServiceDeskReport::getPercent($fields['escalationsTm'], $fields['totalIncidentsTm']);
+        $fields['percentEscalationsSd'] = BUServiceDeskReport::getPercent($fields['escalationsSd'],
+                                                                          $fields['totalIncidentsSd']);
+        $fields['percentEscalationsSc'] = BUServiceDeskReport::getPercent($fields['escalationsSc'],
+                                                                          $fields['totalIncidentsSc']);
+        $fields['percentEscalationsPp'] = BUServiceDeskReport::getPercent($fields['escalationsPp'],
+                                                                          $fields['totalIncidentsPp']);
+        $fields['percentEscalationsTm'] = BUServiceDeskReport::getPercent($fields['escalationsTm'],
+                                                                          $fields['totalIncidentsTm']);
 
         $fields['reopenedSd'] = $this->getCountReopened(array('contractKey' => 'SD'));
         $fields['reopenedSc'] = $this->getCountReopened(array('contractKey' => 'SC'));
         $fields['reopenedPp'] = $this->getCountReopened(array('contractKey' => 'PP'));
         $fields['reopenedTm'] = $this->getCountReopened(array('contractKey' => 'TM'));
 
-        $fields['percentReopenedSd'] = BUServiceDeskReport::getPercent($fields['reopenedSd'], $fields['totalIncidentsSd']);
-        $fields['percentReopenedSc'] = BUServiceDeskReport::getPercent($fields['reopenedSc'], $fields['totalIncidentsSc']);
-        $fields['percentReopenedPp'] = BUServiceDeskReport::getPercent($fields['reopenedPp'], $fields['totalIncidentsPp']);
-        $fields['percentReopenedTm'] = BUServiceDeskReport::getPercent($fields['reopenedTm'], $fields['totalIncidentsTm']);
+        $fields['percentReopenedSd'] = BUServiceDeskReport::getPercent($fields['reopenedSd'],
+                                                                       $fields['totalIncidentsSd']);
+        $fields['percentReopenedSc'] = BUServiceDeskReport::getPercent($fields['reopenedSc'],
+                                                                       $fields['totalIncidentsSc']);
+        $fields['percentReopenedPp'] = BUServiceDeskReport::getPercent($fields['reopenedPp'],
+                                                                       $fields['totalIncidentsPp']);
+        $fields['percentReopenedTm'] = BUServiceDeskReport::getPercent($fields['reopenedTm'],
+                                                                       $fields['totalIncidentsTm']);
 
         $fields['severityOneSd'] = $this->getCountIncidents(array('contractKey' => 'SD', 'priority' => 1));
         $fields['severityOneSc'] = $this->getCountIncidents(array('contractKey' => 'SC', 'priority' => 1));
         $fields['severityOnePp'] = $this->getCountIncidents(array('contractKey' => 'PP', 'priority' => 1));
         $fields['severityOneTm'] = $this->getCountIncidents(array('contractKey' => 'TM', 'priority' => 1));
 
-        $fields['percentSeverityOneSd'] = BUServiceDeskReport::getPercent($fields['severityOneSd'], $fields['totalIncidentsSd']);
-        $fields['percentSeverityOneSc'] = BUServiceDeskReport::getPercent($fields['severityOneSc'], $fields['totalIncidentsSc']);
-        $fields['percentSeverityOneTm'] = BUServiceDeskReport::getPercent($fields['severityOneTm'], $fields['totalIncidentsTm']);
-        $fields['percentSeverityOnePp'] = BUServiceDeskReport::getPercent($fields['severityOnePp'], $fields['totalIncidentsPp']);
+        $fields['percentSeverityOneSd'] = BUServiceDeskReport::getPercent($fields['severityOneSd'],
+                                                                          $fields['totalIncidentsSd']);
+        $fields['percentSeverityOneSc'] = BUServiceDeskReport::getPercent($fields['severityOneSc'],
+                                                                          $fields['totalIncidentsSc']);
+        $fields['percentSeverityOneTm'] = BUServiceDeskReport::getPercent($fields['severityOneTm'],
+                                                                          $fields['totalIncidentsTm']);
+        $fields['percentSeverityOnePp'] = BUServiceDeskReport::getPercent($fields['severityOnePp'],
+                                                                          $fields['totalIncidentsPp']);
 
         $fields['severityTwoSd'] = $this->getCountIncidents(array('contractKey' => 'SD', 'priority' => 2));
         $fields['severityTwoSc'] = $this->getCountIncidents(array('contractKey' => 'SC', 'priority' => 2));
         $fields['severityTwoPp'] = $this->getCountIncidents(array('contractKey' => 'PP', 'priority' => 2));
         $fields['severityTwoTm'] = $this->getCountIncidents(array('contractKey' => 'TM', 'priority' => 2));
 
-        $fields['percentSeverityTwoSd'] = BUServiceDeskReport::getPercent($fields['severityTwoSd'], $fields['totalIncidentsSd']);
-        $fields['percentSeverityTwoSc'] = BUServiceDeskReport::getPercent($fields['severityTwoSc'], $fields['totalIncidentsSc']);
-        $fields['percentSeverityTwoTm'] = BUServiceDeskReport::getPercent($fields['severityTwoTm'], $fields['totalIncidentsTm']);
-        $fields['percentSeverityTwoPp'] = BUServiceDeskReport::getPercent($fields['severityTwoPp'], $fields['totalIncidentsPp']);
+        $fields['percentSeverityTwoSd'] = BUServiceDeskReport::getPercent($fields['severityTwoSd'],
+                                                                          $fields['totalIncidentsSd']);
+        $fields['percentSeverityTwoSc'] = BUServiceDeskReport::getPercent($fields['severityTwoSc'],
+                                                                          $fields['totalIncidentsSc']);
+        $fields['percentSeverityTwoTm'] = BUServiceDeskReport::getPercent($fields['severityTwoTm'],
+                                                                          $fields['totalIncidentsTm']);
+        $fields['percentSeverityTwoPp'] = BUServiceDeskReport::getPercent($fields['severityTwoPp'],
+                                                                          $fields['totalIncidentsPp']);
 
         $fields['severityThreeSd'] = $this->getCountIncidents(array('contractKey' => 'SD', 'priority' => 3));
         $fields['severityThreeSc'] = $this->getCountIncidents(array('contractKey' => 'SC', 'priority' => 3));
         $fields['severityThreePp'] = $this->getCountIncidents(array('contractKey' => 'PP', 'priority' => 3));
         $fields['severityThreeTm'] = $this->getCountIncidents(array('contractKey' => 'TM', 'priority' => 3));
 
-        $fields['percentSeverityThreeSd'] = BUServiceDeskReport::getPercent($fields['severityThreeSd'], $fields['totalIncidentsSd']);
-        $fields['percentSeverityThreeSc'] = BUServiceDeskReport::getPercent($fields['severityThreeSc'], $fields['totalIncidentsSc']);
-        $fields['percentSeverityThreeTm'] = BUServiceDeskReport::getPercent($fields['severityThreeTm'], $fields['totalIncidentsTm']);
-        $fields['percentSeverityThreePp'] = BUServiceDeskReport::getPercent($fields['severityThreePp'], $fields['totalIncidentsPp']);
+        $fields['percentSeverityThreeSd'] = BUServiceDeskReport::getPercent($fields['severityThreeSd'],
+                                                                            $fields['totalIncidentsSd']);
+        $fields['percentSeverityThreeSc'] = BUServiceDeskReport::getPercent($fields['severityThreeSc'],
+                                                                            $fields['totalIncidentsSc']);
+        $fields['percentSeverityThreeTm'] = BUServiceDeskReport::getPercent($fields['severityThreeTm'],
+                                                                            $fields['totalIncidentsTm']);
+        $fields['percentSeverityThreePp'] = BUServiceDeskReport::getPercent($fields['severityThreePp'],
+                                                                            $fields['totalIncidentsPp']);
 
         $fields['severityFourSd'] = $this->getCountIncidents(array('contractKey' => 'SD', 'priority' => 4));
         $fields['severityFourSc'] = $this->getCountIncidents(array('contractKey' => 'SC', 'priority' => 4));
         $fields['severityFourPp'] = $this->getCountIncidents(array('contractKey' => 'PP', 'priority' => 4));
         $fields['severityFourTm'] = $this->getCountIncidents(array('contractKey' => 'TM', 'priority' => 4));
 
-        $fields['percentSeverityFourSd'] = BUServiceDeskReport::getPercent($fields['severityFourSd'], $fields['totalIncidentsSd']);
-        $fields['percentSeverityFourSc'] = BUServiceDeskReport::getPercent($fields['severityFourSc'], $fields['totalIncidentsSc']);
-        $fields['percentSeverityFourTm'] = BUServiceDeskReport::getPercent($fields['severityFourTm'], $fields['totalIncidentsTm']);
-        $fields['percentSeverityFourPp'] = BUServiceDeskReport::getPercent($fields['severityFourPp'], $fields['totalIncidentsPp']);
+        $fields['percentSeverityFourSd'] = BUServiceDeskReport::getPercent($fields['severityFourSd'],
+                                                                           $fields['totalIncidentsSd']);
+        $fields['percentSeverityFourSc'] = BUServiceDeskReport::getPercent($fields['severityFourSc'],
+                                                                           $fields['totalIncidentsSc']);
+        $fields['percentSeverityFourTm'] = BUServiceDeskReport::getPercent($fields['severityFourTm'],
+                                                                           $fields['totalIncidentsTm']);
+        $fields['percentSeverityFourPp'] = BUServiceDeskReport::getPercent($fields['severityFourPp'],
+                                                                           $fields['totalIncidentsPp']);
 
         return $fields;
     }

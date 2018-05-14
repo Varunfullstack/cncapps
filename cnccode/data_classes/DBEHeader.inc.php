@@ -81,6 +81,7 @@ class DBEHeader extends DBEntity
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
     const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
+    const customerReviewMeetingText = "customerReviewMeetingText";
 
     /**
      * calls constructor()
@@ -185,6 +186,7 @@ class DBEHeader extends DBEntity
                          DA_NOT_NULL,
                          'hed_im_team_minutes_in_a_day');
         $this->addColumn(self::backupTargetSuccessRate, DA_INTEGER, DA_NOT_NULL, "hed_backup_target_success_rate");
+        $this->addColumn(self::customerReviewMeetingText, DA_STRING, DA_ALLOW_NULL, "customer_review_meeting_text");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
