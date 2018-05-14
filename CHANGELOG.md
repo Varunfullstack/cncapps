@@ -41,6 +41,7 @@ This project changes will be shown here.
 - Issue 206 - Goods In supplier tab out does not work
 - Issue 207 - Export Prepay Service Request calendar incorrectly linked
 - Issue 209 - Current Documentation Folder & Open Folder does not open when using Chrome
+- Issue 218 - 2nd Site Backup Calculations
 
 ### Removed
 - Issue 223 - Remove Comment link from Activity Page

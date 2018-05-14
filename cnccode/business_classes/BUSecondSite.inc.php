@@ -124,7 +124,8 @@ class BUSecondsite extends Business
                 }
 
                 if ($server['secondsiteImageDelayDays']) {
-                    $timeToLookFrom = strtotime('-' . $server['secondsiteImageDelayDays'] . ' days', $defaultTimeToLookFrom);
+                    $timeToLookFrom = strtotime('-' . $server['secondsiteImageDelayDays'] . ' days',
+                                                $defaultTimeToLookFrom);
                     $this->delayedCheckServers[] = $server;
                 } else {
                     $timeToLookFrom = $defaultTimeToLookFrom;
@@ -141,7 +142,8 @@ class BUSecondsite extends Business
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
 
-                        $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' ' . $error, self::LOG_TYPE_ERROR_INCOMPLETE);
+                        $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' ' . $error,
+                                          self::LOG_TYPE_ERROR_INCOMPLETE);
 
                         $this->setImageStatusByServer($server['server_cuino'], self::STATUS_BAD_CONFIG);
                     }
@@ -157,7 +159,8 @@ class BUSecondsite extends Business
                             $this->imageCount += count($images);
                             $this->serverErrorCount++;
 
-                            $this->logMessage($server['cus_name'] . ' ' . $networkPath . ' ' . $error, self::LOG_TYPE_ERROR_PATH_MISSING);
+                            $this->logMessage($server['cus_name'] . ' ' . $networkPath . ' ' . $error,
+                                              self::LOG_TYPE_ERROR_PATH_MISSING);
 
                             $this->setImageStatusByServer($server['server_cuino'], self::STATUS_SERVER_NOT_FOUND);
 
@@ -255,10 +258,12 @@ class BUSecondsite extends Business
                             if (!$isSuspended) {
                                 $this->imageErrorCount++;
 
-                                $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s', $mostRecentFileTime);
+                                $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s',
+                                                                                                                                                                  $mostRecentFileTime);
                                 $this->logMessage($errorMessage, self::LOG_TYPE_ERROR_NO_IMAGE);
 
-                                $missingImages[] = 'OUT-OF-DATE image found: ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s', $mostRecentFileTime);
+                                $missingImages[] = 'OUT-OF-DATE image found: ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s',
+                                                                                                                  $mostRecentFileTime);
                                 $missingLetters[] = $driveLetter;
 
                                 $status = self::STATUS_OUT_OF_DATE;
@@ -267,18 +272,28 @@ class BUSecondsite extends Business
 
                             }
 
-                            $this->setImageStatus($image['secondSiteImageID'], $status, $mostRecentFileName, date('Y-m-d H:i:s', $mostRecentFileTime));
+                            $this->setImageStatus($image['secondSiteImageID'],
+                                                  $status,
+                                                  $mostRecentFileName,
+                                                  date('Y-m-d H:i:s', $mostRecentFileTime));
 
                         } else {
-                            $this->imagePassesCount++;
+                            if (!$isSuspended) {
+                                $this->imagePassesCount++;
+                            }
                             /*
                             Passed all verification checks.
                             */
-                            $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' Up-to-date image ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s', $mostRecentFileTime), self::LOG_TYPE_SUCCESS);
+                            $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' Up-to-date image ' . $mostRecentFileName . ' ' . DATE('d/m/Y H:i:s',
+                                                                                                                                                          $mostRecentFileTime),
+                                              self::LOG_TYPE_SUCCESS);
 
                             $status = self::STATUS_PASSED;
 
-                            $this->setImageStatus($image['secondSiteImageID'], $status, $mostRecentFileName, date('Y-m-d H:i:s', $mostRecentFileTime));
+                            $this->setImageStatus($image['secondSiteImageID'],
+                                                  $status,
+                                                  $mostRecentFileName,
+                                                  date('Y-m-d H:i:s', $mostRecentFileTime));
                             /*
                             Note: If this server is suspended then it's status will now be set back to passed
                             and the suspended date reset.
@@ -334,37 +349,38 @@ class BUSecondsite extends Business
                       passes,
                       success_rate
                     ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?)";
-            $db->preparedQuery($query, [
-                [
-                    "type" => "i",
-                    "value" => $this->serverCount
-                ],
-                [
-                    "type" => "i",
-                    "value" => $this->imageCount
-                ],
-                [
-                    "type" => "i",
-                    "value" => $this->serverErrorCount,
-                ],
-                [
-                    "type" => "i",
-                    "value" => $this->imageErrorCount,
-                ],
-                [
-                    "type" => "i",
-                    "value" => $this->suspendedServerCount,
-                ],
-                [
-                    "type" => "i",
-                    "value" => $this->imagePassesCount,
-                ],
-                [
-                    "type" => "d",
-                    "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
-                ]
+            $db->preparedQuery($query,
+                               [
+                                   [
+                                       "type" => "i",
+                                       "value" => $this->serverCount
+                                   ],
+                                   [
+                                       "type" => "i",
+                                       "value" => $this->imageCount
+                                   ],
+                                   [
+                                       "type" => "i",
+                                       "value" => $this->serverErrorCount,
+                                   ],
+                                   [
+                                       "type" => "i",
+                                       "value" => $this->imageErrorCount,
+                                   ],
+                                   [
+                                       "type" => "i",
+                                       "value" => $this->suspendedServerCount,
+                                   ],
+                                   [
+                                       "type" => "i",
+                                       "value" => $this->imagePassesCount,
+                                   ],
+                                   [
+                                       "type" => "d",
+                                       "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                                   ]
 
-            ]);
+                               ]);
 
 
         }
@@ -379,7 +395,8 @@ class BUSecondsite extends Business
         ) {
 
             $message = 'Image validation suspended until ' . $server['secondsiteValidationSuspendUntilDate'];
-            $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message, self::LOG_TYPE_SUSPENDED);
+            $this->logMessage($server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message,
+                              self::LOG_TYPE_SUSPENDED);
 
             $this->suspendedCheckServers[] = $server;
 
@@ -817,7 +834,8 @@ class BUSecondsite extends Business
 
         return array_map(function ($item) {
             return $item[0];
-        }, $result->fetch_all());
+        },
+            $result->fetch_all());
     }
 
 
