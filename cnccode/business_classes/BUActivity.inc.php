@@ -5316,10 +5316,44 @@ customer with the past 8 hours email to GL
         } else {
             $fields['submittedTo'] = 'Service Desk';
         }
+
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($customerID);
+
+        $template = 'ServiceLoggedEmail';
+
+
+        $testTime = (new \DateTime($record['createDateTime']))->format('H:i');
+
+        $startTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hBegin);
+        $endTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hEnd);
+        echo '<br>test time is : ' . $testTime;
+        echo '<br>startTime is : ' . $startTime;
+        echo '<br>endTime is : ' . $endTime;
+
+
+        if ($testTime < $startTime || $testTime > $endTime) {
+            echo '<div>Should be special email</div>';
+            $has24HourSupport = $dsCustomer->getValue("support24HourFlag") == 'Y';
+            $buCustomerItem = new BUCustomerItem($this);
+
+            $hasServiceDesk = $buCustomerItem->customerHasServiceDeskContract($customerID);
+
+            if ($has24HourSupport || $hasServiceDesk) {
+                echo '<div>does have 24h support</div>';
+                $template = 'ServiceLoggedEmail24h';
+            } else {
+                echo '<div>does NOT have 24h support</div>';
+                $template = 'ServiceLoggedEmailNot24h';
+            }
+        } else {
+            echo '<div>Should be normal email</div>';
+        }
+
         $this->sendEmailToCustomer(
             array(
                 'problemID' => $dbeProblem->getPKValue(),
-                'templateName' => 'ServiceLoggedEmail',
+                'templateName' => $template,
                 'subjectSuffix' => 'New Request Logged',
                 'fields' => $fields
             )
@@ -6132,9 +6166,7 @@ customer with the past 8 hours email to GL
                 !isset($parameters ['overrideServerGuard'])
             )
         ) {
-
             return; // no email to customer for this request
-
         }
         /*
     See whether to copy in the main contact

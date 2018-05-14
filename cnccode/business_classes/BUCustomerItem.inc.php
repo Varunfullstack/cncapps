@@ -184,7 +184,8 @@ class BUCustomerItem extends Business
             $dsCustomerItem->setValue('secondsiteSuspendedByUserID', $GLOBALS ['auth']->is_authenticated());
             $dsCustomerItem->setValue('secondsiteSuspendedDate', date(CONFIG_MYSQL_DATE));
         } else {
-            $dsCustomerItem->setValue('secondsiteSuspendedByUserID', $dbeCustomerItem->getValue('secondsiteSuspendedByUserID'));
+            $dsCustomerItem->setValue('secondsiteSuspendedByUserID',
+                                      $dbeCustomerItem->getValue('secondsiteSuspendedByUserID'));
             $dsCustomerItem->setValue('secondsiteSuspendedDate', $dbeCustomerItem->getValue('secondsiteSuspendedDate'));
 
         }
@@ -199,8 +200,10 @@ class BUCustomerItem extends Business
             $dsCustomerItem->setValue('secondsiteImageDelayUserID', $GLOBALS ['auth']->is_authenticated());
             $dsCustomerItem->setValue('secondsiteImageDelayDate', date(CONFIG_MYSQL_DATE));
         } else {
-            $dsCustomerItem->setValue('secondsiteImageDelayUserID', $dbeCustomerItem->getValue('secondsiteImageDelayUserID'));
-            $dsCustomerItem->setValue('secondsiteImageDelayDate', $dbeCustomerItem->getValue('secondsiteImageDelayDate'));
+            $dsCustomerItem->setValue('secondsiteImageDelayUserID',
+                                      $dbeCustomerItem->getValue('secondsiteImageDelayUserID'));
+            $dsCustomerItem->setValue('secondsiteImageDelayDate',
+                                      $dbeCustomerItem->getValue('secondsiteImageDelayDate'));
 
         }
         $dsCustomerItem->post();
@@ -407,18 +410,16 @@ class BUCustomerItem extends Business
 
     function customerHasServiceDeskContract($customerID)
     {
-        $ret = false;
-
         $this->getContractsByCustomerID($customerID, $dsContract);
 
         while ($dsContract->fetchNext()) {
 
             if ($dsContract->getValue('itemTypeID') == CONFIG_SERVICEDESK_ITEMTYPEID) {
-                $ret = true;
+                return true;
             }
 
         }
-        return $ret;
+        return false;
     }
 
     function serverIsUnderLocalSecondsiteContract($customerItemID)

@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 221 - Fixed pending closure on Service Request page
 - Issue 219 - Implement CNCAPPS security
 - Issue 217 - 2nd Site Validation test run
+- Issue 222 - Amend initial email content based on 24x7 support process
 
 ### Changed
 - Issue 176 - Change background colours on service request page

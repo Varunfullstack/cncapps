@@ -82,6 +82,9 @@ class DBEHeader extends DBEntity
     const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
     const customerReviewMeetingText = "customerReviewMeetingText";
+    const serviceDeskNotification24hBegin =  "serviceDeskNotification24hBegin";
+    const serviceDeskNotification24hEnd =  "serviceDeskNotification24hEnd";
+
 
     /**
      * calls constructor()
@@ -187,6 +190,8 @@ class DBEHeader extends DBEntity
                          'hed_im_team_minutes_in_a_day');
         $this->addColumn(self::backupTargetSuccessRate, DA_INTEGER, DA_NOT_NULL, "hed_backup_target_success_rate");
         $this->addColumn(self::customerReviewMeetingText, DA_STRING, DA_ALLOW_NULL, "customer_review_meeting_text");
+        $this->addColumn(self::serviceDeskNotification24hBegin, DA_TIME, DA_NOT_NULL, "hed_sd_notification_24_7_begin");
+        $this->addColumn(self::serviceDeskNotification24hEnd, DA_TIME, DA_NOT_NULL, "hed_sd_notification_24_7_end");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
