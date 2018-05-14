@@ -130,11 +130,6 @@ class OneOffPDF
 
             $continue = true;
 
-//        if ($contracts->getValue('renewalTypeID') === 3) {
-//            //this is a renewal ignore
-//            continue;
-//        }
-
             foreach ($validItems as $item) {
                 if (strpos($item, $contracts->getValue('itemTypeDescription')) !== false) {
                     $continue = false;
