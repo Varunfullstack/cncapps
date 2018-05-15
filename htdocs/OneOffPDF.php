@@ -141,7 +141,8 @@ class OneOffPDF
             );
 
             // add name to top of email
-            $thisBody = "<p>Dear $firstName,</p>
+            $thisBody = "<div style='font-family: Arial, sans-serif; font-size: 10pt'>
+<p>Dear $firstName,</p>
 <p>Following on with our recent communication regarding compliance with the new General Data Protection Regulations that are coming into force on the 25th May 2018, CNC have made some changes to our terms of conditions.</p>
 <p>
 We are therefore re-issuing new contract schedules and terms and conditions to all customers that must be signed and in place ready for this new legislation.
@@ -158,6 +159,7 @@ If you have any questions then please do not hesitate to contact us.
 <p>
 Many thanks. 
 </p>
+</div>
 ";
 
             $buMail->mime->setHTMLBody($thisBody);
@@ -295,7 +297,7 @@ $csv = fopen('c:/Temp/gdpr-data.csv', 'r');
 $firstLine = fgetcsv($csv);
 
 while ($row = fgetcsv($csv)) {
-    $test->runIt($row[0], $row[2], $row[3], $row[11]);
+    $test->runIt($row[0], $row[2], $row[3], $row[11], $sendToSignable);
 }
 
 
