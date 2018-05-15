@@ -95,9 +95,11 @@ class DBECallActType extends DBEntity
             " WHERE activeFlag = 'Y'" .
             ($onlyVisibleInSR ? ' and cat_visible_in_sr_flag = "Y" ' : '') .
             " ORDER BY cat_desc";
+        var_dump($statement);
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
 
 }
+
 ?>
