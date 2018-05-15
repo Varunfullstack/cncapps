@@ -211,92 +211,32 @@ class BUUser extends Business
     function teamMembersPerformanceData($teamLevel, $days)
     {
         global $db;
-        $query =
-            "SELECT 
-              (actualWeekHours / potentialWeekHours) *100 as pctWeekHours ,
-              actualWeekHours,
-              potentialWeekHours,
-              userID,
-              userLabel,
-              endOfWeek 
-            FROM
-              (SELECT 
-                SUM(
-                  COALESCE(
-                    TIME_TO_SEC(
-                      IF(
-                        caa_endtime > '19:00',
-                        '19:00',
-                        caa_endtime
-                      )
-                    ) - TIME_TO_SEC(
-                      IF(
-                        caa_starttime < '07:00',
-                        '07:00',
-                        caa_starttime
-                      )
-                    ),
-                    0
-                  )
-                ) / 3600 AS actualWeekHours,
-                MIN(loggedDate) startOfWeek,
-                MAX(loggedDate) endOfWeek,
-                WEEK(loggedDate, 1) AS weekNumber,
-                loggedDate,
-                userID,
-                EXTRACT(YEAR FROM loggedDate) AS YEAR,
-                (
-                  DATEDIFF(MAX(loggedDate), MIN(loggedDate)) + 1
-                ) * consultant.`standardDayHours` AS potentialWeekHours,
-                CONCAT(consultant.`firstName` ,' ', LEFT(consultant.`lastName`,1)) AS userLabel 
-              FROM
-                user_time_log 
-                LEFT JOIN callactivity 
-                  ON caa_consno = userID 
-                  AND caa_date = loggedDate 
-                LEFT JOIN callacttype 
-                  ON cat_callacttypeno = caa_callacttypeno 
-                LEFT JOIN consultant 
-                  ON consultant.`cns_consno` = userID 
-              WHERE DAYOFWEEK(loggedDate) > 1 
-                AND DAYOFWEEK(loggedDate) < 7             
-                AND consultant.teamID = $teamLevel 
-                AND loggedDate >= DATE_SUB(DATE(NOW()), INTERVAL $days DAY) 
-                AND loggedDate < DATE(NOW()) ";
+        $query = "SELECT 
+                      userID,
+                      user_time_log.loggedDate AS loggedDate,
+                      loggedHours,
+                      CONCAT(
+                        consultant.`firstName`,
+                        ' ',
+                        LEFT(consultant.`lastName`, 1)
+                      ) AS userLabel 
+                    FROM
+                      user_time_log 
+                      INNER JOIN 
+                        (SELECT DISTINCT 
+                          loggedDate 
+                        FROM
+                          user_time_log 
+                        ORDER BY loggedDate DESC 
+                        LIMIT 10) AS limited 
+                        ON user_time_log.`loggedDate` = limited.loggedDate 
+                      LEFT JOIN `consultant` 
+                        ON userID = consultant.`cns_consno` 
+                    WHERE teamLevel = $teamLevel 
+                    ORDER BY userID,
+                      user_time_log.loggedDate ASC  ";
 
-        // we need to pull the holidays
-        $yearStart = date('Y', strtotime("-$days days"));
-        $yearEnd = date('Y');
-        $holidays = common_getUKBankHolidays($yearStart);
-
-        if ($yearStart !== $yearEnd) {
-            $holidays = array_merge($holidays, common_getUKBankHolidays($yearEnd));
-        }
-
-        $holidays = array_map(
-            function ($item) {
-                return "'$item'";
-            },
-            $holidays
-        );
-
-        if (count($holidays)) {
-            $holidayString = implode(',', $holidays);
-            $query .= " and loggedDate not in ($holidayString) ";
-        }
-
-        $query .= "AND (
-                  callactivity.`caa_callactivityno` IS NULL 
-                  OR callactivity.`caa_callactivityno` IS NOT NULL 
-                  AND caa_starttime < '19:00' 
-                  AND caa_endtime > '07:00' 
-                  AND callacttype.travelFlag <> 'Y'
-                ) 
-              GROUP BY userID,
-                YEAR,
-                weekNumber) AS innerQuery order by endOfWeek, userID";
         $db->query($query);
-
 
         $rows = [];
         while ($db->next_record(1)) {

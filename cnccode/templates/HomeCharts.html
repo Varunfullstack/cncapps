@@ -98,28 +98,28 @@
             return that.data.then(function (result) {
                 that.membersSelectors.html('');
                 window.dataToAnalyze = result;
-                Object.keys(result.members).forEach(function (memberKey) {
+                Object.keys(result).forEach(function (memberKey) {
 
                     if (that.membersOptions[memberKey] == null) {
                         that.membersOptions[memberKey] = {data: true, trend: false};
                     }
 
                     var context = {
-                        name: result.members[memberKey],
-                        id: memberKey,
-                        data: !!that.membersOptions[memberKey].data,
-                        trend: !!that.membersOptions[memberKey].trend
+                        name: result[memberKey].userName,
+                        id: memberKey
                     };
                     console.log(context);
                     var html = Mustache.to_html(source, context);
-                    var test = '<div class="memberItem" ><label>' + result.members[memberKey] +
-                        '</label><input type="checkbox" id="' + memberKey + '" ' + (that.membersOptions[memberKey] ? 'checked' : '') + '></div>';
+                    var test = '<div class="memberItem" ><label>' + context.name + '</label></div>';
                     that.membersSelectors.append(html);
                 });
 
-                that.storedData = new google.visualization.DataTable(result.data);
+                that.storedData = new google.visualization.DataTable({
+                    cols: result[memberKey].cols,
+                    rows: result[memberKey].rows
+                });
                 // Instantiate and draw our chart, passing in some options.
-                that.chart = new google.visualization.LineChart(that.chartDiv[0]);
+                that.chart = new google.visualization.ColumnChart(that.chartDiv[0]);
                 hideColumns();
             });
         }
@@ -127,16 +127,16 @@
         function hideColumns() {
             var view = new google.visualization.DataView(that.storedData);
 
-            var columnsToHide = [];
-
-            for (var i = 0; i < that.storedData.getNumberOfColumns(); i++) {
-                var columnId = that.storedData.getColumnId(i);
-                if (!isNaN(columnId) && !that.membersOptions[columnId]) {
-                    // is a number ..so it's an id
-                    columnsToHide.push(i);
-                }
-            }
-            view.hideColumns(columnsToHide);
+            // var columnsToHide = [];
+            //
+            // for (var i = 0; i < that.storedData.getNumberOfColumns(); i++) {
+            //     var columnId = that.storedData.getColumnId(i);
+            //     if (!isNaN(columnId) && !that.membersOptions[columnId]) {
+            //         // is a number ..so it's an id
+            //         columnsToHide.push(i);
+            //     }
+            // }
+            // view.hideColumns(columnsToHide);
             that.chart.draw(view, that.storedOptions);
         }
 

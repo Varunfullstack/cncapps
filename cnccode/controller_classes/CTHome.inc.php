@@ -703,56 +703,69 @@ class CTHome extends CTCNC
                 throw new Exception('Team not valid');
         }
 
+
+        $graphs = [];
+
         $dataStructure = [
             "cols" => [
                 ["id" => "dates", "label" => "Dates", "type" => 'string'],
-                ["id" => "accumulation", "label" => "Team", "type" => 'number'],
-                ["id" => "target", "label" => "Target", "type" => 'number']
             ],
             "rows" => [
 
-            ]
-        ];
-        $results = $this->buUser->teamMembersPerformanceData($team, $days);
-        $accumulations = [];
+            ],
+            "dataPoints" => [
 
-        $columnsSet = [];
+            ],
+            "userName" => null
+        ];
+
+
+        $results = $this->buUser->teamMembersPerformanceData($team, $days);
+
 
         foreach ($results as $result) {
-            //for each result we need a column
-            if (!isset($columnsSet[$result['userID']])) {
-                $dataStructure["cols"][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
-                $columnsSet[$result['userID']] = $result['userLabel'];
+            // if the user doesn't have a graph yet create it
+            if (!isset($graphs[$result['userID']])) {
+                $graphs[$result['userID']] = $dataStructure;
+                $graphs[$result['userID']]['cols'][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
+                $graphs[$result['userID']]['userName'] = $result['userLabel'];
             }
 
-            if (!isset($accumulations[$result['endOfWeek']])) {
-                $accumulations[$result['endOfWeek']] = ['accumulation' => ['actualWeekHours' => 0, 'potentialWeekHours' => 0]];
+            // check if the current date is greater than the last data point
+            end($graphs[$result['userID']]['dataPoints']);         // move the internal pointer to the end of the array
+            $key = key($graphs[$result['userID']]['dataPoints']);
+            reset($graphs[$result['userID']]['dataPoints']);
+
+            while (!$key || $key < $result['loggedDate']) {
+                if ($key) {
+                    $date = new DateTime($key);
+                    $date->modify('+1 day');
+
+                    $key = $date->format('Y-m-d');
+                } else {
+                    $key = $result['loggedDate'];
+                }
+
+                $graphs[$result['userID']]['dataPoints'][$key] = null;
+                if ($key == $result['loggedDate']) {
+                    $value = $result['loggedHours'];
+                } else {
+                    $value = null;
+                }
+
+                $cell = ["c" =>
+                    [
+                        ["v" => $key],
+                        ["v" => $value]
+                    ]
+                ];
+
+                $graphs[$result['userID']]['rows'][] = $cell;
             }
-            $accumulationItem = $accumulations[$result['endOfWeek']];
-            $accumulationItem[$result['userID']] = $result['pctWeekHours'];
 
-            $accumulationItem['accumulation']['actualWeekHours'] += $result['actualWeekHours'];
-            $accumulationItem['accumulation']['potentialWeekHours'] += $result['potentialWeekHours'];
-            $accumulationItem['accumulation']['performance'] = $accumulationItem['accumulation']['potentialWeekHours'] ?
-                $accumulationItem['accumulation']['actualWeekHours'] /
-                $accumulationItem['accumulation']['potentialWeekHours'] * 100 : 0;
-
-            $accumulations[$result['endOfWeek']] = $accumulationItem;
         }
 
-        foreach ($accumulations as $key => $accumulation) {
-            $cell = ["c" => [["v" => $key], ["v" => $accumulation['accumulation']['performance']], ["v" => $target]]];
-
-            unset($accumulation['accumulation']);
-            $testing = [];
-            foreach ($accumulation as $userId => $data) {
-                $testing[] = $userId;
-                $cell["c"][] = ["v" => $data];
-            }
-            $dataStructure['rows'][] = $cell;
-        }
-
-        return ["members" => $columnsSet, "data" => $dataStructure];
+        return $graphs;
     } // end displayUserLoggingPerformanceReport
 }// end of class
 ?>
