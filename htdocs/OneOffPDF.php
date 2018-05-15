@@ -32,6 +32,45 @@ $returnArray = array();
 
 class OneOffPDF
 {
+
+    function extractValidContracts($something)
+    {
+
+        $contracts = [];
+        $validItems = [
+            "2nd Site",
+            "Internet Services",
+            "Managed Service",
+            "ServerCare",
+            "ServiceDesk",
+            "Telecom Services",
+            "PrePay"
+        ];
+
+        while ($something->fetchNext()) {
+
+            $continue = true;
+
+            foreach ($validItems as $item) {
+                if (strpos($something->getValue('itemTypeDescription'), $item) !== false) {
+                    $continue = false;
+                }
+            }
+
+            if ($continue) {
+                continue;
+            }
+            $contracts[] = [
+                'itemTypeDescription' => $something->getValue("itemTypeDescription"),
+                'customerItemID' => $something->getValue("customerItemID"),
+                'itemDescription' => $something->getValue('itemDescription')
+            ];
+        }
+
+        return $contracts;
+
+    }
+
     function runIt($customerID, $firstName, $lastName, $emailAddress)
     {
         $mainPDF = new \setasign\Fpdi\Fpdi();
@@ -40,31 +79,30 @@ class OneOffPDF
 // Start contracts
         $dbeJRenContract = new DBEJRenContract($this);
         $dbeJRenContract->getRowsByCustomerID($customerID);
-
-
-        $this->addPages($mainPDF, $dbeJRenContract);
-
-// Domains
-        $dbeJRenDomain = new DBEJRenDomain($this);
-        $dbeJRenDomain->getRowsByCustomerID($customerID);
-
-        $this->addPages($mainPDF, $dbeJRenDomain);
-// end domains
-
-//start broadband
+        // broadband
         $dbeJRenBroadband = new DBEJRenBroadband($this);
         $dbeJRenBroadband->getRowsByCustomerID($customerID);
-        $this->addPages($mainPDF, $dbeJRenBroadband);
-
 // Hosting
         $dbeJRenHosting = new DBEJRenHosting($this);
         $dbeJRenHosting->getRowsByCustomerID($customerID);
-        $this->addPages($mainPDF, $dbeJRenHosting);
 
-//$buExternalItem = new BUExternalItem($this);
-//$buExternalItem->getExternalItemsByCustomerID($customerID, $dsExternalItem);
-//addPages($mainPDF, $buExternalItem);
+        $contracts = array_merge(
+            [],
+            $this->extractValidContracts($dbeJRenContract),
+            $this->extractValidContracts($dbeJRenBroadband),
+            $this->extractValidContracts($dbeJRenHosting)
+        );
 
+
+        uasort($contracts,
+            function ($a, $b) {
+                if (strcmp($a['itemTypeDescription'], $b['itemTypeDescription']) === 0) {
+                    return strcmp($a['itemDescription'], $b['itemDescription']);
+                }
+                return strcmp($a['itemTypeDescription'], $b['itemTypeDescription']);
+            });
+
+        $this->addPages($mainPDF, $contracts);
 
         $pageCount = $mainPDF->setSourceFile(__DIR__ . '/PDF-resources/Terms & Conditions April 2018 branded.pdf');
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
@@ -117,37 +155,12 @@ class OneOffPDF
     function addPages(\setasign\Fpdi\Fpdi $mainPDF, $contracts)
     {
 
-        $validItems = [
-            "2nd Site",
-            "Internet Services",
-            "Managed Service",
-            "ServerCare",
-            "ServiceDesk",
-            "Telecom Services"
-        ];
-
-        while ($contracts->fetchNext()) {
-
-            $continue = true;
-
-            foreach ($validItems as $item) {
-                if (strpos($item, $contracts->getValue('itemTypeDescription')) !== false) {
-                    $continue = false;
-                }
-            }
-
-            if ($continue) {
-                continue;
-            }
-
-
-            echo '<br>contract: ' . $contracts->getValue("customerItemID") . " of type " . $contracts->getValue('itemTypeDescription');
-
+        foreach ($contracts as $contract) {
             // Validation and setting of variables
 
             $buCustomerItem = new BUCustomerItem($this);
-            $buCustomerItem->getCustomerItemByID($contracts->getValue("customerItemID"), $dsContract);
-            $buCustomerItem->getCustomerItemsByContractID($contracts->getValue("customerItemID"), $dsCustomerItem);
+            $buCustomerItem->getCustomerItemByID($contract["customerItemID"], $dsContract);
+            $buCustomerItem->getCustomerItemsByContractID($contract["customerItemID"], $dsCustomerItem);
 
             $buSite = new BUSite($this);
             $buActivity = new BUActivity($this);
@@ -177,6 +190,7 @@ class OneOffPDF
                 $mainPDF->useImportedPage($pageId);
             }
         }
+
     }
 
 
@@ -238,6 +252,9 @@ while ($row = fgetcsv($csv)) {
     $test->runIt($row[0], $row[2], $row[3], $row[11]);
 }
 
+
+//$test->runIt(4572, 'whatever', 'whatever', 'someemai@test.com');
+//$test->runIt(2554, 'whatever', 'whatever', 'someemai@test.com');
 
 
 
