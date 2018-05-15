@@ -26,9 +26,11 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
 require_once($cfg['path_ct'] . '/CTCustomerItem.inc.php');
+require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once __DIR__ . '/../vendor/autoload.php';
 $returnArray = array();
 
+$sendToSignable = isset($_GET['sendToSignable']);
 
 class OneOffPDF
 {
@@ -71,7 +73,7 @@ class OneOffPDF
 
     }
 
-    function runIt($customerID, $firstName, $lastName, $emailAddress)
+    function runIt($customerID, $firstName, $lastName, $emailAddress, $sendToSignable = false)
     {
         $mainPDF = new \setasign\Fpdi\Fpdi();
         $buCustomerItem = new BUCustomerItem($this);
@@ -124,18 +126,62 @@ class OneOffPDF
 
         $mainPDF->Output('F', $fileName);
 
+        if ($sendToSignable) {
 
-//        $this->generateEnvelope($fileName, $firstName, $lastName, $emailAddress, $customerID);
+            $buMail = new BUMail($this);
 
-//header('Pragma: public');
-////header('Expires: 0');
-////header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-////header('Content-Type: application/pdf');
-////header('Content-Disposition: attachment; filename=contract.pdf;');
-////header('Content-Transfer-Encoding: binary');
-////header('Content-Length: ' . filesize('test.pdf'));
-////readfile('test.pdf');
-////unlink('test.pdf');
+            $toEmail = $emailAddress;
+
+            $hdrs = array(
+                'From' => 'support@cnc-ltd.co.uk',
+                'To' => $toEmail,
+                'Subject' => "General Data Protection Regulations - Action Required",
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            // add name to top of email
+            $thisBody = "<p>Dear $firstName,</p>
+<p>Following on with our recent communication regarding compliance with the new General Data Protection Regulations that are coming into force on the 25th May 2018, CNC have made some changes to our terms of conditions.</p>
+<p>
+We are therefore re-issuing new contract schedules and terms and conditions to all customers that must be signed and in place ready for this new legislation.
+</p>
+<p>
+It is important that you or someone with the authority within your company to sign the attached documents does so before the above date to allow us to continue to provide the key services to your organisation.  We’ve now provided this using an e-sign option to make this process as simple as possible.
+</p>
+<p>
+These new terms and conditions include a specific section in relation to data protection and reflect the current CNC product and service offerings as well as general changes in the market place since our last issue in 2014.
+</p>
+ <p>
+If you have any questions then please do not hesitate to contact us.
+</p>
+<p>
+Many thanks. 
+</p>
+";
+
+            $buMail->mime->setHTMLBody($thisBody);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset' => 'UTF-8',
+                'html_charset' => 'UTF-8',
+                'head_charset' => 'UTF-8'
+            );
+
+            $thisBody = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->send(
+                $emailAddress,
+                $hdrs,
+                $thisBody
+            );
+
+            $this->generateEnvelope($fileName, $firstName, $lastName, $emailAddress, $customerID);
+        }
+
         ?>
         <div>
             First Name: <?= $firstName ?>
@@ -251,10 +297,6 @@ $firstLine = fgetcsv($csv);
 while ($row = fgetcsv($csv)) {
     $test->runIt($row[0], $row[2], $row[3], $row[11]);
 }
-
-
-//$test->runIt(4572, 'whatever', 'whatever', 'someemai@test.com');
-//$test->runIt(2554, 'whatever', 'whatever', 'someemai@test.com');
 
 
 
