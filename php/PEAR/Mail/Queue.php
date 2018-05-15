@@ -271,7 +271,7 @@ class Mail_Queue extends PEAR
      */
     function _Mail_Queue()
     {
-        unset($this);
+//        unset($this);
     }
 
     // }}}
