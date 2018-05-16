@@ -28,7 +28,8 @@ class CTRenContract extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
-            "renewals"
+            "renewals",
+            "technical"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");

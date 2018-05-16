@@ -68,6 +68,7 @@ class CTSupplier extends CTCNC
                 $this->search();
                 break;
             case CTCNC_ACT_DISP_SUPPLIER_POPUP:
+                echo 'test';
                 $this->displaySupplierSelectPopup();
                 break;
             case CTSUPPLIER_ACT_SUPPLIER_SEARCH_FORM:
@@ -85,9 +86,13 @@ class CTSupplier extends CTCNC
     {
         if (isset($_REQUEST['parentIDField'])) {
             $_SESSION['supplierParentIDField'] = $_REQUEST['parentIDField'];
+        } else {
+            unset($_SESSION['supplierParentIDField']);
         }
         if (isset($_REQUEST['parentDescField'])) {
             $_SESSION['supplierParentDescField'] = $_REQUEST['parentDescField'];
+        } else {
+            unset($_SESSION['supplierParentDescField']);
         }
     }
 
@@ -431,13 +436,14 @@ class CTSupplier extends CTCNC
         }
         $this->buSupplier->updateSupplier($this->dsSupplier);
         // force entry of a contact if none exists
+
         if ($this->dsSupplier->getValue('contactID') == 0) {
             $this->setFormErrorMessage('Please create a contact or select an existing contact');
             $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
             $this->supplierForm();
             exit;
         } else {
-            // if there is a parent (popup) this forces update of supplierID back through Javascript to parent HTML window
+//             if there is a parent (popup) this forces update of supplierID back through Javascript to parent HTML window
             if (isset($_SESSION['supplierParentDescField'])) {
                 $urlNext = $this->buildLink(
                     $_SERVER['PHP_SELF'],
@@ -448,6 +454,7 @@ class CTSupplier extends CTCNC
                     )
                 );
             } else {
+
                 $urlNext = $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array()
