@@ -5,6 +5,7 @@ function submitSupplier(supplierID, supplierName) {
 	if ((opener) && (!opener.closed)) {
 		opener.document.getElementById("{parentIDField}").value=supplierID;
 		opener.document.getElementById("{parentDescField}").value=supplierName;
+
 		window.close();
 	}
 }

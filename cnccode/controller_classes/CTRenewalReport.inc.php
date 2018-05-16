@@ -8,11 +8,11 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenContract.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenDomain.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenBroadband.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenQuotation.inc.php');
-require_once($cfg['path_dbe'] . '/DBERenHosting.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenContract.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenDomain.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenBroadband.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenQuotation.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJRenHosting.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
@@ -32,6 +32,14 @@ class CTRenewalReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
         $this->dsSearchForm->setValue('customerID', '');
@@ -120,7 +128,8 @@ class CTRenewalReport extends CTCNC
             $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
             $customerString = $dsCustomer->getValue('name');
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $this->template->set_var(
             array(
@@ -173,9 +182,10 @@ class CTRenewalReport extends CTCNC
 
         $items = $buRenewal->getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo, $this);
 
-        usort($items, function ($a, $b) {
-            return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
-        });
+        usort($items,
+            function ($a, $b) {
+                return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
+            });
 
         $lastItemTypeDescription = false;
 
@@ -289,22 +299,21 @@ class CTRenewalReport extends CTCNC
 
             $output = $this->template->get("CONTENTS");
 
-            /*
-            Generate the PDF
-            */
-// include DOMPDF's default configuration
-            require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+            require_once BASE_DRIVE . '/vendor/autoload.php';
 
-            $dompdf = new DOMPDF();
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+            $dompdf = new \Dompdf\Dompdf($options);
+
 
             /* @todo: set template dir */
-            $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+            $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
-            $dompdf->load_html($output);
+            $dompdf->loadHtml($output);
 
             set_time_limit(120);                           // it may take some time!
 
-            $dompdf->set_paper('a4', 'landscape');
+            $dompdf->setPaper('a4', 'landscape');
 
             $dompdf->render();
 

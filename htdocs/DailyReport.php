@@ -33,5 +33,7 @@ switch ($_REQUEST['action']) {
     case 'p5SRWithSalesOrdersAndContract':
         $buDailyReport->p5WithSalesOrderAndContractAssigned();
         break;
+    case 'contactOpenSRReport':
+        $buDailyReport->contactOpenSRReport();
 }
 ?>

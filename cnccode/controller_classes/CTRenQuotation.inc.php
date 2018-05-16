@@ -21,6 +21,14 @@ class CTRenQuotation extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "renewals",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenQuotation = new BURenQuotation($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenQuotation = new DSForm($this);
@@ -75,15 +83,6 @@ class CTRenQuotation extends CTCNC
     {
         $this->setMethodName('displayList');
         $this->setPageTitle('Renewals');
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            if ($_REQUEST['dateGenerated']) {
-
-
-            }
-
-        }
 
         $this->setTemplateFiles(
             array('RenQuotationList' => 'RenQuotationList.inc')
@@ -390,10 +389,10 @@ class CTRenQuotation extends CTCNC
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID' => $this->dsRenQuotation->getValue('customerItemID')
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'ID' => $this->dsRenQuotation->getValue('customerItemID')
+                                 )
                 );
 
         }

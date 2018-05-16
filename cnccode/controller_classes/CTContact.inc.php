@@ -35,6 +35,14 @@ class CTContact extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buContact = new BUContact($this);
         $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
         $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);
@@ -259,7 +267,10 @@ class CTContact extends CTCNC
             if (($_REQUEST['customerID'] != '') AND ($_REQUEST['siteNo'] == '')) {
                 $this->raiseError('siteNo not passed');
             }
-            $this->buContact->initialiseNewContact($_REQUEST['supplierID'], $_REQUEST['customerID'], $_REQUEST['siteNo'], $this->dsContact);
+            $this->buContact->initialiseNewContact($_REQUEST['supplierID'],
+                                                   $_REQUEST['customerID'],
+                                                   $_REQUEST['siteNo'],
+                                                   $this->dsContact);
         }
         return (
         $this->buildLink(

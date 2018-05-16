@@ -249,7 +249,7 @@ define("USER_SYSTEM", 67);
 List of userIDs that can add managers comments to service requests
 */
 $GLOBALS['can_add_manager_comment'] =
-    array(USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA);
+    array(USER_AC, USER_GL, USER_GJ, USER_RH, USER_KA, 110);
 
 /* 
 When automated emails coming in from unrecognised email addresses with these domains,
@@ -370,6 +370,8 @@ define('CONFIG_HEADER_SUPPORT_CONTACT_FLAG', 'mailshot5Flag');
 define('CONFIG_HEADER_TECHNICAL_MAILSHOT_CONTACT_FLAG', 'mailshot6Flag');
 
 define('CONFIG_HEADER_INVOICE_CONTACT', 'mailshot2Flag');     // Customer contact to send invoices to
+
+define('CONFIG_HEADER_DAILY_OPEN_SR_REPORT', 'mailshot11Flag');
 // Phone numbers
 define('CONFIG_IT_SUPPORT_PHONE', '0845 070 0582');
 define('CONFIG_PHONE_SYSTEM_SUPPORT_PHONE', '0845 070 0583');

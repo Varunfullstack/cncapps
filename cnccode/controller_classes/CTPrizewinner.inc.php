@@ -21,6 +21,13 @@ class CTPrizewinner extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPrizewinner = new BUPrizewinner($this);
         $this->dsPrizewinner = new DSForm($this);
         $this->dsPrizewinner->copyColumnsFrom($this->buPrizewinner->dbePrizewinner);
@@ -242,10 +249,10 @@ class CTPrizewinner extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'prizewinnerID' => $this->dsPrizewinner->getValue('prizewinnerID'),
-                    'action' => 'view'
-                )
+                             array(
+                                 'prizewinnerID' => $this->dsPrizewinner->getValue('prizewinnerID'),
+                                 'action' => 'view'
+                             )
             );
         header('Location: ' . $urlNext);
     }

@@ -150,7 +150,6 @@ class DataAccess extends BaseObject
      */
     function replicate(&$data)
     {
-
         $this->setMethodName("replicate");
         $ret = FALSE;
         $this->_colCount = $this->colCount();

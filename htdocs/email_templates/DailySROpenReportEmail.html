@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Report</title>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            font-size: 10pt;
+        }
+
+        table {
+            font-size: 10pt;
+            -webkit-column-gap: 8px;
+            -moz-column-gap: 8px;
+            column-gap: 8px;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #eeeeee;
+        }
+
+        thead tr {
+            background-color: #cccccc;
+        }
+
+    </style>
+</head>
+<body>
+<div>
+    Dear {contactName}
+</div>
+<br>
+<div>
+    The list below shows the status of all the requests that are open with our Service Desk team.
+    Please don’t reply to this email as it won’t be processed by our system, but if you wish to add an update please use
+    the link for the service request that will take you to our portal.
+</div>
+<br>
+<table>
+    <thead>
+    <tr>
+        <th>Service Request</th>
+        <th>Raised By</th>
+        <th>Raised On</th>
+        <th>Status</th>
+        <th align="left">Details</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN openSRBlock -->
+    <tr>
+        <td align="center"><a href="{srLinkToPortal}">{srNumber}</a></td>
+        <td align="center" style="white-space: nowrap">{srRaisedByName}</td>
+        <td align="center" style="white-space: nowrap">{srRaisedOnDate}</td>
+        <td align="center" style="white-space: nowrap">{srStatus}</td>
+        <td align="left">{srDetails}</td>
+    </tr>
+    <!-- END openSRBlock -->
+    </tbody>
+</table>
+<br>
+
+Regards
+
+</body>
+</html>

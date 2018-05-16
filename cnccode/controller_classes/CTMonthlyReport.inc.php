@@ -21,6 +21,13 @@ class CTMonthlyReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->dsServiceDeskReport = new DSForm($this);
         $dbeServiceDeskReport = new dbeServiceDeskReport($this);
         $this->dsServiceDeskReport->copyColumnsFrom($dbeServiceDeskReport);
@@ -388,7 +395,8 @@ class CTMonthlyReport extends CTCNC
 
         $endmth = $startmth + 2;
         $last_quarter['start'] = date('Y-m-d', mktime(0, 0, 0, $startmth, 1, $year));
-        $last_quarter['end'] = date('Y-m-d', mktime(0, 0, 0, $endmth, date("t", mktime(0, 0, 0, $endmth, 1, $year)), $year));
+        $last_quarter['end'] = date('Y-m-d',
+                                    mktime(0, 0, 0, $endmth, date("t", mktime(0, 0, 0, $endmth, 1, $year)), $year));
 
         return $last_quarter;
     }
@@ -435,10 +443,10 @@ class CTMonthlyReport extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'serviceDeskReportID' => $this->dsServiceDeskReport->getValue('serviceDeskReportID'),
-                    'action' => 'view'
-                )
+                             array(
+                                 'serviceDeskReportID' => $this->dsServiceDeskReport->getValue('serviceDeskReportID'),
+                                 'action' => 'view'
+                             )
             );
         header('Location: ' . $urlNext);
     }

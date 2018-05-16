@@ -58,6 +58,7 @@
         }
         return;
     }
+
     function linkedSalesOrderPopup() {
         window.open(
             '{urlLinkedSalesOrder}',
@@ -153,17 +154,18 @@
             <td></td>
             <td></td>
             <td class="promptText">Type</td>
-            <td class="fieldText"><select
-                    {INITIAL_DISABLED}
-                    onchange="setFormChanged();"
-                    id="contractID"
-                    name="callActivity[1][callActTypeID]"
-            >
-                <option value="">Please Select</option>
-                <!-- BEGIN activityTypeBlock -->
-                <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
-                <!-- END activityTypeBlock -->
-            </select>
+            <td class="fieldText">
+                <select
+                        {INITIAL_DISABLED} {typeDisabled}
+                        onchange="setFormChanged();"
+                        id="{contractID}"
+                        name="callActivity[1][callActTypeID]"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN activityTypeBlock -->
+                    <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
+                    <!-- END activityTypeBlock -->
+                </select>
                 <span class="formErrorMessage">{callActTypeIDMessage}</span>
             </td>
 
@@ -446,51 +448,54 @@
             </td>
         </tr>
     </table>
-    <table class="singleBorder" width="900" border="0">
-        <tr>
-            <td class="listHead">Documents</td>
-        </tr>
-        <tr>
-            <td>
-                <table class="singleBorder" width="100%">
-                    <tr>
-                        <td width="29%" class="listHeadText">Description</td>
-                        <td width="28%" class="listHeadText">File</td>
-                        <td width="18%" class="listHeadText">Date</td>
-                        <td width="14%" class="listHeadText">User</td>
-                        <td width="14%" class="listHeadText">&nbsp;</td>
-                    </tr>
-                    <!-- BEGIN documentBlock -->
-                    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
-                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
-                        </td>
-                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
-                        </td>
-                        <td nowrap="nowrap">{createDate}</td>
-                        <td nowrap="nowrap">{createUserName}</td>
-                        <td><A href="{urlDeleteFile}&isEdit=true" title="Delete attached document"
-                               onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
-                        </td>
-                    </tr>
-                    <!-- END documentBlock -->
-                    <tr>
-                        <td class="promptTextLeft">Description</td>
-                        <td colspan="4">
+</form>
+<table class="singleBorder" width="900" border="0">
+    <tr>
+        <td class="listHead">Documents</td>
+    </tr>
+    <tr>
+        <td>
+            <table class="singleBorder" width="100%">
+                <tr>
+                    <td width="29%" class="listHeadText">Description</td>
+                    <td width="28%" class="listHeadText">File</td>
+                    <td width="18%" class="listHeadText">Date</td>
+                    <td width="14%" class="listHeadText">User</td>
+                    <td width="14%" class="listHeadText">&nbsp;</td>
+                </tr>
+                <!-- BEGIN documentBlock -->
+                <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+                    <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
+                    </td>
+                    <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
+                    </td>
+                    <td nowrap="nowrap">{createDate}</td>
+                    <td nowrap="nowrap">{createUserName}</td>
+                    <td><A href="{urlDeleteFile}&isEdit=true" title="Delete attached document"
+                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                    </td>
+                </tr>
+                <!-- END documentBlock -->
+                <tr>
+                    <td class="promptTextLeft">Description</td>
+                    <td colspan="4">
+                        <form action="{urlUploadFile}" method="post" enctype="multipart/form-data">
                             <input name="uploadDescription" type="text" size="45" maxlength="50"
                                    value="{uploadDescription}">
+                            <input type="hidden" name="edit" value="true">
                             <input
                                     name="userfile"
                                     type="file"
                                     value="{userfile}"
                             >
                             <input type="submit" name="uploadFile" value="Upload">
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</form>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 <div id="dialog" title="Alert"><p></p></div>
 <script>
     var timeout;              // timer

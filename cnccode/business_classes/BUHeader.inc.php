@@ -7,6 +7,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJHeader.php");
 
 class BUHeader extends Business
 {

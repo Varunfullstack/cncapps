@@ -1,5 +1,6 @@
 <?php require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalDocument.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPortalDocumentWithoutFile.php");
 
 class BUPortalDocument extends Business
 {

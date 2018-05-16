@@ -28,13 +28,21 @@ class CTCurrentActivityReport extends CTCNC
     const RED = '#F8A5B6';
     const GREEN = '#BDF8BA';
     const BLUE = '#b2daff';
-    const CONTENT = '#F4f4f2';
+    const CONTENT = null;
     const PURPLE = '#dcbdff';
     const ORANGE = '#FFE6AB';
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+
+        $roles = [
+            "technical",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
 
         $this->buActivity = new BUActivity($this);
 
@@ -164,7 +172,9 @@ class CTCurrentActivityReport extends CTCNC
             case 'deescalate':
                 $this->deescalate();
                 break;
-
+            case 'changeQueue':
+                $this->changeQueue();
+                break;
             case 'toggleDisplayFixedPendingClosureFlag':
                 $this->checkPermissions(PHPLIB_PERM_SUPERVISOR);
                 $this->toggleDisplayFixedPendingClosureFlag();
@@ -534,12 +544,73 @@ class CTCurrentActivityReport extends CTCNC
         $this->renderQueue(3);  // Sales
         $this->renderQueue(4);  //Implementations
         $this->renderQueue(5);  // Managers
-//        $this->renderQueue(6);  //Fixed
+
+        if ($_SESSION['selectedCustomerID']) {
+            $this->renderQueue(6);  //Fixed
+        } else {
+            $this->template->set_block('CurrentActivityReport', 'queue6Block', 'requests6');
+            $this->template->set_var(
+
+                array(
+
+                    'workOnClick' => '',
+                    'hoursRemaining' => '',
+                    'updatedBgColor' => '',
+                    'priorityBgColor' => '',
+                    'hoursRemainingBgColor' => '',
+                    'totalActivityDurationHours' => '',
+                    'hdRemaining' => '',
+                    'esRemaining' => '',
+                    'imRemaining' => '',
+                    'hdColor' => '',
+                    'esColor' => '',
+                    'imColor' => '',
+                    'urlCustomer' => '',
+                    'time' => '',
+                    'date' => '',
+                    'problemID' => '',
+                    'reason' => '',
+                    'urlProblemHistoryPopup' => '',
+                    'engineerDropDown' => '',
+                    'engineerName' => '',
+                    'customerName' => '',
+                    'customerNameDisplayClass' => '',
+                    'urlViewActivity' => '',
+                    'linkAllocateAdditionalTime' => '',
+                    'slaResponseHours' => '',
+                    'priority' => '',
+                    'alarmDateTime' => '',
+                    'bgColour' => '',
+                    'workBgColor' => '',
+
+                )
+
+            );
+            $this->template->parse('requests6', 'queue6Block', true);
+
+        }
+
         $this->renderQueue(7); // Future
 
         $this->template->set_block('CurrentActivityReport', 'userFilterBlock', 'users');
 
-        foreach ($this->filterUser as $key => $value) {
+        $loggedInUserID = $this->userID;
+
+        usort($this->filterUser,
+            function ($a, $b) use ($loggedInUserID) {
+
+                if ($a['userID'] == $loggedInUserID) {
+                    return -1;
+                }
+
+                if ($b['userID'] == $loggedInUserID) {
+                    return 1;
+                }
+                return strcasecmp($a['fullName'], $b['fullName']);
+            }
+        );
+
+        foreach ($this->filterUser as $value) {
 
             if ($value['userID'] == $_SESSION['selectedUserID']) {
                 $userSelected = 'SELECTED';
@@ -632,26 +703,8 @@ class CTCurrentActivityReport extends CTCNC
                 array('action' => 'showMineOnly')
             );
 
-        $urlAllocateUser =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'allocateUser'
-                )
-            );
-        $javascript = '
-      <script language="JavaScript">
-        function allocateUser( form ) { 
-          var newIndex = form.userID.selectedIndex; 
-          cururl = \'' . $urlAllocateUser . '\' + form.userID.options[ newIndex ].value; 
-          window.location.assign( cururl ); 
-        } 
-      </script>';
-
         $this->template->set_var(
-
             array(
-                'javaScript' => $javascript,
                 'urlResetFilter' => $urlResetFilter,
                 'urlShowMineOnly' => $urlShowMineOnly,
                 'urlSetFilter' => $urlSetFilter
@@ -681,6 +734,17 @@ class CTCurrentActivityReport extends CTCNC
             $this->buActivity->getProblemsByQueueNo($queueNo, $dsResults);
 
         }
+
+        $queueOptions = [
+            '<option>-</option>',
+            '<option value="1">H</option>',
+            '<option value="2">E</option>',
+            '<option value="3">I</option>',
+            '<option value="4">S</option>',
+            '<option value="5">M</option>'
+        ];
+
+        unset($queueOptions[$queueNo]);
 
         $blockName = 'queue' . $queueNo . 'Block';
 
@@ -755,8 +819,6 @@ class CTCurrentActivityReport extends CTCNC
                     );
 
                 $linkAllocateAdditionalTime = '<a href="' . $urlAllocateAdditionalTime . '" title="Allocate additional time"><img src="/images/clock.png" width="20px">';
-            } else {
-                $urlAllocateAdditionalTime = '';
             }
 
             $javascript = '<script language="JavaScript">
@@ -954,13 +1016,13 @@ class CTCurrentActivityReport extends CTCNC
             $imRemaining = $imAssignedMinutes - $imUsedMinutes;
 
 
-            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'), 1);
+            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
+                                            1);
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
                 array(
-                    'escalateButton' => $escalateButton,
-                    'deEscalateButton' => $deEscalateButton,
+                    'queueOptions' => implode($queueOptions),
                     'workOnClick' => $workOnClick,
                     'hoursRemaining' => $hoursRemaining,
                     'updatedBgColor' => $updatedBgColor,
@@ -979,11 +1041,13 @@ class CTCurrentActivityReport extends CTCNC
                     'problemID' => $dsResults->getValue('problemID'),
                     'reason' => $this->truncate($dsResults->getValue('reason'), 150),
                     'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
-                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'), $dsResults->getValue('userID')),
+                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'),
+                                                                          $dsResults->getValue('userID')),
                     'engineerName' => $dsResults->getValue('engineerName'),
                     'customerName' => $dsResults->getValue('customerName'),
                     'customerNameDisplayClass'
-                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'), $dsResults->getValue('specialAttentionEndDate')),
+                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'),
+                                                          $dsResults->getValue('specialAttentionEndDate')),
                     'urlViewActivity' => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),
@@ -1110,16 +1174,36 @@ class CTCurrentActivityReport extends CTCNC
      */
     function getAllocatedUserDropdown($problemID, $selectedID)
     {
+
         // user selection
         $userSelected = ($selectedID == 0) ? CT_SELECTED : '';
 
-        $string .= '<option ' . $userSelected . ' value="&userID=0&problemID=' . $problemID . '"></option>';
+        $urlAllocateUser =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'allocateUser',
+                    'userID' => '0',
+                    'problemID' => $problemID
+                )
+            );
+        $string = '';
+        $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '"></option>';
 
-        foreach ($this->allocatedUser as $key => $value) {
+        foreach ($this->allocatedUser as $value) {
 
             $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : '';
+            $urlAllocateUser =
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'allocateUser',
+                        'userID' => $value['userID'],
+                        'problemID' => $problemID
+                    )
+                );
 
-            $string .= '<option ' . $userSelected . ' value="&userID=' . $value['userID'] . '&problemID=' . $problemID . '">' . $value['userName'] . '</option>';
+            $string .= '<option ' . $userSelected . ' value="' . $urlAllocateUser . '">' . $value['userName'] . '</option>';
 
         }
 
@@ -1154,11 +1238,9 @@ class CTCurrentActivityReport extends CTCNC
             $specialAttentionFlag == 'Y' &&
             $specialAttentionEndDate >= date('Y-m-d')
         ) {
-            $ret = 'specialAttentionCustomer';
-        } else {
-            $ret = 'content';
+            return 'class="specialAttentionCustomer"';
         }
-        return $ret;
+        return null;
     }
 
     function deleteCustomerRequest()
@@ -1166,6 +1248,23 @@ class CTCurrentActivityReport extends CTCNC
         $customerproblemno = $_REQUEST['cpr_customerproblemno'];
 
         $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
+        $urlNext =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array()
+            );
+        header('Location: ' . $urlNext);
+        exit;
+
+    }
+
+    function changeQueue()
+    {
+        $problemID = $_REQUEST['problemID'];
+        $newQueue = $_REQUEST['queue'];
+
+        $this->buActivity->escalateProblemByProblemID($problemID, $newQueue);
+
         $urlNext =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],

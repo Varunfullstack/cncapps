@@ -22,6 +22,13 @@ class CTHeader extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buHeader = new BUHeader($this);
         $this->dsHeader = new DSForm($this);
         $this->dsHeader->copyColumnsFrom($this->buHeader->dbeJHeader);
@@ -104,6 +111,10 @@ class CTHeader extends CTCNC
                 'faxMessage' => Controller::htmlDisplayText($dsHeader->getMessage('fax')),
                 'goodsContact' => Controller::htmlInputText($dsHeader->getValue('goodsContact')),
                 'goodsContactMessage' => Controller::htmlDisplayText($dsHeader->getMessage('goodsContact')),
+                'serviceDeskNotification24hBegin' => Controller::htmlInputText($dsHeader->getValue('serviceDeskNotification24hBegin')),
+                'serviceDeskNotification24hBeginMessage' => Controller::htmlDisplayText($dsHeader->getMessage('serviceDeskNotification24hBegin')),
+                'serviceDeskNotification24hEnd' => Controller::htmlInputText($dsHeader->getValue('serviceDeskNotification24hEnd')),
+                'serviceDeskNotification24hEndMessage' => Controller::htmlDisplayText($dsHeader->getMessage('serviceDeskNotification24hEnd')),
                 'billingStartTime' => Controller::htmlInputText($dsHeader->getValue('billingStartTime')),
                 'billingStartTimeMessage' => Controller::htmlDisplayText($dsHeader->getMessage('billingStartTime')),
                 'billingEndTime' => Controller::htmlInputText($dsHeader->getValue('billingEndTime')),
@@ -146,6 +157,8 @@ class CTHeader extends CTCNC
                 'mailshot9FlagDefChecked' => $this->getChecked($dsHeader->getValue('mailshot9FlagDef')),
                 'mailshot10FlagDesc' => Controller::htmlInputText($dsHeader->getValue('mailshot10FlagDesc')),
                 'mailshot10FlagDefChecked' => $this->getChecked($dsHeader->getValue('mailshot10FlagDef')),
+                'mailshot11FlagDesc' => Controller::htmlInputText($dsHeader->getValue('mailshot11FlagDesc')),
+                'mailshot11FlagDefChecked' => $this->getChecked($dsHeader->getValue('mailshot11FlagDef')),
                 'priority1Desc' => Controller::htmlInputText($dsHeader->getValue('priority1Desc')),
                 'priority1DescMessage' => Controller::htmlDisplayText($dsHeader->getMessage('priority1Desc')),
                 'priority2Desc' => Controller::htmlInputText($dsHeader->getValue('priority2Desc')),
@@ -230,6 +243,7 @@ class CTHeader extends CTCNC
                 'remoteSupportWarnHours' => Controller::htmlInputText($dsHeader->getValue('remoteSupportWarnHours')),
 
                 'remoteSupportWarnHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('remoteSupportWarnHours')),
+                'customerReviewMeetingText' => Controller::htmlInputText($dsHeader->getValue(DBEHeader::customerReviewMeetingText)),
                 DBEHeader::RemoteSupportMinWarnHours => Controller::htmlInputText($dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours)),
 
                 DBEHeader::RemoteSupportMinWarnHours . 'Message' => Controller::htmlDisplayText($dsHeader->getMessage(DBEHeader::RemoteSupportMinWarnHours)),
@@ -282,9 +296,9 @@ class CTHeader extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }
@@ -353,9 +367,9 @@ class CTHeader extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'editHelpDesk'
-                )
+                             array(
+                                 'action' => 'editHelpDesk'
+                             )
             );
         header('Location: ' . $urlNext);
     }

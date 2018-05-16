@@ -28,6 +28,13 @@ class CTUser extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
         $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
@@ -242,13 +249,8 @@ class CTUser extends CTCNC
                 'petrolRateMessage' => Controller::htmlDisplayText($dsUser->getMessage('petrolRate')),
                 'hourlyPayRate' => Controller::htmlInputText($dsUser->getValue('hourlyPayRate')),
                 'hourlyPayRateMessage' => Controller::htmlDisplayText($dsUser->getMessage('hourlyPayRate')),
-
                 'standardDayHours' => Controller::htmlInputText($dsUser->getValue('standardDayHours')),
-
                 'standardDayHoursMessage' => Controller::htmlDisplayText($dsUser->getMessage('standardDayHours')),
-
-                'petrolRateMessage' => Controller::htmlDisplayText($dsUser->getMessage('petrolRate')),
-
                 'signatureFilename' => Controller::htmlInputText($dsUser->getValue('signatureFilename')),
                 'signatureFilenameMessage' => Controller::htmlDisplayText($dsUser->getMessage('signatureFilename')),
                 'firstName' => Controller::htmlInputText($dsUser->getValue('firstName')),
@@ -269,22 +271,29 @@ class CTUser extends CTCNC
 
                 'salesChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_SALES) !== FALSE) ? CT_CHECKED : '',
 
-                'accountsChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_ACCOUNTS) !== FALSE) ? CT_CHECKED : '',
+                'accountsChecked' => (strpos($dsUser->getValue('perms'),
+                                             PHPLIB_PERM_ACCOUNTS) !== FALSE) ? CT_CHECKED : '',
 
-                'technicalChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_TECHNICAL) !== FALSE) ? CT_CHECKED : '',
+                'technicalChecked' => (strpos($dsUser->getValue('perms'),
+                                              PHPLIB_PERM_TECHNICAL) !== FALSE) ? CT_CHECKED : '',
 
-                'supervisorChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_SUPERVISOR) !== FALSE) ? CT_CHECKED : '',
+                'supervisorChecked' => (strpos($dsUser->getValue('perms'),
+                                               PHPLIB_PERM_SUPERVISOR) !== FALSE) ? CT_CHECKED : '',
 
-                'maintenanceChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_MAINTENANCE) !== FALSE) ? CT_CHECKED : '',
+                'maintenanceChecked' => (strpos($dsUser->getValue('perms'),
+                                                PHPLIB_PERM_MAINTENANCE) !== FALSE) ? CT_CHECKED : '',
 
-                'customerChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_CUSTOMER) !== FALSE) ? CT_CHECKED : '',
+                'customerChecked' => (strpos($dsUser->getValue('perms'),
+                                             PHPLIB_PERM_CUSTOMER) !== FALSE) ? CT_CHECKED : '',
 
-                'renewalsChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_RENEWALS) !== FALSE) ? CT_CHECKED : '',
+                'renewalsChecked' => (strpos($dsUser->getValue('perms'),
+                                             PHPLIB_PERM_RENEWALS) !== FALSE) ? CT_CHECKED : '',
 
                 'changeApproverFlagChecked' => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
 
 
-                'reportsChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_REPORTS) !== FALSE) ? CT_CHECKED : '',
+                'reportsChecked' => (strpos($dsUser->getValue('perms'),
+                                            PHPLIB_PERM_REPORTS) !== FALSE) ? CT_CHECKED : '',
                 'teamMessage' => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
                 'urlUpdate' => $urlUpdate,
                 'urlDelete' => $urlDelete,
@@ -377,10 +386,10 @@ class CTUser extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'userID' => $this->dsUser->getValue('userID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'userID' => $this->dsUser->getValue('userID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

@@ -53,7 +53,7 @@ class BUPDFInvoice extends BaseObject
     var $_dateToUse = '';
     var $_startInvheadID = '';
     var $_endInvheadID = '';
-    var $_titleLine = '';
+    var $_titleLine = 0;
 
     /**
      * Constructor

@@ -1,9 +1,10 @@
 {
     "require": {
-        "dompdf/dompdf": "0.6.*",
-        "doctrine/orm": "^2.5",
-        "doctrine/migrations": "^1.5",
+        "dompdf/dompdf": "^0.8.2",
         "setasign/fpdi": "^2.0",
+        "setasign/fpdi-protection": "^2.0",
+        "syonix/changelog-viewer": "^0.1.7",
+        "crossjoin/pre-mailer": "^1.0",
         "signable/signable-php": "*@dev"
     }
 }

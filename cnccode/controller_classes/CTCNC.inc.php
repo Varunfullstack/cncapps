@@ -11,6 +11,7 @@ require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
+require_once($cfg['path_bu'] . '/BUUser.inc.php');
 
 define('CTCNC_ACT_DISP_CUST_POPUP', 'dispCustPopup');
 define('CTCNC_ACT_DISP_ITEM_POPUP', 'dispItemPopup');
@@ -68,6 +69,7 @@ class CTCNC extends Controller
     var $userID = '';
     var $dbeUser;
     var $dbeTeam;
+    private $user;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -77,7 +79,22 @@ class CTCNC extends Controller
             $this->userID = CONFIG_SCHEDULED_TASK_USER_ID;
         }
 
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->getRow();
+
+        $this->user = new BUUser($this);
+
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+    }
+
+    function canAccess($roles)
+    {
+        $perms = explode(',', $this->dbeUser->getValue(DBEUser::perms));
+        $array = array_intersect($perms, $roles);
+
+        return !!count($array);
+
     }
 
     function getDbeUser()
@@ -86,6 +103,11 @@ class CTCNC extends Controller
             $this->dbeUser = new DBEUser ($this);
         }
         return $this->dbeUser;
+    }
+
+    function getUser()
+    {
+
     }
 
     function getDbeTeam()
@@ -127,6 +149,8 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
+
+
         $urlLogout = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_LOGOUT));
         // if new session then username not set yet
         if ($userName == '') {
@@ -136,35 +160,55 @@ class CTCNC extends Controller
             $userName = $dbeUser->getValue('name');
         }
 
+        $screenSalesTemplate = 'ScreenSales.inc';
+        $screenAccountsTemplate = 'ScreenAccounts.inc';
+        $screenTechnicalTemplate = 'ScreenTechnical.inc';
+        $screenRenewalsTemplate = 'ScreenRenewals.inc';
+        $screenMaintenanceTemplate = 'ScreenMaintenance.inc';
+        $screenReportsTemplate = 'ScreenReports.inc';
+        $screenCustomerTemplate = 'ScreenCustomer.inc';
+
+
+        if (isset($_REQUEST['oldMenu'])) {
+            $screenSalesTemplate = 'ScreenSalesOld.inc';
+            $screenAccountsTemplate = 'ScreenAccountsOld.inc';
+            $screenTechnicalTemplate = 'ScreenTechnicalOld.inc';
+            $screenRenewalsTemplate = 'ScreenRenewalsOld.inc';
+            $screenMaintenanceTemplate = 'ScreenMaintenanceOld.inc';
+            $screenReportsTemplate = 'ScreenReportsOld.inc';
+            $screenCustomerTemplate = 'ScreenCustomerOld.inc';
+        }
+
         $this->template->set_var(array('userName' => $userName, 'fromDate' => '', 'urlLogout' => $urlLogout));
         // display correct menus despending upon permission levels for this user
         if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
-            $this->setTemplateFiles(array('ScreenSales' => 'ScreenSales.inc'));
+
+            $this->setTemplateFiles(array('ScreenSales' => $screenSalesTemplate));
             $this->template->parse('screenSales', 'ScreenSales', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
-            $this->setTemplateFiles(array('ScreenAccounts' => 'ScreenAccounts.inc'));
+            $this->setTemplateFiles(array('ScreenAccounts' => $screenAccountsTemplate));
             $this->template->parse('screenAccounts', 'ScreenAccounts', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
-            $this->setTemplateFiles(array('ScreenTechnical' => 'ScreenTechnical.inc'));
+            $this->setTemplateFiles(array('ScreenTechnical' => $screenTechnicalTemplate));
             $this->template->parse('screenTechnical', 'ScreenTechnical', true);
 
         }
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $this->setTemplateFiles(array('ScreenRenewals' => 'ScreenRenewals.inc'));
+            $this->setTemplateFiles(array('ScreenRenewals' => $screenRenewalsTemplate));
             $this->template->parse('screenRenewals', 'ScreenRenewals', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
-            $this->setTemplateFiles(array('ScreenMaintenance' => 'ScreenMaintenance.inc'));
+            $this->setTemplateFiles(array('ScreenMaintenance' => $screenMaintenanceTemplate));
             $this->template->parse('screenMaintenance', 'ScreenMaintenance', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_REPORTS)) {
-            $this->setTemplateFiles(array('ScreenReports' => 'ScreenReports.inc'));
+            $this->setTemplateFiles(array('ScreenReports' => $screenReportsTemplate));
             $this->template->parse('screenReports', 'ScreenReports', true);
         }
         if ($this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $this->setTemplateFiles(array('ScreenCustomer' => 'ScreenCustomer.inc'));
+            $this->setTemplateFiles(array('ScreenCustomer' => $screenCustomerTemplate));
             $this->template->parse('screenCustomer', 'ScreenCustomer', true);
         }
 
@@ -176,6 +220,9 @@ class CTCNC extends Controller
         if ($_REQUEST ['htmlFmt'] != '') {
             $this->setHTMLFmt($_REQUEST ['htmlFmt']);
         }
+
+        $user = self::getDbeUser();
+
         switch ($_REQUEST ['action']) {
             case CTCNC_ACT_LOGOUT :
                 $this->logout();
@@ -192,22 +239,20 @@ class CTCNC extends Controller
 
     function hasPermissions($levels)
     {
-
-        if (!$this->isRunningFromCommandLine()) {
-            $allow = FALSE;
-            if (is_array($levels)) {
-                while (list ($key, $val) = each($levels)) {
-                    $allow = ($allow | $GLOBALS ['perm']->have_perm($val));
-                }
-            } elseif (isset($GLOBALS ['perm'])) {
-                $allow = $GLOBALS ['perm']->have_perm($levels);
-            } else {
-                $allow = true;
-            }
-        } else {
-            $allow = true;
+        if ($this->isRunningFromCommandLine()) {
+            return true;
         }
-        return $allow;
+
+        $permissions = explode(",", self::getDbeUser()->getValue('perms'));
+        if (is_array($levels)) {
+
+            return array_intersect($levels, $permissions);
+        }
+
+        if ($this->userID) {
+            return in_array($levels, $permissions);
+        }
+        return true;
     }
 
     function teamLevelIs($level)

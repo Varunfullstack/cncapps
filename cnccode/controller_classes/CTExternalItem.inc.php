@@ -25,6 +25,10 @@ class CTExternalItem extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buExternalItem = new BUExternalItem($this);
         $this->dsExternalItem = new DSForm($this);
         $this->dsExternalItem->copyColumnsFrom($this->buExternalItem->dbeExternalItem);

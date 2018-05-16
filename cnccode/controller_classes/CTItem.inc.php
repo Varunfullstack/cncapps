@@ -38,6 +38,14 @@ class CTItem extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buItem = new BUItem($this);
         $this->dsItem = new DSForm($this);    // new specialised dataset with form message support
         $this->dsItem->copyColumnsFrom($this->buItem->dbeItem);

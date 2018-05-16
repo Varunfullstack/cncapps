@@ -38,6 +38,7 @@ class DBEHeader extends DBEntity
     const mailshot8FlagDef = "mailshot8FlagDef";
     const mailshot9FlagDef = "mailshot9FlagDef";
     const mailshot10FlagDef = "mailshot10FlagDef";
+    const mailshot11FlagDef = "mailshot11FlagDef";
     const mailshot1FlagDesc = "mailshot1FlagDesc";
     const mailshot2FlagDesc = "mailshot2FlagDesc";
     const mailshot3FlagDesc = "mailshot3FlagDesc";
@@ -48,6 +49,7 @@ class DBEHeader extends DBEntity
     const mailshot8FlagDesc = "mailshot8FlagDesc";
     const mailshot9FlagDesc = "mailshot9FlagDesc";
     const mailshot10FlagDesc = "mailshot10FlagDesc";
+    const mailshot11FlagDesc = "mailshot11FlagDesc";
     const helpDeskProblems = "helpDeskProblems";
     const hourlyLabourCost = "hourlyLabourCost";
     const highActivityAlertCount = "highActivityAlertCount";
@@ -76,10 +78,13 @@ class DBEHeader extends DBEntity
     const srPromptContractThresholdHours = "srPromptContractThresholdHours";
     const remoteSupportWarnHours = "remoteSupportWarnHours";
     const customerContactWarnHours = "customerContactWarnHours";
-
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
     const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
+    const customerReviewMeetingText = "customerReviewMeetingText";
+    const serviceDeskNotification24hBegin =  "serviceDeskNotification24hBegin";
+    const serviceDeskNotification24hEnd =  "serviceDeskNotification24hEnd";
+
 
     /**
      * calls constructor()
@@ -123,6 +128,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::mailshot8FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg8_def");
         $this->addColumn(self::mailshot9FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg9_def");
         $this->addColumn(self::mailshot10FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg10_def");
+        $this->addColumn(self::mailshot11FlagDef, DA_YN, DA_NOT_NULL, "hed_mailflg11_def");
         $this->addColumn(self::mailshot1FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg1_desc");
         $this->addColumn(self::mailshot2FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg2_desc");
         $this->addColumn(self::mailshot3FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg3_desc");
@@ -133,6 +139,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::mailshot8FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg8_desc");
         $this->addColumn(self::mailshot9FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg9_desc");
         $this->addColumn(self::mailshot10FlagDesc, DA_YN, DA_NOT_NULL, "hed_mailflg10_desc");
+        $this->addColumn(self::mailshot11FlagDesc, DA_STRING, DA_NOT_NULL, "hed_mailflg11_desc");
         $this->addColumn(self::helpDeskProblems, DA_MEMO, DA_NOT_NULL, "hed_helpdesk_problems");
         $this->addColumn(self::hourlyLabourCost, DA_FLOAT, DA_NOT_NULL, "hed_hourly_labour_cost");
         $this->addColumn(self::highActivityAlertCount, DA_FLOAT, DA_NOT_NULL, "hed_high_activity_alert_count");
@@ -154,48 +161,39 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::hdTeamTargetFixHours, DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_fix_hours");
         $this->addColumn(self::esTeamTargetFixHours, DA_FLOAT, DA_NOT_NULL, "hed_es_team_target_fix_hours");
         $this->addColumn(self::imTeamTargetFixHours, DA_FLOAT, DA_NOT_NULL, "hed_im_team_target_fix_hours");
-        $this->addColumn(self::hdTeamTargetFixQtyPerMonth, DA_INTEGER, DA_NOT_NULL, "hed_hd_team_target_fix_qty_per_month");
-        $this->addColumn(self::esTeamTargetFixQtyPerMonth, DA_INTEGER, DA_NOT_NULL, "hed_es_team_target_fix_qty_per_month");
-        $this->addColumn(self::imTeamTargetFixQtyPerMonth, DA_INTEGER, DA_NOT_NULL, "hed_im_team_target_fix_qty_per_month");
-        $this->addColumn(self::srAutocompleteThresholdHours, DA_FLOAT, DA_NOT_NULL, "hed_sr_autocomplete_threshold_hours");
-        $this->addColumn(self::srPromptContractThresholdHours, DA_FLOAT, DA_NOT_NULL, "hed_sr_prompt_contract_threshold_hours");
+        $this->addColumn(self::hdTeamTargetFixQtyPerMonth,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "hed_hd_team_target_fix_qty_per_month");
+        $this->addColumn(self::esTeamTargetFixQtyPerMonth,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "hed_es_team_target_fix_qty_per_month");
+        $this->addColumn(self::imTeamTargetFixQtyPerMonth,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "hed_im_team_target_fix_qty_per_month");
+        $this->addColumn(self::srAutocompleteThresholdHours,
+                         DA_FLOAT,
+                         DA_NOT_NULL,
+                         "hed_sr_autocomplete_threshold_hours");
+        $this->addColumn(self::srPromptContractThresholdHours,
+                         DA_FLOAT,
+                         DA_NOT_NULL,
+                         "hed_sr_prompt_contract_threshold_hours");
         $this->addColumn(self::remoteSupportWarnHours, DA_FLOAT, DA_NOT_NULL, "hed_remote_support_warn_hours");
         $this->addColumn(self::customerContactWarnHours, DA_FLOAT, DA_NOT_NULL, "hed_customer_contact_warn_hours");
         $this->addColumn(self::RemoteSupportMinWarnHours, DA_FLOAT, DA_NOT_NULL, 'hed_remote_support_min_warn_hours');
-        $this->addColumn(self::ImplementationTeamMinutesInADay, DA_INTEGER, DA_NOT_NULL, 'hed_im_team_minutes_in_a_day');
+        $this->addColumn(self::ImplementationTeamMinutesInADay,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         'hed_im_team_minutes_in_a_day');
         $this->addColumn(self::backupTargetSuccessRate, DA_INTEGER, DA_NOT_NULL, "hed_backup_target_success_rate");
+        $this->addColumn(self::customerReviewMeetingText, DA_STRING, DA_ALLOW_NULL, "customer_review_meeting_text");
+        $this->addColumn(self::serviceDeskNotification24hBegin, DA_TIME, DA_NOT_NULL, "hed_sd_notification_24_7_begin");
+        $this->addColumn(self::serviceDeskNotification24hEnd, DA_TIME, DA_NOT_NULL, "hed_sd_notification_24_7_end");
         $this->setPK(0);
         $this->setAddColumnsOff();
-    }
-}
-
-class DBEJHeader extends DBEHeader
-{
-    /**
-     * calls constructor()
-     * @access public
-     * @return void
-     * @param  void
-     * @see constructor()
-     */
-    function __construct(&$owner)
-    {
-        parent::__construct($owner);
-        $this->setAddColumnsOn();
-        $this->addColumn("gscItemDescription", DA_STRING, DA_NOT_NULL, "itm_desc");
-        $this->setAddColumnsOff();
-    }
-
-    function getRow()
-    {
-        $this->setMethodName("getRow");
-        $ret = FALSE;
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON hed_gensup_itemno = itm_itemno"
-        );
-        return (parent::getRow());
     }
 }
 

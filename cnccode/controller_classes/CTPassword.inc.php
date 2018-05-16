@@ -20,6 +20,14 @@ class CTPassword extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "technical",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPassword = new BUPassword($this);
     }
 
@@ -59,17 +67,11 @@ class CTPassword extends CTCNC
         $this->setMethodName('search');
 
         $this->buPassword->initialiseSearchForm($dsSearchForm);
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-
                 $this->setFormErrorOn();
-
             } else {
-
                 $customerID = $dsSearchForm->getValue('customerID');
-
                 $report = $this->displayList($customerID);
                 exit;
             }
@@ -126,6 +128,16 @@ class CTPassword extends CTCNC
      */
     function displayList($customerID = false)
     {
+        $dbeCustomer = new DBECustomer($this);
+
+        if ($_REQUEST['customerID']) {
+            $customerID = $_REQUEST['customerID'];
+        }
+        if (empty($customerID)) {
+            $this->raiseError('Please search for a customer by typing and then pressing tab');
+            exit;
+        }
+
         $this->setMethodName('displayList');
 
         $this->setPageTitle('Passwords');
@@ -133,12 +145,6 @@ class CTPassword extends CTCNC
         $this->setTemplateFiles(
             array('PasswordList' => 'PasswordList.inc')
         );
-
-        $dbeCustomer = new DBECustomer($this);
-
-        if ($_REQUEST['customerID']) {
-            $customerID = $_REQUEST['customerID'];
-        }
 
         $dbeCustomer->getRow($customerID);
 

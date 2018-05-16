@@ -493,7 +493,6 @@ span#imRemainMinutes {
 
 }
 
-
 table#team-performance td, th {
     text-align: right;
 }
@@ -540,6 +539,6 @@ table#suspended {
 
 }
 
-table.table-bordered  tr{
-    background-color: rgb(244,244,242)
+table.table-bordered tr {
+    background-color: rgb(238, 238, 238)
 }

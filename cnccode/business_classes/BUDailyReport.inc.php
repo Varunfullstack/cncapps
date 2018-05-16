@@ -597,6 +597,10 @@ class BUDailyReport extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
+        $preMailer = new \Crossjoin\PreMailer\HtmlString($body);
+
+        $body = $preMailer->getHtml();
+
         $buMail->mime->setHTMLBody($body);
 
         if ($attachment) {
@@ -857,5 +861,126 @@ WHERE pro_priority = 5
   AND pro_contract_cuino <> 0 
   AND pro_contract_cuino IS NOT NULL";
         return $this->db->query($sql);
+    }
+
+    public function contactOpenSRReport()
+    {
+        $this->setMethodName('contactOpenSRReport');
+
+        $contactOpenSRReportData = $this->getContactOpenSRReportData();
+
+        $contactsData = [];
+
+        while ($row = $contactOpenSRReportData->fetch_assoc()) {
+            if (!isset($contactsData[$row['contactName']])) {
+                $contactsData[$row['contactName']] = [
+                    "email" => $row['contactEmail'],
+                    "serviceRequests" => []
+                ];
+            }
+            $contactsData[$row['contactName']]['serviceRequests'][] = $row;
+        }
+
+        foreach ($contactsData as $contactName => $contactsDatum) {
+
+            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+
+            $template->set_file('page', 'DailySROpenReportEmail.html');
+
+            $template->set_var('contactName', $contactName);
+
+            $template->set_block('page', 'openSRBlock', 'openSR');
+
+
+            foreach ($contactsDatum['serviceRequests'] as $SR) {
+                $urlRequest = "https://www.cnc-ltd.co.uk/portal/request/" . $SR['id'] . "/view";
+
+                $template->setVar(
+                    array(
+                        "srLinkToPortal" => $urlRequest,
+                        "srNumber" => $SR['id'],
+                        "srRaisedByName" => $SR['raisedBy'],
+                        "srRaisedOnDate" => (new \DateTime($SR['raisedOn']))->format('d-m-Y h:i'),
+                        "srStatus" => $SR['status'],
+                        "srDetails" => $this->getFirstLinesDetails($SR['details'], 150),
+                    )
+                );
+
+
+                $template->parse('openSR', 'openSRBlock', true);
+
+            }
+
+            $template->parse('output', 'page', true);
+            $body = $template->get_var('output');
+
+            $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
+
+
+
+            $this->sendByEmailTo(
+                $contactsDatum['email'],
+                $subject,
+                $body
+            );
+
+            echo $body;
+
+        }
+
+    }
+
+    private function getFirstLinesDetails($details, $maxCharacters)
+    {
+        $details = strip_tags($details);
+        $details = preg_replace("!\s+!", ' ', $details);
+
+        $lines = preg_split("/\./", $details);
+        $result = "";
+        $counter = 0;
+
+        do {
+            if ($counter) {
+                $result .= '.';
+            }
+            $result .= $lines[$counter];
+            $counter++;
+        } while ($counter < count($lines) && strlen($result) < $maxCharacters);
+        return $result;
+    }
+
+    private function getContactOpenSRReportData()
+    {
+        $sql = "SELECT 
+                  problem.`pro_problemno` AS id,
+                  CONCAT_WS(
+                    ' ',
+                    reporter.`con_first_name`,
+                    reporter.`con_last_name`
+                  ) AS raisedBy,
+                  pro_date_raised AS raisedOn,
+                  IF(
+                    problem.`pro_awaiting_customer_response_flag` = 'Y',
+                    'Awaiting Customer',
+                    'In Progress'
+                  ) AS status,
+                  callactivity.`reason` AS details,
+                  contact.`con_first_name` AS contactName  
+                FROM
+                  problem 
+                  INNER JOIN contact 
+                    ON contact.`con_custno` = problem.`pro_custno` 
+                    AND contact.`con_mailflag11` = 'Y' 
+                  LEFT JOIN callactivity 
+                    ON callactivity.`caa_problemno` = problem.`pro_problemno` 
+                    AND callactivity.`caa_callacttypeno` = 51 
+                  LEFT JOIN contact AS reporter 
+                    ON problem.`pro_contno` = reporter.`con_contno` 
+                WHERE problem.`pro_status` <> 'C' 
+                and problem.`pro_hide_from_customer_flag` <> 'Y'
+                and problem.pro_priority >= 1 and problem.pro_priority <= 4
+                 ORDER BY pro_date_raised";
+        return $this->db->query($sql);
+
     }
 }

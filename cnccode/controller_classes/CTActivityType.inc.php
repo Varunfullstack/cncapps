@@ -24,6 +24,13 @@ class CTActivityType extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buActivityType = new BUActivityType($this);
         $this->dsCallActType = new DSForm($this);
         $this->dsCallActType->copyColumnsFrom($this->buActivityType->dbeCallActType);
@@ -124,11 +131,11 @@ class CTActivityType extends CTCNC
                         'reqFinalStatusFlag' => $dsCallActType->getValue('reqFinalStatusFlag'),
                         'activeFlag' => $dsCallActType->getValue('activeFlag'),
                         'showNotChargeableFlag' => $dsCallActType->getValue('showNotChargeableFlag'),
-                        'activeFlag' => $dsCallActType->getValue('activeFlag'),
                         'engineerOvertimeFlag' => $dsCallActType->getValue('engineerOvertimeFlag'),
                         'travelFlag' => $dsCallActType->getValue('travelFlag'),
                         'onSiteFlag' => $dsCallActType->getValue('onSiteFlag'),
                         'portalDisplayFlag' => $dsCallActType->getValue('portalDisplayFlag'),
+                        'visibleInSRFlag' => $dsCallActType->getValue(DBECallActType::visibleInSRFlag),
                         'urlEdit' => $urlEdit,
                         'txtEdit' => $txtEdit
                     )
@@ -238,11 +245,11 @@ class CTActivityType extends CTCNC
                 'reqFinalStatusFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('reqFinalStatusFlag')),
                 'activeFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('activeFlag')),
                 'showNotChargeableFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('showNotChargeableFlag')),
-                'activeFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('activeFlag')),
                 'engineerOvertimeFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('engineerOvertimeFlag')),
                 'portalDisplayFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('portalDisplayFlag')),
                 'travelFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('travelFlag')),
                 'onSiteFlagChecked' => Controller::htmlChecked($dsCallActType->getValue('onSiteFlag')),
+                'visibleInSRFlagChecked' => Controller::htmlChecked($dsCallActType->getValue(DBECallActType::visibleInSRFlag)),
                 'urlUpdate' => $urlUpdate,
                 'urlDelete' => $urlDelete,
                 'txtDelete' => $txtDelete,
@@ -278,10 +285,10 @@ class CTActivityType extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'callActTypeID' => $this->dsCallActType->getValue('callActTypeID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'callActTypeID' => $this->dsCallActType->getValue('callActTypeID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

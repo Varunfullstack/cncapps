@@ -218,14 +218,13 @@ class BUStaffProductivityReport extends Business
 
         $overtimeCost = 0;
         $normalTimeCost = 0;
-
+        $overtime = 0;
         while ($row = $results->fetch_object()) {
 
             $startTime = common_convertHHMMToDecimal($row->startTime);
             $endTime = common_convertHHMMToDecimal($row->endTime);
 
             $totalTime = $endTime - $startTime;
-
             if ($row->weekday == 0 OR $row->weekday == 6) {
                 $overtime = $endTime - $startTime;
             } else {

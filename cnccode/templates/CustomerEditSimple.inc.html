@@ -249,7 +249,6 @@
     <input {disabled} name="displayInactiveContacts" type="button" value="Show Inactive Contacts"
            onClick="document.location='{showInactiveContactsURL}';">
     <BR/>
-    {customerFolderLink}<BR/>
     {renewalLink}<BR/>
     {passwordLink}<BR/>
 
@@ -829,10 +828,23 @@
                         </td>
                     </tr>
                     <tr>
+                        <td class="content">Non UK</td>
+                        <td class="content">
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[site][{customerID}{siteNo}][nonUKFlag]"
+                                   title="Check to show this site is overseas and not in the UK"
+                                   value="Y" {nonUKFlagChecked}/>
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="content">Active</td>
                         <td class="content">
-                            <input {disabled} type="checkbox" name="form[site][{customerID}{siteNo}][activeFlag]"
-                                   value="Y" {activeFlagChecked}/>
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[site][{customerID}{siteNo}][activeFlag]"
+                                   value="Y"
+                                   {activeFlagChecked}/>
                         </td>
                     </tr>
                     <tr>
@@ -878,6 +890,7 @@
                     <td class="headerLightgrey">{mailshot6FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot7FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot8FlagDesc}</td>
+                    <td class="headerLightgrey">{mailshot11FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot10FlagDesc}</td>
                 </tr>
@@ -1044,6 +1057,10 @@
                     <td class="content">
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot8Flag]" value="Y"
                                {mailshot8FlagChecked}/>
+                    </td>
+                    <td class="content">
+                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot11Flag]" value="Y"
+                               {mailshot11FlagChecked}/>
                     </td>
                     <td class="content">
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot9Flag]" value="Y"

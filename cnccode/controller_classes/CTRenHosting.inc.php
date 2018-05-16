@@ -30,6 +30,14 @@ class CTRenHosting extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "renewals",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenHosting = new BURenHosting($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenHosting = new DSForm($this);
@@ -347,7 +355,6 @@ class CTRenHosting extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenHosting->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenHosting->getValue('totalInvoiceMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenHosting->getValue('totalInvoiceMonths')),
                 'notes' => Controller::htmlInputText($dsRenHosting->getValue('notes')),
                 'notesMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('notes')),
                 'hostingCompany' => Controller::htmlInputText($dsRenHosting->getValue('hostingCompany')),
@@ -423,10 +430,10 @@ class CTRenHosting extends CTCNC
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID' => $this->dsRenHosting->getValue('customerItemID')
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'ID' => $this->dsRenHosting->getValue('customerItemID')
+                                 )
                 );
 
         }

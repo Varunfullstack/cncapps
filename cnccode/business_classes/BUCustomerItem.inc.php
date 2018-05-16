@@ -102,6 +102,21 @@ class BUCustomerItem extends Business
         $this->getData($dbeJContract, $dsResults);
     }
 
+    function getServerCareValidContractsByCustomerID($customerID, &$dsResults)
+    {
+        $this->setMethodName('getServerCareValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getServerCareContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
+    }
+
+    function getServerWatchContractByCustomerID($customerID, &$dsResults){
+        $this->setMethodName('getServerCareValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getServerWatchContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
+    }
+
     function getContractDescriptionsByCustomerItemId($customerItemID)
     {
         $this->setMethodName('getContractsByCustomerID');
@@ -120,21 +135,6 @@ class BUCustomerItem extends Business
             $contractIDs[] = $dbeJContract->getValue('customerItemID');
         }
         return $contractIDs;
-    }
-
-    /**
-     * Return dataset of servercare contracts about to exipire
-     * @param Integer $numberOfMonths expiring within
-     * @param DataSet &$dsResults results
-     * @return bool : Success
-     * @access public
-     */
-    function getExpiringServerCareContracts($numberOfMonths, &$dsResults)
-    {
-        $this->setMethodName('getExpiringServerCareContracts');
-        $dbeJContract = new DBEJContract($this);
-        $dbeJContract->getExpiringServerCareRowsWithinMonths($numberOfMonths);
-        $this->getData($dbeJContract, $dsResults);
     }
 
     /**
@@ -184,7 +184,8 @@ class BUCustomerItem extends Business
             $dsCustomerItem->setValue('secondsiteSuspendedByUserID', $GLOBALS ['auth']->is_authenticated());
             $dsCustomerItem->setValue('secondsiteSuspendedDate', date(CONFIG_MYSQL_DATE));
         } else {
-            $dsCustomerItem->setValue('secondsiteSuspendedByUserID', $dbeCustomerItem->getValue('secondsiteSuspendedByUserID'));
+            $dsCustomerItem->setValue('secondsiteSuspendedByUserID',
+                                      $dbeCustomerItem->getValue('secondsiteSuspendedByUserID'));
             $dsCustomerItem->setValue('secondsiteSuspendedDate', $dbeCustomerItem->getValue('secondsiteSuspendedDate'));
 
         }
@@ -199,8 +200,10 @@ class BUCustomerItem extends Business
             $dsCustomerItem->setValue('secondsiteImageDelayUserID', $GLOBALS ['auth']->is_authenticated());
             $dsCustomerItem->setValue('secondsiteImageDelayDate', date(CONFIG_MYSQL_DATE));
         } else {
-            $dsCustomerItem->setValue('secondsiteImageDelayUserID', $dbeCustomerItem->getValue('secondsiteImageDelayUserID'));
-            $dsCustomerItem->setValue('secondsiteImageDelayDate', $dbeCustomerItem->getValue('secondsiteImageDelayDate'));
+            $dsCustomerItem->setValue('secondsiteImageDelayUserID',
+                                      $dbeCustomerItem->getValue('secondsiteImageDelayUserID'));
+            $dsCustomerItem->setValue('secondsiteImageDelayDate',
+                                      $dbeCustomerItem->getValue('secondsiteImageDelayDate'));
 
         }
         $dsCustomerItem->post();
@@ -407,18 +410,16 @@ class BUCustomerItem extends Business
 
     function customerHasServiceDeskContract($customerID)
     {
-        $ret = false;
-
         $this->getContractsByCustomerID($customerID, $dsContract);
 
         while ($dsContract->fetchNext()) {
 
             if ($dsContract->getValue('itemTypeID') == CONFIG_SERVICEDESK_ITEMTYPEID) {
-                $ret = true;
+                return true;
             }
 
         }
-        return $ret;
+        return false;
     }
 
     function serverIsUnderLocalSecondsiteContract($customerItemID)
@@ -437,6 +438,22 @@ class BUCustomerItem extends Business
         }// end while
 
         return $ret;
+    }
+
+    public function getServiceDeskValidContractsByCustomerID($customerID, &$dsResults)
+    {
+        $this->setMethodName('getServiceDeskValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getServiceDeskContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
+    }
+
+    public function getPrepayContractByCustomerID($customerID, &$dsResults)
+    {
+        $this->setMethodName('getServiceDeskValidContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getPrePayContracts($customerID);
+        $this->getData($dbeJContract, $dsResults);
     }
 }// End of class
 ?>

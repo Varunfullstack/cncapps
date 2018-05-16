@@ -71,9 +71,10 @@ function common_dateFormat($timestamp, $format = 1)
     endif;
 }
 
-/*
-Convert time in HH:MM to decimal
-*/
+/**
+ * @param $hhMM
+ * @return float
+ */
 function common_convertHHMMToDecimal($hhMM)
 {
     $hours = substr($hhMM, 0, 2);
@@ -81,7 +82,7 @@ function common_convertHHMMToDecimal($hhMM)
 
     $minutesAsFraction = $minutes / 60;
 
-    return common_numberFormat($hours + $minutesAsFraction);
+    return +common_numberFormat($hours + $minutesAsFraction);
 }
 
 function convertHHMMToMinutes($hhMM)

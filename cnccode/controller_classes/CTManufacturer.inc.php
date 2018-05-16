@@ -39,6 +39,13 @@ class CTManufacturer extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buManufacturer = new BUManufacturer($this);
         $this->dsManufacturer = new DSForm($this);
         $this->dsManufacturer->copyColumnsFrom($this->buManufacturer->dbeManufacturer);

@@ -1,4 +1,5 @@
 <!-- Template: HeaderEdit.inc.html -->
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <script language='JavaScript'>
     function validateItemDescription() {
         if (Trim(document.getElementById("gscItemDescription").value) != "") {
@@ -508,6 +509,32 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">SD 24x7 notification option begin</td>
+            <td class="field">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][serviceDeskNotification24hBegin]"
+                        value="{serviceDeskNotification24hBegin}"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{serviceDeskNotification24hBeginMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">SD 24x7 notification option end</td>
+            <td class="field">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][serviceDeskNotification24hEnd]"
+                        value="{serviceDeskNotification24hEnd}"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{serviceDeskNotification24hEndMessage}</span>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">SR High Activity Count Email Trigger</td>
             <td class="inputText">
                 <input
@@ -590,6 +617,22 @@
                 > <span class="formErrorMessage">{backupTargetSuccessRateMessage}</span>
             </td>
         </tr>
+        <tr>
+            <td class="promptText">Customer Review Meeting Text</td>
+            <td class="inputText">
+                <textarea name="header[1][customerReviewMeetingText]" id="customerReviewMeetingText">{customerReviewMeetingText}</textarea>
+
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace('customerReviewMeetingText', {
+                            height: '400px',
+                            extraAllowedContent: true,
+                            allowedContent: true
+                        }
+                    );
+                </script>
+            </td>
+        </tr>
+
     </table>
     <BR>
     <table>
@@ -757,6 +800,27 @@
             <td class="inputText"><INPUT name="header[1][mailshot10FlagDef]" {DISABLED} type="checkbox"
                                          value="Y"
                                          {mailshot10FlagDefChecked}></td>
+        </tr>
+        <tr>
+            <td class="promptText">11</td>
+            <td class="inputText">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][mailshot11FlagDesc]"
+                        value="{mailshot11FlagDesc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{mailshot11FlagDescMessage}</span>
+            </td>
+            <td class="inputText">
+                <INPUT name="header[1][mailshot11FlagDef]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="Y"
+                       {mailshot11FlagDefChecked}
+                >
+            </td>
         </tr>
     </table>
     <BR>

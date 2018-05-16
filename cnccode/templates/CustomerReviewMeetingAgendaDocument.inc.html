@@ -1,47 +1,163 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <style media="screen" type="text/css">
-      body{
-        font-family: sans-serif;
-        font-size: 10pt;
-      }
-      
-      h1{
-        font-size: 14pt;
-      }
-      h2{
-        font-size: 12pt;
-      }
-      h3{
-        font-size: 10pt;
-      }
-      
-      table {
-        border-collapse: collapse;
-        padding: 10px;
-      }
+<head>
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <style type="text/css">
 
-      table, th, td {
-        border: 1px solid black;
-      }
-      .pageBreak {
-        page-break-after: always;
-      }
+        @page {
+            padding: 20px 20px;
+            size: A4;
+        }
 
-      table.invisible, table.invisible th, table.invisible td{
-        border: none;
-      }
+        html {
+            height: 100%
+        }
+        image { margin: 0 auto; }
+
+        body {
+            /*display: flex;*/
+            height: 100%;
+            margin: 0;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 10pt;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .flex-column {
+            flex-direction: column;
+        }
+
+        .reportSection { padding-bottom: 30px; display: inline-block; width: 100%; }
+
+        h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 0 auto 20px auto;
+            display: inline-block;
+        }
+
+        h2 {
+            font-size: 16pt;
+        }
+
+        h3 {
+            font-size: 14pt;
+        }
+
+        table {
+            border-collapse: collapse;
+            padding: 10px;
+            margin: 5px auto;
+            float: left;
+        }
+
+        p:nth-child(2) {
+            text-align: center;
+        }
+
+        table, th, td {
+            border: 1px solid black; font-size: 1em; font-family: 'Open Sans', sans-serif; font-kerning: normal; letter-spacing: 0px;
+        }
+
+        .pageBreak {
+            page-break-after: always;
+        }
+
+        table.collapse {
+            border-collapse: collapse;
+            margin: 0 auto;
+            border: 1px solid #666;
+        }
+
+        table.collapse td {
+            padding: 3px;
+        }
+
+        .graph {
+            display: block;
+            margin: 20px auto;
+        }
+
+        .ul3 {
+            margin: 0 auto;
+            padding: 0;
+            max-width: 800px;
+            display: block
+        }
+
+        .ul3 li {
+            width: 33%;
+            list-style-type: none;
+            float: left;
+            display: inline-block;
+        }
+
+        .break {
+            display: block;
+            width: 100%;
+            clear: both
+        }
+
+        .container {
+            max-height: 150px;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .pageBreak {
+            page-break-after: always;
+        }
+
+        .rootCause { width: 600px; margin: 0 auto; }
+        .requestCount { width: 450px; margin: 0 auto; }
+
+        .overflow:nth-child(odd) { width:48%; float: right; margin: 0 !important; }
+        .overflow:nth-child(even) { width:48%; float: left; margin: 0 !important; }
+
+        .thirdTable { width:32%; float: left; margin: 0 2% 0 0 !important; }
+        .thirdTable:nth-child(4) { margin: 0 !important; }
+
+        table.invisible, table.invisible th, table.invisible td {
+            border: none;
+        }
+
+        thead {
+            display: table-row-group;
+        }
+        tr {
+            page-break-before: always;
+            page-break-after: always;
+            page-break-inside: avoid;
+        }
+        table {
+            word-wrap: break-word;
+        }
+        table td {
+            word-break: break-all;
+        }
+
+        .ckeditorContent td, .ckeditorContent th {
+            text-align: center;
+        }
+
+        .ckeditorContent, .ckeditorContent p {
+            text-align: left !important;
+        }
 
     </style>
 
-  </head>
-  <body>
-    <table class="invisible" style="width: 100%;">
-      <tr>
-        <td style="width: 90%" >&nbsp;</td>
-        <td><img src="http://cncapps/images/cnclogo.jpg" style="width:100px"></td>
-      </tr>
-    </table>  
-    {htmlBody}
-  </body>
+</head>
+<body>
+{htmlBody}
+</body>
 </html>

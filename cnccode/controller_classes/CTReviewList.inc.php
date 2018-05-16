@@ -13,9 +13,17 @@ require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
 class CTReviewList extends CTCNC
 {
 
-    function CTHome($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            'sales'
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+
     }
 
     /**
@@ -57,7 +65,7 @@ class CTReviewList extends CTCNC
 
                 $linkURL =
                     $this->buildLink(
-                        'Customer.php',
+                        'CustomerCRM.php',
                         array(
                             'action' => 'displayEditForm',
                             'customerID' => $dsCustomer->getValue('customerID')

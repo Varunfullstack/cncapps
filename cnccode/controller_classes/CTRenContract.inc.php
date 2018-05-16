@@ -27,6 +27,14 @@ class CTRenContract extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "renewals",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenContract = new BURenContract($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenContract = new DSForm($this);
@@ -365,7 +373,6 @@ class CTRenContract extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenContract->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenContract->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenContract->getValue('totalInvoiceMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenContract->getValue('totalInvoiceMonths')),
                 'curUnitCost' => $dsRenContract->getValue('curUnitCost'),
                 'curUnitSale' => $dsRenContract->getValue('curUnitSale'),
                 'notes' => Controller::htmlInputText($dsRenContract->getValue('notes')),
@@ -497,10 +504,10 @@ class CTRenContract extends CTCNC
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID' => $this->dsRenContract->getValue('customerItemID')
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'ID' => $this->dsRenContract->getValue('customerItemID')
+                                 )
                 );
 
         }

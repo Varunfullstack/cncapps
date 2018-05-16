@@ -54,6 +54,15 @@ class CTCustomerItem extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "technical",
+            "sales"
+        ];
+        var_dump('this is customer item');
+        if (!self::hasPermissions($roles)) {
+//            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsCustomerItem = new DSForm($this);
@@ -843,32 +852,34 @@ class CTCustomerItem extends CTCNC
             );
 
             $BUSecondsite = new BUSecondsite($this);
-            $BUSecondsite->getSecondsiteImagesByCustomerItemID($dsCustomerItem->getValue('customerItemID'), $dsSecondsiteImage);
+            $BUSecondsite->getSecondsiteImagesByCustomerItemID($dsCustomerItem->getValue('customerItemID'),
+                                                               $dsSecondsiteImage);
 
             while ($dsSecondsiteImage->fetchNext()) {
 
                 $deleteSecondsiteImageLink =
                     $this->buildLink('SecondSite.php',
-                        array(
-                            'action' => 'delete',
-                            'secondsiteImageID' => $dsSecondsiteImage->getValue('secondsiteImageID')
-                        )
+                                     array(
+                                         'action' => 'delete',
+                                         'secondsiteImageID' => $dsSecondsiteImage->getValue('secondsiteImageID')
+                                     )
                     );
                 $deleteSecondsiteImageText = 'delete';
 
                 $editSecondsiteImageLink =
                     $this->buildLink('SecondSite.php',
-                        array(
-                            'action' => 'edit',
-                            'secondsiteImageID' => $dsSecondsiteImage->getValue('secondsiteImageID')
-                        )
+                                     array(
+                                         'action' => 'edit',
+                                         'secondsiteImageID' => $dsSecondsiteImage->getValue('secondsiteImageID')
+                                     )
                     );
 
                 if ($dsSecondsiteImage->getValue('status') && $dsSecondsiteImage->getValue('imageTime') > 0) {
 
                     $imageTime = strftime("%d/%m/%Y %H:%M:%S", strtotime($dsSecondsiteImage->getValue('imageTime')));
 
-                    $imageAgeDays = number_format((time() - strtotime($dsSecondsiteImage->getValue('imageTime'))) / 86400, 0);
+                    $imageAgeDays = number_format((time() - strtotime($dsSecondsiteImage->getValue('imageTime'))) / 86400,
+                                                  0);
                 } else {
                     $imageTime = '';
                     $imageAgeDays = '';

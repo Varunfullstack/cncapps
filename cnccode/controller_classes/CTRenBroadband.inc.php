@@ -21,6 +21,14 @@ class CTRenBroadband extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "renewals",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenBroadband = new BURenBroadband($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenBroadband = new DSForm($this);
@@ -360,7 +368,6 @@ class CTRenBroadband extends CTCNC
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenBroadband->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenBroadband->getMessage('invoicePeriodMonths')),
                 'totalInvoiceMonths' => Controller::htmlInputText($dsRenBroadband->getValue('totalInvoiceMonths')),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenBroadband->getMessage('totalInvoiceMonths')),
                 'adslPhone' => Controller::htmlInputText($dsRenBroadband->getValue('adslPhone')),
                 'adslPhoneMessage' => Controller::htmlDisplayText($dsRenBroadband->getMessage('adslPhone')),
                 'macCode' => Controller::htmlInputText($dsRenBroadband->getValue('macCode')),
@@ -496,10 +503,10 @@ class CTRenBroadband extends CTCNC
         } else {
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID' => $this->dsRenBroadband->getValue('customerItemID')
-                    )
+                                 array(
+                                     'action' => 'edit',
+                                     'ID' => $this->dsRenBroadband->getValue('customerItemID')
+                                 )
                 );
 
         }
@@ -555,10 +562,10 @@ class CTRenBroadband extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID' => $_REQUEST['customerItemID']
-                )
+                             array(
+                                 'action' => 'edit',
+                                 'ID' => $_REQUEST['customerItemID']
+                             )
             );
 
         header('Location: ' . $urlNext);

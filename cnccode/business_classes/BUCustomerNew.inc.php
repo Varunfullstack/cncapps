@@ -15,11 +15,11 @@ define('BUCUSTOMER_NAME_STR_NT_PASD', 'No name string passed');
 
 class BUCustomer extends Business
 {
-    var $dbeCustomer = "";
-    var $dbeSite = "";
-    var $dbeContact = "";
-    var $dbeCustomerType = "";
-    var $dsHeader = '';
+    protected $dbeCustomer;
+    protected $dbeSite;
+    protected $dbeContact;
+    protected $dbeCustomerType;
+    protected $dsHeader;
 
     /**
      * Constructor
@@ -488,13 +488,19 @@ class BUCustomer extends Business
         $dsContact->fetchNext();
 
         if ($dsSite->getValue('phone') != '') {
-            $contactPhone = '<a href="tel:' . $dsSite->getValue('phone') . '">' . $dsSite->getValue('phone') . '</a>';
+            $contactPhone = '<a href="tel:' . str_replace(' ',
+                                                          '',
+                                                          $dsSite->getValue('phone')) . '">' . $dsSite->getValue('phone') . '</a>';
         }
         if ($dsContact->getValue('phone') != '') {
-            $contactPhone .= ' DDI: <a href="tel:' . $dsContact->getValue('phone') . '">' . $dsContact->getValue('phone') . '</a>';
+            $contactPhone .= ' DDI: <a href="tel:' . str_replace(' ',
+                                                                 '',
+                                                                 $dsContact->getValue('phone')) . '">' . $dsContact->getValue('phone') . '</a>';
         }
         if ($dsContact->getValue('mobilePhone') != '') {
-            $contactPhone .= ' Mobile: <a href="tel:' . $dsContact->getValue('mobilePhone') . '">' . $dsContact->getValue('mobilePhone') . '</a>';
+            $contactPhone .= ' Mobile: <a href="tel:' . str_replace(' ',
+                                                                    '',
+                                                                    $dsContact->getValue('mobilePhone')) . '">' . $dsContact->getValue('mobilePhone') . '</a>';
         }
         return $contactPhone;
     }
@@ -557,6 +563,30 @@ class BUCustomer extends Business
             return false;
         }
 
+    }
+
+    /**
+     * @param $customerID
+     * @return array
+     */
+    function getMainSupportContacts($customerID)
+    {
+        $this->setMethodName('getMainSupportContacts');
+
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+
+        $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
+        $contacts = [];
+        while ($this->dbeContact->fetchNext()) {
+            $contacts[] = [
+                "firstName" => $this->dbeContact->getValue('firstName'),
+                "lastName" => $this->dbeContact->getValue('lastName')
+            ];
+        }
+
+        return $contacts;
     }
 
     function createCustomerFolder($customerID)

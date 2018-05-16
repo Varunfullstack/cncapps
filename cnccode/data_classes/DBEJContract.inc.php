@@ -25,6 +25,24 @@ class DBEJContract extends DBECustomerItem
         $this->addColumn("renewalType", DA_STRING, DA_ALLOW_NULL, "renewalType.description");
         $this->addColumn("postcode", DA_STRING, DA_ALLOW_NULL, "add_postcode");
         $this->addColumn("adslPhone", DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn("invoiceFromDate",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')");
+        $this->addColumn("invoiceToDate",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')");
+
+        $this->addColumn("invoiceFromDateYMD",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
+
+        $this->addColumn("invoiceToDateYMD",
+                         DA_DATE,
+                         DA_NOT_NULL,
+                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
         $this->setAddColumnsOff();
     }
 
@@ -93,30 +111,8 @@ class DBEJContract extends DBECustomerItem
     }
 
     /**
-     * Get servercare contracts about to exipire
-     * @param Integer $numberOfMonths expiring within
-     * @return bool : Success
-     * @access public
-     */
-    function getExpiringServerCareRowsWithinMonths($numberOfMonths)
-    {
-        $this->setMethodName('getExpiringServerCareRowsWithinMonths');
-        if ($numberOfMonths == '') {
-            $this->raiseError('numberOfMonths not passed');
-        }
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON cui_itemno = itm_itemno" .
-            " AND " . $this->getDBColumnName('expiryDate') . ">=  DATE_SUB( CURRENT_DATE(), INTERVAL 2 MONTH ) ";
-        " AND itm_desc LIKE '%ServerCare%'";
-
-        $this->setQueryString($queryString);
-        return (parent::getRows());
-    }
-
-    /**
      * Get prepay contracts
+     * @param $customerID
      * @return bool : Success
      * @access public
      */
@@ -131,14 +127,72 @@ class DBEJContract extends DBECustomerItem
       SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " JOIN item ON cui_itemno = itm_itemno
+            JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
+            JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
 	  	WHERE
 	  		cui_custno = " . $customerID .
             " AND cui_itemno = " . $dsHeader->getValue('gscItemID') .
             " AND cui_expiry_date >= now()" . // and is not expired
-            " AND	cui_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND	renewalStatus  <> 'D'";
+            " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
 
         $this->setQueryString($queryString);
 
+        return (parent::getRows());
+    }
+
+    function getServerCareContracts($customerID, $valid = true)
+    {
+        $queryString = "
+      SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " JOIN item ON cui_itemno = itm_itemno
+             JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
+             JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
+	  	WHERE
+	  		cui_custno = " . $customerID . " and itm_servercare_flag = 'Y' AND itm_desc LIKE '%ServerCare%'";
+        if ($valid) {
+            $queryString .=
+                " AND cui_expiry_date >= now() AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+        }
+        $this->setQueryString($queryString);
+
+        return (parent::getRows());
+    }
+
+    function getServiceDeskContracts($customerID, $valid = true)
+    {
+        $queryString = "
+      SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " JOIN item ON cui_itemno = itm_itemno
+             JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
+             JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
+	  	WHERE
+	  		cui_custno = " . $customerID . " and itm_servercare_flag = 'Y' AND itm_desc LIKE '%ServiceDesk%'";
+        if ($valid) {
+            $queryString .=
+                " AND cui_expiry_date >= now() AND	renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+        }
+        $this->setQueryString($queryString);
+
+        return (parent::getRows());
+    }
+
+    public function getServerWatchContracts($customerID, $valid = true)
+    {
+        $queryString = "
+      SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " JOIN item ON cui_itemno = itm_itemno
+             JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID
+             JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
+	  	WHERE
+	  		cui_custno = " . $customerID . " and itm_servercare_flag = 'Y' AND itm_desc LIKE '%ServerWatch%'";
+        if ($valid) {
+            $queryString .=
+                " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
+        }
+        $this->setQueryString($queryString);
         return (parent::getRows());
     }
 }

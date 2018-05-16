@@ -10,6 +10,7 @@ require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBERootCause.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJProblem.inc.php");

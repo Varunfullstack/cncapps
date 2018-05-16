@@ -6,6 +6,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActType.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 
 class BUActivityType extends Business
