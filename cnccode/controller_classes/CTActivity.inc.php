@@ -4505,7 +4505,12 @@ class CTActivity extends CTCNC
                 $this->redirectToFixed($_REQUEST['callActivityID']);
             }
 
-            $this->editActivity();
+            if ($_POST['edit']) {
+                $this->editActivity();
+                exit;
+            }
+
+            $this->displayActivity();
             exit;
         }
         $this->buActivity->uploadDocumentFile(
@@ -4518,7 +4523,12 @@ class CTActivity extends CTCNC
             $this->redirectToFixed($_REQUEST['callActivityID']);
         }
 
-        $this->redirectToEdit($_REQUEST['callActivityID']);
+        if ($_POST['edit']) {
+            $this->redirectToEdit($_REQUEST['callActivityID']);
+            exit;
+        }
+
+        $this->redirectToDisplay($_REQUEST['callActivityID']);
     }
 
     /**
