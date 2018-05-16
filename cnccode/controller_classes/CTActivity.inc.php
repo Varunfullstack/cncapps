@@ -446,7 +446,8 @@ class CTActivity extends CTCNC
                 if (
                     $this->countParamsSet($_REQUEST['activity']) < 2 AND
                     empty($this->dsSearchForm->getValue('customerID')) AND
-                    $this->dsSearchForm->getValue('contractCustomerItemID') == '99'
+                    $this->dsSearchForm->getValue('contractCustomerItemID') == '99' and
+                    $this->dsSearchForm->getValue('status') !== 'CHECKED_NON_T_AND_M'
                 ) {
                     $this->formErrorMessage = 'you have not selected any filtering criteria for your search, this is not allowed';
                     $this->setFormErrorOn();
