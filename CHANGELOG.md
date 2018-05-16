@@ -2,7 +2,7 @@
 This project changes will be shown here.
 
 
-## [unreleased]
+## [v1.6.0] - 2018-05-16
 ### Added 
 - Issue 189 - Add version number to menu
 - Issue 183 - Add the ability to add time to a service request when in the managers queue
