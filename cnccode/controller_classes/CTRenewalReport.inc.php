@@ -34,6 +34,7 @@ class CTRenewalReport extends CTCNC
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
             "sales",
+            "technical"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");

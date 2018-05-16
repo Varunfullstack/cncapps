@@ -58,8 +58,9 @@ class CTCustomerItem extends CTCNC
             "technical",
             "sales"
         ];
+        var_dump('this is customer item');
         if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
+//            Header("Location: /NotAllowed.php");
             exit;
         }
         $this->buCustomerItem = new BUCustomerItem($this);

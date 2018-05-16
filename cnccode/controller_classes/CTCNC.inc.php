@@ -245,6 +245,7 @@ class CTCNC extends Controller
 
         $permissions = explode(",", self::getDbeUser()->getValue('perms'));
         if (is_array($levels)) {
+
             return array_intersect($levels, $permissions);
         }
 

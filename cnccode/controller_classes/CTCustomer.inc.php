@@ -81,7 +81,8 @@ class CTCustomer extends CTCNC
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
             "sales",
-            "reports"
+            "reports",
+            "technical"
         ];
 
         if (!self::hasPermissions($roles)) {
