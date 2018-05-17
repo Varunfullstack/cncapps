@@ -1,6 +1,8 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.6.1]
+- Issue 231 - Bugs from release 1.6.0
 
 ## [v1.6.0] - 2018-05-16
 ### Added 
