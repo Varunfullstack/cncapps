@@ -75,6 +75,8 @@ if ($error != "") {
 }
 
 curl_close($ch);                                                                // free handle
+
+
 /*
 $handle = fopen( 'E:\\htdocs\\service_desk_monitor_log.htm', 'a');
 fwrite( $handle, '<PRE>' . print_r( $result, true ) . '</PRE>');
@@ -86,6 +88,11 @@ if ($result['curl_error']) {
 if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
+
+$handle = fopen('c:/logs/' . $argv[1] . '-' . (new DateTime())->format('Y-m-d H:i:s') . '.html', 'w');
+fwrite($handle, print_r($result));
+fclose($handle);
+
 
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=localhost;dbname=cncappsdev';
