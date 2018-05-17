@@ -1,25 +1,27 @@
 <html>
 <!-- FOC activities logged the previous day -->
-  <head>
-  <style type="text/css">
-  <!--
-  BODY, P, TD, TH {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9pt;
-  }
-  .singleBorder {
-    border: #e1e1f0 2px solid;
-  }
-  TABLE {
-    border-spacing: 1px;
-  }
-  -->
-  </style>
-  </head>
-  <body>
-    <h1>FOC activities logged yesterday</h1>
-    <table>
-      <tr>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>FOC activities logged yesterday</h1>
+<table>
+    <tr>
         <th>Customer</th>
         <th>Activity No</th>
         <th>Incident No</th>
@@ -27,9 +29,9 @@
         <th>Contract</th>
         <th>Category</th>
         <th>Hours</th>
-      </tr>
-<!-- BEGIN activityBlock -->
-      <tr>
+    </tr>
+    <!-- BEGIN activityBlock -->
+    <tr>
         <td>{customer}</td>
         <td><a href="{urlActivity}">{activityID}</a></td>
         <td><a href="{urlRequest}">{serviceRequestID}</a></td>
@@ -37,9 +39,9 @@
         <td>{contract}</td>
         <td>{category}</td>
         <td>{hours}</td>
-      </tr>
-<!-- END activityBlock -->
-    </table>
-  </body>
+    </tr>
+    <!-- END activityBlock -->
+</table>
+</body>
 </html>
 

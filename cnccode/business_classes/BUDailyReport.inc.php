@@ -296,7 +296,7 @@ class BUDailyReport extends Business
                         'contract' => $row[5],
                         'category' => $row[6],
                         'urlRequest' => $urlRequest,
-                        'urlActivity' => $urlActivity
+                        'urlActivity' => urlencode($urlActivity)
                     )
                 );
 
@@ -597,11 +597,8 @@ class BUDailyReport extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $body = htmlentities($body);
-
-        $preMailer = new \Crossjoin\PreMailer\HtmlString($body);
-
-        $body = $preMailer->getHtml();
+        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
+        $body = $cssToInlineStyles->convert($body);
 
         $buMail->mime->setHTMLBody($body);
 
