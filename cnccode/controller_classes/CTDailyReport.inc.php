@@ -18,7 +18,7 @@ class CTDailyReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        if (!self::hasPermissions($roles)) {
+        if (!self::hasPermissions([])) {
             Header("Location: /NotAllowed.php");
             exit;
         }

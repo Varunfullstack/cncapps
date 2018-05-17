@@ -38,11 +38,12 @@ function getCpuUsage()
     return $cpu;
 }
 
+set_time_limit(0);
 date_default_timezone_set('Europe/London');
 
 $ch = curl_init($argv[1]);                                        // create handle using passed URL
 
-curl_setopt($ch, CURLOPT_TIMEOUT, 20);                // 20 second timeout
+curl_setopt($ch, CURLOPT_TIMEOUT, 1000);                // 20 second timeout
 
 $start_time = date('Y-m-d H:i:s');
 
@@ -74,6 +75,8 @@ if ($error != "") {
 }
 
 curl_close($ch);                                                                // free handle
+
+
 /*
 $handle = fopen( 'E:\\htdocs\\service_desk_monitor_log.htm', 'a');
 fwrite( $handle, '<PRE>' . print_r( $result, true ) . '</PRE>');
@@ -85,6 +88,11 @@ if ($result['curl_error']) {
 if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
+
+$handle = fopen('c:/logs/' . $argv[1] . '-' . (new DateTime())->format('Y-m-d H:i:s') . '.html', 'w');
+fwrite($handle, print_r($result));
+fclose($handle);
+
 
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=localhost;dbname=cncappsdev';
@@ -104,5 +112,6 @@ $statement->bindValue(':maxCpuUsage', getCpuUsage());
 $statement->bindValue(':maxMemoryUsage', memory_get_peak_usage(true));
 
 $statement->execute();
+
 
 ?>
