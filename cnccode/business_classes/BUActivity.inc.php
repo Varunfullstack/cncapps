@@ -217,6 +217,7 @@ class BUActivity extends Business
             trim($dsSearchForm->getValue('toDate')),
             trim($dsSearchForm->getValue('contractCustomerItemID')),
             trim($dsSearchForm->getValue('callActTypeID')),
+            trim($dsSearchForm->getValue('linkedSalesOrderID')),
             trim($dsSearchForm->getValue('managementReviewOnly')),
             trim($dsSearchForm->getValue('breachedSlaOption')),
             $sortColumn,

@@ -38,11 +38,12 @@ function getCpuUsage()
     return $cpu;
 }
 
+set_time_limit(0);
 date_default_timezone_set('Europe/London');
 
 $ch = curl_init($argv[1]);                                        // create handle using passed URL
 
-curl_setopt($ch, CURLOPT_TIMEOUT, 20);                // 20 second timeout
+curl_setopt($ch, CURLOPT_TIMEOUT, 1000);                // 20 second timeout
 
 $start_time = date('Y-m-d H:i:s');
 
@@ -104,5 +105,6 @@ $statement->bindValue(':maxCpuUsage', getCpuUsage());
 $statement->bindValue(':maxMemoryUsage', memory_get_peak_usage(true));
 
 $statement->execute();
+
 
 ?>
