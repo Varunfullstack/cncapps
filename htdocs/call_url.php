@@ -89,7 +89,13 @@ if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
 
-$handle = fopen('c:/logs/' . $argv[1] . '-' . (new DateTime())->format('Y-m-d H:i:s') . '.html', 'w');
+if (preg_match("/\/(\d+)$/", $argv[1], $matches)) {
+    $name = $matches[1];
+} else {
+    $name = 'unknown';
+}
+
+$handle = fopen('c:/logs/' . $name . '-' . (new DateTime())->format('Y-m-d H:i:s') . '.html', 'w');
 fwrite($handle, print_r($result));
 fclose($handle);
 
