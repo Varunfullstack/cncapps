@@ -11,12 +11,14 @@ define("DA_NOT_NULL", 0);
 define("DA_ALLOW_NULL", 1);
 // Column type constants
 define("DA_STRING", "string");
+define("DA_TEXT", "string");
 define("DA_INTEGER", "int");
 define("DA_MEMO", "memo");
 define("DA_FLOAT", "float");
 define("DA_BLOB", "blob");
 define("DA_ID", "id");
 define("DA_YN", "yn");
+define("DA_YN_FLAG", 'yn');
 define("DA_DATETIME", "datetime");
 define("DA_DATE", "date");
 define("DA_TIME", "time");
@@ -51,7 +53,8 @@ define("DA_DATE_NOT_SET", "0000-00-00 00:00:00");
 define("DA_COLUMN_SEPARATOR", ",");
 define("DA_SERIAL_LIMIT", 1000);                // Attempt to tune the columnExists sort method
 // messages
-define("DA_MSG_COLUMN_DOES_NOT_EXIST", 'Column does not exist');                // Attempt to tune the columnExists sort method
+define("DA_MSG_COLUMN_DOES_NOT_EXIST",
+       'Column does not exist');                // Attempt to tune the columnExists sort method
 class DataAccess extends BaseObject
 {
 
@@ -233,7 +236,8 @@ class DataAccess extends BaseObject
             // Using the new $crossRef array to resolve column numbers accross dataaccess objects
             if ($this->postRow) {
                 for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
-                    $this->setValueNoCheckByColumnNumber($crossRef[$ixCol], $data->getValueNoCheckByColumnNumber($ixCol));
+                    $this->setValueNoCheckByColumnNumber($crossRef[$ixCol],
+                                                         $data->getValueNoCheckByColumnNumber($ixCol));
                 }
                 $this->post();
                 $ret = TRUE;

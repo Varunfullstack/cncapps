@@ -28,7 +28,7 @@ class BUPDF extends BaseObject
     var $fontSize = '';
     var $filename = '';
 
-    function __construct(&$owner, $filename, $author, $title, $creator, $subject, $paperSize)
+    function __construct(&$owner, $filename, $author, $title, $creator, $subject, $paperSize, $encrypted = true)
     {
         BaseObject::__construct($owner);
 
@@ -63,7 +63,9 @@ class BUPDF extends BaseObject
         }
 //		$this->pdf = pdf_new();
         $this->pdf = new FPDF_Protection();
-        $this->pdf->SetProtection(['print'], '', '[V.^DW_uA^2~vER$');
+        if ($encrypted) {
+            $this->pdf->SetProtection(['print'], '', '[V.^DW_uA^2~vER$');
+        }
 //        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
 //        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
@@ -270,7 +272,8 @@ class BUPDF extends BaseObject
         |\xF0[\x90-\xBF][\x80-\xBF]{2}    # planes 1-3
         |[\xF1-\xF3][\x80-\xBF]{3}                  # planes 4-15
         |\xF4[\x80-\x8F][\x80-\xBF]{2}    # plane 16
-        )+%xs', $string);
+        )+%xs',
+                          $string);
     }
 
     function printStringAt($position, $string)

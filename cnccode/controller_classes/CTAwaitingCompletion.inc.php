@@ -17,6 +17,7 @@ class CTAwaitingCompletion extends CTCNC
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
             "maintenance",
+            'technical'
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");

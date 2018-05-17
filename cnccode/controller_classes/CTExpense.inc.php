@@ -32,6 +32,8 @@ class CTExpense extends CTCNC
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
             "accounts",
+            "technical",
+            "sales"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");

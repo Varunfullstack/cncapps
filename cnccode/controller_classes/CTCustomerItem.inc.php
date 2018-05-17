@@ -1336,6 +1336,7 @@ class CTCustomerItem extends CTCNC
      */
     function printContract()
     {
+
         // Validation and setting of variables
         $this->setMethodName('printContract');
         $buCustomerItem = new BUCustomerItem($this);

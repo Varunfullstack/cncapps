@@ -66,6 +66,7 @@ class DBECallActivitySearch extends DBEntity
                          DA_INTEGER,
                          DA_ALLOW_NULL,
                          "( SELECT COUNT(*) FROM callactivity AS cac WHERE cac.caa_problemno = callactivity.caa_problemno )");
+        $this->addColumn("linkedSalesOrderID", DA_INTEGER, DA_ALLOW_NULL, "pro_linked_ordno");
         $this->addColumn("managementReviewReason", DA_MEMO, DA_ALLOW_NULL, "pro_management_review_reason");
 
         $this->setPK(0);
@@ -96,6 +97,7 @@ class DBECallActivitySearch extends DBEntity
         $toDate,
         $contractCustomerItemID,
         $callActTypeID,
+        $linkedSalesOrderID,
         $managementReviewOnly = 'N',
         $breachedSlaOption = '',
         $sortColumn = false,
@@ -170,6 +172,11 @@ class DBECallActivitySearch extends DBEntity
         if ($customerID != '' AND $customerID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
+        }
+
+        if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
+            $whereParameters = $whereParameters .
+                " AND " . $this->getDBColumnName('linkedSalesOrderID') . "=" . $linkedSalesOrderID;
         }
 
         if ($userID != '' AND $userID != 0) {
