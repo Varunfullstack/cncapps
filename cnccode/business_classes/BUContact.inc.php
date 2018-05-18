@@ -196,6 +196,7 @@ class BUContact extends Business
         $dsResults->setValue('mailshot8Flag', $dsHeader->getValue('mailshot8FlagDef'));
         $dsResults->setValue('mailshot9Flag', $dsHeader->getValue('mailshot9FlagDef'));
         $dsResults->setValue('mailshot10Flag', $dsHeader->getValue('mailshot10FlagDef'));
+        $dsResults->setValue('mailshot11Flag', $dsHeader->getValue('mailshot11FlagDef'));
         $dsResults->post();
         return TRUE;
     }

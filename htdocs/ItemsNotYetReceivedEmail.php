@@ -6,11 +6,12 @@
  *
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
 require_once("config.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 
-define('OUTPUT_TO_SCREEN', false);
+$outputToScreen = isset($_GET['toScreen']);
 
 if (!$db1 = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
     echo 'Could not connect to mysql host ' . DB_HOST;
@@ -32,7 +33,21 @@ $query = "SELECT
   porhead.`poh_porno`,
   customer.`cus_name`,
   item.`itm_desc`,
-  supplier.`sup_name` 
+  supplier.`sup_name`,
+  IF(
+    poh_direct_del = 'N',
+    'CNC',
+    'Direct'
+  ) AS direct,
+  poh_ord_date,
+  (SELECT 
+    MIN(ca.caa_date) 
+  FROM
+    callactivity ca 
+    LEFT JOIN callacttype cat 
+      ON cat.cat_callacttypeno = ca.caa_callacttypeno 
+  WHERE ca.caa_problemno = problem.`pro_problemno` 
+    AND ca.caa_date >= NOW()) AS futureDate 
 FROM
   porline 
   LEFT JOIN porhead 
@@ -45,24 +60,41 @@ FROM
     ON ordhead.`odh_custno` = customer.`cus_custno` 
   LEFT JOIN supplier 
     ON supplier.`sup_suppno` = porhead.`poh_suppno` 
-WHERE pol_qty_ord <> pol_qty_rec
-AND (poh_type = 'I'
-    OR poh_type = 'P')
-AND (
-poh_ord_consno IS NOT NULL
-OR poh_ord_consno <> 0
-  ) 
-  AND item.`itm_itemno` <> 1491
-AND item.`itm_desc` NOT LIKE '%labour%'";
+  LEFT JOIN problem 
+    ON problem.`pro_linked_ordno` = porhead.`poh_ordno` 
+WHERE pol_qty_ord <> pol_qty_rec 
+  AND (poh_type = 'I' 
+    OR poh_type = 'P') 
+  AND poh_ord_consno IS NOT NULL 
+  AND poh_ord_consno <> 0 
+  AND item.`itm_itemno` <> 1491 
+  AND item.`itm_desc` NOT LIKE '%labour%' 
+  AND customer.cus_name <> 'CNC Sales Stock' 
+  AND item.itm_desc NOT LIKE '%Office 365%' 
+  AND customer.cus_name <> 'CNC Operating Stock' 
+  AND pol_cost > 0 order by poh_ord_date desc 
+";
 
 
 $result = $db1->query($query);
 
-if (!OUTPUT_TO_SCREEN) {
+if (!$outputToScreen) {
     ob_start();
 }
 
 ?>
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <style>
+            BODY, P, TD, TH {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 10pt;
+            }
+
+        </style>
+    </head>
+    <body>
     <P>
         These items have been ordered but have not been received by CNC / the customer.
         In the case of electronic licenses or renewals, these are likely to have gone direct to the customer but may
@@ -83,6 +115,15 @@ if (!OUTPUT_TO_SCREEN) {
             <th>
                 Supplier
             </th>
+            <th>
+                Delivered To
+            </th>
+            <th>
+                Ordered On
+            </th>
+            <th>
+                Visit Booked For
+            </th>
         </TR>
         </thead>
         <tbody>
@@ -102,14 +143,25 @@ if (!OUTPUT_TO_SCREEN) {
                 <td>
                     <?= $i[3] ?>
                 </td>
+                <td>
+                    <?= $i[4] ?>
+                </td>
+                <td>
+                    <?= (new DateTime($i[5]))->format('d/m/Y') ?>
+                </td>
+                <td>
+                    <?= $i[6] ? (new DateTime($i[6]))->format('d/m/Y') : 'N/A' ?>
+                </td>
             </TR>
             <?php
         }
         ?>
         </tbody>
     </TABLE>
+    </body>
+    </html>
 <?php
-if (!OUTPUT_TO_SCREEN) {
+if (!$outputToScreen) {
 
     $body = ob_get_contents();
     ob_end_clean();
@@ -122,7 +174,7 @@ if (!OUTPUT_TO_SCREEN) {
     $hdrs = array(
         'From' => CONFIG_SALES_EMAIL,
         'To' => $toEmail,
-        'Subject' => 'Ordered items not yet received',
+        'Subject' => 'Items not yet received',
         'Date' => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );
