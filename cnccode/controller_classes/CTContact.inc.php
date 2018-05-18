@@ -232,6 +232,7 @@ class CTContact extends CTCNC
                 'mailshot8FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
                 'mailshot9FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
                 'mailshot10FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot10FlagDesc')),
+                'mailshot11FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot11FlagDesc')),
                 'mailshot1FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot1Flag')),
                 'mailshot2FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot2Flag')),
                 'mailshot3FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot3Flag')),
@@ -242,6 +243,7 @@ class CTContact extends CTCNC
                 'mailshot8FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot8Flag')),
                 'mailshot9FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot9Flag')),
                 'mailshot10FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot10Flag')),
+                'mailshot11FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot11Flag')),
                 'urlSubmit' => $urlSubmit,
 //				'urlCancel' => $urlCancel
             )

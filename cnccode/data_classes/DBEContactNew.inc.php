@@ -46,6 +46,7 @@ class DBEContact extends DBCNCEntity
         $this->addColumn("mailshot8Flag", DA_YN, DA_NOT_NULL, "con_mailflag8");
         $this->addColumn("mailshot9Flag", DA_YN, DA_NOT_NULL, "con_mailflag9");
         $this->addColumn("mailshot10Flag", DA_YN, DA_NOT_NULL, "con_mailflag10");
+        $this->addColumn("mailshot11Flag", DA_YN, DA_NOT_NULL, "con_mailflag11");
         $this->addColumn("notes", DA_STRING, DA_ALLOW_NULL, "con_notes");
         $this->addColumn("workStartedEmailFlag", DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
         $this->addColumn("autoCloseEmailFlag", DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
@@ -83,7 +84,8 @@ class DBEContact extends DBCNCEntity
         con_mailflag7 = 'Y' OR
         con_mailflag8 = 'Y' OR
         con_mailflag9 = 'Y' OR
-        con_mailflag10 = 'Y'
+        con_mailflag10 = 'Y' or
+        con_mailflag11 = 'Y'
         )
         ";
 
@@ -212,7 +214,8 @@ class DBEContact extends DBCNCEntity
         con_mailflag7 = 'Y' OR
         con_mailflag8 = 'Y' OR
         con_mailflag9 = 'Y' OR
-        con_mailflag10 = 'Y'
+        con_mailflag10 = 'Y' or
+        con_mailflag11 = 'Y'
         )
         ";
 

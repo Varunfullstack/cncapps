@@ -158,12 +158,12 @@ class DBESite extends DBCNCEntity
         if ($this->getValue('CustomerID') == "") {
             $this->raiseError('CustomerID not set');
         }
-        $this->setQueryString(
+        $quey =
             'SELECT ' . $this->getDBColumnNamesAsString() .
             ' FROM ' . $this->getTableName() .
             ' WHERE ' . $this->getDBColumnName('CustomerID') . '=' . $this->getFormattedValue('CustomerID') .
-            ' AND ' . $this->getDBColumnName('SiteNo') . '=' . $this->getFormattedValue('SiteNo')
-        );
+            ' AND ' . $this->getDBColumnName('SiteNo') . '=' . $this->getFormattedValue('SiteNo');
+        $this->setQueryString($quey);
         return (parent::getRow());
     }
 

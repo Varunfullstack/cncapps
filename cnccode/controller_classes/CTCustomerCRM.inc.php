@@ -279,9 +279,21 @@ class CTCustomerCRM extends CTCNC
 
             }
 
+            $phone = $results->getValue(DBEContact::Phone);
+
+            if (!$phone) {
+                $site = new DBESite($this);
+                $site->setValue(DBESite::CustomerID, $customerID);
+                $site->setValue(DBESite::SiteNo, $results->getValue(DBEContact::SiteNo));
+                $site->getRow();
+
+                $phone = $site->getValue(DBESite::Phone);
+            }
+
             $contactData = [
                 "contactName" => $results->getValue(DBEContact::FirstName) . " " . $results->getValue(DBEContact::LastName),
-                "jobTitle" => $results->getValue(DBEContact::Position)
+                "jobTitle" => $results->getValue(DBEContact::Position),
+                'contactPhone' => $phone
             ];
             $data[] = array_merge($contactData, $customers[$customerID]);
 
@@ -397,7 +409,7 @@ class CTCustomerCRM extends CTCNC
 //                $this->setFormErrorOn();
                 $this->dsSite->setValue('PostcodeClass', CTCUSTOMER_CLS_FORM_ERROR_UC);
             }
-            $this->dsSite->setValue('Phone', $value['phone']);
+            $this->dsSite->setValue('Phone', $value['sitePhone']);
             $this->dsSite->setValue('MaxTravelHours', $value['maxTravelHours']);
             $this->dsSite->setValue('InvoiceContactID', $value['invoiceContactID']);
             $this->dsSite->setValue('DeliverContactID', $value['deliverContactID']);
@@ -1285,7 +1297,7 @@ class CTCustomerCRM extends CTCNC
                 'county' => $site->getValue("County"),
 //                'postcodeClass' => $site->getValue('PostcodeClass'),
                 'postcode' => $site->getValue("Postcode"),
-                'sitePhone' => $site->getValue("Phone"),
+                'sitePhone' => $site->getValue(DBESite::Phone),
                 'siteNo' => $site->getValue("SiteNo"),
                 'sageRef' => $site->getValue("SageRef"),
                 'debtorCode' => $site->getValue("DebtorCode"),
