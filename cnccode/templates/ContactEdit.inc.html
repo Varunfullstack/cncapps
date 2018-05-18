@@ -1,260 +1,266 @@
 <!-- Template: ContactEdit.inc.html -->
-<form name="contactForm" method="post" action="{urlSubmit}" AUTOCOMPLETE = "off">
-	<input type="hidden" name="contact[1][contactID]" value="{contactID}">
-	<input type="hidden" name="contact[1][supplierID]" value="{supplierID}">
-	<input type="hidden" name="contact[1][customerID]" value="{customerID}">
-	<input type="hidden" name="contact[1][siteNo]" value="{siteNo}">
-	<table width="100%" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td width="20%" class="promptText">First Name</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][firstName]"
-					id="firstName"
-					value="{firstName}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{firstNameMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Last Name</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][lastName]"
-					id="lastName"
-					value="{lastName}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{lastNameMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Title</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][title]"
-					id="title"
-					value="{title}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{titleMessage}</font>
-			</td>
-		</tr>
-    <tr> 
-      <td class="promptText">Position</td>
-      <td class="field">
-        <input
-          type="text"
-          name="contact[1][position]"
-          id="position"
-          value="{position}"
-          size="50"
-          maxlength="50"
-        >
-        <font class="formErrorMessage">{positionMessage}</font>
-      </td>
-    </tr>
-		<tr> 
-			<td class="promptText">Email</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][email]"
-					id="email"
-					value="{email}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{emailMessage}</font>
-			</td>
-    </tr>
-    <tr> 
-      <td class="promptText">Portal Password</td>
-      <td class="field">
-        <input
-          type="text"
-          name="contact[1][portalPassword]"
-          id="portalPassword"
-          value="{portalPassword}"
-          size="10"
-          maxlength="10"
-        >
-        <font class="formErrorMessage">{portalPasswordMessage}</font>
-      </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Failed Login Count</td>
-      <td class="field">
-        <input
-          type="text"
-          name="contact[1][failedLoginCount]"
-          id="notes"
-          value="{failedLoginCount}"
-          size="2"
-          maxlength="3"
-        >
-        <font class="formErrorMessage">{failedLoginCountMessage}</font>
-      </td>
-    </tr>
-		<tr> 
-			<td class="promptText">Phone</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][phone]"
-					id="phone"
-					value="{phone}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{phoneMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Mobile</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][mobilePhone]"
-					id="mobilePhone"
-					value="{mobilePhone}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{mobilePhoneMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Fax</td>
-			<td class="field">
-				<input
-					type="text"
-					name="contact[1][fax]"
-					id="fax"
-					value="{fax}"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{faxMessage}</font>
-			</td>
-		</tr>
-    <tr> 
-      <td class="promptText">Notes</td>
-      <td class="field">
-        <input
-          type="text"
-          name="contact[1][notes]"
-          id="notes"
-          value="{notes}"
-          size="200"
-          maxlength="200"
-        >
-        <font class="formErrorMessage">{notesMessage}</font>
-      </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Work Started Emails?</td>
-      <td class="field">
-        <input type="checkbox" name="contact[1][workStartedEmailFlag]" value="Y" {workStartedEmailFlagChecked}>
-      </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Auto-close Emails?</td>
-      <td class="field">
-        <input type="checkbox" name="contact[1][autoCloseEmailFlag]" value="Y" {autoCloseEmailFlagChecked}>
-      </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Accounts Contact?</td>
-      <td class="field">
-        <input type="checkbox" name="contact[1][accountsFlag]" value="Y" {accountsFlagChecked}>
-      </td>
-    </tr>
-		<tr> 
-			<td class="promptText">Discontinued</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][discontinuedFlag]" value="Y" {discontinuedFlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Send Mailshots</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][sendMailshotFlag]" value="Y" {sendMailshotFlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot1FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot1Flag]" value="Y" {mailshot1FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot2FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot2Flag]" value="Y" {mailshot2FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot3FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot3Flag]" value="Y" {mailshot3FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot4FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot4Flag]" value="Y" {mailshot4FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot5FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot5Flag]" value="Y" {mailshot5FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot6FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot6Flag]" value="Y" {mailshot6FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot7FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot7Flag]" value="Y" {mailshot7FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot8FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot8Flag]" value="Y" {mailshot8FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot9FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot9Flag]" value="Y" {mailshot9FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">{mailshot10FlagDesc}</td>
-			<td class="field">
-				<input type="checkbox" name="contact[1][mailshot10Flag]" value="Y" {mailshot10FlagChecked}>
-			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td align="left">
-				<input type="submit" name="Submit" value="Submit">
-			</td>
-		</tr>
-	</table>
+<form name="contactForm" method="post" action="{urlSubmit}" AUTOCOMPLETE="off">
+    <input type="hidden" name="contact[1][contactID]" value="{contactID}">
+    <input type="hidden" name="contact[1][supplierID]" value="{supplierID}">
+    <input type="hidden" name="contact[1][customerID]" value="{customerID}">
+    <input type="hidden" name="contact[1][siteNo]" value="{siteNo}">
+    <table width="100%" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="20%" class="promptText">First Name</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][firstName]"
+                        id="firstName"
+                        value="{firstName}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{firstNameMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Last Name</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][lastName]"
+                        id="lastName"
+                        value="{lastName}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{lastNameMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Title</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][title]"
+                        id="title"
+                        value="{title}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{titleMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Position</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][position]"
+                        id="position"
+                        value="{position}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{positionMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Email</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][email]"
+                        id="email"
+                        value="{email}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{emailMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Portal Password</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][portalPassword]"
+                        id="portalPassword"
+                        value="{portalPassword}"
+                        size="10"
+                        maxlength="10"
+                >
+                <font class="formErrorMessage">{portalPasswordMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Failed Login Count</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][failedLoginCount]"
+                        id="notes"
+                        value="{failedLoginCount}"
+                        size="2"
+                        maxlength="3"
+                >
+                <font class="formErrorMessage">{failedLoginCountMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Phone</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][phone]"
+                        id="phone"
+                        value="{phone}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{phoneMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Mobile</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][mobilePhone]"
+                        id="mobilePhone"
+                        value="{mobilePhone}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{mobilePhoneMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Fax</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][fax]"
+                        id="fax"
+                        value="{fax}"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{faxMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Notes</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="contact[1][notes]"
+                        id="notes"
+                        value="{notes}"
+                        size="200"
+                        maxlength="200"
+                >
+                <font class="formErrorMessage">{notesMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Work Started Emails?</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][workStartedEmailFlag]" value="Y" {workStartedEmailFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Auto-close Emails?</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][autoCloseEmailFlag]" value="Y" {autoCloseEmailFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Accounts Contact?</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][accountsFlag]" value="Y" {accountsFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Discontinued</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][discontinuedFlag]" value="Y" {discontinuedFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Send Mailshots</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][sendMailshotFlag]" value="Y" {sendMailshotFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot1FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot1Flag]" value="Y" {mailshot1FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot2FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot2Flag]" value="Y" {mailshot2FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot3FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot3Flag]" value="Y" {mailshot3FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot4FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot4Flag]" value="Y" {mailshot4FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot5FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot5Flag]" value="Y" {mailshot5FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot6FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot6Flag]" value="Y" {mailshot6FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot7FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot7Flag]" value="Y" {mailshot7FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot8FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot8Flag]" value="Y" {mailshot8FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot11FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot10Flag]" value="Y" {mailshot11FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot9FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot9Flag]" value="Y" {mailshot9FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot10FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox" name="contact[1][mailshot10Flag]" value="Y" {mailshot10FlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td align="left">
+                <input type="submit" name="Submit" value="Submit">
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: ContactEdit.inc.html -->

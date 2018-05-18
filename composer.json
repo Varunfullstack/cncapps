@@ -4,7 +4,7 @@
         "setasign/fpdi": "^2.0",
         "setasign/fpdi-protection": "^2.0",
         "syonix/changelog-viewer": "^0.1.7",
-        "crossjoin/pre-mailer": "^1.0",
-        "signable/signable-php": "*@dev"
+        "signable/signable-php": "*@dev",
+        "tijsverkoyen/css-to-inline-styles": "^2.2"
     }
 }

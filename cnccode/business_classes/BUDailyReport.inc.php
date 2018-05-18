@@ -296,7 +296,7 @@ class BUDailyReport extends Business
                         'contract' => $row[5],
                         'category' => $row[6],
                         'urlRequest' => $urlRequest,
-                        'urlActivity' => $urlActivity
+                        'urlActivity' => urlencode($urlActivity)
                     )
                 );
 
@@ -583,12 +583,10 @@ class BUDailyReport extends Business
         return $this->db->query($sql);
     }
 
-    function sendByEmailTo($toEmail, $subject, $body, $attachment = false)
+    function sendByEmailTo($toEmail, $subject, $body, $attachment = false, $senderEmail = CONFIG_SALES_EMAIL)
     {
 
         $buMail = new BUMail($this);
-
-        $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs = array(
             'From' => $senderEmail,
@@ -597,11 +595,8 @@ class BUDailyReport extends Business
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $body = htmlentities($body);
-
-        $preMailer = new \Crossjoin\PreMailer\HtmlString($body);
-
-        $body = $preMailer->getHtml();
+        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
+        $body = $cssToInlineStyles->convert($body);
 
         $buMail->mime->setHTMLBody($body);
 
@@ -870,7 +865,6 @@ WHERE pro_priority = 5
         $this->setMethodName('contactOpenSRReport');
 
         $contactOpenSRReportData = $this->getContactOpenSRReportData();
-
         $contactsData = [];
 
         while ($row = $contactOpenSRReportData->fetch_assoc()) {
@@ -918,11 +912,12 @@ WHERE pro_priority = 5
 
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
 
-
             $this->sendByEmailTo(
                 $contactsDatum['email'],
                 $subject,
-                $body
+                $body,
+                null,
+                'customerReports@cnc-ltd.co.uk'
             );
 
             echo $body;
@@ -966,7 +961,8 @@ WHERE pro_priority = 5
                     'In Progress'
                   ) AS status,
                   callactivity.`reason` AS details,
-                  contact.`con_first_name` AS contactName  
+                  contact.`con_first_name` AS contactName,
+                  contact.con_email as contactEmail  
                 FROM
                   problem 
                   INNER JOIN contact 
@@ -977,7 +973,8 @@ WHERE pro_priority = 5
                     AND callactivity.`caa_callacttypeno` = 51 
                   LEFT JOIN contact AS reporter 
                     ON problem.`pro_contno` = reporter.`con_contno` 
-                WHERE problem.`pro_status` <> 'C' 
+                WHERE problem.`pro_status` <> 'C'
+                AND problem.`pro_status` <> 'F' 
                 and problem.`pro_hide_from_customer_flag` <> 'Y'
                 and problem.pro_priority >= 1 and problem.pro_priority <= 4
                  ORDER BY pro_date_raised";

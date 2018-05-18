@@ -89,11 +89,6 @@ if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
 
-$handle = fopen('c:/logs/' . $argv[1] . '-' . (new DateTime())->format('Y-m-d H:i:s') . '.html', 'w');
-fwrite($handle, print_r($result));
-fclose($handle);
-
-
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=localhost;dbname=cncappsdev';
 $DB_USER = "webuser";
