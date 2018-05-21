@@ -12,10 +12,9 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUCustomerSrAnalysisReport extends Business
 {
-    private $includedItemTypes;
-
     const ITEMTYPENO_SERVERCARE = 55;
     const ITEMTYPENO_SERVICEDESK = 56;
+    private $includedItemTypes;
 
     function __construct(&$owner)
     {
@@ -41,7 +40,201 @@ class BUCustomerSrAnalysisReport extends Business
         $toDate = $dsSearchForm->getValue('toDate');
         $customerID = $dsSearchForm->getValue('customerID');
 
-        return $this->getResultsByDateRange($customerID, $fromDate, $toDate);
+        return $this->getResultsByDateRangeBrokenByPriority($customerID, $fromDate, $toDate);
+    }
+
+    function getResultsByDateRangeBrokenByPriority($customerID, $fromDate, $toDate)
+    {
+        $resultset = array();
+
+        $months = $this->getMonths(
+            $fromDate,
+            $toDate
+        );
+
+        if ($months) {
+
+            foreach ($months as $key => $row) {
+
+                $resultRow = array();
+
+                $key = $row['year'] . ' ' . $row['month'];
+
+                $resultRow['period'] = $key;
+
+                $resultRow['year'] = $row['year'];
+
+                $resultRow['monthName'] = $row['monthName'];
+
+                $priorities = [1, 2, 3, 4];
+                $itemTypes = [
+                    "serverCare" => self::ITEMTYPENO_SERVERCARE,
+                    "serviceDesk" => self::ITEMTYPENO_SERVICEDESK,
+                    "prepay" => CONFIG_PREPAY_ITEMTYPEID,
+                    "other" => null
+                ];
+
+                $resultRow['types'] = [
+                ];
+
+
+                foreach ($itemTypes as $itemTypeKey => $itemType) {
+
+                    if (!isset($resultRow['types'][$itemTypeKey])) {
+                        $resultRow[$itemTypeKey] = [];
+                    }
+
+                    foreach ($priorities as $priority) {
+
+                        if (!isset($resultRow['types'][$itemTypeKey][$priority])) {
+                            $resultRow['types'][$itemTypeKey][$priority] = [];
+                        }
+
+                        $resultRow['types'][$itemTypeKey][$priority]["count"] = $this->getCountForPriority(
+                            $priority,
+                            $customerID,
+                            $row['year'],
+                            $row['month'],
+                            $itemType
+                        );
+
+                        $resultRow['types'][$itemTypeKey][$priority]["hoursResponded"] = $this->getRespondedHoursByPriority(
+                            $priority,
+                            $customerID,
+                            $row['year'],
+                            $row['month'],
+                            $itemType
+                        );
+
+                        $resultRow['types'][$itemTypeKey][$priority]["hoursFix"] =
+                            $this->getFixHoursByPriority(
+                                $priority,
+                                $customerID,
+                                $row['year'],
+                                $row['month'],
+                                $itemType
+                            );
+                    }
+                }
+
+                $resultset[] = $resultRow;
+            }
+        }
+        return $resultset;
+    }
+
+    function getMonths($fromDate, $toDate)
+    {
+
+        $query = "
+      SELECT
+        YEAR( pro_date_raised ) AS year,
+        MONTH( pro_date_raised ) AS month,
+        MONTHNAME( pro_date_raised ) AS monthName
+      FROM
+        problem
+      WHERE 1=1";
+
+        if ($fromDate) {
+            $query .= " AND  pro_date_raised >= '$fromDate'";
+        }
+        if ($toDate) {
+            $query .= " AND  pro_date_raised <= '$toDate'";
+        }
+
+        $query .= " GROUP BY
+        YEAR( pro_date_raised ), MONTH( pro_date_raised );";
+
+        if ($result = $this->db->query($query)) {
+
+            while ($tmp = $result->fetch_array(MYSQLI_ASSOC)) {
+                $res[] = $tmp;
+            }
+
+        } else {
+            $res = false;
+        }
+        return $res;
+
+    }
+
+    function getCountForPriority($priority, $customerID, $year, $month, $itemtypeno = false)
+    {
+        $query = "
+      SELECT
+        COUNT(*) as count
+      FROM
+        problem
+        JOIN custitem ON cui_cuino = pro_contract_cuino
+        JOIN item ON itm_itemno = cui_itemno
+      WHERE
+        pro_priority = $priority
+        AND MONTH(pro_date_raised) = $month
+        AND YEAR( pro_date_raised) = $year";
+
+        if ($itemtypeno) {
+            $query .= " AND itm_itemtypeno = $itemtypeno";
+        } else {
+            $query .= " AND itm_itemtypeno NOT IN ( " . $this->includedItemTypes . ")";
+        }
+
+        if ($customerID) {
+            $query .= " AND pro_custno = $customerID";
+        }
+
+        return $this->db->query($query)->fetch_object()->count;
+    }
+
+    function getRespondedHoursByPriority($priority, $customerID, $year, $month, $itemtypeno = false)
+    {
+        $query = "
+      SELECT
+        AVG( pro_responded_hours ) as hours
+      FROM
+        problem
+        JOIN custitem ON cui_cuino = pro_contract_cuino
+        JOIN item ON itm_itemno = cui_itemno
+      WHERE
+        pro_priority = $priority
+        AND MONTH(pro_date_raised) = $month
+        AND YEAR( pro_date_raised) = $year";
+
+        if ($itemtypeno) {
+            $query .= " AND itm_itemtypeno = $itemtypeno";
+        } else {
+            $query .= " AND itm_itemtypeno NOT IN ( " . $this->includedItemTypes . ")";
+        }
+
+        if ($customerID) {
+            $query .= " AND pro_custno = $customerID";
+        }
+        return $this->db->query($query)->fetch_object()->hours;
+    }
+
+    function getFixHoursByPriority($priority, $customerID, $year, $month, $itemtypeno = false)
+    {
+        $query = "
+      SELECT
+        AVG( pro_working_hours ) as hours
+      FROM
+        problem
+        JOIN custitem ON cui_cuino = pro_contract_cuino
+        JOIN item ON itm_itemno = cui_itemno
+      WHERE
+        pro_priority = $priority
+        AND MONTH(pro_date_raised) = $month
+        AND YEAR( pro_date_raised) = $year";
+
+        if ($itemtypeno) {
+            $query .= " AND itm_itemtypeno = $itemtypeno";
+        } else {
+            $query .= " AND itm_itemtypeno NOT IN ( " . $this->includedItemTypes . ")";
+        }
+
+        if ($customerID) {
+            $query .= " AND pro_custno = $customerID";
+        };
+        return $this->db->query($query)->fetch_object()->hours;
     }
 
     function getResultsByPeriodRange($customerID, $startPeriod, $endPeriod)
@@ -251,41 +444,6 @@ class BUCustomerSrAnalysisReport extends Business
             }
         }
         return $resultset;
-    }
-
-    function getMonths($fromDate, $toDate)
-    {
-
-        $query = "
-      SELECT
-        YEAR( pro_date_raised ) AS year,
-        MONTH( pro_date_raised ) AS month,
-        MONTHNAME( pro_date_raised ) AS monthName
-      FROM
-        problem
-      WHERE 1=1";
-
-        if ($fromDate) {
-            $query .= " AND  pro_date_raised >= '$fromDate'";
-        }
-        if ($toDate) {
-            $query .= " AND  pro_date_raised <= '$toDate'";
-        }
-
-        $query .= " GROUP BY
-        YEAR( pro_date_raised ), MONTH( pro_date_raised );";
-
-        if ($result = $this->db->query($query)) {
-
-            while ($tmp = $result->fetch_array(MYSQLI_ASSOC)) {
-                $res[] = $tmp;
-            }
-
-        } else {
-            $res = false;
-        }
-        return $res;
-
     }
 
     function getCount1to3($customerID = false, $year, $month, $itemtypeno)
