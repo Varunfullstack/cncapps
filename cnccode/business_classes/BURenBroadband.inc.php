@@ -108,13 +108,12 @@ class BURenBroadband extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenBroadband->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
 
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -214,7 +213,9 @@ class BURenBroadband extends Business
                              */
                             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
-                            $buSalesOrder->getOrderByOrdheadID($dsOrdhead->getValue('ordheadID'), $dsOrdhead, $dsOrdline);
+                            $buSalesOrder->getOrderByOrdheadID($dsOrdhead->getValue('ordheadID'),
+                                                               $dsOrdhead,
+                                                               $dsOrdline);
                             $buInvoice->createInvoiceFromOrder($dsOrdhead, $dsOrdline);
                         }
                     }
@@ -279,8 +280,10 @@ class BURenBroadband extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 1);
                 $dbeOrdline->setValue('qtyLastDespatched', 1);
-                $dbeOrdline->setValue('curUnitSale', $this->dbeJRenBroadband->getValue('salePricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', $this->dbeJRenBroadband->getValue('costPricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      $this->dbeJRenBroadband->getValue('salePricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      $this->dbeJRenBroadband->getValue('costPricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 

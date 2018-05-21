@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 233 - Amend Create Renewal Sales Order email destination
+
 ## [v1.6.2] - 2018-05-21
 ### Fixed
 - Issue 234 - Permissions bug for sales order address page

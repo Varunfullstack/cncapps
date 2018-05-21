@@ -114,13 +114,11 @@ class BURenHosting extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenHosting->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -271,8 +269,10 @@ class BURenHosting extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 0);
                 $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale', ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 
