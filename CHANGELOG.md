@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 244 - Show ItemsNotYetReceivedEmail as a menu link
+
 ## [v1.6.2] - 2018-05-21
 ### Fixed
 - Issue 234 - Permissions bug for sales order address page
