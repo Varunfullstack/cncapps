@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 234 - Permissions bug for sales order address page
+
 ## [v1.6.1] - 2018-05-18
 ### Fixed
 - Issue 231 - Bugs from release 1.6.0
