@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 246 - Add descriptions to Report pages
 ### Changed
 - Issue 233 - Amend Create Renewal Sales Order email destination
+### Removed
+- Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
 
 ## [v1.6.2] - 2018-05-21
 ### Fixed
