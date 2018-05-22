@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 246 - Add descriptions to Report pages
+### Changed
+- Issue 233 - Amend Create Renewal Sales Order email destination
 
 ## [v1.6.2] - 2018-05-21
 ### Fixed

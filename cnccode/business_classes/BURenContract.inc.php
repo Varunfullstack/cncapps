@@ -103,13 +103,11 @@ class BURenContract extends Business
         return;
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenContract->getRenewalsDueRows(false);
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -290,8 +288,10 @@ class BURenContract extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 0);
                 $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale', ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $dsRenContract->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $dsRenContract->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $dsRenContract->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $dsRenContract->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 
@@ -519,7 +519,8 @@ HEREDOC;
 
             $expiryDate = date(
                 'd/m/Y',
-                strtotime('+' . $dbeWarranty->getValue('years') . ' years', strtotime($dsServer->getValue('despatchDate')))
+                strtotime('+' . $dbeWarranty->getValue('years') . ' years',
+                          strtotime($dsServer->getValue('despatchDate')))
             );
 
             $template->set_var(
@@ -541,7 +542,8 @@ HEREDOC;
         $reason = $template->get_var('output');
 
         $buActivity = new BUActivity($this);
-        $callActivityID = $buActivity->createActivityFromCustomerID($dsContract->getValue('customerID'), CONFIG_HEALTHCHECK_ACTIVITY_USER_ID);
+        $callActivityID = $buActivity->createActivityFromCustomerID($dsContract->getValue('customerID'),
+                                                                    CONFIG_HEALTHCHECK_ACTIVITY_USER_ID);
 
         $dbeCustomerItem = new DBECustomerItem ($this);
         $dbeCallActivity = new DBECallActivity ($this);

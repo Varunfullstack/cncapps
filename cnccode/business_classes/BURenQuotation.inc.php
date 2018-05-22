@@ -105,13 +105,11 @@ class BURenQuotation extends Business
         return;
     }
 
-    function emailRenewalsQuotationsDue()
+    function emailRenewalsQuotationsDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenQuotation->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -166,13 +164,11 @@ class BURenQuotation extends Business
 
     }
 
-    function emailRecentlyGeneratedQuotes()
+    function emailRecentlyGeneratedQuotes($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenQuotation->getRecentQuotesRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
