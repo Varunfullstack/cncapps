@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 246 - Add descriptions to Report pages
 - Issue 237 - ServiceRequestReport export tweak
+- Issue 244 - Show ItemsNotYetReceivedEmail as a menu link
 ### Changed
 - Issue 233 - Amend Create Renewal Sales Order email destination
 - Issue 238 - SR Response and number amendment
