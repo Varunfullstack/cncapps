@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 237 - ServiceRequestReport export tweak
 ### Changed
 - Issue 233 - Amend Create Renewal Sales Order email destination
+- Issue 238 - SR Response and number amendment
 ### Removed
 - Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
 
