@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 238 - SR Response and number amendment
 ### Removed
 - Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
+- Issue 241 - Remove Customer Review Meeting from the Accounts menu
 
 ## [v1.6.2] - 2018-05-21
 ### Fixed
