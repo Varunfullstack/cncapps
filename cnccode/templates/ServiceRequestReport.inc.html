@@ -8,9 +8,11 @@
     });
     var state = 'none'; // display status
     var savedCustomerString;
+
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -25,17 +27,22 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
         }
     }
 </script>
+<div class="reportDescription">
+    This will create an export of Service Requests showing key facts, including priority, SLA and fix hours.
+</div>
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm" method="get" action="{urlSubmit}">
     <table width="500px" border="0" cellspacing="0" cellpadding="1">

@@ -542,3 +542,7 @@ table#suspended {
 table.table-bordered tr {
     background-color: rgb(238, 238, 238)
 }
+
+div.reportDescription {
+    font-family: Arial, sans-serif;
+}
