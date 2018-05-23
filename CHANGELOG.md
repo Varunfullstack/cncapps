@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 252 - Ability to remove 'entire SR hidden from customer'
+
 ## [v1.6.3] - 2018-05-23
 ### Fixed
 - Issue 250 - Standardtext.php missing
