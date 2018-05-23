@@ -9,9 +9,12 @@ This project changes will be shown here.
 ### Changed
 - Issue 233 - Amend Create Renewal Sales Order email destination
 - Issue 238 - SR Response and number amendment
+### Fixed
+- Issue 229 - Purchase Authorisation Supplier pop out
 ### Removed
 - Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
 - Issue 241 - Remove Customer Review Meeting from the Accounts menu
+
 
 ## [v1.6.3] - 2018-05-23
 ### Fixed

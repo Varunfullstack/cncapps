@@ -68,7 +68,6 @@ class CTSupplier extends CTCNC
                 $this->search();
                 break;
             case CTCNC_ACT_DISP_SUPPLIER_POPUP:
-                echo 'test';
                 $this->displaySupplierSelectPopup();
                 break;
             case CTSUPPLIER_ACT_SUPPLIER_SEARCH_FORM:
