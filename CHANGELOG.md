@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+## Changed
+- Issue 240 - Standardise date displays in forms
+
 ## [v1.6.2] - 2018-05-21
 ### Fixed
 - Issue 234 - Permissions bug for sales order address page

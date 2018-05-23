@@ -86,9 +86,18 @@ class DBEProblem extends DBEntity
         $this->addColumn(self::hideFromCustomerFlag, DA_STRING, DA_ALLOW_NULL, "pro_hide_from_customer_flag");
         $this->addColumn(self::alarmDate, DA_DATE, DA_ALLOW_NULL, "pro_alarm_date");
         $this->addColumn(self::alarmTime, DA_TIME, DA_ALLOW_NULL, "pro_alarm_time");
-        $this->addColumn(self::totalActivityDurationHours, DA_FLOAT, DA_ALLOW_NULL, "pro_total_activity_duration_hours");
-        $this->addColumn(self::totalTravelActivityDurationHours, DA_FLOAT, DA_ALLOW_NULL, "pro_total_travel_activity_duration_hours");
-        $this->addColumn(self::chargeableActivityDurationHours, DA_FLOAT, DA_ALLOW_NULL, "pro_chargeable_activity_duration_hours");
+        $this->addColumn(self::totalActivityDurationHours,
+                         DA_FLOAT,
+                         DA_ALLOW_NULL,
+                         "pro_total_activity_duration_hours");
+        $this->addColumn(self::totalTravelActivityDurationHours,
+                         DA_FLOAT,
+                         DA_ALLOW_NULL,
+                         "pro_total_travel_activity_duration_hours");
+        $this->addColumn(self::chargeableActivityDurationHours,
+                         DA_FLOAT,
+                         DA_ALLOW_NULL,
+                         "pro_chargeable_activity_duration_hours");
         $this->addColumn(self::slaResponseHours, DA_FLOAT, DA_ALLOW_NULL, "pro_sla_response_hours");
         $this->addColumn(self::escalatedFlag, DA_YN, DA_ALLOW_NULL, "pro_escalated_flag");
         $this->addColumn(self::escalatedUserID, DA_INTEGER, DA_ALLOW_NULL, "pro_escalated_consno");
@@ -100,15 +109,24 @@ class DBEProblem extends DBEntity
         $this->addColumn(self::doNextFlag, DA_YN, DA_ALLOW_NULL, "pro_do_next_flag");
         $this->addColumn(self::rootCauseID, DA_INTEGER, DA_ALLOW_NULL, "pro_rootcauseno");
         $this->addColumn(self::workingHoursAlertSentFlag, DA_YN, DA_ALLOW_NULL, "pro_working_hours_alert_sent_flag");
-        $this->addColumn(self::awaitingCustomerResponseFlag, DA_YN, DA_ALLOW_NULL, "pro_awaiting_customer_response_flag");
-        $this->addColumn(self::workingHoursCalculatedToTime, DA_YN, DA_ALLOW_NULL, "pro_working_hours_calculated_to_time");
+        $this->addColumn(self::awaitingCustomerResponseFlag,
+                         DA_YN,
+                         DA_ALLOW_NULL,
+                         "pro_awaiting_customer_response_flag");
+        $this->addColumn(self::workingHoursCalculatedToTime,
+                         DA_YN,
+                         DA_ALLOW_NULL,
+                         "pro_working_hours_calculated_to_time");
         $this->addColumn(self::monitorAgentName, DA_STRING, DA_ALLOW_NULL, "pro_monitor_agent_name");
         $this->addColumn(self::monitorName, DA_STRING, DA_ALLOW_NULL, "pro_monitor_name");
         $this->addColumn(self::projectID, DA_INTEGER, DA_ALLOW_NULL, "pro_projectno");
         $this->addColumn(self::linkedSalesOrderID, DA_INTEGER, DA_ALLOW_NULL, "pro_linked_ordno");
         $this->addColumn(self::criticalFlag, DA_YN, DA_ALLOW_NULL, "pro_critical_flag");
         $this->addColumn(self::queueNo, DA_INTEGER, DA_ALLOW_NULL, "pro_queue_no");
-        $this->addColumn(self::hdLimitMinutes, DA_INTEGER, DA_NOT_NULL, "pro_hd_limit_minutes"); // Helpdesk team remaining hours
+        $this->addColumn(self::hdLimitMinutes,
+                         DA_INTEGER,
+                         DA_NOT_NULL,
+                         "pro_hd_limit_minutes"); // Helpdesk team remaining hours
         $this->addColumn(self::esLimitMinutes, DA_INTEGER, DA_NOT_NULL, "pro_es_limit_minutes");
         $this->addColumn(self::imLimitMinutes, DA_INTEGER, DA_NOT_NULL, "pro_im_limit_minutes");
         $this->addColumn(self::hdTimeAlertFlag, DA_YN, DA_ALLOW_NULL, "pro_hd_time_alert_flag");
@@ -124,15 +142,17 @@ class DBEProblem extends DBEntity
         }
     }
 
-    public function getManagementReviews($customerID, $startYearMonth, $endYearMonth)
+    public function getManagementReviews($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
     {
+
         $this->setQueryString(
 
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName('customerID') . ' = ' . $customerID .
-            " AND " . $this->getDBColumnName('completeDate') . " BETWEEN '" . $startYearMonth . "-01' AND '" . $endYearMonth . "-31'
-      AND " . $this->getDBColumnName('managementReviewReason') . "<> ''"
+            " AND " . $this->getDBColumnName('completeDate') . " BETWEEN '" .
+            $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "' AND " .
+            $this->getDBColumnName('managementReviewReason') . "<> ''"
         );
 
         return parent::getRows();

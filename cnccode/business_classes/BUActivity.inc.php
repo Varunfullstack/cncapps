@@ -7453,10 +7453,10 @@ customer with the past 8 hours email to GL
         return $this->dbeProblem;
     }
 
-    function getManagementReviewsInPeriod($customerID, $startYearMonth, $endYearMonth, &$dsResults)
+    function getManagementReviewsInPeriod($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate, &$dsResults)
     {
         $dbeProblem = $this->getDbeProblem();
-        $dbeProblem->getManagementReviews($customerID, $startYearMonth, $endYearMonth);
+        $dbeProblem->getManagementReviews($customerID, $startDate, $endDate);
 
         return ($this->getData($dbeProblem, $dsResults));
 

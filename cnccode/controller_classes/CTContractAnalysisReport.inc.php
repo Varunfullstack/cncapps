@@ -247,11 +247,11 @@ class CTContractAnalysisReport extends CTCNC
 
         $d->modify('first day of previous month');
 
-        $dsSearchForm->setValue('endYearMonth', $d->format('Y') . '-' . $d->format('m'));
+        $dsSearchForm->setValue('endYearMonth', $d->format('m') . '/' . $d->format('Y'));
 
         $d->modify('11 months ago');
 
-        $dsSearchForm->setValue('startYearMonth', $d->format('Y') . '-' . $d->format('m'));
+        $dsSearchForm->setValue('startYearMonth', $d->format('m') . '/' . $d->format('Y'));
 
         $dsSearchForm->setValue('contracts', '');      // All
 
