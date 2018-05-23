@@ -285,9 +285,15 @@ class BUCustomerReviewMeeting extends Business
     /**
      * Create a PDF file of customer profit figures and save to documentation
      * folder
-     *
+     * @param $customerID
+     * @param $startDate
+     * @param $endDate
+     * @param $meetingDate
      */
-    public function generateSalesPdf($customerID, $startYearMonth, $endYearMonth, $meetingDate)
+    public function generateSalesPdf($customerID,
+                                     DateTimeInterface $startDate,
+                                     DateTimeInterface $endDate,
+                                     $meetingDate)
     {
         $buCustomer = new BUCustomer($this);
 
@@ -306,8 +312,8 @@ class BUCustomerReviewMeeting extends Business
         $this->initialiseSearchForm($dsSearchForm);
 
         $dsSearchForm->setValue('customerID', $customerID);
-        $dsSearchForm->setValue('startYearMonth', $startYearMonth);
-        $dsSearchForm->setValue('endYearMonth', $endYearMonth);
+        $dsSearchForm->setValue('startYearMonth', $startDate->format('Y-m'));
+        $dsSearchForm->setValue('endYearMonth', $endDate->format('Y-m'));
 
         $results = $buCustomerAnalysisReport->getResults($dsSearchForm);
 
@@ -348,9 +354,9 @@ class BUCustomerReviewMeeting extends Business
         $template->set_var(
             array(
                 'customerName' => $dsCustomer->getValue('name'),
-                'startYearMonth' => $startYearMonth,
+                'startYearMonth' => $startDate->format('Y-m'),
                 'meetingDate' => $meetingDate,
-                'endYearMonth' => $endYearMonth,
+                'endYearMonth' => $endDate->format('Y-m'),
                 'totalSales' => number_format($totalSales, 2),
                 'totalCost' => number_format($totalCost, 2),
                 'totalLabour' => number_format($totalLabour, 2),
@@ -482,8 +488,8 @@ class BUCustomerReviewMeeting extends Business
         $dompdf->render();
 
         $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
-                0,
-                4);
+                                                                                                       0,
+                                                                                                       4);
 
         $dompdf->add_info('Title', 'Renewal Report ' . $meetingDateDmy);
 
@@ -506,7 +512,8 @@ class BUCustomerReviewMeeting extends Business
         $this->pdfEncrypt($filePath, $filePath, 'RenewalOwner2018', 'CNCShoreham2018');
     }
 
-    function pdfEncrypt ($origFile, $destFile, $owner_password=null, $user_password=null, $permissions = ['print']){
+    function pdfEncrypt($origFile, $destFile, $owner_password = null, $user_password = null, $permissions = ['print'])
+    {
         $pdf = new \setasign\FpdiProtection\FpdiProtection();
         $pagecount = $pdf->setSourceFile($origFile);
         // copy all pages from the old unprotected pdf in the new one
@@ -517,8 +524,8 @@ class BUCustomerReviewMeeting extends Business
             //var_dump($dim);exit;
         }
         // Allow for array('print', 'modify', 'copy', 'annot-forms');
-        $pdf->SetProtection($permissions,$user_password, $owner_password);
-        $pdf->Output($destFile,'F'); // F write, D download
+        $pdf->SetProtection($permissions, $user_password, $owner_password);
+        $pdf->Output($destFile, 'F'); // F write, D download
         return $destFile;
     }
 }

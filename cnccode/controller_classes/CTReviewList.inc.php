@@ -88,7 +88,7 @@ class CTReviewList extends CTCNC
 
                     array(
                         'customerName' => $dsCustomer->getValue('name'),
-                        'reviewDate' => $dsCustomer->getValue('reviewDate'),
+                        'reviewDate' => (new DateTime($dsCustomer->getValue('reviewDate')))->format('d/m/Y'),
                         'reviewTime' => $dsCustomer->getValue('reviewTime'),
                         'reviewAction' => substr($dsCustomer->getValue('reviewAction'), 0, 50),
                         'reviewUser' => $user,

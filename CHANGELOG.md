@@ -10,6 +10,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 233 - Amend Create Renewal Sales Order email destination
 - Issue 238 - SR Response and number amendment
+- Issue 240 - Standardise date displays in forms
 ### Fixed
 - Issue 229 - Purchase Authorisation Supplier pop out
 ### Removed

@@ -237,13 +237,13 @@ class BUCustomerSrAnalysisReport extends Business
         return $this->db->query($query)->fetch_object()->hours;
     }
 
-    function getResultsByPeriodRange($customerID, $startPeriod, $endPeriod)
+    function getResultsByPeriodRange($customerID, DateTimeInterface $startPeriod, DateTimeInterface $endPeriod)
     {
         /*
         Turn periods into dates
         */
-        $fromDate = $startPeriod . '-01';
-        $toDate = $endPeriod . '-31';
+        $fromDate = $startPeriod->format('Y-m-d');
+        $toDate = $endPeriod->format('Y-m-d');
 
         return $this->getResultsByDateRange($customerID, $fromDate, $toDate);
     }

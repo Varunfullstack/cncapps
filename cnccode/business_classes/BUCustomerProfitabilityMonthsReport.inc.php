@@ -32,13 +32,12 @@ class BUCustomerProfitabilityMonthsReport extends Business
     function getPeriodsBetween($startYearMonth, $endYearMonth)
     {
         $periods = array();
-
-        $d1 = new DateTime($startYearMonth . "-01");
-        $d2 = new DateTime($endYearMonth . "-28");
+        $d1 = (DateTime::createFromFormat('m/Y', $startYearMonth))->modify('first day of this month');
+        $d2 = DateTime::createFromFormat('m/Y', $endYearMonth)->modify('last day of this month');
 
         while ($d1 <= $d2) {
 
-            $periods[] = $d1->format('Y-m');
+            $periods[] = $d1->format('m/Y');
             $d1->add(new \DateInterval('P1M'));
 
         }
