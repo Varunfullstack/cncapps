@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.6.3] - 2018-05-23
 ### Fixed
 - Issue 250 - Standardtext.php missing
 
