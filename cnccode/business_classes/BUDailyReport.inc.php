@@ -130,8 +130,9 @@ class BUDailyReport extends Business
      *
      * @param mixed $daysAgo
      * @param bool $priorityFiveOnly
+     * @param bool $onScreen
      */
-    function outstandingIncidents($daysAgo, $priorityFiveOnly = false)
+    function outstandingIncidents($daysAgo, $priorityFiveOnly = false, $onScreen = false)
     {
 
         $this->setMethodName('outstandingIncidents');
@@ -220,22 +221,31 @@ class BUDailyReport extends Business
             $csvTemplate->parse('output', 'page', true);
             $csvFile = $csvTemplate->get_var('output');
 
-            if ($priorityFiveOnly) {
-                $subject = 'Priority 5';
+            if (!$onScreen) {
+                if ($priorityFiveOnly) {
+                    $subject = 'Priority 5';
+                } else {
+                    $subject = 'Priority 1-4';
+                }
+
+                $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
+
+                $this->sendByEmailTo(
+                    'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
+                    $subject,
+                    $body,
+                    $csvFile
+                );
             } else {
-                $subject = 'Priority 1-4';
+                ?>
+                <a href="data:text/csv;charset=utf-8;base64,<?= base64_encode($csvFile) ?>" download="outstanding.csv">
+                    Download CSV
+                </a>
+
+                <?php
             }
-
-            $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
-
-            $this->sendByEmailTo(
-                'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
-                $subject,
-                $body,
-                $csvFile
-            );
-
             echo $body;
+
 
         }
 
@@ -453,13 +463,10 @@ class BUDailyReport extends Business
         FROM
           callactivity 
         WHERE caa_problemno = pro_problemno 
-          AND caa_callacttypeno = 51) AS `description`,
-          
+          AND caa_callacttypeno = 51 limit 1) AS `description`,
         DATEDIFF(NOW(),pro_date_raised ) AS `openDays`,
         pro_total_activity_duration_hours AS `timeSpentHours`,
-
         last.caa_date as lastUpdatedDate,
-        
         pro_priority as `priority`,
         team.name AS teamName
       FROM
@@ -470,7 +477,6 @@ class BUDailyReport extends Business
           ON pro_consno = cns_consno 
         LEFT JOIN team
           ON team.teamID = consultant.teamID
-        
         JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
@@ -481,7 +487,6 @@ class BUDailyReport extends Business
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
         WHERE
-        
           DATE(pro_date_raised) <=DATE(
           DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
           AND pro_status NOT IN ('F', 'C')";
@@ -512,7 +517,6 @@ class BUDailyReport extends Business
         
       ORDER BY customer,
         pro_problemno";
-
         return $this->db->query($sql);
     }
 

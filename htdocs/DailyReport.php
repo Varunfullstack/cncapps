@@ -1,39 +1,23 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_bu"] . "/BUDailyReport.inc.php");
-
-$buDailyReport = new BUDailyReport($this);
-
-if ($_REQUEST['daysAgo']) {
-    $daysAgo = $_REQUEST['daysAgo'];
-} else {
-    $daysAgo = 1;
-}
-
-switch ($_REQUEST['action']) {
-
-    case 'fixedIncidents' :
-        $buDailyReport->fixedIncidents($daysAgo);
-        break;
-    case 'focActivities' :
-        $buDailyReport->focActivities($daysAgo);
-        break;
-    case 'prepayOverValue' :
-        $buDailyReport->prepayOverValue($daysAgo);
-        break;
-    case 'outstandingIncidents' :
-        $buDailyReport->outstandingIncidents($daysAgo);
-        break;
-    case 'outstandingPriorityFiveIncidents' :
-        $buDailyReport->outstandingIncidents($daysAgo, true);
-        break;
-    case 'p5SRWithoutSalesOrders':
-        $buDailyReport->p5IncidentsWithoutSalesOrders();
-        break;
-    case 'p5SRWithSalesOrdersAndContract':
-        $buDailyReport->p5WithSalesOrderAndContractAssigned();
-        break;
-    case 'contactOpenSRReport':
-        $buDailyReport->contactOpenSRReport();
-}
-?>
+require_once($cfg["path_ct"] . "/CTDailyReport.inc.php");
+session_start();
+page_open(
+    array(
+        'sess' => PHPLIB_CLASSNAME_SESSION,
+        'auth' => PHPLIB_CLASSNAME_AUTH,
+        'perm' => PHPLIB_CLASSNAME_PERM,
+        ''
+    )
+);
+GLOBAL $cfg;
+header("Cache-control: private");
+$ctStandardText = new CTDailyReport(
+    $_SERVER['REQUEST_METHOD'],
+    $_POST,
+    $_GET,
+    $_COOKIE,
+    $cfg
+);
+$ctStandardText->execute();
+page_close();
