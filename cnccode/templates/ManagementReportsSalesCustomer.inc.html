@@ -1,153 +1,158 @@
 <script language='JavaScript' src='CommonJS.js'></script>
 <script language='JavaScript'>
-var savedCustomerName
-function saveCustomerName(){
-	savedCustomerName = document.getElementById("customerName").value
-}
-function validateCustomerName(){
-	if (Trim(document.getElementById("customerName").value) != ""){
-		if (document.getElementById("customerName").value != savedCustomerName){
-			window.open('{customerPopupURL}&customerString=' +
-			escape(document.getElementById("customerName").value) +
-			'&parentIDField=customerID' +
-			'&parentDescField=customerName',
-			'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-		}
-	}
-	else{
-		document.report.customerID.value = "";
-	}
-}
-function submitOnReturn() {
-   if (event.keyCode == 13) {
-			document.searchForm.submit();
-   }
-}
-function validateCustomerNameOnReturn() {
-   if (event.keyCode == 13) {
-			validateCustomerName();
-   }
-}
+    var savedCustomerName;
+
+    function saveCustomerName() {
+        savedCustomerName = document.getElementById("customerName").value
+    }
+
+    function validateCustomerName() {
+        if (Trim(document.getElementById("customerName").value) != "") {
+            if (document.getElementById("customerName").value != savedCustomerName) {
+                window.open('{customerPopupURL}&customerString=' +
+                    escape(document.getElementById("customerName").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerName',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.report.customerID.value = "";
+        }
+    }
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+
+    function validateCustomerNameOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerName();
+        }
+    }
 </script>
-<link href="maxchart/style/style.css" rel="stylesheet" type="text/css" />
-<FORM  method="post" action="{urlGenerateReport}" name="report" >
-<TABLE>
-	<TR>
-		<TD>Customer<input
-					type="hidden"
-					name="customerID"
-					id="customerID"
-					value="{customerID}"
-				>
-				<input
-					type="text"
-					name="customerName"
-					id="customerName"
-					value="{customerName}"
-					onChange="javascript:validateCustomerName()"
-					size="50"
-					maxlength="50"
-				>
-			</TD>
-			<TD>
-				Year<select
-	name="year"
-	type="text"
-	onChange="form.submit()"
->
-	<!-- BEGIN yearBlock -->
-	<option {yearSelected} value="{year}">{year}</option>
-	<!-- END yearBlock -->
-</select>
-</TD>
-<TD>
-<input type="submit" value="Search" name="Submit">
-</TD>
-</TR>
-</TABLE>
+<link href="maxchart/style/style.css" rel="stylesheet" type="text/css"/>
+<FORM method="post" action="{urlGenerateReport}" name="report">
+    <TABLE>
+        <TR>
+            <TD>Customer<input
+                    type="hidden"
+                    name="customerID"
+                    id="customerID"
+                    value="{customerID}"
+            >
+                <input
+                        type="text"
+                        name="customerName"
+                        id="customerName"
+                        value="{customerName}"
+                        onChange="javascript:validateCustomerName()"
+                        size="50"
+                        maxlength="50"
+                >
+            </TD>
+            <TD>
+                Year
+                <select
+                        name="year"
+                        type="text"
+                        onChange="form.submit()"
+                >
+                    <!-- BEGIN yearBlock -->
+                    <option {yearSelected} value="{year}">{year}</option>
+                    <!-- END yearBlock -->
+                </select>
+            </TD>
+            <TD>
+                <input type="submit" value="Search" name="Submit">
+            </TD>
+        </TR>
+    </TABLE>
 </FORM>
 <table border="1" cellspacing="1" cellpadding="1">
-		<tr>
-				<td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Customer</strong></td>
+    <tr>
+        <td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Customer</strong></td>
         <td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Sector</strong></td>
         <td nowrap="nowrap" bgcolor="#F3F3F3"><strong>PCs</strong></td>
         <td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Servers</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>Year</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>1 </strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>2</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>3</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>4</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>5</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>6</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>7</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>8</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>9</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>10</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>11</strong></td>
-				<td colspan="2" align="center" bgcolor="#F3F3F3"><strong>12</strong></td>
-		</tr>
-		<tr>
-				<td nowrap="nowrap" bgcolor="#E1E1E1">&nbsp;</td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>Year</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>1 </strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>2</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>3</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>4</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>5</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>6</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>7</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>8</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>9</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>10</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>11</strong></td>
+        <td colspan="2" align="center" bgcolor="#F3F3F3"><strong>12</strong></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" bgcolor="#E1E1E1">&nbsp;</td>
         <td colspan="3">&nbsp;</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sales</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
-				<td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
-		</tr>
-		<!-- BEGIN resultsBlock -->
-		<tr>
-				<td nowrap="nowrap" bgcolor="#E1E1E1">{customer}</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sales</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
+        <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
+    </tr>
+    <!-- BEGIN resultsBlock -->
+    <tr>
+        <td nowrap="nowrap" bgcolor="#E1E1E1">{customer}</td>
         <td align="left" nowrap="nowrap">{sector}</td>
         <td align="right" nowrap="nowrap">{noOfPCs}</td>
         <td align="right" nowrap="nowrap">{noOfServers}</td>
-				<td width="50" align="right" nowrap="nowrap">{totalSales}</td>
-				<td width="50" align="right" nowrap="nowrap">{totalProfit}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth1}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth1}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth2}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth2}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth3}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth3}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth4}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth4}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth5}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth5}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth6}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth6}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth7}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth7}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth8}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth8}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth9}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth9}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth10}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth10}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth11}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth11}</td>
-				<td width="50" align="right" nowrap="nowrap">{salesMonth12}</td>
-				<td width="50" align="right" nowrap="nowrap">{profitMonth12}</td>
-		</tr>
-		<!-- END resultsBlock -->
+        <td width="50" align="right" nowrap="nowrap">{totalSales}</td>
+        <td width="50" align="right" nowrap="nowrap">{totalProfit}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth1}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth1}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth2}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth2}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth3}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth3}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth4}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth4}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth5}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth5}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth6}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth6}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth7}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth7}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth8}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth8}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth9}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth9}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth10}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth10}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth11}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth11}</td>
+        <td width="50" align="right" nowrap="nowrap">{salesMonth12}</td>
+        <td width="50" align="right" nowrap="nowrap">{profitMonth12}</td>
+    </tr>
+    <!-- END resultsBlock -->
 </table>

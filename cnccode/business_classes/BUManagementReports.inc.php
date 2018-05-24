@@ -163,7 +163,7 @@ class BUManagementReports extends Business
         return $return;
     }
 
-    function getSalesByCustomer($customerID = false, $year = false)
+    function getSalesByCustomer($customerID = null, $year = null, $sectorId = null, $pcs = null)
     {
         if (!$year) {
             $year = date('Y');
@@ -205,6 +205,14 @@ class BUManagementReports extends Business
         if ($customerID) {
             $sql .= "
 					AND cus_custno = $customerID ";
+        }
+
+        if ($sectorId) {
+            $sql .= " and cus_sectorno = $sectorId";
+        }
+
+        if ($pcs) {
+            $sql .= " and noOfPCs = $pcs";
         }
 
         $sql .= "
