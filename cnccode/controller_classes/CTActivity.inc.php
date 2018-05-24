@@ -343,6 +343,16 @@ class CTActivity extends CTCNC
             case 'toggleMonitoringFlag':
                 $this->toggleMonitoringFlag();
                 break;
+
+            case 'unhideSR':
+                $buUser = new BUUser($this);
+
+                if ($buUser->isSdManager($this->userID)) {
+                    $this->unhideSR();
+                } else {
+                    header('Location: ' . $_SERVER['HTTP_REFERER']);
+                }
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -1287,19 +1297,22 @@ class CTActivity extends CTCNC
         /*
       Show check link if this activity is closed
       */
-        if ($this->hasPermissions(PHPLIB_PERM_SUPERVISOR) & ($dsCallActivity->getValue('endTime') != '') & ($dsCallActivity->getValue('status') == 'O')) {
-            $urlCheckActivity =
+        $buUser = new BUUser($this);
+
+        if ($buUser->isSdManager($this->userID) &&
+            $dsCallActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag) == 'Y') {
+            $urlUnhideSR =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => CTACTIVITY_ACT_CHECK_ACTIVITY,
+                        'action' => 'unhideSR',
                         'callActivityID' => $callActivityID
                     )
                 );
-            $txtCheckActivity = 'Check';
+            $txtUnhideSR = 'Unhide SR';
         } else {
-            $urlCheckActivity = '';
-            $txtCheckActivity = '';
+            $urlUnhideSR = '';
+            $txtUnhideSR = '';
         }
         /*
       Show SCR report and visit confirmation links if this activity type allows
@@ -1736,8 +1749,8 @@ class CTActivity extends CTCNC
                 'urlToggleContext' => $urlToggleContext,
                 'followLink' => $followLink,
                 'travelLink' => $travelLink,
-                'urlCheckActivity' => $urlCheckActivity,
-                'txtCheckActivity' => $txtCheckActivity,
+                'urlUnhideSR' => $urlUnhideSR,
+                'txtUnhideSR' => $txtUnhideSR,
                 'activityType' => Controller::htmlDisplayText($dsCallActivity->getValue('activityType')),
                 'serverGuard' => Controller::htmlDisplayText($this->serverGuardArray[$dsCallActivity->getValue('serverGuard')]),
                 'urlAddToCalendar' => $urlAddToCalendar,
@@ -5505,6 +5518,30 @@ class CTActivity extends CTCNC
     private function checkMonitoring($problemID)
     {
         return $this->buActivity->checkMonitoringFlag($problemID);
+    }
+
+    private function unhideSR()
+    {
+
+        if (!$_REQUEST['callActivityID']) {
+
+            echo 'callActivityID not passed';
+
+        }
+        $dsActivity = new DataSet($this);
+        $this->buActivity->getActivityByID($_REQUEST['callActivityID'], $dsActivity);
+
+        $firstName = $this->dbeUser->getValue(DBEUser::firstName);
+        $lastName = $this->dbeUser->getValue(DBEUser::lastName);
+
+        $this->buActivity->unhideSR($dsActivity->getValue(DBEJCallActivity::problemID));
+
+        $this->buActivity->logOperationalActivity(
+            $dsActivity->getValue('problemID'),
+            $firstName . ' ' . $lastName . " converted this from a hidden SR to a visible SR."
+        );
+
+        $this->redirectToDisplay($_REQUEST['callActivityID']);
     }
 }
 

@@ -237,6 +237,7 @@ class CTCNC extends Controller
         }
     }
 
+
     function hasPermissions($levels)
     {
 

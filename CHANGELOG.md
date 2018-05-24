@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 233 - Amend Create Renewal Sales Order email destination
 - Issue 238 - SR Response and number amendment
 - Issue 240 - Standardise date displays in forms
+- Issue 252 - Ability to remove 'entire SR hidden from customer'
 ### Fixed
 - Issue 229 - Purchase Authorisation Supplier pop out
 ### Removed

@@ -119,7 +119,10 @@
         <TD width="90" class="navigateLink" valign="top">
             <A href="{urlViewExpenses}" title="View/Edit Expenses">{txtViewExpenses}</A></TD>
         <TD width="90" class="navigateLink" valign="top">
-            <A href="{urlCheckActivity}" title="Check activity ready for export">{txtCheckActivity}</A></TD>
+            <A href="{urlUnhideSR}" title="Unhide SR from customer"
+               onClick="if(!confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?')) return(false)"
+            >{txtUnhideSR}</A>
+        </TD>
         <TD width="90" class="navigateLink" valign="top">
             <A href="{urlAddToCalendar}" title="Add to calendar">{txtAddToCalendar}</A>
         </TD>
