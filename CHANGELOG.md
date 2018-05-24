@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 252 - Ability to remove 'entire SR hidden from customer'
 ### Fixed
 - Issue 229 - Purchase Authorisation Supplier pop out
+- Issue 253 - Error uploading a file to customer page, over 8MB warning
 ### Removed
 - Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
 - Issue 241 - Remove Customer Review Meeting from the Accounts menu
