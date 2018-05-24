@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 253 - Error uploading a file to customer page, over 8MB warning
+
 ## [v1.6.3] - 2018-05-23
 ### Fixed
 - Issue 250 - Standardtext.php missing

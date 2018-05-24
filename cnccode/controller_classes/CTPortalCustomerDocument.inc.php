@@ -167,13 +167,14 @@ class CTPortalCustomerDocument extends CTCNC
         /*
         Need a file when creating new
         */
+
         if ($_FILES['userfile']['name'] == '' && $this->dsPortalCustomerDocument->getValue('portalCustomerDocumentID') == '') {
             $this->setFormErrorMessage('Please enter a file path');
         } else {
             /* uploading a file */
 
             if ($_FILES['userfile']['name'] != '' && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-                $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
+                $this->setFormErrorMessage('Document not loaded - is it bigger than ' . ini_get('upload_max_filesize') . '?');
             }
 
         }
