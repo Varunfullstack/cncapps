@@ -19,7 +19,6 @@ This project changes will be shown here.
 - Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
 - Issue 241 - Remove Customer Review Meeting from the Accounts menu
 
-
 ## [v1.6.3] - 2018-05-23
 ### Fixed
 - Issue 250 - Standardtext.php missing
