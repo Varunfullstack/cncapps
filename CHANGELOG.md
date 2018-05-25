@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.7.0] - 2018-05-
+## [v1.7.0] - 2018-05-25
 ### Added
 - Issue 246 - Add descriptions to Report pages
 - Issue 237 - ServiceRequestReport export tweak
