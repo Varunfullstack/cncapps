@@ -1,6 +1,24 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.7.0] - 2018-05-25
+### Added
+- Issue 246 - Add descriptions to Report pages
+- Issue 237 - ServiceRequestReport export tweak
+- Issue 244 - Show ItemsNotYetReceivedEmail as a menu link
+- Issue 245 - Outstanding SRs email to display on screen as well
+### Changed
+- Issue 233 - Amend Create Renewal Sales Order email destination
+- Issue 238 - SR Response and number amendment
+- Issue 240 - Standardise date displays in forms
+- Issue 252 - Ability to remove 'entire SR hidden from customer'
+### Fixed
+- Issue 229 - Purchase Authorisation Supplier pop out
+- Issue 253 - Error uploading a file to customer page, over 8MB warning
+### Removed
+- Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
+- Issue 241 - Remove Customer Review Meeting from the Accounts menu
+
 ## [v1.6.3] - 2018-05-23
 ### Fixed
 - Issue 250 - Standardtext.php missing

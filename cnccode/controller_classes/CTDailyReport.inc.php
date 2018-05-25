@@ -13,16 +13,24 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTDailyReport extends CTCNC
 {
-    var $buDailyReport = '';
+    private $buDailyReport;
+    private $daysAgo = 1;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        if (!self::hasPermissions([])) {
+        $permissions = [
+            'technical'
+        ];
+        if (!self::hasPermissions($permissions)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
         $this->buDailyReport = new BUDailyReport ($this);
+
+        if ($_REQUEST['daysAgo']) {
+            $this->daysAgo = $_REQUEST['daysAgo'];
+        }
     }
 
     /**
@@ -33,13 +41,29 @@ class CTDailyReport extends CTCNC
         switch ($_REQUEST ['action']) {
 
             case 'fixedIncidents' :
-                $this->fixedIncidents();
+                $this->buDailyReport->fixedIncidents($this->daysAgo);
                 break;
             case 'focActivities' :
-                $this->focActivities();
+                $this->buDailyReport->focActivities($this->daysAgo);
                 break;
             case 'prepayOverValue' :
-                $this->prepayOverValue();
+                $this->buDailyReport->prepayOverValue($this->daysAgo);
+                break;
+            case 'outstandingIncidents' :
+                $onScreen = isset($_GET['onScreen']);
+                $this->buDailyReport->outstandingIncidents($this->daysAgo, null, $onScreen);
+                break;
+            case 'outstandingPriorityFiveIncidents' :
+                $this->buDailyReport->outstandingIncidents($this->daysAgo, true);
+                break;
+            case 'p5SRWithoutSalesOrders':
+                $this->buDailyReport->p5IncidentsWithoutSalesOrders();
+                break;
+            case 'p5SRWithSalesOrdersAndContract':
+                $this->buDailyReport->p5WithSalesOrderAndContractAssigned();
+                break;
+            case 'contactOpenSRReport':
+                $this->buDailyReport->contactOpenSRReport();
                 break;
             default :
                 break;

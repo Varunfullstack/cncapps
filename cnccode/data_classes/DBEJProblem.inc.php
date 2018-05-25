@@ -342,7 +342,9 @@ class DBEJProblem extends DBEProblem
         return parent::getRows();
     }
 
-    public function getStartersSRByCustomerIDInDateRange($customerID, $startYearMonth, $endYearMonth)
+    public function getStartersSRByCustomerIDInDateRange($customerID,
+                                                         DateTimeInterface $startDate,
+                                                         DateTimeInterface $endDate)
     {
         $sql =
             "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
@@ -363,7 +365,9 @@ class DBEJProblem extends DBEProblem
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
           pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '$startYearMonth-01' AND  '$endYearMonth-31' " .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '" .
+            $startDate->format('Y-m-d') . "' AND  '" . $endDate->format('Y-m-d')
+            . "' " .
             " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
             " and " . $this->getDBColumnName(self::rootCauseID) . " = 58";
 
@@ -405,7 +409,9 @@ class DBEJProblem extends DBEProblem
         return parent::getRows();
     }
 
-    public function getLeaversSRByCustomerIDInDateRange($customerID, $startYearMonth, $endYearMonth)
+    public function getLeaversSRByCustomerIDInDateRange($customerID,
+                                                        DateTimeInterface $startDate,
+                                                        DateTimeInterface $endDate)
     {
         $sql =
             "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
@@ -426,7 +432,11 @@ class DBEJProblem extends DBEProblem
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
           pro_custno = $customerID" .
-            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '$startYearMonth-01' AND  '$endYearMonth-31' " .
+            " AND cast(" . $this->getDBColumnName(self::dateRaised) . " as date) BETWEEN '" .
+            $startDate->format('Y-m-d')
+            . "' AND  '" .
+            $endDate->format('Y-m-d')
+            . "' " .
             " and " . $this->getDBColumnName(self::hideFromCustomerFlag) . " <> 'Y'" .
             " and " . $this->getDBColumnName(self::rootCauseID) . " = 62";
 

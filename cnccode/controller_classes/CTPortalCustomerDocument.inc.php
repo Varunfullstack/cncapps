@@ -158,22 +158,44 @@ class CTPortalCustomerDocument extends CTCNC
         exit;
     }
 
+    private function return_bytes($val)
+    {
+        $val = trim($val);
+
+        $last = strtolower($val[strlen($val) - 1]);
+        $val = substr($val, 0, -1); // necessary since PHP 7.1; otherwise optional
+
+        switch ($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
+    }
+
     function update()
     {
         $this->setMethodName('update');
 
-        $dsPortalCustomerDocument = &$this->dsPortalCustomerDocument;
         $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray($_REQUEST['portalCustomerDocument']));
         /*
         Need a file when creating new
         */
+
         if ($_FILES['userfile']['name'] == '' && $this->dsPortalCustomerDocument->getValue('portalCustomerDocumentID') == '') {
             $this->setFormErrorMessage('Please enter a file path');
         } else {
             /* uploading a file */
 
             if ($_FILES['userfile']['name'] != '' && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-                $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
+                $this->setFormErrorMessage('Document not loaded - is it bigger than ' .
+                                           $this->return_bytes(ini_get('upload_max_filesize')) / 1024 / 1024 . '
+                                            MBytes ?');
             }
 
         }

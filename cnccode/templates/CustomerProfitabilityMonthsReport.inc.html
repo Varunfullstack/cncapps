@@ -2,105 +2,117 @@
 <script language='JavaScript' src="CommonJS.js"></script>
 
 <script language='JavaScript'>
-var state='none'; // display status
-var savedCustomerString
-function saveCustomerString(){
-  savedCustomerString = document.getElementById("customerString").value
-}
-function validateCustomerString(){
-  if (Trim(document.getElementById("customerString").value) != ""){
-    if (document.getElementById("customerString").value != savedCustomerString){
-      window.open('{urlCustomerPopup}&customerString=' +
-      escape(document.getElementById("customerString").value) +
-      '&parentIDField=customerID' +
-      '&parentDescField=customerString',
-      'customers','scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+    var state = 'none'; // display status
+    var savedCustomerString
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
     }
-  }
-  else{
-    document.searchForm.customerID.value = "";
-  }
-}
-function submitOnReturn() {
-   if (event.keyCode == 13) {
-      document.searchForm.submit();
-   }
-}
-function validateCustomerStringOnReturn() {
-   if (event.keyCode == 13) {
-      validateCustomerString();
-   }
-}
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{urlCustomerPopup}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.searchForm.customerID.value = "";
+        }
+    }
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
 </script>
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm" method="get" action="{urlSubmit}">
-  <table width="500px" border="0" cellspacing="0" cellpadding="1">
-    <tr> 
-      <td width="100" class="promptText"><div align="right">Customer</div></td>
-      <td>
-      <input
-          type="hidden"
-          name="action"
-          value="search"
-        > 
-        <input
-          type="hidden"
-          name="searchForm[1][customerID]"
-          id="customerID"
-          value="{customerID}"
-        > <input
-          type="text"
-          id="customerString"
-          name="customerString"
-          value="{customerString}"
-          onFocus="javascript:saveCustomerString()"
-          onBlur="javascript:validateCustomerString()"
-          onKeypress="javascript:validateCustomerStringOnReturn()"
-          size="50"
-          maxlength="50"
-        > <font class="formErrorMessage"> {customerIDMessage} </font> </td>
-    </tr>
-    <tr> 
-      <td width="100" class="promptText"><div align="right">Start Year/Month</div></td>
-      <td>
-        <input
-          type="text"
-          name="searchForm[1][startYearMonth]"
-          value="{startYearMonth}"
-          placeholder="YYYY-MM"
-          size="10"
-          maxlength="7"
-        > <font class="formErrorMessage"> {startYearMonthMessage} </font> </td>
-    </tr>
-    <tr> 
-      <td width="100" class="promptText"><div align="right">End Year/Month</div></td>
-      <td>
-        <input
-          type="text"
-          name="searchForm[1][endYearMonth]"
-          value="{endYearMonth}"
-          placeholder="YYYY-MM"
-          size="10"
-          maxlength="7"
-        > <font class="formErrorMessage"> {endYearMonthMessage} </font> </td>
-    </tr>
-    <tr> 
-      <td>&nbsp;</td>
-      <td>
-      <input type="submit" name="Search" value="Screen">
-      <input type="submit" name="Search" value="CSV">
-    </tr>
-  </table>
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="100" class="promptText">
+                <div align="right">Customer</div>
+            </td>
+            <td>
+                <input
+                        type="hidden"
+                        name="action"
+                        value="search"
+                >
+                <input
+                        type="hidden"
+                        name="searchForm[1][customerID]"
+                        id="customerID"
+                        value="{customerID}"
+                > <input
+                    type="text"
+                    id="customerString"
+                    name="customerString"
+                    value="{customerString}"
+                    onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    onKeypress="javascript:validateCustomerStringOnReturn()"
+                    size="50"
+                    maxlength="50"
+            > <font class="formErrorMessage"> {customerIDMessage} </font></td>
+        </tr>
+        <tr>
+            <td width="100" class="promptText">
+                <div align="right">Start Month/Year</div>
+            </td>
+            <td>
+                <input
+                        type="text"
+                        name="searchForm[1][startYearMonth]"
+                        value="{startYearMonth}"
+                        placeholder="MM/YYYY"
+                        size="10"
+                        maxlength="7"
+                > <font class="formErrorMessage"> {startYearMonthMessage} </font></td>
+        </tr>
+        <tr>
+            <td width="100" class="promptText">
+                <div align="right">End Month/Year</div>
+            </td>
+            <td>
+                <input
+                        type="text"
+                        name="searchForm[1][endYearMonth]"
+                        value="{endYearMonth}"
+                        placeholder="MM/YYYY"
+                        size="10"
+                        maxlength="7"
+                > <font class="formErrorMessage"> {endYearMonthMessage} </font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" name="Search" value="Screen">
+                <input type="submit" name="Search" value="CSV">
+        </tr>
+    </table>
 </form>
 <table>
-  <tr>
-    <th>Period</th><th>Profit (&pound;)</th>
-  </tr>
-<!-- BEGIN periodBlock -->  
-  <tr>
-    <td align="left">{period}</td><td align="right">{profit}</td>
-  </tr>
-<!-- END periodBlock -->  
+    <tr>
+        <th>Period</th>
+        <th>Profit (&pound;)</th>
+    </tr>
+    <!-- BEGIN periodBlock -->
+    <tr>
+        <td align="left">{period}</td>
+        <td align="right">{profit}</td>
+    </tr>
+    <!-- END periodBlock -->
 </table>
 
 

@@ -83,7 +83,10 @@ class BUContractAnalysisReport extends Business
         return $this->db->query($sql);
     }
 
-    function getLabourHours($customerID, $startYearMonth, $endYearMonth, $contractItemIDs = false)
+    function getLabourHours($customerID,
+                            DateTimeInterface $startDate,
+                            DateTimeInterface $endDate,
+                            $contractItemIDs = false)
     {
         $sql =
             "SELECT
@@ -95,7 +98,7 @@ class BUContractAnalysisReport extends Business
         
       WHERE
         pro_total_activity_duration_hours IS NOT NULL
-        AND problem.pro_date_raised BETWEEN '$startYearMonth-01' AND '$endYearMonth-31'
+        AND problem.pro_date_raised BETWEEN '" . $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "'
         AND pro_custno = $customerID";
 
         if ($contractItemIDs) {
@@ -167,13 +170,12 @@ class BUContractAnalysisReport extends Business
         $buHeader->getHeader($dsHeader);
 
         $contracts = $searchForm->getValue('contracts');
-        $startYearMonth = $searchForm->getValue('startYearMonth');
-        $endYearMonth = $searchForm->getValue('endYearMonth');
+        $startDate = (DateTime::createFromFormat("m/Y",
+                                                 $searchForm->getValue('startYearMonth')))->modify('first day of this month ');
+        $endDate = (DateTime::createFromFormat("m/Y",
+                                               $searchForm->getValue('endYearMonth')))->modify('last day of this month');
 
-        $startYearMonthCompact = str_replace('-', '', $startYearMonth);
-        $endYearMonthCompact = str_replace('-', '', $endYearMonth);
-
-        $numberOfMonths = $this->getMonthsBetweenYearMonths($startYearMonth, $endYearMonth);
+        $numberOfMonths = $startDate->diff($endDate)->m + ($startDate->diff($endDate)->y * 12);
 
         $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
 
@@ -210,8 +212,8 @@ class BUContractAnalysisReport extends Business
             $labourHoursRow =
                 $this->getLabourHours(
                     $customer['customerID'],
-                    $startYearMonth,
-                    $endYearMonth,
+                    $startDate,
+                    $endDate,
                     $contractItemIDs
                 );
 
@@ -227,7 +229,7 @@ class BUContractAnalysisReport extends Business
 
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
 
-            $prepayValues = $this->getPrepayValues($startYearMonth, $endYearMonth, $customer['customerID'], $contractItemIDs);
+            $prepayValues = $this->getPrepayValues($startDate, $endDate, $customer['customerID'], $contractItemIDs);
 
             $sales = round($sales + $prepayValues['sales'], 2);
 //            $labourCost = round($labourCost + $prepayValues['labourCost'], 2);
@@ -260,7 +262,10 @@ class BUContractAnalysisReport extends Business
 
     }
 
-    function getPrepayValues($startYearMonth, $endYearMonth, $customerId, $contractItemIDs = null)
+    function getPrepayValues(DateTimeInterface $startDate,
+                             DateTimeInterface $endDate,
+                             $customerId,
+                             $contractItemIDs = null)
     {
         $query = "SELECT
                   hourlyLabourCharge * hours AS sales,
@@ -285,8 +290,8 @@ class BUContractAnalysisReport extends Business
                         JOIN custitem a
                           ON a.cui_cuino = pro_contract_cuino
                       WHERE pro_total_activity_duration_hours IS NOT NULL
-                            AND problem.pro_date_raised BETWEEN '$startYearMonth-01'
-                            AND '$endYearMonth-31'
+                            AND problem.pro_date_raised BETWEEN '" . $startDate->format('Y-m-d') . "'
+                            AND '" . $endDate->format('Y-m-d') . "'
                             AND a.cui_itemno = custitem.`cui_itemno`
                             and pro_custno = $customerId) AS hours
                    FROM
@@ -317,23 +322,6 @@ class BUContractAnalysisReport extends Business
             "sales" => $sales,
             "labourCost" => $labourCost
         );
-    }
-
-    function getMonthsBetweenYearMonths($startYearMonth, $endYearMonth)
-    {
-        $d1 = new DateTime($startYearMonth . "-01");
-        $d2 = new DateTime($endYearMonth . "-28");
-
-        $months = 0;
-
-        $d1->add(new \DateInterval('P1M'));
-
-        while ($d1 <= $d2) {
-            $months++;
-            $d1->add(new \DateInterval('P1M'));
-        }
-
-        return $months + 1;
     }
 }//End of class
 ?>

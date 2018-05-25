@@ -237,9 +237,12 @@ class CTCNC extends Controller
         }
     }
 
+
     function hasPermissions($levels)
     {
+
         if ($this->isRunningFromCommandLine()) {
+
             return true;
         }
 

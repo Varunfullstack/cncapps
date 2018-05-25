@@ -59,15 +59,17 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
             } else {
-                $periodRegx = '/^([0-9]{4})-([0-9]{2})$/';
+                $periodRegx = '/^(0[1-9]{1}|1[0-2]{1})\/\d{4}$/';
 
                 if (!preg_match($periodRegx, $dsSearchForm->getValue('startYearMonth'), $matches)) {
-                    $dsSearchForm->setMessage('startYearMonth', 'Use format YYYY-MM');
+                    $dsSearchForm->setMessage('startYearMonth', 'Use format MM/YYYY');
                     $this->setFormErrorOn();
                 } elseif (!preg_match($periodRegx, $dsSearchForm->getValue('endYearMonth'), $matches)) {
-                    $dsSearchForm->setMessage('endYearMonth', 'Use format YYYY-MM');
+                    $dsSearchForm->setMessage('endYearMonth', 'Use format MM/YYYY');
                     $this->setFormErrorOn();
                 } else {
+
+
 
                     $reportData =
                         $this->buCustomerProfitabilityMonthsReport->getReportData(

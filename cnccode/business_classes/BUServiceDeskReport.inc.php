@@ -25,9 +25,13 @@ class BUServiceDeskReport extends Business
 
     private $buActivity;
 
+    private $year;
+    private $month;
+
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -51,25 +55,18 @@ class BUServiceDeskReport extends Business
         $this->startDateOneYearAgo = date('Y-m-d', strtotime('-1 year', $startDateUnix));
     }
 
-    function setStartPeriod($period)
+    function setStartPeriod(DateTimeInterface $startDate)
     {
-        $this->year = substr($period, 0, 4);
-        $this->month = substr($period, 5, 2);
-
-        $startDateUnix = strtotime($period);
-
-        $this->startDate = date('Y-m-d', $startDateUnix);
+        $this->year = $startDate->format('Y');
+        $this->month = $startDate->format('m');
+        $this->startDate = $startDate->format('Y-m-d');
     }
 
-    function setEndPeriod($period)
+    function setEndPeriod(DateTimeInterface $endDate)
     {
-        $this->year = substr($period, 0, 4);
-        $this->month = substr($period, 5, 2);
-
-        $endDateUnix = strtotime($period . 'last day next month');
-
-        $this->endDate = date('Y-m-d', $endDateUnix);
-
+        $this->year = $endDate->format('Y');
+        $this->month = $endDate->format('m');
+        $this->endDate = $endDate->format('Y-m-d');
     }
 
     function getMonthName()

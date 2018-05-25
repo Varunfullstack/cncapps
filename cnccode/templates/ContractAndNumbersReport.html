@@ -6,9 +6,6 @@
 <script type="text/javascript"
         src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
 <script>
-
-    // var jsonData = JSON.parse('{jsonData}');
-
     $(function () {
         $('#theTable').DataTable({
             dom: 'Blfrtip',
@@ -80,25 +77,25 @@
 
                 $(api.column(2).footer()).html(
                     'Total: ' + totalServiceDeskUsers
-                )
+                );
 
                 var totalPhysicalServers = api
                     .column(6)
                     .data()
                     .reduce(function (acc, item) {
                         return acc + intVal(item);
-                    }, 0)
+                    }, 0);
 
                 $(api.column(6).footer()).html(
                     'Total: ' + totalPhysicalServers
-                )
+                );
 
                 var totalVirtualServers = api
                     .column(7)
                     .data()
                     .reduce(function (acc, item) {
                         return acc + intVal(item);
-                    }, 0)
+                    }, 0);
 
                 $(api.column(7).footer()).html(
                     'Total: ' + totalVirtualServers
@@ -110,9 +107,12 @@
 </script>
 <style>
     table.dataTable tfoot th {
-        padding-right: 0px !important;
+        padding-right: 0 !important;
     }
 </style>
+<div class="reportDescription">
+    This report breakdowns down the support contracts to show details about the ratio of supported users and servers.
+</div>
 <table id="theTable">
     <thead>
     <tr>

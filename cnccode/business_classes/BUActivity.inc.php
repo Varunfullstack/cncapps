@@ -478,6 +478,11 @@ class BUActivity extends Business
         $this->escalateProblemByProblemID($dsCallActivity->getValue('problemID'));
     }
 
+    /**
+     * @param $callActivityID
+     * @param DataSet $dsResults
+     * @return bool
+     */
     function getActivityByID($callActivityID, &$dsResults)
     {
         $this->dbeJCallActivity->setPKValue($callActivityID);
@@ -4422,7 +4427,8 @@ customer with the past 8 hours email to GL
         $dsResults->replicate($dsAssignedResults);
     }
 
-    function getProblemsByCustomerID($customerID, $priority = 1, $days = 30){
+    function getProblemsByCustomerID($customerID, $priority = 1, $days = 30)
+    {
         $dbeJProblem = new DBEJProblem($this);
 
         $dbeJProblem->getRowsByQueueNo($priority, true); // unassigned first
@@ -7453,10 +7459,10 @@ customer with the past 8 hours email to GL
         return $this->dbeProblem;
     }
 
-    function getManagementReviewsInPeriod($customerID, $startYearMonth, $endYearMonth, &$dsResults)
+    function getManagementReviewsInPeriod($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate, &$dsResults)
     {
         $dbeProblem = $this->getDbeProblem();
-        $dbeProblem->getManagementReviews($customerID, $startYearMonth, $endYearMonth);
+        $dbeProblem->getManagementReviews($customerID, $startDate, $endDate);
 
         return ($this->getData($dbeProblem, $dsResults));
 
@@ -7708,6 +7714,14 @@ customer with the past 8 hours email to GL
 
         $db->query($sql);
         return !!$db->num_rows();
+    }
+
+    public function unhideSR($problemID)
+    {
+
+        global $db;
+        $sql = "update problem set pro_hide_from_customer_flag = 'N'  WHERE pro_problemno = $problemID";
+        return $db->query($sql);
     }
 } // End of class
 ?>

@@ -125,13 +125,11 @@ class BURenDomain extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenDomain->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -277,8 +275,10 @@ class BURenDomain extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 0);
                 $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale', ($dsItem->getValue('curUnitSale') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', ($dsItem->getValue('curUnitCost') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      ($dsItem->getValue('curUnitSale') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      ($dsItem->getValue('curUnitCost') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 
@@ -308,8 +308,8 @@ class BURenDomain extends Business
                 $dbeRenDomainUpdate->setValue('customerItemID', $this->dbeJRenDomain->getPKValue());
                 $dbeRenDomainUpdate->getRow();
                 $dbeRenDomainUpdate->setValue('totalInvoiceMonths',
-                    $this->dbeJRenDomain->getValue('totalInvoiceMonths') +
-                    $this->dbeJRenDomain->getValue('invoicePeriodMonths')
+                                              $this->dbeJRenDomain->getValue('totalInvoiceMonths') +
+                                              $this->dbeJRenDomain->getValue('invoicePeriodMonths')
                 );
                 $dbeRenDomainUpdate->updateRow();
 
