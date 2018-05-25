@@ -6,7 +6,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
-require_once($cfg["path_dbe"] . "/DBECustomerNew.inc.php");
+require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESiteNew.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
@@ -102,7 +102,7 @@ class BUCustomer extends Business
         }
         $this->getCustomerByID($customerID, $dsCustomer);
         $this->dbeSite->setValue("customerID", $customerID);
-        $this->dbeSite->setValue("siteNo", $dsCustomer->getValue('invSiteNo'));
+        $this->dbeSite->setValue("siteNo", $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('invContactID'), $dsContact);
@@ -125,7 +125,7 @@ class BUCustomer extends Business
         }
         $this->getCustomerByID($customerID, $dsCustomer);
         $this->dbeSite->setValue("customerID", $customerID);
-        $this->dbeSite->setValue("siteNo", $dsCustomer->getValue('delSiteNo'));
+        $this->dbeSite->setValue("siteNo", $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('delContactID'), $dsContact);
@@ -278,7 +278,7 @@ class BUCustomer extends Business
      */
     function setSageRef(&$source, &$dbeSite)
     {
-        $customerName = $this->dbeCustomer->getValue('name');
+        $customerName = $this->dbeCustomer->getValue(DBECustomer::Name);
         $shortCode = "";
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr($customerName, $ixChar, 1) != " ") {
@@ -451,7 +451,7 @@ class BUCustomer extends Business
     function setProspectFlagOff($customerID)
     {
         $this->dbeCustomer->getRow($customerID);
-        $this->dbeCustomer->setValue('prospectFlag', 'N');
+        $this->dbeCustomer->setValue(DBECustomer::prospectFlag, 'N');
         return ($this->dbeCustomer->updateRow());
     }
 
@@ -651,7 +651,7 @@ class BUCustomer extends Business
 
         $this->dbeCustomer->getRow($customerID);
 
-        return CUSTOMER_DIR . '/' . $this->dbeCustomer->getValue('name');
+        return CUSTOMER_DIR . '/' . $this->dbeCustomer->getValue(DBECustomer::Name);
 
     }
 
@@ -660,7 +660,7 @@ class BUCustomer extends Business
 
         $this->dbeCustomer->getRow($customerID);
 
-        return CUSTOMER_DIR_FROM_BROWSER . '/' . $this->dbeCustomer->getValue('name');
+        return CUSTOMER_DIR_FROM_BROWSER . '/' . $this->dbeCustomer->getValue(DBECustomer::Name);
 
     }
 

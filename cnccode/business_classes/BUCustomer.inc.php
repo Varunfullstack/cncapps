@@ -140,7 +140,7 @@ class BUCustomer extends Business
         }
         $this->getCustomerByID($customerID, $dsCustomer);
         $this->dbeSite->setValue("CustomerID", $customerID);
-        $this->dbeSite->setValue("SiteNo", $dsCustomer->getValue('InvoiceSiteNo'));
+        $this->dbeSite->setValue("SiteNo", $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('InvoiceContactID'), $dsContact);
@@ -163,7 +163,7 @@ class BUCustomer extends Business
         }
         $this->getCustomerByID($customerID, $dsCustomer);
         $this->dbeSite->setValue("CustomerID", $customerID);
-        $this->dbeSite->setValue("SiteNo", $dsCustomer->getValue('DeliverSiteNo'));
+        $this->dbeSite->setValue("SiteNo", $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('DeliverContactID'), $dsContact);
@@ -281,10 +281,10 @@ class BUCustomer extends Business
         $customerID = $newRow->getPkValue();
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
-        $first = $dbeCustomer->getValue('lastReviewMeetingDate');
-        $second = $newRow->getValue('lastReviewMeetingDate');
-        if ($dbeCustomer->getValue('lastReviewMeetingDate') != $newRow->getValue('lastReviewMeetingDate')) {
-            $newRow->setValue('reviewMeetingEmailSentFlag', 'N');
+        $first = $dbeCustomer->getValue(DBECustomer::LastReviewMeetingDate);
+        $second = $newRow->getValue(DBECustomer::LastReviewMeetingDate);
+        if ($dbeCustomer->getValue(DBECustomer::LastReviewMeetingDate) != $newRow->getValue(DBECustomer::LastReviewMeetingDate)) {
+            $newRow->setValue(DBECustomer::ReviewMeetingEmailSentFlag, 'N');
         }
 
     }
@@ -296,12 +296,12 @@ class BUCustomer extends Business
         }
         $this->setMethodName('updateModify');
         $this->dbeCustomer->getRow($customerID);
-        if ($this->dbeCustomer->getValue('Name') == '') {
+        if ($this->dbeCustomer->getValue(DBECustomer::Name) == '') {
             $this->raiseError('Customer Name is empty for customer ' . $customerID);
             exit;
         }
-        $this->dbeCustomer->setValue('modifyDate', date('Y-m-d H:i:s'));
-        $this->dbeCustomer->setValue('modifyUserID', $GLOBALS ['auth']->is_authenticated());
+        $this->dbeCustomer->setValue(DBECustomer::ModifyDate, date('Y-m-d H:i:s'));
+        $this->dbeCustomer->setValue(DBECustomer::ModifyUserID, $GLOBALS ['auth']->is_authenticated());
         $this->dbeCustomer->updateRow();
     }
 
@@ -374,7 +374,7 @@ class BUCustomer extends Business
      */
     function setSageRef(&$source, &$dbeSite)
     {
-        $customerName = $this->dbeCustomer->getValue('Name');
+        $customerName = $this->dbeCustomer->getValue(DBECustomer::Name);
         $shortCode = "";
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr($customerName, $ixChar, 1) != " ") {
@@ -498,8 +498,8 @@ class BUCustomer extends Business
     function setProspectFlagOff($customerID)
     {
         $this->dbeCustomer->getRow($customerID);
-        $this->dbeCustomer->setValue('prospectFlag', 'N');
-        $this->dbeCustomer->setValue('modifyDate', date('Y-m-d H:i:s'));
+        $this->dbeCustomer->setValue(DBECustomer::ProspectFlag, 'N');
+        $this->dbeCustomer->setValue(DBECustomer::ModifyDate, date('Y-m-d H:i:s'));
         return ($this->dbeCustomer->updateRow());
     }
 
@@ -759,7 +759,7 @@ class BUCustomer extends Business
 //    else{
         $customerDir = CUSTOMER_DIR;
 //    }
-        return $customerDir . '/' . $this->dbeCustomer->getValue('Name');
+        return $customerDir . '/' . $this->dbeCustomer->getValue(DBECustomer::Name);
 
     }
 
@@ -768,7 +768,7 @@ class BUCustomer extends Business
 
         $this->dbeCustomer->getRow($customerID);
 
-        return CUSTOMER_DIR_FROM_BROWSER . '/' . $this->dbeCustomer->getValue('Name');
+        return CUSTOMER_DIR_FROM_BROWSER . '/' . $this->dbeCustomer->getValue(DBECustomer::Name);
 
     }
 
@@ -828,7 +828,12 @@ class BUCustomer extends Business
         return $this->getData($this->dbeCustomer, $dsResults);
     }
 
-    function uploadPortalDocument($customerID, $description, $userfile, $startersFormFlag, $leaversFormFlag, $mainContactOnlyFlag)
+    function uploadPortalDocument($customerID,
+                                  $description,
+                                  $userfile,
+                                  $startersFormFlag,
+                                  $leaversFormFlag,
+                                  $mainContactOnlyFlag)
     {
 
         return $this->addDocument(

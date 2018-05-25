@@ -549,7 +549,7 @@ class CTActivity extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::Name);
         }
 
 
@@ -1147,7 +1147,7 @@ class CTActivity extends CTCNC
 
 
         $customerDetails =
-            $dsCustomer->getValue('name') .
+            $dsCustomer->getValue(DBECustomer::Name) .
             ', ' . $dsSite->getValue('add1') .
             ', ' . $dsSite->getValue('add2') .
             ', ' . $dsSite->getValue('add3') .
@@ -1596,7 +1596,7 @@ class CTActivity extends CTCNC
             }
 
             if (
-                $dsCustomer->getValue('referredFlag') != 'Y' &&   // customer not referred
+                $dsCustomer->getValue(DBECustomer::ReferredFlag) != 'Y' &&   // customer not referred
                 $dbeJProblem->getValue('status') != 'C'           // not completed
             ) {
                 $urlDuplicate =
@@ -1903,8 +1903,8 @@ class CTActivity extends CTCNC
     function getCustomerNameDisplayClass($dsCustomer)
     {
         if (
-            $dsCustomer->getValue('specialAttentionFlag') == 'Y' &&
-            $dsCustomer->getValue('specialAttentionEndDate') >= date('Y-m-d')
+            $dsCustomer->getValue(DBECustomer::SpecialAttentionFlag) == 'Y' &&
+            $dsCustomer->getValue(DBECustomer::SpecialAttentionEndDate) >= date('Y-m-d')
         ) {
             $ret = 'specialAttentionCustomer';
         } else {
@@ -2539,10 +2539,10 @@ class CTActivity extends CTCNC
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($_REQUEST['customerID'], $dsCustomer);
 
-        $this->setPageTitle("Existing Service Requests for " . $dsCustomer->getValue('name'));
+        $this->setPageTitle("Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::Name));
 
         $_SESSION[$this->sessionKey]['reason'] = $_REQUEST['reason'];
-        $_SESSION[$this->sessionKey]['customerName'] = $dsCustomer->getValue('name');
+        $_SESSION[$this->sessionKey]['customerName'] = $dsCustomer->getValue(DBECustomer::Name);
 
         $_SESSION[$this->sessionKey]['hideFromCustomerFlag'] = $_REQUEST['hideFromCustomerFlag'];
 
@@ -2556,7 +2556,7 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             [
-                'techNotes' => $dsCustomer->getValue('techNotes')
+                'techNotes' => $dsCustomer->getValue(DBECustomer::TechNotes)
             ]
         );
 
@@ -3327,7 +3327,7 @@ class CTActivity extends CTCNC
             $buCustomer->getContactByID($dsCallActivity->getValue('contactID'), $dsContact);
 
             $customerDetails =
-                $dsCustomer->getValue('name') .
+                $dsCustomer->getValue(DBECustomer::Name) .
                 ', ' . $dsSite->getValue('add1') .
                 ', ' . $dsSite->getValue('add2') .
                 ', ' . $dsSite->getValue('add3') .
@@ -3343,8 +3343,8 @@ class CTActivity extends CTCNC
             if ($dsContact->getValue('notes') != '') {
                 $dsCallActivity->setValue('contactNotes', $dsContact->getValue('notes'));
             }
-            if ($dsCustomer->getValue('techNotes') != '') {
-                $dsCallActivity->setValue('techNotes', $dsCustomer->getValue('techNotes'));
+            if ($dsCustomer->getValue(DBECustomer::TechNotes) != '') {
+                $dsCallActivity->setValue('techNotes', $dsCustomer->getValue(DBECustomer::TechNotes));
             }
         }
 

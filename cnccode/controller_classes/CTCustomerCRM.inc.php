@@ -184,7 +184,7 @@ class CTCustomerCRM extends CTCNC
             if ($dsSearchForm->getValue('customerID')) {
                 $buCustomer = new BUCustomer ($this);
                 $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-                $customerString = $dsCustomer->getValue('name');
+                $customerString = $dsCustomer->getValue(DBECustomer::Name);
             }
 
             $urlCustomerPopup =
@@ -766,7 +766,7 @@ class CTCustomerCRM extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCNC_ACT_DISP_EDIT,
-                        'customerID' => $dsCustomer->getValue('CustomerID')
+                        'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
                     )
                 );
             header('Location: ' . $nextURL);
@@ -806,12 +806,12 @@ class CTCustomerCRM extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue('CustomerID')
+                            'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
                         )
                     );
 
-                if ($dsCustomer->getValue('reviewUserID')) {
-                    $buUser->getUserByID($dsCustomer->getValue('reviewUserID'), $dsUser);
+                if ($dsCustomer->getValue(DBECustomer::ReviewUserID)) {
+                    $buUser->getUserByID($dsCustomer->getValue(DBECustomer::ReviewUserID), $dsUser);
                     $user = $dsUser->getValue('name');
                 } else {
                     $user = false;
@@ -819,10 +819,10 @@ class CTCustomerCRM extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue('Name'),
-                        'reviewDate' => $dsCustomer->getValue('reviewDate'),
-                        'reviewTime' => $dsCustomer->getValue('reviewTime'),
-                        'reviewAction' => $dsCustomer->getValue('reviewAction'),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                        'reviewDate' => $dsCustomer->getValue(DBECustomer::ReviewDate),
+                        'reviewTime' => $dsCustomer->getValue(DBECustomer::ReviewTime),
+                        'reviewAction' => $dsCustomer->getValue(DBECustomer::ReviewAction),
                         'reviewUser' => $user,
                         'linkURL' => $linkURL
                     )
@@ -868,14 +868,14 @@ class CTCustomerCRM extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue('CustomerID')
+                            'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
                         )
                     );
 
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue('Name'),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
                         'linkURL' => $linkURL
                     )
                 );
@@ -922,15 +922,15 @@ class CTCustomerCRM extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue('CustomerID')
+                            'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
                         )
                     );
 
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue('Name'),
-                        'specialAttentionEndDate' => $dsCustomer->getValue('specialAttentionEndDate'),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                        'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::SpecialAttentionEndDate),
                         'linkURL' => $linkURL
                     )
                 );

@@ -347,8 +347,8 @@ class BUSalesOrder extends Business
         $dsOrdhead->copyColumnsFrom($dbeOrdhead);
         $dsOrdhead->setUpdateModeInsert();
         $dsOrdhead->addColumn('customerName', DA_STRING, DA_NOT_NULL);
-        $dsOrdhead->setValue('customerName', $dsCustomer->getValue('name'));
-        $dsOrdhead->setValue('customerID', $dsCustomer->getValue('customerID'));
+        $dsOrdhead->setValue('customerName', $dsCustomer->getValue(DBECustomer::Name));
+        $dsOrdhead->setValue('customerID', $dsCustomer->getValue(DBECustomer::CustomerID));
         $dsOrdhead->setValue('type', $type);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
@@ -380,17 +380,17 @@ class BUSalesOrder extends Business
         $dsOrdhead->setValue('requestedDate', '0000-00-00');
         $dsOrdhead->setValue('promisedDate', '0000-00-00');
         $dsOrdhead->setValue('expectedDate', '0000-00-00');
-        $dsOrdhead->setValue('invSiteNo', $dsCustomer->getValue('invSiteNo'));
+        $dsOrdhead->setValue('invSiteNo', $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
         $dsOrdhead->setValue('updatedTime', date('Y-m-d H:i:s'));
         $this->setInvoiceSiteAndContact(
-            $dsCustomer->getValue('customerID'),
-            $dsCustomer->getValue('invSiteNo'),
+            $dsCustomer->getValue(DBECustomer::CustomerID),
+            $dsCustomer->getValue(DBECustomer::InvoiceSiteNo),
             $dsOrdhead
         );
-        $dsOrdhead->setValue('delSiteNo', $dsCustomer->getValue('delSiteNo'));
+        $dsOrdhead->setValue('delSiteNo', $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
         $this->setDeliverySiteAndContact(
-            $dsCustomer->getValue('customerID'),
-            $dsCustomer->getValue('delSiteNo'),
+            $dsCustomer->getValue(DBECustomer::CustomerID),
+            $dsCustomer->getValue(DBECustomer::DeliverSiteNo),
             $dsOrdhead
         );
         $dsOrdhead->post();
@@ -604,10 +604,10 @@ class BUSalesOrder extends Business
             }
             $dbeOrdline->setValue('description', $dsOrdline->getValue('description'));
             $dbeOrdline->setValue('curTotalCost',
-                $dsOrdline->getValue('curUnitCost') * $dsOrdline->getValue('qtyOrdered')
+                                  $dsOrdline->getValue('curUnitCost') * $dsOrdline->getValue('qtyOrdered')
             );
             $dbeOrdline->setValue('curTotalSale',
-                $dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered')
+                                  $dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered')
             );
         } else {
             $dbeOrdline->setValue('qtyOrdered', 0);
@@ -1064,10 +1064,10 @@ class BUSalesOrder extends Business
             $dbeOrdline->setValue('curUnitCost', $dsOrdline->getValue('curUnitCost'));
             $dbeOrdline->setValue('curUnitCost', $dsOrdline->getValue('curUnitCost'));
             $dbeOrdline->setValue('curTotalCost',
-                $dsOrdline->getValue('curUnitCost') * $dsOrdline->getValue('qtyOrdered')
+                                  $dsOrdline->getValue('curUnitCost') * $dsOrdline->getValue('qtyOrdered')
             );
             $dbeOrdline->setValue('curTotalSale',
-                $dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered')
+                                  $dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered')
             );
             // this is to get around a bug I just found where the string does not get escaped!!!
             $dbeOrdline->setValue('description', $dbeOrdline->getValue('description'));

@@ -176,7 +176,7 @@ class CTRenewalReport extends CTCNC
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
 
-        $this->template->set_var('customerName', $dbeCustomer->getValue('name'));
+        $this->template->set_var('customerName', $dbeCustomer->getValue(DBECustomer::Name));
 
         $buRenewal = new BURenewal($this);
 
@@ -317,7 +317,7 @@ class CTRenewalReport extends CTCNC
 
             $dompdf->render();
 
-            $dompdf->add_info('Title', 'Renewal Report - ' . $dbeCustomer->getValue('name'));
+            $dompdf->add_info('Title', 'Renewal Report - ' . $dbeCustomer->getValue(DBECustomer::Name));
 
             $dompdf->add_info('Author', 'CNC Ltd');
 

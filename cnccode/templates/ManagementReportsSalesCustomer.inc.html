@@ -1,4 +1,5 @@
 <script language='JavaScript' src='CommonJS.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
 <script language='JavaScript'>
     var savedCustomerName;
 
@@ -32,9 +33,40 @@
             validateCustomerName();
         }
     }
+
+    function fetchData($event) {
+        console.log($event);
+        var formData = new FormData(event.target);
+
+        var object = {};
+        formData.forEach(function (value, key) {
+            object[key] = value;
+        });
+        var json = JSON.stringify(object);
+        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        $.ajax({
+            url: '{fetchDataUrl}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: json
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                console.log('data yay');
+                console.log(result);
+            }
+        }).catch(function () {
+
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
+        return false;
+    }
 </script>
-<link href="maxchart/style/style.css" rel="stylesheet" type="text/css"/>
-<FORM method="post" action="{urlGenerateReport}" name="report">
+<FORM method="post" name="report" onsubmit="return fetchData()">
     <TABLE>
         <TR>
             <TD>Customer<input
@@ -58,13 +90,32 @@
                 <select
                         name="year"
                         type="text"
-                        onChange="form.submit()"
                 >
                     <!-- BEGIN yearBlock -->
                     <option {yearSelected} value="{year}">{year}</option>
                     <!-- END yearBlock -->
                 </select>
             </TD>
+            <td>
+                <label for="sector">
+                    Sector
+                </label>
+                <select name="sector" id="sector">
+                    <!-- BEGIN sectorBlock -->
+                    <option {sectorSelected} value="{sectorID}">{sectorDescription}</option>
+                    <!-- END sectorBlock -->
+                </select>
+            </td>
+            <td>
+                <label for="noOfPcs">
+                    Pcs
+                </label>
+                <select name="noOfPcs" id="noOfPcs">
+                    <!-- BEGIN noOfPcsBlock -->
+                    <option {noOfPcsSelected} value="{noOfPcsDescription}">{noOfPcsDescription}</option>
+                    <!-- END noOfPcsBlock -->
+                </select>
+            </td>
             <TD>
                 <input type="submit" value="Search" name="Submit">
             </TD>

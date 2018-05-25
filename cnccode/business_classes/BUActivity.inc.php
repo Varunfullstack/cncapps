@@ -350,11 +350,11 @@ class BUActivity extends Business
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
         $buSite = new BUSite($this);
-        $buSite->getSiteByID($customerID, $dsCustomer->getValue('delSiteNo'), $dsSite);
+        $buSite->getSiteByID($customerID, $dsCustomer->getValue(DBECustomer::DeliverSiteNo), $dsSite);
         $dsCallActivity->setUpdateModeInsert();
         $dsCallActivity->setValue('callActivityID', 0);
         $dsCallActivity->setValue('customerID', $customerID);
-        $dsCallActivity->setValue('siteNo', $dsCustomer->getValue('delSiteNo'));
+        $dsCallActivity->setValue('siteNo', $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
         $dsCallActivity->setValue('contactID', $dsSite->getValue('invContactID'));
         $dsCallActivity->setValue('userID', $userID);
         $dsCallActivity->setValue('callActTypeID', '');
@@ -889,8 +889,8 @@ class BUActivity extends Business
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($dbeProblem->getValue('customerID'), $dsCustomer);
             if (
-                $dsCustomer->getValue('specialAttentionFlag') == 'Y' &&
-                $dsCustomer->getValue('specialAttentionEndDate') >= date('Y-m-d')
+                $dsCustomer->getValue(DBECustomer::SpecialAttentionFlag) == 'Y' &&
+                $dsCustomer->getValue(DBECustomer::SpecialAttentionEndDate) >= date('Y-m-d')
             ) {
                 $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
             }
@@ -1264,7 +1264,7 @@ class BUActivity extends Business
     Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact.
     */
         if (
-            $dsCustomer->getValue('othersEmailMainFlag') == 'Y' &&
+            $dsCustomer->getValue(DBECustomer::OthersEmailMainFlag) == 'Y' &&
             $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
                 $dbeJCallActivity->getValue('customerID'),
                 $toEmail
@@ -3458,7 +3458,7 @@ is currently a balance of ';
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
         $buSite = new BUSite($this);
 
-        $buSite->getSiteByID($customerID, $dsCustomer->getValue('delSiteNo'), $dsSite);
+        $buSite->getSiteByID($customerID, $dsCustomer->getValue(DBECustomer::DeliverSiteNo), $dsSite);
 
         // create new problem here
         $dbeProblem = new DBEProblem($this);
@@ -3589,7 +3589,8 @@ customer with the past 8 hours email to GL
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($_SESSION[$sessionKey]['customerID'], $dsCustomer);
 
-        if ($dsCustomer->getValue('specialAttentionFlag') == 'Y' && $dsCustomer->getValue('specialAttentionEndDate') >= date('Y-m-d')) {
+        if ($dsCustomer->getValue(DBECustomer::SpecialAttentionFlag) == 'Y' &&
+            $dsCustomer->getValue(DBECustomer::SpecialAttentionEndDate) >= date('Y-m-d')) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
 
@@ -4237,8 +4238,8 @@ customer with the past 8 hours email to GL
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($dbeProblem->getValue('customerID'), $dsCustomer);
         if (
-            $dsCustomer->getValue('specialAttentionFlag') == 'Y' &&
-            $dsCustomer->getValue('specialAttentionEndDate') >= date('Y-m-d')
+            $dsCustomer->getValue(DBECustomer::SpecialAttentionFlag) == 'Y' &&
+            $dsCustomer->getValue(DBECustomer::SpecialAttentionEndDate) >= date('Y-m-d')
         ) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
@@ -4422,7 +4423,8 @@ customer with the past 8 hours email to GL
         $dsResults->replicate($dsAssignedResults);
     }
 
-    function getProblemsByCustomerID($customerID, $priority = 1, $days = 30){
+    function getProblemsByCustomerID($customerID, $priority = 1, $days = 30)
+    {
         $dbeJProblem = new DBEJProblem($this);
 
         $dbeJProblem->getRowsByQueueNo($priority, true); // unassigned first
@@ -6177,7 +6179,7 @@ customer with the past 8 hours email to GL
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dbeJProblem->getValue('customerID'));
 
-        if ($dbeCustomer->getValue('othersEmailMainFlag') == 'N') {
+        if ($dbeCustomer->getValue(DBECustomer::OthersEmailMainFlag) == 'N') {
 
             $copyEmailToMainContact = false;
 
@@ -6185,7 +6187,7 @@ customer with the past 8 hours email to GL
 
             if (
                 $parameters['templateName'] == 'WorkCommencedEmail' &&
-                $dbeCustomer->getValue('workStartedEmailMainFlag') == 'N'
+                $dbeCustomer->getValue(DBECustomer::WorkStartedEmailMainFlag) == 'N'
             ) {
                 $copyEmailToMainContact = false;
             }
@@ -6331,13 +6333,33 @@ customer with the past 8 hours email to GL
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
 
-        $slaHours = $dbeCustomer->getValue('slaP' . $priority);
+        $priorityValue = null;
+
+        switch ($priority) {
+            case 1:
+                $priorityValue = DBECustomer::SlaP1;
+                break;
+            case 2:
+                $priorityValue = DBECustomer::SlaP2;
+                break;
+            case 3:
+                $priorityValue = DBECustomer::SlaP3;
+                break;
+            case 4:
+                $priorityValue = DBECustomer::SlaP4;
+                break;
+            case 5:
+                $priorityValue = DBECustomer::SlaP5;
+                break;
+        }
+
+        $slaHours = $dbeCustomer->getValue($priorityValue);
         /*
     Special attention customers get half of normal SLA
     */
         if (
-            $dbeCustomer->getValue('specialAttentionFlag') == 'Y' &&
-            $dbeCustomer->getValue('specialAttentionEndDate') >= date('Y-m-d')
+            $dbeCustomer->getValue(DBECustomer::SpecialAttentionFlag) == 'Y' &&
+            $dbeCustomer->getValue(DBECustomer::SpecialAttentionEndDate) >= date('Y-m-d')
         ) {
             $slaHours = $slaHours / 2;
         }

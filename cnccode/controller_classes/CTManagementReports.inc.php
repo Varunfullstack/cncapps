@@ -9,14 +9,19 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUManagementReports.inc.php');
 require_once($cfg['path_dbe'] . '/DBESupplier.inc.php');
-require_once($cfg['path_dbe'] . '/DBECustomerNew.inc.php');
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_func'] . '/Common.inc.php');
+require_once($cfg['path_bu'] . '/BUSector.inc.php');
+require_once($cfg['path_dbe'] . '/DBESector.inc.php');
+
 require_once("Mail.php");
 require_once("Mail/mime.php");
 
 class CTManagementReports extends CTCNC
 {
     public $buManagementReports;
+
+    const GetSalesByCustomerDataAction = "GetSalesByCustomerDataAction";
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -48,7 +53,16 @@ class CTManagementReports extends CTCNC
             case 'SpendByCategory':
                 $this->spendByCategory();
                 break;
+            case self::GetSalesByCustomerDataAction:
+                $data = $this->salesByCustomerData(
+                    $_REQUEST['year'],
+                    $_REQUEST['customerID'],
+                    $_REQUEST['sectorID'],
+                    $_REQUEST['noOfPcs']
+                );
 
+                echo json_encode($data);
+                break;
             case 'SpendByManufacturer':
             default:
                 $this->spendByManufacturer();
@@ -366,17 +380,53 @@ class CTManagementReports extends CTCNC
      * @param null|integer $customerId
      * @param null|integer $sector
      * @param null| $pcs
+     * @return array
      */
-    function salesData(
+    function salesByCustomerData(
         $year,
         $customerId = null,
         $sector = null,
         $pcs = null
     )
     {
+        $results = $this->buManagementReports->getSalesByCustomer($customerId, $year);
+        $data = [];
+        while ($row = $results->fetch_object()) {
 
-        $results = $this->buManagementReports->getSalesByCustomer($_REQUEST['customerID'], $_REQUEST['year']);
-
+            $data[] = [
+                'customer' => Controller::htmlDisplayText($row->customer),
+                'sector' => Controller::htmlDisplayText($row->sector),
+                'noOfPCs' => Controller::htmlDisplayText($row->noOfPCs),
+                'noOfServers' => Controller::htmlDisplayText($row->noOfServers),
+                'salesMonth1' => Controller::formatNumber($row->salesMonth1, 0),
+                'profitMonth1' => Controller::formatNumber($row->profitMonth1, 0),
+                'salesMonth2' => Controller::formatNumber($row->salesMonth2, 0),
+                'profitMonth2' => Controller::formatNumber($row->profitMonth2, 0),
+                'salesMonth3' => Controller::formatNumber($row->salesMonth3, 0),
+                'profitMonth3' => Controller::formatNumber($row->profitMonth3, 0),
+                'salesMonth4' => Controller::formatNumber($row->salesMonth4, 0),
+                'profitMonth4' => Controller::formatNumber($row->profitMonth4, 0),
+                'salesMonth5' => Controller::formatNumber($row->salesMonth5, 0),
+                'profitMonth5' => Controller::formatNumber($row->profitMonth5, 0),
+                'salesMonth6' => Controller::formatNumber($row->salesMonth6, 0),
+                'profitMonth6' => Controller::formatNumber($row->profitMonth6, 0),
+                'salesMonth7' => Controller::formatNumber($row->salesMonth7, 0),
+                'profitMonth7' => Controller::formatNumber($row->profitMonth7, 0),
+                'salesMonth8' => Controller::formatNumber($row->salesMonth8, 0),
+                'profitMonth8' => Controller::formatNumber($row->profitMonth8, 0),
+                'salesMonth9' => Controller::formatNumber($row->salesMonth9, 0),
+                'profitMonth9' => Controller::formatNumber($row->profitMonth9, 0),
+                'salesMonth10' => Controller::formatNumber($row->salesMonth10, 0),
+                'profitMonth10' => Controller::formatNumber($row->profitMonth10, 0),
+                'salesMonth11' => Controller::formatNumber($row->salesMonth11, 0),
+                'profitMonth11' => Controller::formatNumber($row->profitMonth11, 0),
+                'salesMonth12' => Controller::formatNumber($row->salesMonth12, 0),
+                'profitMonth12' => Controller::formatNumber($row->profitMonth12, 0),
+                'totalSales' => Controller::formatNumber($row->salesTotal, 0),
+                'totalProfit' => Controller::formatNumber($row->profitTotal, 0)
+            ];
+        }
+        return $data;
     }
 
     function SalesByCustomer()
@@ -390,6 +440,14 @@ class CTManagementReports extends CTCNC
         // year selector
         $this->template->set_block('ManagementReportsSalesCustomer', 'yearBlock', 'years');
         $this->parseYearSelector($_REQUEST['year']);
+        // sector selector
+        $this->template->set_block('ManagementReportsSalesCustomer', 'sectorBlock', 'sectors');
+        $this->parseSectorSelector($_REQUEST['sectorID']);
+
+        // noOfPcs selector
+
+        $this->parseNoOfPcs($this->template, $_REQUEST['noOfPcs']);
+
 
         $customerPopupURL =
             $this->buildLink(
@@ -400,64 +458,28 @@ class CTManagementReports extends CTCNC
                 )
             );
 
-//        $results = $this->buManagementReports->getSalesByCustomer($_REQUEST['customerID'], $_REQUEST['year']);
+        $fetchDataUrl =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => self::GetSalesByCustomerDataAction
+                )
+            );
 
         if ($_REQUEST['customerID']) {
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($_REQUEST['customerID']);
-            $customerName = $dbeCustomer->getValue('name');
+            $customerName = $dbeCustomer->getValue(DBECustomer::Name);
         }
 
-//        $this->template->set_block('ManagementReportsSalesCustomer', 'resultsBlock', 'results');
-
-
-//        while ($row = $results->fetch_object()) {
-//
-//            $this->template->set_var(
-//                array(
-//                    'customer' => Controller::htmlDisplayText($row->customer),
-//                    'sector' => Controller::htmlDisplayText($row->sector),
-//                    'noOfPCs' => Controller::htmlDisplayText($row->noOfPCs),
-//                    'noOfServers' => Controller::htmlDisplayText($row->noOfServers),
-//                    'salesMonth1' => Controller::formatNumber($row->salesMonth1, 0),
-//                    'profitMonth1' => Controller::formatNumber($row->profitMonth1, 0),
-//                    'salesMonth2' => Controller::formatNumber($row->salesMonth2, 0),
-//                    'profitMonth2' => Controller::formatNumber($row->profitMonth2, 0),
-//                    'salesMonth3' => Controller::formatNumber($row->salesMonth3, 0),
-//                    'profitMonth3' => Controller::formatNumber($row->profitMonth3, 0),
-//                    'salesMonth4' => Controller::formatNumber($row->salesMonth4, 0),
-//                    'profitMonth4' => Controller::formatNumber($row->profitMonth4, 0),
-//                    'salesMonth5' => Controller::formatNumber($row->salesMonth5, 0),
-//                    'profitMonth5' => Controller::formatNumber($row->profitMonth5, 0),
-//                    'salesMonth6' => Controller::formatNumber($row->salesMonth6, 0),
-//                    'profitMonth6' => Controller::formatNumber($row->profitMonth6, 0),
-//                    'salesMonth7' => Controller::formatNumber($row->salesMonth7, 0),
-//                    'profitMonth7' => Controller::formatNumber($row->profitMonth7, 0),
-//                    'salesMonth8' => Controller::formatNumber($row->salesMonth8, 0),
-//                    'profitMonth8' => Controller::formatNumber($row->profitMonth8, 0),
-//                    'salesMonth9' => Controller::formatNumber($row->salesMonth9, 0),
-//                    'profitMonth9' => Controller::formatNumber($row->profitMonth9, 0),
-//                    'salesMonth10' => Controller::formatNumber($row->salesMonth10, 0),
-//                    'profitMonth10' => Controller::formatNumber($row->profitMonth10, 0),
-//                    'salesMonth11' => Controller::formatNumber($row->salesMonth11, 0),
-//                    'profitMonth11' => Controller::formatNumber($row->profitMonth11, 0),
-//                    'salesMonth12' => Controller::formatNumber($row->salesMonth12, 0),
-//                    'profitMonth12' => Controller::formatNumber($row->profitMonth12, 0),
-//                    'totalSales' => Controller::formatNumber($row->salesTotal, 0),
-//                    'totalProfit' => Controller::formatNumber($row->profitTotal, 0)
-//
-//                )
-//            );
-//
-//            $this->template->parse('results', 'resultsBlock', true);
-//        }
         $this->template->set_var(
             array(
                 'customerPopupURL' => $customerPopupURL,
                 'customerName' => $customerName,
                 'customerID' => $_REQUEST['customerID'],
                 'sectorID' => $_REQUEST['sectorID'],
-                'noOfPcs' => $_REQUEST['noOfPcs']
+                'noOfPcs' => $_REQUEST['noOfPcs'],
+                'fetchDataUrl' => $fetchDataUrl
             )
         );
 
@@ -487,6 +509,70 @@ class CTManagementReports extends CTCNC
             );
 
             $this->template->parse('years', 'yearBlock', true);
+        }
+    }
+
+    private function parseNoOfPcs(Template $template, $selectedNoOfPcs)
+    {
+        $template->set_block('ManagementReportsSalesCustomer', 'noOfPcsBlock', 'noOfPcsSelector');
+        $options = [
+            "Search All",
+            "0",
+            "1-5",
+            "6-10",
+            "11-25",
+            "26-50",
+            "51-99",
+            "100+"
+        ];
+
+        foreach ($options as $option) {
+            $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : '') : ($option === "Search All" ? CT_SELECTED : '');
+            $this->template->set_var(
+                array(
+                    'noOfPcsSelected' => $isSelected ? CT_SELECTED : null,
+                    'noOfPcsDescription' => $option
+                )
+            );
+
+            $this->template->parse('noOfPcsSelector', 'noOfPcsBlock', true);
+        }
+    }
+
+    private function parseSectorSelector($selectedSectorID)
+    {
+
+        $buSector = new BUSector($this);
+
+        $dsResults = new DataSet($this);
+        $buSector->getAll($dsResults);
+
+
+        $this->template->set_var(
+            array(
+                'selectedSector' => $selectedSectorID ? CT_SELECTED : '',
+                'sectorID' => null,
+                'sectorDescription' => "Search All"
+            )
+        );
+
+        $this->template->parse('sectors', 'sectorBlock', true);
+
+        while ($dsResults->fetchNext()) {
+
+            $sectorID = $dsResults->getValue(DBESector::sectorID);
+            $sectorDescription = $dsResults->getValue(DBESector::description);
+            $selectedSector = ($selectedSectorID == $sectorID) ? CT_SELECTED : '';
+
+            $this->template->set_var(
+                array(
+                    'selectedSector' => $selectedSector,
+                    'sectorID' => $sectorID,
+                    'sectorDescription' => $sectorDescription
+                )
+            );
+
+            $this->template->parse('sectors', 'sectorBlock', true);
         }
     }
 

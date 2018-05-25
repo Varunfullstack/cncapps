@@ -103,13 +103,13 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $nonEditableTemplate->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue('name'),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
                         'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
-                        'slaP1' => $dsCustomer->getValue('slaP1'),
-                        'slaP2' => $dsCustomer->getValue('slaP2'),
-                        'slaP3' => $dsCustomer->getValue('slaP3'),
-                        'slaP4' => $dsCustomer->getValue('slaP4'),
-                        'slaP5' => $dsCustomer->getValue('slaP5')
+                        'slaP1' => $dsCustomer->getValue(DBECustomer::SlaP1),
+                        'slaP2' => $dsCustomer->getValue(DBECustomer::SlaP2),
+                        'slaP3' => $dsCustomer->getValue(DBECustomer::SlaP3),
+                        'slaP4' => $dsCustomer->getValue(DBECustomer::SlaP4),
+                        'slaP5' => $dsCustomer->getValue(DBECustomer::SlaP5)
                     )
                 );
 
@@ -119,12 +119,9 @@ class CTCustomerReviewMeeting extends CTCNC
                     $dsSearchForm->getValue('endYearMonth')
                 );
 
-
-//                $nonEditableTemplate->set_var('chart', json_encode($this->generateCharts($results, $customerId)));
-//
                 $supportedUsersData = $this->getSupportedUsersData($buContact,
-                    $customerId,
-                    $dsCustomer->getValue('name'));
+                                                                   $customerId,
+                                                                   $dsCustomer->getValue(DBECustomer::Name));
 
                 $nonEditableTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
@@ -132,8 +129,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 $contractsTemplate->set_file('contracts', 'CustomerReviewMeetingContractsSection.html');
 
                 $contractsTemplate->set_var("serverContract",
-                    $this->getServerCareContractBody($customerId,
-                        $supportedUsersData['count']));
+                                            $this->getServerCareContractBody($customerId,
+                                                                             $supportedUsersData['count']));
                 $contractsTemplate->set_var("serviceDeskContract", $this->getServiceDeskContractBody($customerId));
                 $contractsTemplate->set_var('prepayContract', $this->getPrepayContractBody($customerId));
 
@@ -143,14 +140,14 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $textTemplate->set_var('contracts', $contractsBody);
                 $textTemplate->set_var('24HourFlag',
-                    $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
+                                       $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null);
                 $textTemplate->set_var('p1Incidents', $this->getP1IncidentsBody($customerId));
                 $textTemplate->set_var('startersAndLeavers',
-                    $this->getStartersAndLeaversBody(
-                        $customerId,
-                        $dsSearchForm->getValue('startYearMonth'),
-                        $dsSearchForm->getValue('endYearMonth')
-                    ));
+                                       $this->getStartersAndLeaversBody(
+                                           $customerId,
+                                           $dsSearchForm->getValue('startYearMonth'),
+                                           $dsSearchForm->getValue('endYearMonth')
+                                       ));
                 $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
                 $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
 
@@ -280,7 +277,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $buHeader = new BUHeader($this);
                 $buHeader->getHeader($dsHeader);
                 $textTemplate->set_var('customerReviewMeetingText',
-                    $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
+                                       $dsHeader->getValue(DBEHeader::customerReviewMeetingText));
 
                 $textTemplate->parse('output', 'page', true);
 
@@ -305,7 +302,8 @@ class CTCustomerReviewMeeting extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -322,7 +320,7 @@ class CTCustomerReviewMeeting extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::Name);
         }
 
         echo "<script> var graphData = " . json_encode($graphData, JSON_NUMERIC_CHECK) . "</script>";
@@ -369,7 +367,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $serverCareContractsTemplate->set_file('serverCareContracts', 'CustomerReviewMeetingServerCare.html');
         $serverCareContractsTemplate->set_var("contractDescription", $datasetContracts->getValue('itemDescription'));
         $serverCareContractsTemplate->set_var("nextInvoice",
-            $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
+                                              $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate'));
         $serverCareContractsTemplate->set_var('usersCount', $supportContactsCount);
 
         $serverCareContractsTemplate->set_block('serverCareContracts', 'contractItemsBlock', 'items');
@@ -872,7 +870,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $frequency = 'N/A';
         }
 
-        return "<h2>Review Meeting Frequency - " . $frequency."</h2>";
+        return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
     }
 
     private function getMainContacts(BUContact $buContact)

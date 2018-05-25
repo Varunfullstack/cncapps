@@ -10,7 +10,7 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUManagementReports extends Business
 {
-
+    /** @var dbSweetcode */
     public $db;
 
     /**
@@ -163,6 +163,13 @@ class BUManagementReports extends Business
         return $return;
     }
 
+    /**
+     * @param null $customerID
+     * @param null $year
+     * @param null $sectorId
+     * @param null $pcs
+     * @return bool|int|mysqli_result|null
+     */
     function getSalesByCustomer($customerID = null, $year = null, $sectorId = null, $pcs = null)
     {
         if (!$year) {
@@ -222,9 +229,8 @@ class BUManagementReports extends Business
 					cus_name
 			)  AS temp
 			ORDER BY profitTotal DESC;";
-
+        var_dump($sql);
         return $this->db->query($sql);
-
     }
 
     function buildSalesByCustomerSegment($month)
