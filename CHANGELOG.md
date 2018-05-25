@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.7.0] - 2018-05-25
 ### Added
 - Issue 246 - Add descriptions to Report pages
 - Issue 237 - ServiceRequestReport export tweak
@@ -18,7 +18,6 @@ This project changes will be shown here.
 ### Removed
 - Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
 - Issue 241 - Remove Customer Review Meeting from the Accounts menu
-
 
 ## [v1.6.3] - 2018-05-23
 ### Fixed
