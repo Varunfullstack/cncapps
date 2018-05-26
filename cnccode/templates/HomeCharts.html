@@ -1,154 +1,109 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src=".javascript/handlebars-v4.0.11.js"></script>
 <script type="text/javascript" src=".javascript/mustache.min.js"></script>
-<script id="member-item-template" type="text/template">
-    <div class="memberItem">
-        <div class="name">
-            {% name %}
-        </div>
-        <div class="selectors">
-            <div class="selector">
-                <div class="item">
-                    Data
-                </div>
-                <input type="checkbox" data-type="data" class="item" data-id="{% id %}" {% #data %} checked {% /data %}
-                >
-            </div>
-            <div class="selector">
-                <div class="item">
-                    Trend
-                </div>
-                <input type="checkbox" class="item" data-type="trend" data-id="{% id %}" {% #trend %} checked
-                       {% /trend %}>
-            </div>
-        </div>
-</script>
-<script type="text/javascript">
-    // Load the Visualization API and the corechart package.
-    google.charts.load('current', {'packages': ['corechart']});
-
-    Mustache.tags = ['{%', '%}'];
-
-    function chartSystem(id, team) {
-        // Set a callback to run when the Google Visualization API is loaded.
-        var that = this;
-        this.title = "";
-        switch (team) {
-            case 1:
-                this.title = "Help Desk";
-                break;
-            case 2:
-                this.title = "Escalations";
-                break;
-            case 3:
-                this.title = "Implementations";
-                break;
-        }
-
-        this.membersOptions = {};
-        this.storedData = null;
-        this.storedOptions = {
-            'title': this.title,
-            'width': 800,
-            'height': 600,
-            series: {
-                0: {lineDashStyle: [1, 1], lineWidth: 6},
-                1: {lineWidth: 8}
-            }
-        };
-        this.mainElm = $('#' + id);
-        if (!this.mainElm[0]) {
-            throw "Couldn't find the element";
-        }
-
-        this.chartDiv = this.mainElm.find('.chart');
-        this.chart = null;
-        this.days = 30;
-        this.ajaxOptions = {
-            url: '?action=lastWeekHelpDesk',
-            dataType: 'json',
-            data: {days: this.days, team: team}
-        };
-        this.data = $.ajax(this.ajaxOptions);
-
-        this.daysSelector = this.mainElm.find('.daysSelector');
-        this.membersSelectors = this.mainElm.find('.membersSelectors');
-
-
-        this.daysSelector.change(function () {
-
-            that.ajaxOptions.data.days = $(this).val();
-
-            that.data = $.ajax(that.ajaxOptions);
-            drawChart()
-        });
-
-        this.membersSelectors.on('change', 'input', function () {
-            console.log(this);
-            var datum = $(this).data();
-            that.membersOptions[datum.id][datum.type] = !that.membersOptions[datum.id][datum.type];
-            hideColumns();
-        });
-
-        var source = document.getElementById("member-item-template").innerHTML;
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
-        function drawChart() {
-            return that.data.then(function (result) {
-                that.membersSelectors.html('');
-                window.dataToAnalyze = result;
-                Object.keys(result).forEach(function (memberKey) {
-
-                    if (that.membersOptions[memberKey] == null) {
-                        that.membersOptions[memberKey] = {data: true, trend: false};
-                    }
-
-                    var context = {
-                        name: result[memberKey].userName,
-                        id: memberKey
-                    };
-                    console.log(context);
-                    var html = Mustache.to_html(source, context);
-                    var test = '<div class="memberItem" ><label>' + context.name + '</label></div>';
-                    that.membersSelectors.append(html);
-                });
-
-                that.storedData = new google.visualization.DataTable({
-                    cols: result[memberKey].cols,
-                    rows: result[memberKey].rows
-                });
-                // Instantiate and draw our chart, passing in some options.
-                that.chart = new google.visualization.ColumnChart(that.chartDiv[0]);
-                hideColumns();
-            });
-        }
-
-        function hideColumns() {
-            var view = new google.visualization.DataView(that.storedData);
-
-            // var columnsToHide = [];
-            //
-            // for (var i = 0; i < that.storedData.getNumberOfColumns(); i++) {
-            //     var columnId = that.storedData.getColumnId(i);
-            //     if (!isNaN(columnId) && !that.membersOptions[columnId]) {
-            //         // is a number ..so it's an id
-            //         columnsToHide.push(i);
-            //     }
-            // }
-            // view.hideColumns(columnsToHide);
-            that.chart.draw(view, that.storedOptions);
-        }
-
-        drawChart();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
+        integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o=" crossorigin="anonymous"></script>
+<style>
+    .chart {
+        width: 100%;
+        min-height: 200px;
     }
 
-    google.charts.setOnLoadCallback(function () {
-        var test = new chartSystem('helpDeskChart', 1);
-        var test2 = new chartSystem('escalationsChart', 2);
-        var test3 = new chartSystem('implementationsChart', 3);
-    });
+    .item {
 
+    }
+
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+
+</style>
+<script id="member-item-template" type="text/template">
+    <div class="item">
+        <div id="{% id %}" class="chart">
+
+        </div>
+    </div>
+</script>
+<script type="text/javascript">
+
+    $(function () {
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages': ['corechart']});
+
+        var teamSelector = $('#teamSelector');
+
+
+        teamSelector.change(function () {
+            drawIndividualCharts($(this).val());
+        });
+        Mustache.tags = ['{%', '%}'];
+
+
+        function drawIndividualCharts(teamId) {
+            var that = this;
+            this.ajaxOptions = {
+                url: '?action=lastWeekHelpDesk',
+                dataType: 'json',
+                data: {days: this.days, team: teamId}
+            };
+            this.data = $.ajax(this.ajaxOptions);
+
+            this.container = $('#teamIndividualCharts');
+            console.log(this.container);
+            this.container.html('');
+
+
+            this.source = document.getElementById("member-item-template").innerHTML;
+            this.data.then(function (data) {
+                Object.keys(data).forEach(function (key) {
+
+                    var id = teamId + '-' + key;
+                    var context = {
+                        name: data[key].userName,
+                        id: id
+                    };
+
+                    var html = Mustache.to_html(that.source, context);
+                    that.container.append(html);
+
+                    var test = that.container.find('#' + id);
+
+                    var storedOptions = {
+                        title: data[key].userName,
+                        trendlines: {0: {}},
+                        legend: 'none'
+                    };
+
+                    var chart = new google.visualization.ColumnChart(test[0]);
+
+
+                    var dataTable = new google.visualization.DataTable(
+                        {cols: data[key].cols, rows: convertToActualDate(data[key].rows)}
+                    );
+
+                    chart.draw(dataTable, storedOptions);
+                })
+            })
+
+
+        }
+
+        function convertToActualDate(rows) {
+
+            rows.forEach(function (row) {
+                row.c[0].v = moment(row.c[0].v).toDate();
+            });
+            return rows;
+        }
+
+
+        google.charts.setOnLoadCallback(function () {
+            drawIndividualCharts(1);
+        });
+    })
 
 </script>
 <style>
@@ -186,76 +141,12 @@
         flex: 0 0 50%;
     }
 </style>
-<div id="helpDeskChart">
-    <h2>
-        Help Desk Team
-    </h2>
-    <div>
-        <div>
-            Members:
-            <div class="membersSelectors">
 
-            </div>
-        </div>
-        <div>
-            <select name="days" class="daysSelector">
-                <option value="7">last 7 Days</option>
-                <option value="30" selected>last 30 Days</option>
-                <option value="90">Last 3 Months</option>
-                <option value="180">last 6 Months</option>
-                <option value="365">last Year</option>
-            </select>
-        </div>
+<select name="team" class="teamSelector" id="teamSelector">
+    <option value="1" selected>Help Desk Team</option>
+    <option value="2">Escalations Team</option>
+    <option value="3">Implementations Team</option>
+</select>
+<div id="teamIndividualCharts" class="container">
 
-        <div class="chart"></div>
-    </div>
 </div>
-<div id="escalationsChart">
-    <h2>
-        Escalations Team
-    </h2>
-    <div>
-        <div>
-            Members:
-            <div class="membersSelectors">
-
-            </div>
-        </div>
-        <div>
-            <select name="days" class="daysSelector">
-                <option value="7">last 7 Days</option>
-                <option value="30" selected>last 30 Days</option>
-                <option value="90">Last 3 Months</option>
-                <option value="180">last 6 Months</option>
-                <option value="365">last Year</option>
-            </select>
-        </div>
-
-        <div class="chart"></div>
-    </div>
-</div>
-<div id="implementationsChart">
-    <h2>
-        Implementations Team
-    </h2>
-    <div>
-        <div>
-            Members:
-            <div class="membersSelectors">
-
-            </div>
-        </div>
-        <div>
-            <select name="days" class="daysSelector">
-                <option value="7">last 7 Days</option>
-                <option value="30" selected>last 30 Days</option>
-                <option value="90">Last 3 Months</option>
-                <option value="180">last 6 Months</option>
-                <option value="365">last Year</option>
-            </select>
-        </div>
-
-        <div class="chart"></div>
-    </div>
-</div>
-{test}

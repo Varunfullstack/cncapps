@@ -708,7 +708,7 @@ class CTHome extends CTCNC
 
         $dataStructure = [
             "cols" => [
-                ["id" => "dates", "label" => "Dates", "type" => 'string'],
+                ["id" => "dates", "label" => "Dates", "type" => 'date'],
             ],
             "rows" => [
 
@@ -755,7 +755,7 @@ class CTHome extends CTCNC
 
                 $cell = ["c" =>
                     [
-                        ["v" => $key],
+                        ["v" => (new \DateTime($key))->format(DATE_ISO8601)],
                         ["v" => $value]
                     ]
                 ];
