@@ -798,20 +798,15 @@ class CTHome extends CTCNC
 
     private function showDetailCharts($engineerID, $startDate, $endDate)
     {
-        /**
-         * if user is only in the technical group then display the curent activity dash-board
-         */
-        if (!$this->buUser->isSdManager($this->userID)) {
 
-            $urlNext =
-                $this->buildLink(
-                    'index.php',
-                    array()
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-
+//        $isStandardUser = false;
+////        $dbeUser = $this->getDbeUser();
+////        $dbeUser->setValue('userID', $this->userID);
+////        $dbeUser->getRow();
+////        if ($this->dbeUser->getValue(DBEUser::teamID) <= 3) {
+////            $engineerID = $this->userID;
+////            $isStandardUser = true;
+////        }
         $this->setTemplateFiles('detailedCharts', 'HomeDetailCharts.inc');
         if (!$engineerID) {
             $this->formError = "Engineer ID not given";
