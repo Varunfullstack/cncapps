@@ -31,7 +31,7 @@
 <script type="text/javascript">
     var userTeam = {userTeam};
     var userID = {userID};
-    var defaultTeam = 1;
+    var defaultTeam = userTeam <= 3 ? userTeam : 1;
 
     $(function () {
         // Load the Visualization API and the corechart package.

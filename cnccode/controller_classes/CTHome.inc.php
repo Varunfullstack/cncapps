@@ -714,13 +714,18 @@ class CTHome extends CTCNC
     private function showLastWeekHelpDeskData($team, $days)
     {
         $isStandardUser = false;
+        if (!$this->buUser->isSdManager($this->userID)) {
+            if ($this->dbeUser->getValue(DBEUser::teamID) <= 3) {
+                $team = $this->dbeUser->getValue(DBEUser::teamID);
+                $isStandardUser = true;
+            } else {
+                return [];
+            }
+        }
         $dbeUser = $this->getDbeUser();
         $dbeUser->setValue('userID', $this->userID);
         $dbeUser->getRow();
-        if ($this->dbeUser->getValue(DBEUser::teamID) <= 3) {
-            $team = $this->dbeUser->getValue(DBEUser::teamID);
-            $isStandardUser = true;
-        }
+
         $target = null;
         switch ($team) {
             case 1:
@@ -798,15 +803,6 @@ class CTHome extends CTCNC
 
     private function showDetailCharts($engineerID, $startDate, $endDate)
     {
-
-//        $isStandardUser = false;
-////        $dbeUser = $this->getDbeUser();
-////        $dbeUser->setValue('userID', $this->userID);
-////        $dbeUser->getRow();
-////        if ($this->dbeUser->getValue(DBEUser::teamID) <= 3) {
-////            $engineerID = $this->userID;
-////            $isStandardUser = true;
-////        }
         $this->setTemplateFiles('detailedCharts', 'HomeDetailCharts.inc');
         if (!$engineerID) {
             $this->formError = "Engineer ID not given";
