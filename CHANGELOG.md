@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.7.1] - 2018-05-29
+### Fixed
+- Issue 257 - Bugs from release 1.7.0
+
 ## [v1.7.0] - 2018-05-25
 ### Added
 - Issue 246 - Add descriptions to Report pages
