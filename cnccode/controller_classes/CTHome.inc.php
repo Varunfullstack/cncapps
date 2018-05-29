@@ -19,6 +19,9 @@ require_once($cfg['path_bu'] . '/BUTeamPerformance.inc.php');
 
 class CTHome extends CTCNC
 {
+    const DetailedChartsAction = 'detailedCharts';
+    const GetDetailedChartsDataAction = "getDetailedChartsData";
+
     private $dsHeader = '';
     private $buUser;
 
@@ -53,6 +56,22 @@ class CTHome extends CTCNC
 
 
                 echo json_encode($this->showLastWeekHelpDeskData($team, $days), JSON_NUMERIC_CHECK);
+                break;
+
+            case self::GetDetailedChartsDataAction:
+
+
+                echo json_encode(
+                    $this->getDetailedChartsData(
+                        $_REQUEST['engineerID'],
+                        $_REQUEST['startDate'],
+                        $_REQUEST['endDate']
+                    ),
+                    JSON_NUMERIC_CHECK
+                );
+                break;
+            case self::DetailedChartsAction:
+                $this->showDetailCharts($_REQUEST['engineerID'], $_REQUEST['startDate'], $_REQUEST['endDate']);
                 break;
             default:
                 $this->display();
@@ -682,12 +701,26 @@ class CTHome extends CTCNC
     private function displayCharts()
     {
         $this->setTemplateFiles('HomeCharts', 'HomeCharts');
+        $this->template->set_var(
+            [
+                "userTeam" => $this->buUser->dbeUser->getValue(DBEUser::teamID),
+                "userID" => $this->buUser->dbeUser->getValue(DBEUser::userID),
+            ]
+        );
         $this->template->parse('CONTENTS', 'HomeCharts', true);
 
     }
 
     private function showLastWeekHelpDeskData($team, $days)
     {
+        $isStandardUser = false;
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->getRow();
+        if ($this->dbeUser->getValue(DBEUser::teamID) <= 3) {
+            $team = $this->dbeUser->getValue(DBEUser::teamID);
+            $isStandardUser = true;
+        }
         $target = null;
         switch ($team) {
             case 1:
@@ -722,8 +755,11 @@ class CTHome extends CTCNC
 
         $results = $this->buUser->teamMembersPerformanceData($team, $days);
 
-
         foreach ($results as $result) {
+            if ($isStandardUser && $result['userID'] !== $this->dbeUser->getValue(DBEUser::userID)) {
+                continue;
+            }
+
             // if the user doesn't have a graph yet create it
             if (!isset($graphs[$result['userID']])) {
                 $graphs[$result['userID']] = $dataStructure;
@@ -731,41 +767,94 @@ class CTHome extends CTCNC
                 $graphs[$result['userID']]['userName'] = $result['userLabel'];
             }
 
-            // check if the current date is greater than the last data point
-            end($graphs[$result['userID']]['dataPoints']);         // move the internal pointer to the end of the array
-            $key = key($graphs[$result['userID']]['dataPoints']);
-            reset($graphs[$result['userID']]['dataPoints']);
+            $cell = ["c" =>
+                [
+                    ["v" => (new \DateTime($result['loggedDate']))->format(DATE_ISO8601)],
+                    ["v" => $result['loggedHours']]
+                ]
+            ];
 
-            while (!$key || $key < $result['loggedDate']) {
-                if ($key) {
-                    $date = new DateTime($key);
-                    $date->modify('+1 day');
-
-                    $key = $date->format('Y-m-d');
-                } else {
-                    $key = $result['loggedDate'];
-                }
-
-                $graphs[$result['userID']]['dataPoints'][$key] = null;
-                if ($key == $result['loggedDate']) {
-                    $value = $result['loggedHours'];
-                } else {
-                    $value = null;
-                }
-
-                $cell = ["c" =>
-                    [
-                        ["v" => (new \DateTime($key))->format(DATE_ISO8601)],
-                        ["v" => $value]
-                    ]
-                ];
-
-                $graphs[$result['userID']]['rows'][] = $cell;
-            }
-
+            $graphs[$result['userID']]['rows'][] = $cell;
         }
 
-        return $graphs;
-    } // end displayUserLoggingPerformanceReport
+        $toReturn = [];
+
+        foreach ($graphs as $userID => $graph) {
+            $toReturn[] = array_merge(
+                ["userID" => $userID],
+                $graph
+            );
+        }
+
+        usort(
+            $toReturn,
+            function ($a, $b) {
+                return strcmp($a['userName'], $b['userName']);
+            }
+        );
+
+        return $toReturn;
+    }
+
+    private function showDetailCharts($engineerID, $startDate, $endDate)
+    {
+        /**
+         * if user is only in the technical group then display the curent activity dash-board
+         */
+        if (!$this->buUser->isSdManager($this->userID)) {
+
+            $urlNext =
+                $this->buildLink(
+                    'index.php',
+                    array()
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        }
+
+        $this->setTemplateFiles('detailedCharts', 'HomeDetailCharts.inc');
+        if (!$engineerID) {
+            $this->formError = "Engineer ID not given";
+            $this->formErrorMessage = "Engineer ID not given";
+            return;
+        }
+
+        $this->template->set_var(
+            [
+                "dataFetchUrl" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => self::GetDetailedChartsDataAction
+                    )
+                ),
+                "engineerID" => $engineerID,
+                "startDate" => $startDate,
+                "endDate" => $endDate
+            ]
+
+        );
+
+        $this->template->parse('CONTENTS', 'detailedCharts', true);
+        $this->parsePage();
+    }
+
+    private function getDetailedChartsData($engineerID, $startDate, $endDate)
+    {
+        if (!$this->buUser->isSdManager($this->userID)) {
+            return $this->buUser->getEngineerDetailedData(
+                $this->userID,
+                (new DateTime($startDate)),
+                (new DateTime($endDate))
+            );
+        }
+        // we need to pull data
+        $data = $this->buUser->getEngineerDetailedData(
+            $engineerID,
+            (new DateTime($startDate)),
+            (new DateTime($endDate))
+        );
+        return $data;
+
+    }
 }// end of class
 ?>

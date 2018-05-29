@@ -10,7 +10,7 @@
     }
 
     .item {
-
+        width: 33%;
     }
 
     .container {
@@ -22,12 +22,16 @@
 </style>
 <script id="member-item-template" type="text/template">
     <div class="item">
+        <button class="details" type="button" data-user-id="{% userID %}">Show Details</button>
         <div id="{% id %}" class="chart">
 
         </div>
     </div>
 </script>
 <script type="text/javascript">
+    var userTeam = {userTeam};
+    var userID = {userID};
+    var defaultTeam = 1;
 
     $(function () {
         // Load the Visualization API and the corechart package.
@@ -35,6 +39,20 @@
 
         var teamSelector = $('#teamSelector');
 
+        if (userTeam > 3) {
+            teamSelector.show();
+        } else {
+            defaultTeam = userTeam;
+        }
+
+        $('body').on('click', '.details', function () {
+            var userId = $(this).data().userId;
+            var today = moment();
+            var aMonthAgo = moment().subtract(30, 'days');
+
+
+            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + aMonthAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+        })
 
         teamSelector.change(function () {
             drawIndividualCharts($(this).val());
@@ -50,20 +68,18 @@
                 data: {days: this.days, team: teamId}
             };
             this.data = $.ajax(this.ajaxOptions);
-
             this.container = $('#teamIndividualCharts');
-            console.log(this.container);
             this.container.html('');
-
-
             this.source = document.getElementById("member-item-template").innerHTML;
             this.data.then(function (data) {
-                Object.keys(data).forEach(function (key) {
+                data.forEach(function (item) {
 
-                    var id = teamId + '-' + key;
+
+                    var id = teamId + '-' + item.userID;
                     var context = {
-                        name: data[key].userName,
-                        id: id
+                        name: item.userName,
+                        id: id,
+                        userID: item.userID
                     };
 
                     var html = Mustache.to_html(that.source, context);
@@ -72,7 +88,7 @@
                     var test = that.container.find('#' + id);
 
                     var storedOptions = {
-                        title: data[key].userName,
+                        title: item.userName,
                         trendlines: {0: {}},
                         legend: 'none'
                     };
@@ -81,7 +97,7 @@
 
 
                     var dataTable = new google.visualization.DataTable(
-                        {cols: data[key].cols, rows: convertToActualDate(data[key].rows)}
+                        {cols: item.cols, rows: convertToActualDate(item.rows)}
                     );
 
                     chart.draw(dataTable, storedOptions);
@@ -101,7 +117,7 @@
 
 
         google.charts.setOnLoadCallback(function () {
-            drawIndividualCharts(1);
+            drawIndividualCharts(defaultTeam);
         });
     })
 
@@ -142,7 +158,7 @@
     }
 </style>
 
-<select name="team" class="teamSelector" id="teamSelector">
+<select name="team" class="teamSelector" id="teamSelector" hidden>
     <option value="1" selected>Help Desk Team</option>
     <option value="2">Escalations Team</option>
     <option value="3">Implementations Team</option>
