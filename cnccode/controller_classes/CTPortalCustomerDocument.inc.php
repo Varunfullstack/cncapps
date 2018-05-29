@@ -152,7 +152,7 @@ class CTPortalCustomerDocument extends CTCNC
         );
 
         header('Content-type: ' . $dsPortalCustomerDocument->getValue('fileMimeType'));
-        header('Content-Disposition: attachment; filename="' . $dsPortalCustomerDocument->getValue('filename') . '"');
+        header('Content-Disposition: inline; filename="' . $dsPortalCustomerDocument->getValue('filename') . '"');
         print $dsPortalCustomerDocument->getValue('file');
 
         exit;
