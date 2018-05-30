@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.7.3] - 2018-05-30
+### Fixed
+- Issue 258 - CustomerCRM searching and saving issues - hotfix required
+
 ## [v1.7.2] - 2018-05-30
 ### Fixed
 - Issue 257 - When running the Customer Review Meeting process it no longer creates the Renewal Report PDF. This can go 

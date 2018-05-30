@@ -184,8 +184,9 @@ class DBEContact extends DBCNCEntity
         if ($leadStatusID) {
             $sqlQuery .= " and customer_lead_status_id = $leadStatusID";
         } else {
-            $sqlQuery .= " and customer_lead_status_id is not null";
+            $sqlQuery .= " and customer_lead_status_id is not null and customer_lead_status_id <> 0";
         }
+
         $this->setQueryString($sqlQuery);
 
         $this->getRows();

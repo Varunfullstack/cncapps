@@ -257,6 +257,8 @@ class CTCustomerCRM extends CTCNC
         }
 
         while ($results->fetchNext()) {
+
+
             $customerID = $results->getValue(DBEContact::CustomerID);
 
             if (!isset($customers[$customerID])) {
