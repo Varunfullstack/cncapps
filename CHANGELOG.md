@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.7.4] - 2018-05-30
+## Fixed
+- Issue 262 - Problems With Customer CRM losing information
+
 ## [v1.7.3] - 2018-05-30
 ### Fixed
 - Issue 258 - CustomerCRM searching and saving issues - hotfix required

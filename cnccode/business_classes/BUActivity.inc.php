@@ -32,7 +32,7 @@ require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
-require_once($cfg ["path_dbe"] . "/DBESiteNew.inc.php");
+require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 define('BUACTIVITY_RESOLVED', 9);
@@ -313,10 +313,10 @@ class BUActivity extends Business
         $emailTo = CONFIG_SALES_EMAIL;
 
         $hdrs = array(
-            'From' => CONFIG_SUPPORT_EMAIL,
-            'To' => $emailTo,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => CONFIG_SUPPORT_EMAIL,
+            'To'           => $emailTo,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -326,9 +326,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $mime->get($mime_params);
@@ -355,7 +355,7 @@ class BUActivity extends Business
         $dsCallActivity->setValue('callActivityID', 0);
         $dsCallActivity->setValue('customerID', $customerID);
         $dsCallActivity->setValue('siteNo', $dsCustomer->getValue('delSiteNo'));
-        $dsCallActivity->setValue('contactID', $dsSite->getValue('invContactID'));
+        $dsCallActivity->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
         $dsCallActivity->setValue('userID', $userID);
         $dsCallActivity->setValue('callActTypeID', '');
         $dsCallActivity->setValue('date', date(CONFIG_MYSQL_DATE));
@@ -364,11 +364,11 @@ class BUActivity extends Business
         $dsCallActivity->setValue('status', 'O');
         $dsCallActivity->setValue('reason', '');
         $dsCallActivity->setValue('siteDesc',
-                                  $dsSite->getValue('add1'),
+                                  $dsSite->getValue(DBESite::Add1),
                                   ' ',
-                                  $dsSite->getValue('add2'),
+                                  $dsSite->getValue(DBESite::Add2),
                                   ' ',
-                                  $dsSite->getValue('town'));
+                                  $dsSite->getValue(DBESite::Town));
         $dsCallActivity->post();
     } // end sendServiceReallocatedEmail
 
@@ -421,13 +421,13 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'  => $activityRef,
+                'reason'       => $dbeJCallActivity->getValue('reason'),
                 'engineerName' => $dbeJProblem->getValue('engineerName'),
                 'customerName' => $dbeJProblem->getValue('customerName'),
-                'urlActivity' => $urlActivity,
+                'urlActivity'  => $urlActivity,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -437,9 +437,9 @@ class BUActivity extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Completed Early',
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Completed Early',
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -447,9 +447,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -599,8 +599,8 @@ class BUActivity extends Business
 
         $this->sendEmailToCustomer(
             array(
-                'problemID' => $problemID,
-                'templateName' => 'ServiceReopenedEmail',
+                'problemID'     => $problemID,
+                'templateName'  => 'ServiceReopenedEmail',
                 'subjectSuffix' => 'Reopened'
             )
         );
@@ -634,12 +634,12 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'  => $activityRef,
+                'reason'       => $dbeJCallActivity->getValue('reason'),
                 'customerName' => $dbeJProblem->getValue('customerName'),
-                'urlActivity' => $urlActivity,
+                'urlActivity'  => $urlActivity,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -649,10 +649,10 @@ class BUActivity extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Priority 5 Fixed: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Priority 5 Fixed: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -660,9 +660,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -850,8 +850,8 @@ class BUActivity extends Business
 
             $this->sendEmailToCustomer(
                 array(
-                    'problemID' => $dsCallActivity->getValue('problemID'),
-                    'templateName' => 'ServicePriorityChangedEmail',
+                    'problemID'     => $dsCallActivity->getValue('problemID'),
+                    'templateName'  => 'ServicePriorityChangedEmail',
                     'subjectSuffix' => 'Priority Changed'
                 )
             );
@@ -986,12 +986,12 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'  => $activityRef,
+                'reason'       => $dbeJCallActivity->getValue('reason'),
                 'customerName' => $dbeJProblem->getValue('customerName'),
-                'urlActivity' => $urlActivity,
+                'urlActivity'  => $urlActivity,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -1001,10 +1001,10 @@ class BUActivity extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'High Activity Alert: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'High Activity Alert: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1012,9 +1012,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1082,12 +1082,12 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'  => $activityRef,
+                'reason'       => $dbeJCallActivity->getValue('reason'),
                 'customerName' => $dbeJProblem->getValue('customerName'),
-                'urlActivity' => $urlActivity,
+                'urlActivity'  => $urlActivity,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -1097,10 +1097,10 @@ class BUActivity extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Service Request ' . $problemID . ' has been updated by another user',
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Service Request ' . $problemID . ' has been updated by another user',
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1108,9 +1108,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1281,10 +1281,10 @@ class BUActivity extends Business
         }
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue('problemID') . ' - ' . $subjectSuffix,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue('problemID') . ' - ' . $subjectSuffix,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1292,9 +1292,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1344,17 +1344,17 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'urlActivity' => $urlActivity,
-                'userName' => $dbeJCallActivity->getValue('userName'),
+                'activityRef'   => $activityRef,
+                'urlActivity'   => $urlActivity,
+                'userName'      => $dbeJCallActivity->getValue('userName'),
                 'durationHours' => round($durationHours, 2),
                 'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
                 'awaitingCustomerResponse'
-                => $awaitingCustomerResponse,
-                'customerName' => $dbeJCallActivity->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                                => $awaitingCustomerResponse,
+                'customerName'  => $dbeJCallActivity->getValue('customerName'),
+                'reason'        => $dbeJCallActivity->getValue('reason'),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                                => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -1367,10 +1367,10 @@ class BUActivity extends Business
 
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Special Attention Activity ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Special Attention Activity ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1378,9 +1378,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1425,17 +1425,17 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'urlActivity' => $urlActivity,
-                'userName' => $dbeJCallActivity->getValue('userName'),
+                'activityRef'   => $activityRef,
+                'urlActivity'   => $urlActivity,
+                'userName'      => $dbeJCallActivity->getValue('userName'),
                 'durationHours' => round($durationHours, 2),
                 'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
                 'awaitingCustomerResponse'
-                => $awaitingCustomerResponse,
-                'customerName' => $dbeJCallActivity->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                                => $awaitingCustomerResponse,
+                'customerName'  => $dbeJCallActivity->getValue('customerName'),
+                'reason'        => $dbeJCallActivity->getValue('reason'),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                                => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -1447,10 +1447,10 @@ class BUActivity extends Business
         $toEmail = 'criticalactivity@' . CONFIG_PUBLIC_DOMAIN;
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Critical SR Activity For ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Critical SR Activity For ' . $dbeJCallActivity->getValue('customerName') . ': ' . $dbeJCallActivity->getValue('activityType'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1458,9 +1458,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1502,14 +1502,14 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'urlActivity' => $urlActivity,
-                'userName' => $dbeJCallActivity->getValue('userName'),
+                'activityRef'   => $activityRef,
+                'urlActivity'   => $urlActivity,
+                'userName'      => $dbeJCallActivity->getValue('userName'),
                 'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
-                'customerName' => $dbeJCallActivity->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'customerName'  => $dbeJCallActivity->getValue('customerName'),
+                'reason'        => $dbeJCallActivity->getValue('reason'),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                                => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -1519,10 +1519,10 @@ class BUActivity extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Future Visit To ' . $dbeJCallActivity->getValue('customerName') . ' Logged : ' . $dbeJCallActivity->getValue('activityType'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Future Visit To ' . $dbeJCallActivity->getValue('customerName') . ' Logged : ' . $dbeJCallActivity->getValue('activityType'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1530,9 +1530,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1599,10 +1599,10 @@ class BUActivity extends Business
 
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1610,9 +1610,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1792,10 +1792,10 @@ class BUActivity extends Business
         $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN . ',' . $this->dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -1803,9 +1803,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -1875,8 +1875,8 @@ class BUActivity extends Business
 
         $this->setTemplateFiles(
             array(
-                'ActivityReenterEndTime' => 'ActivityReenterEndTime.inc',
-                'ActivityWizardHeader' => 'ActivityWizardHeader.inc',
+                'ActivityReenterEndTime'             => 'ActivityReenterEndTime.inc',
+                'ActivityWizardHeader'               => 'ActivityWizardHeader.inc',
                 'ActivityReenterEndTimeCreateTravel' => 'ActivityReenterEndTimeCreateTravel.inc'
             )
         );
@@ -1891,8 +1891,8 @@ class BUActivity extends Business
       * get site row for checking travel time
       */
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue('customerID', $dsCallActivity->getValue('customerID'));
-        $dbeSite->setValue('siteNo', $dsCallActivity->getValue('siteNo'));
+        $dbeSite->setValue(DBESite::CustomerID, $dsCallActivity->getValue('customerID'));
+        $dbeSite->setValue(DBESite::SiteNo, $dsCallActivity->getValue('siteNo'));
         $dbeSite->getRowByCustomerIDSiteNo();
 
         /*
@@ -1917,7 +1917,7 @@ class BUActivity extends Business
 
                     if (
                         strpos($dbeCallActType->getValue('description'), 'FOC') === FALSE &&
-                        $dbeSite->getValue('maxTravelHours') > 0
+                        $dbeSite->getValue(DBESite::MaxTravelHours) > 0
                     ) {
                         $dbeCallActivity = new DBECallActivity($this);
 
@@ -1949,10 +1949,10 @@ class BUActivity extends Business
         $this->template->set_var(
             array(
                 'callActivityID' => $dsCallActivity->getValue('callActivityID'),
-                'customerName' => $dsCallActivity->getValue('customerName'),
-                'endTime' => $dsCallActivity->getValue('endTime'),
+                'customerName'   => $dsCallActivity->getValue('customerName'),
+                'endTime'        => $dsCallActivity->getValue('endTime'),
                 'endTimeMessage' => $error['endTime'],
-                'submitURL' => $submitURL
+                'submitURL'      => $submitURL
             )
         );
 
@@ -1964,7 +1964,7 @@ class BUActivity extends Business
                 $dsCallActivity->getValue('userID'),
                 $dsCallActivity->getValue('date')
             )
-            && $dbeSite->getValue('maxTravelHours') > 0    // the site has travel hours
+            && $dbeSite->getValue(DBESite::MaxTravelHours) > 0    // the site has travel hours
         ) {
             $this->template->parse('activityReenterEndTimeCreateTravel', 'ActivityReenterEndTimeCreateTravel', true);
         }
@@ -2001,7 +2001,7 @@ class BUActivity extends Business
 
         $activityStartTime = $dbeCallActivity->getValue('startTime');
 
-        $travelStart = common_convertDecimalToHHMM(common_convertHHMMToDecimal($activityStartTime) - $dsSite->getValue('maxTravelHours'));
+        $travelStart = common_convertDecimalToHHMM(common_convertHHMMToDecimal($activityStartTime) - $dsSite->getValue(DBESite::MaxTravelHours));
 
         $dbeTravelActivity = $dbeCallActivity;
 
@@ -2031,12 +2031,12 @@ class BUActivity extends Business
 
             $dbeSite = new DBESite($this);
 
-            $dbeSite->setValue('customerID', $customerID);
-            $dbeSite->setValue('siteNo', $siteNo);
+            $dbeSite->setValue(DBESite::CustomerID, $customerID);
+            $dbeSite->setValue(DBESite::SiteNo, $siteNo);
 
             $dbeSite->getRowByCustomerIDSiteNo();
 
-            if ($dbeSite->getValue('maxTravelHours') == -1) {  // new value for travel not set
+            if ($dbeSite->getValue(DBESite::MaxTravelHours) == -1) {  // new value for travel not set
 
                 $ret = true;
 
@@ -2127,19 +2127,19 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'customerName' => $dbeJProblem->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
-                'status' => $this->problemStatusArray[$dbeJProblem->getValue('status')],
+                'activityRef'    => $activityRef,
+                'customerName'   => $dbeJProblem->getValue('customerName'),
+                'reason'         => $dbeJCallActivity->getValue('reason'),
+                'status'         => $this->problemStatusArray[$dbeJProblem->getValue('status')],
                 'awaitingStatus' => ($dbeJProblem->getValue('awaitingCustomerResponseFlag') == 'Y') ? 'Customer' : 'CNC',
-                'dateRaisedDMY' => $dbeJProblem->getValue('dateRaisedDMY'),
-                'timeRaised' => $dbeJProblem->getValue('timeRaised'),
-                'repondedHours' => common_convertDecimalToHHMM($dbeJProblem->getValue('respondedHours')),
-                'workingHours' => common_convertDecimalToHHMM($dbeJProblem->getValue('workingHours')),
-                'engineerName' => $dbeJProblem->getValue('engineerName'),
-                'removedByUser' => $this->dbeUser->getValue('name'),
+                'dateRaisedDMY'  => $dbeJProblem->getValue('dateRaisedDMY'),
+                'timeRaised'     => $dbeJProblem->getValue('timeRaised'),
+                'repondedHours'  => common_convertDecimalToHHMM($dbeJProblem->getValue('respondedHours')),
+                'workingHours'   => common_convertDecimalToHHMM($dbeJProblem->getValue('workingHours')),
+                'engineerName'   => $dbeJProblem->getValue('engineerName'),
+                'removedByUser'  => $this->dbeUser->getValue('name'),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                                 => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -2149,10 +2149,10 @@ class BUActivity extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' Has Been Removed From The System',
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' Has Been Removed From The System',
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -2160,9 +2160,9 @@ class BUActivity extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -2345,21 +2345,21 @@ class BUActivity extends Business
 
             $parameters =
                 array(
-                    'problemID' => $problemID,
-                    'templateName' => 'ServiceFixedEmail',
+                    'problemID'     => $problemID,
+                    'templateName'  => 'ServiceFixedEmail',
                     'subjectSuffix' => 'Fixed',
                 );
 
 
             $parameters =
                 array(
-                    'problemID' => $problemID,
-                    'templateName' => 'ServiceCompletedEmail',
+                    'problemID'     => $problemID,
+                    'templateName'  => 'ServiceCompletedEmail',
                     'subjectSuffix' => 'Now Closed',
-                    'fields' =>
+                    'fields'        =>
                         array(
-                            'reason' => $dbeFirstCallActivity->getValue('reason'),
-                            'rootCause' => $dbeRootCause->getValue('description'),
+                            'reason'              => $dbeFirstCallActivity->getValue('reason'),
+                            'rootCause'           => $dbeRootCause->getValue('description'),
                             'fixedActivityReason' => $dbeFixedCallActivity->getValue('reason')
                         )
 
@@ -2573,7 +2573,7 @@ class BUActivity extends Business
             /* mantis 359: Apply maximum travel hours to travel type activities */
             if ($dbeCallActType->getValue('travelFlag') == 'Y') {
                 $buCustomer->getSiteByCustomerIDSiteNo($customerID, $dbeJCallActivity->getValue('siteNo'), $dsSite);
-                $max_hours = $dsSite->getValue('maxTravelHours');
+                $max_hours = $dsSite->getValue(DBESite::MaxTravelHours);
             } else {
                 // use the max hours field from call activity
                 $max_hours = $dbeCallActType->getValue('maxHours');
@@ -2730,7 +2730,7 @@ class BUActivity extends Business
 
             $buCustomer->getSiteByCustomerIDSiteNo($db->Record['pro_custno'], $db->Record['caa_siteno'], $dsSite);
 
-            if (!$dsSite->getValue('invContactID')) {
+            if (!$dsSite->getValue(DBESite::InvContactID)) {
 
                 $failList .= '<BR/>' . $db->Record['cus_name'] . ', Site: ' . $db->Record['add_town'] . ',' . $db->Record['add_postcode'];
 
@@ -2895,7 +2895,10 @@ class BUActivity extends Business
                 if ($last_custno != '9999') {
                     $topupValue = $this->doTopUp($lastRecord, $update);
                     $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
-                    $this->template->set_var(array('totalCost' => common_numberFormat($this->totalCost), 'previousBalance' => common_numberFormat($lastRecord ['curGSCBalance']), 'remainingBalance' => common_numberFormat($newBalance)));
+                    $this->template->set_var(array('totalCost'        => common_numberFormat($this->totalCost),
+                                                   'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
+                                                   'remainingBalance' => common_numberFormat($newBalance)
+                                             ));
 
                     $this->template->parse('output', 'page', true);
                     fwrite($htmlFileHandle, $this->template->get_var('output'));
@@ -2949,7 +2952,29 @@ class BUActivity extends Business
                                                        $dsSite);
 
                 // Set header fields
-                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $db->Record ['cui_cuino'], 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')), 'add1' => $dsSite->getValue('add1'), 'add2' => $dsSite->getValue('add2'), 'add3' => $dsSite->getValue('add3'), 'town' => $dsSite->getValue('town'), 'county' => $dsSite->getValue('county'), 'postcode' => $dsSite->getValue('postcode'), 'cnc_name' => $this->dsHeader->getValue('name'), 'cnc_add1' => $this->dsHeader->getValue('add1'), 'cnc_add2' => $this->dsHeader->getValue('add2'), 'cnc_add3' => $this->dsHeader->getValue('add3'), 'cnc_town' => $this->dsHeader->getValue('town'), 'cnc_county' => $this->dsHeader->getValue('county'), 'cnc_postcode' => $this->dsHeader->getValue('postcode'), 'cnc_phone' => $this->dsHeader->getValue('phone')));
+                $this->template->set_var(
+                    array(
+                        'companyName'   => $db->Record ['cus_name'],
+                        'customerRef'   => $db->Record ['cui_cuino'],
+                        'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
+                        'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
+                        'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
+                        'add1'          => $dsSite->getValue(DBESite::Add1),
+                        'add2'          => $dsSite->getValue(DBESite::Add2),
+                        'add3'          => $dsSite->getValue(DBESite::Add3),
+                        'town'          => $dsSite->getValue(DBESite::Town),
+                        'county'        => $dsSite->getValue(DBESite::County),
+                        'postcode'      => $dsSite->getValue(DBESite::Postcode),
+                        'cnc_name'      => $this->dsHeader->getValue('name'),
+                        'cnc_add1'      => $this->dsHeader->getValue('add1'),
+                        'cnc_add2'      => $this->dsHeader->getValue('add2'),
+                        'cnc_add3'      => $this->dsHeader->getValue('add3'),
+                        'cnc_town'      => $this->dsHeader->getValue('town'),
+                        'cnc_county'    => $this->dsHeader->getValue('county'),
+                        'cnc_postcode'  => $this->dsHeader->getValue('postcode'),
+                        'cnc_phone'     => $this->dsHeader->getValue('phone')
+                    )
+                );
 
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
@@ -3046,7 +3071,10 @@ class BUActivity extends Business
 
             $topupValue = $this->doTopUp($lastRecord, $update);
             $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
-            $this->template->set_var(array('totalCost' => common_numberFormat($this->totalCost), 'previousBalance' => common_numberFormat($lastRecord ['curGSCBalance']), 'remainingBalance' => common_numberFormat($newBalance)));
+            $this->template->set_var(array('totalCost'        => common_numberFormat($this->totalCost),
+                                           'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
+                                           'remainingBalance' => common_numberFormat($newBalance)
+                                     ));
             $this->template->parse('output', 'page', true);
             fwrite($htmlFileHandle, $this->template->get_var('output'));
             fclose($htmlFileHandle);
@@ -3117,14 +3145,44 @@ class BUActivity extends Business
                 $this->template->set_file('page', 'GSCReport.inc.html');
 
                 // Set header fields
-                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $key, 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')), 'add1' => $dsSite->getValue('add1'), 'add2' => $dsSite->getValue('add2'), 'add3' => $dsSite->getValue('add3'), 'town' => $dsSite->getValue('town'), 'county' => $dsSite->getValue('county'), 'postcode' => $dsSite->getValue('postcode'), 'cnc_name' => $dsHeader->getValue('name'), 'cnc_add1' => $dsHeader->getValue('add1'), 'cnc_add2' => $dsHeader->getValue('add2'), 'cnc_add3' => $dsHeader->getValue('add3'), 'cnc_town' => $dsHeader->getValue('town'), 'cnc_county' => $dsHeader->getValue('county'), 'cnc_postcode' => $dsHeader->getValue('postcode'), 'cnc_phone' => $dsHeader->getValue('phone')));
+                $this->template->set_var(array('companyName'   => $db->Record ['cus_name'],
+                                               'customerRef'   => $key,
+                                               'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
+                                               'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
+                                               'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
+                                               'add1'          => $dsSite->getValue(DBESite::Add1),
+                                               'add2'          => $dsSite->getValue(DBESite::Add2),
+                                               'add3'          => $dsSite->getValue(DBESite::Add3),
+                                               'town'          => $dsSite->getValue(DBESite::Town),
+                                               'county'        => $dsSite->getValue(DBESite::County),
+                                               'postcode'      => $dsSite->getValue(DBESite::Postcode),
+                                               'cnc_name'      => $dsHeader->getValue('name'),
+                                               'cnc_add1'      => $dsHeader->getValue('add1'),
+                                               'cnc_add2'      => $dsHeader->getValue('add2'),
+                                               'cnc_add3'      => $dsHeader->getValue('add3'),
+                                               'cnc_town'      => $dsHeader->getValue('town'),
+                                               'cnc_county'    => $dsHeader->getValue('county'),
+                                               'cnc_postcode'  => $dsHeader->getValue('postcode'),
+                                               'cnc_phone'     => $dsHeader->getValue('phone')
+                                         ));
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
-                $this->template->set_var(array('activityDate' => '', 'activityPostcode' => '', 'activityRef' => '', 'activityContact' => '', 'activityType' => '', 'activityHours' => '', 'activityCost' => '', 'activityDetails' => 'No activity for this period'));
+                $this->template->set_var(array('activityDate'     => '',
+                                               'activityPostcode' => '',
+                                               'activityRef'      => '',
+                                               'activityContact'  => '',
+                                               'activityType'     => '',
+                                               'activityHours'    => '',
+                                               'activityCost'     => '',
+                                               'activityDetails'  => 'No activity for this period'
+                                         ));
 
                 $this->template->parse('lines', 'lineBlock', true);
                 $this->totalCost += $value;
-                $this->template->set_var(array('totalCost' => 0, 'previousBalance' => common_numberFormat($db->Record ['curGSCBalance']), 'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])));
+                $this->template->set_var(array('totalCost'        => 0,
+                                               'previousBalance'  => common_numberFormat($db->Record ['curGSCBalance']),
+                                               'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])
+                                         ));
                 $this->template->parse('output', 'page', true);
                 fwrite($htmlFileHandle, $this->template->get_var('output'));
                 fclose($htmlFileHandle);
@@ -3317,9 +3375,9 @@ is currently a balance of ';
 //      $crlf = "\n";
 
             $hdrs = array(
-                'From' => $senderName . " <" . $senderEmail . ">",
-                'To' => $toEmail,
-                'Subject' => $subject,
+                'From'         => $senderName . " <" . $senderEmail . ">",
+                'To'           => $toEmail,
+                'Subject'      => $subject,
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -3327,9 +3385,9 @@ is currently a balance of ';
             $buMail->mime->addAttachment($statementFilepath, 'text/html');
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
 
             $body = $buMail->mime->get($mime_params);
@@ -3396,14 +3454,14 @@ is currently a balance of ';
 
         $this->template->set_var(
             array(
-                'activityDate' => $Record ['activityDate'],
+                'activityDate'     => $Record ['activityDate'],
                 'activityPostcode' => $postcode,
-                'activityRef' => $activityRef,
-                'activityDetails' => trim($details),
-                'activityContact' => $contacts,
-                'activityType' => trim($Record ['cat_desc']),
-                'activityHours' => $hours,
-                'activityCost' => $displayValue
+                'activityRef'      => $activityRef,
+                'activityDetails'  => trim($details),
+                'activityContact'  => $contacts,
+                'activityType'     => trim($Record ['cat_desc']),
+                'activityHours'    => $hours,
+                'activityCost'     => $displayValue
             )
         );
 
@@ -3476,8 +3534,8 @@ is currently a balance of ';
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue('callActivityID', 0);
-        $dbeCallActivity->setValue('siteNo', $dsSite->getValue('siteNo'));
-        $dbeCallActivity->setValue('contactID', $dsSite->getValue('invContactID'));
+        $dbeCallActivity->setValue('siteNo', $dsSite->getValue(DBESite::SiteNo));
+        $dbeCallActivity->setValue('contactID', $dsSite->getValue(DBESite::InvContactID));
         $dbeCallActivity->setValue('callActTypeID', 1);
         //    $dbeCallActivity->setValue('callID', $callID);
         $dbeCallActivity->setValue('date', date(CONFIG_MYSQL_DATE));
@@ -3560,10 +3618,10 @@ is currently a balance of ';
             }
             $this->sendEmailToCustomer(
                 array(
-                    'problemID' => $dbeProblem->getPKValue(),
-                    'templateName' => 'ServiceLoggedEmail',
+                    'problemID'     => $dbeProblem->getPKValue(),
+                    'templateName'  => 'ServiceLoggedEmail',
                     'subjectSuffix' => 'New Request Logged',
-                    'fields' => $fields
+                    'fields'        => $fields
                 )
             );
 
@@ -3633,10 +3691,10 @@ customer with the past 8 hours email to GL
 
                 'newProblemID' => $newProblemID,
                 'oldProblemID' => $oldProblemID,
-                'urlActivity' => $urlActivity,
+                'urlActivity'  => $urlActivity,
                 'customerName' => $dbeJProblem->getValue('customerName'),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -3647,9 +3705,9 @@ customer with the past 8 hours email to GL
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -3657,9 +3715,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -3760,10 +3818,10 @@ customer with the past 8 hours email to GL
         ob_end_clean();
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Unchecked Activities',
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Unchecked Activities',
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -3773,9 +3831,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -4325,12 +4383,12 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'customerName' => $dbeJProblem->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
-                'urlActivity' => $urlActivity,
-                'lastDetails' => $dbeJLastCallActivity->getValue('reason'),
-                'assignedByUserName' => $assignedByUserName,
+                'activityRef'                 => $activityRef,
+                'customerName'                => $dbeJProblem->getValue('customerName'),
+                'reason'                      => $dbeJCallActivity->getValue('reason'),
+                'urlActivity'                 => $urlActivity,
+                'lastDetails'                 => $dbeJLastCallActivity->getValue('reason'),
+                'assignedByUserName'          => $assignedByUserName,
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
 
             )
@@ -4343,10 +4401,10 @@ customer with the past 8 hours email to GL
         $subject = CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' allocated to you by ' . $assignedByUserName;
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -4354,9 +4412,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -4732,13 +4790,13 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'urlActivity' => $urlActivity,
-                'customerName' => $dbeJProblem->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'   => $activityRef,
+                'urlActivity'   => $urlActivity,
+                'customerName'  => $dbeJProblem->getValue('customerName'),
+                'reason'        => $dbeJCallActivity->getValue('reason'),
                 'internalNotes' => str_replace('&nbsp', '&nbsp;', $dbeJCallActivity->getValue('internalNotes')),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                                => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -4748,10 +4806,10 @@ customer with the past 8 hours email to GL
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'New Project Incident ' . $problemID . ' Created for ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'New Project Incident ' . $problemID . ' Created for ' . $dbeJProblem->getValue('customerName'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -4759,9 +4817,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -5359,10 +5417,10 @@ customer with the past 8 hours email to GL
 
         $this->sendEmailToCustomer(
             array(
-                'problemID' => $dbeProblem->getPKValue(),
-                'templateName' => $template,
+                'problemID'     => $dbeProblem->getPKValue(),
+                'templateName'  => $template,
                 'subjectSuffix' => 'New Request Logged',
-                'fields' => $fields
+                'fields'        => $fields
             )
         );
 
@@ -5466,10 +5524,11 @@ customer with the past 8 hours email to GL
 
         $parameters = [
             [
-                'type' => 's',
+                'type'  => 's',
                 'value' => $monitorName
-            ], [
-                'type' => 's',
+            ],
+            [
+                'type'  => 's',
                 'value' => $monitorAgentName
             ],
         ];
@@ -5598,8 +5657,8 @@ customer with the past 8 hours email to GL
 
                     $this->sendEmailToCustomer(
                         array(
-                            'problemID' => $problemID,
-                            'templateName' => 'WorkCommencedEmail',
+                            'problemID'     => $problemID,
+                            'templateName'  => 'WorkCommencedEmail',
                             'subjectSuffix' => 'Work Started'
                         )
                     );
@@ -5739,12 +5798,12 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'  => $activityRef,
+                'reason'       => $dbeJCallActivity->getValue('reason'),
                 'customerName' => $dbeJProblem->getValue('customerName'),
-                'urlActivity' => $urlActivity,
+                'urlActivity'  => $urlActivity,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -5754,10 +5813,10 @@ customer with the past 8 hours email to GL
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Priority 1 Reopened: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Priority 1 Reopened: SR ' . $problemID . ' ' . $dbeJProblem->getValue('customerName'),
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -5765,9 +5824,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -5905,13 +5964,13 @@ customer with the past 8 hours email to GL
 
             $parameters =
                 array(
-                    'problemID' => $problemID,
-                    'templateName' => 'ServiceFixedEmail',
+                    'problemID'     => $problemID,
+                    'templateName'  => 'ServiceFixedEmail',
                     'subjectSuffix' => 'Fixed',
-                    'fields' =>
+                    'fields'        =>
                         array(
                             'completeDate' => Controller::dateYMDtoDMY($dbeProblem->getValue('completeDate')),
-                            'rootCause' => $dbeRootCause->getValue('description')
+                            'rootCause'    => $dbeRootCause->getValue('description')
                         )
                 );
 
@@ -6063,14 +6122,14 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'reason' => $originalReason,
+                'activityRef'  => $activityRef,
+                'reason'       => $originalReason,
                 'customerName' => $customerName,
-                'fixSummary' => $fixSummary,
-                'urlActivity' => $urlActivity,
-                'fixedBy' => $fixedBy,
+                'fixSummary'   => $fixSummary,
+                'urlActivity'  => $urlActivity,
+                'fixedBy'      => $fixedBy,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC
+                               => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -6080,10 +6139,10 @@ customer with the past 8 hours email to GL
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By ' . $fixedBy,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'Your Escalated ' . CONFIG_SERVICE_REQUEST_DESC . ' for ' . $dbeJProblem->getValue('customerName') . ' Was Fixed By ' . $fixedBy,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -6091,9 +6150,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -6249,16 +6308,16 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'contactFirstName' => $dbeLastActivity->getValue('contactFirstName'),
-                'activityRef' => $parameters['problemID'],
+                'contactFirstName'   => $dbeLastActivity->getValue('contactFirstName'),
+                'activityRef'        => $parameters['problemID'],
                 'CONFIG_SERVICE_REQUEST_DESC'
-                => CONFIG_SERVICE_REQUEST_DESC,
-                'priority' => $this->priorityArray[$dbeJProblem->getValue('priority')],
-                'reason' => $dbeFirstActivity->getValue('reason'),
+                                     => CONFIG_SERVICE_REQUEST_DESC,
+                'priority'           => $this->priorityArray[$dbeJProblem->getValue('priority')],
+                'reason'             => $dbeFirstActivity->getValue('reason'),
                 'lastActivityReason' => $dbeLastActivity->getValue('reason'),
-                'responseDetails' => strtolower($this->getResponseDetails($dbeFirstActivity, $buCustomerItem)),
+                'responseDetails'    => strtolower($this->getResponseDetails($dbeFirstActivity, $buCustomerItem)),
                 'technicianResponsible'
-                => $dbeJProblem->getValue('engineerName')
+                                     => $dbeJProblem->getValue('engineerName')
             )
         );
 
@@ -6287,10 +6346,10 @@ customer with the past 8 hours email to GL
         }
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -6298,9 +6357,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -6534,7 +6593,7 @@ customer with the past 8 hours email to GL
 
         $parameters = [
             [
-                'type' => 's',
+                'type'  => 's',
                 'value' => $details
             ]
         ];
@@ -6575,7 +6634,7 @@ customer with the past 8 hours email to GL
 
         $parameters = [
             [
-                'type' => 's',
+                'type'  => 's',
                 'value' => $details,
             ],
         ];
@@ -6641,23 +6700,23 @@ customer with the past 8 hours email to GL
 
         $template->set_var(
             array(
-                'scrRef' => $callRef,
-                'userName' => $dsCallActivity->getValue('userName'),
-                'contactEmail' => $toEmail,
-                'senderEmail' => $senderEmail,
-                'senderName' => $senderName,
+                'scrRef'           => $callRef,
+                'userName'         => $dsCallActivity->getValue('userName'),
+                'contactEmail'     => $toEmail,
+                'senderEmail'      => $senderEmail,
+                'senderName'       => $senderName,
                 'contactFirstName' => $dsCallActivity->getValue('contactFirstName'),
-                'contactPhone' => $buCustomer->getContactPhone($dsCallActivity->getValue('contactID')),
-                'date' => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
-                'amOrPM' => $amOrPM,
-                'startTime' => $dsCallActivity->getValue('startTime'),
-                'reason' => trim($dsCallActivity->getValue('reason')),
-                'add1' => $dsSite->getValue('add1'),
-                'add2' => $dsSite->getValue('add2'),
-                'add3' => $dsSite->getValue('add3'),
-                'town' => $dsSite->getValue('town'),
-                'county' => $dsSite->getValue('county'),
-                'postcode' => $dsSite->getValue('postcode')
+                'contactPhone'     => $buCustomer->getContactPhone($dsCallActivity->getValue('contactID')),
+                'date'             => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
+                'amOrPM'           => $amOrPM,
+                'startTime'        => $dsCallActivity->getValue('startTime'),
+                'reason'           => trim($dsCallActivity->getValue('reason')),
+                'add1'             => $dsSite->getValue(DBESite::Add1),
+                'add2'             => $dsSite->getValue(DBESite::Add2),
+                'add3'             => $dsSite->getValue(DBESite::Add3),
+                'town'             => $dsSite->getValue(DBESite::Town),
+                'county'           => $dsSite->getValue(DBESite::County),
+                'postcode'         => $dsSite->getValue(DBESite::Postcode)
             )
         );
         $template->parse('output', 'page', true);
@@ -6683,9 +6742,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -6696,10 +6755,10 @@ customer with the past 8 hours email to GL
         $recipients = $toEmail . ',' . $bcc . ',' . $cc;
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => 'On-Site Visit Confirmation for Service Request ' . $callRef,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => 'On-Site Visit Confirmation for Service Request ' . $callRef,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -7055,7 +7114,7 @@ customer with the past 8 hours email to GL
                 'chargeableActivityDurationHours' => $dbeProblem->getValue('chargeableActivityDurationHours'),
 
                 'totalActivityDurationHours' => $dbeProblem->getValue('totalActivityDurationHours'),
-                'timeLeftOnBudget' => $leftOnBudget
+                'timeLeftOnBudget'           => $leftOnBudget
             )
         );
 
@@ -7068,14 +7127,14 @@ customer with the past 8 hours email to GL
 
             $template->set_var(
                 array(
-                    'reason' => $dsActivities->getValue('reason'),
-                    'date' => $this->owner->dateYMDtoDMY($dsActivities->getValue('date')),
-                    'startTime' => $dsActivities->getValue('startTime'),
-                    'endTime' => $dsActivities->getValue('endTime'),
+                    'reason'       => $dsActivities->getValue('reason'),
+                    'date'         => $this->owner->dateYMDtoDMY($dsActivities->getValue('date')),
+                    'startTime'    => $dsActivities->getValue('startTime'),
+                    'endTime'      => $dsActivities->getValue('endTime'),
                     'activityType' => $dsActivities->getValue('activityType'),
-                    'contactName' => $dsActivities->getValue('contactName'),
-                    'duration' => number_format($dsActivities->getValue('durationMinutes') / 60, 2),
-                    'userName' => $dsActivities->getValue('userName'),
+                    'contactName'  => $dsActivities->getValue('contactName'),
+                    'duration'     => number_format($dsActivities->getValue('durationMinutes') / 60, 2),
+                    'userName'     => $dsActivities->getValue('userName'),
                 )
             );
 
@@ -7090,10 +7149,10 @@ customer with the past 8 hours email to GL
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -7101,9 +7160,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -7206,14 +7265,14 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-                'reason' => $dbeJCallActivity->getValue('reason'),
-                'customerName' => $dbeJCallActivity->getValue('customerName'),
-                'userName' => $userName,
-                'minutes' => round($minutes, 2),
-                'comments' => $comments,
+                'problemID'          => $problemID,
+                'reason'             => $dbeJCallActivity->getValue('reason'),
+                'customerName'       => $dbeJCallActivity->getValue('customerName'),
+                'userName'           => $userName,
+                'minutes'            => round($minutes, 2),
+                'comments'           => $comments,
                 'urlDisplayActivity' => $urlDisplayActivity,
-                'internalNotes' => $this->dbeProblem->getValue('internalNotes')
+                'internalNotes'      => $this->dbeProblem->getValue('internalNotes')
             )
         );
 
@@ -7226,10 +7285,10 @@ customer with the past 8 hours email to GL
         $subject = 'Additional ' . $minutes . ' minutes Allocated to SR ' . $problemID . ' ' . $dbeJLastCallActivity->getValue('customerName');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -7237,9 +7296,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -7404,13 +7463,13 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-                'urlActivity' => $urlActivity,
-                'customerName' => $dbeJProblem->getValue('customerName'),
+                'problemID'     => $problemID,
+                'urlActivity'   => $urlActivity,
+                'customerName'  => $dbeJProblem->getValue('customerName'),
                 'initialReason' => $dbeJProblem->getValue('reason'),
-                'fixSummary' => $dbeJProblem->getValue('lastReason'),
+                'fixSummary'    => $dbeJProblem->getValue('lastReason'),
                 'managementReviewReason'
-                => $dbeJProblem->getValue('managementReviewReason')
+                                => $dbeJProblem->getValue('managementReviewReason')
             )
         );
 
@@ -7419,9 +7478,9 @@ customer with the past 8 hours email to GL
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'Subject' => 'Management Review Summary Added ' . $dbeJProblem->getValue('customerName') . ' SR ' . $problemID,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'Subject'      => 'Management Review Summary Added ' . $dbeJProblem->getValue('customerName') . ' SR ' . $problemID,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -7429,9 +7488,9 @@ customer with the past 8 hours email to GL
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
@@ -7459,7 +7518,10 @@ customer with the past 8 hours email to GL
         return $this->dbeProblem;
     }
 
-    function getManagementReviewsInPeriod($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate, &$dsResults)
+    function getManagementReviewsInPeriod($customerID,
+                                          DateTimeInterface $startDate,
+                                          DateTimeInterface $endDate,
+                                          &$dsResults)
     {
         $dbeProblem = $this->getDbeProblem();
         $dbeProblem->getManagementReviews($customerID, $startDate, $endDate);
@@ -7617,18 +7679,18 @@ customer with the past 8 hours email to GL
 
         $template->setVar(
             array(
-                'activityRef' => $activityRef,
-                'activityDate' => $dbeJCallActivity->getValue(DBEJCallActivity::date),
-                'activityStartTime' => $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
-                'activityEndTime' => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
-                'activityTypeName' => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
-                'urlActivity' => $urlActivity,
-                'userName' => $dbeJCallActivity->getValue('userName'),
-                'durationHours' => round($durationHours, 2),
-                'requestStatus' => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
-                'awaitingCustomerResponse' => $awaitingCustomerResponse,
-                'customerName' => $dbeJCallActivity->getValue('customerName'),
-                'reason' => $dbeJCallActivity->getValue('reason'),
+                'activityRef'                 => $activityRef,
+                'activityDate'                => $dbeJCallActivity->getValue(DBEJCallActivity::date),
+                'activityStartTime'           => $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
+                'activityEndTime'             => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
+                'activityTypeName'            => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
+                'urlActivity'                 => $urlActivity,
+                'userName'                    => $dbeJCallActivity->getValue('userName'),
+                'durationHours'               => round($durationHours, 2),
+                'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue('problemStatus')],
+                'awaitingCustomerResponse'    => $awaitingCustomerResponse,
+                'customerName'                => $dbeJCallActivity->getValue('customerName'),
+                'reason'                      => $dbeJCallActivity->getValue('reason'),
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
@@ -7641,10 +7703,10 @@ customer with the past 8 hours email to GL
             $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
 
             $hdrs = array(
-                'From' => $senderEmail,
-                'To' => $toEmail,
-                'Subject' => 'Monitored SR ' . $dbeJCallActivity->getValue('problemID') . ' For ' . $dbeJCallActivity->getValue('customerName'),
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => 'Monitored SR ' . $dbeJCallActivity->getValue('problemID') . ' For ' . $dbeJCallActivity->getValue('customerName'),
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -7652,9 +7714,9 @@ customer with the past 8 hours email to GL
 
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
 
             $body = $buMail->mime->get($mime_params);

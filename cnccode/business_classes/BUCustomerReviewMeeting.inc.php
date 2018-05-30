@@ -133,12 +133,12 @@ class BUCustomerReviewMeeting extends Business
 
                 $template->set_var(
                     array(
-                        'add1' => $dsSite->getValue('add1'),
-                        'add2' => $dsSite->getValue('add2'),
-                        'add3' => $dsSite->getValue('add3'),
-                        'town' => $dsSite->getValue('town'),
-                        'county' => $dsSite->getValue('county'),
-                        'postcode' => $dsSite->getValue('postcode'),
+                        'add1' => $dsSite->getValue(DBESite::Add1),
+                        'add2' => $dsSite->getValue(DBESite::Add2),
+                        'add3' => $dsSite->getValue(DBESite::Add3),
+                        'town' => $dsSite->getValue(DBESite::Town),
+                        'county' => $dsSite->getValue(DBESite::County),
+                        'postcode' => $dsSite->getValue(DBESite::Postcode),
                         'contactPhone' => $phone,
                         'contactName' => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
                     )

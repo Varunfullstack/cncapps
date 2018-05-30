@@ -7,7 +7,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerNew.inc.php");
-require_once($cfg["path_dbe"] . "/DBESiteNew.inc.php");
+require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
@@ -81,7 +81,7 @@ class BUCustomer extends Business
         if ($customerID == '') {
             $this->raiseError('CustomerID not passed');
         }
-        $this->dbeSite->setValue("customerID", $customerID);
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
         $this->dbeSite->getRowsByCustomerID();
         return ($this->getData($this->dbeSite, $dsResults));
     }
@@ -101,11 +101,11 @@ class BUCustomer extends Business
             $this->raiseError('customerID not passed');
         }
         $this->getCustomerByID($customerID, $dsCustomer);
-        $this->dbeSite->setValue("customerID", $customerID);
-        $this->dbeSite->setValue("siteNo", $dsCustomer->getValue('invSiteNo'));
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $this->dbeSite->setValue(DBESite::SiteNo, $dsCustomer->getValue('invSiteNo'));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
-        $this->getContactByID($dsResults->getValue('invContactID'), $dsContact);
+        $this->getContactByID($dsResults->getValue(DBESite::InvoiceContactID), $dsContact);
         return TRUE;
     }
 
@@ -124,8 +124,8 @@ class BUCustomer extends Business
             $this->raiseError('customerID not passed');
         }
         $this->getCustomerByID($customerID, $dsCustomer);
-        $this->dbeSite->setValue("customerID", $customerID);
-        $this->dbeSite->setValue("siteNo", $dsCustomer->getValue('delSiteNo'));
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $this->dbeSite->setValue(DBESite::SiteNo, $dsCustomer->getValue('delSiteNo'));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('delContactID'), $dsContact);
@@ -146,8 +146,8 @@ class BUCustomer extends Business
         if ($customerID == '') {
             $this->raiseError('customerID not passed');
         }
-        $this->dbeSite->setValue("customerID", $customerID);
-        $this->dbeSite->setValue("siteNo", $siteNo);
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $this->dbeSite->setValue(DBESite::SiteNo, $siteNo);
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         return TRUE;
@@ -232,8 +232,8 @@ class BUCustomer extends Business
         $this->addNewContactRow($dsContact, $dsData->getValue('customerID'), '0'); // First siteno always zero
         $ret = $ret & ($this->updateContact($dsContact));
         $dsSite->setUpdateModeUpdate();
-        $dsSite->setValue('delContactID', $dsContact->getValue('contactID'));
-        $dsSite->setValue('invContactID', $dsContact->getValue('contactID'));
+        $dsSite->setValue(DBESite::DelContactID, $dsContact->getValue('contactID'));
+        $dsSite->setValue(DBESite::InvContactID, $dsContact->getValue('contactID'));
         $dsSite->post();
         $ret = $ret & ($this->updateSite($dsSite));        // Then update site delivery and invoice contacts
         return $ret;
@@ -264,7 +264,7 @@ class BUCustomer extends Business
      */
     function setCustomerID(&$source, &$dbeSite)
     {
-        $dbeSite->setValue('customerID', $source->getValue('customerID'));
+        $dbeSite->setValue(DBESite::CustomerID, $source->getValue(DBESite::CustomerID));
         return TRUE;
     }
 
@@ -357,11 +357,11 @@ class BUCustomer extends Business
         } else {
             $dsSite->clearCurrentRow();
             $dsSite->setUpdateModeInsert();
-            $dsSite->setValue('customerID', $customerID);
-            $dsSite->setValue('siteNo', -9);
-            $dsSite->setValue('add1', 'Address Line 1');
-            $dsSite->setValue('town', 'TOWN');
-            $dsSite->setValue('postcode', 'POSTCODE');
+            $dsSite->setValue(DBESite::CustomerID, $customerID);
+            $dsSite->setValue(DBESite::SiteNo, -9);
+            $dsSite->setValue(DBESite::Add1, 'Address Line 1');
+            $dsSite->setValue(DBESite::Town, 'TOWN');
+            $dsSite->setValue(DBESite::Postcode, 'POSTCODE');
             $dsSite->post();
             return TRUE;
         }
@@ -464,8 +464,8 @@ class BUCustomer extends Business
         $this->getSiteByCustomerIDSiteNo($dsContact->getValue('customerID'), $dsContact->getValue('siteNo'), $dsSite);
         $dsContact->fetchNext();
 
-        if ($dsSite->getValue('phone') != '') {
-            $contactPhone = $dsSite->getValue('phone');
+        if ($dsSite->getValue(DBESite::Phone) != '') {
+            $contactPhone = $dsSite->getValue(DBESite::Phone);
         }
         if ($dsContact->getValue('phone') != '') {
             $contactPhone .= ' DDI: ' . $dsContact->getValue('phone');
@@ -487,10 +487,10 @@ class BUCustomer extends Business
         $this->getSiteByCustomerIDSiteNo($dsContact->getValue('customerID'), $dsContact->getValue('siteNo'), $dsSite);
         $dsContact->fetchNext();
 
-        if ($dsSite->getValue('phone') != '') {
+        if ($dsSite->getValue(DBESite::Phone) != '') {
             $contactPhone = '<a href="tel:' . str_replace(' ',
                                                           '',
-                                                          $dsSite->getValue('phone')) . '">' . $dsSite->getValue('phone') . '</a>';
+                                                          $dsSite->getValue(DBESite::Phone)) . '">' . $dsSite->getValue(DBESite::Phone) . '</a>';
         }
         if ($dsContact->getValue('phone') != '') {
             $contactPhone .= ' DDI: <a href="tel:' . str_replace(' ',

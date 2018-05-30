@@ -1500,7 +1500,6 @@ ORDER BY cus_name ASC  ";
         }
 
         $this->dsSite->initialise();
-
         while ($this->dsSite->fetchNext()) {
             if (!$this->formError) {                                                      // Only get from DB if not displaying form error(s)
                 $this->dsSite->setValue('Add1Class', CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
