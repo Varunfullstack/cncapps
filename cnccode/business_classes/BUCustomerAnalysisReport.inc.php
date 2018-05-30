@@ -195,11 +195,15 @@ class BUCustomerAnalysisReport extends Business
         $buHeader->getHeader($dsHeader);
 
         $customerID = $searchForm->getValue('customerID');
-        $startDate = (DateTime::createFromFormat("m/Y",
-                                                 $searchForm->getValue('startYearMonth')))->modify('first day of this month ');
-        $endDate = (DateTime::createFromFormat("m/Y",
-                                               $searchForm->getValue('endYearMonth')))->modify('last day of this month');
 
+        $startDate = DateTime::createFromFormat(
+            "m/Y",
+            $searchForm->getValue('startYearMonth')
+        )->modify('first day of this month ');
+        $endDate = DateTime::createFromFormat(
+            "m/Y",
+            $searchForm->getValue('endYearMonth')
+        )->modify('last day of this month');
 
         $numberOfMonths = $startDate->diff($endDate)->m + ($startDate->diff($endDate)->y * 12);
 

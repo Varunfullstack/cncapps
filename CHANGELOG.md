@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.7.2] - 2018-05-30
+### Fixed
+- Issue 257 - When running the Customer Review Meeting process it no longer creates the Renewal Report PDF. This can go 
+straight into live cncapps once fixed
+
 ## [v1.7.1] - 2018-05-29
 ### Fixed
 - Issue 257 - Bugs from release 1.7.0
