@@ -312,8 +312,8 @@ class BUCustomerReviewMeeting extends Business
         $this->initialiseSearchForm($dsSearchForm);
 
         $dsSearchForm->setValue('customerID', $customerID);
-        $dsSearchForm->setValue('startYearMonth', $startDate->format('Y-m'));
-        $dsSearchForm->setValue('endYearMonth', $endDate->format('Y-m'));
+        $dsSearchForm->setValue('startYearMonth', $startDate->format('m/Y'));
+        $dsSearchForm->setValue('endYearMonth', $endDate->format('m/Y'));
 
         $results = $buCustomerAnalysisReport->getResults($dsSearchForm);
 
