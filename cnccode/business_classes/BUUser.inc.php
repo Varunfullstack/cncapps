@@ -208,7 +208,7 @@ class BUUser extends Business
         return $db->Record[0];
     }
 
-    function teamMembersPerformanceData($teamLevel, $days)
+    function teamMembersPerformanceData($teamLevel, $days, $hideExcluded = true)
     {
         global $db;
         $query = "SELECT 
@@ -233,8 +233,14 @@ class BUUser extends Business
                       LEFT JOIN `consultant` 
                         ON userID = consultant.`cns_consno` 
                     WHERE teamLevel = $teamLevel 
-                    ORDER BY userID,
-                      user_time_log.loggedDate ASC  ";
+                      ";
+
+        if($hideExcluded){
+            $query.= ' and consultant.excludeFromStatsFlag <> "Y"';
+        }
+
+        $query.= " ORDER BY userID,
+                      user_time_log.loggedDate ASC";
 
         $db->query($query);
 
@@ -291,17 +297,40 @@ class BUUser extends Business
   loggedDate,
   user_time_log.`loggedHours`,
   userID,
-  CASE  consultant.`teamID` 
-   WHEN 1 THEN (SELECT hed_hd_team_target_log_percentage FROM headert LIMIT 1)
-   WHEN 2 THEN (SELECT hed_es_team_target_log_percentage FROM headert LIMIT 1)
-   WHEN 3 THEN (SELECT hed_im_team_target_log_percentage FROM headert LIMIT 1)
-   ELSE 0
-  END AS target
+  CASE
+    team.`level`
+    WHEN 1 
+    THEN 
+    (SELECT 
+      hed_hd_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    WHEN 2 
+    THEN 
+    (SELECT 
+      hed_es_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    WHEN 3 
+    THEN 
+    (SELECT 
+      hed_im_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    ELSE 0 
+  END AS target 
 FROM
-  user_time_log LEFT JOIN consultant ON cns_consno = userID
-WHERE userID = $engineerID
+  user_time_log 
+  LEFT JOIN consultant 
+    ON cns_consno = userID 
+  LEFT JOIN team 
+    ON `consultant`.`teamID` = team.`teamID`
+WHERE userID = $engineerID 
   AND loggedDate >= '" . $startDate->format('Y-m-d') . "' 
-  AND loggedDate <= '" . $endDate->format('Y-m-d') . "'
+  AND loggedDate <= '" . $endDate->format('Y-m-d') . "' 
 ORDER BY user_time_log.`loggedDate` DESC 
         ";
 
@@ -367,9 +396,7 @@ ORDER BY user_time_log.`loggedDate` DESC
     function getUsersByTeamLevel($teamLevel)
     {
         global $db;
-
-        $db->query(
-            "SELECT 
+        $quey = "SELECT 
         c.cns_consno,
         CONCAT( SUBSTR(c.firstName, 1, 1), SUBSTR(c.`lastName`,1, 1) ) AS initials
         
@@ -380,11 +407,10 @@ ORDER BY user_time_log.`loggedDate` DESC
       WHERE
         t.level = $teamLevel
         AND c.`activeFlag` = 'Y'
-
+        and c.excludeFromStatsFlag <> 'Y'
       ORDER BY
-        firstName, lastName"
-        );
-
+        firstName, lastName";
+        $db->query($quey);
         $ret = array();
 
         while ($db->next_record()) {

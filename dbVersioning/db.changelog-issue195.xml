@@ -30,4 +30,14 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet id="issue195-1524127856-4" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="consultant" columnName="excludeFromStatsFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="excludeFromStatsFlag" type="char(1)" value="N"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

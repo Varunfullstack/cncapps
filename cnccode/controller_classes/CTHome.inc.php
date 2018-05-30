@@ -703,8 +703,9 @@ class CTHome extends CTCNC
         $this->setTemplateFiles('HomeCharts', 'HomeCharts');
         $this->template->set_var(
             [
-                "userTeam" => $this->buUser->dbeUser->getValue(DBEUser::teamID),
+                "userLevel" => $teamLevel = $this->buUser->getLevelByUserID($this->userID),
                 "userID" => $this->buUser->dbeUser->getValue(DBEUser::userID),
+                "isManager" => $this->buUser->isSdManager($this->userID) ? 'true' : 'false',
             ]
         );
         $this->template->parse('CONTENTS', 'HomeCharts', true);
@@ -715,8 +716,8 @@ class CTHome extends CTCNC
     {
         $isStandardUser = false;
         if (!$this->buUser->isSdManager($this->userID)) {
-            if ($this->dbeUser->getValue(DBEUser::teamID) <= 3) {
-                $team = $this->dbeUser->getValue(DBEUser::teamID);
+            if ($this->buUser->getLevelByUserID($this->userID) <= 3) {
+                $team = $this->buUser->getLevelByUserID($this->userID);
                 $isStandardUser = true;
             } else {
                 return [];
@@ -758,7 +759,7 @@ class CTHome extends CTCNC
         ];
 
 
-        $results = $this->buUser->teamMembersPerformanceData($team, $days);
+        $results = $this->buUser->teamMembersPerformanceData($team, $days, $this->buUser->isSdManager($this->userID));
 
         foreach ($results as $result) {
             if ($isStandardUser && $result['userID'] !== $this->dbeUser->getValue(DBEUser::userID)) {
@@ -810,6 +811,11 @@ class CTHome extends CTCNC
             return;
         }
 
+        $dbeUser = new DBEUser($this);
+
+        $dbeUser->setValue(DBEJUser::userID, $engineerID);
+        $dbeUser->getRow();
+
         $this->template->set_var(
             [
                 "dataFetchUrl" => $this->buildLink(
@@ -819,6 +825,7 @@ class CTHome extends CTCNC
                     )
                 ),
                 "engineerID" => $engineerID,
+                "engineerName" => $dbeUser->getValue(DBEJUser::firstName) . ' ' . $dbeUser->getValue(DBEJUser::lastName),
                 "startDate" => $startDate,
                 "endDate" => $endDate
             ]

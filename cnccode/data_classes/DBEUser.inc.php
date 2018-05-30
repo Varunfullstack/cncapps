@@ -83,7 +83,7 @@ class DBEUser extends DBEntity
         $this->addColumn(self::appearInQueueFlag, DA_YN, DA_NOT_NULL);
         $this->addColumn(self::standardDayHours, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::changeApproverFlag, DA_YN, DA_NOT_NULL);
-//        $this->addColumn(self::excludeFromStatsFlag, DA_YN, DA_NOT_NULL);
+        $this->addColumn(self::excludeFromStatsFlag, DA_YN, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

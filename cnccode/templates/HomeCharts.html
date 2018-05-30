@@ -10,7 +10,8 @@
     }
 
     .item {
-        width: 33%;
+        width: 30%;
+        margin: 8px;
     }
 
     .container {
@@ -23,15 +24,17 @@
 <script id="member-item-template" type="text/template">
     <div class="item">
         <button class="details" type="button" data-user-id="{% userID %}">Show Details</button>
+        <br>
         <div id="{% id %}" class="chart">
 
         </div>
     </div>
 </script>
 <script type="text/javascript">
-    var userTeam = {userTeam};
+    var userLevel = {userLevel};
     var userID = {userID};
-    var defaultTeam = userTeam <= 3 ? userTeam : 1;
+    var isManager = {isManager};
+    var defaultTeam = userLevel <= 3 ? userLevel : 1;
 
     $(function () {
         // Load the Visualization API and the corechart package.
@@ -39,10 +42,10 @@
 
         var teamSelector = $('#teamSelector');
 
-        if (userTeam > 3) {
+        if (isManager) {
             teamSelector.show();
         } else {
-            defaultTeam = userTeam;
+            defaultTeam = userLevel;
         }
 
         $('body').on('click', '.details', function () {
@@ -52,7 +55,7 @@
 
 
             document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + aMonthAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
-        })
+        });
 
         teamSelector.change(function () {
             drawIndividualCharts($(this).val());
@@ -117,7 +120,7 @@
 
 
         google.charts.setOnLoadCallback(function () {
-            drawIndividualCharts(defaultTeam);
+            drawIndividualCharts(teamSelector.val());
         });
     })
 
@@ -157,12 +160,14 @@
         flex: 0 0 50%;
     }
 </style>
-
+<br>
 <select name="team" class="teamSelector" id="teamSelector" hidden>
     <option value="1" selected>Help Desk Team</option>
     <option value="2">Escalations Team</option>
     <option value="3">Implementations Team</option>
 </select>
+<br>
+<br>
 <div id="teamIndividualCharts" class="container">
 
 </div>

@@ -100,7 +100,7 @@
 
 // Set chart options
                 var options = {
-                    'title': 'Time Logged',
+                    'title': 'Hours Logged Over Time',
                     seriesType: 'bars',
                     series: {
                         1: {type: 'line'},
@@ -108,7 +108,8 @@
                     },
                     legend: {
                         position: 'bottom'
-                    }
+                    },
+                    vAxis: {title: 'Hours Logged'}
                 };
 
 // Instantiate and draw our chart, passing in some options.
@@ -135,7 +136,7 @@
 
 // Set chart options
                 var options2 = {
-                    'title': 'Time Logged',
+                    'title': 'Logged Percentage Over Time',
                     seriesType: 'line',
                     series: {
                         1: {type: 'line'},
@@ -143,7 +144,8 @@
                     },
                     legend: {
                         position: 'bottom'
-                    }
+                    },
+                    vAxis: {title: '% Of Time Logged'}
                 };
 
 // Instantiate and draw our chart, passing in some options.
@@ -159,9 +161,27 @@
     })
 
 </script>
-<p>Start Date: <input type="text" id="startDatePicker"></p>
-<p>EndDate Date: <input type="text" id="endDatePicker"></p>
+<style>
+    label {
+        display: inline-block;
+        width: 140px;
+        text-align: right;
+    }
+</style>
+<h1>
+    Detailed Logging Figures for {engineerName}.
+</h1>
+<div>
+    <label style="width: 80px">Start Date:</label>
+    <input type="text" id="startDatePicker">
+</div>
+<div>
+    <label style="width: 80px">End Date:</label>
+    <input type="text" id="endDatePicker">
+</div>
+<br>
 <div id="chart_div"></div>
+<br>
 <div id="chartTarget">
 
 </div>
