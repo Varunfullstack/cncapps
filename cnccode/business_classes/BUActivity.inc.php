@@ -1630,24 +1630,49 @@ class BUActivity extends Business
     function updateTotalUserLoggedHours($userID, $date)
     {
 
+        $startTime = '07:00';
+        $endTime = '18:30';
         $sql =
-            "UPDATE user_time_log
-        SET loggedHours =
-          (
-            SELECT
-              SUM( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 3600
-            FROM
-              callactivity
-              JOIN callacttype ON cat_callacttypeno = caa_callacttypeno
-              
-            WHERE
-              caa_consno = userID
-              AND caa_date = loggedDate
-              AND callacttype.travelFlag <> 'Y'
-          )
-      WHERE
-        userID = $userID
-        AND loggedDate = '$date'";
+            "UPDATE 
+              user_time_log 
+            SET
+              loggedHours = 
+              (SELECT 
+                ROUND(
+                  COALESCE(
+                    SUM(
+                      COALESCE(
+                        TIME_TO_SEC(
+                          IF(
+                            caa_endtime > '$endTime',
+                            '$endTime',
+                            caa_endtime
+                          )
+                        ) - TIME_TO_SEC(
+                          IF(
+                            caa_starttime < '$startTime',
+                            '$startTime',
+                            caa_starttime
+                          )
+                        ),
+                        0
+                      )
+                    ) / 3600,
+                    0
+                  ),
+                  2
+                ) 
+              FROM
+                callactivity 
+                JOIN callacttype 
+                  ON cat_callacttypeno = caa_callacttypeno 
+              WHERE caa_consno = userID 
+                AND caa_date = loggedDate 
+                AND callacttype.travelFlag <> 'Y' 
+                AND caa_starttime < '$endTime' 
+                AND caa_endtime > '$startTime') 
+            WHERE userID = $userID 
+              AND loggedDate = '$date' ";
 
         $this->db->query($sql);
 
@@ -7308,9 +7333,10 @@ customer with the past 8 hours email to GL
     {
         $bankHolidays = common_getUkBankHolidays(date('Y'));
 
-        if (in_array(date('Y-m-d'), $bankHolidays)) {
+        if (in_array(date('Y-m-d'), $bankHolidays) || date('N') > 5) {
             return; // ignore holidays
         }
+
 
         $this->dbeUser->getRows(true);
         while ($this->dbeUser->fetchNext()) {
@@ -7323,7 +7349,7 @@ customer with the past 8 hours email to GL
      * Create record on userTimeLog for given user
      *
      * @note: The startTime is set to zero because this function is being used
-     * to generate hoiday records at the end of the day. The user didn't have a
+     * to generate holiday records at the end of the day. The user didn't have a
      * start time.
      *
      * @param mixed $userID

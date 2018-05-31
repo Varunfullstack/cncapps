@@ -18,6 +18,9 @@ require_once($cfg['path_bu'] . '/BUTeamPerformance.inc.php');
 
 class CTHome extends CTCNC
 {
+    const DetailedChartsAction = 'detailedCharts';
+    const GetDetailedChartsDataAction = "getDetailedChartsData";
+
     private $dsHeader = '';
     private $buUser;
 
@@ -35,6 +38,40 @@ class CTHome extends CTCNC
     function defaultAction()
     {
         switch ($_REQUEST['action']) {
+            case 'updateServiceDetails':
+                $this->updateServiceDetails();
+                break;
+            case 'lastWeekHelpDesk':
+
+                $days = $_REQUEST['days'];
+                if (!$days) {
+                    $days = 30;
+                }
+                $team = 1;
+
+                if (isset($_REQUEST['team'])) {
+                    $team = $_REQUEST['team'];
+                }
+
+
+                echo json_encode($this->showLastWeekHelpDeskData($team, $days), JSON_NUMERIC_CHECK);
+                break;
+
+            case self::GetDetailedChartsDataAction:
+
+
+                echo json_encode(
+                    $this->getDetailedChartsData(
+                        $_REQUEST['engineerID'],
+                        $_REQUEST['startDate'],
+                        $_REQUEST['endDate']
+                    ),
+                    JSON_NUMERIC_CHECK
+                );
+                break;
+            case self::DetailedChartsAction:
+                $this->showDetailCharts($_REQUEST['engineerID'], $_REQUEST['startDate'], $_REQUEST['endDate']);
+                break;
             default:
                 $this->display();
                 break;
@@ -83,6 +120,8 @@ class CTHome extends CTCNC
         } else {
             $this->displayUserPerformanceReport();
         }
+
+        $this->displayCharts();
 
 
         $this->parsePage();
@@ -558,6 +597,163 @@ class CTHome extends CTCNC
 
         $this->template->parse('CONTENTS', 'DashboardAllUsersPerformanceReport', true);
 
-    } // end displayUserLoggingPerformanceReport
+    }
+
+    private function displayCharts()
+    {
+        $this->setTemplateFiles('HomeCharts', 'HomeCharts');
+        $this->template->set_var(
+            [
+                "userLevel" => $teamLevel = $this->buUser->getLevelByUserID($this->userID),
+                "userID" => $this->buUser->dbeUser->getValue(DBEUser::userID),
+                "isManager" => $this->buUser->isSdManager($this->userID) ? 'true' : 'false',
+            ]
+        );
+        $this->template->parse('CONTENTS', 'HomeCharts', true);
+
+    }
+
+    private function showLastWeekHelpDeskData($team, $days)
+    {
+        $isStandardUser = false;
+        if (!$this->buUser->isSdManager($this->userID)) {
+            if ($this->buUser->getLevelByUserID($this->userID) <= 3) {
+                $team = $this->buUser->getLevelByUserID($this->userID);
+                $isStandardUser = true;
+            } else {
+                return [];
+            }
+        }
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->getRow();
+
+        $target = null;
+        switch ($team) {
+            case 1:
+                $target = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+                break;
+            case 2:
+                $target = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+                break;
+            case 3:
+                $target = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
+                break;
+            default:
+                throw new Exception('Team not valid');
+        }
+
+
+        $graphs = [];
+
+        $dataStructure = [
+            "cols" => [
+                ["id" => "dates", "label" => "Dates", "type" => 'date'],
+            ],
+            "rows" => [
+
+            ],
+            "dataPoints" => [
+
+            ],
+            "userName" => null
+        ];
+
+
+        $results = $this->buUser->teamMembersPerformanceData($team, $days, $this->buUser->isSdManager($this->userID));
+
+        foreach ($results as $result) {
+            if ($isStandardUser && $result['userID'] !== $this->dbeUser->getValue(DBEUser::userID)) {
+                continue;
+            }
+
+            // if the user doesn't have a graph yet create it
+            if (!isset($graphs[$result['userID']])) {
+                $graphs[$result['userID']] = $dataStructure;
+                $graphs[$result['userID']]['cols'][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
+                $graphs[$result['userID']]['userName'] = $result['userLabel'];
+            }
+
+            $cell = ["c" =>
+                [
+                    ["v" => (new \DateTime($result['loggedDate']))->format(DATE_ISO8601)],
+                    ["v" => $result['loggedHours']]
+                ]
+            ];
+
+            $graphs[$result['userID']]['rows'][] = $cell;
+        }
+
+        $toReturn = [];
+
+        foreach ($graphs as $userID => $graph) {
+            $toReturn[] = array_merge(
+                ["userID" => $userID],
+                $graph
+            );
+        }
+
+        usort(
+            $toReturn,
+            function ($a, $b) {
+                return strcmp($a['userName'], $b['userName']);
+            }
+        );
+
+        return $toReturn;
+    }
+
+    private function showDetailCharts($engineerID, $startDate, $endDate)
+    {
+        $this->setTemplateFiles('detailedCharts', 'HomeDetailCharts.inc');
+        if (!$engineerID) {
+            $this->formError = "Engineer ID not given";
+            $this->formErrorMessage = "Engineer ID not given";
+            return;
+        }
+
+        $dbeUser = new DBEUser($this);
+
+        $dbeUser->setValue(DBEJUser::userID, $engineerID);
+        $dbeUser->getRow();
+
+        $this->template->set_var(
+            [
+                "dataFetchUrl" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => self::GetDetailedChartsDataAction
+                    )
+                ),
+                "engineerID" => $engineerID,
+                "engineerName" => $dbeUser->getValue(DBEJUser::firstName) . ' ' . $dbeUser->getValue(DBEJUser::lastName),
+                "startDate" => $startDate,
+                "endDate" => $endDate
+            ]
+
+        );
+
+        $this->template->parse('CONTENTS', 'detailedCharts', true);
+        $this->parsePage();
+    }
+
+    private function getDetailedChartsData($engineerID, $startDate, $endDate)
+    {
+        if (!$this->buUser->isSdManager($this->userID)) {
+            return $this->buUser->getEngineerDetailedData(
+                $this->userID,
+                (new DateTime($startDate)),
+                (new DateTime($endDate))
+            );
+        }
+        // we need to pull data
+        $data = $this->buUser->getEngineerDetailedData(
+            $engineerID,
+            (new DateTime($startDate)),
+            (new DateTime($endDate))
+        );
+        return $data;
+
+    }
 }// end of class
 ?>

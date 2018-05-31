@@ -1,96 +1,115 @@
-  <h2>User Performance</h2>
-  <h3>Help Desk</h3>
-  <table id="user-performance-helpdesk" width="350px">
-    <thead>
-      <tr>
-        <th width="30%">User</th>
-        <th width="30%">Target %</th>
-        <th colspan="2">Week</th>
-        <th colspan="2">Month</th>
-      </tr>
-      <tr>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>%</th>
-        <th>Hours</th>
-        <th>%</th>
-        <th>Hours</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN hdUserBlock -->
-       <tr>
-        <th>{initials}</th>
-        <td style="text-align: center;">{targetPercentage}</td>
-        <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
-        <td>{weeklyHours}</td>
-        <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
-        <td>{monthlyHours}</td>
-      </tr>
-      <!-- END hdUserBlock -->
-    </tbody>
-  </table>
-  
-  <h3>Escalations</h3>
-  <table id="user-performance-escalations" width="350px">
-    <thead>
-      <tr>
-        <th width="30%">User</th>
-        <th width="30%">Target %</th>
-        <th colspan="2">Week</th>
-        <th colspan="2">Month</th>
-      </tr>
-      <tr>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>%</th>
-        <th>Hours</th>
-        <th>%</th>
-        <th>Hours</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN esUserBlock -->
-       <tr>
-        <th>{initials}</th>
-        <td style="text-align: center;">{targetPercentage}</td>
-        <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
-        <td>{weeklyHours}</td>
-        <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
-        <td>{monthlyHours}</td>
-      </tr>
-      <!-- END esUserBlock -->
-    </tbody>
-  </table> 
-  
-  <h3>Implementations</h3>
-  <table id="user-performance-implementations" width="350px">
-    <thead>
-      <tr>
-        <th width="30%">User</th>
-        <th width="30%">Target %</th>
-        <th colspan="2">Week</th>
-        <th colspan="2">Month</th>
-      </tr>
-      <tr>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-        <th>%</th>
-        <th>Hours</th>
-        <th>%</th>
-        <th>Hours</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN imUserBlock -->
-       <tr>
-        <th>{initials}</th>
-        <td style="text-align: center;">{targetPercentage}</td>
-        <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
-        <td>{weeklyHours}</td>
-        <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
-        <td>{monthlyHours}</td>
-      </tr>
-      <!-- END imUserBlock -->
-    </tbody>
-  </table>    
+<style>
+    .performanceItem {
+        flex-grow: 1;
+        /*margin: 8px;*/
+    }
+
+    .performanceContainer {
+        display: flex;
+        flex-wrap: wrap;
+    }
+</style>
+<h2>User Performance</h2>
+<div class="performanceContainer">
+    <div class="performanceItem">
+        <h3>Help Desk</h3>
+        <table id="user-performance-helpdesk" width="350px">
+            <thead>
+            <tr>
+                <th width="30%">User</th>
+                <th width="30%">Target %</th>
+                <th colspan="2">Week</th>
+                <th colspan="2">Month</th>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>%</th>
+                <th>Hours</th>
+                <th>%</th>
+                <th>Hours</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN hdUserBlock -->
+            <tr>
+                <th>{initials}</th>
+                <td style="text-align: center;">{targetPercentage}</td>
+                <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
+                <td>{weeklyHours}</td>
+                <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
+                <td>{monthlyHours}</td>
+            </tr>
+            <!-- END hdUserBlock -->
+            </tbody>
+        </table>
+    </div>
+    <div class="performanceItem">
+        <h3>Escalations</h3>
+        <table id="user-performance-escalations" width="350px">
+            <thead>
+            <tr>
+                <th width="30%">User</th>
+                <th width="30%">Target %</th>
+                <th colspan="2">Week</th>
+                <th colspan="2">Month</th>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>%</th>
+                <th>Hours</th>
+                <th>%</th>
+                <th>Hours</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN esUserBlock -->
+            <tr>
+                <th>{initials}</th>
+                <td style="text-align: center;">{targetPercentage}</td>
+                <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
+                <td>{weeklyHours}</td>
+                <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
+                <td>{monthlyHours}</td>
+            </tr>
+            <!-- END esUserBlock -->
+            </tbody>
+        </table>
+    </div>
+    <div class="performanceItem">
+        <h3>Implementations</h3>
+        <table id="user-performance-implementations" width="350px">
+            <thead>
+            <tr>
+                <th width="30%">User</th>
+                <th width="30%">Target %</th>
+                <th colspan="2">Week</th>
+                <th colspan="2">Month</th>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>%</th>
+                <th>Hours</th>
+                <th>%</th>
+                <th>Hours</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN imUserBlock -->
+            <tr>
+                <th>{initials}</th>
+                <td style="text-align: center;">{targetPercentage}</td>
+                <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
+                <td>{weeklyHours}</td>
+                <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
+                <td>{monthlyHours}</td>
+            </tr>
+            <!-- END imUserBlock -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

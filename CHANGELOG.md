@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 195 - Graph to show user productivity
+
 ## [v1.7.3] - 2018-05-30
 ### Fixed
 - Issue 258 - CustomerCRM searching and saving issues - hotfix required

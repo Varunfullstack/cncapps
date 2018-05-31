@@ -290,8 +290,7 @@ class CTUser extends CTCNC
                                              PHPLIB_PERM_RENEWALS) !== FALSE) ? CT_CHECKED : '',
 
                 'changeApproverFlagChecked' => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
-
-
+                'excludeFromStatsFlagChecked' => Controller::htmlChecked($dsUser->getValue(DBEUser::excludeFromStatsFlag)),
                 'reportsChecked' => (strpos($dsUser->getValue('perms'),
                                             PHPLIB_PERM_REPORTS) !== FALSE) ? CT_CHECKED : '',
                 'teamMessage' => Controller::htmlDisplayText($dsUser->getMessage('teamID')),

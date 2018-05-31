@@ -207,6 +207,142 @@ class BUUser extends Business
         return $db->Record[0];
     }
 
+    function teamMembersPerformanceData($teamLevel, $days, $hideExcluded = true)
+    {
+        global $db;
+        $query = "SELECT 
+                      userID,
+                      user_time_log.loggedDate AS loggedDate,
+                      loggedHours,
+                      CONCAT(
+                        consultant.`firstName`,
+                        ' ',
+                        LEFT(consultant.`lastName`, 1)
+                      ) AS userLabel 
+                    FROM
+                      user_time_log 
+                      INNER JOIN 
+                        (SELECT DISTINCT 
+                          loggedDate 
+                        FROM
+                          user_time_log 
+                        ORDER BY loggedDate DESC 
+                        LIMIT 10) AS limited 
+                        ON user_time_log.`loggedDate` = limited.loggedDate 
+                      LEFT JOIN `consultant` 
+                        ON userID = consultant.`cns_consno` 
+                    WHERE teamLevel = $teamLevel 
+                      ";
+
+        if($hideExcluded){
+            $query.= ' and consultant.excludeFromStatsFlag <> "Y"';
+        }
+
+        $query.= " ORDER BY userID,
+                      user_time_log.loggedDate ASC";
+
+        $db->query($query);
+
+        $rows = [];
+        while ($db->next_record(1)) {
+            $rows[] = $db->Record;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param $engineerID
+     * @param DateTimeInterface $startDate
+     * @param DateTimeInterface $endDate
+     * @return array
+     */
+    function getEngineerDetailedData($engineerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
+    {
+        global $db;
+
+        $query = "
+        SELECT 
+  getLoggedTimeAvg (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    20
+  ) AS monthAvg,
+  getLoggedTimeTotal (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    20
+  ) AS monthTotal,
+  getToLogHours (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    20
+  ) AS monthToLog,
+  getLoggedTimeAvg (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    5
+  ) AS fiveDaysAvg,
+  getLoggedTimeTotal (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    5
+  ) AS fiveDaysTotal,
+  getToLogHours (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    5
+  ) AS fiveDaysToLog,
+  loggedDate,
+  user_time_log.`loggedHours`,
+  userID,
+  CASE
+    team.`level`
+    WHEN 1 
+    THEN 
+    (SELECT 
+      hed_hd_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    WHEN 2 
+    THEN 
+    (SELECT 
+      hed_es_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    WHEN 3 
+    THEN 
+    (SELECT 
+      hed_im_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    ELSE 0 
+  END AS target 
+FROM
+  user_time_log 
+  LEFT JOIN consultant 
+    ON cns_consno = userID 
+  LEFT JOIN team 
+    ON `consultant`.`teamID` = team.`teamID`
+WHERE userID = $engineerID 
+  AND loggedDate >= '" . $startDate->format('Y-m-d') . "' 
+  AND loggedDate <= '" . $endDate->format('Y-m-d') . "' 
+ORDER BY user_time_log.`loggedDate` DESC 
+        ";
+
+        $db->query($query);
+
+        $rows = [];
+        while ($db->next_record(1)) {
+            $rows[] = $db->Record;
+        }
+
+        return $rows;
+    }
+
     /*
     Activity logging performance for past number of days by user
     */
@@ -259,9 +395,7 @@ class BUUser extends Business
     function getUsersByTeamLevel($teamLevel)
     {
         global $db;
-
-        $db->query(
-            "SELECT 
+        $quey = "SELECT 
         c.cns_consno,
         CONCAT( SUBSTR(c.firstName, 1, 1), SUBSTR(c.`lastName`,1, 1) ) AS initials
         
@@ -272,11 +406,10 @@ class BUUser extends Business
       WHERE
         t.level = $teamLevel
         AND c.`activeFlag` = 'Y'
-
+        and c.excludeFromStatsFlag <> 'Y'
       ORDER BY
-        firstName, lastName"
-        );
-
+        firstName, lastName";
+        $db->query($quey);
         $ret = array();
 
         while ($db->next_record()) {
