@@ -2895,9 +2895,10 @@ class BUActivity extends Business
                 if ($last_custno != '9999') {
                     $topupValue = $this->doTopUp($lastRecord, $update);
                     $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
-                    $this->template->set_var(array('totalCost'        => common_numberFormat($this->totalCost),
-                                                   'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
-                                                   'remainingBalance' => common_numberFormat($newBalance)
+                    $this->template->set_var(array(
+                                                 'totalCost'        => common_numberFormat($this->totalCost),
+                                                 'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
+                                                 'remainingBalance' => common_numberFormat($newBalance)
                                              ));
 
                     $this->template->parse('output', 'page', true);
@@ -3071,9 +3072,10 @@ class BUActivity extends Business
 
             $topupValue = $this->doTopUp($lastRecord, $update);
             $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
-            $this->template->set_var(array('totalCost'        => common_numberFormat($this->totalCost),
-                                           'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
-                                           'remainingBalance' => common_numberFormat($newBalance)
+            $this->template->set_var(array(
+                                         'totalCost'        => common_numberFormat($this->totalCost),
+                                         'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
+                                         'remainingBalance' => common_numberFormat($newBalance)
                                      ));
             $this->template->parse('output', 'page', true);
             fwrite($htmlFileHandle, $this->template->get_var('output'));
@@ -3145,43 +3147,46 @@ class BUActivity extends Business
                 $this->template->set_file('page', 'GSCReport.inc.html');
 
                 // Set header fields
-                $this->template->set_var(array('companyName'   => $db->Record ['cus_name'],
-                                               'customerRef'   => $key,
-                                               'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
-                                               'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
-                                               'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
-                                               'add1'          => $dsSite->getValue(DBESite::Add1),
-                                               'add2'          => $dsSite->getValue(DBESite::Add2),
-                                               'add3'          => $dsSite->getValue(DBESite::Add3),
-                                               'town'          => $dsSite->getValue(DBESite::Town),
-                                               'county'        => $dsSite->getValue(DBESite::County),
-                                               'postcode'      => $dsSite->getValue(DBESite::Postcode),
-                                               'cnc_name'      => $dsHeader->getValue('name'),
-                                               'cnc_add1'      => $dsHeader->getValue('add1'),
-                                               'cnc_add2'      => $dsHeader->getValue('add2'),
-                                               'cnc_add3'      => $dsHeader->getValue('add3'),
-                                               'cnc_town'      => $dsHeader->getValue('town'),
-                                               'cnc_county'    => $dsHeader->getValue('county'),
-                                               'cnc_postcode'  => $dsHeader->getValue('postcode'),
-                                               'cnc_phone'     => $dsHeader->getValue('phone')
+                $this->template->set_var(array(
+                                             'companyName'   => $db->Record ['cus_name'],
+                                             'customerRef'   => $key,
+                                             'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
+                                             'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
+                                             'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
+                                             'add1'          => $dsSite->getValue(DBESite::Add1),
+                                             'add2'          => $dsSite->getValue(DBESite::Add2),
+                                             'add3'          => $dsSite->getValue(DBESite::Add3),
+                                             'town'          => $dsSite->getValue(DBESite::Town),
+                                             'county'        => $dsSite->getValue(DBESite::County),
+                                             'postcode'      => $dsSite->getValue(DBESite::Postcode),
+                                             'cnc_name'      => $dsHeader->getValue('name'),
+                                             'cnc_add1'      => $dsHeader->getValue('add1'),
+                                             'cnc_add2'      => $dsHeader->getValue('add2'),
+                                             'cnc_add3'      => $dsHeader->getValue('add3'),
+                                             'cnc_town'      => $dsHeader->getValue('town'),
+                                             'cnc_county'    => $dsHeader->getValue('county'),
+                                             'cnc_postcode'  => $dsHeader->getValue('postcode'),
+                                             'cnc_phone'     => $dsHeader->getValue('phone')
                                          ));
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
-                $this->template->set_var(array('activityDate'     => '',
-                                               'activityPostcode' => '',
-                                               'activityRef'      => '',
-                                               'activityContact'  => '',
-                                               'activityType'     => '',
-                                               'activityHours'    => '',
-                                               'activityCost'     => '',
-                                               'activityDetails'  => 'No activity for this period'
+                $this->template->set_var(array(
+                                             'activityDate'     => '',
+                                             'activityPostcode' => '',
+                                             'activityRef'      => '',
+                                             'activityContact'  => '',
+                                             'activityType'     => '',
+                                             'activityHours'    => '',
+                                             'activityCost'     => '',
+                                             'activityDetails'  => 'No activity for this period'
                                          ));
 
                 $this->template->parse('lines', 'lineBlock', true);
                 $this->totalCost += $value;
-                $this->template->set_var(array('totalCost'        => 0,
-                                               'previousBalance'  => common_numberFormat($db->Record ['curGSCBalance']),
-                                               'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])
+                $this->template->set_var(array(
+                                             'totalCost'        => 0,
+                                             'previousBalance'  => common_numberFormat($db->Record ['curGSCBalance']),
+                                             'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])
                                          ));
                 $this->template->parse('output', 'page', true);
                 fwrite($htmlFileHandle, $this->template->get_var('output'));
@@ -7589,7 +7594,10 @@ customer with the past 8 hours email to GL
         $ret = array();
 
         foreach ($results as $result) {
-            $result['percentage'] = ($result['hours'] / $grandTotalHours) * 100;
+            $result['percentage'] = 0;
+            if ($grandTotalHours) {
+                $result['percentage'] = ($result['hours'] / $grandTotalHours) * 100;
+            }
             $ret[] = $result;
         }
         return $ret;
