@@ -232,8 +232,8 @@ class BUCustomer extends Business
         $this->addNewContactRow($dsContact, $dsData->getValue('customerID'), '0'); // First siteno always zero
         $ret = $ret & ($this->updateContact($dsContact));
         $dsSite->setUpdateModeUpdate();
-        $dsSite->setValue(DBESite::DelContactID, $dsContact->getValue('contactID'));
-        $dsSite->setValue(DBESite::InvContactID, $dsContact->getValue('contactID'));
+        $dsSite->setValue(DBESite::DeliverContactID, $dsContact->getValue('contactID'));
+        $dsSite->setValue(DBESite::InvoiceContactID, $dsContact->getValue('contactID'));
         $dsSite->post();
         $ret = $ret & ($this->updateSite($dsSite));        // Then update site delivery and invoice contacts
         return $ret;

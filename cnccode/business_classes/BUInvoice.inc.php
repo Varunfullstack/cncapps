@@ -332,7 +332,7 @@ class BUInvoice extends Business
         $buSite = new BUSite($this);
         $buSite->getSiteByID($customerID, $dsCustomer->getValue('invSiteNo'), $dsSite);
         $buContact = new BUContact($this);
-        $buContact->getContactByID($dsSite->getValue(DBESite::InvContactID), $dsContact);
+        $buContact->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dbeInvhead->setValue('invheadID', 0); // for new number
@@ -346,7 +346,7 @@ class BUInvoice extends Business
         $dbeInvhead->setValue('town', $dsSite->getValue(DBESite::Town));
         $dbeInvhead->setValue('county', $dsSite->getValue(DBESite::County));
         $dbeInvhead->setValue('postcode', $dsSite->getValue(DBESite::Postcode));
-        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::InvContactID));
+        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
         $dbeInvhead->setValue('contactName',
             $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );
@@ -546,7 +546,7 @@ class BUInvoice extends Business
         $buSite->getSiteByID($dbeInvhead->getValue('customerID'), (int)$siteNo, $dsSite);
 
         $buContact = new BUContact($this);
-        if (!$buContact->getContactByID($dsSite->getValue(DBESite::InvContactID), $dsContact)) {
+        if (!$buContact->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact)) {
             $this->raiseError('contact not found');
         }
 
@@ -557,7 +557,7 @@ class BUInvoice extends Business
         $dbeInvhead->setValue('town', $dsSite->getValue(DBESite::Town));
         $dbeInvhead->setValue('county', $dsSite->getValue(DBESite::County));
         $dbeInvhead->setValue('postcode', $dsSite->getValue(DBESite::Postcode));
-        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::InvContactID));
+        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
         $dbeInvhead->setValue('contactName',
             $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );

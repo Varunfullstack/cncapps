@@ -2730,7 +2730,7 @@ class BUActivity extends Business
 
             $buCustomer->getSiteByCustomerIDSiteNo($db->Record['pro_custno'], $db->Record['caa_siteno'], $dsSite);
 
-            if (!$dsSite->getValue(DBESite::InvContactID)) {
+            if (!$dsSite->getValue(DBESite::InvoiceContactID)) {
 
                 $failList .= '<BR/>' . $db->Record['cus_name'] . ', Site: ' . $db->Record['add_town'] . ',' . $db->Record['add_postcode'];
 
@@ -3540,7 +3540,7 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue('callActivityID', 0);
         $dbeCallActivity->setValue('siteNo', $dsSite->getValue(DBESite::SiteNo));
-        $dbeCallActivity->setValue('contactID', $dsSite->getValue(DBESite::InvContactID));
+        $dbeCallActivity->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
         $dbeCallActivity->setValue('callActTypeID', 1);
         //    $dbeCallActivity->setValue('callID', $callID);
         $dbeCallActivity->setValue('date', date(CONFIG_MYSQL_DATE));

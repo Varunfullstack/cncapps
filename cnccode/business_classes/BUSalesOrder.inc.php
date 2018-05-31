@@ -414,7 +414,7 @@ class BUSalesOrder extends Business
         $dsOrdhead->setValue('invCounty', $dsSite->getValue(DBESite::County));
         $dsOrdhead->setValue('invPostcode', $dsSite->getValue(DBESite::Postcode));
         $dsOrdhead->setValue('invSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::InvContactID), $dsContact);
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact);
         $dsOrdhead->setValue('invContactID', $dsContact->getValue('contactID'));
         $dsOrdhead->setValue('invContactName', $dsContact->getValue('lastName'));
         $dsOrdhead->setValue('invContactSalutation', $dsContact->getValue('firstName'));
@@ -437,7 +437,7 @@ class BUSalesOrder extends Business
         $dsOrdhead->setValue('delCounty', $dsSite->getValue(DBESite::County));
         $dsOrdhead->setValue('delPostcode', $dsSite->getValue(DBESite::Postcode));
         $dsOrdhead->setValue('delSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::DelContactID), $dsContact);
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::DeliverContactID), $dsContact);
         $dsOrdhead->setValue('delContactID', $dsContact->getValue('contactID'));
         $dsOrdhead->setValue('delContactName', $dsContact->getValue('lastName'));
         $dsOrdhead->setValue('delContactSalutation', $dsContact->getValue('firstName'));
@@ -471,7 +471,7 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setValue('invCounty', $dsSite->getValue(DBESite::County));
         $dbeOrdhead->setValue('invPostcode', $dsSite->getValue(DBESite::Postcode));
         $dbeOrdhead->setValue('invSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::InvContactID), $dsContact);
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact);
         $dbeOrdhead->setValue('invContactID', $dsContact->getValue('contactID'));
         $dbeOrdhead->setValue('invContactName', $dsContact->getValue('lastName'));
         $dbeOrdhead->setValue('invContactSalutation', $dsContact->getValue('firstName'));
@@ -507,7 +507,7 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setValue('delCounty', $dsSite->getValue(DBESite::County));
         $dbeOrdhead->setValue('delPostcode', $dsSite->getValue(DBESite::Postcode));
         $dbeOrdhead->setValue('delSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::DelContactID), $dsContact);
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::DeliverContactID), $dsContact);
         $dbeOrdhead->setValue('delContactID', $dsContact->getValue('contactID'));
         $dbeOrdhead->setValue('delContactName', $dsContact->getValue('lastName'));
         $dbeOrdhead->setValue('delContactSalutation', $dsContact->getValue('firstName'));
