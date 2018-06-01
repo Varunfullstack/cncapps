@@ -3993,7 +3993,6 @@ class CTActivity extends CTCNC
       Record action button selected
       */
         if (isset($_REQUEST['Fixed'])) {
-
             $nextStatus = 'Fixed';
         } elseif (isset($_REQUEST['CustomerAction'])) {
             $dsCallActivity->setUpdateModeUpdate();
