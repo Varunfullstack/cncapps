@@ -218,8 +218,8 @@ class BUManagementReports extends Business
             $sql .= " and cus_sectorno = $sectorId";
         }
 
-        if ($pcs) {
-            $sql .= " and noOfPCs = $pcs";
+        if ($pcs === "0" || $pcs) {
+            $sql .= " and noOfPCs = '$pcs'";
         }
 
         $sql .= "
@@ -229,7 +229,6 @@ class BUManagementReports extends Business
 					cus_name
 			)  AS temp
 			ORDER BY profitTotal DESC;";
-        var_dump($sql);
         return $this->db->query($sql);
     }
 

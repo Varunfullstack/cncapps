@@ -1,5 +1,13 @@
 <script language='JavaScript' src='CommonJS.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
+<link rel="stylesheet" type="text/css"
+      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
+<script src=".javascript/accounting.min.js"></script>
 <script language='JavaScript'>
     var savedCustomerName;
 
@@ -34,6 +42,157 @@
         }
     }
 
+    var dataTable;
+
+    function moneyFormat(data, type, row, meta) {
+        if (!data) {
+            return null;
+        }
+
+        return accounting.formatMoney(data, "£", ',', ".");
+    }
+
+    $(document).ready(function () {
+        dataTable = $('#myTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            paging: false,
+            columns: [
+                {data: "customer"},
+                {data: "sector"},
+                {data: "noOfPCs"},
+                {data: "noOfServers"},
+                {
+                    data: "totalSales",
+                    render: moneyFormat
+                },
+                {
+                    data: "totalProfit",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth1",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth1",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth2",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth2",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth3",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth3",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth4",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth4",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth5",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth5",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth6",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth6",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth7",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth7",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth8",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth8",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth9",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth9",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth10",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth10",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth11",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth11",
+                    render: moneyFormat
+                },
+                {
+                    data: "salesMonth12",
+                    render: moneyFormat
+                },
+                {
+                    data: "profitMonth12",
+                    render: moneyFormat
+                }
+            ],
+            columnDefs: [{
+                targets: [4, 5, 6, 7, 8, 9, 10, 11],
+                data: function (row, type, val, meta) {
+                    console.log(row, type, val, meta);
+                    // if (type === 'set') {
+                    //     row.price = val;
+                    //     // Store the computed display and filter values for efficiency
+                    //     row.price_display = val == "" ? "" : "$" + numberFormat(val);
+                    //     row.price_filter = val == "" ? "" : "$" + numberFormat(val) + " " + val;
+                    //     return;
+                    // }
+                    // else if (type === 'display') {
+                    //     return row.price_display;
+                    // }
+                    // 'sort', 'type' and undefined all just use the integer
+                    return row.price;
+                }
+            }]
+        });
+    });
+
     function fetchData($event) {
         console.log($event);
         var formData = new FormData(event.target);
@@ -49,14 +208,16 @@
             method: 'POST',
             type: 'post',
             dataType: 'json',
-            data: json
+            data: object
         }).then(function (result) {
 
             if (result.status == 'error') {
                 alert('Failed to retrieve data');
             } else {
-                console.log('data yay');
-                console.log(result);
+                dataTable.clear();
+                dataTable.rows.add(result);
+                dataTable.draw();
+
             }
         }).catch(function () {
 
@@ -112,7 +273,7 @@
                 </label>
                 <select name="noOfPcs" id="noOfPcs">
                     <!-- BEGIN noOfPcsBlock -->
-                    <option {noOfPcsSelected} value="{noOfPcsDescription}">{noOfPcsDescription}</option>
+                    <option {noOfPcsSelected} value="{noOfPcsValue}">{noOfPcsDescription}</option>
                     <!-- END noOfPcsBlock -->
                 </select>
             </td>
@@ -122,7 +283,8 @@
         </TR>
     </TABLE>
 </FORM>
-<table border="1" cellspacing="1" cellpadding="1">
+<table border="1" cellspacing="1" cellpadding="1" id="myTable">
+    <thead>
     <tr>
         <td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Customer</strong></td>
         <td nowrap="nowrap" bgcolor="#F3F3F3"><strong>Sector</strong></td>
@@ -172,6 +334,8 @@
         <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Sale</td>
         <td align="right" nowrap="nowrap" bgcolor="#CCCCCC">Profit</td>
     </tr>
+    </thead>
+    <tbody>
     <!-- BEGIN resultsBlock -->
     <tr>
         <td nowrap="nowrap" bgcolor="#E1E1E1">{customer}</td>
@@ -206,4 +370,6 @@
         <td width="50" align="right" nowrap="nowrap">{profitMonth12}</td>
     </tr>
     <!-- END resultsBlock -->
+    </tbody>
+
 </table>

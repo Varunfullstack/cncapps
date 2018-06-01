@@ -57,7 +57,7 @@ class CTManagementReports extends CTCNC
                 $data = $this->salesByCustomerData(
                     $_REQUEST['year'],
                     $_REQUEST['customerID'],
-                    $_REQUEST['sectorID'],
+                    $_REQUEST['sector'],
                     $_REQUEST['noOfPcs']
                 );
 
@@ -129,19 +129,19 @@ class CTManagementReports extends CTCNC
             $this->template->set_var(
                 array(
                     'manufacturer' => Controller::htmlDisplayText($row->manufacturer),
-                    'month1' => Controller::formatNumber($row->month1, 0),
-                    'month2' => Controller::formatNumber($row->month2, 0),
-                    'month3' => Controller::formatNumber($row->month3, 0),
-                    'month4' => Controller::formatNumber($row->month4, 0),
-                    'month5' => Controller::formatNumber($row->month5, 0),
-                    'month6' => Controller::formatNumber($row->month6, 0),
-                    'month7' => Controller::formatNumber($row->month7, 0),
-                    'month8' => Controller::formatNumber($row->month8, 0),
-                    'month9' => Controller::formatNumber($row->month9, 0),
-                    'month10' => Controller::formatNumber($row->month10, 0),
-                    'month11' => Controller::formatNumber($row->month11, 0),
-                    'month12' => Controller::formatNumber($row->month12, 0),
-                    'total' => Controller::formatNumber($total, 0)
+                    'month1'       => Controller::formatNumber($row->month1, 0),
+                    'month2'       => Controller::formatNumber($row->month2, 0),
+                    'month3'       => Controller::formatNumber($row->month3, 0),
+                    'month4'       => Controller::formatNumber($row->month4, 0),
+                    'month5'       => Controller::formatNumber($row->month5, 0),
+                    'month6'       => Controller::formatNumber($row->month6, 0),
+                    'month7'       => Controller::formatNumber($row->month7, 0),
+                    'month8'       => Controller::formatNumber($row->month8, 0),
+                    'month9'       => Controller::formatNumber($row->month9, 0),
+                    'month10'      => Controller::formatNumber($row->month10, 0),
+                    'month11'      => Controller::formatNumber($row->month11, 0),
+                    'month12'      => Controller::formatNumber($row->month12, 0),
+                    'total'        => Controller::formatNumber($total, 0)
                 )
             );
 
@@ -158,10 +158,10 @@ class CTManagementReports extends CTCNC
 
         $this->template->set_var(
             array(
-                'urlTheChart' => $urlTheChart,
+                'urlTheChart'       => $urlTheChart,
                 'urlGenerateReport' => $urlGenerateReport,
-                'manufacturerName' => $_REQUEST['manufacturerName'],
-                'grandTotal' => Controller::formatNumber($grandTotal, 0)
+                'manufacturerName'  => $_REQUEST['manufacturerName'],
+                'grandTotal'        => Controller::formatNumber($grandTotal, 0)
             )
         );
 
@@ -187,7 +187,7 @@ class CTManagementReports extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
-                    'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                    'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -225,19 +225,19 @@ class CTManagementReports extends CTCNC
             $this->template->set_var(
                 array(
                     'supplier' => Controller::htmlDisplayText($row->supplier),
-                    'month1' => Controller::formatNumber($row->month1, 0),
-                    'month2' => Controller::formatNumber($row->month2, 0),
-                    'month3' => Controller::formatNumber($row->month3, 0),
-                    'month4' => Controller::formatNumber($row->month4, 0),
-                    'month5' => Controller::formatNumber($row->month5, 0),
-                    'month6' => Controller::formatNumber($row->month6, 0),
-                    'month7' => Controller::formatNumber($row->month7, 0),
-                    'month8' => Controller::formatNumber($row->month8, 0),
-                    'month9' => Controller::formatNumber($row->month9, 0),
-                    'month10' => Controller::formatNumber($row->month10, 0),
-                    'month11' => Controller::formatNumber($row->month11, 0),
-                    'month12' => Controller::formatNumber($row->month12, 0),
-                    'total' => Controller::formatNumber(
+                    'month1'   => Controller::formatNumber($row->month1, 0),
+                    'month2'   => Controller::formatNumber($row->month2, 0),
+                    'month3'   => Controller::formatNumber($row->month3, 0),
+                    'month4'   => Controller::formatNumber($row->month4, 0),
+                    'month5'   => Controller::formatNumber($row->month5, 0),
+                    'month6'   => Controller::formatNumber($row->month6, 0),
+                    'month7'   => Controller::formatNumber($row->month7, 0),
+                    'month8'   => Controller::formatNumber($row->month8, 0),
+                    'month9'   => Controller::formatNumber($row->month9, 0),
+                    'month10'  => Controller::formatNumber($row->month10, 0),
+                    'month11'  => Controller::formatNumber($row->month11, 0),
+                    'month12'  => Controller::formatNumber($row->month12, 0),
+                    'total'    => Controller::formatNumber(
                         $row->month1 +
                         $row->month2 +
                         $row->month3 +
@@ -266,9 +266,9 @@ class CTManagementReports extends CTCNC
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
-                'urlSupplierPopup' => $supplierPopupURL,
-                'supplierName' => $supplierName,
-                'supplierID' => $_REQUEST['supplierID']
+                'urlSupplierPopup'  => $supplierPopupURL,
+                'supplierName'      => $supplierName,
+                'supplierID'        => $_REQUEST['supplierID']
             )
         );
 
@@ -320,19 +320,19 @@ class CTManagementReports extends CTCNC
             $this->template->set_var(
                 array(
                     'category' => Controller::htmlDisplayText($row->category),
-                    'month1' => Controller::formatNumber($row->month1, 0),
-                    'month2' => Controller::formatNumber($row->month2, 0),
-                    'month3' => Controller::formatNumber($row->month3, 0),
-                    'month4' => Controller::formatNumber($row->month4, 0),
-                    'month5' => Controller::formatNumber($row->month5, 0),
-                    'month6' => Controller::formatNumber($row->month6, 0),
-                    'month7' => Controller::formatNumber($row->month7, 0),
-                    'month8' => Controller::formatNumber($row->month8, 0),
-                    'month9' => Controller::formatNumber($row->month9, 0),
-                    'month10' => Controller::formatNumber($row->month10, 0),
-                    'month11' => Controller::formatNumber($row->month11, 0),
-                    'month12' => Controller::formatNumber($row->month12, 0),
-                    'total' => Controller::formatNumber(
+                    'month1'   => Controller::formatNumber($row->month1, 0),
+                    'month2'   => Controller::formatNumber($row->month2, 0),
+                    'month3'   => Controller::formatNumber($row->month3, 0),
+                    'month4'   => Controller::formatNumber($row->month4, 0),
+                    'month5'   => Controller::formatNumber($row->month5, 0),
+                    'month6'   => Controller::formatNumber($row->month6, 0),
+                    'month7'   => Controller::formatNumber($row->month7, 0),
+                    'month8'   => Controller::formatNumber($row->month8, 0),
+                    'month9'   => Controller::formatNumber($row->month9, 0),
+                    'month10'  => Controller::formatNumber($row->month10, 0),
+                    'month11'  => Controller::formatNumber($row->month11, 0),
+                    'month12'  => Controller::formatNumber($row->month12, 0),
+                    'total'    => Controller::formatNumber(
                         $row->month1 +
                         $row->month2 +
                         $row->month3 +
@@ -363,9 +363,9 @@ class CTManagementReports extends CTCNC
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
-                'urlCategoryPopup' => $categoryPopupURL,
-                'categoryName' => $categoryName,
-                'categoryID' => $_REQUEST['categoryID']
+                'urlCategoryPopup'  => $categoryPopupURL,
+                'categoryName'      => $categoryName,
+                'categoryID'        => $_REQUEST['categoryID']
             )
         );
 
@@ -389,41 +389,41 @@ class CTManagementReports extends CTCNC
         $pcs = null
     )
     {
-        $results = $this->buManagementReports->getSalesByCustomer($customerId, $year);
+        $results = $this->buManagementReports->getSalesByCustomer($customerId, $year, $sector, $pcs);
         $data = [];
         while ($row = $results->fetch_object()) {
 
             $data[] = [
-                'customer' => Controller::htmlDisplayText($row->customer),
-                'sector' => Controller::htmlDisplayText($row->sector),
-                'noOfPCs' => Controller::htmlDisplayText($row->noOfPCs),
-                'noOfServers' => Controller::htmlDisplayText($row->noOfServers),
-                'salesMonth1' => Controller::formatNumber($row->salesMonth1, 0),
-                'profitMonth1' => Controller::formatNumber($row->profitMonth1, 0),
-                'salesMonth2' => Controller::formatNumber($row->salesMonth2, 0),
-                'profitMonth2' => Controller::formatNumber($row->profitMonth2, 0),
-                'salesMonth3' => Controller::formatNumber($row->salesMonth3, 0),
-                'profitMonth3' => Controller::formatNumber($row->profitMonth3, 0),
-                'salesMonth4' => Controller::formatNumber($row->salesMonth4, 0),
-                'profitMonth4' => Controller::formatNumber($row->profitMonth4, 0),
-                'salesMonth5' => Controller::formatNumber($row->salesMonth5, 0),
-                'profitMonth5' => Controller::formatNumber($row->profitMonth5, 0),
-                'salesMonth6' => Controller::formatNumber($row->salesMonth6, 0),
-                'profitMonth6' => Controller::formatNumber($row->profitMonth6, 0),
-                'salesMonth7' => Controller::formatNumber($row->salesMonth7, 0),
-                'profitMonth7' => Controller::formatNumber($row->profitMonth7, 0),
-                'salesMonth8' => Controller::formatNumber($row->salesMonth8, 0),
-                'profitMonth8' => Controller::formatNumber($row->profitMonth8, 0),
-                'salesMonth9' => Controller::formatNumber($row->salesMonth9, 0),
-                'profitMonth9' => Controller::formatNumber($row->profitMonth9, 0),
-                'salesMonth10' => Controller::formatNumber($row->salesMonth10, 0),
+                'customer'      => Controller::htmlDisplayText($row->customer),
+                'sector'        => Controller::htmlDisplayText($row->sector),
+                'noOfPCs'       => Controller::htmlDisplayText($row->noOfPCs),
+                'noOfServers'   => Controller::htmlDisplayText($row->noOfServers),
+                'salesMonth1'   => Controller::formatNumber($row->salesMonth1, 0),
+                'profitMonth1'  => Controller::formatNumber($row->profitMonth1, 0),
+                'salesMonth2'   => Controller::formatNumber($row->salesMonth2, 0),
+                'profitMonth2'  => Controller::formatNumber($row->profitMonth2, 0),
+                'salesMonth3'   => Controller::formatNumber($row->salesMonth3, 0),
+                'profitMonth3'  => Controller::formatNumber($row->profitMonth3, 0),
+                'salesMonth4'   => Controller::formatNumber($row->salesMonth4, 0),
+                'profitMonth4'  => Controller::formatNumber($row->profitMonth4, 0),
+                'salesMonth5'   => Controller::formatNumber($row->salesMonth5, 0),
+                'profitMonth5'  => Controller::formatNumber($row->profitMonth5, 0),
+                'salesMonth6'   => Controller::formatNumber($row->salesMonth6, 0),
+                'profitMonth6'  => Controller::formatNumber($row->profitMonth6, 0),
+                'salesMonth7'   => Controller::formatNumber($row->salesMonth7, 0),
+                'profitMonth7'  => Controller::formatNumber($row->profitMonth7, 0),
+                'salesMonth8'   => Controller::formatNumber($row->salesMonth8, 0),
+                'profitMonth8'  => Controller::formatNumber($row->profitMonth8, 0),
+                'salesMonth9'   => Controller::formatNumber($row->salesMonth9, 0),
+                'profitMonth9'  => Controller::formatNumber($row->profitMonth9, 0),
+                'salesMonth10'  => Controller::formatNumber($row->salesMonth10, 0),
                 'profitMonth10' => Controller::formatNumber($row->profitMonth10, 0),
-                'salesMonth11' => Controller::formatNumber($row->salesMonth11, 0),
+                'salesMonth11'  => Controller::formatNumber($row->salesMonth11, 0),
                 'profitMonth11' => Controller::formatNumber($row->profitMonth11, 0),
-                'salesMonth12' => Controller::formatNumber($row->salesMonth12, 0),
+                'salesMonth12'  => Controller::formatNumber($row->salesMonth12, 0),
                 'profitMonth12' => Controller::formatNumber($row->profitMonth12, 0),
-                'totalSales' => Controller::formatNumber($row->salesTotal, 0),
-                'totalProfit' => Controller::formatNumber($row->profitTotal, 0)
+                'totalSales'    => Controller::formatNumber($row->salesTotal, 0),
+                'totalProfit'   => Controller::formatNumber($row->profitTotal, 0)
             ];
         }
         return $data;
@@ -453,7 +453,7 @@ class CTManagementReports extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
-                    'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -475,11 +475,11 @@ class CTManagementReports extends CTCNC
         $this->template->set_var(
             array(
                 'customerPopupURL' => $customerPopupURL,
-                'customerName' => $customerName,
-                'customerID' => $_REQUEST['customerID'],
-                'sectorID' => $_REQUEST['sectorID'],
-                'noOfPcs' => $_REQUEST['noOfPcs'],
-                'fetchDataUrl' => $fetchDataUrl
+                'customerName'     => $customerName,
+                'customerID'       => $_REQUEST['customerID'],
+                'sectorID'         => $_REQUEST['sectorID'],
+                'noOfPcs'          => $_REQUEST['noOfPcs'],
+                'fetchDataUrl'     => $fetchDataUrl
             )
         );
 
@@ -504,7 +504,7 @@ class CTManagementReports extends CTCNC
             $this->template->set_var(
                 array(
                     'yearSelected' => $yearSelected,
-                    'year' => $year
+                    'year'         => $year
                 )
             );
 
@@ -528,10 +528,17 @@ class CTManagementReports extends CTCNC
 
         foreach ($options as $option) {
             $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : '') : ($option === "Search All" ? CT_SELECTED : '');
+            if ($option === 'Search All') {
+                $value = '';
+            } else {
+                $value = $option;
+            }
+
             $this->template->set_var(
                 array(
-                    'noOfPcsSelected' => $isSelected ? CT_SELECTED : null,
-                    'noOfPcsDescription' => $option
+                    'noOfPcsSelected'    => $isSelected ? CT_SELECTED : null,
+                    'noOfPcsDescription' => $option,
+                    'noOfPcsValue'       => $value
                 )
             );
 
@@ -550,8 +557,8 @@ class CTManagementReports extends CTCNC
 
         $this->template->set_var(
             array(
-                'selectedSector' => $selectedSectorID ? CT_SELECTED : '',
-                'sectorID' => null,
+                'selectedSector'    => $selectedSectorID ? CT_SELECTED : '',
+                'sectorID'          => null,
                 'sectorDescription' => "Search All"
             )
         );
@@ -566,8 +573,8 @@ class CTManagementReports extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'selectedSector' => $selectedSector,
-                    'sectorID' => $sectorID,
+                    'selectedSector'    => $selectedSector,
+                    'sectorID'          => $sectorID,
                     'sectorDescription' => $sectorDescription
                 )
             );
