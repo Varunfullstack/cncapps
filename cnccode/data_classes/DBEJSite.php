@@ -10,8 +10,8 @@ require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 
 class DBEJSite extends DBESite
 {
-    const InvContactName = "InvContactName";
-    const DelContactName = "DelContactName";
+    const InvContactName = "invContactName";
+    const DelContactName = "delContactName";
 
     /**
      * calls constructor()

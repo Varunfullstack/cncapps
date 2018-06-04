@@ -68,6 +68,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 $this->setFormErrorOn();
             } else {
 
+
+
                 $startDate = (DateTime::createFromFormat("m/Y",
                                                          $dsSearchForm->getValue('startYearMonth')))->modify('first day of this month ');
                 $endDate = (DateTime::createFromFormat("m/Y",
