@@ -3630,28 +3630,6 @@ is currently a balance of ';
 
         }
 
-
-        /*
-If there is a row on the activity_archive table with the same 200 chars of description for this
-customer with the past 8 hours email to GL
-*/
-        $shortReason = substr($_SESSION[$sessionKey]['reason'], 0, 200);
-
-        $queryString =
-            "SELECT caa_problemno
-      FROM callactivity_archive
-      WHERE
-        length(trim(reason)) > 0" .
-            " AND  trim(substr( reason, 0, 200 )) = TRIM( substr( '" . addslashes($shortReason) . "',0,200))" .
-            " AND DATE_ADD(CONCAT(caa_date, ' ', caa_starttime ) , INTERVAL 8 HOUR ) >= NOW()";
-
-
-        $resultSet = $this->db->query($queryString);
-        if ($record = $resultSet->fetch_assoc()) {
-            $this->sendServiceReAddedEmail($dbeProblem->getPKValue(), $record['caa_problemno']);
-            $resultSet->close();
-        }
-
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($_SESSION[$sessionKey]['customerID'], $dsCustomer);
 
