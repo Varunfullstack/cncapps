@@ -663,7 +663,10 @@ class DataAccess extends BaseObject
                 $name = func_get_arg(0);
                 $type = func_get_arg(1);
                 $null = func_get_arg(2);
-                $validationFunction = func_get_arg(2);
+                $validationFunction = null;
+                if ($numArgs > 3) {
+                    $validationFunction = func_get_arg(3);
+                }
                 // add a column name only once
                 $ixColumn = $this->columnExists($name);
                 if ($ixColumn == DA_OUT_OF_RANGE) {
@@ -1260,7 +1263,6 @@ class DataAccess extends BaseObject
 
     private function setValidationFunction($ixColumn, $validationFunction)
     {
-
         $ret = FALSE;
         $ixColumn = $this->columnExists($ixColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {

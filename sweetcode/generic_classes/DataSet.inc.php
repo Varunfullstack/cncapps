@@ -405,7 +405,6 @@ class DataSet extends DataAccess
                         // Column type validation
 
                         $validationFunction = $this->getValidationFunction($fieldName);
-
                         if ($validationFunction) {
                             if (!$validationFunction($value)) {
                                 $this->setMessage($fieldName, DATASET_MSG_INVALID);
