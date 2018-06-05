@@ -121,7 +121,6 @@ class BUSite extends Business
             $insert = TRUE;
         } else {
             // get the existing row with sage ref
-//			$this->getSiteByID($dsSite->getValue(DBESite::CustomerID), $dsSite->getValue('siteNo'), $dsSite);
             $this->dbeSite->setValue(DBESite::CustomerID, $dsSite->getValue(DBESite::CustomerID));
             $this->dbeSite->setValue(DBESite::SiteNo, $dsSite->getValue(DBESite::SiteNo));
             $this->dbeSite->setUpdateModeUpdate();

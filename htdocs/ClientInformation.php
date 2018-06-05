@@ -39,8 +39,8 @@ $dbeAttendeeUser	= new DBEUser($this);
 $dbeAttendeeUser->setValue('userID', $_REQUEST['attendeeUserID']);
 $dbeAttendeeUser->getRow();
 
-if ($dsSite->getValue('phone') != ''){
-	$phone = $dsSite->getValue('phone');
+if ($dsSite->getValue(DBESite::Phone) != ''){
+	$phone = $dsSite->getValue(DBESite::Phone);
 }
 if ($dsContact->getValue('phone') != ''){
 	$phone .= ' DDI: ' . $dsContact->getValue('phone');

@@ -1285,22 +1285,20 @@ class CTCustomerCRM extends CTCNC
                 'slaP4'                           => $this->dsCustomer->getValue('slaP4'),
                 'slaP5'                           => $this->dsCustomer->getValue('slaP5'),
 
-                'add1'              => $site->getValue("Add1"),
-                'add2'              => $site->getValue("Add2"),
-                'add3'              => $site->getValue("Add3"),
-                //                'townClass' => $site->getValue('TownClass'),
-                'town'              => $site->getValue("Town"),
-                'county'            => $site->getValue("County"),
-                //                'postcodeClass' => $site->getValue('PostcodeClass'),
-                'postcode'          => $site->getValue("Postcode"),
+                'add1'              => $site->getValue(DBESite::Add1),
+                'add2'              => $site->getValue(DBESite::Add2),
+                'add3'              => $site->getValue(DBESite::Add3),
+                'town'              => $site->getValue(DBESite::Town),
+                'county'            => $site->getValue(DBESite::County),
+                'postcode'          => $site->getValue(DBESite::Postcode),
                 'sitePhone'         => $site->getValue(DBESite::Phone),
-                'siteNo'            => $site->getValue("SiteNo"),
-                'sageRef'           => $site->getValue("SageRef"),
-                'debtorCode'        => $site->getValue("DebtorCode"),
-                'maxTravelHours'    => $site->getValue("MaxTravelHours"),
+                'siteNo'            => $site->getValue(DBESite::SiteNo),
+                'sageRef'           => $site->getValue(DBESite::SageRef),
+                'debtorCode'        => $site->getValue(DBESite::DebtorCode),
+                'maxTravelHours'    => $site->getValue(DBESite::MaxTravelHours),
                 'deliverContactID'  => $site->getValue(DBESite::DeliverContactID),
-                'activeFlagChecked' => ($site->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
-                'activeFlag'        => $site->getValue('ActiveFlag'),
+                'activeFlagChecked' => ($site->getValue(DBESite::ActiveFlag) == 'Y') ? CT_CHECKED : '',
+                'activeFlag'        => $site->getValue(DBESite::ActiveFlag),
                 'deliveryContactID' => $site->getValue(DBESite::DeliverContactID),
                 'invoiceContactID'  => $site->getValue(DBESite::DeliverContactID),
                 'nonUKFlag'         => $site->getValue(DBESite::NonUKFlag),
@@ -1567,9 +1565,9 @@ class CTCustomerCRM extends CTCNC
 
         if (!$this->formError) {// Only get from DB if not displaying form error(s)
             $thing = CTCUSTOMER_CLS_TABLE_EDIT_HEADER;
-//            $site->setValue('Add1Class',);
-//            $site->setValue('TownClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
-//            $site->setValue('PostcodeClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
+//            $site->setValue(DBESite::Add1Class,);
+//            $site->setValue(DBESite::TownClass, CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
+//            $site->setValue(DBESite::PostcodeClass, CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
         }
 
         //      $this->template->set_block('CustomerEdit','contacts', '');
@@ -1577,18 +1575,18 @@ class CTCustomerCRM extends CTCNC
             $this->buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'action'     => CTCUSTOMER_ACT_ADDCONTACT,
-                                 'customerID' => $site->getValue("CustomerID"),
-                                 'siteNo'     => $site->getValue("SiteNo")
+                                 'customerID' => $site->getValue(DBESite::CustomerID),
+                                 'siteNo'     => $site->getValue(DBESite::SiteNo)
                              )
             );
         // If we can delete this site set the link
-        if ($this->buCustomer->canDeleteSite($site->getValue("CustomerID"), $site->getValue("SiteNo"))) {
+        if ($this->buCustomer->canDeleteSite($site->getValue(DBESite::CustomerID), $site->getValue(DBESite::SiteNo))) {
             $deleteSiteURL = $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCUSTOMER_ACT_DELETESITE,
-                    'customerID' => $site->getValue("CustomerID"),
-                    'siteNo'     => $site->getValue("SiteNo")
+                    'customerID' => $site->getValue(DBESite::CustomerID),
+                    'siteNo'     => $site->getValue(DBESite::SiteNo)
                 )
             );
             $deleteSiteText = 'Delete Site';
@@ -1601,24 +1599,24 @@ class CTCustomerCRM extends CTCNC
         $this->template->set_var(
             array(
                 'add1Class'      => $thing,
-                'add1'           => $site->getValue("Add1"),
-                'add2'           => $site->getValue("Add2"),
-                'add3'           => $site->getValue("Add3"),
-                //                'townClass' => $site->getValue('TownClass'),
-                'town'           => $site->getValue("Town"),
-                'county'         => $site->getValue("County"),
-                //                'postcodeClass' => $site->getValue('PostcodeClass'),
-                'postcode'       => $site->getValue("Postcode"),
-                'sitePhone'      => $site->getValue("Phone"),
-                'siteNo'         => $site->getValue("SiteNo"),
-                'customerID'     => $site->getValue("CustomerID"),
-                'sageRef'        => $site->getValue("SageRef"),
-                'debtorCode'     => $site->getValue("DebtorCode"),
-                'maxTravelHours' => $site->getValue("MaxTravelHours"),
+                'add1'           => $site->getValue(DBESite::Add1),
+                'add2'           => $site->getValue(DBESite::Add2),
+                'add3'           => $site->getValue(DBESite::Add3),
+                //                'townClass' => $site->getValue(DBESite::TownClass),
+                'town'           => $site->getValue(DBESite::Town),
+                'county'         => $site->getValue(DBESite::County),
+                //                'postcodeClass' => $site->getValue(DBESite::PostcodeClass),
+                'postcode'       => $site->getValue(DBESite::Postcode),
+                'sitePhone'      => $site->getValue(DBESite::Phone),
+                'siteNo'         => $site->getValue(DBESite::SiteNo),
+                'customerID'     => $site->getValue(DBESite::CustomerID),
+                'sageRef'        => $site->getValue(DBESite::SageRef),
+                'debtorCode'     => $site->getValue(DBESite::DebtorCode),
+                'maxTravelHours' => $site->getValue(DBESite::MaxTravelHours),
 
-                'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $site->getValue('SiteNo')) ? CT_CHECKED : '',
-                'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $site->getValue('SiteNo')) ? CT_CHECKED : '',
-                'activeFlagChecked'      => ($site->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
+                'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $site->getValue(DBESite::SiteNo)) ? CT_CHECKED : '',
+                'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $site->getValue(DBESite::SiteNo)) ? CT_CHECKED : '',
+                'activeFlagChecked'      => ($site->getValue(DBESite::ActiveFlag) == 'Y') ? CT_CHECKED : '',
                 'deleteSiteText'         => $deleteSiteText,
                 'deleteSiteURL'          => $deleteSiteURL
             )
@@ -1628,7 +1626,7 @@ class CTCustomerCRM extends CTCNC
 
 
         $this->parseContactSelector(
-            $site->getValue('InvoiceContactID'),
+            $site->getValue(DBESite::InvoiceContactID),
             $this->dsContact,
             'invoiceContacts',
             'selectInvoiceContactBlock'
@@ -1637,7 +1635,7 @@ class CTCustomerCRM extends CTCNC
         $this->template->set_block('CustomerEdit', 'deliverContacts', '');
 
         $this->parseContactSelector(
-            $site->getValue('DeliverContactID'),
+            $site->getValue(DBESite::DeliverContactID),
             $this->dsContact,
             'deliverContacts',
             'selectDeliverContactBlock'
@@ -2067,18 +2065,18 @@ class CTCustomerCRM extends CTCNC
     {
         // Site selection
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue('CustomerID', $customerID);
+        $dbeSite->setValue(DBESite::CustomerID, $customerID);
         $dbeSite->getRowsByCustomerID();
 
 
         while ($dbeSite->fetchNext()) {
-            $siteSelected = ($siteNo == $dbeSite->getValue("SiteNo")) ? CT_SELECTED : '';
-            $siteDesc = $dbeSite->getValue("SiteNo");
+            $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::SiteNo)) ? CT_SELECTED : '';
+            $siteDesc = $dbeSite->getValue(DBESite::SiteNo);
 
             $this->template->set_var(
                 array(
                     'siteSelected'   => $siteSelected,
-                    'selectSiteNo'   => $dbeSite->getValue("SiteNo"),
+                    'selectSiteNo'   => $dbeSite->getValue(DBESite::SiteNo),
                     'selectSiteDesc' => $siteDesc
                 )
             );

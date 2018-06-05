@@ -133,13 +133,13 @@ class CTProspectImport extends CTCNC
         $dsSite->replicate($importDataset);
         while ($dsSite->fetchNext()) {
             // ensure postcode doesn't exist on DB
-            $dbeSite->setValue('postcode', $dsSite->getValue('postcode'));
+            $dbeSite->setValue(DBESite::Postcode, $dsSite->getValue(DBESite::Postcode));
             $dbeSite->getRowsByColumn('postcode');
             if ($dbeSite->fetchNext()) {
                 $errorMessage .=
                     'Duplicate postcode on line ' .
                     ($dsSite->ixCurrentRow + 2) .
-                    ', value: ' . $dsSite->getValue('postcode') . '<BR>';
+                    ', value: ' . $dsSite->getValue(DBESite::Postcode) . '<BR>';
             }
             $errorMessage .= $this->validateNotNull($dsSite);
         }
@@ -185,27 +185,27 @@ class CTProspectImport extends CTCNC
 
             // insert site row
             $this->copyValues($dsSite, $dbeSite);
-            $dbeSite->setValue('customerID', $dbeCustomer->getValue('customerID'));
+            $dbeSite->setValue(DBESite::CustomerID, $dbeCustomer->getValue('customerID'));
             $dbeSite->insertRow();
 
             // go back to customer and update invoice and delivery site numbers
             $dbeCustomer->getRow();
-            $dbeCustomer->setValue('delSiteNo', $dbeSite->getValue('siteNo'));
-            $dbeCustomer->setValue('invSiteNo', $dbeSite->getValue('siteNo'));
+            $dbeCustomer->setValue('delSiteNo', $dbeSite->getValue(DBESite::SiteNo));
+            $dbeCustomer->setValue('invSiteNo', $dbeSite->getValue(DBESite::SiteNo));
             $dbeCustomer->updateRow();
 
             // Insert contact row
             $this->copyValues($dsContact, $dbeContact);
             $dbeContact->setValue('customerID', $dbeCustomer->getValue('customerID'));
-            $dbeContact->setValue('siteNo', $dbeSite->getValue('siteNo'));
+            $dbeContact->setValue('siteNo', $dbeSite->getValue(DBESite::SiteNo));
             $dbeContact->setValue('phone', '');
             $dbeContact->insertRow();
 
             // go back to site and update default contacts
             $dbeSite->getRow();
-            $dbeSite->setValue('sageRef', $this->buSite->getSageRef($dbeCustomer->getValue('customerID')));
-            $dbeSite->setValue('delContactID', $dbeContact->getValue('contactID'));
-            $dbeSite->setValue('invContactID', $dbeContact->getValue('contactID'));
+            $dbeSite->setValue(DBESite::SageRef, $this->buSite->getSageRef($dbeCustomer->getValue('customerID')));
+            $dbeSite->setValue(DBESite::DelContactID, $dbeContact->getValue('contactID'));
+            $dbeSite->setValue(DBESite::InvContactID, $dbeContact->getValue('contactID'));
             $dbeSite->updateRow();
         }
 
