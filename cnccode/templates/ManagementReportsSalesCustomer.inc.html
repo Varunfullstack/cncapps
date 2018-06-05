@@ -46,26 +46,45 @@
 
     function moneyFormat(data, type, row, meta) {
         if (!data) {
-            return null;
+            data = 0;
         }
 
-        return accounting.formatMoney(data, "£", ',', ".");
+        return accounting.formatMoney(data, "£", ".", ',');
     }
 
     $(document).ready(function () {
         dataTable = $('#myTable').DataTable({
             dom: 'Blfrtip',
             buttons: [
+                // {
+                //     extend: 'csv',
+                //     bom: true,
+                //     exportOptions: {
+                //         orthogonal: 'data'
+                //     }
+                // },
                 {
-                    extend: 'csv',
-                    bom: true
+                    extend: 'excel'
                 }
             ],
             paging: false,
             columns: [
                 {data: "customer"},
                 {data: "sector"},
-                {data: "noOfPCs"},
+                {
+                    data: "noOfPCs",
+                    render: function (data, type, row) {
+                        if (type === 'sort' || type === 'type') {
+                            if (data.indexOf('-') > -1) {
+                                return +(data.substring(0, data.indexOf('-')));
+                            } else {
+                                return +data;
+                            }
+                        }
+
+                        return data;
+                    }
+                },
                 {data: "noOfServers"},
                 {
                     data: "totalSales",
@@ -269,7 +288,7 @@
             </td>
             <td>
                 <label for="noOfPcs">
-                    Pcs
+                    PCs
                 </label>
                 <select name="noOfPcs" id="noOfPcs">
                     <!-- BEGIN noOfPcsBlock -->
