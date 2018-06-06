@@ -58,7 +58,7 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
@@ -66,16 +66,16 @@ class BUDailyReport extends Business
 
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
-                        'serviceRequestID' => $row[1],
-                        'fixedBy' => $row[2],
-                        'description' => $description,
-                        'durationHours' => $row[4],
-                        'timeSpentHours' => $row[5],
+                        'customer'          => $row[0],
+                        'serviceRequestID'  => $row[1],
+                        'fixedBy'           => $row[2],
+                        'description'       => $description,
+                        'durationHours'     => $row[4],
+                        'timeSpentHours'    => $row[5],
                         'responseTimeHours' => $row[6],
-                        'fixTimeHours' => $row[7],
-                        'contract' => $row[8],
-                        'urlRequest' => $urlRequest
+                        'fixTimeHours'      => $row[7],
+                        'contract'          => $row[8],
+                        'urlRequest'        => $urlRequest
                     )
                 );
 
@@ -83,15 +83,15 @@ class BUDailyReport extends Business
 
                 $csvTemplate->setVar(
                     array(
-                        'customer' => $row[0],
-                        'serviceRequestID' => $row[1],
-                        'fixedBy' => $row[2],
-                        'description' => $description,
-                        'durationHours' => $row[4],
-                        'timeSpentHours' => $row[5],
+                        'customer'          => $row[0],
+                        'serviceRequestID'  => $row[1],
+                        'fixedBy'           => $row[2],
+                        'description'       => $description,
+                        'durationHours'     => $row[4],
+                        'timeSpentHours'    => $row[5],
                         'responseTimeHours' => $row[6],
-                        'fixTimeHours' => $row[7],
-                        'contract' => $row[8]
+                        'fixTimeHours'      => $row[7],
+                        'contract'          => $row[8]
                     )
                 );
 
@@ -171,36 +171,36 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'assignedTo' => $row[2],
-                        'description' => substr(common_stripEverything($row[3]), 0, 50),
-                        'durationHours' => $row[4],
-                        'timeSpentHours' => $row[5],
-                        'lastUpdatedDate' => $row[6],
-                        'priority' => $row[7],
-                        'teamName' => $row[8],
-                        'urlRequest' => $urlRequest
+                        'assignedTo'       => $row[2],
+                        'description'      => substr(common_stripEverything($row[3]), 0, 50),
+                        'durationHours'    => $row[4],
+                        'timeSpentHours'   => $row[5],
+                        'lastUpdatedDate'  => $row[6],
+                        'priority'         => $row[7],
+                        'teamName'         => $row[8],
+                        'urlRequest'       => $urlRequest
                     )
                 );
 
                 $csvTemplate->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'assignedTo' => $row[2],
-                        'description' => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
-                        'durationHours' => $row[4],
-                        'timeSpentHours' => $row[5],
-                        'lastUpdatedDate' => $row[6],
-                        'priority' => $row[7],
-                        'teamName' => $row[8],
+                        'assignedTo'       => $row[2],
+                        'description'      => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'durationHours'    => $row[4],
+                        'timeSpentHours'   => $row[5],
+                        'lastUpdatedDate'  => $row[6],
+                        'priority'         => $row[7],
+                        'teamName'         => $row[8],
                     )
                 );
 
@@ -284,7 +284,7 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
@@ -293,20 +293,20 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'callActivityID' => $row[2],
-                            'action' => 'displayActivity'
+                            'action'         => 'displayActivity'
                         )
                     );
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'activityID' => $row[2],
-                        'technician' => $row[3],
-                        'hours' => number_format($row[4], 2),
-                        'contract' => $row[5],
-                        'category' => $row[6],
-                        'urlRequest' => $urlRequest,
-                        'urlActivity' => urlencode($urlActivity)
+                        'activityID'       => $row[2],
+                        'technician'       => $row[3],
+                        'hours'            => number_format($row[4], 2),
+                        'contract'         => $row[5],
+                        'category'         => $row[6],
+                        'urlRequest'       => $urlRequest,
+                        'urlActivity'      => urlencode($urlActivity)
                     )
                 );
 
@@ -363,7 +363,7 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
@@ -372,19 +372,19 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'callActivityID' => $row[2],
-                            'action' => 'displayActivity'
+                            'action'         => 'displayActivity'
                         )
                     );
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'activityID' => $row[2],
-                        'value' => number_format($row[3], 2),
-                        'technician' => $row[4],
-                        'urlRequest' => $urlRequest,
-                        'urlActivity' => $urlActivity,
-                        'contract' => $row[8]
+                        'activityID'       => $row[2],
+                        'value'            => number_format($row[3], 2),
+                        'technician'       => $row[4],
+                        'urlRequest'       => $urlRequest,
+                        'urlActivity'      => $urlActivity,
+                        'contract'         => $row[8]
                     )
                 );
 
@@ -593,9 +593,9 @@ class BUDailyReport extends Business
         $buMail = new BUMail($this);
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'Subject' => $subject,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -610,9 +610,9 @@ class BUDailyReport extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -670,37 +670,37 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'assignedTo' => $row[2],
-                        'description' => substr(common_stripEverything($row[3]), 0, 50),
-                        'durationHours' => $row[4],
-                        'timeSpentHours' => $row[5],
-                        'lastUpdatedDate' => $row[6],
-                        'priority' => $row[7],
-                        'teamName' => $row[8],
-                        'urlRequest' => $urlRequest,
-                        'title' => $title
+                        'assignedTo'       => $row[2],
+                        'description'      => substr(common_stripEverything($row[3]), 0, 50),
+                        'durationHours'    => $row[4],
+                        'timeSpentHours'   => $row[5],
+                        'lastUpdatedDate'  => $row[6],
+                        'priority'         => $row[7],
+                        'teamName'         => $row[8],
+                        'urlRequest'       => $urlRequest,
+                        'title'            => $title
                     )
                 );
 
                 $csvTemplate->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'assignedTo' => $row[2],
-                        'description' => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
-                        'durationHours' => $row[4],
-                        'timeSpentHours' => $row[5],
-                        'lastUpdatedDate' => $row[6],
-                        'priority' => $row[7],
-                        'teamName' => $row[8],
+                        'assignedTo'       => $row[2],
+                        'description'      => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'durationHours'    => $row[4],
+                        'timeSpentHours'   => $row[5],
+                        'lastUpdatedDate'  => $row[6],
+                        'priority'         => $row[7],
+                        'teamName'         => $row[8],
                     )
                 );
 
@@ -792,25 +792,25 @@ class BUDailyReport extends Business
                         'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'description' => substr(common_stripEverything($row[2]), 0, 50),
-                        'urlRequest' => $urlRequest,
-                        'title' => $title
+                        'description'      => substr(common_stripEverything($row[2]), 0, 50),
+                        'urlRequest'       => $urlRequest,
+                        'title'            => $title
                     )
                 );
 
                 $csvTemplate->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'description' => str_replace(',', '', substr(common_stripEverything($row[2]), 0, 50)),
+                        'description'      => str_replace(',', '', substr(common_stripEverything($row[2]), 0, 50)),
                     )
                 );
 
@@ -872,22 +872,23 @@ WHERE pro_priority = 5
         $contactsData = [];
 
         while ($row = $contactOpenSRReportData->fetch_assoc()) {
-            if (!isset($contactsData[$row['contactName']])) {
-                $contactsData[$row['contactName']] = [
-                    "email" => $row['contactEmail'],
+            if (!isset($contactsData[$row['contactID']])) {
+                $contactsData[$row['contactID']] = [
+                    "name"            => $row['contactName'],
+                    "email"           => $row['contactEmail'],
                     "serviceRequests" => []
                 ];
             }
-            $contactsData[$row['contactName']]['serviceRequests'][] = $row;
+            $contactsData[$row['contactID']]['serviceRequests'][] = $row;
         }
 
-        foreach ($contactsData as $contactName => $contactsDatum) {
+        foreach ($contactsData as $contactID => $contactsDatum) {
 
             $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
 
             $template->set_file('page', 'DailySROpenReportEmail.html');
 
-            $template->set_var('contactName', $contactName);
+            $template->set_var('contactName', $contactsDatum['contactName']);
 
             $template->set_block('page', 'openSRBlock', 'openSR');
 
@@ -898,11 +899,11 @@ WHERE pro_priority = 5
                 $template->setVar(
                     array(
                         "srLinkToPortal" => $urlRequest,
-                        "srNumber" => $SR['id'],
+                        "srNumber"       => $SR['id'],
                         "srRaisedByName" => $SR['raisedBy'],
                         "srRaisedOnDate" => (new \DateTime($SR['raisedOn']))->format('d-m-Y h:i'),
-                        "srStatus" => $SR['status'],
-                        "srDetails" => $this->getFirstLinesDetails($SR['details'], 150),
+                        "srStatus"       => $SR['status'],
+                        "srDetails"      => $this->getFirstLinesDetails($SR['details'], 150),
                     )
                 );
 
@@ -966,7 +967,8 @@ WHERE pro_priority = 5
                   ) AS status,
                   callactivity.`reason` AS details,
                   contact.`con_first_name` AS contactName,
-                  contact.con_email as contactEmail  
+                  contact.con_email as contactEmail,
+                  contact.`con_contno` AS contactID   
                 FROM
                   problem 
                   INNER JOIN contact 
