@@ -876,6 +876,7 @@ WHERE pro_priority = 5
                 $contactsData[$row['contactID']] = [
                     "name"            => $row['contactName'],
                     "email"           => $row['contactEmail'],
+                    "customerName"    => $row['customerName'],
                     "serviceRequests" => []
                 ];
             }
@@ -900,7 +901,7 @@ WHERE pro_priority = 5
                     array(
                         "srLinkToPortal" => $urlRequest,
                         "srNumber"       => $SR['id'],
-                        "srRaisedByName" => $SR['raisedBy'],
+                        "srRaisedByName" => $SR['raisedBy'] . ($onScreen ? ('( ' . $contactsDatum['customerName'] . ' )') : ''),
                         "srRaisedOnDate" => (new \DateTime($SR['raisedOn']))->format('d-m-Y h:i'),
                         "srStatus"       => $SR['status'],
                         "srDetails"      => $this->getFirstLinesDetails($SR['details'], 150),
@@ -971,7 +972,8 @@ WHERE pro_priority = 5
                   callactivity.`reason` AS details,
                   contact.`con_first_name` AS contactName,
                   contact.con_email as contactEmail,
-                  contact.`con_contno` AS contactID   
+                  contact.`con_contno` AS contactID,
+                  customer.cus_name as customerName
                 FROM
                   problem 
                   INNER JOIN contact 
@@ -981,7 +983,8 @@ WHERE pro_priority = 5
                     ON callactivity.`caa_problemno` = problem.`pro_problemno` 
                     AND callactivity.`caa_callacttypeno` = 51 
                   LEFT JOIN contact AS reporter 
-                    ON problem.`pro_contno` = reporter.`con_contno` 
+                    ON problem.`pro_contno` = reporter.`con_contno`
+                    left join customer on problem.pro_custno = customer.cus_custno 
                 WHERE problem.`pro_status` <> 'C'
                 AND problem.`pro_status` <> 'F' 
                 and problem.`pro_hide_from_customer_flag` <> 'Y'
