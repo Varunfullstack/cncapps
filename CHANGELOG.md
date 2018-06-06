@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.7.5] - 2018-06-06
+### Fixed
+- Issue 265 - Daily Report sending some customer data to wrong people
+
 ## [v1.7.3] - 2018-05-30
 ### Fixed
 - Issue 258 - CustomerCRM searching and saving issues - hotfix required
