@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.7.5] -2018-06-06
+## [v1.7.5] - 2018-06-06
 ### Fixed
 - Issue 265 - Daily Report sending some customer data to wrong people
 
