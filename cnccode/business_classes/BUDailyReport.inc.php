@@ -864,7 +864,7 @@ WHERE pro_priority = 5
         return $this->db->query($sql);
     }
 
-    public function contactOpenSRReport()
+    public function contactOpenSRReport($onScreen)
     {
         $this->setMethodName('contactOpenSRReport');
 
@@ -888,7 +888,7 @@ WHERE pro_priority = 5
 
             $template->set_file('page', 'DailySROpenReportEmail.html');
 
-            $template->set_var('contactName', $contactsDatum['contactName']);
+            $template->set_var('contactName', $contactsDatum['name']);
 
             $template->set_block('page', 'openSRBlock', 'openSR');
 
@@ -917,14 +917,17 @@ WHERE pro_priority = 5
 
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
 
-            $this->sendByEmailTo(
-                $contactsDatum['email'],
-                $subject,
-                $body,
-                null,
-                'customerReports@cnc-ltd.co.uk'
-            );
+            if (!$onScreen) {
+                $this->sendByEmailTo(
+                    $contactsDatum['email'],
+                    $subject,
+                    $body,
+                    null,
+                    'customerReports@cnc-ltd.co.uk'
+                );
+            }
 
+            echo '<br><div>Sent to Email ' . $contactsDatum['email'] . '</div><br>';
             echo $body;
 
         }

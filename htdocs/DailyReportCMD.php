@@ -38,7 +38,7 @@ switch ($_REQUEST ['action']) {
         $buDailyReport->p5WithSalesOrderAndContractAssigned();
         break;
     case 'contactOpenSRReport':
-        $buDailyReport->contactOpenSRReport();
+        $buDailyReport->contactOpenSRReport($onScreen);
         break;
     default :
         break;
