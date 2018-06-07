@@ -346,7 +346,7 @@ class BUCustomer extends Business
         $ret = ($this->updateDataaccessObject($dsData, $this->dbeSite));
 
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
-        $this->updateModify($dsData->getValue('CustomerID'));
+        $this->updateModify($dsData->getValue(DBESite::CustomerID));
         return $ret;
     }
 
