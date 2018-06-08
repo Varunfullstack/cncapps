@@ -3975,7 +3975,8 @@ class CTActivity extends CTCNC
                 //try to close all the activities
                 $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue('problemID'));
 
-                if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID')) > 0) {
+                if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID'),
+                                                                    $dsCallActivity->getValue('callActivityID')) > 0) {
                     $this->dsCallActivity->setMessage('problemStatus',
                                                       'Can not fix, there are open activities on this request');
                     $this->formError = true;
@@ -4078,7 +4079,10 @@ class CTActivity extends CTCNC
             if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID')) > 0) {
                 $this->dsCallActivity->setMessage('problemStatus',
                                                   'Can not fix, there are open activities on this request');
-                $this->formError = true;
+                $_REQUEST['callActivityID'] = $callActivityID;
+                $_REQUEST['action'] = CTACTIVITY_ACT_EDIT_ACTIVITY;
+                $this->editActivity();
+                exit;
             } else {
                 $urlNext =
                     $this->buildLink(

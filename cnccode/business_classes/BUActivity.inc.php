@@ -7768,7 +7768,7 @@ is currently a balance of ';
     public function closeActivitiesWithEndTime($problemID)
     {
         global $db;
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE problemId = $problemID and caa_endtime <> ''";
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime <> ''";
         $db->query($sql);
         return true;
     }
