@@ -1,5 +1,20 @@
 <!-- Template: CustomerEdit.inc.html -->
 <script language='JavaScript' src='.javascript/ajax.js'></script>
+<style>
+
+    table.content tbody td {
+        background-color: #F4f4f2;
+        text-align: left;
+        padding: 5px;
+        vertical-align: top;
+        white-space: nowrap;
+    }
+
+    .contactError input {
+        border-color: red;
+    }
+
+</style>
 <script type="text/JavaScript">
 
     $(function () {
@@ -583,7 +598,7 @@
                         size="5"
                         maxlength="5"
                 >
-                <span class="formErrorMessage">{reviewTimeMessage}</span>By
+                <span class="formErrorMessage formError">{reviewTimeMessage}</span>By
                 <select
                         {disabled}
                         type="text"
@@ -883,9 +898,13 @@
         </div> <!-- customerEditSites -->
         <br/>
         <br/>
+        <script>
+
+        </script>
         <h3 style="clear: both;">Contacts</h3>
         <div class="contacts">
             <table class="content" border="0" cellpadding="2" cellspacing="1" width="100%">
+                <thead>
                 <tr>
                     <td class="headerLightgrey">&nbsp;</td>
                     <td class="headerLightgrey">&nbsp;</td>
@@ -917,6 +936,8 @@
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot10FlagDesc}</td>
                 </tr>
+                </thead>
+                <tbody>
                 <!-- BEGIN contactBlock -->
                 <input type="hidden" name="form[contact][{contactID}][contactID]" value="{contactID}">
                 <input type="hidden" name="form[contact][{contactID}][customerID]" value="{customerID}">
@@ -930,12 +951,12 @@
                 >
 
                 <tr>
-                    <td class="content">
+                    <td>
                         <A href="#"
                            onclick="javascript:contactPopup({contactID}, 'editContact', '{customerID}','{siteNo}' )">edit</a>
                     </td>
-                    <td class="content">{deleteContactLink}</td>
-                    <td class="content">
+                    <td>{deleteContactLink}</td>
+                    <td>
                         <select
                                 name="form[contact][{contactID}][siteNo]">
                             <!-- BEGIN selectSiteBlock -->
@@ -943,7 +964,7 @@
                             <!-- END selectSiteBlock -->
                         </select>
                     </td>
-                    <td class="content">
+                    <td class="{titleClass}">
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][title]"
@@ -952,7 +973,7 @@
                                 value="{title}"
                         >
                     </td>
-                    <td class="content" class='{firstNameClass}'>
+                    <td class='{firstNameClass}'>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][firstName]"
@@ -962,7 +983,7 @@
                                 required
                         >
                     </td>
-                    <td class="content" class='{lastNameClass}'>
+                    <td class='{lastNameClass}'>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][lastName]"
@@ -972,14 +993,14 @@
                                 required
                         >
                     </td>
-                    <td class="content"><input
+                    <td><input
                             name="form[contact][{contactID}][position]" id="form[contact][{contactID}][position]"
                             value="{position}"
                             size="10"
                             maxlength="20"
                             {disabled}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][phone]"
@@ -987,7 +1008,7 @@
                                 size="10"
                                 maxlength="30">
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][mobilePhone]"
@@ -995,7 +1016,7 @@
                                 size="10"
                                 maxlength="30">
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][email]"
@@ -1003,7 +1024,7 @@
                                 size="25"
                                 maxlength="50">
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][portalPassword]"
@@ -1011,7 +1032,7 @@
                                 size="4"
                                 maxlength="10">
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][failedLoginCount]"
@@ -1019,8 +1040,8 @@
                                 size="2"
                                 maxlength="5">
                     </td>
-                    <td nowrap="nowrap" class="content"><select {disabled} name="letters_menu"
-                                                                onchange="MM_jumpMenu('_blank',this,0)">
+                    <td nowrap="nowrap"><select {disabled} name="letters_menu"
+                                                onchange="MM_jumpMenu('_blank',this,0)">
                         <option>Send Letter</option>
                         <option value="{clientFormURL}">Appointment</option>
                         <!-- BEGIN customLetterBlock -->
@@ -1028,75 +1049,76 @@
                         <!-- END customLetterBlock -->
                     </select>
                     </td>
-                    <td class="content"><input
+                    <td><input
                             {disabled}
                             name="form[contact][{contactID}][notes]"
                             size="5"
                             maxlength="200"
                             value="{notes}"/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][workStartedEmailFlag]"
                                value="Y" {workStartedEmailFlagChecked}>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][autoCloseEmailFlag]"
                                value="Y" {autoCloseEmailFlagChecked}>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][accountsFlag]" value="Y"
                                {accountsFlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][sendMailshotFlag]" value="Y"
                                {sendMailshotFlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot1Flag]" value="Y"
                                {mailshot1FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot2Flag]" value="Y"
                                {mailshot2FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot3Flag]" value="Y"
                                {mailshot3FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot4Flag]" value="Y"
                                {mailshot4FlagChecked} class="stmCheckBox"/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot5Flag]" value="Y"
                                {mailshot5FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot6Flag]" value="Y"
                                {mailshot6FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot7Flag]" value="Y"
                                {mailshot7FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot8Flag]" value="Y"
                                {mailshot8FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot11Flag]" value="Y"
                                {mailshot11FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot9Flag]" value="Y"
                                {mailshot9FlagChecked}/>
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot10Flag]" value="Y"
                                {mailshot10FlagChecked} class="contactMain"/>
                     </td>
                 </tr>
                 <!-- END contactBlock -->
+                </tbody>
             </table>
             <input {disabled} type="submit" name="Go" value="Save">
             <input name="Button" type="button" value="Cancel" onClick="document.location='{cancelURL}';">
