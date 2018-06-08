@@ -67,13 +67,13 @@ class CTReviewList extends CTCNC
                     $this->buildLink(
                         'CustomerCRM.php',
                         array(
-                            'action' => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue('customerID')
+                            'action'     => 'displayEditForm',
+                            'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
                         )
                     );
 
                 if ($dsCustomer->getValue('reviewUserID')) {
-                    $buUser->getUserByID($dsCustomer->getValue('reviewUserID'), $dsUser);
+                    $buUser->getUserByID($dsCustomer->getValue(DBECustomer::ReviewUserID), $dsUser);
                     $user = $dsUser->getValue('name');
                 } else {
                     $user = false;
@@ -87,13 +87,13 @@ class CTReviewList extends CTCNC
                 $this->template->set_var(
 
                     array(
-                        'customerName' => $dsCustomer->getValue('name'),
-                        'reviewDate' => (new DateTime($dsCustomer->getValue('reviewDate')))->format('d/m/Y'),
-                        'reviewTime' => $dsCustomer->getValue('reviewTime'),
-                        'reviewAction' => substr($dsCustomer->getValue('reviewAction'), 0, 50),
-                        'reviewUser' => $user,
-                        'linkURL' => $linkURL,
-                        'reportURL' => $reportUrl
+                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::ReviewDate)))->format('d/m/Y'),
+                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::ReviewTime),
+                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::ReviewAction), 0, 50),
+                        'reviewUser'   => $user,
+                        'linkURL'      => $linkURL,
+                        'reportURL'    => $reportUrl
                     )
 
                 );
