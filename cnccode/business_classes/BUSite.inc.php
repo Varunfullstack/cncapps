@@ -170,7 +170,7 @@ class BUSite extends Business
     {
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
-        $customerName = $dsCustomer->getValue('name');
+        $customerName = $dsCustomer->getValue(DBECustomer::Name);
         $shortCode = "";
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr($customerName, $ixChar, 1) != " ") {

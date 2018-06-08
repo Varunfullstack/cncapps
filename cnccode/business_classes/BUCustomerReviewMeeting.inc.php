@@ -353,7 +353,7 @@ class BUCustomerReviewMeeting extends Business
         }
         $template->set_var(
             array(
-                'customerName' => $dsCustomer->getValue('name'),
+                'customerName' => $dsCustomer->getValue(DBECustomer::Name),
                 'startYearMonth' => $startDate->format('Y-m'),
                 'meetingDate' => $meetingDate,
                 'endYearMonth' => $endDate->format('Y-m'),

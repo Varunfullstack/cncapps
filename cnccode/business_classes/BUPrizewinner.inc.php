@@ -74,7 +74,7 @@ class BUPrizewinner extends Business
         $template->set_file('page', 'PrizewinnerWinnersEmail.inc.html');
 
         $winnerName = $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName');
-        $winnerCompany = $dsCustomer->getValue('name');
+        $winnerCompany = $dsCustomer->getValue(DBECustomer::Name);
 
         $template->setVar(
             array(
@@ -133,7 +133,7 @@ class BUPrizewinner extends Business
                 $template->setVar(
                     array(
                         'contactName' => $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName'),
-                        'contactCompany' => $dsCustomer->getValue('name'),
+                        'contactCompany' => $dsCustomer->getValue(DBECustomer::Name),
                         'winnerName' => $winnerName,
                         'winnerCompanyName' => $winnerCompany
                     )

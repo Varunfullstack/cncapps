@@ -97,8 +97,8 @@ class BURenewal extends Business
         while ($dsCustomer->fetchNext()) {
             $this->sendRenewalEmailToCustomer($dsCustomer);
 
-            $this->dbeCustomer->getRow($dsCustomer->getValue('customerID'));
-            $this->dbeCustomer->setValue('sendContractEmail', '');
+            $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::CustomerID));
+            $this->dbeCustomer->setValue(DBECustomer::SendContractEmail, '');
             $this->dbeCustomer->updateRow();
         }
     }
@@ -110,7 +110,7 @@ class BURenewal extends Business
         */
         $buMail = new BUMail($this);
 
-        $toEmail = $dsCustomer->getValue('sendContractEmail');
+        $toEmail = $dsCustomer->getValue(DBECustomer::SendContractEmail);
 
         $senderEmail = CONFIG_SALES_EMAIL;
         $senderName = 'CNC Sales';
@@ -127,7 +127,7 @@ class BURenewal extends Business
         $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
         $template->set_file('page', 'RenewalScheduleEmail.inc.html');
 
-        $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue('customerID'));
+        $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue(DBECustomer::CustomerID));
         $this->getData($this->dbeJContract, $dsRenewal);
 
         $renewalCount = 0;
@@ -145,7 +145,7 @@ class BURenewal extends Business
         }
 
         if ($renewalCount > 0) {
-            $this->addCustomerAcceptedDocumentsToEmail($dsCustomer->getValue('customerID'), $buMail);
+            $this->addCustomerAcceptedDocumentsToEmail($dsCustomer->getValue(DBECustomer::CustomerID), $buMail);
 
             $template->parse('output', 'page', true);
             $buMail->mime->setHTMLBody($template->get_var('output'));
@@ -204,8 +204,8 @@ class BURenewal extends Business
 
             $this->sendTandcEmailToCustomer($dsCustomer);
 
-            $this->dbeCustomer->getRow($dsCustomer->getValue('customerID'));
-            $this->dbeCustomer->setValue('sendTandcEmail', '');
+            $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::CustomerID));
+            $this->dbeCustomer->setValue(DBECustomer::SendTandcEmail, '');
             $this->dbeCustomer->updateRow();
 
         }
@@ -219,11 +219,11 @@ class BURenewal extends Business
         */
         $buMail = new BUMail($this);
 
-        $toEmail = $dsCustomer->getValue('sendTandcEmail');
+        $toEmail = $dsCustomer->getValue(DBECustomer::SendTandcEmail);
 
         $senderEmail = CONFIG_SALES_EMAIL;
         $senderName = 'CNC Sales';
-        $subject = 'Accepted Terms & Conditions - ' . $dsCustomer->getValue('name');
+        $subject = 'Accepted Terms & Conditions - ' . $dsCustomer->getValue(DBECustomer::Name);
 
 
         $hdrs = array(
@@ -236,7 +236,7 @@ class BURenewal extends Business
         $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
         $template->set_file('page', 'TermsAndConditionsEmail.inc.html');
 
-        $this->addCustomerAcceptedDocumentsToEmail($dsCustomer->getValue('customerID'), $buMail);
+        $this->addCustomerAcceptedDocumentsToEmail($dsCustomer->getValue(DBECustomer::CustomerID), $buMail);
 
         $template->parse('output', 'page', true);
         $buMail->mime->setHTMLBody($template->get_var('output'));

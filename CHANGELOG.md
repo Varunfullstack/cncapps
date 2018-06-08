@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 195 - Graph to show user productivity
+### Changed
+- Issue 236 - Enhance Sales By Customer report 
 
 ## [v1.7.5] - 2018-06-06
 ### Fixed

@@ -211,16 +211,6 @@ class BURenHosting extends Business
 
                     $buSalesOrder->initialiseOrder($dsOrdhead, $dsOrdline, $dsCustomer);
 
-                    /*
-                     * if this is a Server Care contract and the expiry date is less 2 months away
-                     * then generate health-check activities
-                     */
-                    /*
-                     * @TODO find out whether service desk renewals need notifications
-                              if ( $this->dbeJRenHosting->getValue('itemID') == CONFIG_SERVICEDESK_ITEM_ID  ){
-                                $this->emailSalesOrderNotification( $dsCustomer->getValue('name'), $dsOrdhead->getValue ( 'ordheadID' ) );
-                              }
-                    */
                     $line = -1;  // initialise sales order line seq
                 }
                 /**

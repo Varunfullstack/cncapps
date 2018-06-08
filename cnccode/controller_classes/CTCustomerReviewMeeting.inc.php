@@ -103,13 +103,13 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $nonEditableTemplate->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue('name'),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
                         'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
-                        'slaP1' => $dsCustomer->getValue('slaP1'),
-                        'slaP2' => $dsCustomer->getValue('slaP2'),
-                        'slaP3' => $dsCustomer->getValue('slaP3'),
-                        'slaP4' => $dsCustomer->getValue('slaP4'),
-                        'slaP5' => $dsCustomer->getValue('slaP5')
+                        'slaP1' => $dsCustomer->getValue(DBECustomer::SlaP1),
+                        'slaP2' => $dsCustomer->getValue(DBECustomer::SlaP2),
+                        'slaP3' => $dsCustomer->getValue(DBECustomer::SlaP3),
+                        'slaP4' => $dsCustomer->getValue(DBECustomer::SlaP4),
+                        'slaP5' => $dsCustomer->getValue(DBECustomer::SlaP5)
                     )
                 );
 
@@ -121,7 +121,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $supportedUsersData = $this->getSupportedUsersData($buContact,
                                                                    $customerId,
-                                                                   $dsCustomer->getValue('name'));
+                                                                   $dsCustomer->getValue(DBECustomer::Name));
 
                 $nonEditableTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
@@ -320,7 +320,7 @@ class CTCustomerReviewMeeting extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::Name);
         }
 
         echo "<script> var graphData = " . json_encode($graphData, JSON_NUMERIC_CHECK) . "</script>";

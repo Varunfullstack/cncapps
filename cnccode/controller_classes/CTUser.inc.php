@@ -9,7 +9,7 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg['path_dbe'] . '/DBECustomerNew.inc.php');
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBETeam.inc.php');
 // Actions
 define('CTUSER_ACT_DISPLAY_LIST', 'userList');
@@ -339,15 +339,15 @@ class CTUser extends CTCNC
 
         // customer selection
         $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRows('name');
+        $dbeCustomer->getRows(DBECustomer::Name);
         $this->template->set_block('UserEdit', 'customerBlock', 'customers');
         while ($dbeCustomer->fetchNext()) {
-            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue("customerID")) ? CT_SELECTED : '';
+            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(DBECustomer::CustomerID)) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'customerSelected' => $customerSelected,
-                    'customerID' => $dbeCustomer->getValue("customerID"),
-                    'customerName' => $dbeCustomer->getValue("name")
+                    'customerID' => $dbeCustomer->getValue(DBECustomer::CustomerID),
+                    'customerName' => $dbeCustomer->getValue(DBECustomer::Name)
                 )
             );
             $this->template->parse('customers', 'customerBlock', true);

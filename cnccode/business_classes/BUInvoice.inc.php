@@ -330,14 +330,14 @@ class BUInvoice extends Business
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
         $buSite = new BUSite($this);
-        $buSite->getSiteByID($customerID, $dsCustomer->getValue('invSiteNo'), $dsSite);
+        $buSite->getSiteByID($customerID, $dsCustomer->getValue(DBECustomer::InvoiceSiteNo), $dsSite);
         $buContact = new BUContact($this);
         $buContact->getContactByID($dsSite->getValue('invContactID'), $dsContact);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dbeInvhead->setValue('invheadID', 0); // for new number
         $dbeInvhead->setValue('customerID', $customerID);
-        $dbeInvhead->setValue('siteNo', $dsCustomer->getValue('invSiteNo'));
+        $dbeInvhead->setValue('siteNo', $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
         $dbeInvhead->setValue('ordheadID', '');
         $dbeInvhead->setValue('type', $type);    // Invoice/Credit Note
         $dbeInvhead->setValue('add1', $dsSite->getValue('add1'));
@@ -348,7 +348,7 @@ class BUInvoice extends Business
         $dbeInvhead->setValue('postcode', $dsSite->getValue('postcode'));
         $dbeInvhead->setValue('contactID', $dsSite->getValue('invContactID'));
         $dbeInvhead->setValue('contactName',
-            $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
+                              $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );
         $dbeInvhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_30_DAYS);    // default
         $vatCode = $dsHeader->getValue('stdVATCode');
@@ -559,7 +559,7 @@ class BUInvoice extends Business
         $dbeInvhead->setValue('postcode', $dsSite->getValue('postcode'));
         $dbeInvhead->setValue('contactID', $dsSite->getValue('invContactID'));
         $dbeInvhead->setValue('contactName',
-            $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
+                              $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );
 
         $dbeInvhead->updateRow();
@@ -582,7 +582,7 @@ class BUInvoice extends Business
         $dbeInvhead->getRow($invheadID); //existing values
         $dbeInvhead->setValue('contactID', $contactID);
         $dbeInvhead->setValue('contactName',
-            $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
+                              $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );
         $dbeInvhead->updateRow();
         return TRUE;
@@ -722,7 +722,7 @@ class BUInvoice extends Business
 
                 $buCustomer->getCustomerByID($dsInvhead->getValue('customerID'), $dsCustomer);
 
-                $list[] = $dsCustomer->getValue('name');
+                $list[] = $dsCustomer->getValue(DBECustomer::Name);
 
             }
 

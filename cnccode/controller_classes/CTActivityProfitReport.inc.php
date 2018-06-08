@@ -122,7 +122,7 @@ class CTActivityProfitReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::Name);
         }
 
         $this->template->set_block('ActivityProfitReport', 'resultBlock', 'results');
@@ -277,17 +277,23 @@ class CTActivityProfitReport extends CTCNC
 
         $buCustomer->getCustomerByID($_REQUEST ['customerID'], $dsCustomer);
 
-        $this->template->set_var(array('formError' => $this->formError, 'customerName' => $dsCustomer->getValue('name'), 'fromDate' => Controller::dateYMDtoDMY($_REQUEST ['fromDate']), 'toDate' => Controller::dateYMDtoDMY($_REQUEST ['toDate']), 'SDHoursTotal' => number_format($SDHoursTotal,
-                                                                                                                                                                                                                                                                                     2), 'SDChargeTotal' => number_format($SDChargeTotal,
-                                                                                                                                                                                                                                                                                                                          2), 'SDProRataTotal' => number_format($SDProRataTotal,
-                                                                                                                                                                                                                                                                                                                                                                2), 'PPHoursTotal' => number_format($PPHoursTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                    2), 'PPChargeTotal' => number_format($PPChargeTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                                                         2), 'SCHoursTotal' => number_format($SCHoursTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                             2), 'SCChargeTotal' => number_format($SCChargeTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  2), 'SCProRataTotal' => number_format($SCProRataTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        2), 'TMHoursTotal' => number_format($TMHoursTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            2), 'TMChargeTotal' => number_format($TMChargeTotal,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 2)));
+        $this->template->set_var(
+            array(
+                'formError' => $this->formError,
+                'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                'fromDate' => Controller::dateYMDtoDMY($_REQUEST ['fromDate']),
+                'toDate' => Controller::dateYMDtoDMY($_REQUEST ['toDate']),
+                'SDHoursTotal' => number_format($SDHoursTotal, 2),
+                'SDChargeTotal' => number_format($SDChargeTotal, 2),
+                'SDProRataTotal' => number_format($SDProRataTotal, 2),
+                'PPHoursTotal' => number_format($PPHoursTotal, 2),
+                'PPChargeTotal' => number_format($PPChargeTotal, 2),
+                'SCHoursTotal' => number_format($SCHoursTotal, 2),
+                'SCChargeTotal' => number_format($SCChargeTotal, 2),
+                'SCProRataTotal' => number_format($SCProRataTotal, 2),
+                'TMHoursTotal' => number_format($TMHoursTotal, 2),
+                'TMChargeTotal' => number_format($TMChargeTotal, 2))
+        );
 
         $this->template->parse('CONTENTS', 'ActivityProfitReportDrill', true);
         $this->parsePage();
@@ -335,7 +341,15 @@ class CTActivityProfitReport extends CTCNC
 
         $buCustomer->getCustomerByID($_REQUEST ['customerID'], $dsCustomer);
 
-        $this->template->set_var(array('formError' => $this->formError, 'customerName' => $dsCustomer->getValue('name'), 'fromDate' => Controller::dateYMDtoDMY($_REQUEST ['fromDate']), 'toDate' => Controller::dateYMDtoDMY($_REQUEST ['toDate'])));
+        $this->template->set_var(
+            array(
+                'formError' => $this->formError,
+                'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                'fromDate' => Controller::dateYMDtoDMY($_REQUEST ['fromDate']),
+                'toDate' => Controller::dateYMDtoDMY($_REQUEST ['toDate']
+                )
+            )
+        );
 
         $this->template->parse('CONTENTS', 'ActivityProfitReportInvoiceDrill', true);
         $this->parsePage();

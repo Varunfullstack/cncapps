@@ -211,12 +211,12 @@ class CTHome extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue('customerID')
+                            'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
                         )
                     );
 
-                if ($dsCustomer->getValue('reviewUserID')) {
-                    $this->buUser->getUserByID($dsCustomer->getValue('reviewUserID'), $dsUser);
+                if ($dsCustomer->getValue(DBECustomer::ReviewUserID)) {
+                    $this->buUser->getUserByID($dsCustomer->getValue(DBECustomer::ReviewUserID), $dsUser);
                     $user = $dsUser->getValue('name');
                 } else {
                     $user = false;
