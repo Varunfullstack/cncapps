@@ -7,6 +7,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 236 - Enhance Sales By Customer report 
 - Issue 239 - New navigation buttons in the activity pages
+- Issue 243 - Amend Contract Document details
 
 ## [v1.7.5] - 2018-06-06
 ### Fixed

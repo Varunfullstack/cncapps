@@ -373,8 +373,8 @@ define('CONFIG_HEADER_INVOICE_CONTACT', 'mailshot2Flag');     // Customer contac
 
 define('CONFIG_HEADER_DAILY_OPEN_SR_REPORT', 'mailshot11Flag');
 // Phone numbers
-define('CONFIG_IT_SUPPORT_PHONE', '0845 070 0582');
-define('CONFIG_PHONE_SYSTEM_SUPPORT_PHONE', '0845 070 0583');
+define('CONFIG_IT_SUPPORT_PHONE', '01273 384111');
+define('CONFIG_PHONE_SYSTEM_SUPPORT_PHONE', '01273 384111');
 
 define('CONFIG_MYSQL_DATE', 'Y-m-d');
 define('CONFIG_MYSQL_TIME', 'H:i:s');
