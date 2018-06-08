@@ -104,12 +104,12 @@ class CTCustomerReviewMeeting extends CTCNC
                 $nonEditableTemplate->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue('name'),
-                        'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
-                        'slaP1' => $dsCustomer->getValue('slaP1'),
-                        'slaP2' => $dsCustomer->getValue('slaP2'),
-                        'slaP3' => $dsCustomer->getValue('slaP3'),
-                        'slaP4' => $dsCustomer->getValue('slaP4'),
-                        'slaP5' => $dsCustomer->getValue('slaP5')
+                        'meetingDate'  => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
+                        'slaP1'        => $dsCustomer->getValue('slaP1'),
+                        'slaP2'        => $dsCustomer->getValue('slaP2'),
+                        'slaP3'        => $dsCustomer->getValue('slaP3'),
+                        'slaP4'        => $dsCustomer->getValue('slaP4'),
+                        'slaP5'        => $dsCustomer->getValue('slaP5')
                     )
                 );
 
@@ -199,15 +199,15 @@ class CTCustomerReviewMeeting extends CTCNC
                         $this->buildLink(
                             'Activity.php',
                             array(
-                                'action' => 'displayLastActivity',
+                                'action'    => 'displayLastActivity',
                                 'problemID' => $dsReviews->getValue('problemID')
                             )
                         );
 
                     $textTemplate->set_var(
                         array(
-                            'reviewHeading' => 'Review Item ' . $itemNo . '. SR no ' . $dsReviews->getValue('problemID'),
-                            'urlServiceRequest' => $urlServiceRequest,
+                            'reviewHeading'        => 'Review Item ' . $itemNo . '. SR no ' . $dsReviews->getValue('problemID'),
+                            'urlServiceRequest'    => $urlServiceRequest,
                             'managementReviewText' => $dsReviews->getValue('managementReviewReason'),
                         )
                     );
@@ -229,7 +229,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     $nonEditableTemplate->set_var(
                         array(
                             'srUserName' => $row->name,
-                            'srCount' => $row->count
+                            'srCount'    => $row->count
                         )
                     );
 
@@ -245,7 +245,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     $nonEditableTemplate->set_var(
                         array(
                             'srRootCauseDescription' => $row->rootCauseDescription,
-                            'srCount' => $row->count
+                            'srCount'                => $row->count
                         )
                     );
 
@@ -303,7 +303,10 @@ class CTCustomerReviewMeeting extends CTCNC
         }
 
         $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+                                             array(
+                                                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                                                 'htmlFmt' => CT_HTML_FMT_POPUP
+                                             ));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -327,20 +330,20 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
-                'customerString' => $customerString,
-                'startYearMonth' => $dsSearchForm->getValue('startYearMonth'),
+                'customerID'            => $dsSearchForm->getValue('customerID'),
+                'customerIDMessage'     => $dsSearchForm->getMessage('customerID'),
+                'customerString'        => $customerString,
+                'startYearMonth'        => $dsSearchForm->getValue('startYearMonth'),
                 'startYearMonthMessage' => $dsSearchForm->getMessage('startYearMonth'),
-                'endYearMonth' => $dsSearchForm->getValue('endYearMonth'),
-                'endYearMonthMessage' => $dsSearchForm->getMessage('endYearMonth'),
-                'meetingDate' => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
-                'meetingDateYmd' => $dsSearchForm->getValue('meetingDate'),
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'editableText' => $editableText,
-                'nonEditableText' => $nonEditableText,
-                'urlSubmit' => $urlSubmit,
-                'urlGeneratePdf' => $urlGeneratePdf,
+                'endYearMonth'          => $dsSearchForm->getValue('endYearMonth'),
+                'endYearMonthMessage'   => $dsSearchForm->getMessage('endYearMonth'),
+                'meetingDate'           => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
+                'meetingDateYmd'        => $dsSearchForm->getValue('meetingDate'),
+                'urlCustomerPopup'      => $urlCustomerPopup,
+                'editableText'          => $editableText,
+                'nonEditableText'       => $nonEditableText,
+                'urlSubmit'             => $urlSubmit,
+                'urlGeneratePdf'        => $urlGeneratePdf,
             )
         );
 
@@ -387,9 +390,9 @@ class CTCustomerReviewMeeting extends CTCNC
             $serverCareContractsTemplate->set_var(
                 array(
                     'itemDescription' => $dsServer->getValue('itemDescription'),
-                    'serialNo' => $dsServer->getValue('serialNo'),
-                    'serverName' => $dsServer->getValue('serverName'),
-                    'purchaseDate' => $purchaseDate,
+                    'serialNo'        => $dsServer->getValue('serialNo'),
+                    'serverName'      => $dsServer->getValue('serverName'),
+                    'purchaseDate'    => $purchaseDate,
                 )
             );
 
@@ -508,10 +511,10 @@ class CTCustomerReviewMeeting extends CTCNC
 
             $p1IncidentsTemplate->set_var(
                 [
-                    "id" => $dbeProblem->getValue(DBEJProblem::problemID),
+                    "id"      => $dbeProblem->getValue(DBEJProblem::problemID),
                     "summary" => $dbeProblem->getValue(DBEJProblem::reason),
                     "outcome" => $dbeProblem->getValue(DBEJProblem::lastReason),
-                    "SLA" => $respondedHours > $slaResponse ? "Not Achieved" : "Achieved",
+                    "SLA"     => $respondedHours > $slaResponse ? "Not Achieved" : "Achieved",
                 ]
             );
 
@@ -601,27 +604,27 @@ class CTCustomerReviewMeeting extends CTCNC
     {
 
         $serverCareIncidents = [
-            "title" => "ServerCare Incidents",
+            "title"   => "ServerCare Incidents",
             "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
-            "data" => []
+            "data"    => []
         ];
 
         $serviceDesk = [
-            "title" => "ServiceDesk/Pre-Pay Incidents",
+            "title"   => "ServiceDesk/Pre-Pay Incidents",
             "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
-            "data" => []
+            "data"    => []
         ];
 
         $otherContracts = [
-            "title" => "Other Contract Incidents",
+            "title"   => "Other Contract Incidents",
             "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
-            "data" => []
+            "data"    => []
         ];
 
         $totalSR = [
-            "title" => "Total SR's",
+            "title"   => "Total SR's",
             "columns" => ["Dates", "P1-3", "P4",],
-            "data" => []
+            "data"    => []
         ];
 
 
@@ -668,7 +671,13 @@ class CTCustomerReviewMeeting extends CTCNC
         $datasetContracts = null;
         $BUCustomerItem->getServerCareValidContractsByCustomerID($customerId, $datasetContracts);
 
-        return ["serverCareIncidents" => $serverCareIncidents, "serviceDesk" => $serviceDesk, "otherContracts" => $otherContracts, "totalSR" => $totalSR, "renderServerCare" => !!$datasetContracts->rowCount()];
+        return [
+            "serverCareIncidents" => $serverCareIncidents,
+            "serviceDesk"         => $serviceDesk,
+            "otherContracts"      => $otherContracts,
+            "totalSR"             => $totalSR,
+            "renderServerCare"    => !!$datasetContracts->rowCount()
+        ];
     }
 
     private function generateGraph($data, $dataX)
@@ -762,16 +771,16 @@ class CTCustomerReviewMeeting extends CTCNC
                 }
 
                 $duplicates[$userId] = [
-                    "firstName" => $firstName,
-                    "lastName" => $lastName,
-                    "id" => $userId,
+                    "firstName"  => $firstName,
+                    "lastName"   => $lastName,
+                    "id"         => $userId,
                     "customerId" => $customerId
                 ];
             } else {
                 $userMap[$key] = [
-                    "firstName" => $firstName,
-                    "lastName" => $lastName,
-                    "id" => $userId,
+                    "firstName"  => $firstName,
+                    "lastName"   => $lastName,
+                    "id"         => $userId,
                     "customerId" => $customerId
                 ];
             }
@@ -779,7 +788,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
             $supportContacts[] = [
                 "firstName" => $firstName,
-                "lastName" => $lastName
+                "lastName"  => $lastName
             ];
         }
 
@@ -804,9 +813,9 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $template->set_var(
                     array(
-                        'contactID' => $row['id'],
+                        'contactID'        => $row['id'],
                         'contactFirstName' => $row['firstName'],
-                        'contactLastName' => $row['lastName'],
+                        'contactLastName'  => $row['lastName'],
 
                     )
                 );
@@ -821,9 +830,9 @@ class CTCustomerReviewMeeting extends CTCNC
             $subject = 'Possible duplicated customer contacts';
 
             $hdrs = array(
-                'From' => $senderEmail,
-                'Subject' => $subject,
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -831,9 +840,9 @@ class CTCustomerReviewMeeting extends CTCNC
 
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
             $body = $buMail->mime->get($mime_params);
 
@@ -854,7 +863,7 @@ class CTCustomerReviewMeeting extends CTCNC
             $supportContactInfo .= "<li>" . $supportContacts[$i]['firstName'] . ' ' . $supportContacts[$i]['lastName'] . "</li>";
         }
         return [
-            "data" => $supportContactInfo,
+            "data"  => $supportContactInfo,
             "count" => count($supportContacts)
         ];
     }
@@ -864,6 +873,9 @@ class CTCustomerReviewMeeting extends CTCNC
         $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
 
         switch ($value) {
+            case 1:
+                $frequency = 'Monthly';
+                break;
             case 3:
                 $frequency = 'Quarterly';
                 break;

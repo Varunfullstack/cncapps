@@ -71,6 +71,7 @@ class CTCustomer extends CTCNC
     );
 
     var $meetingFrequency = array(
+        "1" => "Monthly",
         "3" => "Quarterly",
         "6" => "Six-monthly",
         "12" => "Annually"
