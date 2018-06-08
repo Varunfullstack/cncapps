@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 195 - Graph to show user productivity
+- Issue 264 - Add option for Monthly in customer review meeting frequency
 ### Changed
 - Issue 236 - Enhance Sales By Customer report 
 - Issue 239 - New navigation buttons in the activity pages
