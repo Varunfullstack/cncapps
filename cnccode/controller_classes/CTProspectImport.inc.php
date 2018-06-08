@@ -189,27 +189,27 @@ class CTProspectImport extends CTCNC
 
             // insert site row
             $this->copyValues($dsSite, $dbeSite);
-            $dbeSite->setValue('customerID', $dbeCustomer->getValue(DBECustomer::CustomerID));
+            $dbeSite->setValue(DBESite::CustomerID, $dbeCustomer->getValue(DBECustomer::CustomerID));
             $dbeSite->insertRow();
 
             // go back to customer and update invoice and delivery site numbers
             $dbeCustomer->getRow();
-            $dbeCustomer->setValue(DBECustomer::DeliverSiteNo, $dbeSite->getValue('siteNo'));
-            $dbeCustomer->setValue(DBECustomer::InvoiceSiteNo, $dbeSite->getValue('siteNo'));
+            $dbeCustomer->setValue(DBECustomer::DeliverSiteNo, $dbeSite->getValue(DBESite::SiteNo));
+            $dbeCustomer->setValue(DBECustomer::InvoiceSiteNo, $dbeSite->getValue(DBESite::SiteNo));
             $dbeCustomer->updateRow();
 
             // Insert contact row
             $this->copyValues($dsContact, $dbeContact);
             $dbeContact->setValue('customerID', $dbeCustomer->getValue(DBECustomer::CustomerID));
-            $dbeContact->setValue('siteNo', $dbeSite->getValue('siteNo'));
+            $dbeContact->setValue('siteNo', $dbeSite->getValue(DBESite::SiteNo));
             $dbeContact->setValue('phone', '');
             $dbeContact->insertRow();
 
             // go back to site and update default contacts
             $dbeSite->getRow();
-            $dbeSite->setValue('sageRef', $this->buSite->getSageRef($dbeCustomer->getValue(DBECustomer::CustomerID)));
-            $dbeSite->setValue('delContactID', $dbeContact->getValue('contactID'));
-            $dbeSite->setValue('invContactID', $dbeContact->getValue('contactID'));
+            $dbeSite->setValue(DBESite::SageRef, $this->buSite->getSageRef($dbeCustomer->getValue(DBECustomer::CustomerID)));
+            $dbeSite->setValue(DBESite::DelContactID, $dbeContact->getValue('contactID'));
+            $dbeSite->setValue(DBESite::InvContactID, $dbeContact->getValue('contactID'));
             $dbeSite->updateRow();
         }
 

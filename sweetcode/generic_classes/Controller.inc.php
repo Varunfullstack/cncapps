@@ -500,7 +500,6 @@ class Controller extends BaseObject
         $this->template->set_var("pageTitle", $this->getPageTitle());
 
 
-
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var("environmentTag", 'bgcolor="#FAE8EF"');
         }
@@ -646,21 +645,44 @@ class Controller extends BaseObject
         $this->pageTitle = $this->pageTitle . $newString;
     }
 
+    function generateCallTrace()
+    {
+        $e = new Exception();
+        $trace = explode("\n", $e->getTraceAsString());
+        // reverse array to make steps line up chronologically
+        $trace = array_reverse($trace);
+        array_shift($trace); // remove {main}
+        array_pop($trace); // remove call to this method
+        $length = count($trace);
+        $result = array();
+
+        for ($i = 0; $i < $length; $i++) {
+            $result[] = ($i + 1) . ')' . substr($trace[$i],
+                                                strpos($trace[$i],
+                                                       ' ')); // replace '#someNum' with '$i)', set the right ordering
+        }
+
+        return "\t" . implode("\n\t", $result);
+    }
+
+
     /**
      * Display fatal error page with passed message
      * @access private
      */
     function displayFatalError($errorMessage)
     {
-        $this->setPageTitle('A Problem Has Occured');
+        $this->setPageTitle('A Problem Has Occurred');
         $this->setTemplateFiles(array("FatalError" => "FatalError.inc"));
+
         $this->template->set_var(
             array(
                 "errorMessage" => $errorMessage,
-                "className" => $this->getClassName(),
-                "methodName" => $this->getMethodName(),
-                "url" => $_SERVER['PHP_SELF'],
-                "arguments" => $_SERVER['argv']
+                "className"    => $this->getClassName(),
+                "methodName"   => $this->getMethodName(),
+                "trace"        => $this->generateCallTrace(),
+                "url"          => $_SERVER['PHP_SELF'],
+                "arguments"    => $_SERVER['argv']
             )
         );
         $this->template->parse("CONTENTS", "FatalError", true);

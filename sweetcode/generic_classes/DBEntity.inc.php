@@ -803,8 +803,8 @@ class DBEntity extends DataAccess
     /**
      * Get column value by name or column number and trim trailing spaces
      * @access public
-     * @param string $ixColumn
-     * @return variant Right-trimmed column value
+     * @param  string|int $ixPassedColumn
+     * @return string|int|float|boolean Right-trimmed column value
      */
     function getValue($ixPassedColumn)
     {
@@ -833,8 +833,9 @@ class DBEntity extends DataAccess
     /**
      * Set column value by name or column number and trim trailing spaces
      * @access public
-     * @param variant $ixPassedColumn String name or col no
+     * @param string|int $ixPassedColumn String name or col no
      * @param string $value value to set
+     * @return bool
      */
     function setValue($ixPassedColumn, $value)
     {

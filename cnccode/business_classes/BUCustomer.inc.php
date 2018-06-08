@@ -114,7 +114,7 @@ class BUCustomer extends Business
         if ($customerID == '') {
             $this->raiseError('CustomerID not passed');
         }
-        $this->dbeSite->setValue("CustomerID", $customerID);
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
         if ($showInactiveSites) {
             $activeFlag = 'N';
         } else {
@@ -139,8 +139,8 @@ class BUCustomer extends Business
             $this->raiseError('CustomerID not passed');
         }
         $this->getCustomerByID($customerID, $dsCustomer);
-        $this->dbeSite->setValue("CustomerID", $customerID);
-        $this->dbeSite->setValue("SiteNo", $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $this->dbeSite->setValue(DBESite::SiteNo, $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('InvoiceContactID'), $dsContact);
@@ -162,8 +162,8 @@ class BUCustomer extends Business
             $this->raiseError('CustomerID not passed');
         }
         $this->getCustomerByID($customerID, $dsCustomer);
-        $this->dbeSite->setValue("CustomerID", $customerID);
-        $this->dbeSite->setValue("SiteNo", $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $this->dbeSite->setValue(DBESite::SiteNo, $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
         $this->dbeSite->getRowByCustomerIDSiteNo();
         $this->getData($this->dbeSite, $dsResults);
         $this->getContactByID($dsResults->getValue('DeliverContactID'), $dsContact);
@@ -325,8 +325,8 @@ class BUCustomer extends Business
         $this->addNewContactRow($dsContact, $dsData->getValue('CustomerID'), '0'); // First siteno always zero
         $ret = $ret & ($this->updateContact($dsContact));
         $dsSite->setUpdateModeUpdate();
-        $dsSite->setValue('DeliverContactID', $dsContact->getValue('ContactID'));
-        $dsSite->setValue('InvoiceContactID', $dsContact->getValue('ContactID'));
+        $dsSite->setValue(DBESite::DeliverContactID, $dsContact->getValue('ContactID'));
+        $dsSite->setValue(DBESite::InvoiceContactID, $dsContact->getValue('ContactID'));
         $dsSite->post();
         $ret = $ret & ($this->updateSite($dsSite));        // Then update site delivery and invoice contacts
         return $ret;
@@ -346,7 +346,7 @@ class BUCustomer extends Business
         $ret = ($this->updateDataaccessObject($dsData, $this->dbeSite));
 
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
-        $this->updateModify($dsData->getValue('CustomerID'));
+        $this->updateModify($dsData->getValue(DBESite::CustomerID));
         return $ret;
     }
 
@@ -360,7 +360,7 @@ class BUCustomer extends Business
      */
     function setCustomerID(&$source, &$dbeSite)
     {
-        $dbeSite->setValue('CustomerID', $source->getValue('CustomerID'));
+        $dbeSite->setValue(DBESite::CustomerID, $source->getValue('customerID'));
         return TRUE;
     }
 
@@ -457,15 +457,15 @@ class BUCustomer extends Business
         } else {
             $dsSite->clearCurrentRow();
             $dsSite->setUpdateModeInsert();
-            $dsSite->setValue('CustomerID', $customerID);
-            $dsSite->setValue('ActiveFlag', 'Y');
-            $dsSite->setValue('SiteNo', -9);
-            $dsSite->setValue('Add1', 'Address Line 1');
-            $dsSite->setValue('Town', 'TOWN');
-            $dsSite->setValue('MaxTravelHours', -1);    // means not set because 0 is now a valid distance
-            $dsSite->setValue('Postcode', 'POSTCODE');
+            $dsSite->setValue(DBESite::CustomerID, $customerID);
+            $dsSite->setValue(DBESite::ActiveFlag, 'Y');
+            $dsSite->setValue(DBESite::SiteNo, -9);
+            $dsSite->setValue(DBESite::Add1, 'Address Line 1');
+            $dsSite->setValue(DBESite::Town, 'TOWN');
+            $dsSite->setValue(DBESite::MaxTravelHours, -1);    // means not set because 0 is now a valid distance
+            $dsSite->setValue(DBESite::Postcode, 'POSTCODE');
             $dsSite->post();
-//			$this->updateModify($dsSite->getValue('CustomerID'));
+//			$this->updateModify($dsSite->getValue(DBESite::CustomerID));
             return TRUE;
         }
     }
@@ -563,7 +563,7 @@ class BUCustomer extends Business
     {
         $this->dbeContact->setValue('CustomerID', $customerID);
         $this->dbeContact->deleteRowsByCustomerID();
-        $this->dbeSite->setValue('CustomerID', $customerID);
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
         $this->dbeSite->deleteRowsByCustomerID();
         $this->dbeCustomer->setPKValue($customerID);
         $this->dbeCustomer->deleteRow();
@@ -608,8 +608,8 @@ class BUCustomer extends Business
         $this->dbeContact->setValue('CustomerID', $customerID);
         $this->dbeContact->setValue('SiteNo', $siteNo);
         $this->dbeContact->deleteRowsByCustomerIDSiteNo();
-        $this->dbeSite->setValue('CustomerID', $customerID);
-        $this->dbeSite->setValue('SiteNo', $siteNo);
+        $this->dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $this->dbeSite->setValue(DBESite::SiteNo, $siteNo);
         $this->dbeSite->deleteRow();
         $this->updateModify($customerID);
     }

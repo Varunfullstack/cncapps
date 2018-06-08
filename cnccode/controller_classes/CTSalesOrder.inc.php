@@ -2845,17 +2845,17 @@ class CTSalesOrder extends CTCNC
     function parseSiteSelector($siteNo, &$dsSite, $blockVar, $block)
     {
         while ($dsSite->fetchNext()) {
-            $siteSelected = ($dsSite->getValue('siteNo') == $siteNo) ? CT_SELECTED : '';
+            $siteSelected = ($dsSite->getValue(DBESite::SiteNo) == $siteNo) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     $block . 'Selected' => $siteSelected,
-                    $block . 'SiteNo' => $dsSite->getValue('siteNo'),
-                    $block . 'Add1' => $dsSite->getValue('add1'),
-                    $block . 'Add2' => $dsSite->getValue('add2'),
-                    $block . 'Add3' => $dsSite->getValue('add3'),
-                    $block . 'Town' => $dsSite->getValue('town'),
-                    $block . 'County' => $dsSite->getValue('county'),
-                    $block . 'Postcode' => $dsSite->getValue('postcode')
+                    $block . 'SiteNo' => $dsSite->getValue(DBESite::SiteNo),
+                    $block . 'Add1' => $dsSite->getValue(DBESite::Add1),
+                    $block . 'Add2' => $dsSite->getValue(DBESite::Add2),
+                    $block . 'Add3' => $dsSite->getValue(DBESite::Add3),
+                    $block . 'Town' => $dsSite->getValue(DBESite::Town),
+                    $block . 'County' => $dsSite->getValue(DBESite::County),
+                    $block . 'Postcode' => $dsSite->getValue(DBESite::Postcode)
                 )
             );
             $this->template->parse($blockVar, $block, true);

@@ -32,7 +32,7 @@ require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
-require_once($cfg ["path_dbe"] . "/DBESiteNew.inc.php");
+require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 define('BUACTIVITY_RESOLVED', 9);
@@ -355,7 +355,7 @@ class BUActivity extends Business
         $dsCallActivity->setValue('callActivityID', 0);
         $dsCallActivity->setValue('customerID', $customerID);
         $dsCallActivity->setValue('siteNo', $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
-        $dsCallActivity->setValue('contactID', $dsSite->getValue('invContactID'));
+        $dsCallActivity->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
         $dsCallActivity->setValue('userID', $userID);
         $dsCallActivity->setValue('callActTypeID', '');
         $dsCallActivity->setValue('date', date(CONFIG_MYSQL_DATE));
@@ -364,11 +364,11 @@ class BUActivity extends Business
         $dsCallActivity->setValue('status', 'O');
         $dsCallActivity->setValue('reason', '');
         $dsCallActivity->setValue('siteDesc',
-                                  $dsSite->getValue('add1'),
+                                  $dsSite->getValue(DBESite::Add1),
                                   ' ',
-                                  $dsSite->getValue('add2'),
+                                  $dsSite->getValue(DBESite::Add2),
                                   ' ',
-                                  $dsSite->getValue('town'));
+                                  $dsSite->getValue(DBESite::Town));
         $dsCallActivity->post();
     } // end sendServiceReallocatedEmail
 
@@ -1916,8 +1916,8 @@ class BUActivity extends Business
       * get site row for checking travel time
       */
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue('customerID', $dsCallActivity->getValue('customerID'));
-        $dbeSite->setValue('siteNo', $dsCallActivity->getValue('siteNo'));
+        $dbeSite->setValue(DBESite::CustomerID, $dsCallActivity->getValue('customerID'));
+        $dbeSite->setValue(DBESite::SiteNo, $dsCallActivity->getValue('siteNo'));
         $dbeSite->getRowByCustomerIDSiteNo();
 
         /*
@@ -1942,7 +1942,7 @@ class BUActivity extends Business
 
                     if (
                         strpos($dbeCallActType->getValue('description'), 'FOC') === FALSE &&
-                        $dbeSite->getValue('maxTravelHours') > 0
+                        $dbeSite->getValue(DBESite::MaxTravelHours) > 0
                     ) {
                         $dbeCallActivity = new DBECallActivity($this);
 
@@ -1989,7 +1989,7 @@ class BUActivity extends Business
                 $dsCallActivity->getValue('userID'),
                 $dsCallActivity->getValue('date')
             )
-            && $dbeSite->getValue('maxTravelHours') > 0    // the site has travel hours
+            && $dbeSite->getValue(DBESite::MaxTravelHours) > 0    // the site has travel hours
         ) {
             $this->template->parse('activityReenterEndTimeCreateTravel', 'ActivityReenterEndTimeCreateTravel', true);
         }
@@ -2026,7 +2026,7 @@ class BUActivity extends Business
 
         $activityStartTime = $dbeCallActivity->getValue('startTime');
 
-        $travelStart = common_convertDecimalToHHMM(common_convertHHMMToDecimal($activityStartTime) - $dsSite->getValue('maxTravelHours'));
+        $travelStart = common_convertDecimalToHHMM(common_convertHHMMToDecimal($activityStartTime) - $dsSite->getValue(DBESite::MaxTravelHours));
 
         $dbeTravelActivity = $dbeCallActivity;
 
@@ -2056,12 +2056,12 @@ class BUActivity extends Business
 
             $dbeSite = new DBESite($this);
 
-            $dbeSite->setValue('customerID', $customerID);
-            $dbeSite->setValue('siteNo', $siteNo);
+            $dbeSite->setValue(DBESite::CustomerID, $customerID);
+            $dbeSite->setValue(DBESite::SiteNo, $siteNo);
 
             $dbeSite->getRowByCustomerIDSiteNo();
 
-            if ($dbeSite->getValue('maxTravelHours') == -1) {  // new value for travel not set
+            if ($dbeSite->getValue(DBESite::MaxTravelHours) == -1) {  // new value for travel not set
 
                 $ret = true;
 
@@ -2598,7 +2598,7 @@ class BUActivity extends Business
             /* mantis 359: Apply maximum travel hours to travel type activities */
             if ($dbeCallActType->getValue('travelFlag') == 'Y') {
                 $buCustomer->getSiteByCustomerIDSiteNo($customerID, $dbeJCallActivity->getValue('siteNo'), $dsSite);
-                $max_hours = $dsSite->getValue('maxTravelHours');
+                $max_hours = $dsSite->getValue(DBESite::MaxTravelHours);
             } else {
                 // use the max hours field from call activity
                 $max_hours = $dbeCallActType->getValue('maxHours');
@@ -2755,7 +2755,7 @@ class BUActivity extends Business
 
             $buCustomer->getSiteByCustomerIDSiteNo($db->Record['pro_custno'], $db->Record['caa_siteno'], $dsSite);
 
-            if (!$dsSite->getValue('invContactID')) {
+            if (!$dsSite->getValue(DBESite::InvoiceContactID)) {
 
                 $failList .= '<BR/>' . $db->Record['cus_name'] . ', Site: ' . $db->Record['add_town'] . ',' . $db->Record['add_postcode'];
 
@@ -2978,27 +2978,7 @@ class BUActivity extends Business
                                                        $dsSite);
 
                 // Set header fields
-                $this->template->set_var(array(
-                                             'companyName'   => $db->Record ['cus_name'],
-                                             'customerRef'   => $db->Record ['cui_cuino'],
-                                             'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
-                                             'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
-                                             'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
-                                             'add1'          => $dsSite->getValue('add1'),
-                                             'add2'          => $dsSite->getValue('add2'),
-                                             'add3'          => $dsSite->getValue('add3'),
-                                             'town'          => $dsSite->getValue('town'),
-                                             'county'        => $dsSite->getValue('county'),
-                                             'postcode'      => $dsSite->getValue('postcode'),
-                                             'cnc_name'      => $this->dsHeader->getValue('name'),
-                                             'cnc_add1'      => $this->dsHeader->getValue('add1'),
-                                             'cnc_add2'      => $this->dsHeader->getValue('add2'),
-                                             'cnc_add3'      => $this->dsHeader->getValue('add3'),
-                                             'cnc_town'      => $this->dsHeader->getValue('town'),
-                                             'cnc_county'    => $this->dsHeader->getValue('county'),
-                                             'cnc_postcode'  => $this->dsHeader->getValue('postcode'),
-                                             'cnc_phone'     => $this->dsHeader->getValue('phone')
-                                         ));
+                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $db->Record ['cui_cuino'], 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')), 'add1' => $dsSite->getValue(DBESite::Add1),'add2' => $dsSite->getValue(DBESite::Add2),'add3' => $dsSite->getValue(DBESite::Add3),'town' => $dsSite->getValue(DBESite::Town),'county' => $dsSite->getValue(DBESite::County),'postcode' => $dsSite->getValue(DBESite::Postcode),'cnc_name' => $this->dsHeader->getValue('name'), 'cnc_add1' => $this->dsHeader->getValue('add1'), 'cnc_add2' => $this->dsHeader->getValue('add2'), 'cnc_add3' => $this->dsHeader->getValue('add3'), 'cnc_town' => $this->dsHeader->getValue('town'), 'cnc_county' => $this->dsHeader->getValue('county'), 'cnc_postcode' => $this->dsHeader->getValue('postcode'), 'cnc_phone' => $this->dsHeader->getValue('phone')));
 
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
@@ -3170,27 +3150,7 @@ class BUActivity extends Business
                 $this->template->set_file('page', 'GSCReport.inc.html');
 
                 // Set header fields
-                $this->template->set_var(array(
-                                             'companyName'   => $db->Record ['cus_name'],
-                                             'customerRef'   => $key,
-                                             'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
-                                             'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
-                                             'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
-                                             'add1'          => $dsSite->getValue('add1'),
-                                             'add2'          => $dsSite->getValue('add2'),
-                                             'add3'          => $dsSite->getValue('add3'),
-                                             'town'          => $dsSite->getValue('town'),
-                                             'county'        => $dsSite->getValue('county'),
-                                             'postcode'      => $dsSite->getValue('postcode'),
-                                             'cnc_name'      => $dsHeader->getValue('name'),
-                                             'cnc_add1'      => $dsHeader->getValue('add1'),
-                                             'cnc_add2'      => $dsHeader->getValue('add2'),
-                                             'cnc_add3'      => $dsHeader->getValue('add3'),
-                                             'cnc_town'      => $dsHeader->getValue('town'),
-                                             'cnc_county'    => $dsHeader->getValue('county'),
-                                             'cnc_postcode'  => $dsHeader->getValue('postcode'),
-                                             'cnc_phone'     => $dsHeader->getValue('phone')
-                                         ));
+                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $key, 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')), 'add1' => $dsSite->getValue(DBESite::Add1),'add2' => $dsSite->getValue(DBESite::Add2),'add3' => $dsSite->getValue(DBESite::Add3),'town' => $dsSite->getValue(DBESite::Town),'county' => $dsSite->getValue(DBESite::County),'postcode' => $dsSite->getValue(DBESite::Postcode),'cnc_name' => $dsHeader->getValue('name'), 'cnc_add1' => $dsHeader->getValue('add1'), 'cnc_add2' => $dsHeader->getValue('add2'), 'cnc_add3' => $dsHeader->getValue('add3'), 'cnc_town' => $dsHeader->getValue('town'), 'cnc_county' => $dsHeader->getValue('county'), 'cnc_postcode' => $dsHeader->getValue('postcode'), 'cnc_phone' => $dsHeader->getValue('phone')));
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
                 $this->template->set_var(array(
@@ -3562,8 +3522,8 @@ is currently a balance of ';
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue('callActivityID', 0);
-        $dbeCallActivity->setValue('siteNo', $dsSite->getValue('siteNo'));
-        $dbeCallActivity->setValue('contactID', $dsSite->getValue('invContactID'));
+        $dbeCallActivity->setValue('siteNo', $dsSite->getValue(DBESite::SiteNo));
+        $dbeCallActivity->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
         $dbeCallActivity->setValue('callActTypeID', 1);
         //    $dbeCallActivity->setValue('callID', $callID);
         $dbeCallActivity->setValue('date', date(CONFIG_MYSQL_DATE));
@@ -3654,6 +3614,28 @@ is currently a balance of ';
             );
 
         }
+
+
+//        /*
+//If there is a row on the activity_archive table with the same 200 chars of description for this
+//customer with the past 8 hours email to GL
+//*/
+//        $shortReason = substr($_SESSION[$sessionKey]['reason'], 0, 200);
+//
+//        $queryString =
+//            "SELECT caa_problemno
+//      FROM callactivity_archive
+//      WHERE
+//        length(trim(reason)) > 0" .
+//            " AND  trim(substr( reason, 0, 200 )) = TRIM( substr( '" . addslashes($shortReason) . "',0,200))" .
+//            " AND DATE_ADD(CONCAT(caa_date, ' ', caa_starttime ) , INTERVAL 8 HOUR ) >= NOW()";
+//
+//
+//        $resultSet = $this->db->query($queryString);
+//        if ($record = $resultSet->fetch_assoc()) {
+//            $this->sendServiceReAddedEmail($dbeProblem->getPKValue(), $record['caa_problemno']);
+//            $resultSet->close();
+//        }
 
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($_SESSION[$sessionKey]['customerID'], $dsCustomer);
@@ -5612,8 +5594,9 @@ is currently a balance of ';
         $dbeProblem->getRow($problemID);
 
         $dbeCustomer = new DBECustomer($this);
+        echo 'test '.__LINE__;
         $dbeCustomer->getRow($dbeProblem->getValue('customerID'));
-
+        echo 'test '.__LINE__;
         /*
     if not already allocated to a user, set to current user
     */
@@ -6736,12 +6719,12 @@ is currently a balance of ';
                 'amOrPM'           => $amOrPM,
                 'startTime'        => $dsCallActivity->getValue('startTime'),
                 'reason'           => trim($dsCallActivity->getValue('reason')),
-                'add1'             => $dsSite->getValue('add1'),
-                'add2'             => $dsSite->getValue('add2'),
-                'add3'             => $dsSite->getValue('add3'),
-                'town'             => $dsSite->getValue('town'),
-                'county'           => $dsSite->getValue('county'),
-                'postcode'         => $dsSite->getValue('postcode')
+                'add1'             => $dsSite->getValue(DBESite::Add1),
+                'add2'             => $dsSite->getValue(DBESite::Add2),
+                'add3'             => $dsSite->getValue(DBESite::Add3),
+                'town'             => $dsSite->getValue(DBESite::Town),
+                'county'           => $dsSite->getValue(DBESite::County),
+                'postcode'         => $dsSite->getValue(DBESite::Postcode)
             )
         );
         $template->parse('output', 'page', true);
@@ -7615,7 +7598,10 @@ is currently a balance of ';
         $ret = array();
 
         foreach ($results as $result) {
-            $result['percentage'] = ($result['hours'] / $grandTotalHours) * 100;
+            $result['percentage'] = 0;
+            if ($grandTotalHours) {
+                $result['percentage'] = ($result['hours'] / $grandTotalHours) * 100;
+            }
             $ret[] = $result;
         }
         return $ret;

@@ -57,18 +57,18 @@ $firstName = $dsContact->getValue('firstName');
 $addressee = $dsContact->getValue('title').' '.$firstName[0].' '.$dsContact->getValue('lastName');
 echo Controller::htmlDisplayText($addressee).'<BR/>';
 echo Controller::htmlDisplayText($dsCustomer->getValue('name')).'<BR/>';
-echo Controller::htmlDisplayText($dsSite->getValue('add1')).'<BR/>';
-if ($dsSite->getValue('add2') != ''){
-	echo Controller::htmlDisplayText($dsSite->getValue('add2')).'<BR/>';
+echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add1)).'<BR/>';
+if ($dsSite->getValue(DBESite::Add2) != ''){
+	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add2)).'<BR/>';
 }
-if ($dsSite->getValue('add3') != ''){
-	echo Controller::htmlDisplayText($dsSite->getValue('add3')).'<BR/>';
+if ($dsSite->getValue(DBESite::Add3) != ''){
+	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add3)).'<BR/>';
 }
-echo Controller::htmlDisplayText($dsSite->getValue('town')).'<BR/>';
-if ($dsSite->getValue('county') != ''){
-	echo Controller::htmlDisplayText($dsSite->getValue('county')).'<BR/>';
+echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Town)).'<BR/>';
+if ($dsSite->getValue(DBESite::County) != ''){
+	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::County)).'<BR/>';
 }
-echo Controller::htmlDisplayText($dsSite->getValue('postcode')).'<BR/>';
+echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Postcode)).'<BR/>';
 /*
 Body
 */

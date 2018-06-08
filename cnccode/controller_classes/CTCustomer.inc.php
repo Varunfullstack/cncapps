@@ -195,34 +195,34 @@ class CTCustomer extends CTCNC
             $this->dsSite->setValue('Add1Class', CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
             $this->dsSite->setValue('TownClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
             $this->dsSite->setValue('PostcodeClass', CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC);
-            $this->dsSite->setValue('CustomerID', $value['customerID']);
-            $this->dsSite->setValue('SiteNo', $value['siteNo']);
-            $this->dsSite->setValue('Add1', $value['add1']);
-            if ($this->dsSite->getValue('Add1') == '') {
+            $this->dsSite->setValue(DBESite::CustomerID, $value['customerID']);
+            $this->dsSite->setValue(DBESite::SiteNo, $value['siteNo']);
+            $this->dsSite->setValue(DBESite::Add1, $value['add1']);
+            if ($this->dsSite->getValue(DBESite::Add1) == '') {
                 $this->setFormErrorOn();
                 $this->dsSite->setValue('Add1Class', CTCUSTOMER_CLS_FORM_ERROR);
             }
-            $this->dsSite->setValue('Add2', $value['add2']);
-            $this->dsSite->setValue('Add3', $value['add3']);
-            $this->dsSite->setValue('Town', strtoupper($value['town']));
-            if ($this->dsSite->getValue('Town') == '') {
+            $this->dsSite->setValue(DBESite::Add2, $value['add2']);
+            $this->dsSite->setValue(DBESite::Add3, $value['add3']);
+            $this->dsSite->setValue(DBESite::Town, strtoupper($value['town']));
+            if ($this->dsSite->getValue(DBESite::Town) == '') {
                 $this->setFormErrorOn();
                 $this->dsSite->setValue('TownClass', CTCUSTOMER_CLS_FORM_ERROR_UC);
             }
-            $this->dsSite->setValue('County', $value['county']);
-            $this->dsSite->setValue('Postcode', strtoupper($value['postcode']));
-            if ($this->dsSite->getValue('Postcode') == '') {
+            $this->dsSite->setValue(DBESite::County, $value['county']);
+            $this->dsSite->setValue(DBESite::Postcode, strtoupper($value['postcode']));
+            if ($this->dsSite->getValue(DBESite::Postcode) == '') {
                 $this->setFormErrorOn();
                 $this->dsSite->setValue('PostcodeClass', CTCUSTOMER_CLS_FORM_ERROR_UC);
             }
-            $this->dsSite->setValue('Phone', $value['phone']);
-            $this->dsSite->setValue('MaxTravelHours', $value['maxTravelHours']);
-            $this->dsSite->setValue('InvoiceContactID', $value['invoiceContactID']);
-            $this->dsSite->setValue('DeliverContactID', $value['deliverContactID']);
-            $this->dsSite->setValue('SageRef', $value['sageRef']);
-            $this->dsSite->setValue('DebtorCode', $value['debtorCode']);
+            $this->dsSite->setValue(DBESite::Phone, $value['phone']);
+            $this->dsSite->setValue(DBESite::MaxTravelHours, $value['maxTravelHours']);
+            $this->dsSite->setValue(DBESite::InvoiceContactID, $value['invoiceContactID']);
+            $this->dsSite->setValue(DBESite::DeliverContactID, $value['deliverContactID']);
+            $this->dsSite->setValue(DBESite::SageRef, $value['sageRef']);
+            $this->dsSite->setValue(DBESite::DebtorCode, $value['debtorCode']);
             $this->dsSite->setValue(DBESite::NonUKFlag, $this->getYN($value['nonUKFlag']));
-            $this->dsSite->setValue('ActiveFlag', $this->getYN($value['activeFlag']));
+            $this->dsSite->setValue(DBESite::ActiveFlag, $this->getYN($value['activeFlag']));
             $this->dsSite->post();
         }
     }
@@ -1501,7 +1501,6 @@ ORDER BY cus_name ASC  ";
         }
 
         $this->dsSite->initialise();
-
         while ($this->dsSite->fetchNext()) {
             if (!$this->formError) {                                                      // Only get from DB if not displaying form error(s)
                 $this->dsSite->setValue('Add1Class', CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
@@ -1514,19 +1513,19 @@ ORDER BY cus_name ASC  ";
                 $this->buildLink($_SERVER['PHP_SELF'],
                                  array(
                                      'action' => CTCUSTOMER_ACT_ADDCONTACT,
-                                     'customerID' => $this->dsSite->getValue("CustomerID"),
-                                     'siteNo' => $this->dsSite->getValue("SiteNo")
+                                     'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
+                                     'siteNo' => $this->dsSite->getValue(DBESite::SiteNo)
                                  )
                 );
             // If we can delete this site set the link
-            if ($this->buCustomer->canDeleteSite($this->dsSite->getValue("CustomerID"),
-                                                 $this->dsSite->getValue("SiteNo"))) {
+            if ($this->buCustomer->canDeleteSite($this->dsSite->getValue(DBESite::CustomerID),
+                                                 $this->dsSite->getValue(DBESite::SiteNo))) {
                 $deleteSiteURL = $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCUSTOMER_ACT_DELETESITE,
-                        'customerID' => $this->dsSite->getValue("CustomerID"),
-                        'siteNo' => $this->dsSite->getValue("SiteNo")
+                        'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
+                        'siteNo' => $this->dsSite->getValue(DBESite::SiteNo)
                     )
                 );
                 $deleteSiteText = 'Delete Site';
@@ -1539,24 +1538,24 @@ ORDER BY cus_name ASC  ";
             $this->template->set_var(
                 array(
                     'add1Class' => $this->dsSite->getValue('Add1Class'),
-                    'add1' => $this->dsSite->getValue("Add1"),
-                    'add2' => $this->dsSite->getValue("Add2"),
-                    'add3' => $this->dsSite->getValue("Add3"),
+                    'add1' => $this->dsSite->getValue(DBESite::Add1),
+                    'add2' => $this->dsSite->getValue(DBESite::Add2),
+                    'add3' => $this->dsSite->getValue(DBESite::Add3),
                     'townClass' => $this->dsSite->getValue('TownClass'),
-                    'town' => $this->dsSite->getValue("Town"),
-                    'county' => $this->dsSite->getValue("County"),
+                    'town' => $this->dsSite->getValue(DBESite::Town),
+                    'county' => $this->dsSite->getValue(DBESite::County),
                     'postcodeClass' => $this->dsSite->getValue('PostcodeClass'),
-                    'postcode' => $this->dsSite->getValue("Postcode"),
-                    'sitePhone' => $this->dsSite->getValue("Phone"),
-                    'siteNo' => $this->dsSite->getValue("SiteNo"),
-                    'customerID' => $this->dsSite->getValue("CustomerID"),
-                    'sageRef' => $this->dsSite->getValue("SageRef"),
-                    'debtorCode' => $this->dsSite->getValue("DebtorCode"),
-                    'maxTravelHours' => $this->dsSite->getValue("MaxTravelHours"),
+                    'postcode' => $this->dsSite->getValue(DBESite::Postcode),
+                    'sitePhone' => $this->dsSite->getValue(DBESite::Phone),
+                    'siteNo' => $this->dsSite->getValue(DBESite::SiteNo),
+                    'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
+                    'sageRef' => $this->dsSite->getValue(DBESite::SageRef),
+                    'debtorCode' => $this->dsSite->getValue(DBESite::DebtorCode),
+                    'maxTravelHours' => $this->dsSite->getValue(DBESite::MaxTravelHours),
 
-                    'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $this->dsSite->getValue('SiteNo')) ? CT_CHECKED : '',
-                    'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $this->dsSite->getValue('SiteNo')) ? CT_CHECKED : '',
-                    'activeFlagChecked' => ($this->dsSite->getValue('ActiveFlag') == 'Y') ? CT_CHECKED : '',
+                    'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue('InvoiceSiteNo') == $this->dsSite->getValue(DBESite::SiteNo)) ? CT_CHECKED : '',
+                    'deliverSiteFlagChecked' => ($this->dsCustomer->getValue('DeliverSiteNo') == $this->dsSite->getValue(DBESite::SiteNo)) ? CT_CHECKED : '',
+                    'activeFlagChecked' => ($this->dsSite->getValue(DBESite::ActiveFlag) == 'Y') ? CT_CHECKED : '',
                     'nonUKFlagChecked' => ($this->dsSite->getValue(DBESite::NonUKFlag) == 'Y') ? CT_CHECKED : '',
                     'deleteSiteText' => $deleteSiteText,
                     'deleteSiteURL' => $deleteSiteURL
@@ -1567,7 +1566,7 @@ ORDER BY cus_name ASC  ";
 
 
             $this->parseContactSelector(
-                $this->dsSite->getValue('InvoiceContactID'),
+                $this->dsSite->getValue(DBESite::InvoiceContactID),
                 $this->dsContact,
                 'invoiceContacts',
                 'selectInvoiceContactBlock'
@@ -1576,7 +1575,7 @@ ORDER BY cus_name ASC  ";
             $this->template->set_block('CustomerEdit', 'deliverContacts', '');
 
             $this->parseContactSelector(
-                $this->dsSite->getValue('DeliverContactID'),
+                $this->dsSite->getValue(DBESite::DeliverContactID),
                 $this->dsContact,
                 'deliverContacts',
                 'selectDeliverContactBlock'
@@ -1662,8 +1661,8 @@ ORDER BY cus_name ASC  ";
                     'email' => $this->dsContact->getValue("Email"),
                     'notes' => $this->dsContact->getValue("Notes"),
                     'discontinuedFlag' => $this->dsContact->getValue("DiscontinuedFlag"),
-                    'invoiceContactFlagChecked' => ($this->dsContact->getValue("ContactID") == $this->dsSite->getValue('InvoiceContactID')) ? CT_CHECKED : '',
-                    'deliverContactFlagChecked' => ($this->dsContact->getValue("ContactID") == $this->dsSite->getValue('DeliverContactID')) ? CT_CHECKED : '',
+                    'invoiceContactFlagChecked' => ($this->dsContact->getValue("ContactID") == $this->dsSite->getValue(DBESite::InvoiceContactID)) ? CT_CHECKED : '',
+                    'deliverContactFlagChecked' => ($this->dsContact->getValue("ContactID") == $this->dsSite->getValue(DBESite::DeliverContactID)) ? CT_CHECKED : '',
                     'sendMailshotFlagChecked' => $this->getChecked($this->dsContact->getValue("SendMailshotFlag")),
                     'accountsFlagChecked' => $this->getChecked($this->dsContact->getValue("AccountsFlag")),
                     'mailshot1FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot1Flag")),
@@ -2016,18 +2015,18 @@ ORDER BY cus_name ASC  ";
     {
         // Site selection
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue('CustomerID', $customerID);
+        $dbeSite->setValue(DBESite::CustomerID, $customerID);
         $dbeSite->getRowsByCustomerID();
 
 
         while ($dbeSite->fetchNext()) {
-            $siteSelected = ($siteNo == $dbeSite->getValue("SiteNo")) ? CT_SELECTED : '';
-            $siteDesc = $dbeSite->getValue("SiteNo");
+            $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::SiteNo)) ? CT_SELECTED : '';
+            $siteDesc = $dbeSite->getValue(DBESite::SiteNo);
 
             $this->template->set_var(
                 array(
                     'siteSelected' => $siteSelected,
-                    'selectSiteNo' => $dbeSite->getValue("SiteNo"),
+                    'selectSiteNo' => $dbeSite->getValue(DBESite::SiteNo),
                     'selectSiteDesc' => $siteDesc
                 )
             );

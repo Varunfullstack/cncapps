@@ -87,6 +87,7 @@ class DataAccess extends BaseObject
     var $newRowValue = 0;                    // This value in a primary key column indicates to INSERT a new row into a Data Access object
     var $failOutOfRange = TRUE;
     var $_colCount = 0;
+    protected $colValidation = [];
 
     function __construct(&$owner)
     {
@@ -662,11 +663,15 @@ class DataAccess extends BaseObject
                 $name = func_get_arg(0);
                 $type = func_get_arg(1);
                 $null = func_get_arg(2);
+                $validationFunction = null;
+                if ($numArgs > 3) {
+                    $validationFunction = func_get_arg(3);
+                }
                 // add a column name only once
                 $ixColumn = $this->columnExists($name);
                 if ($ixColumn == DA_OUT_OF_RANGE) {
                     $ixColumn = $this->_colCount;    // Add to end
-                    $this->setNameAndType($ixColumn, $name, $type, $null);
+                    $this->setNameAndType($ixColumn, $name, $type, $null, $validationFunction);
                 }
                 $ret = $ixColumn;        // found column
             }
@@ -713,18 +718,20 @@ class DataAccess extends BaseObject
     /**
      * Set-up columns on the object
      * @access private
-     * @param integer ixColumn Column number
+     * @param $ixColumn
      * @param string $name Column name
      * @param integer $type Column type See DA_ constants for values
      * @param integer $null Nulls allowed: DA_ALLOW_NULL DA_NOT_NULL
+     * @param $validationFunction
      * @return bool Success
      */
-    function setNameAndType($ixColumn, $name, $type, $null)
+    function setNameAndType($ixColumn, $name, $type, $null, $validationFunction = null)
     {
         // Note: Must call setName first to create column
         $this->setName($ixColumn, $name);
         $this->setType($ixColumn, $type);
         $this->setNull($ixColumn, $null);
+        $this->setValidationFunction($ixColumn, $validationFunction);
         return TRUE;
     }
 
@@ -1252,6 +1259,19 @@ class DataAccess extends BaseObject
         $value = str_replace("\"", "", $value);                // and double quotes
 
         return $value;
+    }
+
+    private function setValidationFunction($ixColumn, $validationFunction)
+    {
+        $ret = FALSE;
+        $ixColumn = $this->columnExists($ixColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            $this->colValidation[$ixColumn] = $validationFunction;
+            $ret = TRUE;
+        } else {
+            $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
+        }
+        return $ret;
     }
 
 }

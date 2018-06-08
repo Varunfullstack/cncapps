@@ -1005,6 +1005,7 @@ class CTActivity extends CTCNC
         $this->setPageTitle('Activity');
 
         $this->buActivity->getActivityByID($_REQUEST['callActivityID'], $dsCallActivity);
+
         $callActivityID = $dsCallActivity->getValue('callActivityID');
 
         $problemID = $dsCallActivity->getValue('problemID');
@@ -1158,11 +1159,11 @@ class CTActivity extends CTCNC
 
         $customerDetails =
             $dsCustomer->getValue(DBECustomer::Name) .
-            ', ' . $dsSite->getValue('add1') .
-            ', ' . $dsSite->getValue('add2') .
-            ', ' . $dsSite->getValue('add3') .
-            ', ' . $dsSite->getValue('town') .
-            ', ' . $dsSite->getValue('postcode');
+            ', ' . $dsSite->getValue(DBESite::Add1) .
+            ', ' . $dsSite->getValue(DBESite::Add2) .
+            ', ' . $dsSite->getValue(DBESite::Add3) .
+            ', ' . $dsSite->getValue(DBESite::Town) .
+            ', ' . $dsSite->getValue(DBESite::Postcode);
 
         if ($dsContact) {
             $customerDetails .=
@@ -2889,7 +2890,7 @@ class CTActivity extends CTCNC
     {
         // Site selection
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue('customerID', $customerID);
+        $dbeSite->setValue(DBESite::CustomerID, $customerID);
         $dbeSite->getRowsByCustomerID();
 
         $siteCount = 0;
@@ -2897,7 +2898,7 @@ class CTActivity extends CTCNC
             $siteCount++;
         }
 
-        $dbeSite->setValue('customerID', $customerID);
+        $dbeSite->setValue(DBESite::CustomerID, $customerID);
         $dbeSite->getRowsByCustomerID();
 
         $this->template->set_block($templateName, $blockName, 'sites');
@@ -2907,15 +2908,16 @@ class CTActivity extends CTCNC
             if ($siteCount == 1) {
                 $siteSelected = CT_SELECTED;
             } else {
-                $siteSelected = ($siteNo == $dbeSite->getValue("siteNo")) ? CT_SELECTED : '';
+                $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::SiteNo)) ? CT_SELECTED : '';
             }
 
-            $siteDesc = $dbeSite->getValue("add1") . ' ' . $dbeSite->getValue("town") . ' ' . $dbeSite->getValue("postcode");
+            $siteDesc = $dbeSite->getValue(DBESite::Add1) . ' '
+                . $dbeSite->getValue(DBESite::Town) . ' ' . $dbeSite->getValue(DBESite::Postcode);
 
             $this->template->set_var(
                 array(
                     'siteSelected' => $siteSelected,
-                    'siteNo'       => $dbeSite->getValue("siteNo"),
+                    'siteNo'       => $dbeSite->getValue(DBESite::SiteNo),
                     'siteDesc'     => $siteDesc
                 )
             );
@@ -2949,8 +2951,8 @@ class CTActivity extends CTCNC
                 $endMainContactStyle = '';
             }
 
-            $dbeSite->setValue('customerID', $dbeContact->getValue("customerID"));
-            $dbeSite->setValue('siteNo', $dbeContact->getValue("siteNo"));
+            $dbeSite->setValue(DBESite::CustomerID, $dbeContact->getValue("customerID"));
+            $dbeSite->setValue(DBESite::SiteNo, $dbeContact->getValue("siteNo"));
             $dbeSite->getRow();
 
             $name = $dbeContact->getValue("firstName") . ' ' . $dbeContact->getValue("lastName");
@@ -2975,7 +2977,9 @@ class CTActivity extends CTCNC
                     }
                 }
 
-                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue('add1') . ' ' . $dbeSite->getValue('town') . ' ' . $dbeSite->getValue('postcode') . '">';
+                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::Add1) . ' ' .
+                    $dbeSite->getValue(DBESite::Town) . ' ' .
+                    $dbeSite->getValue(DBESite::Postcode) . '">';
                 $optGroupClose = '';
             } else {
                 $optGroupOpen = '';
@@ -3341,11 +3345,11 @@ class CTActivity extends CTCNC
 
             $customerDetails =
                 $dsCustomer->getValue(DBECustomer::Name) .
-                ', ' . $dsSite->getValue('add1') .
-                ', ' . $dsSite->getValue('add2') .
-                ', ' . $dsSite->getValue('add3') .
-                ', ' . $dsSite->getValue('town') .
-                ', ' . $dsSite->getValue('postcode') .
+                ', ' . $dsSite->getValue(DBESite::Add1) .
+                ', ' . $dsSite->getValue(DBESite::Add2) .
+                ', ' . $dsSite->getValue(DBESite::Add3) .
+                ', ' . $dsSite->getValue(DBESite::Town) .
+                ', ' . $dsSite->getValue(DBESite::Postcode) .
                 ', ' . $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName') . ', ' . $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID'));
 
             if ($dsContact->getValue('email') != '') {
@@ -4040,8 +4044,8 @@ class CTActivity extends CTCNC
             $dbeCallActType->getValue('itemSalePrice') > 0
         ) {
             $dbeSite = new DBESite($this);
-            $dbeSite->setValue('customerID', $this->dsCallActivity->getValue('customerID'));
-            $dbeSite->setValue('siteNo', $this->dsCallActivity->getValue('siteNo'));
+            $dbeSite->setValue(DBESite::CustomerID, $this->dsCallActivity->getValue('customerID'));
+            $dbeSite->setValue(DBESite::SiteNo, $this->dsCallActivity->getValue('siteNo'));
             $dbeSite->getRowByCustomerIDSiteNo();
             if (
                 $this->buActivity->travelActivityForCustomerEngineerTodayExists(
@@ -4050,7 +4054,7 @@ class CTActivity extends CTCNC
                     $this->dsCallActivity->getValue('userID'),
                     $this->dsCallActivity->getValue('date')
                 )
-                && $dbeSite->getValue('maxTravelHours') > 0    // the site has travel hours
+                && $dbeSite->getValue(DBESite::MaxTravelHours) > 0    // the site has travel hours
 
             ) {
                 $urlNext =
@@ -4460,12 +4464,12 @@ class CTActivity extends CTCNC
                 'endHHMM'      => str_replace(':', '', $endTime),
                 'customerName' => $dsCallActivity->getValue('customerName'),
                 'notes'        => $notes,
-                'add1'         => $dsSite->getValue('add1'),
-                'add2'         => $dsSite->getValue('add2'),
-                'add3'         => $dsSite->getValue('add3'),
-                'town'         => $dsSite->getValue('town'),
-                'county'       => $dsSite->getValue('county'),
-                'postcode'     => $dsSite->getValue('postcode'),
+                'add1'         => $dsSite->getValue(DBESite::Add1),
+                'add2'         => $dsSite->getValue(DBESite::Add2),
+                'add3'         => $dsSite->getValue(DBESite::Add3),
+                'town'         => $dsSite->getValue(DBESite::Town),
+                'county'       => $dsSite->getValue(DBESite::County),
+                'postcode'     => $dsSite->getValue(DBESite::Postcode),
                 'urlActivity'  => $urlActivity
             )
         );

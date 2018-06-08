@@ -300,23 +300,23 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
-        $this->_buPDF->printString($dsSite->getValue('add1'));
-        if ($dsSite->getValue('add2') != '') {
+        $this->_buPDF->printString($dsSite->getValue(DBESite::Add1));
+        if ($dsSite->getValue(DBESite::Add2) != '') {
             $this->_buPDF->CR();
-            $this->_buPDF->printString($dsSite->getValue('add2'));
+            $this->_buPDF->printString($dsSite->getValue(DBESite::Add2));
         }
-        if ($dsSite->getValue('add3') != '') {
+        if ($dsSite->getValue(DBESite::Add3) != '') {
             $this->_buPDF->CR();
-            $this->_buPDF->printString($dsSite->getValue('add3'));
-        }
-        $this->_buPDF->CR();
-        $this->_buPDF->printString($dsSite->getValue('town'));
-        if ($dsSite->getValue('county') != '') {
-            $this->_buPDF->CR();
-            $this->_buPDF->printString($dsSite->getValue('county'));
+            $this->_buPDF->printString($dsSite->getValue(DBESite::Add3));
         }
         $this->_buPDF->CR();
-        $this->_buPDF->printString($dsSite->getValue('postcode'));
+        $this->_buPDF->printString($dsSite->getValue(DBESite::Town));
+        if ($dsSite->getValue(DBESite::County) != '') {
+            $this->_buPDF->CR();
+            $this->_buPDF->printString($dsSite->getValue(DBESite::County));
+        }
+        $this->_buPDF->CR();
+        $this->_buPDF->printString($dsSite->getValue(DBESite::Postcode));
         $this->_buPDF->CR();
         $this->_buPDF->CR();
 

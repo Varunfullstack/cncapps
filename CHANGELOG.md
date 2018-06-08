@@ -11,6 +11,8 @@ This project changes will be shown here.
 - Issue 243 - Amend Contract Document details
 ### Removed
 - Issue 260 - Remove Spend/Category from the Reports Menu
+## Fixed
+- Issue 262 - Problems With Customer CRM losing information
 
 ## [v1.7.5] - 2018-06-06
 ### Fixed
