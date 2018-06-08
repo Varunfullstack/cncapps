@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.8.0] 
 ### Added
 - Issue 195 - Graph to show user productivity
 - Issue 264 - Add option for Monthly in customer review meeting frequency
