@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 195 - Graph to show user productivity
 ### Changed
 - Issue 236 - Enhance Sales By Customer report 
+- Issue 239 - New navigation buttons in the activity pages
 
 ## [v1.7.5] - 2018-06-06
 ### Fixed

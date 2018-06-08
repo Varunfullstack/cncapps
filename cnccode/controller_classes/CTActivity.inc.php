@@ -1439,7 +1439,7 @@ class CTActivity extends CTCNC
                 );
 
             $linkPreviousActivity =
-                '<a href="' . $urlPreviousActivity . '">&lt;Previous</A>';
+                '<button type="button" onclick="location.href=\'' . $urlPreviousActivity . '\';"><i class="fa fa-backward" aria-hidden="true"></i> Previous</button>';
 
         }
 
@@ -1455,7 +1455,7 @@ class CTActivity extends CTCNC
                 );
 
             $linkFirstActivity =
-                '<a href="' . $urlFirstActivity . '">&lt;&lt;First</A>';
+                '<button type="button" onclick="location.href=\'' . $urlFirstActivity . '\';"><i class="fa fa-step-backward"></i> First</button>';
         }
 
         if ($linksArray['next']) {
@@ -1470,8 +1470,7 @@ class CTActivity extends CTCNC
                 );
 
             $linkNextActivity =
-                '<a href="' . $urlNextActivity . '">Next&gt;</A>';
-
+                '<button type="button" style="white-space: nowrap" onclick="location.href=\'' . $urlNextActivity . '\';">Next <i class="fa fa-forward" aria-hidden="true"></i></button>';
         }
 
         if ($linksArray['last']) {
@@ -1486,7 +1485,7 @@ class CTActivity extends CTCNC
                 );
 
             $linkLastActivity =
-                '<a href="' . $urlLastActivity . '">Last&gt;&gt;</A>';
+                '<button type="button" style="white-space: nowrap" onclick="location.href=\'' . $urlLastActivity . '\';">Last <i class="fa fa-fast-forward" aria-hidden="true"></i></button>';
         }
 
         $urlToggleCriticalFlag =
