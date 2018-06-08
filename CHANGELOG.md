@@ -8,6 +8,8 @@ This project changes will be shown here.
 - Issue 236 - Enhance Sales By Customer report 
 - Issue 239 - New navigation buttons in the activity pages
 - Issue 243 - Amend Contract Document details
+### Removed
+- Issue 260 - Remove Spend/Category from the Reports Menu
 
 ## [v1.7.5] - 2018-06-06
 ### Fixed
