@@ -198,7 +198,13 @@
     .redText td.content > input, .redText td.content > textarea, .redText td.content > select, .redText td.content > button {
         color: red !important;
     }
+
+    .float-right {
+        text-align: right;
+        float: right
+    }
 </style>
+<link rel="stylesheet" href="/font-awesome/css/font-awesome.css"/>
 <script language='JavaScript' src='popcalendar/popcalendar.js'></script>
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}" onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)">{deleteCustomerText}</a>
@@ -605,13 +611,30 @@
             </div>
 
             <div class="customerNoteNav">
-                <input {disabled} type="button" name="First" value="First" onclick="loadNote('first')">
-                <input {disabled} type="button" name="Previous" value="Previous" onclick="loadNote('previous')">
-                <input {disabled} type="button" name="Next" value="Next" onclick="loadNote('next')">
-                <input {disabled} type="button" name="Last" value="Last" onclick="loadNote('last')">
-                <input {disabled} type="button" name="Delete" value="Delete" onclick="deleteNote()">
-                <input {disabled} type="button" name="New" value="New" onclick="newNote()">
-                <input {disabled} type="button" name="Save" value="Save" onclick="saveNote()">
+                <button {disabled} type="button" name="First" aria-hidden="true" onclick="loadNote('first')">
+                    <i class="fa fa-step-backward"></i> First
+                </button>
+                <button {disabled} type="button" name="Previous" onclick="loadNote('previous')">
+                    <i class="fa fa-backward" aria-hidden="true"></i> Back
+                </button>
+                <button {disabled} type="button" name="Next" onclick="loadNote('next')">
+                    Next <i class="fa fa-forward" aria-hidden="true"></i>
+                </button>
+                <button {disabled} type="button" name="Last" onclick="loadNote('last')">
+                    Last <i class="fa fa-step-forward" aria-hidden="true"></i>
+                </button>
+                <button {disabled} type="button" name="Delete" onclick="deleteNote()">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                    Delete
+                </button>
+                <button {disabled} type="button" name="New" onclick="newNote()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    New
+                </button>
+                <button {disabled} type="button" name="Save" onclick="saveNote()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </button>
                 {customerNotePopupLink}
             </div>
 
