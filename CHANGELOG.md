@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 264 - Add option for Monthly in customer review meeting frequency
+
 ## [v1.7.5] - 2018-06-06
 ### Fixed
 - Issue 265 - Daily Report sending some customer data to wrong people
