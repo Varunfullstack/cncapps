@@ -7765,12 +7765,14 @@ is currently a balance of ';
         return $db->query($sql);
     }
 
-    private function closeActivitiesWithEndTime($problemID)
+    public function closeActivitiesWithEndTime($problemID)
     {
         global $db;
         $sql = "update callactivity  set caa_status  = 'C'  WHERE problemId = $problemID and caa_endtime <> ''";
         $db->query($sql);
         return true;
     }
+
+
 } // End of class
 ?>
