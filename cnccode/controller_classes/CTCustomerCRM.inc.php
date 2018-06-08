@@ -468,6 +468,9 @@ class CTCustomerCRM extends CTCNC
         foreach ($customerArray as $value) {
 
             $this->buCustomer->getCustomerByID($value['customerID'], $this->dsCustomer);
+            echo $this->dsCustomer->getValue(DBECustomer::Name);
+//            $this->dsCustomer->getRow($value['customerID']);
+//            $this->getData($this->, $this->dsSite);
             $this->dsCustomer->setUpdateModeInsert();
             $this->dsCustomer->setValue('MailshotFlag', $this->getYN($value['mailshotFlag']));
             $this->dsCustomer->setValue(DBECustomer::CustomerLeadStatusID, $value['customerLeadStatusID']);
@@ -1954,6 +1957,7 @@ class CTCustomerCRM extends CTCNC
         $this->setMethodName('update');
         $this->setCustomerID($this->dsCustomer->getValue('CustomerID'));
         if (!$this->formError) {
+
             $this->buCustomer->updateCustomer($this->dsCustomer);
             $this->buCustomer->updateSite($this->dsSite);
             if (isset($this->postVars["form"]["contact"])) {

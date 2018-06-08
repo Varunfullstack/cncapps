@@ -360,7 +360,7 @@ class BUCustomer extends Business
      */
     function setCustomerID(&$source, &$dbeSite)
     {
-        $dbeSite->setValue(DBESite::CustomerID, $source->getValue('CustomerID'));
+        $dbeSite->setValue(DBESite::CustomerID, $source->getValue('customerID'));
         return TRUE;
     }
 
