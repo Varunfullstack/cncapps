@@ -82,7 +82,7 @@ define(
 );
 define(
     'CTCUSTOMER_CLS_FORM_ERROR',
-    'formError'
+    'contactError'
 );
 define(
     'CTCUSTOMER_CLS_TABLE_EDIT_HEADER',
@@ -170,6 +170,7 @@ class CTCustomer extends CTCNC
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
+        $this->dsContact->addColumn('TitleClass', DA_STRING, DA_ALLOW_NULL);
         $this->dsContact->addColumn(
             'FirstNameClass',
             DA_STRING,
@@ -264,10 +265,18 @@ class CTCustomer extends CTCNC
                 DBEContact::siteNo,
                 $value['siteNo']
             );
+
             $this->dsContact->setValue(
                 DBEContact::title,
                 $value['title']
             );
+            if ($this->dsContact->getValue('Title') == '') {
+                $this->setFormErrorOn();
+                $this->dsContact->setValue('TitleClass', CTCUSTOMER_CLS_FORM_ERROR);
+            } else {
+                $this->dsContact->setValue('TitleClass', null);
+            }
+
             $this->dsContact->setValue(
                 DBEContact::lastName,
                 $value['lastName']
@@ -2445,6 +2454,7 @@ ORDER BY cus_name ASC  ";
                     'customerID'                  => $this->dsContact->getValue(DBEContact::customerID),
                     'supplierID'                  => $this->dsContact->getValue(DBEContact::supplierID),
                     'title'                       => $this->dsContact->getValue(DBEContact::title),
+                    'titleClass'                  => $this->dsContact->getValue('TitleClass'),
                     'firstName'                   => $this->dsContact->getValue(DBEContact::firstName),
                     'lastName'                    => $this->dsContact->getValue(DBEContact::lastName),
                     'firstNameClass'              => $this->dsContact->getValue('FirstNameClass'),
