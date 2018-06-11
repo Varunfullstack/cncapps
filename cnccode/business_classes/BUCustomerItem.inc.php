@@ -213,7 +213,7 @@ class BUCustomerItem extends Business
             $buCustomer = new BUCustomer($this);
             $buCustomer->getDeliverSiteByCustomerID($dsCustomerItem->getValue('customerID'), $dsSite, $dsContact);
             $dsCustomerItem->setUpdateModeUpdate();
-            $dsCustomerItem->setValue('siteNo', $dsSite->getValue(DBESite::SiteNo));
+            $dsCustomerItem->setValue('siteNo', $dsSite->getValue(DBESite::siteNo));
             $dsCustomerItem->post();
         }
         if ($success = $this->updateDataaccessObject($dsCustomerItem, $dbeCustomerItem)) {

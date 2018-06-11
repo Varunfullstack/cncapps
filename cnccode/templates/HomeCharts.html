@@ -51,10 +51,8 @@
         $('body').on('click', '.details', function () {
             var userId = $(this).data().userId;
             var today = moment();
-            var aMonthAgo = moment().subtract(30, 'days');
-
-
-            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + aMonthAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+            var sixtyDaysAgo = moment().subtract(60, 'days');
+            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
         });
 
         teamSelector.change(function () {

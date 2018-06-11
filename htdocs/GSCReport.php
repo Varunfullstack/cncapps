@@ -26,12 +26,12 @@
     <tr>
         <td valign="top" class="label">Address:</td>
         <td colspan="5" valign="top">
-            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add1)); ?></P>
-            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add2)); ?></P>
-            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add3)); ?></P>
-            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Town)); ?></P>
-            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::County)); ?></P>
-            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Postcode)); ?></P>
+            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::add1)); ?></P>
+            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::add2)); ?></P>
+            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::add3)); ?></P>
+            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::town)); ?></P>
+            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::county)); ?></P>
+            <P class="addressLine"><?php echo Controller::htmlDisplayText($dsSite->getValue(DBESite::postcode)); ?></P>
         </td>
     </tr>
     <tr>

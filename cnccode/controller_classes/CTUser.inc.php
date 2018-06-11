@@ -339,15 +339,15 @@ class CTUser extends CTCNC
 
         // customer selection
         $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRows(DBECustomer::Name);
+        $dbeCustomer->getRows(DBECustomer::name);
         $this->template->set_block('UserEdit', 'customerBlock', 'customers');
         while ($dbeCustomer->fetchNext()) {
-            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(DBECustomer::CustomerID)) ? CT_SELECTED : '';
+            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(DBECustomer::customerID)) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'customerSelected' => $customerSelected,
-                    'customerID' => $dbeCustomer->getValue(DBECustomer::CustomerID),
-                    'customerName' => $dbeCustomer->getValue(DBECustomer::Name)
+                    'customerID' => $dbeCustomer->getValue(DBECustomer::customerID),
+                    'customerName' => $dbeCustomer->getValue(DBECustomer::name)
                 )
             );
             $this->template->parse('customers', 'customerBlock', true);

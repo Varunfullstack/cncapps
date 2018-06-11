@@ -122,7 +122,7 @@ class CTActivityProfitReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue(DBECustomer::Name);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_block('ActivityProfitReport', 'resultBlock', 'results');
@@ -280,7 +280,7 @@ class CTActivityProfitReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError' => $this->formError,
-                'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                'customerName' => $dsCustomer->getValue(DBECustomer::name),
                 'fromDate' => Controller::dateYMDtoDMY($_REQUEST ['fromDate']),
                 'toDate' => Controller::dateYMDtoDMY($_REQUEST ['toDate']),
                 'SDHoursTotal' => number_format($SDHoursTotal, 2),
@@ -344,7 +344,7 @@ class CTActivityProfitReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError' => $this->formError,
-                'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                'customerName' => $dsCustomer->getValue(DBECustomer::name),
                 'fromDate' => Controller::dateYMDtoDMY($_REQUEST ['fromDate']),
                 'toDate' => Controller::dateYMDtoDMY($_REQUEST ['toDate']
                 )

@@ -182,7 +182,7 @@ class CTPassword extends CTCNC
                     'urlSubmit' => $urlSubmit,
                     'urlAdd' => $urlAdd,
                     'urlLoadFromCsv' => $urlLoadFromCsv,
-                    'customerName' => $dbeCustomer->getValue(DBECustomer::Name),
+                    'customerName' => $dbeCustomer->getValue(DBECustomer::name),
                     'customerID' => $_REQUEST['customerID'],
                     'formError' => $this->getFormErrorMessage()
                 )

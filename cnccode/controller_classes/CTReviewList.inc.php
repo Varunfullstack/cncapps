@@ -68,12 +68,12 @@ class CTReviewList extends CTCNC
                         'CustomerCRM.php',
                         array(
                             'action'     => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::CustomerID)
+                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
                         )
                     );
 
                 if ($dsCustomer->getValue('reviewUserID')) {
-                    $buUser->getUserByID($dsCustomer->getValue(DBECustomer::ReviewUserID), $dsUser);
+                    $buUser->getUserByID($dsCustomer->getValue(DBECustomer::reviewUserID), $dsUser);
                     $user = $dsUser->getValue('name');
                 } else {
                     $user = false;
@@ -87,10 +87,10 @@ class CTReviewList extends CTCNC
                 $this->template->set_var(
 
                     array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
-                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::ReviewDate)))->format('d/m/Y'),
-                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::ReviewTime),
-                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::ReviewAction), 0, 50),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
+                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::reviewDate)))->format('d/m/Y'),
+                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
+                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::reviewAction), 0, 50),
                         'reviewUser'   => $user,
                         'linkURL'      => $linkURL,
                         'reportURL'    => $reportUrl

@@ -469,7 +469,7 @@ class CTManagementReports extends CTCNC
         if ($_REQUEST['customerID']) {
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($_REQUEST['customerID']);
-            $customerName = $dbeCustomer->getValue(DBECustomer::Name);
+            $customerName = $dbeCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(

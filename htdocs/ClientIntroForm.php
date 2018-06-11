@@ -32,19 +32,19 @@ $buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue('customerID'), $dsCo
 $address =
 	$addressee . "\r\n" .
 	$dsCustomer->getValue('name') . "\r\n" .
-	$dsSite->getValue(DBESite::Add1) . "\r\n";
+	$dsSite->getValue(DBESite::add1) . "\r\n";
 
-if ($dsSite->getValue(DBESite::Add2) != ''){
-	$address .= $dsSite->getValue(DBESite::Add2) . "\r\n";
+if ($dsSite->getValue(DBESite::add2) != ''){
+	$address .= $dsSite->getValue(DBESite::add2) . "\r\n";
 }
-if ($dsSite->getValue(DBESite::Add3) != ''){
-	$address .= $dsSite->getValue(DBESite::Add3) . "\r\n";
+if ($dsSite->getValue(DBESite::add3) != ''){
+	$address .= $dsSite->getValue(DBESite::add3) . "\r\n";
 }
-$address .= $dsSite->getValue(DBESite::Town) . "\r\n";
-if ($dsSite->getValue(DBESite::County) != ''){
-	$address .= $dsSite->getValue(DBESite::County) . "\r\n";
+$address .= $dsSite->getValue(DBESite::town) . "\r\n";
+if ($dsSite->getValue(DBESite::county) != ''){
+	$address .= $dsSite->getValue(DBESite::county) . "\r\n";
 }
-$address .= $dsSite->getValue(DBESite::Postcode) . "\r\n";
+$address .= $dsSite->getValue(DBESite::postcode) . "\r\n";
 ?>
 <html>
 <head>

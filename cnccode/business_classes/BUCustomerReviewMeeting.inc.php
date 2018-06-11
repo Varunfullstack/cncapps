@@ -133,12 +133,12 @@ class BUCustomerReviewMeeting extends Business
 
                 $template->set_var(
                     array(
-                        'add1'         => $dsSite->getValue(DBESite::Add1),
-                        'add2'         => $dsSite->getValue(DBESite::Add2),
-                        'add3'         => $dsSite->getValue(DBESite::Add3),
-                        'town'         => $dsSite->getValue(DBESite::Town),
-                        'county'       => $dsSite->getValue(DBESite::County),
-                        'postcode'     => $dsSite->getValue(DBESite::Postcode),
+                        'add1'         => $dsSite->getValue(DBESite::add1),
+                        'add2'         => $dsSite->getValue(DBESite::add2),
+                        'add3'         => $dsSite->getValue(DBESite::add3),
+                        'town'         => $dsSite->getValue(DBESite::town),
+                        'county'       => $dsSite->getValue(DBESite::county),
+                        'postcode'     => $dsSite->getValue(DBESite::postcode),
                         'contactPhone' => $phone,
                         'contactName'  => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
                     )
@@ -363,7 +363,7 @@ class BUCustomerReviewMeeting extends Business
         }
         $template->set_var(
             array(
-                'customerName'       => $dsCustomer->getValue(DBECustomer::Name),
+                'customerName'       => $dsCustomer->getValue(DBECustomer::name),
                 'startYearMonth'     => $startDate->format('Y-m'),
                 'meetingDate'        => $meetingDate,
                 'endYearMonth'       => $endDate->format('Y-m'),

@@ -114,21 +114,21 @@ class CTProspectImport extends CTCNC
         $errorMessage = '';
         while ($dsCustomer->fetchNext()) {
             $dsCustomer->setUpdateModeUpdate();
-            $dsCustomer->setValue(DBECustomer::MailshotFlag, 'Y');
-            $dsCustomer->setValue(DBECustomer::CreateDate, date('Y-m-d'));
-            $dsCustomer->setValue(DBECustomer::ReferredFlag, 'Y');
-            $dsCustomer->setValue(DBECustomer::PCXFlag, 'N');
-            $dsCustomer->setValue(DBECustomer::CustomerTypeID, '47');
-            $dsCustomer->setValue(DBECustomer::ProspectFlag, 'Y');
+            $dsCustomer->setValue(DBECustomer::mailshotFlag, 'Y');
+            $dsCustomer->setValue(DBECustomer::createDate, date('Y-m-d'));
+            $dsCustomer->setValue(DBECustomer::referredFlag, 'Y');
+            $dsCustomer->setValue(DBECustomer::pCXFlag, 'N');
+            $dsCustomer->setValue(DBECustomer::customerTypeID, '47');
+            $dsCustomer->setValue(DBECustomer::prospectFlag, 'Y');
             $errorMessage .= $this->validateNotNull($dsCustomer);
             // ensure name doesn't exist on DB
-            $dbeCustomer->setValue(DBECustomer::Name, $dsCustomer->getValue(DBECustomer::Name));
-            $dbeCustomer->getRowsByColumn(DBECustomer::Name);
+            $dbeCustomer->setValue(DBECustomer::name, $dsCustomer->getValue(DBECustomer::name));
+            $dbeCustomer->getRowsByColumn(DBECustomer::name);
             if ($dbeCustomer->fetchNext()) {
                 $errorMessage .=
                     'Duplicate customer name on line ' .
                     ($dsCustomer->ixCurrentRow + 2) .
-                    ', value: ' . $dsCustomer->getValue(DBECustomer::Name) . '<BR>';
+                    ', value: ' . $dsCustomer->getValue(DBECustomer::name) . '<BR>';
             }
             $dsCustomer->post();
         }
@@ -137,13 +137,13 @@ class CTProspectImport extends CTCNC
         $dsSite->replicate($importDataset);
         while ($dsSite->fetchNext()) {
             // ensure postcode doesn't exist on DB
-            $dbeSite->setValue(DBESite::Postcode, $dsSite->getValue(DBESite::Postcode));
-            $dbeSite->getRowsByColumn(DBESite::Postcode);
+            $dbeSite->setValue(DBESite::postcode, $dsSite->getValue(DBESite::postcode));
+            $dbeSite->getRowsByColumn(DBESite::postcode);
             if ($dbeSite->fetchNext()) {
                 $errorMessage .=
                     'Duplicate postcode on line ' .
                     ($dsSite->ixCurrentRow + 2) .
-                    ', value: ' . $dsSite->getValue(DBESite::Postcode) . '<BR>';
+                    ', value: ' . $dsSite->getValue(DBESite::postcode) . '<BR>';
             }
             $errorMessage .= $this->validateNotNull($dsSite);
         }
@@ -153,7 +153,7 @@ class CTProspectImport extends CTCNC
         $columns = $dsContact->colCount();
         while ($dsContact->fetchNext()) {
             $dsContact->setUpdateModeUpdate();
-            $dsContact->setValue(DBEContact::SendMailshotFlag, 'Y');
+            $dsContact->setValue(DBEContact::sendMailshotFlag, 'Y');
             $dsContact->setValue('discontinuedFlag', 'N');
             $dsContact->setValue('mailshot1Flag', 'Y');                    // CNC address book
             $dsContact->setValue('mailshot2Flag', 'N');
@@ -189,25 +189,25 @@ class CTProspectImport extends CTCNC
 
             // insert site row
             $this->copyValues($dsSite, $dbeSite);
-            $dbeSite->setValue(DBESite::CustomerID, $dbeCustomer->getValue(DBECustomer::CustomerID));
+            $dbeSite->setValue(DBESite::customerID, $dbeCustomer->getValue(DBECustomer::customerID));
             $dbeSite->insertRow();
 
             // go back to customer and update invoice and delivery site numbers
             $dbeCustomer->getRow();
-            $dbeCustomer->setValue(DBECustomer::DeliverSiteNo, $dbeSite->getValue(DBESite::SiteNo));
-            $dbeCustomer->setValue(DBECustomer::InvoiceSiteNo, $dbeSite->getValue(DBESite::SiteNo));
+            $dbeCustomer->setValue(DBECustomer::deliverSiteNo, $dbeSite->getValue(DBESite::siteNo));
+            $dbeCustomer->setValue(DBECustomer::invoiceSiteNo, $dbeSite->getValue(DBESite::siteNo));
             $dbeCustomer->updateRow();
 
             // Insert contact row
             $this->copyValues($dsContact, $dbeContact);
-            $dbeContact->setValue('customerID', $dbeCustomer->getValue(DBECustomer::CustomerID));
-            $dbeContact->setValue('siteNo', $dbeSite->getValue(DBESite::SiteNo));
+            $dbeContact->setValue('customerID', $dbeCustomer->getValue(DBECustomer::customerID));
+            $dbeContact->setValue('siteNo', $dbeSite->getValue(DBESite::siteNo));
             $dbeContact->setValue('phone', '');
             $dbeContact->insertRow();
 
             // go back to site and update default contacts
             $dbeSite->getRow();
-            $dbeSite->setValue(DBESite::SageRef, $this->buSite->getSageRef($dbeCustomer->getValue(DBECustomer::CustomerID)));
+            $dbeSite->setValue(DBESite::sageRef, $this->buSite->getSageRef($dbeCustomer->getValue(DBECustomer::customerID)));
             $dbeSite->setValue(DBESite::DelContactID, $dbeContact->getValue('contactID'));
             $dbeSite->setValue(DBESite::InvContactID, $dbeContact->getValue('contactID'));
             $dbeSite->updateRow();

@@ -559,7 +559,7 @@ class CTActivity extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue(DBECustomer::Name);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
 
@@ -1158,12 +1158,12 @@ class CTActivity extends CTCNC
 
 
         $customerDetails =
-            $dsCustomer->getValue(DBECustomer::Name) .
-            ', ' . $dsSite->getValue(DBESite::Add1) .
-            ', ' . $dsSite->getValue(DBESite::Add2) .
-            ', ' . $dsSite->getValue(DBESite::Add3) .
-            ', ' . $dsSite->getValue(DBESite::Town) .
-            ', ' . $dsSite->getValue(DBESite::Postcode);
+            $dsCustomer->getValue(DBECustomer::name) .
+            ', ' . $dsSite->getValue(DBESite::add1) .
+            ', ' . $dsSite->getValue(DBESite::add2) .
+            ', ' . $dsSite->getValue(DBESite::add3) .
+            ', ' . $dsSite->getValue(DBESite::town) .
+            ', ' . $dsSite->getValue(DBESite::postcode);
 
         if ($dsContact) {
             $customerDetails .=
@@ -1609,7 +1609,7 @@ class CTActivity extends CTCNC
             }
 
             if (
-                $dsCustomer->getValue(DBECustomer::ReferredFlag) != 'Y' &&   // customer not referred
+                $dsCustomer->getValue(DBECustomer::referredFlag) != 'Y' &&   // customer not referred
                 $dbeJProblem->getValue('status') != 'C'           // not completed
             ) {
                 $urlDuplicate =
@@ -1916,8 +1916,8 @@ class CTActivity extends CTCNC
     function getCustomerNameDisplayClass($dsCustomer)
     {
         if (
-            $dsCustomer->getValue(DBECustomer::SpecialAttentionFlag) == 'Y' &&
-            $dsCustomer->getValue(DBECustomer::SpecialAttentionEndDate) >= date('Y-m-d')
+            $dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+            $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
         ) {
             $ret = 'specialAttentionCustomer';
         } else {
@@ -2552,10 +2552,10 @@ class CTActivity extends CTCNC
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($_REQUEST['customerID'], $dsCustomer);
 
-        $this->setPageTitle("Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::Name));
+        $this->setPageTitle("Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name));
 
         $_SESSION[$this->sessionKey]['reason'] = $_REQUEST['reason'];
-        $_SESSION[$this->sessionKey]['customerName'] = $dsCustomer->getValue(DBECustomer::Name);
+        $_SESSION[$this->sessionKey]['customerName'] = $dsCustomer->getValue(DBECustomer::name);
 
         $_SESSION[$this->sessionKey]['hideFromCustomerFlag'] = $_REQUEST['hideFromCustomerFlag'];
 
@@ -2569,7 +2569,7 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             [
-                'techNotes' => $dsCustomer->getValue(DBECustomer::TechNotes)
+                'techNotes' => $dsCustomer->getValue(DBECustomer::techNotes)
             ]
         );
 
@@ -2890,7 +2890,7 @@ class CTActivity extends CTCNC
     {
         // Site selection
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $dbeSite->setValue(DBESite::customerID, $customerID);
         $dbeSite->getRowsByCustomerID();
 
         $siteCount = 0;
@@ -2898,7 +2898,7 @@ class CTActivity extends CTCNC
             $siteCount++;
         }
 
-        $dbeSite->setValue(DBESite::CustomerID, $customerID);
+        $dbeSite->setValue(DBESite::customerID, $customerID);
         $dbeSite->getRowsByCustomerID();
 
         $this->template->set_block($templateName, $blockName, 'sites');
@@ -2908,16 +2908,16 @@ class CTActivity extends CTCNC
             if ($siteCount == 1) {
                 $siteSelected = CT_SELECTED;
             } else {
-                $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::SiteNo)) ? CT_SELECTED : '';
+                $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::siteNo)) ? CT_SELECTED : '';
             }
 
-            $siteDesc = $dbeSite->getValue(DBESite::Add1) . ' '
-                . $dbeSite->getValue(DBESite::Town) . ' ' . $dbeSite->getValue(DBESite::Postcode);
+            $siteDesc = $dbeSite->getValue(DBESite::add1) . ' '
+                . $dbeSite->getValue(DBESite::town) . ' ' . $dbeSite->getValue(DBESite::postcode);
 
             $this->template->set_var(
                 array(
                     'siteSelected' => $siteSelected,
-                    'siteNo'       => $dbeSite->getValue(DBESite::SiteNo),
+                    'siteNo'       => $dbeSite->getValue(DBESite::siteNo),
                     'siteDesc'     => $siteDesc
                 )
             );
@@ -2951,8 +2951,8 @@ class CTActivity extends CTCNC
                 $endMainContactStyle = '';
             }
 
-            $dbeSite->setValue(DBESite::CustomerID, $dbeContact->getValue("customerID"));
-            $dbeSite->setValue(DBESite::SiteNo, $dbeContact->getValue("siteNo"));
+            $dbeSite->setValue(DBESite::customerID, $dbeContact->getValue("customerID"));
+            $dbeSite->setValue(DBESite::siteNo, $dbeContact->getValue("siteNo"));
             $dbeSite->getRow();
 
             $name = $dbeContact->getValue("firstName") . ' ' . $dbeContact->getValue("lastName");
@@ -2977,9 +2977,9 @@ class CTActivity extends CTCNC
                     }
                 }
 
-                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::Add1) . ' ' .
-                    $dbeSite->getValue(DBESite::Town) . ' ' .
-                    $dbeSite->getValue(DBESite::Postcode) . '">';
+                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' .
+                    $dbeSite->getValue(DBESite::town) . ' ' .
+                    $dbeSite->getValue(DBESite::postcode) . '">';
                 $optGroupClose = '';
             } else {
                 $optGroupOpen = '';
@@ -3344,12 +3344,12 @@ class CTActivity extends CTCNC
             $buCustomer->getContactByID($dsCallActivity->getValue('contactID'), $dsContact);
 
             $customerDetails =
-                $dsCustomer->getValue(DBECustomer::Name) .
-                ', ' . $dsSite->getValue(DBESite::Add1) .
-                ', ' . $dsSite->getValue(DBESite::Add2) .
-                ', ' . $dsSite->getValue(DBESite::Add3) .
-                ', ' . $dsSite->getValue(DBESite::Town) .
-                ', ' . $dsSite->getValue(DBESite::Postcode) .
+                $dsCustomer->getValue(DBECustomer::name) .
+                ', ' . $dsSite->getValue(DBESite::add1) .
+                ', ' . $dsSite->getValue(DBESite::add2) .
+                ', ' . $dsSite->getValue(DBESite::add3) .
+                ', ' . $dsSite->getValue(DBESite::town) .
+                ', ' . $dsSite->getValue(DBESite::postcode) .
                 ', ' . $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName') . ', ' . $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID'));
 
             if ($dsContact->getValue('email') != '') {
@@ -3360,8 +3360,8 @@ class CTActivity extends CTCNC
             if ($dsContact->getValue('notes') != '') {
                 $dsCallActivity->setValue('contactNotes', $dsContact->getValue('notes'));
             }
-            if ($dsCustomer->getValue(DBECustomer::TechNotes) != '') {
-                $dsCallActivity->setValue('techNotes', $dsCustomer->getValue(DBECustomer::TechNotes));
+            if ($dsCustomer->getValue(DBECustomer::techNotes) != '') {
+                $dsCallActivity->setValue('techNotes', $dsCustomer->getValue(DBECustomer::techNotes));
             }
         }
 
@@ -4044,8 +4044,8 @@ class CTActivity extends CTCNC
             $dbeCallActType->getValue('itemSalePrice') > 0
         ) {
             $dbeSite = new DBESite($this);
-            $dbeSite->setValue(DBESite::CustomerID, $this->dsCallActivity->getValue('customerID'));
-            $dbeSite->setValue(DBESite::SiteNo, $this->dsCallActivity->getValue('siteNo'));
+            $dbeSite->setValue(DBESite::customerID, $this->dsCallActivity->getValue('customerID'));
+            $dbeSite->setValue(DBESite::siteNo, $this->dsCallActivity->getValue('siteNo'));
             $dbeSite->getRowByCustomerIDSiteNo();
             if (
                 $this->buActivity->travelActivityForCustomerEngineerTodayExists(
@@ -4054,7 +4054,7 @@ class CTActivity extends CTCNC
                     $this->dsCallActivity->getValue('userID'),
                     $this->dsCallActivity->getValue('date')
                 )
-                && $dbeSite->getValue(DBESite::MaxTravelHours) > 0    // the site has travel hours
+                && $dbeSite->getValue(DBESite::maxTravelHours) > 0    // the site has travel hours
 
             ) {
                 $urlNext =
@@ -4464,12 +4464,12 @@ class CTActivity extends CTCNC
                 'endHHMM'      => str_replace(':', '', $endTime),
                 'customerName' => $dsCallActivity->getValue('customerName'),
                 'notes'        => $notes,
-                'add1'         => $dsSite->getValue(DBESite::Add1),
-                'add2'         => $dsSite->getValue(DBESite::Add2),
-                'add3'         => $dsSite->getValue(DBESite::Add3),
-                'town'         => $dsSite->getValue(DBESite::Town),
-                'county'       => $dsSite->getValue(DBESite::County),
-                'postcode'     => $dsSite->getValue(DBESite::Postcode),
+                'add1'         => $dsSite->getValue(DBESite::add1),
+                'add2'         => $dsSite->getValue(DBESite::add2),
+                'add3'         => $dsSite->getValue(DBESite::add3),
+                'town'         => $dsSite->getValue(DBESite::town),
+                'county'       => $dsSite->getValue(DBESite::county),
+                'postcode'     => $dsSite->getValue(DBESite::postcode),
                 'urlActivity'  => $urlActivity
             )
         );

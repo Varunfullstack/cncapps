@@ -47,9 +47,9 @@ class BUSite extends Business
             $ret = ($this->getSiteByID($customerID, $matchString, $dsResults));
         }
         if (!$ret) {
-            $this->dbeJSite->setValue(DBESite::CustomerID, $customerID);
+            $this->dbeJSite->setValue(DBESite::customerID, $customerID);
             if ($matchString{0} == '?') {  // get all contacts for supplier
-                $this->dbeJSite->getRowsByColumn(DBESite::CustomerID);
+                $this->dbeJSite->getRowsByColumn(DBESite::customerID);
             } else {                                                // try to match
                 $this->dbeJSite->getRowsByDescMatch($matchString);
             }
@@ -75,8 +75,8 @@ class BUSite extends Business
 //			$this->raiseError('siteNo not passed');
 //		}
         $this->setMethodName('getSiteByID');
-        $this->dbeJSite->setValue(DBESite::CustomerID, $customerID);
-        $this->dbeJSite->setValue(DBESite::SiteNo, $siteNo);
+        $this->dbeJSite->setValue(DBESite::customerID, $customerID);
+        $this->dbeJSite->setValue(DBESite::siteNo, $siteNo);
         $this->dbeJSite->getRow();
         return $this->getData($this->dbeJSite, $dsResults);
     }
@@ -95,9 +95,9 @@ class BUSite extends Business
         }
         $dsResults->copyColumnsFrom($this->dbeJSite);
         $dsResults->setUpdateModeInsert();
-        $dsResults->setValue(DBESite::CustomerID, $customerID);
-        $dsResults->setValue(DBESite::SiteNo, -9);                // means new site as zero is valid siteno
-        $dsResults->setValue(DBESite::MaxTravelHours, -9);        // means not set because 0 is now a valid distance
+        $dsResults->setValue(DBESite::customerID, $customerID);
+        $dsResults->setValue(DBESite::siteNo, -9);                // means new site as zero is valid siteno
+        $dsResults->setValue(DBESite::maxTravelHours, -9);        // means not set because 0 is now a valid distance
         $dsResults->post();
         return TRUE;
     }
@@ -113,39 +113,39 @@ class BUSite extends Business
     function updateSite(&$dsSite)
     {
         $this->setMethodName('updateSite');
-        if ($dsSite->getValue(DBESite::SiteNo) == -9) { // new one
-            $this->dbeSite->setValue(DBESite::CustomerID, $dsSite->getValue(DBESite::CustomerID));
-            $dsSite->setValue(DBESite::SiteNo, $this->dbeSite->getNextPKValue());
+        if ($dsSite->getValue(DBESite::siteNo) == -9) { // new one
+            $this->dbeSite->setValue(DBESite::customerID, $dsSite->getValue(DBESite::customerID));
+            $dsSite->setValue(DBESite::siteNo, $this->dbeSite->getNextPKValue());
             $this->dbeSite->setUpdateModeInsert();
-            $this->dbeSite->setValue(DBESite::SageRef, $this->getSageRef($dsSite->getValue(DBESite::CustomerID)));
+            $this->dbeSite->setValue(DBESite::sageRef, $this->getSageRef($dsSite->getValue(DBESite::customerID)));
             $insert = TRUE;
         } else {
             // get the existing row with sage ref
-            $this->dbeSite->setValue(DBESite::CustomerID, $dsSite->getValue(DBESite::CustomerID));
-            $this->dbeSite->setValue(DBESite::SiteNo, $dsSite->getValue(DBESite::SiteNo));
+            $this->dbeSite->setValue(DBESite::customerID, $dsSite->getValue(DBESite::customerID));
+            $this->dbeSite->setValue(DBESite::siteNo, $dsSite->getValue(DBESite::siteNo));
             $this->dbeSite->setUpdateModeUpdate();
             $insert = FALSE;
         }
-        $this->dbeSite->setValue(DBESite::CustomerID, $dsSite->getValue(DBESite::CustomerID));
-        $this->dbeSite->setValue(DBESite::SiteNo, $dsSite->getValue(DBESite::SiteNo));
-        $this->dbeSite->setValue(DBESite::Add1, $dsSite->getValue(DBESite::Add1));
-        $this->dbeSite->setValue(DBESite::Add2, $dsSite->getValue(DBESite::Add2));
-        $this->dbeSite->setValue(DBESite::Add3, $dsSite->getValue(DBESite::Add3));
-        $this->dbeSite->setValue(DBESite::Town, $dsSite->getValue(DBESite::Town));
-        $this->dbeSite->setValue(DBESite::County, $dsSite->getValue(DBESite::County));
-        $this->dbeSite->setValue(DBESite::Postcode, $dsSite->getValue(DBESite::Postcode));
-        $this->dbeSite->setValue(DBESite::InvoiceContactID, $dsSite->getValue(DBESite::InvoiceContactID));
-        $this->dbeSite->setValue(DBESite::DeliverContactID, $dsSite->getValue(DBESite::DeliverContactID));
-        $this->dbeSite->setValue(DBESite::DebtorCode, $dsSite->getValue(DBESite::DebtorCode));
-        $this->dbeSite->setValue(DBESite::Phone, $dsSite->getValue(DBESite::Phone));
+        $this->dbeSite->setValue(DBESite::customerID, $dsSite->getValue(DBESite::customerID));
+        $this->dbeSite->setValue(DBESite::siteNo, $dsSite->getValue(DBESite::siteNo));
+        $this->dbeSite->setValue(DBESite::add1, $dsSite->getValue(DBESite::add1));
+        $this->dbeSite->setValue(DBESite::add2, $dsSite->getValue(DBESite::add2));
+        $this->dbeSite->setValue(DBESite::add3, $dsSite->getValue(DBESite::add3));
+        $this->dbeSite->setValue(DBESite::town, $dsSite->getValue(DBESite::town));
+        $this->dbeSite->setValue(DBESite::county, $dsSite->getValue(DBESite::county));
+        $this->dbeSite->setValue(DBESite::postcode, $dsSite->getValue(DBESite::postcode));
+        $this->dbeSite->setValue(DBESite::invoiceContactID, $dsSite->getValue(DBESite::invoiceContactID));
+        $this->dbeSite->setValue(DBESite::deliverContactID, $dsSite->getValue(DBESite::deliverContactID));
+        $this->dbeSite->setValue(DBESite::debtorCode, $dsSite->getValue(DBESite::debtorCode));
+        $this->dbeSite->setValue(DBESite::phone, $dsSite->getValue(DBESite::phone));
         $this->dbeSite->post();
         if ($insert) {
             //create default contact details
             $buContact = new BUContact($this);
             $dsContact = new DataSet($this);
             $buContact->initialiseNewContact('',
-                                             $dsSite->getValue(DBESite::CustomerID),
-                                             $dsSite->getValue(DBESite::SiteNo),
+                                             $dsSite->getValue(DBESite::customerID),
+                                             $dsSite->getValue(DBESite::siteNo),
                                              $dsContact);
             $dsContact->setUpdateModeUpdate();
             $dsContact->setValue('firstName', 'Please');
@@ -154,8 +154,8 @@ class BUSite extends Business
             $dsContact->post();
             $buContact->updateContact($dsContact);
             $this->dbeSite->setUpdateModeUpdate();
-            $this->dbeSite->setValue(DBESite::InvoiceContactID, $dsContact->getValue('contactID'));
-            $this->dbeSite->setValue(DBESite::DeliverContactID, $dsContact->getValue('contactID'));
+            $this->dbeSite->setValue(DBESite::invoiceContactID, $dsContact->getValue('contactID'));
+            $this->dbeSite->setValue(DBESite::deliverContactID, $dsContact->getValue('contactID'));
             $this->dbeSite->post();
         }
         return TRUE;
@@ -173,7 +173,7 @@ class BUSite extends Business
     {
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
-        $customerName = $dsCustomer->getValue(DBECustomer::Name);
+        $customerName = $dsCustomer->getValue(DBECustomer::name);
         $shortCode = "";
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr($customerName, $ixChar, 1) != " ") {

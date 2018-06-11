@@ -330,23 +330,23 @@ class BUInvoice extends Business
         $buCustomer = new BUCustomer($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
         $buSite = new BUSite($this);
-        $buSite->getSiteByID($customerID, $dsCustomer->getValue(DBECustomer::InvoiceSiteNo), $dsSite);
+        $buSite->getSiteByID($customerID, $dsCustomer->getValue(DBECustomer::invoiceSiteNo), $dsSite);
         $buContact = new BUContact($this);
-        $buContact->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact);
+        $buContact->getContactByID($dsSite->getValue(DBESite::invoiceContactID), $dsContact);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dbeInvhead->setValue('invheadID', 0); // for new number
         $dbeInvhead->setValue('customerID', $customerID);
-        $dbeInvhead->setValue('siteNo', $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
+        $dbeInvhead->setValue('siteNo', $dsCustomer->getValue(DBECustomer::invoiceSiteNo));
         $dbeInvhead->setValue('ordheadID', '');
         $dbeInvhead->setValue('type', $type);    // Invoice/Credit Note
-        $dbeInvhead->setValue('add1', $dsSite->getValue(DBESite::Add1));
-        $dbeInvhead->setValue('add2', $dsSite->getValue(DBESite::Add2));
-        $dbeInvhead->setValue('add3', $dsSite->getValue(DBESite::Add3));
-        $dbeInvhead->setValue('town', $dsSite->getValue(DBESite::Town));
-        $dbeInvhead->setValue('county', $dsSite->getValue(DBESite::County));
-        $dbeInvhead->setValue('postcode', $dsSite->getValue(DBESite::Postcode));
-        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
+        $dbeInvhead->setValue('add1', $dsSite->getValue(DBESite::add1));
+        $dbeInvhead->setValue('add2', $dsSite->getValue(DBESite::add2));
+        $dbeInvhead->setValue('add3', $dsSite->getValue(DBESite::add3));
+        $dbeInvhead->setValue('town', $dsSite->getValue(DBESite::town));
+        $dbeInvhead->setValue('county', $dsSite->getValue(DBESite::county));
+        $dbeInvhead->setValue('postcode', $dsSite->getValue(DBESite::postcode));
+        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::invoiceContactID));
         $dbeInvhead->setValue('contactName',
                               $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );
@@ -360,7 +360,7 @@ class BUInvoice extends Business
         $dbeInvhead->setValue('vatRate', $vatRate);
         $dbeInvhead->setValue('intPORef', '');
         $dbeInvhead->setValue('custPORef', '');
-        $dbeInvhead->setValue('debtorCode', $dsSite->getValue(DBESite::DebtorCode));
+        $dbeInvhead->setValue('debtorCode', $dsSite->getValue(DBESite::debtorCode));
         $dbeInvhead->setValue('source', 'S');// sales (consultancy no longer used)
         $dbeInvhead->setValue('vatOnly', 'N');// no longer used
         $dbeInvhead->setValue('datePrinted', '0000-00-00'); // not printed
@@ -546,18 +546,18 @@ class BUInvoice extends Business
         $buSite->getSiteByID($dbeInvhead->getValue('customerID'), (int)$siteNo, $dsSite);
 
         $buContact = new BUContact($this);
-        if (!$buContact->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact)) {
+        if (!$buContact->getContactByID($dsSite->getValue(DBESite::invoiceContactID), $dsContact)) {
             $this->raiseError('contact not found');
         }
 
         $dbeInvhead->setValue('siteNo', $siteNo);
-        $dbeInvhead->setValue('add1', $dsSite->getValue(DBESite::Add1));
-        $dbeInvhead->setValue('add2', $dsSite->getValue(DBESite::Add2));
-        $dbeInvhead->setValue('add3', $dsSite->getValue(DBESite::Add3));
-        $dbeInvhead->setValue('town', $dsSite->getValue(DBESite::Town));
-        $dbeInvhead->setValue('county', $dsSite->getValue(DBESite::County));
-        $dbeInvhead->setValue('postcode', $dsSite->getValue(DBESite::Postcode));
-        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::InvoiceContactID));
+        $dbeInvhead->setValue('add1', $dsSite->getValue(DBESite::add1));
+        $dbeInvhead->setValue('add2', $dsSite->getValue(DBESite::add2));
+        $dbeInvhead->setValue('add3', $dsSite->getValue(DBESite::add3));
+        $dbeInvhead->setValue('town', $dsSite->getValue(DBESite::town));
+        $dbeInvhead->setValue('county', $dsSite->getValue(DBESite::county));
+        $dbeInvhead->setValue('postcode', $dsSite->getValue(DBESite::postcode));
+        $dbeInvhead->setValue('contactID', $dsSite->getValue(DBESite::invoiceContactID));
         $dbeInvhead->setValue('contactName',
                               $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName')
         );
@@ -722,7 +722,7 @@ class BUInvoice extends Business
 
                 $buCustomer->getCustomerByID($dsInvhead->getValue('customerID'), $dsCustomer);
 
-                $list[] = $dsCustomer->getValue(DBECustomer::Name);
+                $list[] = $dsCustomer->getValue(DBECustomer::name);
 
             }
 

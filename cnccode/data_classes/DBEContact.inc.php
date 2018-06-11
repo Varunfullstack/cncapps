@@ -7,38 +7,38 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEContact extends DBCNCEntity
 {
-    const ContactID = "ContactID";
-    const SiteNo = "SiteNo";
-    const CustomerID = "CustomerID";
-    const SupplierID = "SupplierID";
-    const Title = "Title";
-    const Position = "Position";
-    const LastName = "LastName";
-    const FirstName = "FirstName";
-    const Email = "Email";
-    const Phone = "Phone";
-    const MobilePhone = "MobilePhone";
-    const Fax = "Fax";
-    const PortalPassword = "PortalPassword";
-    const SendMailshotFlag = "SendMailshotFlag";
-    const DiscontinuedFlag = "DiscontinuedFlag";
-    const AccountsFlag = "AccountsFlag";
-    const StatementFlag = "StatementFlag";
-    const Mailshot1Flag = "Mailshot1Flag";
-    const Mailshot2Flag = "Mailshot2Flag";
-    const Mailshot3Flag = "Mailshot3Flag";
-    const Mailshot4Flag = "Mailshot4Flag";
-    const Mailshot5Flag = "Mailshot5Flag";
-    const Mailshot6Flag = "Mailshot6Flag";
-    const Mailshot7Flag = "Mailshot7Flag";
-    const Mailshot8Flag = "Mailshot8Flag";
-    const Mailshot9Flag = "Mailshot9Flag";
-    const Mailshot10Flag = "Mailshot10Flag";
-    const Mailshot11Flag = "Mailshot11Flag";
-    const Notes = "Notes";
-    const WorkStartedEmailFlag = "WorkStartedEmailFlag";
-    const AutoCloseEmailFlag = "AutoCloseEmailFlag";
-    const FailedLoginCount = "FailedLoginCount";
+    const contactID = "ContactID";
+    const siteNo = "SiteNo";
+    const customerID = "CustomerID";
+    const supplierID = "SupplierID";
+    const title = "Title";
+    const position = "Position";
+    const lastName = "LastName";
+    const firstName = "FirstName";
+    const email = "Email";
+    const phone = "Phone";
+    const mobilePhone = "MobilePhone";
+    const fax = "Fax";
+    const portalPassword = "PortalPassword";
+    const sendMailshotFlag = "SendMailshotFlag";
+    const discontinuedFlag = "DiscontinuedFlag";
+    const accountsFlag = "AccountsFlag";
+    const statementFlag = "StatementFlag";
+    const mailshot1Flag = "Mailshot1Flag";
+    const mailshot2Flag = "Mailshot2Flag";
+    const mailshot3Flag = "Mailshot3Flag";
+    const mailshot4Flag = "Mailshot4Flag";
+    const mailshot5Flag = "Mailshot5Flag";
+    const mailshot6Flag = "Mailshot6Flag";
+    const mailshot7Flag = "Mailshot7Flag";
+    const mailshot8Flag = "Mailshot8Flag";
+    const mailshot9Flag = "Mailshot9Flag";
+    const mailshot10Flag = "Mailshot10Flag";
+    const mailshot11Flag = "Mailshot11Flag";
+    const notes = "Notes";
+    const workStartedEmailFlag = "WorkStartedEmailFlag";
+    const autoCloseEmailFlag = "AutoCloseEmailFlag";
+    const failedLoginCount = "FailedLoginCount";
 
     /**
      * calls constructor()
@@ -51,38 +51,38 @@ class DBEContact extends DBCNCEntity
     {
         parent::__construct($owner);
         $this->setTableName("Contact");
-        $this->addColumn(self::ContactID, DA_ID, DA_NOT_NULL, "con_contno");
-        $this->addColumn(self::SiteNo, DA_ID, DA_ALLOW_NULL, "con_siteno");
-        $this->addColumn(self::CustomerID, DA_ID, DA_ALLOW_NULL, "con_custno");
-        $this->addColumn(self::SupplierID, DA_ID, DA_ALLOW_NULL, "con_suppno");
-        $this->addColumn(self::Title, DA_STRING, DA_ALLOW_NULL, "con_title");
-        $this->addColumn(self::Position, DA_STRING, DA_ALLOW_NULL, "con_position");
-        $this->addColumn(self::LastName, DA_STRING, DA_ALLOW_NULL, "con_last_name");
-        $this->addColumn(self::FirstName, DA_STRING, DA_ALLOW_NULL, "con_first_name");
-        $this->addColumn(self::Email, DA_STRING, DA_ALLOW_NULL, "con_email");
-        $this->addColumn(self::Phone, DA_STRING, DA_ALLOW_NULL, "con_phone");
-        $this->addColumn(self::MobilePhone, DA_STRING, DA_ALLOW_NULL, "con_mobile_phone");
-        $this->addColumn(self::Fax, DA_STRING, DA_ALLOW_NULL, "con_fax");
-        $this->addColumn(self::PortalPassword, DA_STRING, DA_ALLOW_NULL, "con_portal_password");
-        $this->addColumn(self::SendMailshotFlag, DA_YN, DA_NOT_NULL, "con_mailshot");
-        $this->addColumn(self::DiscontinuedFlag, DA_YN, DA_ALLOW_NULL, "con_discontinued");
-        $this->addColumn(self::AccountsFlag, DA_YN, DA_NOT_NULL, "con_accounts_flag");
-        $this->addColumn(self::StatementFlag, DA_YN, DA_NOT_NULL, "con_statement_flag");
-        $this->addColumn(self::Mailshot1Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag1");
-        $this->addColumn(self::Mailshot2Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag2");
-        $this->addColumn(self::Mailshot3Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag3");
-        $this->addColumn(self::Mailshot4Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag4");
-        $this->addColumn(self::Mailshot5Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag5");
-        $this->addColumn(self::Mailshot6Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag6");
-        $this->addColumn(self::Mailshot7Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag7");
-        $this->addColumn(self::Mailshot8Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag8");
-        $this->addColumn(self::Mailshot9Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag9");
-        $this->addColumn(self::Mailshot10Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag10");
+        $this->addColumn(self::contactID, DA_ID, DA_NOT_NULL, "con_contno");
+        $this->addColumn(self::siteNo, DA_ID, DA_ALLOW_NULL, "con_siteno");
+        $this->addColumn(self::customerID, DA_ID, DA_ALLOW_NULL, "con_custno");
+        $this->addColumn(self::supplierID, DA_ID, DA_ALLOW_NULL, "con_suppno");
+        $this->addColumn(self::title, DA_STRING, DA_ALLOW_NULL, "con_title");
+        $this->addColumn(self::position, DA_STRING, DA_ALLOW_NULL, "con_position");
+        $this->addColumn(self::lastName, DA_STRING, DA_ALLOW_NULL, "con_last_name");
+        $this->addColumn(self::firstName, DA_STRING, DA_ALLOW_NULL, "con_first_name");
+        $this->addColumn(self::email, DA_STRING, DA_ALLOW_NULL, "con_email");
+        $this->addColumn(self::phone, DA_STRING, DA_ALLOW_NULL, "con_phone");
+        $this->addColumn(self::mobilePhone, DA_STRING, DA_ALLOW_NULL, "con_mobile_phone");
+        $this->addColumn(self::fax, DA_STRING, DA_ALLOW_NULL, "con_fax");
+        $this->addColumn(self::portalPassword, DA_STRING, DA_ALLOW_NULL, "con_portal_password");
+        $this->addColumn(self::sendMailshotFlag, DA_YN, DA_NOT_NULL, "con_mailshot");
+        $this->addColumn(self::discontinuedFlag, DA_YN, DA_ALLOW_NULL, "con_discontinued");
+        $this->addColumn(self::accountsFlag, DA_YN, DA_NOT_NULL, "con_accounts_flag");
+        $this->addColumn(self::statementFlag, DA_YN, DA_NOT_NULL, "con_statement_flag");
+        $this->addColumn(self::mailshot1Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag1");
+        $this->addColumn(self::mailshot2Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag2");
+        $this->addColumn(self::mailshot3Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag3");
+        $this->addColumn(self::mailshot4Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag4");
+        $this->addColumn(self::mailshot5Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag5");
+        $this->addColumn(self::mailshot6Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag6");
+        $this->addColumn(self::mailshot7Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag7");
+        $this->addColumn(self::mailshot8Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag8");
+        $this->addColumn(self::mailshot9Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag9");
+        $this->addColumn(self::mailshot10Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag10");
         $this->addColumn("Mailshot11Flag", DA_YN, DA_ALLOW_NULL, "con_mailflag11");
-        $this->addColumn(self::Notes, DA_STRING, DA_ALLOW_NULL, "con_notes");
-        $this->addColumn(self::WorkStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
-        $this->addColumn(self::AutoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
-        $this->addColumn(self::FailedLoginCount, DA_INTEGER, DA_ALLOW_NULL, "con_failed_login_count");
+        $this->addColumn(self::notes, DA_STRING, DA_ALLOW_NULL, "con_notes");
+        $this->addColumn(self::workStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
+        $this->addColumn(self::autoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
+        $this->addColumn(self::failedLoginCount, DA_INTEGER, DA_ALLOW_NULL, "con_failed_login_count");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -179,7 +179,7 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " left join customer on con_custno = cus_custno 
-             WHERE " . $this->getDBColumnName(self::Mailshot10Flag) . " = 'Y' ";
+             WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y' ";
 
         if ($leadStatusID) {
             $sqlQuery .= " and customer_lead_status_id = $leadStatusID";

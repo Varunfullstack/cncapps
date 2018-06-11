@@ -191,7 +191,7 @@ class CTDespatch extends CTCNC
         if ($_REQUEST['customerID'] != '') {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($_REQUEST['customerID'], $dsCustomer);
-            $customerString = $dsCustomer->getValue(DBECustomer::Name);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $this->template->set_var(
             array(
