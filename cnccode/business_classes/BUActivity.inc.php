@@ -1696,9 +1696,9 @@ class BUActivity extends Business
     Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact.
     */
         if ($mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
-            $dbeJCallActivity->getValue(DBEJCallActivity::customerID),
+            $dbeJCallActivity->getValue('customerID'),
             $toEmail,
-            DBEContact::othersEmailFlag
+            DBEContact::OthersEmailFlag
         )
         ) {
 
@@ -8534,6 +8534,7 @@ is currently a balance of ';
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dbeJProblem->getValue(DBEJProblem::customerID));
+
 
         /*
     See whether to send an email to the last activity contact

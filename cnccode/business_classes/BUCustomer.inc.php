@@ -354,6 +354,37 @@ class BUCustomer extends Business
         return $row['count'] > 0;
     }
 
+    function checkEmail($email, $contactID)
+    {
+        if ($email === '') {
+            return true;
+        }
+        $query = "select count(con_contno) as count from contact where con_email = ? ";
+
+        $paramTypes = 's';
+        $params = [
+            $email,
+        ];
+
+        if ($contactID) {
+            $query .= " and con_contno <> ? ";
+            $paramTypes .= "i";
+            $params[] = [
+                $contactID,
+            ];
+        }
+
+        array_unshift($params, $paramTypes);
+        $statement = $this->db->prepare($query);
+        call_user_func([$statement, 'bind_param'], $params);
+        $result = $statement->execute() ? $statement->get_result() : false;
+
+        $statement->close();
+
+        $row = $result->fetch_assoc();
+        return $row['count'] > 0;
+    }
+
     /**
      * Get all customer types
      * @param DataSet &$dsResults results
