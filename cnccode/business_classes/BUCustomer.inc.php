@@ -203,6 +203,37 @@ class BUCustomer extends Business
         return ($this->getDatasetByPK($contactID, $this->dbeContact, $dsResults));
     }
 
+    function checkEmail($email, $contactID)
+    {
+        if ($email === '') {
+            return true;
+        }
+        $query = "select count(con_contno) as count from contact where con_email = ? ";
+
+        $paramTypes = 's';
+        $params = [
+            $email,
+        ];
+
+        if ($contactID) {
+            $query .= " and con_contno <> ? ";
+            $paramTypes .= "i";
+            $params[] = [
+                $contactID,
+            ];
+        }
+
+        array_unshift($params, $paramTypes);
+        $statement = $this->db->prepare($query);
+        call_user_func([$statement, 'bind_param'], $params);
+        $result = $statement->execute() ? $statement->get_result() : false;
+
+        $statement->close();
+
+        $row = $result->fetch_assoc();
+        return $row['count'] > 0;
+    }
+
     /**
      * Get all customer types
      * @parameter DataSet &$dsResults results
@@ -479,9 +510,6 @@ class BUCustomer extends Business
         $dsCustomer->setValue('MailshotFlag', 'Y');
         $dsCustomer->setValue('ReferredFlag', 'N');
         $dsCustomer->setValue('ProspectFlag', 'Y');
-        $dsCustomer->setValue('OthersEmailMainFlag', 'Y');
-        $dsCustomer->setValue('WorkStartedEmailMainFlag', 'Y');
-        $dsCustomer->setValue('AutoCloseEmailMainFlag', 'Y');
         $dsCustomer->setValue('CreateDate', date('Y-m-d'));
         $dsCustomer->setValue('InvoiceSiteNo', 0);
         $dsCustomer->setValue('DeliverSiteNo', 0);
@@ -828,7 +856,12 @@ class BUCustomer extends Business
         return $this->getData($this->dbeCustomer, $dsResults);
     }
 
-    function uploadPortalDocument($customerID, $description, $userfile, $startersFormFlag, $leaversFormFlag, $mainContactOnlyFlag)
+    function uploadPortalDocument($customerID,
+                                  $description,
+                                  $userfile,
+                                  $startersFormFlag,
+                                  $leaversFormFlag,
+                                  $mainContactOnlyFlag)
     {
 
         return $this->addDocument(

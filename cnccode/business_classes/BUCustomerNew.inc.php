@@ -528,10 +528,13 @@ class BUCustomer extends Business
      * i.e. those contacts with mailFlag10 = Y
      * @parameter integer $customerID
      * @parameter DataSet &$dsResults results
+     * @param $customerID
+     * @param $excludeEmail
+     * @param null $flag
      * @return bool : Success
      * @access public
      */
-    function getMainSupportEmailAddresses($customerID, $excludeEmail)
+    function getMainSupportEmailAddresses($customerID, $excludeEmail, $flag = null)
     {
         $this->setMethodName('getMainSupportEmailAddresses');
 
@@ -550,6 +553,7 @@ class BUCustomer extends Business
                 ($this->dbeContact->getValue('email') != $excludeEmail)
                 AND
                 (strpos($this->dbeContact->getValue('email'), $emailList) == FALSE)
+                and (!$flag or $this->dbeContact->getValue($flag) === 'Y')
             ) {
                 $emailList .= $this->dbeContact->getValue('email') . ',';
 
@@ -582,7 +586,7 @@ class BUCustomer extends Business
         while ($this->dbeContact->fetchNext()) {
             $contacts[] = [
                 "firstName" => $this->dbeContact->getValue('firstName'),
-                "lastName" => $this->dbeContact->getValue('lastName')
+                "lastName"  => $this->dbeContact->getValue('lastName')
             ];
         }
 

@@ -36,8 +36,11 @@ class DBEContact extends DBCNCEntity
     const Mailshot10Flag = "Mailshot10Flag";
     const Mailshot11Flag = "Mailshot11Flag";
     const Notes = "Notes";
-    const WorkStartedEmailFlag = "WorkStartedEmailFlag";
-    const AutoCloseEmailFlag = "AutoCloseEmailFlag";
+    const WorkStartedEmailFlag = "workStartedEmailFlag";
+    const AutoCloseEmailFlag = "autoCloseEmailFlag";
+    const OthersEmailFlag = 'othersEmailMainFlag';
+    const OthersWorkStartedEmailFlag = "WorkStartedEmailFlag";
+    const OthersAutoCloseEmailFlag = "AutoCloseEmailFlag";
     const FailedLoginCount = "FailedLoginCount";
 
     /**
@@ -78,11 +81,14 @@ class DBEContact extends DBCNCEntity
         $this->addColumn(self::Mailshot8Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag8");
         $this->addColumn(self::Mailshot9Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag9");
         $this->addColumn(self::Mailshot10Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag10");
-        $this->addColumn("Mailshot11Flag", DA_YN, DA_ALLOW_NULL, "con_mailflag11");
+        $this->addColumn(self::Mailshot11Flag, DA_YN, DA_ALLOW_NULL, "con_mailflag11");
         $this->addColumn(self::Notes, DA_STRING, DA_ALLOW_NULL, "con_notes");
         $this->addColumn(self::WorkStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
         $this->addColumn(self::AutoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
         $this->addColumn(self::FailedLoginCount, DA_INTEGER, DA_ALLOW_NULL, "con_failed_login_count");
+        $this->addColumn(self::OthersEmailFlag, DA_YN_FLAG, DA_NOT_NULL, "othersEmailsFlag");
+        $this->addColumn(self::OthersWorkStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "othersWorkStartedFlag");
+        $this->addColumn(self::OthersAutoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "autoCloseEmailsFlag");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
