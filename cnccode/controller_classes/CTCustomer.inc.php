@@ -181,6 +181,7 @@ class CTCustomer extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
+        $this->dsContact->addColumn('EmailClass', DA_STRING, DA_ALLOW_NULL);
         $this->dsSite = new DataSet($this);
         $this->dsSite->setIgnoreNULLOn();
         $this->dsSite->copyColumnsFrom($this->buCustomer->dbeSite);
@@ -287,15 +288,38 @@ class CTCustomer extends CTCNC
                     'LastNameClass',
                     CTCUSTOMER_CLS_FORM_ERROR
                 );
+            } else {
+                $this->dsContact->setValue('LastNameClass', null);
             }
             $this->dsContact->setValue(
                 DBEContact::firstName,
                 $value['firstName']
             );
-            $this->dsContact->setValue(
-                DBEContact::email,
-                $value['email']
-            );
+
+            if ($this->dsContact->getValue(DBEContact::firstName) == '') {
+                $this->setFormErrorOn();
+                $this->dsContact->setValue('FirstNameClass', CTCUSTOMER_CLS_FORM_ERROR);
+            } else {
+                $this->dsContact->setValue('FirstNameClass', null);
+            }
+
+            $validEmail = true;
+            $email = $value['email'] == '' ? null : $value['email'];
+
+
+            $this->dsContact->setValue('EmailClass', null);
+            if ($email) {
+                if (!($this->buCustomer->checkEmail($email, $value['contactID']))) {
+                    $this->setFormErrorOn();
+                    $this->dsContact->setValue('EmailClass', CTCUSTOMER_CLS_FORM_ERROR);
+                    $validEmail = false;
+                }
+            }
+
+            if ($validEmail) {
+                $this->dsContact->setValue(DBEContact::email, $email);
+            }
+
             $this->dsContact->setValue(
                 DBEContact::phone,
                 $value['phone']
@@ -331,10 +355,6 @@ class CTCustomer extends CTCNC
             $this->dsContact->setValue(
                 DBEContact::sendMailshotFlag,
                 $this->getYN($value['sendMailshotFlag'])
-            );// Use getYN() because HTML POST does not send a FALSE value
-            $this->dsContact->setValue(
-                DBEContact::mailshot1Flag,
-                $this->getYN($value['mailshot1Flag'])
             );// Use getYN() because HTML POST does not send a FALSE value
             $this->dsContact->setValue(
                 DBEContact::mailshot2Flag,
@@ -664,18 +684,6 @@ class CTCustomer extends CTCNC
             $this->dsCustomer->setValue(
                 DBECustomer::prospectFlag,
                 $this->getYN($value['prospectFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::othersEmailMainFlag,
-                $this->getYN($value['othersEmailMainFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::workStartedEmailMainFlag,
-                $this->getYN($value['workStartedEmailMainFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::autoCloseEmailMainFlag,
-                $this->getYN($value['autoCloseEmailMainFlag'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::createDate,
@@ -1786,8 +1794,8 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_var(
             array(
-                'urlContactPopup'                 => $urlContactPopup,
-                'bodyTagExtras'                   => $bodyTagExtras,
+                'urlContactPopup'                => $urlContactPopup,
+                'bodyTagExtras'                  => $bodyTagExtras,
                 /* hidden */
                 'reviewMeetingEmailSentFlag'      => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingEmailSentFlag
@@ -2530,6 +2538,15 @@ ORDER BY cus_name ASC  ";
                     'deleteContactLink'           => $deleteContactLink
                 )
             );
+            echo '<div>';
+            var_dump($this->dsContact->getValue(DBEContact::OthersEmailFlag));
+            echo '</div>';
+            echo '<div>';
+            var_dump($this->dsContact->getValue(DBEContact::OthersWorkStartedEmailFlag));
+            echo '</div>';
+            echo '<div>';
+            var_dump($this->dsContact->getValue(DBEContact::OthersAutoCloseEmailFlag));
+            echo '</div>';
 
             $this->siteDropdown(
                 $this->dsContact->getValue(DBEContact::customerID),

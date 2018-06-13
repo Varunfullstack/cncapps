@@ -1695,12 +1695,11 @@ class BUActivity extends Business
         /*
     Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact.
     */
-        if (
-            $dsCustomer->getValue(DBECustomer::othersEmailMainFlag) == 'Y' &&
-            $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
-                $dbeJCallActivity->getValue(DBEJCallActivity::customerID),
-                $toEmail
-            )
+        if ($mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
+            $dbeJCallActivity->getValue('customerID'),
+            $toEmail,
+            DBEContact::OthersEmailFlag
+        )
         ) {
 
             $toEmail .= ',' . $mainSupportEmailAddresses;
@@ -8478,31 +8477,10 @@ is currently a balance of ';
         ) {
             return; // no email to customer for this request
         }
-        /*
-    See whether to copy in the main contact
-    */
-        $copyEmailToMainContact = true;
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dbeJProblem->getValue(DBEJProblem::customerID));
 
-        if ($dbeCustomer->getValue(DBECustomer::othersEmailMainFlag) == 'N') {
-
-            $copyEmailToMainContact = false;
-
-        } else {
-
-            if (
-                $parameters['templateName'] == 'WorkCommencedEmail' &&
-                $dbeCustomer->getValue(DBECustomer::workStartedEmailMainFlag) == 'N'
-            ) {
-                $copyEmailToMainContact = false;
-            }
-
-        }
-        /*
-    End see whether to copy in main contact
-    */
 
         /*
     See whether to send an email to the last activity contact
@@ -8525,20 +8503,17 @@ is currently a balance of ';
          * Send the email to all main support email addresses at the client but exclude them if
          * $copyEmailToMainContact set to exclude main contacts.
          */
-        if (
-            $copyEmailToMainContact &&
-            $mainSupportEmailAddresses =
-                $buCustomer->getMainSupportEmailAddresses(
-                    $dbeLastActivity->getValue(DBEJCallActivity::customerID),
-                    $toEmail
-                )
-        ) {
 
+
+        if ($parameters['templateName'] == 'WorkCommencedEmail' &&
+            $mainSupportEmailAddresses =
+                $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue(DBEJCallActivity::customerID), $toEmail,
+                                                          DBEContact::OthersWorkStartedEmailFlag)
+        ) {
             if ($toEmail) {
                 $toEmail .= ',';
             }
             $toEmail .= $mainSupportEmailAddresses;
-
         }
 
         if (!$toEmail) {
