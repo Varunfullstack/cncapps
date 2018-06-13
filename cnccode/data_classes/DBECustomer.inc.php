@@ -18,9 +18,9 @@ class DBECustomer extends DBCNCEntity
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
     const prospectFlag = "prospectFlag";
-    const othersEmailMainFlag = "othersEmailMainFlag";
-    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
-    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
+//    const othersEmailMainFlag = "othersEmailMainFlag";
+//    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
+//    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -139,24 +139,6 @@ class DBECustomer extends DBCNCEntity
             DA_YN_FLAG,
             DA_NOT_NULL,
             "cus_prospect"
-        );
-        $this->addColumn(
-            self::othersEmailMainFlag,
-            DA_YN_FLAG,
-            DA_NOT_NULL,
-            "cus_others_email_main_flag"
-        );
-        $this->addColumn(
-            self::workStartedEmailMainFlag,
-            DA_YN_FLAG,
-            DA_NOT_NULL,
-            "cus_work_started_email_main_flag"
-        );
-        $this->addColumn(
-            self::autoCloseEmailMainFlag,
-            DA_YN_FLAG,
-            DA_NOT_NULL,
-            "cus_auto_close_email_main_flag"
         );
         $this->addColumn(
             self::gscTopUpAmount,

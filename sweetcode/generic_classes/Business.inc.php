@@ -27,8 +27,8 @@ class Business extends BaseObject
 
     /**
      * Insert/update one or more rows from a source DataSet into a destination DBObject
-     * @param DataSet &$Source Set of data
-     * @param DBObject &$Destinantion DataAccess object
+     * @param DataSet $dsSource
+     * @param DataAccess $dbDestination
      * @return bool
      * @access private
      */

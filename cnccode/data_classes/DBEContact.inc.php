@@ -39,6 +39,9 @@ class DBEContact extends DBCNCEntity
     const workStartedEmailFlag = "workStartedEmailFlag";
     const autoCloseEmailFlag = "autoCloseEmailFlag";
     const failedLoginCount = "failedLoginCount";
+    const OthersEmailFlag = 'othersEmailMainFlag';
+    const OthersWorkStartedEmailFlag = "WorkStartedEmailFlag";
+    const OthersAutoCloseEmailFlag = "AutoCloseEmailFlag";
 
     /**
      * calls constructor()
@@ -243,6 +246,9 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
             "con_failed_login_count"
         );
+        $this->addColumn(self::OthersEmailFlag, DA_YN_FLAG, DA_NOT_NULL, "othersEmailsFlag");
+        $this->addColumn(self::OthersWorkStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "othersWorkStartedFlag");
+        $this->addColumn(self::OthersAutoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "autoCloseEmailsFlag");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

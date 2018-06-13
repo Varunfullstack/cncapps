@@ -1711,13 +1711,13 @@ class CTCustomerCRM extends CTCNC
                 'prospectFlagChecked'             => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::prospectFlag)
                 ),
-                'othersEmailMainFlagChecked'      => $this->getChecked(
+//                'othersEmailMainFlagChecked'      => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::othersEmailMainFlag)
                 ),
-                'workStartedEmailMainFlagChecked' => $this->getChecked(
+//                'workStartedEmailMainFlagChecked' => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
                 ),
-                'autoCloseEmailMainFlagChecked'   => $this->getChecked(
+//                'autoCloseEmailMainFlagChecked'   => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)
                 ),
                 'pcxFlagChecked'                  => $this->getChecked(

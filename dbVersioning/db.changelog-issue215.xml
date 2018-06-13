@@ -1,0 +1,114 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue215-1528799226-0">
+        <tagDatabase tag="issue215"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="othersEmailFlag"/>
+        </preConditions>
+        <sql>
+            UPDATE contact AS c INNER JOIN customer ON c.`con_custno` = customer.`cus_custno` AND c.`con_mailflag10` =
+            'Y' SET c.othersEmailFlag = customer.`cus_others_email_main_flag`
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-3">
+        <preConditions>
+            <columnExists tableName="customer" columnName="cus_others_email_main_flag"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_others_email_main_flag"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_others_email_main_flag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+            <sql>
+                update customer set customer.cus_others_email_main_flag = (select c.othersEmailFlag from contact as c
+                where c.con_custno = customer.cus_custno limit 1)
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersWorkStartedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersWorkStartedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-5">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="othersWorkStartedEmailFlag"/>
+        </preConditions>
+        <sql>
+            UPDATE contact AS c INNER JOIN customer ON c.`con_custno` = customer.`cus_custno` AND c.`con_mailflag10` =
+            'Y' SET c.othersWorkStartedEmailFlag = customer.`cus_work_started_email_main_flag`
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-6">
+        <preConditions>
+            <columnExists tableName="customer" columnName="cus_work_started_email_main_flag"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_work_started_email_main_flag"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_work_started_email_main_flag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+            <sql>
+                update customer set customer.cus_work_started_email_main_flag = (select c.othersWorkStartedEmailFlag from contact as c
+                where c.con_custno = customer.cus_custno limit 1)
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersAutoCloseEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersAutoCloseEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-8">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="othersAutoCloseEmailFlag"/>
+        </preConditions>
+        <sql>
+            UPDATE contact AS c INNER JOIN customer ON c.`con_custno` = customer.`cus_custno` AND c.`con_mailflag10` =
+            'Y' SET c.othersAutoCloseEmailFlag = customer.`cus_auto_close_email_main_flag`
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-9">
+        <preConditions>
+            <columnExists tableName="customer" columnName="cus_auto_close_email_main_flag"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_auto_close_email_main_flag"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_auto_close_email_main_flag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+            <sql>
+                update customer set customer.cus_auto_close_email_main_flag = (select c.othersAutoCloseEmailFlag from contact as c
+                where c.con_custno = customer.cus_custno limit 1)
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
