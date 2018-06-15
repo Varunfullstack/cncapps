@@ -343,14 +343,10 @@ class CTCustomerCRM extends CTCNC
             $this->dsContact->setValue('DiscontinuedFlag', $value['discontinuedFlag']);
             $this->dsContact->setValue('SendMailshotFlag',
                                        $this->getYN($value['sendMailshotFlag']));// Use getYN() because HTML POST does not send a FALSE value
-            $this->dsContact->setValue('Mailshot1Flag',
-                                       $this->getYN($value['mailshot1Flag']));// Use getYN() because HTML POST does not send a FALSE value
             $this->dsContact->setValue('Mailshot2Flag', $this->getYN($value['mailshot2Flag']));
             $this->dsContact->setValue('Mailshot3Flag', $this->getYN($value['mailshot3Flag']));
             $this->dsContact->setValue('Mailshot4Flag', $this->getYN($value['mailshot4Flag']));
             $this->dsContact->setValue('Mailshot5Flag', $this->getYN($value['mailshot5Flag']));
-            $this->dsContact->setValue('Mailshot6Flag', $this->getYN($value['mailshot6Flag']));
-            $this->dsContact->setValue('Mailshot7Flag', $this->getYN($value['mailshot7Flag']));
             $this->dsContact->setValue('Mailshot8Flag', $this->getYN($value['mailshot8Flag']));
             $this->dsContact->setValue('Mailshot9Flag', $this->getYN($value['mailshot9Flag']));
             $this->dsContact->setValue('Mailshot10Flag', $this->getYN($value['mailshot10Flag']));
@@ -1257,13 +1253,10 @@ class CTCustomerCRM extends CTCNC
 //                'autoCloseEmailMainFlagChecked' => $this->getChecked($this->dsCustomer->getValue('AutoCloseEmailMainFlag')),
                 'pcxFlagChecked' => $this->getChecked($this->dsCustomer->getValue('PCXFlag')),
                 'createDate' => $this->dsCustomer->getValue("CreateDate"),
-                'mailshot1FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot1FlagDesc"),
                 'mailshot2FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
                 'mailshot3FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot3FlagDesc"),
                 'mailshot4FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
                 'mailshot5FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot5FlagDesc"),
-                'mailshot6FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot6FlagDesc"),
-                'mailshot7FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot7FlagDesc"),
                 'mailshot8FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
                 'mailshot9FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
                 'mailshot10FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot10FlagDesc"),
@@ -1731,13 +1724,10 @@ class CTCustomerCRM extends CTCNC
                     'deliverContactFlagChecked' => ($this->dsContact->getValue("ContactID") == $this->dsSite->getValue('DeliverContactID')) ? CT_CHECKED : '',
                     'sendMailshotFlagChecked' => $this->getChecked($this->dsContact->getValue("SendMailshotFlag")),
                     'accountsFlagChecked' => $this->getChecked($this->dsContact->getValue("AccountsFlag")),
-                    'mailshot1FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot1Flag")),
                     'mailshot2FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot2Flag")),
                     'mailshot3FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot3Flag")),
                     'mailshot4FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot4Flag")),
                     'mailshot5FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot5Flag")),
-                    'mailshot6FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot6Flag")),
-                    'mailshot7FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot7Flag")),
                     'mailshot8FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot8Flag")),
                     'mailshot9FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot9Flag")),
                     'mailshot10FlagChecked' => $this->getChecked($this->dsContact->getValue("Mailshot10Flag")),

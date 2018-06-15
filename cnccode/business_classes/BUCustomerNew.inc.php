@@ -335,13 +335,10 @@ class BUCustomer extends Business
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
-        $dsContact->setValue('mailshot1Flag', $dsHeader->getValue("mailshot1FlagDef"));
         $dsContact->setValue('mailshot2Flag', $dsHeader->getValue("mailshot2FlagDef"));
         $dsContact->setValue('mailshot3Flag', $dsHeader->getValue("mailshot3FlagDef"));
         $dsContact->setValue('mailshot4Flag', $dsHeader->getValue("mailshot4FlagDef"));
         $dsContact->setValue('mailshot5Flag', $dsHeader->getValue("mailshot5FlagDef"));
-        $dsContact->setValue('mailshot6Flag', $dsHeader->getValue("mailshot6FlagDef"));
-        $dsContact->setValue('mailshot7Flag', $dsHeader->getValue("mailshot7FlagDef"));
         $dsContact->setValue('mailshot8Flag', $dsHeader->getValue("mailshot8FlagDef"));
         $dsContact->setValue('mailshot9Flag', $dsHeader->getValue("mailshot9FlagDef"));
         $dsContact->setValue('mailshot10Flag', $dsHeader->getValue("mailshot10FlagDef"));

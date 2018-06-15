@@ -203,7 +203,7 @@ class BUCustomer extends Business
         return ($this->getDatasetByPK($contactID, $this->dbeContact, $dsResults));
     }
 
-    function checkEmail($email, $contactID)
+    function duplicatedEmail($email, $contactID)
     {
         if ($email === '') {
             return true;
@@ -218,18 +218,18 @@ class BUCustomer extends Business
         if ($contactID) {
             $query .= " and con_contno <> ? ";
             $paramTypes .= "i";
-            $params[] = [
-                $contactID,
-            ];
+            $params[] = +$contactID;
         }
 
-        array_unshift($params, $paramTypes);
+        $params = array_merge([$paramTypes], $params);
+        $refArray = [];
+        foreach ($params as $key => $value) $refArray[$key] = &$params[$key];
+
         $statement = $this->db->prepare($query);
-        call_user_func([$statement, 'bind_param'], $params);
+        call_user_func_array([$statement, 'bind_param'], $refArray);
         $result = $statement->execute() ? $statement->get_result() : false;
 
         $statement->close();
-
         $row = $result->fetch_assoc();
         return $row['count'] > 0;
     }
@@ -464,13 +464,10 @@ class BUCustomer extends Business
         $dsContact->setValue('SendMailshotFlag', 'Y');
         $dsContact->setValue('AccountsFlag', 'N');
         $dsContact->setValue('StatementFlag', 'N');
-        $dsContact->setValue('Mailshot1Flag', $this->dsHeader->getValue("mailshot1FlagDef"));
         $dsContact->setValue('Mailshot2Flag', $this->dsHeader->getValue("mailshot2FlagDef"));
         $dsContact->setValue('Mailshot3Flag', $this->dsHeader->getValue("mailshot3FlagDef"));
         $dsContact->setValue('Mailshot4Flag', $this->dsHeader->getValue("mailshot4FlagDef"));
         $dsContact->setValue('Mailshot5Flag', $this->dsHeader->getValue("mailshot5FlagDef"));
-        $dsContact->setValue('Mailshot6Flag', $this->dsHeader->getValue("mailshot6FlagDef"));
-        $dsContact->setValue('Mailshot7Flag', $this->dsHeader->getValue("mailshot7FlagDef"));
         $dsContact->setValue('Mailshot8Flag', $this->dsHeader->getValue("mailshot8FlagDef"));
         $dsContact->setValue('Mailshot9Flag', $this->dsHeader->getValue("mailshot9FlagDef"));
         $dsContact->setValue('Mailshot10Flag', $this->dsHeader->getValue("mailshot10FlagDef"));

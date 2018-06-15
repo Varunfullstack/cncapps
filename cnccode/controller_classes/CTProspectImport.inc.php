@@ -151,13 +151,10 @@ class CTProspectImport extends CTCNC
             $dsContact->setUpdateModeUpdate();
             $dsContact->setValue('sendMailshotFlag', 'Y');
             $dsContact->setValue('discontinuedFlag', 'N');
-            $dsContact->setValue('mailshot1Flag', 'Y');                    // CNC address book
             $dsContact->setValue('mailshot2Flag', 'N');
             $dsContact->setValue('mailshot3Flag', 'Y');                    // newsletter
             $dsContact->setValue('mailshot4Flag', 'N');
             $dsContact->setValue('mailshot5Flag', 'N');
-            $dsContact->setValue('mailshot6Flag', 'N');
-            $dsContact->setValue('mailshot7Flag', 'N');
             $dsContact->setValue('mailshot8Flag', 'N');
             $dsContact->setValue('mailshot9Flag', 'N');
             $dsContact->setValue('mailshot10Flag', 'N');
