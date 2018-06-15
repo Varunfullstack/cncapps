@@ -104,11 +104,11 @@ class CTContact extends CTCNC
         $urlCreate = $this->buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action' => CTCNC_ACT_CONTACT_ADD,
+                'action'     => CTCNC_ACT_CONTACT_ADD,
                 'supplierID' => $_REQUEST['supplierID'],
                 'customerID' => $_REQUEST['customerID'],
-                'siteNo' => $_REQUEST['siteNo'],
-                'htmlFmt' => CT_HTML_FMT_POPUP
+                'siteNo'     => $_REQUEST['siteNo'],
+                'htmlFmt'    => CT_HTML_FMT_POPUP
             )
         );
         if ($_REQUEST['contactName']{0} == '/') {
@@ -153,8 +153,8 @@ class CTContact extends CTCNC
                 $this->template->set_var(
                     array(
                         'contactName' => Controller::htmlDisplayText(($name)),
-                        'submitName' => addslashes($name), //so dblquotes don't mess javascript up
-                        'contactID' => $this->dsContact->getValue("contactID")
+                        'submitName'  => addslashes($name), //so dblquotes don't mess javascript up
+                        'contactID'   => $this->dsContact->getValue("contactID")
                     )
                 );
                 $this->template->parse('contacts', 'contactBlock', true);
@@ -162,7 +162,7 @@ class CTContact extends CTCNC
         }
         $this->template->set_var(
             array(
-                'parentIDField' => $_SESSION['contactParentIDField'],
+                'parentIDField'   => $_SESSION['contactParentIDField'],
                 'parentDescField' => $_SESSION['contactParentDescField']
             )
         );
@@ -191,61 +191,55 @@ class CTContact extends CTCNC
         $this->setTemplateFiles('ContactEdit', 'ContactEdit.inc');
         $this->template->set_var(
             array(
-                'contactID' => $this->dsContact->getValue('contactID'),
-                'supplierID' => $this->dsContact->getValue('supplierID'),
-                'customerID' => $this->dsContact->getValue('customerID'),
-                'siteNo' => $this->dsContact->getValue('siteNo'),
-                'firstName' => Controller::htmlInputText($this->dsContact->getValue('firstName')),
-                'firstNameMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('firstName')),
-                'lastName' => Controller::htmlInputText($this->dsContact->getValue('lastName')),
-                'lastNameMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('lastName')),
-                'position' => Controller::htmlInputText($this->dsContact->getValue('position')),
-                'positionMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('position')),
-                'title' => Controller::htmlInputText($this->dsContact->getValue('title')),
-                'titleMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('title')),
-                'email' => Controller::htmlInputText($this->dsContact->getValue('email')),
-                'emailMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('email')),
-                'portalPassword' => Controller::htmlInputText($this->dsContact->getValue('portalPassword')),
-                'portalPasswordMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('portalPassword')),
-                'failedLoginCount' => Controller::htmlDisplayText($this->dsContact->getValue('failedLoginCount')),
-                'failedLoginCountMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('failedLoginCount')),
-                'notes' => Controller::htmlInputText($this->dsContact->getValue('notes')),
-                'notesMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('notes')),
-                'phone' => Controller::htmlDisplayText($this->dsContact->getValue('phone')),
-                'phoneMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('phone')),
-                'mobilePhone' => Controller::htmlDisplayText($this->dsContact->getValue('mobilePhone')),
-                'mobilePhoneMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('mobilePhone')),
-                'fax' => Controller::htmlDisplayText($this->dsContact->getValue('fax')),
-                'faxMessage' => Controller::htmlDisplayText($this->dsContact->getMessage('fax')),
+                'contactID'                   => $this->dsContact->getValue('contactID'),
+                'supplierID'                  => $this->dsContact->getValue('supplierID'),
+                'customerID'                  => $this->dsContact->getValue('customerID'),
+                'siteNo'                      => $this->dsContact->getValue('siteNo'),
+                'firstName'                   => Controller::htmlInputText($this->dsContact->getValue('firstName')),
+                'firstNameMessage'            => Controller::htmlDisplayText($this->dsContact->getMessage('firstName')),
+                'lastName'                    => Controller::htmlInputText($this->dsContact->getValue('lastName')),
+                'lastNameMessage'             => Controller::htmlDisplayText($this->dsContact->getMessage('lastName')),
+                'position'                    => Controller::htmlInputText($this->dsContact->getValue('position')),
+                'positionMessage'             => Controller::htmlDisplayText($this->dsContact->getMessage('position')),
+                'title'                       => Controller::htmlInputText($this->dsContact->getValue('title')),
+                'titleMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('title')),
+                'email'                       => Controller::htmlInputText($this->dsContact->getValue('email')),
+                'emailMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('email')),
+                'portalPassword'              => Controller::htmlInputText($this->dsContact->getValue('portalPassword')),
+                'portalPasswordMessage'       => Controller::htmlDisplayText($this->dsContact->getMessage('portalPassword')),
+                'failedLoginCount'            => Controller::htmlDisplayText($this->dsContact->getValue('failedLoginCount')),
+                'failedLoginCountMessage'     => Controller::htmlDisplayText($this->dsContact->getMessage('failedLoginCount')),
+                'notes'                       => Controller::htmlInputText($this->dsContact->getValue('notes')),
+                'notesMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('notes')),
+                'phone'                       => Controller::htmlDisplayText($this->dsContact->getValue('phone')),
+                'phoneMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('phone')),
+                'mobilePhone'                 => Controller::htmlDisplayText($this->dsContact->getValue('mobilePhone')),
+                'mobilePhoneMessage'          => Controller::htmlDisplayText($this->dsContact->getMessage('mobilePhone')),
+                'fax'                         => Controller::htmlDisplayText($this->dsContact->getValue('fax')),
+                'faxMessage'                  => Controller::htmlDisplayText($this->dsContact->getMessage('fax')),
                 'workStartedEmailFlagChecked' => Controller::htmlChecked($this->dsContact->getValue('workStartedEmailFlag')),
-                'autoCloseEmailFlagChecked' => Controller::htmlChecked($this->dsContact->getValue('autoCloseEmailFlag')),
-                'accountsFlagChecked' => Controller::htmlChecked($this->dsContact->getValue('accountsFlag')),
-                'sendMailshotFlagChecked' => Controller::htmlChecked($this->dsContact->getValue('sendMailshotFlag')),
-                'discontinuedFlagChecked' => Controller::htmlChecked($this->dsContact->getValue('discontinuedFlag')),
-                'mailshot1FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot1FlagDesc')),
-                'mailshot2FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
-                'mailshot3FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
-                'mailshot4FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
-                'mailshot5FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot5FlagDesc')),
-                'mailshot6FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot6FlagDesc')),
-                'mailshot7FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot7FlagDesc')),
-                'mailshot8FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
-                'mailshot9FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
-                'mailshot10FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot10FlagDesc')),
-                'mailshot11FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot11FlagDesc')),
-                'mailshot1FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot1Flag')),
-                'mailshot2FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot2Flag')),
-                'mailshot3FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot3Flag')),
-                'mailshot4FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot4Flag')),
-                'mailshot5FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot5Flag')),
-                'mailshot6FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot6Flag')),
-                'mailshot7FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot7Flag')),
-                'mailshot8FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot8Flag')),
-                'mailshot9FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot9Flag')),
-                'mailshot10FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot10Flag')),
-                'mailshot11FlagChecked' => Controller::htmlChecked($this->dsContact->getValue('mailshot11Flag')),
-                'urlSubmit' => $urlSubmit,
-//				'urlCancel' => $urlCancel
+                'autoCloseEmailFlagChecked'   => Controller::htmlChecked($this->dsContact->getValue('autoCloseEmailFlag')),
+                'accountsFlagChecked'         => Controller::htmlChecked($this->dsContact->getValue('accountsFlag')),
+                'sendMailshotFlagChecked'     => Controller::htmlChecked($this->dsContact->getValue('sendMailshotFlag')),
+                'discontinuedFlagChecked'     => Controller::htmlChecked($this->dsContact->getValue('discontinuedFlag')),
+                'mailshot2FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
+                'mailshot3FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
+                'mailshot4FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
+                'mailshot5FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot5FlagDesc')),
+                'mailshot8FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
+                'mailshot9FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
+                'mailshot10FlagDesc'          => Controller::htmlDisplayText($dsHeader->getValue('mailshot10FlagDesc')),
+                'mailshot11FlagDesc'          => Controller::htmlDisplayText($dsHeader->getValue('mailshot11FlagDesc')),
+                'mailshot2FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot2Flag')),
+                'mailshot3FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot3Flag')),
+                'mailshot4FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot4Flag')),
+                'mailshot5FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot5Flag')),
+                'mailshot8FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot8Flag')),
+                'mailshot9FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot9Flag')),
+                'mailshot10FlagChecked'       => Controller::htmlChecked($this->dsContact->getValue('mailshot10Flag')),
+                'mailshot11FlagChecked'       => Controller::htmlChecked($this->dsContact->getValue('mailshot11Flag')),
+                'urlSubmit'                   => $urlSubmit,
+                //				'urlCancel' => $urlCancel
             )
         );
         $this->template->parse('CONTENTS', 'ContactEdit', true);
@@ -278,7 +272,7 @@ class CTContact extends CTCNC
         $this->buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action' => CTCONTACT_ACT_CONTACT_INSERT,
+                'action'  => CTCONTACT_ACT_CONTACT_INSERT,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         )
@@ -307,7 +301,7 @@ class CTContact extends CTCNC
         $this->buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action' => CTCONTACT_ACT_CONTACT_UPDATE,
+                'action'  => CTCONTACT_ACT_CONTACT_UPDATE,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         )
@@ -322,8 +316,8 @@ class CTContact extends CTCNC
             $this->template->set_var(
                 array(
                     'payMethodDescription' => $dsPayMethod->getValue('description'),
-                    'payMethodID' => $dsPayMethod->getValue('payMethodID'),
-                    'payMethodSelected' => ($payMethodID == $dsPayMethod->getValue('payMethodID')) ? CT_SELECTED : ''
+                    'payMethodID'          => $dsPayMethod->getValue('payMethodID'),
+                    'payMethodSelected'    => ($payMethodID == $dsPayMethod->getValue('payMethodID')) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse('payMethods', 'payMethodBlock', true);
@@ -358,12 +352,12 @@ class CTContact extends CTCNC
         $urlNext = $this->buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action' => CTCNC_ACT_DISP_CONTACT_POPUP,
-                'supplierID' => $this->dsContact->getValue('supplierID'),
-                'customerID' => $this->dsContact->getValue('customerID'),
-                'siteNo' => $this->dsContact->getValue('siteNo'),
+                'action'      => CTCNC_ACT_DISP_CONTACT_POPUP,
+                'supplierID'  => $this->dsContact->getValue('supplierID'),
+                'customerID'  => $this->dsContact->getValue('customerID'),
+                'siteNo'      => $this->dsContact->getValue('siteNo'),
                 'contactName' => $this->dsContact->getPKValue(),
-                'htmlFmt' => CT_HTML_FMT_POPUP
+                'htmlFmt'     => CT_HTML_FMT_POPUP
             )
         );
         header('Location: ' . $urlNext);

@@ -565,13 +565,10 @@
                     <td class="headerLightgrey">Auto-close?</td>
                     <td class="headerLightgrey">Accounts</td>
                     <td class="headerLightgrey">Mailshot</td>
-                    <td class="headerLightgrey">{mailshot1FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot4FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot5FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot6FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot7FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot8FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot10FlagDesc}</td>
@@ -755,20 +752,9 @@
                         />
                     </td>
                     <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][sendMailshotFlag]"
-                               value="Y"
-                               {sendMailshotFlagChecked}
-                        />
-                    </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot1Flag]"
-                               value="Y"
-                               {mailshot1FlagChecked}
-                        />
+                        <input {disabled} type="checkbox" name="form[contact][{contactID}][sendMailshotFlag]" value="Y"
+                               {sendMailshotFlagChecked}/>
+
                     </td>
                     <td class="content">
                         <input {disabled}
@@ -796,28 +782,9 @@
                         />
                     </td>
                     <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot5Flag]"
-                               value="Y"
-                               {mailshot5FlagChecked}
-                        />
-                    </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot6Flag]"
-                               value="Y"
-                               {mailshot6FlagChecked}
-                        />
-                    </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot7Flag]"
-                               value="Y"
-                               {mailshot7FlagChecked}
-                        />
+                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot5Flag]" value="Y"
+                               {mailshot5FlagChecked}/>
+
                     </td>
                     <td class="content">
                         <input {disabled}

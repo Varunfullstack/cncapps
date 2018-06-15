@@ -513,10 +513,6 @@ class CTCustomerCRM extends CTCNC
                 $this->getYN($value['sendMailshotFlag'])
             );// Use getYN() because HTML POST does not send a FALSE value
             $this->dsContact->setValue(
-                DBEContact::mailshot1Flag,
-                $this->getYN($value['mailshot1Flag'])
-            );// Use getYN() because HTML POST does not send a FALSE value
-            $this->dsContact->setValue(
                 DBEContact::mailshot2Flag,
                 $this->getYN($value['mailshot2Flag'])
             );
@@ -531,14 +527,6 @@ class CTCustomerCRM extends CTCNC
             $this->dsContact->setValue(
                 DBEContact::mailshot5Flag,
                 $this->getYN($value['mailshot5Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot6Flag,
-                $this->getYN($value['mailshot6Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot7Flag,
-                $this->getYN($value['mailshot7Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot8Flag,
@@ -1658,115 +1646,72 @@ class CTCustomerCRM extends CTCNC
                 'urlContactPopup'                    => $urlContactPopup,
                 'bodyTagExtras'                      => $bodyTagExtras,
                 /* hidden */
-                'reviewMeetingEmailSentFlag'         => $this->dsCustomer->getValue(
-                    DBECustomer::reviewMeetingEmailSentFlag
-                ),
-                'customerNotePopupLink'              => $this->getCustomerNotePopupLink($this->getCustomerID()),
-                'showInactiveContactsURL'            => $showInactiveContactsURL,
-                'showInactiveSitesURL'               => $showInactiveSitesURL,
-                'customerID'                         => $this->dsCustomer->getValue(DBECustomer::customerID),
-                'customerName'                       => $this->dsCustomer->getValue(DBECustomer::name),
-                'reviewCount'                        => $this->buCustomer->getReviewCount(),
-                'customerFolderLink'                 => $customerFolderLink,
-                //                'customerNameClass'                  => $this->dsCustomer->getValue(DBECustomer::NameClass),
-                //                'SectorMessage'                      => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
-                'regNo'                              => $this->dsCustomer->getValue(DBECustomer::regNo),
-                'mailshotFlagChecked'                => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
-                ),
-                'referredFlagChecked'                => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::referredFlag)
-                ),
-                'specialAttentionFlagChecked'        => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
-                ),
-                'specialAttentionEndDate'            => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
-                ),
-                //                'specialAttentionEndDateMessage'     => $this->dsCustomer->getValue(DBECustomer::SpecialAttentionEndDateMessage),
-                'lastReviewMeetingDate'              => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
-                ),
-                'dateMeetingConfirmedDate'           => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
-                'meetingDateTime'                    => Controller::dateToISO(
-                    $this->dsCustomer->getValue(DBECustomer::meetingDateTime)
-                ),
-                DBECustomer::inviteSent              => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::inviteSent)
-                ),
-                DBECustomer::reportProcessed         => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::reportProcessed)
-                ),
-                DBECustomer::reportSent              => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::reportSent)
-                ),
-                DBECustomer::crmComments             => $this->dsCustomer->getValue(DBECustomer::crmComments),
-                DBECustomer::companyBackground       => $this->dsCustomer->getValue(DBECustomer::companyBackground),
-                DBECustomer::decisionMakerBackground => $this->dsCustomer->getValue(
-                    DBECustomer::decisionMakerBackground
-                ),
-                DBECustomer::opportunityDeal         => $this->dsCustomer->getValue(DBECustomer::opportunityDeal),
-                DBECustomer::rating                  => $this->dsCustomer->getValue(DBECustomer::rating),
+                'reviewMeetingEmailSentFlag' => $this->dsCustomer->getValue(DBECustomer::reviewMeetingEmailSentFlag),
+                'customerNotePopupLink' => $this->getCustomerNotePopupLink($this->getCustomerID()),
+                'showInactiveContactsURL' => $showInactiveContactsURL,
+                'showInactiveSitesURL' => $showInactiveSitesURL,
+                'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID),
+                'customerName' => $this->dsCustomer->getValue(DBECustomer::name),
+                'reviewCount' => $this->buCustomer->getReviewCount(),
+                'customerFolderLink' => $customerFolderLink,
+                //'customerNameClass' => $this->dsCustomer->getValue(DBECustomer::NameClass),
+                //'SectorMessage' => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
+                'regNo' => $this->dsCustomer->getValue(DBECustomer::regNo),
+                'mailshotFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::mailshotFlag)),
+                'referredFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::referredFlag)),
+                'specialAttentionFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)),
+                'specialAttentionEndDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)),
+                //'specialAttentionEndDateMessage' => $this->dsCustomer->getValue(DBECustomer::SpecialAttentionEndDateMessage),
+                'lastReviewMeetingDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)),
+                'dateMeetingConfirmedDate' => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
+                'meetingDateTime' => Controller::dateToISO($this->dsCustomer->getValue(DBECustomer::meetingDateTime)),
+                DBECustomer::inviteSent => $this->getChecked($this->dsCustomer->getValue(DBECustomer::inviteSent)),
+                DBECustomer::reportProcessed => $this->getChecked($this->dsCustomer->getValue(DBECustomer::reportProcessed)),
+                DBECustomer::reportSent => $this->getChecked($this->dsCustomer->getValue(DBECustomer::reportSent)),
+                DBECustomer::crmComments => $this->dsCustomer->getValue(DBECustomer::crmComments),
+                DBECustomer::companyBackground => $this->dsCustomer->getValue(DBECustomer::companyBackground),
+                DBECustomer::decisionMakerBackground => $this->dsCustomer->getValue(DBECustomer::decisionMakerBackground),
+                DBECustomer::opportunityDeal => $this->dsCustomer->getValue(DBECustomer::opportunityDeal),
+                DBECustomer::rating => $this->dsCustomer->getValue(DBECustomer::rating),
 
-                'prospectFlagChecked'             => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::prospectFlag)
+                'prospectFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::prospectFlag)
                 ),
-//                'othersEmailMainFlagChecked'      => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::othersEmailMainFlag)
-                ),
-//                'workStartedEmailMainFlagChecked' => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
-                ),
-//                'autoCloseEmailMainFlagChecked'   => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)
-                ),
-                'pcxFlagChecked'                  => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::pcxFlag)
-                ),
-                'createDate'                      => $this->dsCustomer->getValue(DBECustomer::createDate),
-                'mailshot1FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot1FlagDesc"),
-                'mailshot2FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
-                'mailshot3FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot3FlagDesc"),
-                'mailshot4FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
-                'mailshot5FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot5FlagDesc"),
-                'mailshot6FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot6FlagDesc"),
-                'mailshot7FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot7FlagDesc"),
-                'mailshot8FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
-                'mailshot9FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
-                'mailshot10FlagDesc'              => $this->buCustomer->dsHeader->getValue("mailshot10FlagDesc"),
-                'submitURL'                       => $submitURL,
-                'renewalLink'                     => $renewalLink,
-                'passwordLink'                    => $passwordLink,
-                'deleteCustomerURL'               => $deleteCustomerURL,
-                'deleteCustomerText'              => $deleteCustomerText,
-                'cancelURL'                       => $cancelURL,
-                'disabled'                        => $this->hasPermissions(
-                    PHPLIB_PERM_SALES
-                ) ? '' : CTCNC_HTML_DISABLED,
-                'gscTopUpAmount'                  => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
-                'noOfServers'                     => $this->dsCustomer->getValue(DBECustomer::noOfServers),
-                'noOfSites'                       => $this->dsCustomer->getValue(DBECustomer::noOfSites),
-                'modifyDate'                      => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                      => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewDate)
-                ),
-                'reviewTime'                      => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewTime)
-                ),
-                'becameCustomerDate'              => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
-                ),
-                'droppedCustomerDate'             => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
-                ),
-                'reviewAction'                    => $this->dsCustomer->getValue(DBECustomer::reviewAction),
-                'comments'                        => $this->dsCustomer->getValue(DBECustomer::comments),
-                'techNotes'                       => $this->dsCustomer->getValue(DBECustomer::techNotes),
-                'slaP1'                           => $this->dsCustomer->getValue(DBECustomer::slaP1),
-                'slaP2'                           => $this->dsCustomer->getValue(DBECustomer::slaP2),
-                'slaP3'                           => $this->dsCustomer->getValue(DBECustomer::slaP3),
-                'slaP4'                           => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5),
+//                'othersEmailMainFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::othersEmailMainFlag)),
+//                'workStartedEmailMainFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::workStartedEmailMainFlag)),
+//                'autoCloseEmailMainFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)),
+                'pcxFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::pcxFlag)),
+                'createDate' => $this->dsCustomer->getValue(DBECustomer::createDate),
+                'mailshot2FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
+                'mailshot3FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot3FlagDesc"),
+                'mailshot4FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
+                'mailshot5FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot5FlagDesc"),
+
+                'mailshot8FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
+                'mailshot9FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
+                'mailshot10FlagDesc' => $this->buCustomer->dsHeader->getValue("mailshot10FlagDesc"),
+                'submitURL' => $submitURL,
+                'renewalLink' => $renewalLink,
+                'passwordLink' => $passwordLink,
+                'deleteCustomerURL' => $deleteCustomerURL,
+                'deleteCustomerText' => $deleteCustomerText,
+                'cancelURL' => $cancelURL,
+                'disabled' => $this->hasPermissions(PHPLIB_PERM_SALES) ? '' : CTCNC_HTML_DISABLED,
+                'gscTopUpAmount' => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
+                'noOfServers' => $this->dsCustomer->getValue(DBECustomer::noOfServers),
+                'noOfSites' => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'modifyDate' => $this->dsCustomer->getValue(DBECustomer::modifyDate),
+                'reviewDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::reviewDate)),
+                'reviewTime' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::reviewTime)),
+                'becameCustomerDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::becameCustomerDate)),
+                'droppedCustomerDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
+                ),'reviewAction' => $this->dsCustomer->getValue(DBECustomer::reviewAction),
+                'comments' => $this->dsCustomer->getValue(DBECustomer::comments),
+                'techNotes' => $this->dsCustomer->getValue(DBECustomer::techNotes),
+                'slaP1' => $this->dsCustomer->getValue(DBECustomer::slaP1),
+                'slaP2' => $this->dsCustomer->getValue(DBECustomer::slaP2),
+                'slaP3' => $this->dsCustomer->getValue(DBECustomer::slaP3),
+                'slaP4' => $this->dsCustomer->getValue(DBECustomer::slaP4),
+                'slaP5' => $this->dsCustomer->getValue(DBECustomer::slaP5),
 
                 'add1' => $site->getValue(DBESite::add1),
                 'add2' => $site->getValue(DBESite::add2),
@@ -2379,9 +2324,6 @@ class CTCustomerCRM extends CTCNC
                     'accountsFlagChecked'         => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::accountsFlag)
                     ),
-                    'mailshot1FlagChecked'        => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot1Flag)
-                    ),
                     'mailshot2FlagChecked'        => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot2Flag)
                     ),
@@ -2393,12 +2335,6 @@ class CTCustomerCRM extends CTCNC
                     ),
                     'mailshot5FlagChecked'        => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot5Flag)
-                    ),
-                    'mailshot6FlagChecked'        => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot6Flag)
-                    ),
-                    'mailshot7FlagChecked'        => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot7Flag)
                     ),
                     'mailshot8FlagChecked'        => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot8Flag)

@@ -58,6 +58,7 @@ class BUPrizewinner extends Business
     function sendWinnerEmail($winnerContactID)
     {
 
+        exit;
         $buMail = new BUMail($this);
 
         $buCustomer = new BUCustomer($this);
@@ -119,7 +120,7 @@ class BUPrizewinner extends Business
             Individual emails to each support contact at every company
             */
             $buContact = new BUContact($this);
-            $buContact->getTechnicalMailshotContacts($dsContact);
+
 
             $duplicateList = array();
 
