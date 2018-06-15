@@ -35,8 +35,8 @@ class CTContactExport extends CTCNC
     var $prospectFlags =
         array(
             'Customers and Prospects' => '',
-            'Prospects' => 'Y',
-            'Customers' => 'N'
+            'Prospects'               => 'Y',
+            'Customers'               => 'N'
         );
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
@@ -72,13 +72,10 @@ class CTContactExport extends CTCNC
         $dsSearchForm = new DSForm ($this);
         $dsSearchForm->addColumn('customerID', DA_ID, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('sendMailshotFlag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot1Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot2Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot3Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot4Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot5Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot6Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot7Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot8Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot9Flag', DA_YN, DA_ALLOW_NULL);
         $dsSearchForm->addColumn('mailshot10Flag', DA_YN, DA_ALLOW_NULL);
@@ -185,7 +182,7 @@ class CTContactExport extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
-                    'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -200,54 +197,48 @@ class CTContactExport extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'prospectFlagBothSelected' => $dsSearchForm->getValue('prospectFlag') == '' ? 'SELECTED' : '',
+                'customerID'                   => $dsSearchForm->getValue('customerID'),
+                'customerString'               => $customerString,
+                'prospectFlagBothSelected'     => $dsSearchForm->getValue('prospectFlag') == '' ? 'SELECTED' : '',
                 'prospectFlagProsepctSelected' => $dsSearchForm->getValue('prospectFlag') == 'Y' ? 'SELECTED' : '',
                 'prospectFlagCustomerSelected' => $dsSearchForm->getValue('prospectFlag') == 'N' ? 'SELECTED' : '',
-                'sendMailshotFlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('sendMailshotFlag')),
-                'exportEmailOnlyFlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('exportEmailOnlyFlag')),
-                'mailshot1FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot1Flag')),
-                'mailshot2FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot2Flag')),
-                'mailshot3FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot3Flag')),
-                'mailshot4FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot4Flag')),
-                'mailshot5FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot5Flag')),
-                'mailshot6FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot6Flag')),
-                'mailshot7FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot7Flag')),
-                'mailshot8FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot8Flag')),
-                'mailshot9FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot9Flag')),
-                'mailshot10FlagChecked' => Controller::htmlChecked($dsSearchForm->getValue('mailshot10Flag')),
-                'mailshot1FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot1FlagDesc')),
-                'mailshot2FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
-                'mailshot3FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
-                'mailshot4FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
-                'mailshot5FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot5FlagDesc')),
-                'mailshot6FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot6FlagDesc')),
-                'mailshot7FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot7FlagDesc')),
-                'mailshot8FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
-                'mailshot9FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
-                'mailshot10FlagDesc' => Controller::htmlDisplayText($dsHeader->getValue('mailshot10FlagDesc')),
-                'noOfPCs' => $dsSearchForm->getValue('noOfPCs'),
-                'noOfServers' => $dsSearchForm->getValue('noOfServers'),
-                'newCustomerFromDate' => $dsSearchForm->getValue('newCustomerFromDate'),
-                'newCustomerToDate' => $dsSearchForm->getValue('newCustomerToDate'),
-                'droppedCustomerFromDate' => $dsSearchForm->getValue('droppedCustomerFromDate'),
-                'droppedCustomerToDate' => $dsSearchForm->getValue('droppedCustomerToDate'),
+                'sendMailshotFlagChecked'      => Controller::htmlChecked($dsSearchForm->getValue('sendMailshotFlag')),
+                'exportEmailOnlyFlagChecked'   => Controller::htmlChecked($dsSearchForm->getValue('exportEmailOnlyFlag')),
+                'mailshot2FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot2Flag')),
+                'mailshot3FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot3Flag')),
+                'mailshot4FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot4Flag')),
+                'mailshot5FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot5Flag')),
+                'mailshot8FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot8Flag')),
+                'mailshot9FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot9Flag')),
+                'mailshot10FlagChecked'        => Controller::htmlChecked($dsSearchForm->getValue('mailshot10Flag')),
+                'mailshot2FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
+                'mailshot3FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
+                'mailshot4FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
+                'mailshot5FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot5FlagDesc')),
+                'mailshot8FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
+                'mailshot9FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
+                'mailshot10FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot10FlagDesc')),
+                'noOfPCs'                      => $dsSearchForm->getValue('noOfPCs'),
+                'noOfServers'                  => $dsSearchForm->getValue('noOfServers'),
+                'newCustomerFromDate'          => $dsSearchForm->getValue('newCustomerFromDate'),
+                'newCustomerToDate'            => $dsSearchForm->getValue('newCustomerToDate'),
+                'droppedCustomerFromDate'      => $dsSearchForm->getValue('droppedCustomerFromDate'),
+                'droppedCustomerToDate'        => $dsSearchForm->getValue('droppedCustomerToDate'),
                 'broadbandRenewalFlagChecked'
-                => Controller::htmlChecked($dsSearchForm->getValue('broadbandRenewalFlag')),
+                                               => Controller::htmlChecked($dsSearchForm->getValue('broadbandRenewalFlag')),
                 'quotationRenewalFlagChecked'
-                => Controller::htmlChecked($dsSearchForm->getValue('quotationRenewalFlag')),
+                                               => Controller::htmlChecked($dsSearchForm->getValue('quotationRenewalFlag')),
                 'contractRenewalFlagChecked'
-                => Controller::htmlChecked($dsSearchForm->getValue('contractRenewalFlag')),
-                'broadbandIsp' => $dsSearchForm->getValue('broadbandIsp'),
-                'fromEmailAddress' => $dsSearchForm->getValue('fromEmailAddress'),
-                'emailSubject' => $dsSearchForm->getValue('emailSubject'),
-                'emailBody' => $dsSearchForm->getValue('emailBody'),
-                'fromEmailAddressMessage' => $dsSearchForm->getMessage('fromEmailAddress'),
-                'emailSubjectMessage' => $dsSearchForm->getMessage('emailSubject'),
-                'emailBodyMessage' => $dsSearchForm->getMessage('emailBody'),
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit
+                                               => Controller::htmlChecked($dsSearchForm->getValue('contractRenewalFlag')),
+                'broadbandIsp'                 => $dsSearchForm->getValue('broadbandIsp'),
+                'fromEmailAddress'             => $dsSearchForm->getValue('fromEmailAddress'),
+                'emailSubject'                 => $dsSearchForm->getValue('emailSubject'),
+                'emailBody'                    => $dsSearchForm->getValue('emailBody'),
+                'fromEmailAddressMessage'      => $dsSearchForm->getMessage('fromEmailAddress'),
+                'emailSubjectMessage'          => $dsSearchForm->getMessage('emailSubject'),
+                'emailBodyMessage'             => $dsSearchForm->getMessage('emailBody'),
+                'urlCustomerPopup'             => $urlCustomerPopup,
+                'urlSubmit'                    => $urlSubmit
             )
         );
 
@@ -264,8 +255,8 @@ class CTContactExport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'contractItemIDChecked' => $itemChecked,
-                    'contractItemID' => $dbeItem->getValue('itemID'),
+                    'contractItemIDChecked'   => $itemChecked,
+                    'contractItemID'          => $dbeItem->getValue('itemID'),
                     'contractItemDescription' => $dbeItem->getValue('description')
                 )
             );
@@ -285,8 +276,8 @@ class CTContactExport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'quotationItemIDChecked' => $itemChecked,
-                    'quotationItemID' => $dbeItem->getValue('itemID'),
+                    'quotationItemIDChecked'   => $itemChecked,
+                    'quotationItemID'          => $dbeItem->getValue('itemID'),
                     'quotationItemDescription' => $dbeItem->getValue('description')
                 )
             );
@@ -300,9 +291,9 @@ class CTContactExport extends CTCNC
         while ($dsSector->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'sectorID' => $dsSector->getValue("sectorID"),
+                    'sectorID'          => $dsSector->getValue("sectorID"),
                     'sectorDescription' => $dsSector->getValue("description"),
-                    'sectorSelected' => (in_array($dsSector->getValue('sectorID'), $sectorIDs)) ? CT_SELECTED : ''
+                    'sectorSelected'    => (in_array($dsSector->getValue('sectorID'), $sectorIDs)) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse('sectors', 'sectorBlock', true);
@@ -313,7 +304,7 @@ class CTContactExport extends CTCNC
         foreach ($this->noOfPCs as $index => $value) {
             $this->template->set_var(
                 array(
-                    'noOfPCsValue' => $value,
+                    'noOfPCsValue'    => $value,
                     'noOfPCsSelected' => $value == $dsSearchForm->getValue('noOfPCs') ? CT_SELECTED : ''
                 )
             );
@@ -326,9 +317,9 @@ class CTContactExport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'prospectFlag' => $value,
+                    'prospectFlag'            => $value,
                     'prospectFlagDescription' => $index,
-                    'prospectFlagSelected' => $value == $dsSearchForm->getValue('prospectFlag') ? CT_SELECTED : ''
+                    'prospectFlagSelected'    => $value == $dsSearchForm->getValue('prospectFlag') ? CT_SELECTED : ''
                 )
             );
             $this->template->parse('prospectFlags', 'prospectFlagBlock', true);
@@ -390,7 +381,7 @@ class CTContactExport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'standardTextContent' => htmlentities($dbeStandardText->getValue('stt_text')),
+                    'standardTextContent'     => htmlentities($dbeStandardText->getValue('stt_text')),
                     'standardTextDescription' => $dbeStandardText->getValue('stt_desc')
                 )
             );
