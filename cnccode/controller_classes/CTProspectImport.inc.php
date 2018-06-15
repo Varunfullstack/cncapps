@@ -158,8 +158,10 @@ class CTProspectImport extends CTCNC
             $dsContact->setValue('mailshot2Flag', 'N');
             $dsContact->setValue('mailshot3Flag', 'Y');                    // newsletter
             $dsContact->setValue('mailshot4Flag', 'N');
+            $dsContact->setValue('mailshot5Flag', 'N');
             $dsContact->setValue('mailshot8Flag', 'N');
             $dsContact->setValue('mailshot9Flag', 'N');
+            $dsContact->setValue('mailshot10Flag', 'N');
             $dsContact->post();
             $errorMessage .= $this->validateNotNull($dsContact);
         }

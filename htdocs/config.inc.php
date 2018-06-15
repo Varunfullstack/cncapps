@@ -363,6 +363,10 @@ define('CONFIG_PREPAY_ALERT_LIMIT', 100);
 
 define('CONFIG_HEADER_GSC_STATEMENT_FLAG', 'mailshot8Flag');    // GSC statement contact flag column
 
+define('CONFIG_HEADER_MAIN_CONTACT_FLAG', 'mailshot10Flag');    // Main contact flag column
+
+define('CONFIG_HEADER_SUPPORT_CONTACT_FLAG', 'mailshot5Flag');
+
 define('CONFIG_HEADER_INVOICE_CONTACT', 'mailshot2Flag');     // Customer contact to send invoices to
 
 define('CONFIG_HEADER_DAILY_OPEN_SR_REPORT', 'mailshot11Flag');
