@@ -27,10 +27,8 @@ class DBEContact extends DBCNCEntity
     const mailshot2Flag = "mailshot2Flag";
     const mailshot3Flag = "mailshot3Flag";
     const mailshot4Flag = "mailshot4Flag";
-    const mailshot5Flag = "mailshot5Flag";
     const mailshot8Flag = "mailshot8Flag";
     const mailshot9Flag = "mailshot9Flag";
-    const mailshot10Flag = "mailshot10Flag";
     const mailshot11Flag = "mailshot11Flag";
     const notes = "notes";
     const workStartedEmailFlag = "workStartedEmailFlag";
@@ -40,6 +38,12 @@ class DBEContact extends DBCNCEntity
     const OthersWorkStartedEmailFlag = "WorkStartedEmailFlag";
     const OthersAutoCloseEmailFlag = "AutoCloseEmailFlag";
     const reviewUser = "reviewUser";
+    const supportLevel = "supportLevel";
+
+
+    const supportLevelMain = 'main';
+    const supportLevelSupport = 'support';
+    const supportLevelSupportDelegate = 'delegate';
 
     /**
      * calls constructor()
@@ -173,12 +177,6 @@ class DBEContact extends DBCNCEntity
             "con_mailflag4"
         );
         $this->addColumn(
-            self::mailshot5Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag5"
-        );
-        $this->addColumn(
             self::mailshot8Flag,
             DA_YN,
             DA_NOT_NULL,
@@ -189,12 +187,6 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             "con_mailflag9"
-        );
-        $this->addColumn(
-            self::mailshot10Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag10"
         );
         $this->addColumn(
             self::mailshot11Flag,
@@ -226,10 +218,36 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
             "con_failed_login_count"
         );
-        $this->addColumn(self::OthersEmailFlag, DA_YN_FLAG, DA_NOT_NULL, "othersEmailsFlag");
-        $this->addColumn(self::OthersWorkStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "othersWorkStartedFlag");
-        $this->addColumn(self::OthersAutoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "autoCloseEmailsFlag");
-        $this->addColumn(self::reviewUser, DA_YN, DA_ALLOW_NULL, "reviewUser");
+        $this->addColumn(
+            self::OthersEmailFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL,
+            "othersEmailsFlag"
+        );
+        $this->addColumn(
+            self::OthersWorkStartedEmailFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "othersWorkStartedFlag"
+        );
+        $this->addColumn(
+            self::OthersAutoCloseEmailFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "autoCloseEmailsFlag"
+        );
+        $this->addColumn(
+            self::reviewUser,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "reviewUser"
+        );
+        $this->addColumn(
+            self::supportLevel,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'supportLevel'
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -263,11 +281,9 @@ class DBEContact extends DBCNCEntity
 					con_mailflag2 = 'Y' OR
 					con_mailflag3 = 'Y' OR
 					con_mailflag4 = 'Y' OR
-					con_mailflag5 = 'Y' OR
 					con_mailflag8 = 'Y' OR
 					con_mailflag9 = 'Y' OR
-					con_mailflag10 = 'Y' or
-                    con_mailflag11 = 'Y'
+					supportLevel is not null
 					)
 					";
         }
@@ -278,7 +294,7 @@ class DBEContact extends DBCNCEntity
                 ) . " = 'Y'";    // only nominated support contacts
         }
 
-        $query .= " ORDER BY con_mailflag10 DESC, con_first_name, con_last_name";
+        $query .= " ORDER con_first_name, con_last_name";
 
         $this->setQueryString($query);
 
@@ -583,7 +599,7 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " left join customer on con_custno = cus_custno 
-             WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y' ";
+             WHERE " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
 
         if ($leadStatusID) {
             $sqlQuery .= " and customer_lead_status_id = $leadStatusID";
