@@ -221,4 +221,90 @@
             <column name="reviewUser" type="char(1)" defaultValue="N"/>
         </addColumn>
     </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-20">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="supportLevel"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="supportLevel" type="char(20)" defaultValue="support"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-21">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="supportLevel"/>
+        </preConditions>
+        <sql>
+            UPDATE contact SET supportLevel = IF(con_mailflag10 = 'Y', 'main', IF(con_mailflag5 = 'Y', 'support', NULL))
+        </sql>
+        <rollback>
+        </rollback>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-22">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag5"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag5"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag5" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-23">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag10"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag10"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag10" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-24">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg5_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg5_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg5_def" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-25">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg5_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg5_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg5_desc" type="char(30)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-26">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg10_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg10_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg10_def" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-27">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg10_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg10_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg10_desc" type="char(30)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

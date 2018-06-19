@@ -79,17 +79,11 @@ class BUContactExport extends Business
             if ($dsSearchForm->getValue('mailshot4Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot4FlagDesc') . "`";
             }
-            if ($dsSearchForm->getValue('mailshot5Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot5FlagDesc') . "`";
-            }
             if ($dsSearchForm->getValue('mailshot8Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot8FlagDesc') . "`";
             }
             if ($dsSearchForm->getValue('mailshot9Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot9FlagDesc') . "`";
-            }
-            if ($dsSearchForm->getValue('mailshot10Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot10FlagDesc') . "`";
             }
             if ($dsSearchForm->getValue('newCustomerFromDate')) {
                 $query .= ", '" . $dsSearchForm->getValue('newCustomerFromDate') . "' AS `New Customer From`";
@@ -171,17 +165,14 @@ class BUContactExport extends Business
         if ($dsSearchForm->getValue('mailshot4Flag')) {
             $query .= " AND con_mailflag4 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot5Flag')) {
-            $query .= " AND con_mailflag5 =  'Y'";
-        }
         if ($dsSearchForm->getValue('mailshot8Flag')) {
             $query .= " AND con_mailflag8 =  'Y'";
         }
         if ($dsSearchForm->getValue('mailshot9Flag')) {
             $query .= " AND con_mailflag9 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot10Flag')) {
-            $query .= " AND con_mailflag10 =  'Y'";
+        if ($dsSearchForm->getValue('supportLevel')) {
+            $query .= " AND supportLevel =  'main'";
         }
         if ($dsSearchForm->getValue('broadbandRenewalFlag')) {
             $query .= " AND declinedFlag = 'N'";
