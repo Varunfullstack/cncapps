@@ -393,15 +393,15 @@ class BUCustomer extends Business
     {
         $dsCustomer->clearCurrentRow();
         $dsCustomer->setUpdateModeInsert();
-        $dsCustomer->setValue('customerID', 0);
-        $dsCustomer->setValue('name', 'New Customer');
-        $dsCustomer->setValue('mailshotFlag', 'Y');
-        $dsCustomer->setValue('referredFlag', 'N');
-        $dsCustomer->setValue('prospectFlag', 'Y');
-        $dsCustomer->setValue('createDate', date('Y-m-d'));
-        $dsCustomer->setValue('invSiteNo', 0);
-        $dsCustomer->setValue('delSiteNo', 0);
-        $dsCustomer->setValue('customerTypeID', 0);
+        $dsCustomer->setValue(DBECustomer::customerID, 0);
+        $dsCustomer->setValue(DBECustomer::name, 'New Customer');
+        $dsCustomer->setValue(DBECustomer::mailshotFlag, 'Y');
+        $dsCustomer->setValue(DBECustomer::referredFlag, 'N');
+        $dsCustomer->setValue(DBECustomer::prospectFlag, 'Y');
+        $dsCustomer->setValue(DBECustomer::createDate, date('Y-m-d'));
+        $dsCustomer->setValue(DBECustomer::invSiteNo, 0);
+        $dsCustomer->setValue(DBECustomer::delSiteNo, 0);
+        $dsCustomer->setValue(DBECustomer::customerTypeID, 0);
         $dsCustomer->post();
     }
 

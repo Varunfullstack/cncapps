@@ -7,6 +7,13 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEProject extends DBEntity
 {
+    const projectID = "projectID";
+    const customerID = "customerID";
+    const description = "description";
+    const notes = "notes";
+    const startDate = "startDate";
+    const expiryDate = "expiryDate";
+
     /**
      * calls constructor()
      * @access public
@@ -18,19 +25,45 @@ class DBEProject extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("project");
-        $this->addColumn("projectID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("customerID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("notes", DA_MEMO, DA_ALLOW_NULL);
-        $this->addColumn("startDate", DA_DATE, DA_NOT_NULL);
-        $this->addColumn("expiryDate", DA_DATE, DA_NOT_NULL);
+        $this->addColumn(
+            self::projectID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::notes,
+            DA_MEMO,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::startDate,
+            DA_DATE,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::expiryDate,
+            DA_DATE,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
 
         $this->db->connect();
     }
 
-    function getRowsByCustomerID($customerID, $activityDate = false)
+    function getRowsByCustomerID($customerID,
+                                 $activityDate = false
+    )
     {
         $this->setMethodName("getRowsByCustomerID");
         if ($customerID == '') {
@@ -40,11 +73,14 @@ class DBEProject extends DBEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . "='" . mysqli_real_escape_string($this->db->link_id(), $customerID) . "' AND description != ''";
+            " WHERE " . $this->getDBColumnName(self::customerID) . "='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $customerID
+            ) . "' AND description != ''";
 
         if ($activityDate) {
             $queryString .=
-                " AND " . $this->getDBColumnName('expiryDate') . ">= '$activityDate'";
+                " AND " . $this->getDBColumnName(self::expiryDate) . ">= '$activityDate'";
         }
 
         $this->setQueryString($queryString);

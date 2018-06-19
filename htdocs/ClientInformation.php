@@ -26,9 +26,9 @@ $buCustomer = new BUCustomer($this);
 $buCustomer->getContactByID($_REQUEST['contactID'], $dsContact);
 $dsContact->fetchNext();
 
-$buCustomer->getCustomerByID($dsContact->getValue('customerID'), $dsCustomer);
+$buCustomer->getCustomerByID($dsContact->getValue(DBEContact::customerID), $dsCustomer);
 $dsCustomer->fetchNext();
-$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue('customerID'), $dsContact->getValue('siteNo'), $dsSite);
+$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue(DBEContact::customerID), $dsContact->getValue(DBEContact::siteNo), $dsSite);
 $dsContact->fetchNext();
 
 $dbeUser=new DBEUser($this);
@@ -42,13 +42,13 @@ $dbeAttendeeUser->getRow();
 if ($dsSite->getValue(DBESite::phone) != ''){
 	$phone = $dsSite->getValue(DBESite::phone);
 }
-if ($dsContact->getValue('phone') != ''){
-	$phone .= ' DDI: ' . $dsContact->getValue('phone');
+if ($dsContact->getValue(DBEContact::phone) != ''){
+	$phone .= ' DDI: ' . $dsContact->getValue(DBEContact::phone);
 }
-if ($dsContact->getValue('mobilePhone') != ''){
-	$phone .= ' Mobile: ' . $dsContact->getValue('mobilePhone');
+if ($dsContact->getValue(DBEContact::mobilePhone) != ''){
+	$phone .= ' Mobile: ' . $dsContact->getValue(DBEContact::mobilePhone);
 }
-$newClient = ($dsCustomer->getValue('prospectFlag') == 'Y');
+$newClient = ($dsCustomer->getValue(DBECustomer::prospectFlag) == 'Y');
 
 if (isset($_REQUEST['Confirmation'])){
 	require('ClientInformationEmail.php');				// the confirm button was clicked so include the email template

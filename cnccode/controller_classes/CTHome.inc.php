@@ -137,8 +137,8 @@ class CTHome extends CTCNC
         $profit = $dbeSalesOrderTotals->getValue('saleValue') - $dbeSalesOrderTotals->getValue('costValue');
         $this->template->set_var(
             array(
-                'soSale' => Controller::formatNumber($dbeSalesOrderTotals->getValue('saleValue')),
-                'soCost' => Controller::formatNumber($dbeSalesOrderTotals->getValue('costValue')),
+                'soSale'   => Controller::formatNumber($dbeSalesOrderTotals->getValue('saleValue')),
+                'soCost'   => Controller::formatNumber($dbeSalesOrderTotals->getValue('costValue')),
                 'soProfit' => Controller::formatNumber($profit)
             )
         );
@@ -151,8 +151,8 @@ class CTHome extends CTCNC
         $profit = $dbeInvoiceTotals->getValue('saleValue') - $dbeInvoiceTotals->getValue('costValue');
         $this->template->set_var(
             array(
-                'invPrintedSale' => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
-                'invPrintedCost' => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
+                'invPrintedSale'   => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
+                'invPrintedCost'   => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
                 'invPrintedProfit' => Controller::formatNumber($profit)
             )
         );
@@ -164,8 +164,8 @@ class CTHome extends CTCNC
         $profit = $dbeInvoiceTotals->getValue('saleValue') - $dbeInvoiceTotals->getValue('costValue');
         $this->template->set_var(
             array(
-                'invUnprintedSale' => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
-                'invUnprintedCost' => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
+                'invUnprintedSale'   => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
+                'invUnprintedCost'   => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
                 'invUnprintedProfit' => Controller::formatNumber($profit)
             )
         );
@@ -175,8 +175,8 @@ class CTHome extends CTCNC
 
         $this->template->set_var(
             array(
-                'saleTotal' => Controller::formatNumber($saleTotal),
-                'costTotal' => Controller::formatNumber($costTotal),
+                'saleTotal'   => Controller::formatNumber($saleTotal),
+                'costTotal'   => Controller::formatNumber($costTotal),
                 'profitTotal' => Controller::formatNumber($profitTotal)
             )
         );
@@ -210,7 +210,7 @@ class CTHome extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'displayEditForm',
+                            'action'     => 'displayEditForm',
                             'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
                         )
                     );
@@ -224,12 +224,12 @@ class CTHome extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue('name'),
-                        'reviewDate' => $dsCustomer->getValue('reviewDate'),
-                        'reviewTime' => $dsCustomer->getValue('reviewTime'),
-                        'reviewAction' => $dsCustomer->getValue('reviewAction'),
-                        'reviewUser' => $user,
-                        'linkURL' => $linkURL
+                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
+                        'reviewDate'   => $dsCustomer->getValue(DBECustomer::reviewDate),
+                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
+                        'reviewAction' => $dsCustomer->getValue(DBECustomer::reviewAction),
+                        'reviewUser'   => $user,
+                        'linkURL'      => $linkURL
                     )
                 );
 
@@ -257,8 +257,8 @@ class CTHome extends CTCNC
             $editProjectLink =
                 $this->buildLink('Project.php',
                                  array(
-                                     'action' => 'edit',
-                                     'projectID' => $project['projectID'],
+                                     'action'     => 'edit',
+                                     'projectID'  => $project['projectID'],
                                      'backToHome' => true
                                  )
                 );
@@ -266,13 +266,13 @@ class CTHome extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'projectID' => $project['projectID'],
+                    'projectID'    => $project['projectID'],
                     'customerName' => $project['customerName'],
-                    'description' => $project['description'],
-                    'notes' => $project['notes'],
-                    'startDate' => strftime("%d/%m/%Y", strtotime($project['startDate'])),
-                    'expiryDate' => strftime("%d/%m/%Y", strtotime($project['expiryDate'])),
-                    'urlEdit' => $editProjectLink
+                    'description'  => $project['description'],
+                    'notes'        => $project['notes'],
+                    'startDate'    => strftime("%d/%m/%Y", strtotime($project['startDate'])),
+                    'expiryDate'   => strftime("%d/%m/%Y", strtotime($project['expiryDate'])),
+                    'urlEdit'      => $editProjectLink
                 )
             );
 
@@ -293,16 +293,16 @@ class CTHome extends CTCNC
         $this->template->set_var(
             array(
                 'esTeamTargetSlaPercentage' => $this->dsHeader->getValue('esTeamTargetSlaPercentage'),
-                'esTeamTargetFixHours' => $this->dsHeader->getValue('esTeamTargetFixHours'),
-                'esTeamTargetFixQty' => $this->dsHeader->getValue('esTeamTargetFixQtyPerMonth') * 3,
+                'esTeamTargetFixHours'      => $this->dsHeader->getValue('esTeamTargetFixHours'),
+                'esTeamTargetFixQty'        => $this->dsHeader->getValue('esTeamTargetFixQtyPerMonth') * 3,
 
                 'imTeamTargetSlaPercentage' => $this->dsHeader->getValue('imTeamTargetSlaPercentage'),
-                'imTeamTargetFixHours' => $this->dsHeader->getValue('imTeamTargetFixHours'),
-                'imTeamTargetFixQty' => $this->dsHeader->getValue('imTeamTargetFixQtyPerMonth') * 3,
+                'imTeamTargetFixHours'      => $this->dsHeader->getValue('imTeamTargetFixHours'),
+                'imTeamTargetFixQty'        => $this->dsHeader->getValue('imTeamTargetFixQtyPerMonth') * 3,
 
                 'hdTeamTargetSlaPercentage' => $this->dsHeader->getValue('hdTeamTargetSlaPercentage'),
-                'hdTeamTargetFixHours' => $this->dsHeader->getValue('hdTeamTargetFixHours'),
-                'hdTeamTargetFixQty' => $this->dsHeader->getValue('hdTeamTargetFixQtyPerMonth') * 3
+                'hdTeamTargetFixHours'      => $this->dsHeader->getValue('hdTeamTargetFixHours'),
+                'hdTeamTargetFixQty'        => $this->dsHeader->getValue('hdTeamTargetFixQtyPerMonth') * 3
             )
         );
 
@@ -379,7 +379,7 @@ class CTHome extends CTCNC
                                                                                       0),
 
                     'hdTeamActualFixHours' . $result['quarter'] => number_format($result['hdTeamActualFixHours'], 2),
-                    'hdTeamActualFixQty' . $result['quarter'] => $result['hdTeamActualFixQty']
+                    'hdTeamActualFixQty' . $result['quarter']   => $result['hdTeamActualFixQty']
                 )
             );
 
@@ -605,7 +605,7 @@ class CTHome extends CTCNC
         $this->template->set_var(
             [
                 "userLevel" => $teamLevel = $this->buUser->getLevelByUserID($this->userID),
-                "userID" => $this->buUser->dbeUser->getValue(DBEUser::userID),
+                "userID"    => $this->buUser->dbeUser->getValue(DBEUser::userID),
                 "isManager" => $this->buUser->isSdManager($this->userID) ? 'true' : 'false',
             ]
         );
@@ -647,16 +647,16 @@ class CTHome extends CTCNC
         $graphs = [];
 
         $dataStructure = [
-            "cols" => [
+            "cols"       => [
                 ["id" => "dates", "label" => "Dates", "type" => 'date'],
             ],
-            "rows" => [
+            "rows"       => [
 
             ],
             "dataPoints" => [
 
             ],
-            "userName" => null
+            "userName"   => null
         ];
 
 
@@ -670,15 +670,19 @@ class CTHome extends CTCNC
             // if the user doesn't have a graph yet create it
             if (!isset($graphs[$result['userID']])) {
                 $graphs[$result['userID']] = $dataStructure;
-                $graphs[$result['userID']]['cols'][] = ["id" => $result['userID'], "label" => $result['userLabel'], 'type' => 'number'];
+                $graphs[$result['userID']]['cols'][] = ["id"    => $result['userID'],
+                                                        "label" => $result['userLabel'],
+                                                        'type'  => 'number'
+                ];
                 $graphs[$result['userID']]['userName'] = $result['userLabel'];
             }
 
-            $cell = ["c" =>
-                [
-                    ["v" => (new \DateTime($result['loggedDate']))->format(DATE_ISO8601)],
-                    ["v" => $result['loggedHours']]
-                ]
+            $cell = [
+                "c" =>
+                    [
+                        ["v" => (new \DateTime($result['loggedDate']))->format(DATE_ISO8601)],
+                        ["v" => $result['loggedHours']]
+                    ]
             ];
 
             $graphs[$result['userID']]['rows'][] = $cell;
@@ -725,10 +729,10 @@ class CTHome extends CTCNC
                         'action' => self::GetDetailedChartsDataAction
                     )
                 ),
-                "engineerID" => $engineerID,
+                "engineerID"   => $engineerID,
                 "engineerName" => $dbeUser->getValue(DBEJUser::firstName) . ' ' . $dbeUser->getValue(DBEJUser::lastName),
-                "startDate" => $startDate,
-                "endDate" => $endDate
+                "startDate"    => $startDate,
+                "endDate"      => $endDate
             ]
 
         );

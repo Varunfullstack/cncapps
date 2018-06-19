@@ -7,6 +7,13 @@ require_once($cfg["path_dbe"] . "/DBEOrdline.inc.php");
 
 class DBEJOrdline extends DBEOrdline
 {
+
+    const supplierName = "supplierName";
+    const webSiteURL = "webSiteURL";
+    const itemDescription = "itemDescription";
+    const renewalTypeID = "renewalTypeID";
+    const partNo = "partNo";
+
     /**
      * calls constructor()
      * @access public
@@ -18,11 +25,35 @@ class DBEJOrdline extends DBEOrdline
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("supplierName", DA_STRING, DA_ALLOW_NULL, "sup_name");
-        $this->addColumn("webSiteURL", DA_STRING, DA_ALLOW_NULL, "sup_web_site_url");
-        $this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "itm_desc");
-        $this->addColumn("renewalTypeID", DA_ID, DA_ALLOW_NULL);
-        $this->addColumn("partNo", DA_STRING, DA_ALLOW_NULL, "itm_unit_of_sale");
+        $this->addColumn(
+            self::supplierName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_name"
+        );
+        $this->addColumn(
+            self::webSiteURL,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_web_site_url"
+        );
+        $this->addColumn(
+            self::itemDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "itm_desc"
+        );
+        $this->addColumn(
+            self::renewalTypeID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::partNo,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "itm_unit_of_sale"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -46,7 +77,9 @@ class DBEJOrdline extends DBEOrdline
         }
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName('supplierID') . "=sup_suppno" .
+            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+                'supplierID'
+            ) . "=sup_suppno" .
             " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
             " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn)//.
 //			" ORDER BY ".$this->getDBColumnName($ixColumn)
@@ -62,7 +95,9 @@ class DBEJOrdline extends DBEOrdline
 
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName('supplierID') . "=sup_suppno" .
+            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+                'supplierID'
+            ) . "=sup_suppno" .
             " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
             " WHERE " . $this->getDBColumnName('ordheadID') . "=" . $this->getFormattedValue('ordheadID') .
             " AND odl_qty_desp > 0" .
@@ -84,7 +119,9 @@ class DBEJOrdline extends DBEOrdline
 
         $query =
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName('supplierID') . "=sup_suppno" .
+            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+                'supplierID'
+            ) . "=sup_suppno" .
             " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
             " WHERE " . $this->getDBColumnName('ordheadID') . "=" . $this->getFormattedValue('ordheadID') .
             " AND " . $this->getDBColumnName('sequenceNo') . "=" . $this->getFormattedValue('sequenceNo');

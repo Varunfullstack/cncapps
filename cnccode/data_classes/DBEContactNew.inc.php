@@ -8,6 +8,40 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEContact extends DBCNCEntity
 {
+
+    const  contactID = "contactID";
+    const  siteNo = "siteNo";
+    const  customerID = "customerID";
+    const  supplierID = "supplierID";
+    const  title = "title";
+    const  lastName = "lastName";
+    const  position = "position";
+    const  firstName = "firstName";
+    const  email = "email";
+    const  phone = "phone";
+    const  mobilePhone = "mobilePhone";
+    const  fax = "fax";
+    const  portalPassword = "portalPassword";
+    const  sendMailshotFlag = "sendMailshotFlag";
+    const  discontinuedFlag = "discontinuedFlag";
+    const  accountsFlag = "accountsFlag";
+    const  statementFlag = "statementFlag";
+    const  mailshot1Flag = "mailshot1Flag";
+    const  mailshot2Flag = "mailshot2Flag";
+    const  mailshot3Flag = "mailshot3Flag";
+    const  mailshot4Flag = "mailshot4Flag";
+    const  mailshot5Flag = "mailshot5Flag";
+    const  mailshot6Flag = "mailshot6Flag";
+    const  mailshot7Flag = "mailshot7Flag";
+    const  mailshot8Flag = "mailshot8Flag";
+    const  mailshot9Flag = "mailshot9Flag";
+    const  mailshot10Flag = "mailshot10Flag";
+    const  mailshot11Flag = "mailshot11Flag";
+    const  notes = "notes";
+    const  workStartedEmailFlag = "workStartedEmailFlag";
+    const  autoCloseEmailFlag = "autoCloseEmailFlag";
+    const  failedLoginCount = "failedLoginCount";
+
     /**
      * calls constructor()
      * @access public
@@ -19,38 +53,198 @@ class DBEContact extends DBCNCEntity
     {
         parent::__construct($owner);
         $this->setTableName("Contact");
-        $this->addColumn("contactID", DA_ID, DA_NOT_NULL, "con_contno");
-        $this->addColumn("siteNo", DA_ID, DA_ALLOW_NULL, "con_siteno");
-        $this->addColumn("customerID", DA_ID, DA_ALLOW_NULL, "con_custno");
-        $this->addColumn("supplierID", DA_ID, DA_ALLOW_NULL, "con_suppno");
-        $this->addColumn("title", DA_STRING, DA_ALLOW_NULL, "con_title");
-        $this->addColumn("lastName", DA_STRING, DA_NOT_NULL, "con_last_name");
-        $this->addColumn("position", DA_STRING, DA_ALLOW_NULL, "con_position");
-        $this->addColumn("firstName", DA_STRING, DA_NOT_NULL, "con_first_name");
-        $this->addColumn("email", DA_STRING, DA_ALLOW_NULL, "con_email");
-        $this->addColumn("phone", DA_STRING, DA_ALLOW_NULL, "con_phone");
-        $this->addColumn("mobilePhone", DA_STRING, DA_ALLOW_NULL, "con_mobile_phone");
-        $this->addColumn("fax", DA_STRING, DA_ALLOW_NULL, "con_fax");
-        $this->addColumn("portalPassword", DA_STRING, DA_ALLOW_NULL, "con_portal_password");
-        $this->addColumn("sendMailshotFlag", DA_YN, DA_NOT_NULL, "con_mailshot");
-        $this->addColumn("discontinuedFlag", DA_YN, DA_NOT_NULL, "con_discontinued");
-        $this->addColumn("accountsFlag", DA_YN, DA_NOT_NULL, "con_accounts_flag");
-        $this->addColumn("statementFlag", DA_YN, DA_NOT_NULL, "con_statement_flag");
-        $this->addColumn("mailshot1Flag", DA_YN, DA_NOT_NULL, "con_mailflag1");
-        $this->addColumn("mailshot2Flag", DA_YN, DA_NOT_NULL, "con_mailflag2");
-        $this->addColumn("mailshot3Flag", DA_YN, DA_NOT_NULL, "con_mailflag3");
-        $this->addColumn("mailshot4Flag", DA_YN, DA_NOT_NULL, "con_mailflag4");
-        $this->addColumn("mailshot5Flag", DA_YN, DA_NOT_NULL, "con_mailflag5");
-        $this->addColumn("mailshot6Flag", DA_YN, DA_NOT_NULL, "con_mailflag6");
-        $this->addColumn("mailshot7Flag", DA_YN, DA_NOT_NULL, "con_mailflag7");
-        $this->addColumn("mailshot8Flag", DA_YN, DA_NOT_NULL, "con_mailflag8");
-        $this->addColumn("mailshot9Flag", DA_YN, DA_NOT_NULL, "con_mailflag9");
-        $this->addColumn("mailshot10Flag", DA_YN, DA_NOT_NULL, "con_mailflag10");
-        $this->addColumn("mailshot11Flag", DA_YN, DA_NOT_NULL, "con_mailflag11");
-        $this->addColumn("notes", DA_STRING, DA_ALLOW_NULL, "con_notes");
-        $this->addColumn("workStartedEmailFlag", DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
-        $this->addColumn("autoCloseEmailFlag", DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
-        $this->addColumn("failedLoginCount", DA_INTEGER, DA_ALLOW_NULL, "con_failed_login_count");
+        $this->addColumn(
+            self::contactID,
+            DA_ID,
+            DA_NOT_NULL,
+            "con_contno"
+        );
+        $this->addColumn(
+            self::siteNo,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "con_siteno"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "con_custno"
+        );
+        $this->addColumn(
+            self::supplierID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "con_suppno"
+        );
+        $this->addColumn(
+            self::title,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_title"
+        );
+        $this->addColumn(
+            self::lastName,
+            DA_STRING,
+            DA_NOT_NULL,
+            "con_last_name"
+        );
+        $this->addColumn(
+            self::position,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_position"
+        );
+        $this->addColumn(
+            self::firstName,
+            DA_STRING,
+            DA_NOT_NULL,
+            "con_first_name"
+        );
+        $this->addColumn(
+            self::email,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_email"
+        );
+        $this->addColumn(
+            self::phone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_phone"
+        );
+        $this->addColumn(
+            self::mobilePhone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_mobile_phone"
+        );
+        $this->addColumn(
+            self::fax,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_fax"
+        );
+        $this->addColumn(
+            self::portalPassword,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_portal_password"
+        );
+        $this->addColumn(
+            self::sendMailshotFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailshot"
+        );
+        $this->addColumn(
+            self::discontinuedFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_discontinued"
+        );
+        $this->addColumn(
+            self::accountsFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_accounts_flag"
+        );
+        $this->addColumn(
+            self::statementFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_statement_flag"
+        );
+        $this->addColumn(
+            self::mailshot1Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag1"
+        );
+        $this->addColumn(
+            self::mailshot2Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag2"
+        );
+        $this->addColumn(
+            self::mailshot3Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag3"
+        );
+        $this->addColumn(
+            self::mailshot4Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag4"
+        );
+        $this->addColumn(
+            self::mailshot5Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag5"
+        );
+        $this->addColumn(
+            self::mailshot6Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag6"
+        );
+        $this->addColumn(
+            self::mailshot7Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag7"
+        );
+        $this->addColumn(
+            self::mailshot8Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag8"
+        );
+        $this->addColumn(
+            self::mailshot9Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag9"
+        );
+        $this->addColumn(
+            self::mailshot10Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag10"
+        );
+        $this->addColumn(
+            self::mailshot11Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag11"
+        );
+        $this->addColumn(
+            self::notes,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_notes"
+        );
+        $this->addColumn(
+            self::workStartedEmailFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "con_work_started_email_flag"
+        );
+        $this->addColumn(
+            self::autoCloseEmailFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "con_auto_close_email_flag"
+        );
+        $this->addColumn(
+            self::failedLoginCount,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "con_failed_login_count"
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -64,13 +258,13 @@ class DBEContact extends DBCNCEntity
     function getRowsByCustomerID($supportOnly = true)
     {
         $this->setMethodName("getRowsByCustomerID");
-        if ($this->getValue('customerID') == '') {
+        if ($this->getValue(self::customerID) == '') {
             $this->raiseError('customerID not set');
         }
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . '=' . $this->getFormattedValue('customerID');
+            " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
 
         $sql .=
             " AND (
@@ -90,7 +284,9 @@ class DBEContact extends DBCNCEntity
         ";
 
         if ($supportOnly) {
-            $sql .= " AND " . $this->getDBColumnName('mailshot5Flag') . " = 'Y'";    // only nominated support contacts
+            $sql .= " AND " . $this->getDBColumnName(
+                    self::mailshot5Flag
+                ) . " = 'Y'";    // only nominated support contacts
         }
 
         $sql .= " ORDER BY con_siteno, con_mailflag10 DESC, con_last_name, con_first_name";
@@ -103,12 +299,13 @@ class DBEContact extends DBCNCEntity
     /**
      * Return Rows By CustomerID And SiteNo
      * @access public
+     * @param bool $supportOnly
      * @return bool Success
      */
     function getRowsByCustomerIDSiteNo($supportOnly = false)
     {
         $this->setMethodName("getRowsByCustomerIDSiteNo");
-        if ($this->getValue('customerID') == '') {
+        if ($this->getValue(self::customerID) == '') {
             $this->raiseError('customerID not set');
         }
         /*
@@ -119,16 +316,18 @@ class DBEContact extends DBCNCEntity
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . '=' . $this->getFormattedValue('customerID') .
-            " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
-            " AND " . $this->getDBColumnName('siteNo') . '=' . $this->getFormattedValue('siteNo');
+            " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID) .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
 
         if ($supportOnly) {
-            $sql .= " AND " . $this->getDBColumnName('mailshot5Flag') . " = 'Y'";        // only nominated support contacts
+            $sql .= " AND " . $this->getDBColumnName(
+                    self::mailshot5Flag
+                ) . " = 'Y'";        // only nominated support contacts
         }
 
         $sql .=
-            " ORDER BY " . $this->getDBColumnName('lastName');
+            " ORDER BY " . $this->getDBColumnName(self::lastName);
 
         $this->setQueryString($sql);
 
@@ -145,7 +344,7 @@ class DBEContact extends DBCNCEntity
     {
         $this->setMethodName("getSupplierContactRowsByNameMatch");
         $ret = FALSE;
-        if ($this->getValue('supplierID') == '') {
+        if ($this->getValue(self::supplierID) == '') {
             $this->raiseError('supplierID not set');
         }
         if ($match == '') {
@@ -154,13 +353,17 @@ class DBEContact extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
-                                                                                                     $match) . "%'" .
-            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
-                                                                                                  $match) . "%')" .
-            " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
-            " AND " . $this->getDBColumnName('supplierID') . " = " . $this->getFormattedValue('supplierID') .
-            " ORDER BY " . $this->getDBColumnName('lastName') . "," . $this->getDBColumnName('firstName')
+            " WHERE (" . $this->getDBColumnName(self::lastName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%'" .
+            " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%')" .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::supplierID) . " = " . $this->getFormattedValue(self::supplierID) .
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName)
 
         );
         $ret = (parent::getRows());
@@ -177,7 +380,7 @@ class DBEContact extends DBCNCEntity
     {
         $this->setMethodName("getCustomerRowsByNameMatch");
         $ret = FALSE;
-        if ($this->getValue('customerID') == '') {
+        if ($this->getValue(self::customerID) == '') {
             $this->raiseError('customerID not set');
         }
         /*
@@ -191,16 +394,20 @@ class DBEContact extends DBCNCEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE (" . $this->getDBColumnName('lastName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
-                                                                                                     $match) . "%'" .
-            " OR " . $this->getDBColumnName('firstName') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(),
-                                                                                                  $match) . "%')" .
-            " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
-            " AND " . $this->getDBColumnName('customerID') . " = " . $this->getFormattedValue('customerID');
+            " WHERE (" . $this->getDBColumnName(self::lastName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%'" .
+            " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%')" .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $this->getFormattedValue(self::customerID);
 
-        if ($this->getValue('siteNo') != '') {
+        if ($this->getValue(self::siteNo) != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('siteNo') . " = " . $this->getFormattedValue('siteNo');
+                " AND " . $this->getDBColumnName(self::siteNo) . " = " . $this->getFormattedValue(self::siteNo);
         }
         $queryString .=
             " AND (
@@ -220,7 +427,7 @@ class DBEContact extends DBCNCEntity
         ";
 
         $queryString .=
-            " ORDER BY " . $this->getDBColumnName('lastName') . "," . $this->getDBColumnName('firstName');
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName);
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -231,15 +438,15 @@ class DBEContact extends DBCNCEntity
      */
     function getSupplierRows()
     {
-        if ($this->getValue('supplierID') == '') {
+        if ($this->getValue(self::supplierID) == '') {
             $this->raiseError('supplierID not set');
         }
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
-            " AND " . $this->getDBColumnName('supplierID') . " = " . $this->getFormattedValue('supplierID') .
-            " ORDER BY " . $this->getDBColumnName('lastName') . "," . $this->getDBColumnName('firstName')
+            " WHERE " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::supplierID) . " = " . $this->getFormattedValue(self::supplierID) .
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName)
 
         );
         return (parent::getRows());
@@ -255,7 +462,7 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_GSC_STATEMENT_FLAG) . " = 'Y'" .
-            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
         );
         return (parent::getRows());
     }
@@ -269,7 +476,7 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_MAIN_CONTACT_FLAG) . " = 'Y'" .
-            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID;
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
         $this->setQueryString($sql);
         return (parent::getRows());
     }
@@ -299,7 +506,8 @@ class DBEContact extends DBCNCEntity
       WHERE cus_mailshot = 'Y'
         AND " . $this->getDBColumnName(CONFIG_HEADER_TECHNICAL_MAILSHOT_CONTACT_FLAG) . " = 'Y'
         AND " . $this->getDBColumnName(CONFIG_HEADER_SUPPORT_CONTACT_FLAG) . " = 'Y'
-        AND cus_prospect = 'N'");
+        AND cus_prospect = 'N'"
+        );
 
         return (parent::getRows());
     }
@@ -313,7 +521,7 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_INVOICE_CONTACT) . " = 'Y'" .
-            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
 
         );
         return (parent::getRows());
@@ -327,8 +535,8 @@ class DBEContact extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName("mailshot10Flag") . " = 'Y'" .
-            " AND " . $this->getDBColumnName('customerID') . " = " . $customerID
+            " WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
 
         );
         return (parent::getRows());

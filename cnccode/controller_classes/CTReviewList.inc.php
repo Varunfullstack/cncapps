@@ -72,7 +72,7 @@ class CTReviewList extends CTCNC
                         )
                     );
 
-                if ($dsCustomer->getValue('reviewUserID')) {
+                if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
                     $buUser->getUserByID($dsCustomer->getValue(DBECustomer::reviewUserID), $dsUser);
                     $user = $dsUser->getValue('name');
                 } else {

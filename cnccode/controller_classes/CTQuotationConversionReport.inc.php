@@ -82,7 +82,7 @@ class CTQuotationConversionReport extends CTCNC
         $urlCustomerPopup = $this->buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
@@ -101,21 +101,21 @@ class CTQuotationConversionReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
+                'formError'         => $this->formError,
+                'customerID'        => $dsSearchForm->getValue('customerID'),
                 'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
-                'customerString' => $customerString,
-                'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $dsSearchForm->getMessage('toDate'),
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit
+                'customerString'    => $customerString,
+                'fromDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
+                'fromDateMessage'   => $dsSearchForm->getMessage('fromDate'),
+                'toDate'            => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
+                'toDateMessage'     => $dsSearchForm->getMessage('toDate'),
+                'urlCustomerPopup'  => $urlCustomerPopup,
+                'urlSubmit'         => $urlSubmit
             )
         );
 
@@ -136,10 +136,10 @@ class CTQuotationConversionReport extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'month' => $row['month'],
-                        'year' => $row['year'],
-                        'quoteCount' => $row['quoteCount'],
-                        'conversionCount' => $row['conversionCount'],
+                        'month'                => $row['month'],
+                        'year'                 => $row['year'],
+                        'quoteCount'           => $row['quoteCount'],
+                        'conversionCount'      => $row['conversionCount'],
                         'conversionPercentage' => number_format($percentage, 2)
                     )
 

@@ -15,13 +15,13 @@ class DBECustomer extends DBCNCEntity
     const mailshotFlag = "mailshotFlag";
     const createDate = "createDate";
     const referredFlag = "referredFlag";
-    const pCXFlag = "pCXFlag";
+    const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
     const prospectFlag = "prospectFlag";
     const othersEmailMainFlag = "othersEmailMainFlag";
     const workStartedEmailMainFlag = "workStartedEmailMainFlag";
     const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
-    const gSCTopUpAmount = "gSCTopUpAmount";
+    const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
     const noOfPCs = "noOfPCs";
@@ -85,13 +85,13 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(self::mailshotFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_mailshot");
         $this->addColumn(self::createDate, DA_DATE, DA_NOT_NULL, "cus_create_date");
         $this->addColumn(self::referredFlag, DA_YN_FLAG, DA_ALLOW_NULL, "cus_referred");
-        $this->addColumn(self::pCXFlag, DA_YN_FLAG, DA_ALLOW_NULL, "cus_pcx");
+        $this->addColumn(self::pcxFlag, DA_YN_FLAG, DA_ALLOW_NULL, "cus_pcx");
         $this->addColumn(self::customerTypeID, DA_ID, DA_NOT_NULL, "cus_ctypeno");
         $this->addColumn(self::prospectFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_prospect");
         $this->addColumn(self::othersEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_others_email_main_flag");
         $this->addColumn(self::workStartedEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_work_started_email_main_flag");
         $this->addColumn(self::autoCloseEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_auto_close_email_main_flag");
-        $this->addColumn(self::gSCTopUpAmount,
+        $this->addColumn(self::gscTopUpAmount,
                          DA_FLOAT,
                          DA_NOT_NULL);                        // amount to top up general support contract by
         $this->addColumn(self::modifyDate, DA_DATETIME, DA_ALLOW_NULL);                        // amount to

@@ -117,7 +117,7 @@ class CTProspectImport extends CTCNC
             $dsCustomer->setValue(DBECustomer::mailshotFlag, 'Y');
             $dsCustomer->setValue(DBECustomer::createDate, date('Y-m-d'));
             $dsCustomer->setValue(DBECustomer::referredFlag, 'Y');
-            $dsCustomer->setValue(DBECustomer::pCXFlag, 'N');
+            $dsCustomer->setValue(DBECustomer::pcxFlag, 'N');
             $dsCustomer->setValue(DBECustomer::customerTypeID, '47');
             $dsCustomer->setValue(DBECustomer::prospectFlag, 'Y');
             $errorMessage .= $this->validateNotNull($dsCustomer);

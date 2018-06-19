@@ -18,12 +18,12 @@ define('BUPDFSUPPORT_DETAILS_BOX_WIDTH', 90);
 define('BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH', 50);    // used for cost box too
 define('BUPDFSUPPORT_DETAILS_BOX_LEFT_EDGE', 11);
 define('BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE',        // relative to other boxes
-    BUPDFSUPPORT_DETAILS_BOX_LEFT_EDGE +
-    BUPDFSUPPORT_DETAILS_BOX_WIDTH
+       BUPDFSUPPORT_DETAILS_BOX_LEFT_EDGE +
+       BUPDFSUPPORT_DETAILS_BOX_WIDTH
 );
 define('BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE',
-    BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE +
-    BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH
+       BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE +
+       BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH
 );
 
 class BUPDFSupportContract extends BaseObject
@@ -48,7 +48,13 @@ class BUPDFSupportContract extends BaseObject
      * @param $buActivity
      * @param $customerHasServiceDeskContract
      */
-    function __construct(&$owner, &$dsContract, &$dsCustomerItem, &$dsSite, &$dsCustomer, &$buActivity, $customerHasServiceDeskContract)
+    function __construct(&$owner,
+                         &$dsContract,
+                         &$dsCustomerItem,
+                         &$dsSite,
+                         &$dsCustomer,
+                         &$buActivity,
+                         $customerHasServiceDeskContract)
     {
         BaseObject::__construct($owner);
         $this->_dsContract = $dsContract;
@@ -129,7 +135,8 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->setFontSize(8);
             $this->_buPDF->setFont();
             $this->_buPDF->CR();
-            $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'Phone Number: ' . $dsContract->getValue('adslPhone'));
+            $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL,
+                                         'Phone Number: ' . $dsContract->getValue('adslPhone'));
         }
 
         if ($this->_renewalTypeID == CONFIG_HOSTING_RENEWAL_TYPE_ID) {
@@ -170,7 +177,8 @@ class BUPDFSupportContract extends BaseObject
 
                 $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, $itemDescription);
                 $this->_buPDF->printStringAt(BUPDFSUPPORT_SERIAL_NO_COL - 30, $dsCustomerItem->getValue('serialNo'));
-                $this->_buPDF->printStringRJAt(BUPDFSUPPORT_PURCHASE_DATE, Controller::dateYMDtoDMY($dsCustomerItem->getValue('despatchDate')));
+                $this->_buPDF->printStringRJAt(BUPDFSUPPORT_PURCHASE_DATE,
+                                               Controller::dateYMDtoDMY($dsCustomerItem->getValue('despatchDate')));
                 $this->_buPDF->CR();
             } while ($dsCustomerItem->fetchNext());
         }
@@ -181,7 +189,8 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->setFontSize(10);
             $this->_buPDF->setFont();
             $this->_buPDF->CR();
-            $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'Number of supported users: ' . $dsContract->getValue('users'));
+            $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL,
+                                         'Number of supported users: ' . $dsContract->getValue('users'));
             $this->_buPDF->setFontSize(10);
             $this->_buPDF->setFont();
         }
@@ -194,16 +203,20 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'SLA - ' . $this->_buActivity->priorityArray[1]);
-        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60, $this->_dsCustomer->getValue('slaP1') . ' hour(s)');
+        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60,
+                                     $this->_dsCustomer->getValue(DBECustomer::slaP1) . ' hour(s)');
         $this->_buPDF->CR();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'SLA - ' . $this->_buActivity->priorityArray[2]);
-        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60, $this->_dsCustomer->getValue('slaP2') . ' hour(s)');
+        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60,
+                                     $this->_dsCustomer->getValue(DBECustomer::slaP2) . ' hour(s)');
         $this->_buPDF->CR();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'SLA - ' . $this->_buActivity->priorityArray[3]);
-        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60, $this->_dsCustomer->getValue('slaP3') . ' hour(s)');
+        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60,
+                                     $this->_dsCustomer->getValue(DBECustomer::slaP3) . ' hour(s)');
         $this->_buPDF->CR();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'SLA - ' . $this->_buActivity->priorityArray[4]);
-        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60, $this->_dsCustomer->getValue('slaP4') . ' hour(s)');
+        $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60,
+                                     $this->_dsCustomer->getValue(DBECustomer::slaP4) . ' hour(s)');
         $this->_buPDF->CR();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL, 'SLA - ' . $this->_buActivity->priorityArray[5]);
         $this->_buPDF->printStringAt(BUPDFSUPPORT_DETAILS_COL + 60, 'N/A');
@@ -220,7 +233,7 @@ class BUPDFSupportContract extends BaseObject
 
         $hoursOfSupport = '';
 
-        if ($this->_dsCustomer->getValue('support24HourFlag') == 'Y') {
+        if ($this->_dsCustomer->getValue(DBECustomer::support24HourFlag) == 'Y') {
             $hoursOfSupport = '24 x 7 for Severe Impact Incidents or ';
         }
 
@@ -232,7 +245,7 @@ class BUPDFSupportContract extends BaseObject
             $hoursOfSupport .= ' 8:30am to 6:00pm';
         }
 
-        if ($this->_dsCustomer->getValue('support24HourFlag') == 'Y') {
+        if ($this->_dsCustomer->getValue(DBECustomer::support24HourFlag) == 'Y') {
             $hoursOfSupport .= ' for all others.
 ';
         }
@@ -253,7 +266,8 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
         $this->_buPDF->CR();
-        $this->_buPDF->printStringAt(10, 'This Contract Schedule forms part of an Agreement between the Parties and both Parties agree to be bound by the Terms & Conditions attached or available on the CNC web site.');
+        $this->_buPDF->printStringAt(10,
+                                     'This Contract Schedule forms part of an Agreement between the Parties and both Parties agree to be bound by the Terms & Conditions attached or available on the CNC web site.');
         $this->_buPDF->CR();
         $this->_buPDF->CR();
         $this->_buPDF->placeImageAt($GLOBALS['cfg']['cncaddress_path'], 'PNG', 6, 200);
@@ -324,16 +338,27 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->moveYTo($firstAddLine);    //move back up the page
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->printStringRJAt(BUPDFSUPPORT_HEADING_DESC_COL, 'ServiceDesk Number');
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, CONFIG_IT_SUPPORT_PHONE);
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(),
-            BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFSUPPORT_HEADING_DESC_COL, 'Email');
@@ -341,17 +366,30 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, CONFIG_SUPPORT_EMAIL);
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFSUPPORT_HEADING_DESC_COL, 'Start Date');
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
-        $this->_buPDF->printStringAt(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, Controller::dateYMDtoDMY($dsContract->getValue('installationDate')));
+        $this->_buPDF->printStringAt(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                                     Controller::dateYMDtoDMY($dsContract->getValue('installationDate')));
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
 
@@ -359,13 +397,20 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->printStringRJAt(BUPDFSUPPORT_HEADING_DESC_COL, 'Billing Period');
             $this->_buPDF->setBoldOff();
             $this->_buPDF->setFont();
-            $this->_buPDF->printStringAt(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $dsContract->getValue('invoicePeriodMonths') . ' month(s)');
+            $this->_buPDF->printStringAt(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                                         $dsContract->getValue('invoicePeriodMonths') . ' month(s)');
         }
 
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
 
-        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFSUPPORT_HEADING_DESC_COL, 'Contract Reference');
@@ -375,7 +420,10 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->CR();
 
         // show contract price if not pre-pay otherwise empty box
-        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_SERIAL_NO_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
 
         $itemID = $dsContract->getValue('itemID');
         $this->_renewalTypeID = $dsContract->getValue('renewalTypeID');
@@ -420,7 +468,10 @@ class BUPDFSupportContract extends BaseObject
 
             );
         }
-        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
+                           $this->_buPDF->getYPos(),
+                           BUPDFSUPPORT_SERIAL_NO_BOX_WIDTH,
+                           $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->CR();
 
         $this->_titleLine = $this->_buPDF->getYPos();

@@ -504,7 +504,7 @@ class BUCustomer extends Business
         $dsCustomer->setValue(DBECustomer::deliverSiteNo, 0);
         $dsCustomer->setValue(DBECustomer::customerTypeID, 0);
 
-        $dsCustomer->setValue(DBECustomer::pCXFlag, 'N');          // 2nd site
+        $dsCustomer->setValue(DBECustomer::pcxFlag, 'N');          // 2nd site
         $dsCustomer->setValue(DBECustomer::specialAttentionFlag, 'N');
         $dsCustomer->setValue(DBECustomer::support24HourFlag, 'N');
 

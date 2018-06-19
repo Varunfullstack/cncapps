@@ -98,7 +98,7 @@ class CTRenewalReport extends CTCNC
                         $this->buildLink(
                             $_SERVER ['PHP_SELF'],
                             array(
-                                'action' => 'producePdfReport',
+                                'action'     => 'producePdfReport',
                                 'customerID' => $customerID
                             )
                         );
@@ -126,21 +126,23 @@ class CTRenewalReport extends CTCNC
         if ($this->dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+                                             array('action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                                                   'htmlFmt' => CT_HTML_FMT_POPUP
+                                             ));
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $this->dsSearchForm->getValue('customerID'),
+                'formError'         => $this->formError,
+                'customerID'        => $this->dsSearchForm->getValue('customerID'),
                 'customerIDMessage' => $this->dsSearchForm->getMessage('customerID'),
-                'customerString' => $customerString,
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'producePdfLink' => $producePdfLink,
-                'urlSubmit' => $urlSubmit,
-                'report' => $report
+                'customerString'    => $customerString,
+                'urlCustomerPopup'  => $urlCustomerPopup,
+                'producePdfLink'    => $producePdfLink,
+                'urlSubmit'         => $urlSubmit,
+                'report'            => $report
             )
         );
 
@@ -244,16 +246,16 @@ class CTRenewalReport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'linkURL' => $item['linkURL'],
-                    'notes' => $item['notes'],
-                    'description' => Controller::htmlDisplayText($item['description']),
+                    'linkURL'             => $item['linkURL'],
+                    'notes'               => $item['notes'],
+                    'description'         => Controller::htmlDisplayText($item['description']),
                     'itemTypeDescription' => Controller::htmlDisplayText($item['itemTypeDescription']),
-                    'expiryDate' => Controller::htmlDisplayText($item['expiryDate']),
-                    'salePrice' => $salePrice,
-                    'costPrice' => $costPrice,
-                    'customerItemID' => $item['customerItemID'],
-                    'coveredItemsString' => $coveredItemsString,
-                    'itemClass' => $itemClass
+                    'expiryDate'          => Controller::htmlDisplayText($item['expiryDate']),
+                    'salePrice'           => $salePrice,
+                    'costPrice'           => $costPrice,
+                    'customerItemID'      => $item['customerItemID'],
+                    'coveredItemsString'  => $coveredItemsString,
+                    'itemClass'           => $itemClass
                 )
             );
 
@@ -267,7 +269,7 @@ class CTRenewalReport extends CTCNC
             $this->buildLink(
                 'ExternalItem.php',
                 array(
-                    'action' => 'add',
+                    'action'     => 'add',
                     'customerID' => $customerID
                 )
             );
@@ -285,9 +287,9 @@ class CTRenewalReport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'totalSalePrice' => Controller::formatNumber($totalSalePrice),
-                    'totalCostPrice' => Controller::formatNumber($totalCostPrice),
-                    'urlCreateQuote' => $urlCreateQuote,
+                    'totalSalePrice'    => Controller::formatNumber($totalSalePrice),
+                    'totalCostPrice'    => Controller::formatNumber($totalCostPrice),
+                    'urlCreateQuote'    => $urlCreateQuote,
                     'buttonCreateQuote' => '<input type="submit" value="Quote">'
                 )
             );
@@ -387,7 +389,7 @@ class CTRenewalReport extends CTCNC
                 $this->buildLink(
                     'SalesOrder.php',
                     array(
-                        'action' => 'displaySalesOrder',
+                        'action'    => 'displaySalesOrder',
                         'ordheadID' => $toOrdheadID
                     )
                 );

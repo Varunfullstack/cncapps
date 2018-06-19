@@ -750,7 +750,7 @@ class CTSalesOrder extends CTCNC
         $this->template->set_var('rowNum', 1); // just so that javascript does not error!
         if ($this->getCustomerID() != '') {
             $this->buCustomer->getCustomerByID($this->getCustomerID(), $dsCustomer);
-            $this->setCustomerString($dsCustomer->getValue('name'));
+            $this->setCustomerString($dsCustomer->getValue(DBECustomer::name));
         }
         $this->template->set_var(
             array(
