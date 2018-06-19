@@ -401,20 +401,12 @@ class CTCustomer extends CTCNC
                 $this->getYN($value['mailshot4Flag'])
             );
             $this->dsContact->setValue(
-                DBEContact::mailshot5Flag,
-                $this->getYN($value['mailshot5Flag'])
-            );
-            $this->dsContact->setValue(
                 DBEContact::mailshot8Flag,
                 $this->getYN($value['mailshot8Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot9Flag,
                 $this->getYN($value['mailshot9Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot10Flag,
-                $this->getYN($value['mailshot10Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot11Flag,
@@ -438,11 +430,10 @@ class CTCustomer extends CTCNC
             );
 
             if (
-                $value['email'] == '' &&
-                $value[CONFIG_HEADER_SUPPORT_CONTACT_FLAG] == 'Y'
+                $value['email'] == ''
             ) {
                 $this->setFormErrorOn();
-                $this->formErrorMessage = 'NOT SAVED: Email address required for support contacts';
+                $this->formErrorMessage = 'NOT SAVED: Email address required';
             }
 
             // Determine whether a new contact is to be added
@@ -1885,17 +1876,11 @@ ORDER BY cus_name ASC  ";
                 'mailshot4FlagDesc'               => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot4FlagDesc
                 ),
-                'mailshot5FlagDesc'               => $this->buCustomer->dsHeader->getValue(
-                    DBEHeader::mailshot5FlagDesc
-                ),
                 'mailshot8FlagDesc'               => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot8FlagDesc
                 ),
                 'mailshot9FlagDesc'               => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot9FlagDesc
-                ),
-                'mailshot10FlagDesc'              => $this->buCustomer->dsHeader->getValue(
-                    DBEHeader::mailshot10FlagDesc
                 ),
                 'mailshot11FlagDesc'              => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot11FlagDesc
@@ -2495,6 +2480,7 @@ ORDER BY cus_name ASC  ";
                     'portalPassword'                    => $this->dsContact->getValue(DBEContact::portalPassword),
                     'failedLoginCount'                  => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                             => $this->dsContact->getValue(DBEContact::email),
+                    'emailClass'                        => $this->dsContact->getValue("EmailClass"),
                     'notes'                             => $this->dsContact->getValue(DBEContact::notes),
                     'discontinuedFlag'                  => $this->dsContact->getValue(DBEContact::discontinuedFlag),
                     'invoiceContactFlagChecked'         => ($this->dsContact->getValue(
@@ -2522,17 +2508,11 @@ ORDER BY cus_name ASC  ";
                     'mailshot4FlagChecked'              => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot4Flag)
                     ),
-                    'mailshot5FlagChecked'              => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot5Flag)
-                    ),
                     'mailshot8FlagChecked'              => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot8Flag)
                     ),
                     'mailshot9FlagChecked'              => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot9Flag)
-                    ),
-                    'mailshot10FlagChecked'             => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::mailshot10Flag)
                     ),
                     'mailshot11FlagChecked'             => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot11Flag)
@@ -2552,6 +2532,7 @@ ORDER BY cus_name ASC  ";
                     'othersAutoCloseEmailFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::OthersAutoCloseEmailFlag)
                     ),
+                    'reviewUserChecked'                 => $this->getChecked($this->dsContact->getValue(DBEContact::reviewUser)),
                     'clientFormURL'                     => $clientFormURL,
                     'dearJohnURL'                       => $dearJohnURL,
                     'dmLetterURL'                       => $dmLetterURL,
