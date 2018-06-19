@@ -182,10 +182,8 @@ class BUContact extends Business
         $dsResults->setValue('mailshot2Flag', $dsHeader->getValue('mailshot2FlagDef'));
         $dsResults->setValue('mailshot3Flag', $dsHeader->getValue('mailshot3FlagDef'));
         $dsResults->setValue('mailshot4Flag', $dsHeader->getValue('mailshot4FlagDef'));
-        $dsResults->setValue('mailshot5Flag', $dsHeader->getValue('mailshot5FlagDef'));
         $dsResults->setValue('mailshot8Flag', $dsHeader->getValue('mailshot8FlagDef'));
         $dsResults->setValue('mailshot9Flag', $dsHeader->getValue('mailshot9FlagDef'));
-        $dsResults->setValue('mailshot10Flag', $dsHeader->getValue('mailshot10FlagDef'));
         $dsResults->setValue('mailshot11Flag', $dsHeader->getValue('mailshot11FlagDef'));
         $dsResults->post();
         return TRUE;
@@ -209,10 +207,8 @@ class BUContact extends Business
         $dsResults->setValue('mailshot2Flag', 'N');
         $dsResults->setValue('mailshot3Flag', 'N');
         $dsResults->setValue('mailshot4Flag', 'N');
-        $dsResults->setValue('mailshot5Flag', 'N');
         $dsResults->setValue('mailshot8Flag', 'N');
         $dsResults->setValue('mailshot9Flag', 'N');
-        $dsResults->setValue('mailshot10Flag', 'N');
         return TRUE;
     }
 

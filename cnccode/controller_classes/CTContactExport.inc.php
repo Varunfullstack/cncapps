@@ -39,9 +39,20 @@ class CTContactExport extends CTCNC
             'Customers'               => 'N'
         );
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "accounts",
         ];
@@ -70,37 +81,131 @@ class CTContactExport extends CTCNC
         $this->setMethodName('search');
 
         $dsSearchForm = new DSForm ($this);
-        $dsSearchForm->addColumn('customerID', DA_ID, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('sendMailshotFlag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot2Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot3Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot4Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot5Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot8Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot9Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('mailshot10Flag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('exportEmailOnlyFlag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('broadbandRenewalFlag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('broadbandIsp', DA_STRING, DA_ALLOW_NULL);
+        $dsSearchForm->addColumn(
+            'customerID',
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'sendMailshotFlag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'mailshot2Flag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'mailshot3Flag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'mailshot4Flag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'mailshot8Flag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'mailshot9Flag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'exportEmailOnlyFlag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'broadbandRenewalFlag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'broadbandIsp',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
 
-        $dsSearchForm->addColumn('quotationRenewalFlag', DA_YN, DA_ALLOW_NULL);
+        $dsSearchForm->addColumn(
+            'quotationRenewalFlag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
 
-        $dsSearchForm->addColumn('contractRenewalFlag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('contractItemID', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('quotationItemID', DA_YN, DA_ALLOW_NULL);
+        $dsSearchForm->addColumn(
+            'contractRenewalFlag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'contractItemID',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'quotationItemID',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
 
-        $dsSearchForm->addColumn('prospectFlag', DA_YN, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('noOfPCs', DA_STRING, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('noOfServers', DA_INTEGER, DA_ALLOW_NULL);
+        $dsSearchForm->addColumn(
+            'prospectFlag',
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'noOfPCs',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'noOfServers',
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
 
-        $dsSearchForm->addColumn('newCustomerFromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('newCustomerToDate', DA_DATE, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('droppedCustomerFromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('droppedCustomerToDate', DA_DATE, DA_ALLOW_NULL);
+        $dsSearchForm->addColumn(
+            'newCustomerFromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'newCustomerToDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'droppedCustomerFromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'droppedCustomerToDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
 
-        $dsSearchForm->addColumn('fromEmailAddress', DA_STRING, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('emailSubject', DA_STRING, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('emailBody', DA_STRING, DA_ALLOW_NULL);
+        $dsSearchForm->addColumn(
+            'fromEmailAddress',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'emailSubject',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'emailBody',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
 
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
@@ -133,7 +238,10 @@ class CTContactExport extends CTCNC
 
             if ($_REQUEST['SendEmail']) {
 
-                $dsSearchForm->setValue('exportEmailOnlyFlag', 0);
+                $dsSearchForm->setValue(
+                    'exportEmailOnlyFlag',
+                    0
+                );
 
             }
 
@@ -153,23 +261,38 @@ class CTContactExport extends CTCNC
             } else {
 
                 if (!$dsSearchForm->getValue('fromEmailAddress')) {
-                    $dsSearchForm->setMessage('fromEmailAddress', 'Required');
+                    $dsSearchForm->setMessage(
+                        'fromEmailAddress',
+                        'Required'
+                    );
                 }
                 if (!$dsSearchForm->getValue('emailSubject')) {
-                    $dsSearchForm->setMessage('emailSubject', 'Required');
+                    $dsSearchForm->setMessage(
+                        'emailSubject',
+                        'Required'
+                    );
                 }
                 if (!$dsSearchForm->getValue('emailBody')) {
-                    $dsSearchForm->setMessage('emailBody', 'Required');
+                    $dsSearchForm->setMessage(
+                        'emailBody',
+                        'Required'
+                    );
                 }
                 if (count($dsSearchForm->message) == 0) {
-                    $this->buContactExport->sendEmail($dsSearchForm, $results);
+                    $this->buContactExport->sendEmail(
+                        $dsSearchForm,
+                        $results
+                    );
                 }
 
             }
 
         }
 
-        $this->setTemplateFiles('ContactExport', 'ContactExport.inc');
+        $this->setTemplateFiles(
+            'ContactExport',
+            'ContactExport.inc'
+        );
 
         $urlSubmit = $this->buildLink(
             $_SERVER['PHP_SELF'],
@@ -189,7 +312,10 @@ class CTContactExport extends CTCNC
 
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue('customerID'),
+                $dsCustomer
+            );
             $customerString = $dsCustomer->getValue('name');
         }
 
@@ -203,21 +329,19 @@ class CTContactExport extends CTCNC
                 'prospectFlagProsepctSelected' => $dsSearchForm->getValue('prospectFlag') == 'Y' ? 'SELECTED' : '',
                 'prospectFlagCustomerSelected' => $dsSearchForm->getValue('prospectFlag') == 'N' ? 'SELECTED' : '',
                 'sendMailshotFlagChecked'      => Controller::htmlChecked($dsSearchForm->getValue('sendMailshotFlag')),
-                'exportEmailOnlyFlagChecked'   => Controller::htmlChecked($dsSearchForm->getValue('exportEmailOnlyFlag')),
+                'exportEmailOnlyFlagChecked'   => Controller::htmlChecked(
+                    $dsSearchForm->getValue('exportEmailOnlyFlag')
+                ),
                 'mailshot2FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot2Flag')),
                 'mailshot3FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot3Flag')),
                 'mailshot4FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot4Flag')),
-                'mailshot5FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot5Flag')),
                 'mailshot8FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot8Flag')),
                 'mailshot9FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot9Flag')),
-                'mailshot10FlagChecked'        => Controller::htmlChecked($dsSearchForm->getValue('mailshot10Flag')),
                 'mailshot2FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
                 'mailshot3FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
                 'mailshot4FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
-                'mailshot5FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot5FlagDesc')),
                 'mailshot8FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
                 'mailshot9FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
-                'mailshot10FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot10FlagDesc')),
                 'noOfPCs'                      => $dsSearchForm->getValue('noOfPCs'),
                 'noOfServers'                  => $dsSearchForm->getValue('noOfServers'),
                 'newCustomerFromDate'          => $dsSearchForm->getValue('newCustomerFromDate'),
@@ -225,11 +349,17 @@ class CTContactExport extends CTCNC
                 'droppedCustomerFromDate'      => $dsSearchForm->getValue('droppedCustomerFromDate'),
                 'droppedCustomerToDate'        => $dsSearchForm->getValue('droppedCustomerToDate'),
                 'broadbandRenewalFlagChecked'
-                                               => Controller::htmlChecked($dsSearchForm->getValue('broadbandRenewalFlag')),
+                                               => Controller::htmlChecked(
+                    $dsSearchForm->getValue('broadbandRenewalFlag')
+                ),
                 'quotationRenewalFlagChecked'
-                                               => Controller::htmlChecked($dsSearchForm->getValue('quotationRenewalFlag')),
+                                               => Controller::htmlChecked(
+                    $dsSearchForm->getValue('quotationRenewalFlag')
+                ),
                 'contractRenewalFlagChecked'
-                                               => Controller::htmlChecked($dsSearchForm->getValue('contractRenewalFlag')),
+                                               => Controller::htmlChecked(
+                    $dsSearchForm->getValue('contractRenewalFlag')
+                ),
                 'broadbandIsp'                 => $dsSearchForm->getValue('broadbandIsp'),
                 'fromEmailAddress'             => $dsSearchForm->getValue('fromEmailAddress'),
                 'emailSubject'                 => $dsSearchForm->getValue('emailSubject'),
@@ -247,11 +377,18 @@ class CTContactExport extends CTCNC
         $dbeItem = new DBEItem($this);
         $dbeItem->getRenewalTypeRows(2);
 
-        $this->template->set_block('ContactExport', 'contractItemBlock', 'contractItemRows');
+        $this->template->set_block(
+            'ContactExport',
+            'contractItemBlock',
+            'contractItemRows'
+        );
 
         while ($dbeItem->fetchNext()) {
 
-            $itemChecked = (in_array($dbeItem->getValue('itemID'), $contractItemIDs)) ? CT_CHECKED : '';
+            $itemChecked = (in_array(
+                $dbeItem->getValue('itemID'),
+                $contractItemIDs
+            )) ? CT_CHECKED : '';
 
             $this->template->set_var(
                 array(
@@ -260,7 +397,11 @@ class CTContactExport extends CTCNC
                     'contractItemDescription' => $dbeItem->getValue('description')
                 )
             );
-            $this->template->parse('contractItemRows', 'contractItemBlock', true);
+            $this->template->parse(
+                'contractItemRows',
+                'contractItemBlock',
+                true
+            );
         }
 
         // quotation item selector
@@ -268,11 +409,18 @@ class CTContactExport extends CTCNC
         $dbeItem = new DBEItem($this);
         $dbeItem->getRenewalTypeRows(3);
 
-        $this->template->set_block('ContactExport', 'quotationItemBlock', 'quotationItemRows');
+        $this->template->set_block(
+            'ContactExport',
+            'quotationItemBlock',
+            'quotationItemRows'
+        );
 
         while ($dbeItem->fetchNext()) {
 
-            $itemChecked = (in_array($dbeItem->getValue('itemID'), $quotationItemIDs)) ? CT_CHECKED : '';
+            $itemChecked = (in_array(
+                $dbeItem->getValue('itemID'),
+                $quotationItemIDs
+            )) ? CT_CHECKED : '';
 
             $this->template->set_var(
                 array(
@@ -281,25 +429,44 @@ class CTContactExport extends CTCNC
                     'quotationItemDescription' => $dbeItem->getValue('description')
                 )
             );
-            $this->template->parse('quotationItemRows', 'quotationItemBlock', true);
+            $this->template->parse(
+                'quotationItemRows',
+                'quotationItemBlock',
+                true
+            );
         }
 
 // sectors
         $buSector = new BUSector($this);
-        $this->template->set_block('ContactExport', 'sectorBlock', 'sectors');
+        $this->template->set_block(
+            'ContactExport',
+            'sectorBlock',
+            'sectors'
+        );
         $buSector->getAll($dsSector);
         while ($dsSector->fetchNext()) {
             $this->template->set_var(
                 array(
                     'sectorID'          => $dsSector->getValue("sectorID"),
                     'sectorDescription' => $dsSector->getValue("description"),
-                    'sectorSelected'    => (in_array($dsSector->getValue('sectorID'), $sectorIDs)) ? CT_SELECTED : ''
+                    'sectorSelected'    => (in_array(
+                        $dsSector->getValue('sectorID'),
+                        $sectorIDs
+                    )) ? CT_SELECTED : ''
                 )
             );
-            $this->template->parse('sectors', 'sectorBlock', true);
+            $this->template->parse(
+                'sectors',
+                'sectorBlock',
+                true
+            );
         }
 
-        $this->template->set_block('ContactExport', 'noOfPCsBlock', 'noOfPCs');
+        $this->template->set_block(
+            'ContactExport',
+            'noOfPCsBlock',
+            'noOfPCs'
+        );
 
         foreach ($this->noOfPCs as $index => $value) {
             $this->template->set_var(
@@ -308,10 +475,18 @@ class CTContactExport extends CTCNC
                     'noOfPCsSelected' => $value == $dsSearchForm->getValue('noOfPCs') ? CT_SELECTED : ''
                 )
             );
-            $this->template->parse('noOfPCs', 'noOfPCsBlock', true);
+            $this->template->parse(
+                'noOfPCs',
+                'noOfPCsBlock',
+                true
+            );
         }
 
-        $this->template->set_block('ContactExport', 'prospectFlagBlock', 'prospectFlags');
+        $this->template->set_block(
+            'ContactExport',
+            'prospectFlagBlock',
+            'prospectFlags'
+        );
 
         foreach ($this->prospectFlags as $index => $value) {
 
@@ -322,12 +497,23 @@ class CTContactExport extends CTCNC
                     'prospectFlagSelected'    => $value == $dsSearchForm->getValue('prospectFlag') ? CT_SELECTED : ''
                 )
             );
-            $this->template->parse('prospectFlags', 'prospectFlagBlock', true);
+            $this->template->parse(
+                'prospectFlags',
+                'prospectFlagBlock',
+                true
+            );
         }
 
-        $this->standardTextList('ContactExport', 'standardTextBlock');
+        $this->standardTextList(
+            'ContactExport',
+            'standardTextBlock'
+        );
 
-        $this->template->parse('CONTENTS', 'ContactExport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ContactExport',
+            true
+        );
 
         $this->parsePage();
 
@@ -348,7 +534,10 @@ class CTContactExport extends CTCNC
             Column names in first row
             */
             if ($firstRow) {
-                echo implode(',', array_keys($row)) . "\n";
+                echo implode(
+                        ',',
+                        array_keys($row)
+                    ) . "\n";
                 $firstRow = false;
             }
             /*
@@ -358,7 +547,10 @@ class CTContactExport extends CTCNC
                 $row[$key] = '"' . $value . '"';
             }
 
-            echo implode(',', $row) . "\n";
+            echo implode(
+                    ',',
+                    $row
+                ) . "\n";
         }
 
         $this->pageClose();
@@ -371,11 +563,21 @@ class CTContactExport extends CTCNC
     )
     {
         $dbeStandardText = new DBEStandardText($this);
-        $dbeStandardText->setValue('stt_standardtexttypeno', CONFIG_STANDARD_TEXT_TYPE_EMAIL);
+        $dbeStandardText->setValue(
+            'stt_standardtexttypeno',
+            CONFIG_STANDARD_TEXT_TYPE_EMAIL
+        );
 
-        $dbeStandardText->getRowsByColumn('stt_standardtexttypeno', 'stt_desc');
+        $dbeStandardText->getRowsByColumn(
+            'stt_standardtexttypeno',
+            'stt_desc'
+        );
 
-        $this->template->set_block($template, $block, 'rows');
+        $this->template->set_block(
+            $template,
+            $block,
+            'rows'
+        );
 
         while ($dbeStandardText->fetchNext()) {
 
@@ -385,7 +587,11 @@ class CTContactExport extends CTCNC
                     'standardTextDescription' => $dbeStandardText->getValue('stt_desc')
                 )
             );
-            $this->template->parse('rows', $block, true);
+            $this->template->parse(
+                'rows',
+                $block,
+                true
+            );
         }
 
     }
