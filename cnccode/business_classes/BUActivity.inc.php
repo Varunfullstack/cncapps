@@ -7176,7 +7176,7 @@ is currently a balance of ';
         contact
       WHERE
         con_custno = '" . $customerID . "'
-        AND con_mailflag10 = 'Y'";
+        AND supportLevel = 'main'";
 
         $db->query($queryString);
         $db->next_record();
@@ -7196,7 +7196,7 @@ is currently a balance of ';
           contact
         WHERE
           con_custno = '" . $customerID . "'
-          AND con_mailflag5 = 'Y'";
+          AND supportLevel = 'support'";
 
             $db->query($queryString);
             $db->next_record();
@@ -8740,7 +8740,7 @@ is currently a balance of ';
           WHERE
             con_email LIKE '%$emailDomain%'
             AND con_custno <> 0
-            AND con_mailflag5 = 'Y'";
+            AND (supportLevel = 'main' or supportLevel = 'support')";
 
         $db->query($sql);
 
@@ -8761,8 +8761,7 @@ is currently a balance of ';
             SELECT
               con_contno,
               con_custno,
-              con_siteno,
-              con_mailflag5
+              con_siteno
             FROM
               contact
             WHERE
@@ -8771,7 +8770,7 @@ is currently a balance of ';
                     $record['senderEmailAddress']
                 ) . "'
               AND con_custno <> 0 
-              AND con_mailflag5 = 'Y'";
+              AND (supportLevel = 'main' or supportLevel = 'support')";
 
             $db->query($sql);
             if ($db->next_record()) {
@@ -8803,7 +8802,7 @@ is currently a balance of ';
                 contact
               WHERE
                 con_custno = $customerID
-                and con_mailflag10 = 'Y'";
+                and supportLevel = 'main'";
 
                 $db->query($sql);
 
