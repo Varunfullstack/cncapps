@@ -554,10 +554,8 @@
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot4FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot5FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot8FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot10FlagDesc}</td>
                 </tr>
                 <!-- BEGIN contactBlock -->
                 <input type="hidden"
@@ -759,18 +757,8 @@
                         />
                     </td>
                     <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot4Flag]"
-                               value="Y"
-                               {mailshot4FlagChecked}
-                               class="stmCheckBox"
-                        />
-                    </td>
-                    <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot5Flag]" value="Y"
-                               {mailshot5FlagChecked}/>
-
+                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot4Flag]" value="Y"
+                               {mailshot4FlagChecked} class="stmCheckBox"/>
                     </td>
                     <td class="content">
                         <input {disabled}
@@ -781,20 +769,9 @@
                         />
                     </td>
                     <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot9Flag]"
-                               value="Y"
-                               {mailshot9FlagChecked}
-                        />
-                    </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot10Flag]"
-                               value="Y"
-                               {mailshot10FlagChecked}
-                        />
+                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot9Flag]" value="Y"
+                               {mailshot9FlagChecked}/>
+
                     </td>
                 </tr>
                 <!-- END contactBlock -->
