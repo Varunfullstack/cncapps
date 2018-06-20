@@ -149,36 +149,6 @@ class CTCustomerReviewMeeting extends CTCNC
                                        ));
                 $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
                 $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
-
-//                /*
-//                End SR Performance Statistics
-//                */
-//                $textTemplate->set_block('page', 'serverBlock', 'servers');
-//
-//                $buCustomerItem->getServersByCustomerID($dsSearchForm->getValue('customerID'), $dsServer);
-//
-//                while ($dsServer->fetchNext()) {
-//
-//                    if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
-//                        $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
-//                    } else {
-//                        $purchaseDate = '';
-//                    }
-//
-//                    $textTemplate->set_var(
-//                        array(
-//                            'itemDescription' => $dsServer->getValue('itemDescription'),
-//                            'serialNo' => $dsServer->getValue('serialNo'),
-//                            'serverName' => $dsServer->getValue('serverName'),
-//                            'purchaseDate' => $purchaseDate,
-//                        )
-//                    );
-//
-//                    $textTemplate->parse('servers', 'serverBlock', true);
-//
-//                } // end while
-
-
                 $textTemplate->set_block('page', 'managementReviewBlock', 'reviews');
 
                 $buActivity->getManagementReviewsInPeriod(

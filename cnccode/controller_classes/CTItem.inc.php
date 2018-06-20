@@ -280,7 +280,6 @@ class CTItem extends CTCNC
         );
         $this->parseItemTypeSelector($this->dsItem->getValue('itemTypeID'));
         $this->parseRenewalTypeSelector($this->dsItem->getValue('renewalTypeID'));
-        //$this->parseManufacturerSelector($this->dsItem->getValue('manufacturerID'));
         $this->parseWarrantySelector($this->dsItem->getValue('warrantyID'));
         $this->template->parse('CONTENTS', 'ItemEdit', true);
         $this->parsePage();

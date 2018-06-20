@@ -103,9 +103,6 @@ $oFCKeditor = new FCKeditor('letterText');
 $oFCKeditor->BasePath = '/FCKeditor/';
 $oFCKeditor->Height = '800px';
 $oFCKeditor->Value = $file;
-/*
-$oFCKeditor->Value		= $address . "<P>" . date('l, jS F Y') ."</P><P>" . "Dear " . $dsContact->getValue('title').' '.$dsContact->getValue('lastName'). ",</P>" . $letterBody;
-*/
 ?>
     <html>
     <head>

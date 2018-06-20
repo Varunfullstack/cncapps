@@ -78,17 +78,6 @@ class BUUser extends Business
      */
     function canDeleteUser($ID)
     {
-        /*
-                $dbeExpense = new DBEExpense($this);
-                // validate no activities of this type
-                $dbeExpense->setValue('expenseTypeID', $ID);
-                if ( $dbeExpense->countRowsByColumn('expenseTypeID') < 1 ){
-                    return TRUE;
-                }
-                else{
-                    return FALSE;
-                }
-        */
         return FALSE;
     }
 

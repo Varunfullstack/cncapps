@@ -1380,7 +1380,6 @@ class CTSalesOrder extends CTCNC
                             $page,
                             array(
                                 'action' => 'editFromSalesOrder',
-//								'customerItemID' =>	$dsOrdhead->getValue('renewalCustomerItemID'),
                                 'ordheadID' => $dsOrdhead->getValue('ordheadID'),
                                 'sequenceNo' => $dsOrdline->getValue("sequenceNo")
                             )
@@ -1535,7 +1534,7 @@ class CTSalesOrder extends CTCNC
                         }
                     }
                     $this->template->parse('salesOrderLine', 'SalesOrderItemLine');
-                } // if ($dsOrdline->getValue("lineType")=="I")
+                }
                 else {
                     if (!$readOnly) {
                         $this->template->parse('salesOrderLineIcons', 'SalesOrderLineIcons', true);
@@ -2509,7 +2508,7 @@ class CTSalesOrder extends CTCNC
                     $buPDF->printStringRJAt(173, Controller::formatNumberCur($total));
                     if ($dsOrdline->getValue('itemID') != 0) {                        // some item lines in old system did not have a related item record
                         $this->buItem->getItemByID($dsOrdline->getValue('itemID'), $dsItem);
-                    } // if ($dsOrdline->getValue('itemID') != '')
+                    }
                 } else {
                     $buPDF->printStringAt(40, $dsOrdline->getValue('description')); // comment line
                 }
@@ -2667,7 +2666,7 @@ class CTSalesOrder extends CTCNC
                         if ($dsItem->getValue('notes')) {
                             $description .= "\n" . str_replace(chr(13), '', $dsItem->getValue('notes'));
                         }
-                    } // if ($dsOrdline->getValue('itemID') != '')
+                    }
 
                 } else {
                     // comment line
@@ -3210,7 +3209,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                         $buPDF->setFontSize(10);
                         $buPDF->setFont();
                     }
-                } // if ($dsOrdline->getValue('itemID') != '')
+                }
             } else {
                 $buPDF->printStringAt(40, $dsOrdline->getValue('description')); // comment line
             }

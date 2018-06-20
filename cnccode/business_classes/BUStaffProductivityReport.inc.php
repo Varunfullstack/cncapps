@@ -473,21 +473,6 @@ class BUStaffProductivityReport extends Business
             $ret[$row->name]['totalBilled'] =
                 $ret[$row->name]['tAndmBilled'] +
                 $ret[$row->name]['prePayBilled'];
-
-            /*
-                $ret[ $row->name ][ 'inHouseHours'] =
-                  $this->getInHouseHours(
-                    $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate')
-                  );
-                $ret[  $row->name ][ 'inHouseCost'] =
-                  $this->getInHouseCost(
-                    $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate')
-                  );
-          */
         }
         return $ret;
     }

@@ -73,10 +73,6 @@ const renewalTypeID = "renewalTypeID";
         if ($this->getValue('description') == '') {
             $this->raiseError('description not set');
         }
-        /*
-                $matchStringArray = split(' ', $this->getValue('description'));
-                // split the string into words so that we can search for them anywhere in the description
-        */
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .

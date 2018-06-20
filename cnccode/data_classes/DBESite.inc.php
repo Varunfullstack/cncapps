@@ -245,5 +245,4 @@ class DBESite extends DBCNCEntity
         return (parent::runQuery()); // ensures it goes to SCOTrans and deleted on UNIX box
     }
 }
-
 ?>

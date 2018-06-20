@@ -253,7 +253,6 @@ class BUActivity extends Business
             'customerID',
             ''
         );
-//        $dsData->setValue('project', '');
         $dsData->setValue(
             'userID',
             ''
@@ -4858,7 +4857,6 @@ is currently a balance of ';
             DBEJCallActivity::callActTypeID,
             1
         );
-        //    $dbeCallActivity->setValue('callID', $callID);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
@@ -4985,71 +4983,71 @@ is currently a balance of ';
 
         $dsCallActivity->setUpdateModeInsert();
         $dsCallActivity->setValue(
-            'callActivityID',
+            DBEJCallActivity::callActivityID,
             0
         );
         $dsCallActivity->setValue(
-            'siteNo',
+            DBEJCallActivity::siteNo,
             $_SESSION [$sessionKey] ['siteNo']
         );
         $dsCallActivity->setValue(
-            'contactID',
+            DBEJCallActivity::contactID,
             $_SESSION [$sessionKey] ['contactID']
         );
         $dsCallActivity->setValue(
-            'callActTypeID',
+            DBEJCallActivity::callActTypeID,
             $_SESSION [$sessionKey] ['callActTypeID']
         );
         $dsCallActivity->setValue(
-            'problemID',
+            DBEJCallActivity::problemID,
             $dbeProblem->getPKValue()
         );
         $dsCallActivity->setValue(
-            'date',
+            DBEJCallActivity::date,
             $_SESSION [$sessionKey] ['dateRaised']
         );
         $dsCallActivity->setValue(
-            'startTime',
+            DBEJCallActivity::startTime,
             $_SESSION [$sessionKey] ['timeRaised']
         );
         $dsCallActivity->setValue(
-            'endTime',
+            DBEJCallActivity::endTime,
             $endTime
         );
         $dsCallActivity->setValue(
-            'status',
+            DBEJCallActivity::status,
             'C'
         ); // Checked
         $dsCallActivity->setValue(
-            'expenseExportFlag',
+            DBEJCallActivity::expenseExportFlag,
             'N'
         );
         $dsCallActivity->setValue(
-            'reason',
+            DBEJCallActivity::reason,
             $_SESSION [$sessionKey] ['reason']
         );
         $dsCallActivity->setValue(
-            'serverGuard',
+            DBEJCallActivity::serverGuard,
             $_SESSION [$sessionKey] ['serverGuard']
         );
         $dsCallActivity->setValue(
-            'curValue',
+            DBEJCallActivity::curValue,
             $_SESSION [$sessionKey] ['curValue']
         );
         $dsCallActivity->setValue(
-            'statementYearMonth',
+            DBEJCallActivity::statementYearMonth,
             ''
         );
         $dsCallActivity->setValue(
-            'customerItemID',
+            DBEJCallActivity::customerItemID,
             ''
         );
         $dsCallActivity->setValue(
-            'authorisedFlag',
+            DBEJCallActivity::authorisedFlag,
             'Y'
         );
         $dsCallActivity->setValue(
-            'userID',
+            DBEJCallActivity::userID,
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
@@ -5376,11 +5374,11 @@ is currently a balance of ';
         $dbeCallDocument = new DBECallDocument($this);
         $dbeCallDocument->setPKValue('');
         $dbeCallDocument->setValue(
-            'problemID',
+            DBEJCallDocument::problemID,
             $problemID
         );
         $dbeCallDocument->setValue(
-            'file',
+            DBEJCallDocument::file,
             fread(
                 fopen(
                     $filePath,
@@ -5390,27 +5388,27 @@ is currently a balance of ';
             )
         );
         $dbeCallDocument->setValue(
-            'description',
+            DBEJCallDocument::description,
             ( string )$description
         );
         $dbeCallDocument->setValue(
-            'filename',
+            DBEJCallDocument::filename,
             ( string )$fileName
         );
         $dbeCallDocument->setValue(
-            'fileLength',
+            DBEJCallDocument::fileLength,
             ( int )$fileSizeBytes
         );
         $dbeCallDocument->setValue(
-            'createUserID',
+            DBEJCallDocument::createUserID,
             ( string )$this->loggedInUserID
         );
         $dbeCallDocument->setValue(
-            'createDate',
+            DBEJCallDocument::createDate,
             date(CONFIG_MYSQL_DATETIME)
         );
         $dbeCallDocument->setValue(
-            'fileMIMEType',
+            DBEJCallDocument::fileMIMEType,
             ( string )$mimeType
         );
 
@@ -5930,7 +5928,7 @@ is currently a balance of ';
             $reason <> $dbeCallActivity->getValue(DBEJCallActivity::reason)
         ) {
             $dbeCallActivity->setValue(
-                'reason',
+                DBEJCallActivity::reason,
                 $reason
             );
             $dbeCallActivity->updateRow();
@@ -5944,7 +5942,7 @@ is currently a balance of ';
         ) {
 
             $dbeProblem->setValue(
-                'internalNotes',
+                DBEJProblem::internalNotes,
                 $internalNotes
             );
             $dbeProblem->updateRow();
@@ -6383,7 +6381,12 @@ is currently a balance of ';
     /*
   Engineer activity is one not raised by system
   */
-
+    /**
+     * @param $ordheadID
+     * @param $dsInput
+     * @param bool $selectedOrderLine
+     * @return string
+     */
     function createSalesServiceRequest($ordheadID,
                                        $dsInput,
                                        $selectedOrderLine = false
@@ -6425,18 +6428,18 @@ is currently a balance of ';
     */
         $dbePorhead = new DBEPorhead($this);
         $dbePorhead->setValue(
-            'ordheadID',
+            DBEJPorhead::ordheadID,
             $ordheadID
         );
 
-        if ($dbePorhead->countRowsByColumn('ordheadID')) {
+        if ($dbePorhead->countRowsByColumn(DBEJPorhead::ordheadID)) {
 
             $dbePorhead->setValue(
-                'ordheadID',
+                DBEJPorhead::ordheadID,
                 $ordheadID
             );
 
-            $dbePorhead->getRowsByColumn('ordheadID');
+            $dbePorhead->getRowsByColumn(DBEJPorhead::ordheadID);
 
             $directDelivery = false;
             while ($dbePorhead->fetchNext()) {
@@ -6577,84 +6580,84 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
 
         $dbeCallActivity->setValue(
-            'callActivityID',
+            DBEJCallActivity::callActivityID,
             0
         );
         $dbeCallActivity->setValue(
-            'siteNo',
+            DBEJCallActivity::siteNo,
             $dsOrdhead->getValue(DBEOrdhead::delSiteNo)
         );
         $dbeCallActivity->setValue(
-            'contactID',
+            DBEJCallActivity::contactID,
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
         $dbeCallActivity->setValue(
-            'callActTypeID',
+            DBEJCallActivity::callActTypeID,
             CONFIG_INITIAL_ACTIVITY_TYPE_ID
         );
         $dbeCallActivity->setValue(
-            'problemID',
+            DBEJCallActivity::problemID,
             $dbeProblem->getPKValue()
         );
         $dbeCallActivity->setValue(
-            'date',
+            DBEJCallActivity::date,
             $dateRaised
         );
         $dbeCallActivity->setValue(
-            'startTime',
+            DBEJCallActivity::startTime,
             $timeRaised
         );
 
         $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
         $dbeCallActivity->setValue(
-            'endTime',
+            DBEJCallActivity::endTime,
             $endTime
         );
         $dbeCallActivity->setValue(
-            'status',
+            DBEJCallActivity::status,
             'C'
         );
         $dbeCallActivity->setValue(
-            'expenseExportFlag',
+            DBEJCallActivity::expenseExportFlag,
             'N'
         );
         $dbeCallActivity->setValue(
-            'reason',
+            DBEJCallActivity::reason,
             $reason
         );
         $dbeCallActivity->setValue(
-            'serverGuard',
+            DBEJCallActivity::serverGuard,
             'N'
         );
         $dbeCallActivity->setValue(
-            'curValue',
+            DBEJCallActivity::curValue,
             0
         );
         $dbeCallActivity->setValue(
-            'statementYearMonth',
+            DBEJCallActivity::statementYearMonth,
             ''
         );
         $dbeCallActivity->setValue(
-            'customerItemID',
+            DBEJCallActivity::customerItemID,
             ''
         );
         $dbeCallActivity->setValue(
-            'underContractFlag',
+            DBEJCallActivity::underContractFlag,
             'N'
         );
         $dbeCallActivity->setValue(
-            'authorisedFlag',
+            DBEJCallActivity::authorisedFlag,
             'Y'
         );
         if (isset($GLOBALS['auth'])) {
             $dbeCallActivity->setValue(
-                'userID',
+                DBEJCallActivity::userID,
                 $GLOBALS['auth']->is_authenticated()
             ); // user that created activity
         } else {
             $dbeCallActivity->setValue(
-                'userID',
+                DBEJCallActivity::userID,
                 USER_SYSTEM
             );
         }
@@ -7357,12 +7360,12 @@ is currently a balance of ';
         /* @todo confirm with GL */
         if ($record['sendEmail'] == 'A') {
             $dbeProblem->setValue(
-                'hideFromCustomerFlag',
+                DBEJProblem::hideFromCustomerFlag,
                 'N'
             );
         } else {
             $dbeProblem->setValue(
-                'hideFromCustomerFlag',
+                DBEJProblem::hideFromCustomerFlag,
                 'Y'
             );
         }
@@ -7374,27 +7377,27 @@ is currently a balance of ';
         }
 
         $dbeProblem->setValue(
-            'queueNo',
+            DBEJProblem::queueNo,
             $queueNo
         );
         $dbeProblem->setValue(
-            'monitorName',
+            DBEJProblem::monitorName,
             $record['monitorName']
         );
         $dbeProblem->setValue(
-            'monitorAgentName',
+            DBEJProblem::monitorAgentName,
             $record['monitorAgentName']
         );
         $dbeProblem->setValue(
-            'rootCauseID',
+            DBEJProblem::rootCauseID,
             $record['rootCauseID']
         );
         $dbeProblem->setValue(
-            'contractCustomerItemID',
+            DBEJProblem::contractCustomerItemID,
             $record['contractCustomerItemID']
         );
         $dbeProblem->setValue(
-            'userID',
+            DBEJProblem::userID,
             ''
         );        // not allocated
         $dbeProblem->insertRow();
@@ -7403,54 +7406,54 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
 
         $dbeCallActivity->setValue(
-            'callActivityID',
+            DBEJCallActivity::callActivityID,
             0
         );
         $dbeCallActivity->setValue(
-            'siteNo',
+            DBEJCallActivity::siteNo,
             $siteNo
         );
         $dbeCallActivity->setValue(
-            'contactID',
+            DBEJCallActivity::contactID,
             $contact['contactID']
         );
         $dbeCallActivity->setValue(
-            'callActTypeID',
+            DBEJCallActivity::callActTypeID,
             CONFIG_INITIAL_ACTIVITY_TYPE_ID
         );
         $dbeCallActivity->setValue(
-            'date',
+            DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
-            'startTime',
+            DBEJCallActivity::startTime,
             date('H:i')
         );
 
         $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
         $dbeCallActivity->setValue(
-            'endTime',
+            DBEJCallActivity::endTime,
             $endTime
         );
         $dbeCallActivity->setValue(
-            'status',
+            DBEJCallActivity::status,
             'C'
         );
         $dbeCallActivity->setValue(
-            'serverGuard',
+            DBEJCallActivity::serverGuard,
             $record['serverGuardFlag']
         );
         $dbeCallActivity->setValue(
-            'reason',
+            DBEJCallActivity::reason,
             Controller::formatForHTML($details)
         );
         $dbeCallActivity->setValue(
-            'problemID',
+            DBEJCallActivity::problemID,
             $dbeProblem->getPKValue()
         );
         $dbeCallActivity->setValue(
-            'userID',
+            DBEJCallActivity::userID,
             USER_SYSTEM
         );
 
@@ -7718,7 +7721,7 @@ is currently a balance of ';
         if ($ifUnallocatedSetToCurrentUser && !$dbeProblem->getValue(DBEJProblem::userID)) {
 
             $dbeProblem->setValue(
-                'userID',
+                DBEJProblem::userID,
                 $userID
             );
 
@@ -7736,7 +7739,7 @@ is currently a balance of ';
                 }
 
                 $dbeProblem->setValue(
-                    'queueNo',
+                    DBEJProblem::queueNo,
                     $queueNo
                 );
             }
@@ -7852,12 +7855,12 @@ is currently a balance of ';
 
         if ($endTime) {
             $dbeCallActivity->setValue(
-                'status',
+                DBEJCallActivity::status,
                 'C'
             ); // Checked if have an end time
         } else {
             $dbeCallActivity->setValue(
-                'status',
+                DBEJCallActivity::status,
                 'O'
             ); // Leave open
         }
@@ -7961,7 +7964,7 @@ is currently a balance of ';
         $this->dbeUser->getRow($dbeJProblem->getValue(DBEJProblem::fixedUserID));
 
         $toEmail = $this->dbeUser->getValue(
-                'username'
+                DBEJUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN . ',' . 'srp1reopened@' . CONFIG_PUBLIC_DOMAIN;
 
         $activityRef = $problemID . ' ' . $dbeJProblem->getValue(DBEJProblem::customerName);
@@ -8056,7 +8059,7 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callactivityID);
         $dbeCallActivity->setValue(
-            'awaitingCustomerResponseFlag',
+            DBEJCallActivity::awaitingCustomerResponseFlag,
             'N'
         );
         $dbeCallActivity->updateRow();
@@ -9390,7 +9393,7 @@ is currently a balance of ';
             );
             $dbeProblem->setValue(
                 DBEProblem::contactID,
-                $dbeContact->getValue('contactID')
+                $dbeContact->getValue(DBEContact::contactID)
             );
             $dbeProblem->setValue(
                 DBEProblem::hideFromCustomerFlag,
@@ -9421,59 +9424,59 @@ is currently a balance of ';
             $problemID = $dbeProblem->getPKValue();
 
             $dbeCallActivity->setValue(
-                'callActivityID',
+                DBEJCallActivity::callActivityID,
                 0
             );
             $dbeCallActivity->setValue(
-                'siteNo',
-                $dbeContact->getValue('siteNo')
+                DBEJCallActivity::siteNo,
+                $dbeContact->getValue(DBEContact::siteNo)
             ); // contact default siteno
             $dbeCallActivity->setValue(
-                'contactID',
-                $dbeContact->getValue('contactID')
+                DBEJCallActivity::contactID,
+                $dbeContact->getValue(DBEContact::contactID)
             );
             $dbeCallActivity->setValue(
-                'callActTypeID',
+                DBEJCallActivity::callActTypeID,
                 CONFIG_INITIAL_ACTIVITY_TYPE_ID
             );
             $dbeCallActivity->setValue(
-                'date',
+                DBEJCallActivity::date,
                 date(CONFIG_MYSQL_DATE)
             );
             $dbeCallActivity->setValue(
-                'startTime',
+                DBEJCallActivity::startTime,
                 date('H:i')
             );
             $dbeCallActivity->setValue(
-                'endTime',
+                DBEJCallActivity::endTime,
                 date('H:i')
             );
             $dbeCallActivity->setValue(
-                'status',
+                DBEJCallActivity::status,
                 'C'
             );
             $dbeCallActivity->setValue(
-                'serverGuard',
+                DBEJCallActivity::serverGuard,
                 'Y'
             );
             $dbeCallActivity->setValue(
-                'secondsiteErrorServer',
+                DBEJCallActivity::secondsiteErrorServer,
                 $serverName
             );
             $dbeCallActivity->setValue(
-                'secondsiteErrorCustomerItemID',
+                DBEJCallActivity::secondsiteErrorCustomerItemID,
                 $serverCustomerItemID
             );
             $dbeCallActivity->setValue(
-                'reason',
+                DBEJCallActivity::reason,
                 $details
             );
             $dbeCallActivity->setValue(
-                'problemID',
+                DBEJCallActivity::problemID,
                 $problemID
             );
             $dbeCallActivity->setValue(
-                'userID',
+                DBEJCallActivity::userID,
                 USER_SYSTEM
             );
 
@@ -9484,7 +9487,7 @@ is currently a balance of ';
             $this->createFollowOnActivity(
                 $callActivityID,
                 CONFIG_2NDSITE_BACKUP_ACTIVITY_TYPE_ID,
-                $dbeContact->getValue('contactID'),
+                $dbeContact->getValue(DBEContact::contactID),
                 $details,
                 'N',
                 false,
@@ -9560,13 +9563,13 @@ is currently a balance of ';
             $dsCallActivity
         );
 
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
         $dbeProblem = new DBEProblem($this);
 
         $dbeProblem->getRow($problemID);
         $dbeProblem->setValue(
-            'linkedSalesOrderID',
+            DBEJProblem::linkedSalesOrderID,
             $salesOrderID
         );
         $dbeProblem->updateRow();
@@ -9631,7 +9634,7 @@ is currently a balance of ';
             'ServiceAdditionalTimeEmail.inc.html'
         );
 
-        $userName = $this->dbeUser->getValue('firstName') . ' ' . $this->dbeUser->getValue('lastName');
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
 
         $teamID = $this->dbeUser->getValue(DBEUser::teamID);
 
@@ -9663,7 +9666,7 @@ is currently a balance of ';
 
         $leftOnBudget = $assignedMinutes - $usedMinutes;
         $subject = 'Time Requested: ' . CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID . ' ' . $dbeJLastCallActivity->getValue(
-                'customerName'
+                DBEJCallActivity::customerName
             ) . ' allocated to ' . $userName;
 
         $requestedReason = $reason;
@@ -9671,7 +9674,7 @@ is currently a balance of ';
         $urlAllocateAdditionalTime = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=allocateAdditionalTime&problemID=' . $problemID;
 
         $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
-                'callActivityID'
+                DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
@@ -9684,13 +9687,13 @@ is currently a balance of ';
 
                 'urlLastActivity' => $urlLastActivity,
 
-                'internalNotes' => $dbeProblem->getValue('internalNotes'),
+                'internalNotes' => $dbeProblem->getValue(DBEJProblem::internalNotes),
 
                 'requestedReason' => $requestedReason,
 
-                'chargeableActivityDurationHours' => $dbeProblem->getValue('chargeableActivityDurationHours'),
+                'chargeableActivityDurationHours' => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
 
-                'totalActivityDurationHours' => $dbeProblem->getValue('totalActivityDurationHours'),
+                'totalActivityDurationHours' => $dbeProblem->getValue(DBEJProblem::totalActivityDurationHours),
                 'timeLeftOnBudget'           => $leftOnBudget
             )
         );
@@ -9708,17 +9711,17 @@ is currently a balance of ';
 
             $template->set_var(
                 array(
-                    'reason'       => $dsActivities->getValue('reason'),
-                    'date'         => $this->owner->dateYMDtoDMY($dsActivities->getValue('date')),
-                    'startTime'    => $dsActivities->getValue('startTime'),
-                    'endTime'      => $dsActivities->getValue('endTime'),
-                    'activityType' => $dsActivities->getValue('activityType'),
-                    'contactName'  => $dsActivities->getValue('contactName'),
+                    'reason'       => $dsActivities->getValue(DBEJCallActivity::reason),
+                    'date'         => $this->owner->dateYMDtoDMY($dsActivities->getValue(DBEJCallActivity::date)),
+                    'startTime'    => $dsActivities->getValue(DBEJCallActivity::startTime),
+                    'endTime'      => $dsActivities->getValue(DBEJCallActivity::endTime),
+                    'activityType' => $dsActivities->getValue(DBEJCallActivity::activityType),
+                    'contactName'  => $dsActivities->getValue(DBEJCallActivity::contactName),
                     'duration'     => number_format(
-                        $dsActivities->getValue('durationMinutes') / 60,
+                        $dsActivities->getValue(DBEJCallActivity::durationMinutes) / 60,
                         2
                     ),
-                    'userName'     => $dsActivities->getValue('userName'),
+                    'userName'     => $dsActivities->getValue(DBEJCallActivity::userName),
                 )
             );
 
@@ -9860,7 +9863,7 @@ is currently a balance of ';
     {
         $buMail = new BUMail($this);
 
-        $problemID = $this->dbeProblem->getValue('problemID');
+        $problemID = $this->dbeProblem->getValue(DBEJProblem::problemID);
         $dbeUser = new DBEUser($this);
 
         $assignedUser = $this->dbeProblem->getValue(DBEProblem::userID);
@@ -9878,7 +9881,7 @@ is currently a balance of ';
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
 
-        $toEmail = $dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
+        $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
 
         $template = new Template(
             EMAIL_TEMPLATE_DIR,
@@ -9890,16 +9893,16 @@ is currently a balance of ';
         );
 
         $urlDisplayActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
-                'callActivityID'
+                DBEJCallActivity::callActivityID
             );
 
-        $userName = $dbeUser->getValue('firstName') . ' ' . $dbeUser->getValue('lastName');
+        $userName = $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName);
 
         $template->setVar(
             array(
                 'problemID'          => $problemID,
-                'reason'             => $dbeJCallActivity->getValue('reason'),
-                'customerName'       => $dbeJCallActivity->getValue('customerName'),
+                'reason'             => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'customerName'       => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
                 'userName'           => $userName,
                 'minutes'            => round(
                     $minutes,
@@ -9907,7 +9910,7 @@ is currently a balance of ';
                 ),
                 'comments'           => $comments,
                 'urlDisplayActivity' => $urlDisplayActivity,
-                'internalNotes'      => $this->dbeProblem->getValue('internalNotes')
+                'internalNotes'      => $this->dbeProblem->getValue(DBEJCallActivity::internalNotes)
             )
         );
 
@@ -9922,7 +9925,7 @@ is currently a balance of ';
         $minutes =
 
         $subject = 'Additional ' . $minutes . ' minutes Allocated to SR ' . $problemID . ' ' . $dbeJLastCallActivity->getValue(
-                'customerName'
+                DBEJCallActivity::customerName
             );
 
         $hdrs = array(
@@ -10033,7 +10036,7 @@ is currently a balance of ';
 
         $this->dbeUser->getRows(true);
         while ($this->dbeUser->fetchNext()) {
-            $this->createUserTimeLogRecord($this->dbeUser->getValue('userID'));
+            $this->createUserTimeLogRecord($this->dbeUser->getValue(DBEUser::userID));
         }
 
     }
@@ -10069,9 +10072,9 @@ is currently a balance of ';
     Set logged hours to the target for the team
     */
         if ($teamLevel == 1) {
-            $targetPercentage = $this->dsHeader->getValue('hdTeamTargetLogPercentage');
+            $targetPercentage = $this->dsHeader->getValue(DBEJHeader::hdTeamTargetLogPercentage);
         } else {
-            $targetPercentage = $this->dsHeader->getValue('esTeamTargetLogPercentage');
+            $targetPercentage = $this->dsHeader->getValue(DBEJHeader::esTeamTargetLogPercentage);
         }
 
         $loggedHours = $standardDayHours * ($targetPercentage / 100);
@@ -10106,7 +10109,7 @@ is currently a balance of ';
         $dbeProblem = $this->getDbeProblem();
         $dbeProblem->getRow($problemID);
         $dbeProblem->setValue(
-            'managementReviewReason',
+            DBEProblem::managementReviewReason,
             $text
         );
         $dbeProblem->updateRow();
@@ -10131,18 +10134,18 @@ is currently a balance of ';
         );
 
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
-                'callActivityID'
+                DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
             array(
                 'problemID'     => $problemID,
                 'urlActivity'   => $urlActivity,
-                'customerName'  => $dbeJProblem->getValue('customerName'),
-                'initialReason' => $dbeJProblem->getValue('reason'),
-                'fixSummary'    => $dbeJProblem->getValue('lastReason'),
+                'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'initialReason' => $dbeJProblem->getValue(DBEJProblem::reason),
+                'fixSummary'    => $dbeJProblem->getValue(DBEJProblem::lastReason),
                 'managementReviewReason'
-                                => $dbeJProblem->getValue('managementReviewReason')
+                                => $dbeJProblem->getValue(DBEJProblem::managementReviewReason)
             )
         );
 
@@ -10157,7 +10160,7 @@ is currently a balance of ';
         $hdrs = array(
             'From'         => $senderEmail,
             'Subject'      => 'Management Review Summary Added ' . $dbeJProblem->getValue(
-                    'customerName'
+                    DBEJProblem::customerName
                 ) . ' SR ' . $problemID,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
@@ -10367,19 +10370,19 @@ is currently a balance of ';
         ];
 
         if (!in_array(
-            $dbeJCallActivity->getValue("callActTypeID"),
+            $dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID),
             $validActivityTypeIDs
         )) {
             return;
         }
 
-        $monitoringPeople = $this->getPeopleMonitoringProblem($dbeJCallActivity->getValue('problemID'));
+        $monitoringPeople = $this->getPeopleMonitoringProblem($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
 
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
 
-        $activityRef = $dbeJCallActivity->getValue('problemID') . ' ' . $dbeJCallActivity->getValue('customerName');
+        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(DBEJCallActivity::customerName);
 
         $template = new Template(
             EMAIL_TEMPLATE_DIR,
@@ -10394,12 +10397,12 @@ is currently a balance of ';
             );
 
         $durationHours = common_convertHHMMToDecimal(
-                $dbeJCallActivity->getValue('endTime')
-            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue('startTime'));
+                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
+            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
 
         $awaitingCustomerResponse = '';
 
-        if ($dbeJCallActivity->getValue('requestAwaitingCustomerResponseFlag') == 'Y') {
+        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
             $awaitingCustomerResponse = 'Awaiting Customer';
         } else {
             $awaitingCustomerResponse = 'Awaiting CNC';
@@ -10414,17 +10417,17 @@ is currently a balance of ';
                 'activityEndTime'             => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
                 'activityTypeName'            => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
                 'urlActivity'                 => $urlActivity,
-                'userName'                    => $dbeJCallActivity->getValue('userName'),
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
                 'durationHours'               => round(
                     $durationHours,
                     2
                 ),
                 'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
-                    'problemStatus'
+                    DBEJCallActivity::problemStatus
                 )],
                 'awaitingCustomerResponse'    => $awaitingCustomerResponse,
-                'customerName'                => $dbeJCallActivity->getValue('customerName'),
-                'reason'                      => $dbeJCallActivity->getValue('reason'),
+                'customerName'                => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
             )
         );
@@ -10444,8 +10447,8 @@ is currently a balance of ';
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
                 'Subject'      => 'Monitored SR ' . $dbeJCallActivity->getValue(
-                        'problemID'
-                    ) . ' For ' . $dbeJCallActivity->getValue('customerName'),
+                        DBEJCallActivity::problemID
+                    ) . ' For ' . $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );

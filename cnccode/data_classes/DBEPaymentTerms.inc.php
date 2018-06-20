@@ -7,6 +7,13 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPaymentTerms extends DBEntity
 {
+
+    const paymentTermsID = "paymentTermsID";
+    const description = "description";
+    const days = "days";
+    const generateInvoiceFlag = "generateInvoiceFlag";
+    const automaticInvoiceFlag = "automaticInvoiceFlag";
+
     /**
      * calls constructor()
      * @access public
@@ -18,11 +25,31 @@ class DBEPaymentTerms extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("paymentterms");
-        $this->addColumn("paymentTermsID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("days", DA_INTEGER, DA_NOT_NULL);
-        $this->addColumn("generateInvoiceFlag", DA_YN, DA_NOT_NULL);
-        $this->addColumn("automaticInvoiceFlag", DA_YN, DA_NOT_NULL);
+        $this->addColumn(
+            self::paymentTermsID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::days,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::generateInvoiceFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::automaticInvoiceFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

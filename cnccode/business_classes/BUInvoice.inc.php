@@ -665,12 +665,6 @@ class BUInvoice extends Business
         if ($dsInvline->getValue('lineType') == 'I') {
             $dbeInvline->setValue('itemID', $dsInvline->getValue('itemID'));
             $dbeInvline->setValue('stockcat', $dsInvline->getValue('stockcat'));
-            /* Use new screen field stockcat instead
-                        $buItem= new BUItem($this);
-                        if ($buItem->getItemByID($dsInvline->getValue('itemID'), $dsItem)){
-                            $dbeInvline->setValue('stockcat', $dsItem->getValue('stockcat'));
-                        }
-            */
         }
         $dbeInvline->setValue('description', $dsInvline->getValue('description'));
         if ($action == "U") {

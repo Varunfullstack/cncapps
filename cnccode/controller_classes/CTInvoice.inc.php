@@ -719,7 +719,6 @@ class CTInvoice extends CTCNC
                 'invheadID'        => $invheadID,
                 'contactID'        => $dsInvhead->getValue('contactID'),
                 'contactName'      => Controller::htmlInputText($dsInvhead->getValue('firstName') . ' ' . $dsInvhead->getValue('lastName')),
-                //				'payMethod' => Controller::htmlInputText($dsInvhead->getValue('payMethod')),
                 'datePrinted'      => $this->dateYMDtoDMY($datePrinted),
                 'custPORef'        => Controller::htmlInputText($dsInvhead->getValue('custPORef')),
                 'customerName'     => Controller::htmlDisplayText($dsInvhead->getValue('customerName')),
@@ -959,10 +958,8 @@ class CTInvoice extends CTCNC
 
     function invoiceLineForm($parentPage = 'InvoiceLineEdit')
     {
-        // Lines
         $this->template->set_var(
             array(
-//				'stockcat' => $this->dsInvline->getValue("stockcat"),
 'customerName'       => $this->dsInvhead->getValue("customerName"),
 'itemID'             => $this->dsInvline->getValue("itemID"),
 'description'        => htmlspecialchars($this->dsInvline->getValue("description")),
@@ -1068,8 +1065,6 @@ class CTInvoice extends CTCNC
         }
         $this->formError = !$this->dsInvline->populateFromArray($_REQUEST['invline']);
         // Validate Item line
-//		$this->setOrdheadID($this->dsInvline->getValue('ordheadID'));
-
         if ($this->formError) {                    // Form error so redisplay edit form
             if ($_REQUEST['action'] == CTINVOICE_ACT_INSERT_LINE) {
                 $_REQUEST['action'] = CTINVOICE_ACT_ADD_LINE;

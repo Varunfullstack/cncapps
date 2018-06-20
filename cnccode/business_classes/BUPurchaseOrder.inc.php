@@ -227,45 +227,6 @@ class BUPurchaseOrder extends Business
         return TRUE;
     }
 
-    /*
-        function createNewOrder($supplierID, &$dsPorhead){
-            $this->setMethodName('createNewOrder');
-            if ($supplierID==''){
-                $this->raiseError('supplierID not passed');
-            }
-            if (!is_a($dsPorhead, 'DSForm')){
-                $this->raiseError('dsPorhead not initialised');
-            }
-            $dsSupplier = & $this->dsSupplier;
-            $dbePorhead = & $this->dbePorhead;
-            $buSupplier = new BUSupplier($this);
-            $buHeader = new BUHeader($this);
-            $buSupplier->getSupplierByID($supplierID, $dsSupplier);
-            $dbePorhead->setValue('supplierID', $supplierID);
-            $dbePorhead->setValue('porheadID', 0); // new PK
-            $dbePorhead->setValue('porheadID', '');
-            $dbePorhead->setValue('date', date('Y-m-d'));
-            $dbePorhead->setValue('userID', '1');			// TO BE CHANGED TO CURRENT
-            $dbePorhead->setValue('directDeliveryFlag', 'N');
-            $dbePorhead->setValue('type', 'I');
-            $dbePorhead->setValue('printedFlag', 'N');
-            $buHeader->getHeader($dsHeader);
-            $dsHeader->fetchNext();
-            $vatCode = $dsHeader->getValue('stdVATCode');
-            $dbePorhead->setValue('vatCode', $vatCode);
-            $dbeVat=new DBEVat($this);
-            $dbeVat->getRow();
-            $vatRate = $dbeVat->getValue((integer) $vatCode[1]); // get 2nd part of code and use as column no
-            $dbePorhead->setValue('vatRate', $vatRate);
-            $dbePorhead->setValue('supplierRef', null);
-            $dbePorhead->setValue('contactID', $dsSupplier->getValue('contactID'));
-            $dbePorhead->setValue('invoices', null); // sales invoices (not sure if required now)
-            $dbePorhead->setValue('payMethodID', $dsSupplier->getValue('payMethodID')); // default
-            $dbePorhead->setValue('locationID', null); // not stock
-            $dbePorhead->insertRow();
-            $this->getOrderByID($dbePorhead->getPKValue(), $dsPorhead, $dsPorline);
-        }
-    */
     function getOrdlineByIDSeqNo($porheadID, $sequenceNo, &$dsPorline)
     {
         $this->setMethodName('getOrdlineByIDSeqNo');
@@ -818,11 +779,6 @@ class BUPurchaseOrder extends Business
                 }
                 $dbeCustomerItem->setValue('warrantyID', $dsGoodsIn->getValue('warrantyID'));
                 $dbeCustomerItem->setValue('serialNo', $dsGoodsIn->getValue('serialNo'));
-                /*
-                @todo: update for many-to-many
-
-                            $dbeCustomerItem->setValue('contractID', 	null);
-                    */
                 $dbeCustomerItem->insertRow();
             }
             // update recieved qty on porline

@@ -369,10 +369,8 @@ class BUSalesOrder extends Business
             ($dsOrdhead->getValue('customerID') == CONFIG_SALES_STOCK_CUSTOMERID) OR
             ($dsOrdhead->getValue('customerID') == CONFIG_MAINT_STOCK_CUSTOMERID)
         ) {
-//	 		$dsOrdhead->setValue('payMethod', 'N'); // switch to paymentTermsID
             $dsOrdhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_NO_INVOICE);    // switch to paymentTermsID
         } else {
-// 			$dsOrdhead->setValue('payMethod', 'F');	// switch to paymentTermsID
             $dsOrdhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_30_DAYS);    // switch to paymentTermsID
         }
         $dsOrdhead->setValue('partInvoice', 'Y');

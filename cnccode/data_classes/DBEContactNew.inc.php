@@ -308,11 +308,6 @@ class DBEContact extends DBCNCEntity
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('customerID not set');
         }
-        /*
-                if ($this->getValue('siteNo')==''){
-                    $this->raiseError('siteNo not set');
-                }
-        */
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
@@ -383,11 +378,6 @@ class DBEContact extends DBCNCEntity
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('customerID not set');
         }
-        /*
-                if ($this->getValue('siteNo')==''){
-                    $this->raiseError('siteNo not set');
-                }
-        */
         if ($match == '') {
             $this->raiseError('$match not set');
         }

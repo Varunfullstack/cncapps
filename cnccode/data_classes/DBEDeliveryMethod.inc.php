@@ -7,6 +7,10 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEDeliveryMethod extends DBEntity
 {
+    const deliveryMethodID = "deliveryMethodID";
+    const description = "description";
+    const sendNoteFlag = "sendNoteFlag";
+
     /**
      * calls constructor()
      * @access public
@@ -18,9 +22,24 @@ class DBEDeliveryMethod extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("delivery");
-        $this->addColumn("deliveryMethodID", DA_ID, DA_NOT_NULL, "del_delno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "del_desc");
-        $this->addColumn("sendNoteFlag", DA_YN, DA_NOT_NULL, "del_send_note");
+        $this->addColumn(
+            self::deliveryMethodID,
+            DA_ID,
+            DA_NOT_NULL,
+            "del_delno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "del_desc"
+        );
+        $this->addColumn(
+            self::sendNoteFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "del_send_note"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

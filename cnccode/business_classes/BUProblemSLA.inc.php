@@ -164,22 +164,6 @@ class BUProblemSLA extends Business
             }
 
             $this->dbeProblem->setValue('awaitingCustomerResponseFlag', $this->awaitingCustomerResponseFlag);
-            /* Removed as per GL
-                    if (
-                      $this->dbeProblem->getValue( 'priority' ) < 4 &&
-                      $workingHours > self::workingHoursAlertLimit &&
-                      $this->dbeProblem->getValue( 'workingHoursAlertSentFlag') =='N'
-                    ){
-                      /*
-                      Email to GL and RH
-                      */
-            /*
-            $this->dbeProblem->setValue('workingHoursAlertSentFlag', 'Y' );
-
-            $this->sendWorkingHoursAlertEmail( $dsResults->getValue( 'problemID') );
-
-          }
-  */
             $this->dbeProblem->updateRow();
 
             echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
@@ -205,23 +189,6 @@ class BUProblemSLA extends Business
             }
 
             $this->dbeProblem->setValue('awaitingCustomerResponseFlag', $this->awaitingCustomerResponseFlag);
-            /*
-                    if (
-                      $this->dbeProblem->getValue( 'priority' ) < 4 &&
-                      $workingHours > self::workingHoursAlertLimit &&
-                      $this->dbeProblem->getValue( 'workingHoursAlertSentFlag') =='N'
-                    ){
-
-                      /*
-                      Email to GL and RH
-                      */
-            /*
-                      $this->dbeProblem->setValue('workingHoursAlertSentFlag', 'Y' );
-
-                      $this->sendWorkingHoursAlertEmail( $dsResults->getValue( 'problemID') );
-
-                    }
-            */
             $this->dbeProblem->updateRow();
 
             echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';

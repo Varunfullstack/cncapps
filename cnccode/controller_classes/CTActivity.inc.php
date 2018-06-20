@@ -1834,14 +1834,6 @@ class CTActivity extends CTCNC
                     'toggleContext'  => '1'
                 )
             );
-
-
-//        if ($buCustomer->customerFolderExists($dsCallActivity->getValue('customerID'))) {
-//            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($dsCallActivity->getValue('customerID'));
-//
-//            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Current Documentation Folder">Current Documentation Folder</a>';
-//        }
-
         $buCustomerItem = new BUCustomerItem($this);
         $minResponseTime = $buCustomerItem->getMinResponseTime($dsCallActivity->getValue('customerID'));
 
