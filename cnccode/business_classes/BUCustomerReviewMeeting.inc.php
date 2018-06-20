@@ -89,7 +89,7 @@ class BUCustomerReviewMeeting extends Business
             contact
           WHERE
             con_discontinued <> 'Y'
-            AND con_mailflag7 = 'Y'
+            and reviewUser = 'Y'
             AND con_custno = " . $customer['customerID'];
 
             $results = $this->db->query($sql);

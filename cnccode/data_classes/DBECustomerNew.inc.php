@@ -18,9 +18,9 @@ class DBECustomer extends DBCNCEntity
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
     const prospectFlag = "prospectFlag";
-    const othersEmailMainFlag = "othersEmailMainFlag";
-    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
-    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
+//    const othersEmailMainFlag = "othersEmailMainFlag";
+//    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
+//    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const reviewDate = "reviewDate";
     const reviewTime = "reviewTime";
@@ -66,9 +66,9 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(self::pcxFlag, DA_YN, DA_ALLOW_NULL, "cus_pcx");
         $this->addColumn(self::customerTypeID, DA_ID, DA_NOT_NULL, "cus_ctypeno");
         $this->addColumn(self::prospectFlag, DA_YN, DA_NOT_NULL, "cus_prospect");
-        $this->addColumn(self::othersEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_others_email_main_flag");
-        $this->addColumn(self::workStartedEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_work_started_email_main_flag");
-        $this->addColumn(self::autoCloseEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_auto_close_email_main_flag");
+//        $this->addColumn(self::othersEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_others_email_main_flag");
+//        $this->addColumn(self::workStartedEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_work_started_email_main_flag");
+//        $this->addColumn(self::autoCloseEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_auto_close_email_main_flag");
         $this->addColumn(self::gscTopUpAmount, DA_FLOAT, DA_NOT_NULL);                        // amount to top up general support contract by
         $this->addColumn(self::reviewDate, DA_DATE, DA_ALLOW_NULL);
         $this->addColumn(self::reviewTime, DA_TIME, DA_ALLOW_NULL);

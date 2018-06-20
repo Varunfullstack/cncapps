@@ -71,14 +71,7 @@ class BUContact extends Business
         return $ret;
     }
 
-    function getTechnicalMailshotContacts(&$dsResults)
-    {
-        $this->setMethodName('getTechnicalMailshotContacts');
-        $this->dbeContact->getTechnicalMailshotRows();
-        $ret = ($this->getData($this->dbeContact, $dsResults));
-        $dsResults->columnSort('lastName', 'firstName');
-        return $ret;
-    }
+
 
     /**
      * Get Contact rows whose names match the search string or, if the string is numeric, try to select by customerID
@@ -186,16 +179,11 @@ class BUContact extends Business
         $dsResults->setValue('customerID', $customerID);
         $dsResults->setValue('discontinuedFlag', 'N');
         $dsResults->setValue('notes', '');
-        $dsResults->setValue('mailshot1Flag', $dsHeader->getValue('mailshot1FlagDef'));
         $dsResults->setValue('mailshot2Flag', $dsHeader->getValue('mailshot2FlagDef'));
         $dsResults->setValue('mailshot3Flag', $dsHeader->getValue('mailshot3FlagDef'));
         $dsResults->setValue('mailshot4Flag', $dsHeader->getValue('mailshot4FlagDef'));
-        $dsResults->setValue('mailshot5Flag', $dsHeader->getValue('mailshot5FlagDef'));
-        $dsResults->setValue('mailshot6Flag', $dsHeader->getValue('mailshot6FlagDef'));
-        $dsResults->setValue('mailshot7Flag', $dsHeader->getValue('mailshot7FlagDef'));
         $dsResults->setValue('mailshot8Flag', $dsHeader->getValue('mailshot8FlagDef'));
         $dsResults->setValue('mailshot9Flag', $dsHeader->getValue('mailshot9FlagDef'));
-        $dsResults->setValue('mailshot10Flag', $dsHeader->getValue('mailshot10FlagDef'));
         $dsResults->setValue('mailshot11Flag', $dsHeader->getValue('mailshot11FlagDef'));
         $dsResults->post();
         return TRUE;
@@ -216,16 +204,11 @@ class BUContact extends Business
         // create/populate new dataset
         $dsResults->copyColumnsFrom($this->dbeContact);
         $dsResults->setValue('discontinuedFlag', 'N');
-        $dsResults->setValue('mailshot1Flag', 'N');
         $dsResults->setValue('mailshot2Flag', 'N');
         $dsResults->setValue('mailshot3Flag', 'N');
         $dsResults->setValue('mailshot4Flag', 'N');
-        $dsResults->setValue('mailshot5Flag', 'N');
-        $dsResults->setValue('mailshot6Flag', 'N');
-        $dsResults->setValue('mailshot7Flag', 'N');
         $dsResults->setValue('mailshot8Flag', 'N');
         $dsResults->setValue('mailshot9Flag', 'N');
-        $dsResults->setValue('mailshot10Flag', 'N');
         return TRUE;
     }
 

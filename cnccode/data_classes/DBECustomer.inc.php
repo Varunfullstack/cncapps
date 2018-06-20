@@ -18,9 +18,9 @@ class DBECustomer extends DBCNCEntity
     const PCXFlag = "PCXFlag";
     const CustomerTypeID = "CustomerTypeID";
     const ProspectFlag = "ProspectFlag";
-    const OthersEmailMainFlag = "OthersEmailMainFlag";
-    const WorkStartedEmailMainFlag = "WorkStartedEmailMainFlag";
-    const AutoCloseEmailMainFlag = "AutoCloseEmailMainFlag";
+//    const OthersEmailMainFlag = "OthersEmailMainFlag";
+//    const WorkStartedEmailMainFlag = "WorkStartedEmailMainFlag";
+//    const AutoCloseEmailMainFlag = "AutoCloseEmailMainFlag";
     const GSCTopUpAmount = "GSCTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -84,9 +84,9 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(self::PCXFlag, DA_YN_FLAG, DA_ALLOW_NULL, "cus_pcx");
         $this->addColumn(self::CustomerTypeID, DA_ID, DA_NOT_NULL, "cus_ctypeno");
         $this->addColumn(self::ProspectFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_prospect");
-        $this->addColumn(self::OthersEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_others_email_main_flag");
-        $this->addColumn(self::WorkStartedEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_work_started_email_main_flag");
-        $this->addColumn(self::AutoCloseEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_auto_close_email_main_flag");
+//        $this->addColumn(self::OthersEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_others_email_main_flag");
+//        $this->addColumn(self::WorkStartedEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_work_started_email_main_flag");
+//        $this->addColumn(self::AutoCloseEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_auto_close_email_main_flag");
         $this->addColumn(self::GSCTopUpAmount, DA_FLOAT, DA_NOT_NULL);                        // amount to top up general support contract by
         $this->addColumn(self::modifyDate, DA_DATETIME, DA_ALLOW_NULL);                        // amount to
         $this->addColumn(self::modifyUserID, DA_INTEGER, DA_ALLOW_NULL);

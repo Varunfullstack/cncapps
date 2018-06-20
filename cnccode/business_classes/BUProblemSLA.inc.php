@@ -251,8 +251,10 @@ class BUProblemSLA extends Business
                 $hoursUntilComplete =
                     $this->getWorkingHoursBetweenUnixDates(
 
-                        date('U'),                                                      // from now
-                        strtotime($this->dbeProblem->getValue('completeDate') . ' ' . $dbeCallActivity->getValue('endTime')),  // time on completion date
+                        date('U'),
+                        // from now
+                        strtotime($this->dbeProblem->getValue('completeDate') . ' ' . $dbeCallActivity->getValue('endTime')),
+                        // time on completion date
                         false                                                           // no pauses
                     );
                 /*
@@ -275,7 +277,8 @@ class BUProblemSLA extends Business
                         $hoursUntilComplete <= ($this->workingHoursInDay * 2) &&
                         $this->dbeProblem->getValue('completionAlertCount') < 2
                     ) {
-                        $this->dbeProblem->setValue('completionAlertCount', $this->dbeProblem->getValue('completionAlertCount') + 1);
+                        $this->dbeProblem->setValue('completionAlertCount',
+                                                    $this->dbeProblem->getValue('completionAlertCount') + 1);
                         $this->dbeProblem->updateRow();
 
                         $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
@@ -286,11 +289,8 @@ class BUProblemSLA extends Business
 
                             $this->sendCompletionAlertEmail(
                                 $problemID,
-                                $this->dbeProblem->getValue('completeDate'),
-                                $dbeCustomer->getValue('workStartedEmailMainFlag')
+                                $this->dbeProblem->getValue('completeDate')
                             );
-
-
                         } // end if hours until complete
 
 
@@ -405,7 +405,7 @@ class BUProblemSLA extends Business
 
         $template->setVar(
             array(
-                'customerName' => $customer->cus_name,
+                'customerName'            => $customer->cus_name,
                 'specialAttentionEndDate' => $customer->cus_special_attention_end_date,
             )
         );
@@ -415,9 +415,9 @@ class BUProblemSLA extends Business
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'Subject' => 'Special Attention Period Ends Soon For ' . $customer->cus_name,
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'Subject'      => 'Special Attention Period Ends Soon For ' . $customer->cus_name,
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -425,9 +425,9 @@ class BUProblemSLA extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -484,12 +484,12 @@ class BUProblemSLA extends Business
 
             $template->setVar(
                 array(
-                    'urlActivity' => $urlActivity,
-                    'customerName' => $dbeJProblem->getValue('customerName'),
-                    'activityRef' => $activityRef,
-                    'reason' => $dbeJCallActivity->getValue('reason'),
+                    'urlActivity'                 => $urlActivity,
+                    'customerName'                => $dbeJProblem->getValue('customerName'),
+                    'activityRef'                 => $activityRef,
+                    'reason'                      => $dbeJCallActivity->getValue('reason'),
                     'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
-                    'percentage' => number_format($percentage, 0)
+                    'percentage'                  => number_format($percentage, 0)
                 )
             );
 
@@ -498,10 +498,10 @@ class BUProblemSLA extends Business
             $body = $template->get_var('output');
 
             $hdrs = array(
-                'To' => $toEmail,
-                'From' => $senderEmail,
-                'Subject' => 'WARNING - SR for ' . $dbeJProblem->getValue('customerName') . 'assigned to ' . $dbeJProblem->getValue('engineerName') . ' close to breaching SLA',
-                'Date' => date("r"),
+                'To'           => $toEmail,
+                'From'         => $senderEmail,
+                'Subject'      => 'WARNING - SR for ' . $dbeJProblem->getValue('customerName') . 'assigned to ' . $dbeJProblem->getValue('engineerName') . ' close to breaching SLA',
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -509,9 +509,9 @@ class BUProblemSLA extends Business
 
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
             $body = $buMail->mime->get($mime_params);
 
@@ -533,6 +533,7 @@ class BUProblemSLA extends Business
      * Send Service Completion Alert Email
      *
      * @param mixed $problemID
+     * @param $completeDate
      */
     function sendCompletionAlertEmail($problemID, $completeDate)
     {
@@ -557,13 +558,6 @@ class BUProblemSLA extends Business
         */
         $copyEmailToMainContact = true;
 
-        if (
-            $dbeCustomer->getValue('othersEmailMainFlag') == 'N' ||
-            $dbeCustomer->getValue('autoCloseEmailMainFlag') == 'N'
-        ) {
-            $copyEmailToMainContact = false;
-        }
-
         /*
         do we send to first activity contact?
         */
@@ -584,19 +578,20 @@ class BUProblemSLA extends Business
         /*
         Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact or don't want to get them.
         */
-        if ($copyEmailToMainContact) {
-            if (
-                $workStartedEmailMain == 'Y' &&
-                $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses($dbeJCallActivity->getValue('customerID'), $toEmail)) {
 
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getMainSupportRowsByCustomerID($dbeJProblem->getValue('customerID'));
+
+        while ($dbeContact->fetchNext()) {
+            if ($dbeContact->getValue(DBEContact::OthersEmailFlag) == 'Y' &&
+                $dbeContact->getValue(DBEContact::OthersAutoCloseEmailFlag)) {
                 if ($toEmail) {
-                    $toEmail .= ',';
+                    $toEmail .= ",";
                 }
 
-                $toEmail .= $mainSupportEmailAddresses;
-
+                $toEmail .= $dbeContact->getValue(DBEContact::Email);
             }
-
         }
 
         if (!$toEmail) {       // no recipients so no email
@@ -621,14 +616,14 @@ class BUProblemSLA extends Business
 
         $template->setVar(
             array(
-                'contactFirstName' => $dbeJCallActivity->getValue('contactFirstName'),
-                'activityRef' => $activityRef,
-                'reason' => $dbeJCallActivity->getValue('reason'),
-                'lastActivityReason' => $dbeJLastCallActivity->getValue('reason'),
-                'rootCause' => $rootCause,
+                'contactFirstName'            => $dbeJCallActivity->getValue('contactFirstName'),
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue('reason'),
+                'lastActivityReason'          => $dbeJLastCallActivity->getValue('reason'),
+                'rootCause'                   => $rootCause,
                 'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
-                'completeDate' => Controller::dateYMDtoDMY($completeDate),
-                'resolvedEngineerName' => $dbeFixedUser->getValue('firstName') . ' ' . $dbeFixedUser->getValue('lastName')
+                'completeDate'                => Controller::dateYMDtoDMY($completeDate),
+                'resolvedEngineerName'        => $dbeFixedUser->getValue('firstName') . ' ' . $dbeFixedUser->getValue('lastName')
 
             )
         );
@@ -639,10 +634,10 @@ class BUProblemSLA extends Business
 
         $hdrs =
             array(
-                'From' => $senderEmail,
-                'To' => $toEmail,
-                'Subject' => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue('problemID') . ' - Pending Closure on ' . Controller::dateYMDtoDMY($completeDate),
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue('problemID') . ' - Pending Closure on ' . Controller::dateYMDtoDMY($completeDate),
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -650,9 +645,9 @@ class BUProblemSLA extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 

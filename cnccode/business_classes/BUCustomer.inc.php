@@ -203,6 +203,37 @@ class BUCustomer extends Business
         return ($this->getDatasetByPK($contactID, $this->dbeContact, $dsResults));
     }
 
+    function duplicatedEmail($email, $contactID)
+    {
+        if ($email === '') {
+            return true;
+        }
+        $query = "select count(con_contno) as count from contact where con_email = ? ";
+
+        $paramTypes = 's';
+        $params = [
+            $email,
+        ];
+
+        if ($contactID) {
+            $query .= " and con_contno <> ? ";
+            $paramTypes .= "i";
+            $params[] = +$contactID;
+        }
+
+        $params = array_merge([$paramTypes], $params);
+        $refArray = [];
+        foreach ($params as $key => $value) $refArray[$key] = &$params[$key];
+
+        $statement = $this->db->prepare($query);
+        call_user_func_array([$statement, 'bind_param'], $refArray);
+        $result = $statement->execute() ? $statement->get_result() : false;
+
+        $statement->close();
+        $row = $result->fetch_assoc();
+        return $row['count'] > 0;
+    }
+
     /**
      * Get all customer types
      * @parameter DataSet &$dsResults results
@@ -433,16 +464,11 @@ class BUCustomer extends Business
         $dsContact->setValue('SendMailshotFlag', 'Y');
         $dsContact->setValue('AccountsFlag', 'N');
         $dsContact->setValue('StatementFlag', 'N');
-        $dsContact->setValue('Mailshot1Flag', $this->dsHeader->getValue("mailshot1FlagDef"));
         $dsContact->setValue('Mailshot2Flag', $this->dsHeader->getValue("mailshot2FlagDef"));
         $dsContact->setValue('Mailshot3Flag', $this->dsHeader->getValue("mailshot3FlagDef"));
         $dsContact->setValue('Mailshot4Flag', $this->dsHeader->getValue("mailshot4FlagDef"));
-        $dsContact->setValue('Mailshot5Flag', $this->dsHeader->getValue("mailshot5FlagDef"));
-        $dsContact->setValue('Mailshot6Flag', $this->dsHeader->getValue("mailshot6FlagDef"));
-        $dsContact->setValue('Mailshot7Flag', $this->dsHeader->getValue("mailshot7FlagDef"));
         $dsContact->setValue('Mailshot8Flag', $this->dsHeader->getValue("mailshot8FlagDef"));
         $dsContact->setValue('Mailshot9Flag', $this->dsHeader->getValue("mailshot9FlagDef"));
-        $dsContact->setValue('Mailshot10Flag', $this->dsHeader->getValue("mailshot10FlagDef"));
         $dsContact->setValue('Mailshot11Flag', $this->dsHeader->getValue("mailshot11FlagDef"));
         $dsContact->post();
         $this->updateModify($dsContact->getValue('CustomerID'));
@@ -479,9 +505,6 @@ class BUCustomer extends Business
         $dsCustomer->setValue('MailshotFlag', 'Y');
         $dsCustomer->setValue('ReferredFlag', 'N');
         $dsCustomer->setValue('ProspectFlag', 'Y');
-        $dsCustomer->setValue('OthersEmailMainFlag', 'Y');
-        $dsCustomer->setValue('WorkStartedEmailMainFlag', 'Y');
-        $dsCustomer->setValue('AutoCloseEmailMainFlag', 'Y');
         $dsCustomer->setValue('CreateDate', date('Y-m-d'));
         $dsCustomer->setValue('InvoiceSiteNo', 0);
         $dsCustomer->setValue('DeliverSiteNo', 0);
@@ -828,7 +851,12 @@ class BUCustomer extends Business
         return $this->getData($this->dbeCustomer, $dsResults);
     }
 
-    function uploadPortalDocument($customerID, $description, $userfile, $startersFormFlag, $leaversFormFlag, $mainContactOnlyFlag)
+    function uploadPortalDocument($customerID,
+                                  $description,
+                                  $userfile,
+                                  $startersFormFlag,
+                                  $leaversFormFlag,
+                                  $mainContactOnlyFlag)
     {
 
         return $this->addDocument(

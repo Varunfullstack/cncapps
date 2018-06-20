@@ -1268,12 +1268,11 @@ class BUActivity extends Business
         /*
     Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact.
     */
-        if (
-            $dsCustomer->getValue('othersEmailMainFlag') == 'Y' &&
-            $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
-                $dbeJCallActivity->getValue('customerID'),
-                $toEmail
-            )
+        if ($mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
+            $dbeJCallActivity->getValue('customerID'),
+            $toEmail,
+            DBEContact::OthersEmailFlag
+        )
         ) {
 
             $toEmail .= ',' . $mainSupportEmailAddresses;
@@ -5226,7 +5225,7 @@ is currently a balance of ';
         contact
       WHERE
         con_custno = '" . $customerID . "'
-        AND con_mailflag10 = 'Y'";
+        AND supportLevel = 'main'";
 
         $db->query($queryString);
         $db->next_record();
@@ -5246,7 +5245,7 @@ is currently a balance of ';
           contact
         WHERE
           con_custno = '" . $customerID . "'
-          AND con_mailflag5 = 'Y'";
+          AND supportLevel = 'support'";
 
             $db->query($queryString);
             $db->next_record();
@@ -6213,31 +6212,10 @@ is currently a balance of ';
         ) {
             return; // no email to customer for this request
         }
-        /*
-    See whether to copy in the main contact
-    */
-        $copyEmailToMainContact = true;
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dbeJProblem->getValue('customerID'));
 
-        if ($dbeCustomer->getValue('othersEmailMainFlag') == 'N') {
-
-            $copyEmailToMainContact = false;
-
-        } else {
-
-            if (
-                $parameters['templateName'] == 'WorkCommencedEmail' &&
-                $dbeCustomer->getValue('workStartedEmailMainFlag') == 'N'
-            ) {
-                $copyEmailToMainContact = false;
-            }
-
-        }
-        /*
-    End see whether to copy in main contact
-    */
 
         /*
     See whether to send an email to the last activity contact
@@ -6265,17 +6243,18 @@ is currently a balance of ';
     Send the email to all main support email addresses at the client but exclude them if
     $copyEmailToMainContact set to exclude main contacts.
     */
-        if (
-            $copyEmailToMainContact &&
-            $mainSupportEmailAddresses =
-                $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue('customerID'), $toEmail)
-        ) {
 
+
+        if ($parameters['templateName'] == 'WorkCommencedEmail' &&
+            $mainSupportEmailAddresses =
+                $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue('customerID'),
+                                                          $toEmail,
+                                                          DBEContact::OthersWorkStartedEmailFlag)
+        ) {
             if ($toEmail) {
                 $toEmail .= ',';
             }
             $toEmail .= $mainSupportEmailAddresses;
-
         }
 
         if (!$toEmail) {
@@ -6419,7 +6398,7 @@ is currently a balance of ';
           WHERE
             con_email LIKE '%$emailDomain%'
             AND con_custno <> 0
-            AND con_mailflag5 = 'Y'";
+            AND (supportLevel = 'main' or supportLevel = 'support')";
 
         $db->query($sql);
 
@@ -6440,14 +6419,13 @@ is currently a balance of ';
             SELECT
               con_contno,
               con_custno,
-              con_siteno,
-              con_mailflag5
+              con_siteno
             FROM
               contact
             WHERE
               con_email = '" . mysqli_real_escape_string($db->link_id(), $record[senderEmailAddress]) . "'
               AND con_custno <> 0 
-              AND con_mailflag5 = 'Y'";
+              AND (supportLevel = 'main' or supportLevel = 'support')";
 
             $db->query($sql);
             if ($db->next_record()) {
@@ -6476,7 +6454,7 @@ is currently a balance of ';
                 contact
               WHERE
                 con_custno = $customerID
-                and con_mailflag10 = 'Y'";
+                and supportLevel = 'main'";
 
                 $db->query($sql);
 
