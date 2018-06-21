@@ -130,9 +130,9 @@ class CTRenContract extends CTCNC
                     array(
                         'customerName' => $dsRenContract->getValue('customerName'),
                         'itemDescription' => $dsRenContract->getValue('itemDescription'),
-                        'invoiceFromDate' => $this->dateYMDtoDMY($dsRenContract->getValue('invoiceFromDate')),
-                        'invoiceToDate' => $this->dateYMDtoDMY($dsRenContract->getValue('invoiceToDate')),
-                        'notes' => $this->dateYMDtoDMY($dsRenContract->getValue('notes')),
+                        'invoiceFromDate' => Controller::dateYMDtoDMY($dsRenContract->getValue('invoiceFromDate')),
+                        'invoiceToDate' => Controller::dateYMDtoDMY($dsRenContract->getValue('invoiceToDate')),
+                        'notes' => Controller::dateYMDtoDMY($dsRenContract->getValue('notes')),
                         'urlEdit' => $urlEdit,
                         'urlList' => $urlList,
                         'txtEdit' => $txtEdit
@@ -368,7 +368,7 @@ class CTRenContract extends CTCNC
                 'itemID' => Controller::htmlDisplayText($dsRenContract->getValue('itemID')),
                 'itemDescription' => Controller::htmlDisplayText($dsRenContract->getValue('itemDescription')),
                 'invoiceFromDate' => $dsRenContract->getValue('invoiceFromDate'),
-                'installationDate' => $this->dateYMDtoDMY($dsRenContract->getValue('installationDate')),
+                'installationDate' => Controller::dateYMDtoDMY($dsRenContract->getValue('installationDate')),
                 'invoiceToDate' => $dsRenContract->getValue('invoiceToDate'),
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenContract->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenContract->getMessage('invoicePeriodMonths')),

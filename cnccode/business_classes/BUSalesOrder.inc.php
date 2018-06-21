@@ -335,7 +335,11 @@ class BUSalesOrder extends Business
     /**
      * Initialse fields for new quote
      * @parameter integer $customerID
-     * @return bool : Success
+     * @param $dsOrdhead
+     * @param $dsOrdline
+     * @param $dsCustomer
+     * @param string $type
+     * @return void : Success
      * @access public
      */
     function initialiseQuote(&$dsOrdhead, &$dsOrdline, &$dsCustomer, $type = 'Q')
@@ -348,44 +352,44 @@ class BUSalesOrder extends Business
         $dsOrdhead->setUpdateModeInsert();
         $dsOrdhead->addColumn('customerName', DA_STRING, DA_NOT_NULL);
         $dsOrdhead->setValue('customerName', $dsCustomer->getValue(DBECustomer::name));
-        $dsOrdhead->setValue('customerID', $dsCustomer->getValue(DBECustomer::customerID));
-        $dsOrdhead->setValue('type', $type);
+        $dsOrdhead->setValue(DBEOrdhead::customerID, $dsCustomer->getValue(DBECustomer::customerID));
+        $dsOrdhead->setValue(DBEOrdhead::type, $type);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
         $vatCode = $dsHeader->getValue('stdVATCode');
-        $dsOrdhead->setValue('vatCode', $vatCode);
+        $dsOrdhead->setValue(DBEOrdhead::vatCode, $vatCode);
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatRate = $dbeVat->getValue((integer)$vatCode[1]); // get 2nd part of code and use as column no
-        $dsOrdhead->setValue('vatRate', $vatRate);
-        $dsOrdhead->setValue('date', date('Y-m-d'));
+        $dsOrdhead->setValue(DBEOrdhead::vatRate, $vatRate);
+        $dsOrdhead->setValue(DBEOrdhead::date, date('Y-m-d'));
 
         if ($type == 'Q') {
-            $dsOrdhead->setValue('quotationCreateDate', date('Y-m-d'));
+            $dsOrdhead->setValue(DBEOrdhead::quotationCreateDate, date('Y-m-d'));
         }
         // If the order customer is an internal stock location then we set pay method to no invoice
         if (
-            ($dsOrdhead->getValue('customerID') == CONFIG_SALES_STOCK_CUSTOMERID) OR
-            ($dsOrdhead->getValue('customerID') == CONFIG_MAINT_STOCK_CUSTOMERID)
+            ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) OR
+            ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_MAINT_STOCK_CUSTOMERID)
         ) {
-            $dsOrdhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_NO_INVOICE);    // switch to paymentTermsID
+            $dsOrdhead->setValue(DBEOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_NO_INVOICE);    // switch to paymentTermsID
         } else {
-            $dsOrdhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_30_DAYS);    // switch to paymentTermsID
+            $dsOrdhead->setValue(DBEOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_30_DAYS);    // switch to paymentTermsID
         }
-        $dsOrdhead->setValue('partInvoice', 'Y');
-        $dsOrdhead->setValue('addItem', 'Y');
-        $dsOrdhead->setValue('requestedDate', '0000-00-00');
-        $dsOrdhead->setValue('promisedDate', '0000-00-00');
-        $dsOrdhead->setValue('expectedDate', '0000-00-00');
-        $dsOrdhead->setValue('invSiteNo', $dsCustomer->getValue(DBECustomer::invoiceSiteNo));
-        $dsOrdhead->setValue('updatedTime', date('Y-m-d H:i:s'));
+        $dsOrdhead->setValue(DBEOrdhead::partInvoice, 'Y');
+        $dsOrdhead->setValue(DBEOrdhead::addItem, 'Y');
+        $dsOrdhead->setValue(DBEOrdhead::requestedDate, '0000-00-00');
+        $dsOrdhead->setValue(DBEOrdhead::promisedDate, '0000-00-00');
+        $dsOrdhead->setValue(DBEOrdhead::expectedDate, '0000-00-00');
+        $dsOrdhead->setValue(DBEOrdhead::invSiteNo, $dsCustomer->getValue(DBECustomer::invoiceSiteNo));
+        $dsOrdhead->setValue(DBEOrdhead::updatedTime, date('Y-m-d H:i:s'));
         $this->setInvoiceSiteAndContact(
             $dsCustomer->getValue(DBECustomer::customerID),
             $dsCustomer->getValue(DBECustomer::invoiceSiteNo),
             $dsOrdhead
         );
-        $dsOrdhead->setValue('delSiteNo', $dsCustomer->getValue(DBECustomer::deliverSiteNo));
+        $dsOrdhead->setValue(DBEOrdhead::delSiteNo, $dsCustomer->getValue(DBECustomer::deliverSiteNo));
         $this->setDeliverySiteAndContact(
             $dsCustomer->getValue(DBECustomer::customerID),
             $dsCustomer->getValue(DBECustomer::deliverSiteNo),

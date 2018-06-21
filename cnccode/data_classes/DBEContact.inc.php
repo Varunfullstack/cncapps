@@ -90,13 +90,13 @@ class DBEContact extends DBCNCEntity
         $this->addColumn(
             self::lastName,
             DA_STRING,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_last_name"
         );
         $this->addColumn(
             self::firstName,
             DA_STRING,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_first_name"
         );
         $this->addColumn(
@@ -138,7 +138,7 @@ class DBEContact extends DBCNCEntity
         $this->addColumn(
             self::discontinuedFlag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_discontinued"
         );
         $this->addColumn(
@@ -156,67 +156,67 @@ class DBEContact extends DBCNCEntity
         $this->addColumn(
             self::mailshot1Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag1"
         );
         $this->addColumn(
             self::mailshot2Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag2"
         );
         $this->addColumn(
             self::mailshot3Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag3"
         );
         $this->addColumn(
             self::mailshot4Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag4"
         );
         $this->addColumn(
             self::mailshot5Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag5"
         );
         $this->addColumn(
             self::mailshot6Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag6"
         );
         $this->addColumn(
             self::mailshot7Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag7"
         );
         $this->addColumn(
             self::mailshot8Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag8"
         );
         $this->addColumn(
             self::mailshot9Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag9"
         );
         $this->addColumn(
             self::mailshot10Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag10"
         );
         $this->addColumn(
-            "Mailshot11Flag",
+            self::mailshot11Flag,
             DA_YN,
-            DA_ALLOW_NULL,
+            DA_NOT_NULL,
             "con_mailflag11"
         );
         $this->addColumn(
@@ -250,21 +250,26 @@ class DBEContact extends DBCNCEntity
     /**
      * Return Rows By CustomerID
      * @access public
+     * @param $customerID
+     * @param bool $includeInactive
+     * @param bool $supportOnly
      * @return bool Success
      */
-    function getRowsByCustomerID($includeInactive = false)
+    function getRowsByCustomerID($customerID,
+                                 $includeInactive = false,
+                                 $supportOnly = false
+    )
     {
-        $this->setMethodName("getRowsByCustomerID");
-        if ($this->getValue(self::customerID) == '') {
-            $this->raiseError('CustomerID not set');
-        }
+        $this->setValue(
+            self::customerID,
+            $customerID
+        );
         $query =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
 
         if (!$includeInactive) {
-
             $query .=
                 " AND (
 					con_mailshot = 'Y' OR
@@ -277,9 +282,16 @@ class DBEContact extends DBCNCEntity
 					con_mailflag7 = 'Y' OR
 					con_mailflag8 = 'Y' OR
 					con_mailflag9 = 'Y' OR
-					con_mailflag10 = 'Y'
+					con_mailflag10 = 'Y' or
+                    con_mailflag11 = 'Y'
 					)
 					";
+        }
+
+        if ($supportOnly) {
+            $query .= " AND " . $this->getDBColumnName(
+                    self::mailshot5Flag
+                ) . " = 'Y'";    // only nominated support contacts
         }
 
         $query .= " ORDER BY con_mailflag10 DESC, con_first_name, con_last_name";
@@ -327,6 +339,254 @@ class DBEContact extends DBCNCEntity
             " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo)
         );
         return (parent::runQuery()); // ensures it goes to SCOTrans and deleted on UNIX box
+    }
+
+    /**
+     * Return Rows By CustomerID And SiteNo
+     * @access public
+     * @param $customerID
+     * @param $siteNo
+     * @param bool $supportOnly
+     * @return bool Success
+     */
+    function getRowsByCustomerIDSiteNo($customerID,
+                                       $siteNo,
+                                       $supportOnly = false
+    )
+    {
+        $this->setMethodName("getRowsByCustomerIDSiteNo");
+
+        $this->setValue(
+            self::customerID,
+            $customerID
+        );
+        $this->setValue(
+            self::siteNo,
+            $siteNo
+        );
+
+        $sql =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID) .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
+
+        if ($supportOnly) {
+            $sql .= " AND " . $this->getDBColumnName(
+                    self::mailshot5Flag
+                ) . " = 'Y'";        // only nominated support contacts
+        }
+
+        $sql .=
+            " ORDER BY " . $this->getDBColumnName(self::lastName);
+
+        $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
+    /**
+     * Get rows by name match
+     * Excludes discontinued rows
+     * @access public
+     * @return bool Success
+     */
+    function getSupplierContactRowsByNameMatch($match)
+    {
+        $this->setMethodName("getSupplierContactRowsByNameMatch");
+        $ret = FALSE;
+        if ($this->getValue(self::supplierID) == '') {
+            $this->raiseError('supplierID not set');
+        }
+        if ($match == '') {
+            $this->raiseError('$match not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE (" . $this->getDBColumnName(self::lastName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%'" .
+            " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%')" .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::supplierID) . " = " . $this->getFormattedValue(self::supplierID) .
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName)
+
+        );
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    /**
+     * Get customer/site rows by name match
+     * Excludes discontinued rows
+     * @access public
+     * @return bool Success
+     */
+    function getCustomerRowsByNameMatch($match)
+    {
+        $this->setMethodName("getCustomerRowsByNameMatch");
+        $ret = FALSE;
+        if ($this->getValue(self::customerID) == '') {
+            $this->raiseError('customerID not set');
+        }
+        if ($match == '') {
+            $this->raiseError('$match not set');
+        }
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE (" . $this->getDBColumnName(self::lastName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%'" .
+            " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%')" .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $this->getFormattedValue(self::customerID);
+
+        if ($this->getValue(self::siteNo) != '') {
+            $queryString .=
+                " AND " . $this->getDBColumnName(self::siteNo) . " = " . $this->getFormattedValue(self::siteNo);
+        }
+        $queryString .=
+            " AND (
+        con_mailshot = 'Y' OR
+        con_mailflag1 = 'Y' OR
+        con_mailflag2 = 'Y' OR
+        con_mailflag3 = 'Y' OR
+        con_mailflag4 = 'Y' OR
+        con_mailflag5 = 'Y' OR
+        con_mailflag6 = 'Y' OR
+        con_mailflag7 = 'Y' OR
+        con_mailflag8 = 'Y' OR
+        con_mailflag9 = 'Y' OR
+        con_mailflag10 = 'Y' or
+        con_mailflag11 = 'Y'
+        )
+        ";
+
+        $queryString .=
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName);
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    /**
+     * all rows for given supplier
+     */
+    function getSupplierRows()
+    {
+        if ($this->getValue(self::supplierID) == '') {
+            $this->raiseError('supplierID not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::supplierID) . " = " . $this->getFormattedValue(self::supplierID) .
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName)
+
+        );
+        return (parent::getRows());
+    }
+
+    /* contact to send gsc statements to */
+    function getGSCRowsByCustomerID($customerID)
+    {
+        if ($customerID == '') {
+            $this->raiseError('customerID not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_GSC_STATEMENT_FLAG) . " = 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
+        );
+        return (parent::getRows());
+    }
+
+    function getMainSupportRowsByCustomerID($customerID)
+    {
+        if ($customerID == '') {
+            $this->raiseError('customerID not set');
+        }
+        $sql =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_MAIN_CONTACT_FLAG) . " = 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
+        $this->setQueryString($sql);
+        return (parent::getRows());
+    }
+
+    function getSupportRows($customerID = false)
+    {
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_SUPPORT_CONTACT_FLAG) . " = 'Y'
+        AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+
+        if ($customerID) {
+            $sql .= " AND con_custno = " . $customerID;
+        }
+        $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
+    function getTechnicalMailshotRows()
+    {
+        $this->setQueryString(
+            "SELECT
+        contact.*
+      FROM contact
+          JOIN customer ON cus_custno = con_custno
+      WHERE cus_mailshot = 'Y'
+        AND " . $this->getDBColumnName(CONFIG_HEADER_TECHNICAL_MAILSHOT_CONTACT_FLAG) . " = 'Y'
+        AND " . $this->getDBColumnName(CONFIG_HEADER_SUPPORT_CONTACT_FLAG) . " = 'Y'
+        AND cus_prospect = 'N'"
+        );
+
+        return (parent::getRows());
+    }
+
+    function getInvoiceContactsByCustomerID($customerID)
+    {
+        if ($customerID == '') {
+            $this->raiseError('customerID not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_INVOICE_CONTACT) . " = 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
+
+        );
+        return (parent::getRows());
+    }
+
+    function getMainContacts($customerID)
+    {
+        if ($customerID == '') {
+            $this->raiseError('customerID not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
+
+        );
+        return (parent::getRows());
     }
 
     /**

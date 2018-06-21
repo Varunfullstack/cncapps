@@ -7,6 +7,9 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEBroadbandServiceType extends DBEntity
 {
+    const broadbandServiceTypeID = "broadbandServiceTypeID";
+    const description = "description";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +21,16 @@ class DBEBroadbandServiceType extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("broadbandservicetype");
-        $this->addColumn("broadbandServiceTypeID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("description", DA_TEXT, DA_NOT_NULL);
+        $this->addColumn(
+            self::broadbandServiceTypeID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::description,
+            DA_TEXT,
+            DA_NOT_NULL
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

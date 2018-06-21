@@ -1385,8 +1385,7 @@ class CTActivity extends CTCNC
                 $dbeCallActivity,
                 $_SESSION['includeTravel'],
                 $_SESSION['includeOperationalTasks'],
-                $_SESSION['includeServerGuardUpdates'],
-                $_SESSION['context']
+                $_SESSION['includeServerGuardUpdates']
             );
 
         /*
@@ -3401,12 +3400,7 @@ class CTActivity extends CTCNC
         $dbeContact = new DBEContact($this);
         $dbeSite = new DBESite($this);
 
-        $dbeContact->setValue(
-            'customerID',
-            $customerID
-        );
-
-        $dbeContact->getRowsByCustomerID();
+        $dbeContact->getRowsByCustomerID($customerID);
 
         $this->template->set_block(
             $templateName,
@@ -4903,17 +4897,10 @@ class CTActivity extends CTCNC
             $_REQUEST['callActivityID'],
             $_REQUEST['callActivityTypeID'],
             false,
-            // Customer COntact
             $_REQUEST['reason'],
-            // Reason
-            false,
-            // ServerGuard?
             true,
-            // if unallocated set to current user?
             false,
-            // set end time?
             $GLOBALS['auth']->is_authenticated(),
-            // userID
             $_REQUEST['moveToUsersQueue']
         );
 
@@ -4967,9 +4954,7 @@ class CTActivity extends CTCNC
                 CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
                 $customerproblem['cpr_contno'],
                 $customerproblem['cpr_reason'],
-                $customerproblem['cpr_serverguard_flag'],
                 false,
-                // don't allocate to current user
                 true,
                 USER_SYSTEM
             );

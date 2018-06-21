@@ -8,7 +8,7 @@
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
-require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
+require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 define('BUCUSTOMER_NAME_STR_NT_PASD', 'No name string passed');
@@ -137,9 +137,9 @@ class BUCustomer extends Business
 
     /**
      * Get site by customerID and SiteNo
-     * @param $customerID
-     * @param $siteNo
-     * @param $dsResults
+     * @param integer $customerID
+     * @param integer $siteNo
+     * @param DataSet $dsResults
      * @return bool : Success
      * @access public
      */
@@ -169,8 +169,7 @@ class BUCustomer extends Business
         if ($customerID == '') {
             $this->raiseError('customerID not passed');
         }
-        $this->dbeContact->setValue("customerID", $customerID);
-        $this->dbeContact->getRowsByCustomerID();
+        $this->dbeContact->getRowsByCustomerID($customerID);
         return ($this->getData($this->dbeContact, $dsResults));
     }
 
@@ -399,8 +398,8 @@ class BUCustomer extends Business
         $dsCustomer->setValue(DBECustomer::referredFlag, 'N');
         $dsCustomer->setValue(DBECustomer::prospectFlag, 'Y');
         $dsCustomer->setValue(DBECustomer::createDate, date('Y-m-d'));
-        $dsCustomer->setValue(DBECustomer::invSiteNo, 0);
-        $dsCustomer->setValue(DBECustomer::delSiteNo, 0);
+        $dsCustomer->setValue(DBECustomer::invoiceSiteNo, 0);
+        $dsCustomer->setValue(DBECustomer::deliverSiteNo, 0);
         $dsCustomer->setValue(DBECustomer::customerTypeID, 0);
         $dsCustomer->post();
     }

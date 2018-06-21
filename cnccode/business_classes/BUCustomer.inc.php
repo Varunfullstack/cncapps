@@ -176,6 +176,7 @@ class BUCustomer extends Business
      * Get contact rows by customerID
      * @param integer $customerID
      * @param DataSet &$dsResults results
+     * @param bool $includeInactive
      * @return bool : Success
      * @access public
      */
@@ -185,8 +186,7 @@ class BUCustomer extends Business
         if ($customerID == '') {
             $this->raiseError('customerID not passed');
         }
-        $this->dbeContact->setValue(DBEContact::customerID, $customerID);
-        $this->dbeContact->getRowsByCustomerID($includeInactive);
+        $this->dbeContact->getRowsByCustomerID($customerID, $includeInactive);
         return ($this->getData($this->dbeContact, $dsResults));
     }
 

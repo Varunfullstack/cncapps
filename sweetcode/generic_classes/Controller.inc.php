@@ -894,7 +894,7 @@ class Controller extends BaseObject
      * @param string $separator
      * @return string
      */
-    function dateYMDtoDMY($dateYMD, $separator = '/')
+    public static function dateYMDtoDMY($dateYMD, $separator = '/')
     {
         if (($dateYMD == '') OR ($dateYMD == '0000-00-00')) {
             return '';

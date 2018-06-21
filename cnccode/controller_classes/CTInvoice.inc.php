@@ -719,7 +719,7 @@ class CTInvoice extends CTCNC
                 'invheadID'        => $invheadID,
                 'contactID'        => $dsInvhead->getValue('contactID'),
                 'contactName'      => Controller::htmlInputText($dsInvhead->getValue('firstName') . ' ' . $dsInvhead->getValue('lastName')),
-                'datePrinted'      => $this->dateYMDtoDMY($datePrinted),
+                'datePrinted'      => Controller::dateYMDtoDMY($datePrinted),
                 'custPORef'        => Controller::htmlInputText($dsInvhead->getValue('custPORef')),
                 'customerName'     => Controller::htmlDisplayText($dsInvhead->getValue('customerName')),
                 'vatCode'          => Controller::htmlDisplayText($dsInvhead->getValue('vatCode')),

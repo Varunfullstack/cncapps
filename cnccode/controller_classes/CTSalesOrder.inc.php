@@ -3440,7 +3440,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->set_var(
             array(
-                'etaDate' => $this->dateYMDtoDMY($dsInput->getValue('etaDate')),
+                'etaDate' => Controller::dateYMDtoDMY($dsInput->getValue('etaDate')),
                 'etaDateMessage' => $dsInput->getMessage('etaDate'),
 
                 'serviceRequestText' => $dsInput->getValue('serviceRequestText'),
