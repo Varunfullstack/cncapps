@@ -6,7 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrderDocument.inc.php');

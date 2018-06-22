@@ -6,7 +6,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg["path_bu"] . "/BUContact.inc.php");
 require_once($cfg['path_dbe'] . "/DBEJSite.php");
 define('BUSITE_MATCH_STR_NT_PASD', 'No match string passed');

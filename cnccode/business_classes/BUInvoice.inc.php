@@ -11,7 +11,7 @@ require_once($cfg["path_dbe"] . "/DBEInvline.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJInvline.inc.php");
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUSite.inc.php');
 require_once($cfg['path_bu'] . '/BUSageExport.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');

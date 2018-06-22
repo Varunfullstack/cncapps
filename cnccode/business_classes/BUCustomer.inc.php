@@ -173,6 +173,27 @@ class BUCustomer extends Business
     }
 
     /**
+     * Get site by customerID and SiteNo
+     * @param integer $customerID
+     * @param integer $siteNo
+     * @param DataSet $dsResults
+     * @return bool : Success
+     * @access public
+     */
+    function getSiteByCustomerIDSiteNo($customerID, $siteNo, &$dsResults)
+    {
+        $this->setMethodName('getSiteByCustomerIDSiteNo');
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+        $this->dbeSite->setValue(DBESite::customerID, $customerID);
+        $this->dbeSite->setValue(DBESite::siteNo, $siteNo);
+        $this->dbeSite->getRowByCustomerIDSiteNo();
+        $this->getData($this->dbeSite, $dsResults);
+        return TRUE;
+    }
+
+    /**
      * Get contact rows by customerID
      * @param integer $customerID
      * @param DataSet &$dsResults results
@@ -216,7 +237,7 @@ class BUCustomer extends Business
     function getCustomerTypes(&$dsResults)
     {
         $this->setMethodName('getCustomerTypes');
-        $this->dbeCustomerType->getRows('description');
+        $this->dbeCustomerType->getRows(DBECustomerType::description);
         return ($this->getData($this->dbeCustomerType, $dsResults));
     }
 
@@ -512,12 +533,197 @@ class BUCustomer extends Business
         $dsCustomer->post();
     }
 
+    /**
+     * Get contact rows by customerID
+     * @parameter integer $customerID
+     * @parameter DataSet &$dsResults results
+     * @return bool : Success
+     * @access public
+     */
+    function getContactsByCustomerIDSiteNo($customerID, $siteNo, &$dsResults, $supportContacts = false)
+    {
+        $this->setMethodName('getContactsByCustomerIDSiteNo');
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+        if ($siteNo == '') {
+            $this->raiseError('siteNo not passed');
+        }
+        $this->dbeContact->getRowsByCustomerIDSiteNo($customerID, $siteNo, $supportContacts);
+        return ($this->getData($this->dbeContact, $dsResults));
+    }
+
+    /**
+     * Get support contact rows by customerID
+     * @param integer $customerID
+     * @param integer $siteNo
+     * @param DataSet $dsResults
+     * @return bool : Success
+     * @access public
+     */
+    function getSupportContactsByCustomerIDSiteNo($customerID, $siteNo, &$dsResults)
+    {
+        $this->setMethodName('getSupportContactsByCustomerIDSiteNo');
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+        if ($siteNo == '') {
+            $this->raiseError('siteNo not passed');
+        }
+        $this->dbeContact->getSupportRowsByCustomerIDSiteNo($customerID, $siteNo);
+        return ($this->getData($this->dbeContact, $dsResults));
+    }
+
+    /**
+     * Is contact a nominated support contact
+     * @parameter integer $contactID
+     * @return bool : True = support contact
+     * @access public
+     */
+    function isASupportContact($contactID)
+    {
+        $this->setMethodName('isASupportContact');
+        if ($contactID == '') {
+            $this->raiseError('contactID not passed');
+        }
+        $this->dbeContact->getRow($contactID);
+        if ($this->dbeContact->getValue('mailshot5Flag') == 'Y') {
+            $ret = true;
+        } else {
+            $ret = false;
+        }
+        return $ret;
+    }
+
     function setProspectFlagOff($customerID)
     {
         $this->dbeCustomer->getRow($customerID);
         $this->dbeCustomer->setValue(DBECustomer::prospectFlag, 'N');
         $this->dbeCustomer->setValue(DBECustomer::modifyDate, date('Y-m-d H:i:s'));
         return ($this->dbeCustomer->updateRow());
+    }
+
+    /**
+     * @param int $contactID
+     * @return string
+     */
+    function getContactPhone($contactID)
+    {
+        // if we have a contact then get all the phone details for display
+        /** @var DataSet $dsContact */
+        $this->getContactByID($contactID, $dsContact);
+//		$dsContact->fetchNext();
+        /** @var DataSet $dsSite */
+        $this->getSiteByCustomerIDSiteNo(
+            $dsContact->getValue('customerID'),
+            $dsContact->getValue('siteNo'),
+            $dsSite
+        );
+        $dsContact->fetchNext();
+
+        if ($dsSite->getValue(DBESite::phone) != '') {
+            $contactPhone = $dsSite->getValue(DBESite::phone);
+        }
+        if ($dsContact->getValue('phone') != '') {
+            $contactPhone .= ' DDI: ' . $dsContact->getValue('phone');
+        }
+        if ($dsContact->getValue('mobilePhone') != '') {
+            $contactPhone .= ' Mobile: ' . $dsContact->getValue('mobilePhone');
+        }
+        return $contactPhone;
+    }
+
+    /**
+     * This version includes tel: tags for soft phone dialing from browser
+     */
+    function getContactPhoneForHtml($contactID)
+    {
+        /** @var DataSet $dsContact */
+        $this->getContactByID($contactID, $dsContact);
+        /** @var DataSet $dsSite */
+        $this->getSiteByCustomerIDSiteNo(
+            $dsContact->getValue('customerID'),
+            $dsContact->getValue('siteNo'),
+            $dsSite
+        );
+        $dsContact->fetchNext();
+
+        if ($dsSite->getValue(DBESite::phone) != '') {
+            $contactPhone = '<a href="tel:' . str_replace(' ',
+                                                          '',
+                                                          $dsSite->getValue(DBESite::phone)) . '">' . $dsSite->getValue(DBESite::phone) . '</a>';
+        }
+        if ($dsContact->getValue('phone') != '') {
+            $contactPhone .= ' DDI: <a href="tel:' . str_replace(' ',
+                                                                 '',
+                                                                 $dsContact->getValue('phone')) . '">' . $dsContact->getValue('phone') . '</a>';
+        }
+        if ($dsContact->getValue('mobilePhone') != '') {
+            $contactPhone .= ' Mobile: <a href="tel:' . str_replace(' ',
+                                                                    '',
+                                                                    $dsContact->getValue('mobilePhone')) . '">' . $dsContact->getValue('mobilePhone') . '</a>';
+        }
+        return $contactPhone;
+    }
+
+    /**
+     * Get all the invoice contacts
+     * @parameter CustomerID CustomerID
+     * @return bool : Success
+     * @access public
+     */
+    function getInvoiceContactsByCustomerID($customerID, &$dsData)
+    {
+        $this->setMethodName('getInvoiceContactsByCustomerID');
+
+        $this->dbeContact->getInvoiceContactsByCustomerID($customerID);
+
+        $ret = $this->getData($this->dbeContact, $dsData);
+        return $ret;
+
+    }
+
+
+    /**
+     * Get main support contact rows by customerID
+     * i.e. those contacts with mailFlag10 = Y
+     * @parameter integer $customerID
+     * @parameter DataSet &$dsResults results
+     * @return bool : Success
+     * @access public
+     */
+    function getMainSupportEmailAddresses($customerID, $excludeEmail)
+    {
+        $this->setMethodName('getMainSupportEmailAddresses');
+
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+
+        $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
+
+        $emailList = false;
+
+        while ($this->dbeContact->fetchNext()) {
+
+            // exclude excluded or duplicated emails
+            if (
+                ($this->dbeContact->getValue('email') != $excludeEmail)
+                AND
+                (strpos($this->dbeContact->getValue('email'), $emailList) == FALSE)
+            ) {
+                $emailList .= $this->dbeContact->getValue('email') . ',';
+
+            }
+
+        }
+
+        if ($emailList) {
+            return substr($emailList, 0, -1);            // remove trailing comma
+        } else {
+            return false;
+        }
+
     }
 
     /**
@@ -620,6 +826,30 @@ class BUCustomer extends Business
         return TRUE;    // no rows on dependent tables
     }
 
+    /**
+     *    Delete sites and contacts
+     * @param $customerID
+     * @return array
+     */
+    function getMainSupportContacts($customerID)
+    {
+        $this->setMethodName('getMainSupportContacts');
+
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+
+        $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
+        $contacts = [];
+        while ($this->dbeContact->fetchNext()) {
+            $contacts[] = [
+                "firstName" => $this->dbeContact->getValue('firstName'),
+                "lastName"  => $this->dbeContact->getValue('lastName')
+            ];
+        }
+
+        return $contacts;
+    }
     /**
      *    Delete sites and contacts
      * @param $customerID
@@ -794,6 +1024,21 @@ class BUCustomer extends Business
 
         return CUSTOMER_DIR_FROM_BROWSER . '/' . $this->dbeCustomer->getValue(DBECustomer::name);
 
+    }
+
+    function getDailyCallList(&$dsResults, $sortColumn = false)
+    {
+        if ($this->owner->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
+            $reviewUserID = false;
+        } else {
+            $reviewUserID = $GLOBALS['auth']->is_authenticated();
+        }
+
+        $this->dbeCustomer->getReviewList($reviewUserID, $sortColumn);
+
+        $ret = $this->getData($this->dbeCustomer, $dsResults);
+
+        return $ret;
     }
 
     /**

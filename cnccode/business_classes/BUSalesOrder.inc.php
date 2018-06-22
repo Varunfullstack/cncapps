@@ -14,7 +14,7 @@ require_once($cfg["path_dbe"] . "/DBEOrdlinePO.inc.php"); // for Puchase orders
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBEVat.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
 require_once($cfg["path_bu"] . "/BURenQuotation.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');

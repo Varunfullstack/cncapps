@@ -14,7 +14,7 @@ require_once($cfg['path_dbe'] . '/DBEJRenBroadband.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJRenQuotation.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJRenHosting.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUExternalItem.inc.php');
 require_once($cfg ['path_bu'] . '/BURenBroadband.inc.php');

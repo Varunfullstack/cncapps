@@ -12,7 +12,7 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerItemDocument.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJContract.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 
 class BUCustomerItem extends Business
 {

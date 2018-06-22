@@ -11,7 +11,7 @@ require_once($cfg["path_dbe"] . "/DBEJPrizewinner.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . "/BUContact.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 
 class BUPrizewinner extends Business
 {

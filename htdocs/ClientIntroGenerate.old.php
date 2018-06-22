@@ -16,7 +16,7 @@ page_open(
 		''
 	)
 );
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg['path_gc'] . '/Controller.inc.php');
 $buCustomer = new BUCustomer($this);

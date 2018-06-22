@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerReviewMeeting.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_bu'] . '/BUContact.inc.php');
 require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');

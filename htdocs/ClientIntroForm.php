@@ -1,7 +1,7 @@
 <?php
 require_once("config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 GLOBAL $cfg;
 page_open(
 	array(

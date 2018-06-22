@@ -1,7 +1,6 @@
 <?php /**
  * Customer business class
  *
- * NOTE: uses new lower-case standard database classes
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
@@ -10,19 +9,28 @@ require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
+require_once($cfg["path_dbe"] . "/DBECustomerLeadStatus.php");
+require_once($cfg["path_dbe"] . "/DBELeadStatus.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 define('BUCUSTOMER_NAME_STR_NT_PASD', 'No name string passed');
 
 class BUCustomer extends Business
 {
-    protected $dbeCustomer;
-    protected $dbeSite;
+    var $dbeCustomer = "";
+    var $dbeSite = "";
+    var $dbeContact = "";
     /**
-     * @var DBEContact $dbeContact
+     * @var DBECustomerType
      */
-    protected $dbeContact;
-    protected $dbeCustomerType;
-    protected $dsHeader;
+    var $dbeCustomerType;
+
+    /**
+     * @var DBECustomerLeadStatus
+     */
+    protected $dbeCustomerLeadStatuses;
+    var $buHeader = '';
+    /** @var DBEHeader */
+    public $dsHeader;
 
     /**
      * Constructor
@@ -36,23 +44,46 @@ class BUCustomer extends Business
         $this->dbeSite = new DBESite($this);
         $this->dbeContact = new DBEContact($this);
         $this->dbeCustomerType = new DBECustomerType($this);
+        $this->dbeCustomerLeadStatuses = new DBECustomerLeadStatus($this);
+        $this->buHeader = new BUHeader($this);
+        $this->buHeader->getHeader($this->dsHeader);
+        $this->dsHeader->fetchNext();
     }
 
     /**
      * Get customer rows whose names match the search string or, if the string is numeric, try to select by customerID
-     * @parameter String $nameSearchString String to match against or numeric customerID
-     * @parameter DataSet &$dsResults results
+     * @param String $nameSearchString String to match against or numeric customerID
+     * @param DataSet &$dsResults results
      * @return bool : One or more rows
      * @access public
      */
-    function getCustomersByNameMatch($contactString, $phoneString, $nameMatchString, $town, &$dsResults)
+    function getCustomersByNameMatch(
+        $contactString = '',
+        $phoneString = '',
+        $nameMatchString = '',
+        $town = '',
+        $newCustomerFromDate = '',
+        $newCustomerToDate = '',
+        $droppedCustomerFromDate = '',
+        $droppedCustomerToDate = '',
+        &$dsResults
+    )
     {
         $this->setMethodName('getCustomersByNameMatch');
         $nameMatchString = trim($nameMatchString);
         if (is_numeric($nameMatchString)) {
             $ret = ($this->getCustomerByID($nameMatchString, $dsResults));
         } else {
-            $this->dbeCustomer->getRowsByNameMatch($contactString, $phoneString, $nameMatchString, $town);
+            $this->dbeCustomer->getRowsByNameMatch(
+                $contactString,
+                $phoneString,
+                $nameMatchString,
+                $town,
+                $newCustomerFromDate,
+                $newCustomerToDate,
+                $droppedCustomerFromDate,
+                $droppedCustomerToDate
+            );
             $ret = ($this->getData($this->dbeCustomer, $dsResults));
         }
         return $ret;
@@ -60,8 +91,8 @@ class BUCustomer extends Business
 
     /**
      * Get customer row by customerID
-     * @parameter integer $customerID
-     * @parameter DataSet &$dsResults results
+     * @param integer $customerID
+     * @param DataSet &$dsResults results
      * @return bool : Success
      * @access public
      */
@@ -73,27 +104,32 @@ class BUCustomer extends Business
 
     /**
      * Get site rows by customerID
-     * @parameter integer $customerID
-     * @parameter DataSet &$dsResults results
+     * @param integer $customerID
+     * @param DataSet &$dsResults results
      * @return bool : Success
      * @access public
      */
-    function getSitesByCustomerID($customerID, &$dsResults)
+    function getSitesByCustomerID($customerID, &$dsResults, $showInactiveSites)
     {
         $this->setMethodName('getSitesByCustomerID');
         if ($customerID == '') {
             $this->raiseError('CustomerID not passed');
         }
         $this->dbeSite->setValue(DBESite::customerID, $customerID);
-        $this->dbeSite->getRowsByCustomerID();
+        if ($showInactiveSites) {
+            $activeFlag = 'N';
+        } else {
+            $activeFlag = 'Y';
+        }
+        $this->dbeSite->getRowsByCustomerID($activeFlag);
         return ($this->getData($this->dbeSite, $dsResults));
     }
 
     /**
      * Get invoice site by customerID
-     * @parameter integer $customerID
-     * @parameter integer $siteNo
-     * @parameter DataSet &$dsResults results
+     * @param integer $customerID
+     * @param DataSet &$dsResults results
+     * @param $dsContact
      * @return bool : Success
      * @access public
      */
@@ -101,8 +137,9 @@ class BUCustomer extends Business
     {
         $this->setMethodName('getInvoiceSiteByCustomerID');
         if ($customerID == '') {
-            $this->raiseError('customerID not passed');
+            $this->raiseError('CustomerID not passed');
         }
+        /** @var DataSet $dsCustomer */
         $this->getCustomerByID($customerID, $dsCustomer);
         $this->dbeSite->setValue(DBESite::customerID, $customerID);
         $this->dbeSite->setValue(DBESite::siteNo, $dsCustomer->getValue(DBECustomer::invoiceSiteNo));
@@ -114,8 +151,8 @@ class BUCustomer extends Business
 
     /**
      * Get invoice site by customerID, siteNo
-     * @param $customerID
-     * @param DataSet $dsResults
+     * @param integer $customerID
+     * @param DataSet &$dsResults results
      * @param $dsContact
      * @return void : Success
      * @access public
@@ -124,7 +161,7 @@ class BUCustomer extends Business
     {
         $this->setMethodName('getDeliverySiteByCustomerID');
         if ($customerID == '') {
-            $this->raiseError('customerID not passed');
+            $this->raiseError('CustomerID not passed');
         }
         /** @var DataSet $dsCustomer */
         $this->getCustomerByID($customerID, $dsCustomer);
@@ -158,25 +195,26 @@ class BUCustomer extends Business
 
     /**
      * Get contact rows by customerID
-     * @parameter integer $customerID
-     * @parameter DataSet &$dsResults results
+     * @param integer $customerID
+     * @param DataSet &$dsResults results
+     * @param bool $includeInactive
      * @return bool : Success
      * @access public
      */
-    function getContactsByCustomerID($customerID, &$dsResults)
+    function getContactsByCustomerID($customerID, &$dsResults, $includeInactive = false)
     {
         $this->setMethodName('getContactsByCustomerID');
         if ($customerID == '') {
             $this->raiseError('customerID not passed');
         }
-        $this->dbeContact->getRowsByCustomerID($customerID);
+        $this->dbeContact->getRowsByCustomerID($customerID, $includeInactive);
         return ($this->getData($this->dbeContact, $dsResults));
     }
 
     /**
      * Get contact rows by customerID
-     * @parameter integer $customerID
-     * @parameter DataSet &$dsResults results
+     * @param integer $customerID
+     * @param DataSet &$dsResults results
      * @return bool : Success
      * @access public
      */
@@ -191,34 +229,106 @@ class BUCustomer extends Business
 
     /**
      * Get all customer types
-     * @parameter DataSet &$dsResults results
+     * @param DataSet &$dsResults results
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
     function getCustomerTypes(&$dsResults)
     {
         $this->setMethodName('getCustomerTypes');
-        $this->dbeCustomerType->getRows();
+        $this->dbeCustomerType->getRows(DBECustomerType::description);
         return ($this->getData($this->dbeCustomerType, $dsResults));
     }
 
     /**
+     * @param DataSet $dsResults
+     * @return bool
+     */
+    function getCustomerLeadStatuses(&$dsResults)
+    {
+        $this->dbeCustomerLeadStatuses->getRows('name');
+        return ($this->getData($this->dbeCustomerLeadStatuses, $dsResults));
+    }
+
+    /**
+     * @param null $leadStatusID
+     * @return DBEContact
+     */
+    function getMainContactsByLeadStatus($leadStatusID = null)
+    {
+        return $this->dbeContact->getMainContactsByLeadStatus($leadStatusID);
+    }
+
+    /**
+     * Get all lead status rows
+     * @param DataSet &$dsResults results
+     * @return bool : Success
+     * @access public
+     */
+    function getLeadStatus(&$dsResults)
+    {
+        $this->setMethodName('getLeadStatus');
+        $dbeLeadStatus = new DBELeadStatus($this);
+        $dbeLeadStatus->getRows();
+        return ($this->getData($dbeLeadStatus, $dsResults));
+    }
+
+    /**
      * Update customer
-     * @parameter DataSet &$dsData dataset to apply
+     * @param DataSet &$dsData dataset to apply
      * @return bool : Success
      * @access public
      */
     function updateCustomer(&$dsData)
     {
         $this->setMethodName('updateCustomer');
+        if ($dsData->getValue(DBECustomer::name) == '') {
+            $this->raiseError('Customer Name is empty!');
+            exit;
+        }
+        $dsData->setValue(DBECustomer::modifyDate, date('Y-m-d H:i:s'));
+        $dsData->setValue(DBECustomer::modifyUserID, $GLOBALS ['auth']->is_authenticated());
+
+        $this->dbeCustomer->setCallbackMethod(DA_BEFORE_POST, $this, 'beforeUpdateCustomer');
+
         return ($this->updateDataaccessObject($dsData, $this->dbeCustomer));
+    }
+
+    /**
+     * @param DataSet $newRow
+     */
+    function beforeUpdateCustomer(&$newRow)
+    {
+        $customerID = $newRow->getPkValue();
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($customerID);
+        if ($dbeCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(DBECustomer::lastReviewMeetingDate)) {
+            $newRow->setValue(DBECustomer::reviewMeetingEmailSentFlag, 'N');
+        }
+    }
+
+    function updateModify($customerID)
+    {
+        if (!$customerID) {
+            $this->raiseError('customerID not set');
+        }
+        $this->setMethodName('updateModify');
+        $this->dbeCustomer->getRow($customerID);
+        if ($this->dbeCustomer->getValue(DBECustomer::name) == '') {
+            $this->raiseError('Customer Name is empty for customer ' . $customerID);
+            exit;
+        }
+        $this->dbeCustomer->setValue(DBECustomer::modifyDate, date('Y-m-d H:i:s'));
+        $this->dbeCustomer->setValue(DBECustomer::modifyUserID, $GLOBALS ['auth']->is_authenticated());
+        $this->dbeCustomer->updateRow();
     }
 
     /**
      * Insert customer
      * This also creates site and contact row to be completed. We pass dsSite and dsContact by ref for use afterwards
      * to avoid having to query the database from CTCustomer
-     * @param DataSet $dsData
+     * @param DataSet &$dsData dataset to apply
      * @param DataSet $dsSite
      * @param DataSet $dsContact
      * @return bool : Success
@@ -228,16 +338,19 @@ class BUCustomer extends Business
     {
         $this->setMethodName('insertCustomer');
         $ret = ($this->updateCustomer($dsData));
-        $this->addNewSiteRow($dsSite, $dsData->getValue('customerID'));                        // New customerID
+        $this->addNewSiteRow($dsSite,
+                             $dsData->getValue(DBECustomer::customerID));                        // New customerID
         $dsSite->initialise();
         $this->dbeSite->setCallbackMethod(DA_BEFORE_POST, $this, 'setSageRef');
         $ret = $ret & ($this->updateSite($dsSite));
         $this->dbeSite->resetCallbackMethod(DA_BEFORE_POST);
-        $this->addNewContactRow($dsContact, $dsData->getValue('customerID'), '0'); // First siteno always zero
+        $this->addNewContactRow($dsContact,
+                                $dsData->getValue(DBECustomer::customerID),
+                                '0'); // First siteno always zero
         $ret = $ret & ($this->updateContact($dsContact));
         $dsSite->setUpdateModeUpdate();
-        $dsSite->setValue(DBESite::deliverContactID, $dsContact->getValue('contactID'));
-        $dsSite->setValue(DBESite::invoiceContactID, $dsContact->getValue('contactID'));
+        $dsSite->setValue(DBESite::deliverContactID, $dsContact->getValue(DBEContact::contactID));
+        $dsSite->setValue(DBESite::invoiceContactID, $dsContact->getValue(DBEContact::contactID));
         $dsSite->post();
         $ret = $ret & ($this->updateSite($dsSite));        // Then update site delivery and invoice contacts
         return $ret;
@@ -245,7 +358,7 @@ class BUCustomer extends Business
 
     /**
      * Update site
-     * @parameter DataSet &$dsData dataset to apply
+     * @param DataSet $dsData
      * @return bool : Success
      * @access public
      */
@@ -255,30 +368,29 @@ class BUCustomer extends Business
         $this->dbeSite->setCallbackMethod(DA_AFTER_COLUMNS_CREATED, $this, 'setCustomerID');
         $ret = ($this->updateDataaccessObject($dsData, $this->dbeSite));
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
+        $this->updateModify($dsData->getValue(DBESite::customerID));
         return $ret;
     }
 
     /**
      * by default, replicate() function only sets the siteNo (PK column) before setUPdateModeUpdate
      * so we jump in to set the customerID as well because DBESite has a composite PK
-     * @parameter DataSet &$dsData dataset Not used
-     * @parameter dbeEntity &$dbeSite site database entity
-     * @param DataSet $source
-     * @param DataSet $dbeSite
+     * @param DataSet &$source dataset Not used
+     * @param DBESite &$dbeSite site database entity
      * @return bool : Success
      * @access public
      */
     function setCustomerID(&$source, &$dbeSite)
     {
-        $dbeSite->setValue(DBESite::customerID, $source->getValue(DBESite::customerID));
+        $dbeSite->setValue(DBESite::customerID, $source->getValue(DBECustomer::customerID));
         return TRUE;
     }
 
     /**
      * Calculate a unique Sage Reference for new customer site
      * Based upon uppercase first two non-space characters of name plus integer starting at 1 (e.g. KA002)
-     * @param DataSet $source
-     * @param DataSet $dbeSite
+     * @param DataSet &$source dataset
+     * @param DBESite &$dbeSite site database entity
      * @return bool : Success
      * @access public
      */
@@ -308,20 +420,23 @@ class BUCustomer extends Business
 
     /**
      * Update contact
-     * @parameter DataSet &$dsData dataset to apply
+     * @param DataSet &$dsData dataset to apply
      * @return bool : Success
      * @access public
      */
     function updateContact(&$dsData)
     {
         $this->setMethodName('updateContact');
-        return ($this->updateDataaccessObject($dsData, $this->dbeContact));
+        $ret = $this->updateDataaccessObject($dsData, $this->dbeContact);
+        $this->updateModify($dsData->getValue(DBEContact::customerID));
+        return $ret;
+
     }
 
     /**
      * @param DataSet $dsContact
      * @param $customerID
-     * @param DataSet $siteNo
+     * @param $siteNo
      * @return bool
      */
     function addNewContactRow(&$dsContact, $customerID, $siteNo)
@@ -337,28 +452,28 @@ class BUCustomer extends Business
         }
         $dsContact->clearCurrentRow();
         $dsContact->setUpdateModeInsert();
-        $dsContact->setValue('contactID', 0);
-        $dsContact->setValue('customerID', $customerID);
-        $dsContact->setValue('firstName', 'First Name');
-        $dsContact->setValue('lastName', 'Last Name');
-        $dsContact->setValue('siteNo', $siteNo);
-        $dsContact->setValue('discontinuedFlag', 'N');
-        $dsContact->setValue('sendMailshotFlag', 'Y');
-        $buHeader = new BUHeader($this);
-        /** @var DataSet $dsHeader */
-        $buHeader->getHeader($dsHeader);
-        $dsHeader->fetchNext();
-        $dsContact->setValue('mailshot1Flag', $dsHeader->getValue("mailshot1FlagDef"));
-        $dsContact->setValue('mailshot2Flag', $dsHeader->getValue("mailshot2FlagDef"));
-        $dsContact->setValue('mailshot3Flag', $dsHeader->getValue("mailshot3FlagDef"));
-        $dsContact->setValue('mailshot4Flag', $dsHeader->getValue("mailshot4FlagDef"));
-        $dsContact->setValue('mailshot5Flag', $dsHeader->getValue("mailshot5FlagDef"));
-        $dsContact->setValue('mailshot6Flag', $dsHeader->getValue("mailshot6FlagDef"));
-        $dsContact->setValue('mailshot7Flag', $dsHeader->getValue("mailshot7FlagDef"));
-        $dsContact->setValue('mailshot8Flag', $dsHeader->getValue("mailshot8FlagDef"));
-        $dsContact->setValue('mailshot9Flag', $dsHeader->getValue("mailshot9FlagDef"));
-        $dsContact->setValue('mailshot10Flag', $dsHeader->getValue("mailshot10FlagDef"));
+        $dsContact->setValue(DBEContact::contactID, 0);
+        $dsContact->setValue(DBEContact::customerID, $customerID);
+        $dsContact->setValue(DBEContact::firstName, 'First Name');
+        $dsContact->setValue(DBEContact::lastName, 'Last Name');
+        $dsContact->setValue(DBEContact::siteNo, $siteNo);
+        $dsContact->setValue(DBEContact::discontinuedFlag, 'N');
+        $dsContact->setValue(DBEContact::sendMailshotFlag, 'Y');
+        $dsContact->setValue(DBEContact::accountsFlag, 'N');
+        $dsContact->setValue(DBEContact::statementFlag, 'N');
+        $dsContact->setValue(DBEContact::mailshot1Flag, $this->dsHeader->getValue(DBEHeader::mailshot1FlagDef));
+        $dsContact->setValue(DBEContact::mailshot2Flag, $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef));
+        $dsContact->setValue(DBEContact::mailshot3Flag, $this->dsHeader->getValue(DBEHeader::mailshot3FlagDef));
+        $dsContact->setValue(DBEContact::mailshot4Flag, $this->dsHeader->getValue(DBEHeader::mailshot4FlagDef));
+        $dsContact->setValue(DBEContact::mailshot5Flag, $this->dsHeader->getValue(DBEHeader::mailshot5FlagDef));
+        $dsContact->setValue(DBEContact::mailshot6Flag, $this->dsHeader->getValue(DBEHeader::mailshot6FlagDef));
+        $dsContact->setValue(DBEContact::mailshot7Flag, $this->dsHeader->getValue(DBEHeader::mailshot7FlagDef));
+        $dsContact->setValue(DBEContact::mailshot8Flag, $this->dsHeader->getValue(DBEHeader::mailshot8FlagDef));
+        $dsContact->setValue(DBEContact::mailshot9Flag, $this->dsHeader->getValue(DBEHeader::mailshot9FlagDef));
+        $dsContact->setValue(DBEContact::mailshot10Flag, $this->dsHeader->getValue(DBEHeader::mailshot10FlagDef));
+        $dsContact->setValue(DBEContact::mailshot11Flag, $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef));
         $dsContact->post();
+        $this->updateModify($dsContact->getValue(DBEContact::customerID));
         return TRUE;
     }
 
@@ -376,11 +491,14 @@ class BUCustomer extends Business
             $dsSite->clearCurrentRow();
             $dsSite->setUpdateModeInsert();
             $dsSite->setValue(DBESite::customerID, $customerID);
+            $dsSite->setValue(DBESite::activeFlag, 'Y');
             $dsSite->setValue(DBESite::siteNo, -9);
             $dsSite->setValue(DBESite::add1, 'Address Line 1');
             $dsSite->setValue(DBESite::town, 'TOWN');
+            $dsSite->setValue(DBESite::maxTravelHours, -1);    // means not set because 0 is now a valid distance
             $dsSite->setValue(DBESite::postcode, 'POSTCODE');
             $dsSite->post();
+//			$this->updateModify($dsSite->getValue(DBESite::CustomerID));
             return TRUE;
         }
     }
@@ -397,10 +515,19 @@ class BUCustomer extends Business
         $dsCustomer->setValue(DBECustomer::mailshotFlag, 'Y');
         $dsCustomer->setValue(DBECustomer::referredFlag, 'N');
         $dsCustomer->setValue(DBECustomer::prospectFlag, 'Y');
+        $dsCustomer->setValue(DBECustomer::othersEmailMainFlag, 'Y');
+        $dsCustomer->setValue(DBECustomer::workStartedEmailMainFlag, 'Y');
+        $dsCustomer->setValue(DBECustomer::autoCloseEmailMainFlag, 'Y');
         $dsCustomer->setValue(DBECustomer::createDate, date('Y-m-d'));
         $dsCustomer->setValue(DBECustomer::invoiceSiteNo, 0);
         $dsCustomer->setValue(DBECustomer::deliverSiteNo, 0);
         $dsCustomer->setValue(DBECustomer::customerTypeID, 0);
+
+        $dsCustomer->setValue(DBECustomer::pcxFlag, 'N');          // 2nd site
+        $dsCustomer->setValue(DBECustomer::specialAttentionFlag, 'N');
+        $dsCustomer->setValue(DBECustomer::support24HourFlag, 'N');
+
+        $dsCustomer->setValue(DBECustomer::modifyDate, date('Y-m-d H:i:s'));
         $dsCustomer->post();
     }
 
@@ -420,9 +547,7 @@ class BUCustomer extends Business
         if ($siteNo == '') {
             $this->raiseError('siteNo not passed');
         }
-        $this->dbeContact->setValue("customerID", $customerID);
-        $this->dbeContact->setValue("siteNo", $siteNo);
-        $this->dbeContact->getRowsByCustomerIDSiteNo($supportContacts);
+        $this->dbeContact->getRowsByCustomerIDSiteNo($customerID, $siteNo, $supportContacts);
         return ($this->getData($this->dbeContact, $dsResults));
     }
 
@@ -443,9 +568,7 @@ class BUCustomer extends Business
         if ($siteNo == '') {
             $this->raiseError('siteNo not passed');
         }
-        $this->dbeContact->setValue("customerID", $customerID);
-        $this->dbeContact->setValue("siteNo", $siteNo);
-        $this->dbeContact->getSupportRowsByCustomerIDSiteNo();
+        $this->dbeContact->getSupportRowsByCustomerIDSiteNo($customerID, $siteNo);
         return ($this->getData($this->dbeContact, $dsResults));
     }
 
@@ -474,6 +597,7 @@ class BUCustomer extends Business
     {
         $this->dbeCustomer->getRow($customerID);
         $this->dbeCustomer->setValue(DBECustomer::prospectFlag, 'N');
+        $this->dbeCustomer->setValue(DBECustomer::modifyDate, date('Y-m-d H:i:s'));
         return ($this->dbeCustomer->updateRow());
     }
 
@@ -601,6 +725,107 @@ class BUCustomer extends Business
     }
 
     /**
+     *    Check dependent tables:
+     *    Calls
+     *    Customer Items
+     * Sales Orders
+     * Invoices
+     */
+    function canDeleteCustomer($customerID, $userID)
+    {
+        global $cfg;
+
+        if ($userID != USER_GJ) {
+            return false;
+        }
+
+        // sales orders
+        require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
+        $dbeOrdhead = new DBEOrdhead($this);
+        $dbeOrdhead->setValue(DBEOrdhead::customerID, $customerID);
+        if ($dbeOrdhead->countRowsByColumn(DBEOrdhead::customerID) > 0) {
+            return FALSE;
+        }
+        // calls
+        require_once($cfg['path_dbe'] . '/DBEProblem.inc.php');
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(DBEProblem::customerID, $customerID);
+        if ($dbeProblem->countRowsByColumn(DBEProblem::customerID) > 0) {
+            return FALSE;
+        }
+        // customer items
+        require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
+        $dbeCustomerItem = new DBECustomerItem($this);
+        $dbeCustomerItem->setValue(DBECustomerItem::customerID, $customerID);
+        if ($dbeCustomerItem->countRowsByColumn(DBECustomerItem::customerID) > 0) {
+            return FALSE;
+        }
+        // invoices
+        require_once($cfg['path_dbe'] . '/DBEInvhead.inc.php');
+        $dbeInvhead = new DBEInvhead($this);
+        $dbeInvhead->setValue(DBEInvhead::customerID, $customerID);
+        if ($dbeInvhead->countRowsByColumn(DBEInvhead::customerID) > 0) {
+            return FALSE;
+        }
+        // customer notes
+        require_once($cfg['path_dbe'] . '/DBECustomerNote.inc.php');
+        $dbeCustomerNote = new DBECustomerNote($this);
+        $dbeCustomerNote->setValue(DBECustomerNote::customerID, $customerID);
+        if ($dbeCustomerNote->countRowsByColumn(DBECustomerNote::customerID) > 0) {
+            return FALSE;
+        }
+        return TRUE;    // no rows on dependent tables
+    }
+
+    /**
+     *    Delete customers, sites and contacts
+     */
+    function deleteCustomer($customerID)
+    {
+        $this->dbeContact->setValue(DBEContact::customerID, $customerID);
+        $this->dbeContact->deleteRowsByCustomerID();
+        $this->dbeSite->setValue(DBESite::customerID, $customerID);
+        $this->dbeSite->deleteRowsByCustomerID();
+        $this->dbeCustomer->setPKValue($customerID);
+        $this->dbeCustomer->deleteRow();
+    }
+
+    /**
+     *    Check dependent tables:
+     *    Calls
+     *    Customer Items
+     * Sales Orders
+     * Invoices
+     * @param $customerID
+     * @param $siteNo
+     * @return bool
+     */
+    function canDeleteSite($customerID, $siteNo)
+    {
+        global $cfg;
+        // sales orders
+        require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
+        $dbeOrdhead = new DBEOrdhead($this);
+        if ($dbeOrdhead->countRowsByCustomerSiteNo($customerID, $siteNo) > 0) {
+            return FALSE;
+        }
+        // sales invoices
+        require_once($cfg['path_dbe'] . '/DBEInvhead.inc.php');
+        $dbeInvhead = new DBEInvhead($this);
+        if ($dbeInvhead->countRowsByCustomerSiteNo($customerID, $siteNo) > 0) {
+            return FALSE;
+        }
+        // calls
+        require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
+        $dbeCallActivity = new DBECallActivity($this);
+        if ($dbeCallActivity->countRowsByCustomerSiteNo($customerID, $siteNo) > 0) {
+            return FALSE;
+        }
+        return TRUE;    // no rows on dependent tables
+    }
+
+    /**
+     *    Delete sites and contacts
      * @param $customerID
      * @return array
      */
@@ -623,6 +848,66 @@ class BUCustomer extends Business
 
         return $contacts;
     }
+    /**
+     *    Delete sites and contacts
+     * @param $customerID
+     * @param $siteNo
+     */
+    function deleteSite($customerID, $siteNo)
+    {
+        $this->dbeContact->setValue(DBEContact::customerID, $customerID);
+        $this->dbeContact->setValue(DBEContact::siteNo, $siteNo);
+        $this->dbeContact->deleteRowsByCustomerIDSiteNo();
+        $this->dbeSite->setValue(DBESite::customerID, $customerID);
+        $this->dbeSite->setValue(DBESite::siteNo, $siteNo);
+        $this->dbeSite->deleteRow();
+        $this->updateModify($customerID);
+    }
+
+    /**
+     *    Check whether allowed to delete contact
+     * Check dependent tables:
+     * Calls
+     *    Customer Items
+     * Sales Orders
+     * Invoices
+     * @param $contactID
+     * @return bool
+     */
+    function canDeleteContact($contactID)
+    {
+        global $cfg;
+        // sales orders
+        require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
+        $dbeOrdhead = new DBEOrdhead($this);
+        if ($dbeOrdhead->countRowsByContactID($contactID) > 0) {
+            return FALSE;
+        }
+        // sales invoices
+        require_once($cfg['path_dbe'] . '/DBEInvhead.inc.php');
+        $dbeInvhead = new DBEInvhead($this);
+        $dbeInvhead->setValue(DBEInvhead::contactID, $contactID);
+        if ($dbeInvhead->countRowsByColumn(DBEInvhead::contactID) > 0) {
+            return FALSE;
+        }
+        // calls
+        require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(DBECallActivity::contactID, $contactID);
+        if ($dbeCallActivity->countRowsByColumn(DBECallActivity::contactID) > 0) {
+            return FALSE;
+        }
+        return TRUE;    // no rows on dependent tables
+    }
+
+    /**
+     *    Delete contact
+     */
+    function deleteContact($contactID)
+    {
+        $this->dbeContact->setValue(DBEContact::contactID, $contactID);
+        $this->dbeContact->deleteRow();
+    }
 
     function createCustomerFolder($customerID)
     {
@@ -633,6 +918,40 @@ class BUCustomer extends Business
         if (!is_dir($dir)) {
 
             mkdir($dir);
+            /*
+            Then sub/folders
+            */
+            $subfolders =
+                array(
+                    'Client Information Forms',
+                    'CNC Internet',
+                    'Current Documentation',
+                    'E-Support Packs',
+                    'PC Build Sheets',
+                    'Projects',
+                    'Review Meetings',
+                    'Software Licencing',
+                    'Vulnerability Scans'
+                );
+
+            foreach ($subfolders as $folder) {
+                mkdir($dir . '/' . $folder);
+            }
+            /*
+            Then these under Current Documentation
+            */
+            $subfolders =
+                array(
+                    'Documents and Forms',
+                    'Old Documentation',
+                    'Photos'
+                );
+
+            foreach ($subfolders as $folder) {
+                mkdir($dir . '/Current Documentation/' . $folder);
+            }
+
+            mkdir($dir . '/Current Documentation/Documents and Forms/Starters & Leavers');
 
         }
 
@@ -686,7 +1005,13 @@ class BUCustomer extends Business
 
         $this->dbeCustomer->getRow($customerID);
 
-        return CUSTOMER_DIR . '/' . $this->dbeCustomer->getValue(DBECustomer::name);
+//	  if ( strpos( 'MSIE', $_SERVER['HTTP_USER_AGENT'] ) ) {
+//      $customerDir = '/' . CUSTOMER_DIR;
+//    }
+//    else{
+        $customerDir = CUSTOMER_DIR;
+//    }
+        return $customerDir . '/' . $this->dbeCustomer->getValue(DBECustomer::name);
 
     }
 
@@ -713,5 +1038,115 @@ class BUCustomer extends Business
 
         return $ret;
     }
+
+    /**
+     * Get next prospect to be reviewed
+     * @param DataSet $dsResults
+     * @return bool
+     */
+    function getNextReviewProspect(&$dsResults)
+    {
+        $this->dbeCustomer->getReviewProspectRow();
+        $this->getData($this->dbeCustomer, $dsResults);
+        $gotRow = $dsResults->fetchNext();
+
+        return $gotRow;
+    }
+
+    /**
+     * Count customers to be reviewed
+     *
+     * Based on the review date
+     *
+     */
+    function getReviewCount()
+    {
+        return $this->dbeCustomer->countReviewRows();
+    }
+
+    function get24HourSupportCustomers(&$dsResults)
+    {
+        $this->dbeCustomer->get24HourSupportCustomers();
+        return $this->getData($this->dbeCustomer, $dsResults);
+    }
+
+    function hasDefaultInvoiceContactsAtAllSites($customerID)
+    {
+        $db = new dbSweetcode (); // database connection for query
+
+        $sql =
+            "SELECT COUNT(*) AS recCount
+			FROM customer
+				JOIN address ON cus_custno = add_custno AND cus_inv_siteno = add_siteno
+			WHERE
+				add_inv_contno = 0
+				AND cus_prospect = 'N'
+				AND cus_mailshot = 'Y'
+				AND cus_custno = " . $customerID;
+
+        $db->query($sql);
+        $db->next_record();
+
+        return $db->Record ['recCount'];
+
+    }
+
+    function getSpecialAttentionCustomers(&$dsResults)
+    {
+        $this->dbeCustomer->getSpecialAttentionCustomers();
+        return $this->getData($this->dbeCustomer, $dsResults);
+    }
+
+    function uploadPortalDocument($customerID,
+                                  $description,
+                                  $userfile,
+                                  $startersFormFlag,
+                                  $leaversFormFlag,
+                                  $mainContactOnlyFlag)
+    {
+
+        return $this->addDocument(
+            $customerID,
+            $userfile ['tmp_name'],
+            $userfile ['size'],
+            $description,
+            $userfile ['name'],
+            $userfile ['type'],
+            $startersFormFlag,
+            $leaversFormFlag,
+            $mainContactOnlyFlag
+        );
+    }
+
+    function addDocument(
+        $customerID,
+        $filePath,
+        $fileSizeBytes,
+        $description,
+        $fileName,
+        $mimeType,
+        $startersFormFlag,
+        $leaversFormFlag,
+        $mainContactOnlyFlag
+    )
+    {
+        $dbePortalCustomerDocument = new DBEPortalCustomerDocument ($this);
+        $dbePortalCustomerDocument->setPKValue('');
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::file,
+                                             fread(fopen($filePath, 'rb'), $fileSizeBytes));
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::description, ( string )$description);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::filename, ( string )$fileName);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::createdUserID,
+                                             ( string )$GLOBALS ['auth']->is_authenticated());
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::createdDate, date(CONFIG_MYSQL_DATETIME));
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::fileMimeType, ( string )$mimeType);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::startersFormFlag, $startersFormFlag);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::leaversFormFlag, $leaversFormFlag);
+        $dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::mainContactOnlyFlag, $mainContactOnlyFlag);
+
+        return ($dbePortalCustomerDocument->insertRow());
+    }
+
+
 }// End of class
 ?>
