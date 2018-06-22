@@ -1661,7 +1661,7 @@ class CTCustomerCRM extends CTCNC
         $this->template->parse('sites', 'siteBlock', true);
 
         $this->dsContact->initialise();
-        $this->dsContact->sortAscending('LastName');
+        $this->dsContact->sortAscending(DBEContact::lastName);
 
         while ($this->dsContact->fetchNext()) {
 

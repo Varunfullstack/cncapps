@@ -2376,7 +2376,7 @@ ORDER BY cus_name ASC  ";
             );
         }
         $this->dsContact->initialise();
-        $this->dsContact->sortAscending('LastName');
+        $this->dsContact->sortAscending(DBEContact::lastName);
 
         while ($this->dsContact->fetchNext()) {
 

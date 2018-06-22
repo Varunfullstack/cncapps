@@ -91,10 +91,10 @@ class BUSalesOrder extends Business
             if (!$ret) {
                 $this->raiseError('order not found');
             }
-            $dbeJOrdline->setValue('ordheadID', $ordheadID);
-            $dbeJOrdline->getRowsByColumn('ordheadID', 'sequenceNo');
+            $dbeJOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
+            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID, DBEJOrdline::sequenceNo);
             $this->getData($dbeJOrdline, $dsJOrdline);
-            $dsJOrdline->sortAscending('sequenceNo');
+            $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
             $buCustomer = new BUCustomer($this);
             $buCustomer->getContactByID($dsOrdhead->getValue('delContactID'), $dsDeliveryContact);
         }
@@ -207,7 +207,6 @@ class BUSalesOrder extends Business
             $this->dbeJQuotation->setValue('ordheadID', $ordheadID);
             $this->dbeJQuotation->getRowsByOrdheadID();
             $ret = ($this->getData($this->dbeJQuotation, $dsResults));
-            //$dsResults->sortAscending('versionNo');
         }
         return $ret;
     }
