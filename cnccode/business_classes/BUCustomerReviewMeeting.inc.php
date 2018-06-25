@@ -8,10 +8,10 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
-require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
+require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 use Dompdf\Dompdf;
@@ -69,7 +69,7 @@ class BUCustomerReviewMeeting extends Business
 
             $template->setVar(
                 array(
-                    'urlCustomer' => $urlCustomer,
+                    'urlCustomer'     => $urlCustomer,
                     'lastMeetingDate' => $customer['lastMeetingDate'],
                     'nextMeetingDate' => $customer['nextMeetingDate']
                 )
@@ -98,10 +98,10 @@ class BUCustomerReviewMeeting extends Business
 
                 $template->setVar(
                     array(
-                        'firstName' => $row['firstName'],
-                        'lastName' => $row['lastName'],
-                        'ddiPhone' => $row['ddiPhone'],
-                        'mobilePhone' => $row['mobilePhone'],
+                        'firstName'    => $row['firstName'],
+                        'lastName'     => $row['lastName'],
+                        'ddiPhone'     => $row['ddiPhone'],
+                        'mobilePhone'  => $row['mobilePhone'],
                         'emailAddress' => $row['emailAddress']
                     )
                 );
@@ -133,14 +133,14 @@ class BUCustomerReviewMeeting extends Business
 
                 $template->set_var(
                     array(
-                        'add1' => $dsSite->getValue('add1'),
-                        'add2' => $dsSite->getValue('add2'),
-                        'add3' => $dsSite->getValue('add3'),
-                        'town' => $dsSite->getValue('town'),
-                        'county' => $dsSite->getValue('county'),
-                        'postcode' => $dsSite->getValue('postcode'),
+                        'add1'         => $dsSite->getValue(DBESite::add1),
+                        'add2'         => $dsSite->getValue(DBESite::add2),
+                        'add3'         => $dsSite->getValue(DBESite::add3),
+                        'town'         => $dsSite->getValue(DBESite::town),
+                        'county'       => $dsSite->getValue(DBESite::county),
+                        'postcode'     => $dsSite->getValue(DBESite::postcode),
                         'contactPhone' => $phone,
-                        'contactName' => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
+                        'contactName'  => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
                     )
                 );
 
@@ -149,8 +149,8 @@ class BUCustomerReviewMeeting extends Business
             $template->set_var(
                 array(
                     'dateYYYYMMDD' => $nextMeetingDateYmd,
-                    'nowYYYYMMDD' => date('Ymd'),
-                    'nowHHMMSS' => date('His'),
+                    'nowYYYYMMDD'  => date('Ymd'),
+                    'nowHHMMSS'    => date('His'),
                     'customerName' => $customer['customerName']
                 )
             );
@@ -165,9 +165,9 @@ class BUCustomerReviewMeeting extends Business
             $subject = 'Review meeting with ' . $customer['customerName'] . ' due by ' . $customer['nextMeetingDate'];
 
             $hdrs = array(
-                'From' => $senderEmail,
-                'Subject' => $subject,
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -177,9 +177,9 @@ class BUCustomerReviewMeeting extends Business
 
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
 
             $body = $buMail->mime->get($mime_params);
@@ -210,12 +210,22 @@ class BUCustomerReviewMeeting extends Business
 
     } // end function
 
+
     public function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
+
+        $checkMonthYear = function ($value) {
+            if (!$value) {
+                return false;
+            }
+
+            return !!DateTime::createFromFormat('m/Y', $value);
+        };
+
         $dsData->addColumn('customerID', DA_STRING, DA_NOT_NULL);
-        $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL);
-        $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL, $checkMonthYear);
+        $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL, $checkMonthYear);
         $dsData->addColumn('meetingDate', DA_DATE, DA_NOT_NULL);
     }
 
@@ -334,13 +344,13 @@ class BUCustomerReviewMeeting extends Business
 
             $template->set_var(
                 array(
-                    'contract' => $contractName,
-                    'sales' => number_format($row['sales'], 2),
-                    'cost' => number_format($row['cost'], 2),
-                    'labour' => number_format($row['labourCost'], 2),
-                    'profit' => number_format($row['profit'], 2),
-                    'profitPercent' => $row['profitPercent'],
-                    'labourHours' => $row['labourHours'],
+                    'contract'         => $contractName,
+                    'sales'            => number_format($row['sales'], 2),
+                    'cost'             => number_format($row['cost'], 2),
+                    'labour'           => number_format($row['labourCost'], 2),
+                    'profit'           => number_format($row['profit'], 2),
+                    'profitPercent'    => $row['profitPercent'],
+                    'labourHours'      => $row['labourHours'],
                     'profitAlertClass' => $profitAlertClass
                 )
             );
@@ -353,16 +363,16 @@ class BUCustomerReviewMeeting extends Business
         }
         $template->set_var(
             array(
-                'customerName' => $dsCustomer->getValue('name'),
-                'startYearMonth' => $startDate->format('Y-m'),
-                'meetingDate' => $meetingDate,
-                'endYearMonth' => $endDate->format('Y-m'),
-                'totalSales' => number_format($totalSales, 2),
-                'totalCost' => number_format($totalCost, 2),
-                'totalLabour' => number_format($totalLabour, 2),
-                'totalProfit' => number_format($totalSales - $totalCost - $totalLabour, 2),
+                'customerName'       => $dsCustomer->getValue(DBECustomer::name),
+                'startYearMonth'     => $startDate->format('Y-m'),
+                'meetingDate'        => $meetingDate,
+                'endYearMonth'       => $endDate->format('Y-m'),
+                'totalSales'         => number_format($totalSales, 2),
+                'totalCost'          => number_format($totalCost, 2),
+                'totalLabour'        => number_format($totalLabour, 2),
+                'totalProfit'        => number_format($totalSales - $totalCost - $totalLabour, 2),
                 'totalProfitPercent' => number_format(100 - (($totalCost + $totalLabour) / $totalSales) * 100, 2),
-                'totalLabourHours' => number_format($totalLabourHours, 2),
+                'totalLabourHours'   => number_format($totalLabourHours, 2),
             )
         );
         /*
@@ -439,15 +449,15 @@ class BUCustomerReviewMeeting extends Business
 
             $template->set_var(
                 array(
-                    'notes' => $item['notes'],
-                    'description' => Controller::htmlDisplayText($item['description']),
+                    'notes'               => $item['notes'],
+                    'description'         => Controller::htmlDisplayText($item['description']),
                     'itemTypeDescription' => Controller::htmlDisplayText($item['itemTypeDescription']),
-                    'expiryDate' => Controller::htmlDisplayText($item['expiryDate']),
-                    'salePrice' => $salePrice,
-                    'costPrice' => $costPrice,
-                    'customerItemID' => $item['customerItemID'],
-                    'coveredItemsString' => $coveredItemsString,
-                    'itemClass' => $itemClass
+                    'expiryDate'          => Controller::htmlDisplayText($item['expiryDate']),
+                    'salePrice'           => $salePrice,
+                    'costPrice'           => $costPrice,
+                    'customerItemID'      => $item['customerItemID'],
+                    'coveredItemsString'  => $coveredItemsString,
+                    'itemClass'           => $itemClass
                 )
             );
 

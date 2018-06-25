@@ -9,6 +9,10 @@ require_once($cfg["path_dbe"] . '/DBEPortalCustomerDocumentWithoutFile.inc.php')
 
 class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
 {
+    const filename = "filename";
+    const file = "file";
+    const fileMimeType = "fileMimeType";
+
     /**
      * portals constructor()
      * @access public
@@ -19,9 +23,9 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("filename", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("file", DA_BLOB, DA_ALLOW_NULL);
-        $this->addColumn("fileMimeType", DA_STRING, DA_NOT_NULL);
+        $this->addColumn(self::filename, DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(self::file, DA_BLOB, DA_ALLOW_NULL);
+        $this->addColumn(self::fileMimeType, DA_STRING, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

@@ -7,6 +7,16 @@ require_once($cfg["path_dbe"] . "/DBEPorhead.inc.php");
 
 class DBEJPorhead extends DBEPorhead
 {
+    const supplierName = "supplierName";
+    const supplierPhone = "supplierPhone";
+    const customerName = "customerName";
+    const contactName = "contactName";
+    const contactPhone = "contactPhone";
+    const contactEmail = "contactEmail";
+    const orderedByName = "orderedByName";
+    const raisedByName = "raisedByName";
+    const webSiteURL = "webSiteURL";
+
     /**
      * calls constructor()
      * @access public
@@ -18,15 +28,60 @@ class DBEJPorhead extends DBEPorhead
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("supplierName", DA_STRING, DA_NOT_NULL, 'sup_name');
-        $this->addColumn("supplierPhone", DA_STRING, DA_NOT_NULL, 'sup_phone');
-        $this->addColumn("customerName", DA_STRING, DA_NOT_NULL, 'cus_name');
-        $this->addColumn("contactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(contact.con_first_name,' ',contact.con_last_name)");
-        $this->addColumn("contactPhone", DA_STRING, DA_ALLOW_NULL, 'contact.con_phone');
-        $this->addColumn("contactEmail", DA_STRING, DA_ALLOW_NULL, 'contact.con_email');
-        $this->addColumn("orderedByName", DA_STRING, DA_ALLOW_NULL, 'ob.cns_name');
-        $this->addColumn("raisedByName", DA_STRING, DA_ALLOW_NULL, 'rb.cns_name');
-        $this->addColumn("webSiteURL", DA_STRING, DA_ALLOW_NULL, "sup_web_site_url");
+        $this->addColumn(
+            self::supplierName,
+            DA_STRING,
+            DA_NOT_NULL,
+            'sup_name'
+        );
+        $this->addColumn(
+            self::supplierPhone,
+            DA_STRING,
+            DA_NOT_NULL,
+            'sup_phone'
+        );
+        $this->addColumn(
+            self::customerName,
+            DA_STRING,
+            DA_NOT_NULL,
+            'cus_name'
+        );
+        $this->addColumn(
+            self::contactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(contact.con_first_name,' ',contact.con_last_name)"
+        );
+        $this->addColumn(
+            self::contactPhone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'contact.con_phone'
+        );
+        $this->addColumn(
+            self::contactEmail,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'contact.con_email'
+        );
+        $this->addColumn(
+            self::orderedByName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'ob.cns_name'
+        );
+        $this->addColumn(
+            self::raisedByName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'rb.cns_name'
+        );
+        $this->addColumn(
+            self::webSiteURL,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_web_site_url"
+        );
         $this->setAddColumnsOff();
     }
 
@@ -52,96 +107,112 @@ class DBEJPorhead extends DBEPorhead
             $statement =
                 "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
                 " FROM " . $this->getTableName() .
-                " JOIN porline ON " . $this->getTableName() . "." . $this->getDBColumnName('porheadID') .
+                " JOIN porline ON " . $this->getTableName() . "." . $this->getDBColumnName(self::porheadID) .
                 "= porline.pol_porno" .
                 " JOIN item ON porline.pol_itemno" .
                 "= item.itm_itemno" .
-                " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName('supplierID') .
+                " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName(self::supplierID) .
                 "= supplier.sup_suppno" .
-                " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName('ordheadID') .
+                " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName(self::ordheadID) .
                 "= ordhead.odh_ordno" .
                 " LEFT JOIN contact" .
-                " ON " . $this->getDBColumnName('contactID') . " = contact.con_contno" .
+                " ON " . $this->getDBColumnName(self::contactID) . " = contact.con_contno" .
                 " LEFT JOIN consultant AS rb" .
-                " ON " . $this->getDBColumnName('userID') . " = rb.cns_consno" .
+                " ON " . $this->getDBColumnName(self::userID) . " = rb.cns_consno" .
                 " LEFT JOIN consultant AS ob" .
-                " ON " . $this->getDBColumnName('orderUserID') . " = ob.cns_consno" .
+                " ON " . $this->getDBColumnName(self::orderUserID) . " = ob.cns_consno" .
                 " LEFT JOIN customer ON ordhead.odh_custno= customer.cus_custno";
         } else {
             $statement =
                 "SELECT " . $this->getDBColumnNamesAsString() .
                 " FROM " . $this->getTableName() .
-                " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName('supplierID') .
+                " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName(self::supplierID) .
                 "= supplier.sup_suppno" .
                 " LEFT JOIN contact" .
-                " ON " . $this->getDBColumnName('contactID') . " = contact.con_contno" .
+                " ON " . $this->getDBColumnName(self::contactID) . " = contact.con_contno" .
                 " LEFT JOIN consultant AS rb" .
-                " ON " . $this->getDBColumnName('userID') . " = rb.cns_consno" .
+                " ON " . $this->getDBColumnName(self::userID) . " = rb.cns_consno" .
                 " LEFT JOIN consultant AS ob" .
-                " ON " . $this->getDBColumnName('orderUserID') . " = ob.cns_consno" .
-                " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName('ordheadID') .
+                " ON " . $this->getDBColumnName(self::orderUserID) . " = ob.cns_consno" .
+                " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName(self::ordheadID) .
                 "= ordhead.odh_ordno" .
                 " LEFT JOIN customer ON ordhead.odh_custno= customer.cus_custno";
         }
         $statement = $statement . " WHERE 1=1";
         if ($supplierID != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('supplierID') . "=" . $supplierID;
+                " AND " . $this->getDBColumnName(self::supplierID) . "=" . $supplierID;
         }
         if ($ordheadID != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('ordheadID') . "=" . $ordheadID;
+                " AND " . $this->getDBColumnName(self::ordheadID) . "=" . $ordheadID;
         }
         if ($fromDate != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('date') . ">= '" . $fromDate . "'";
+                " AND " . $this->getDBColumnName(self::date) . ">= '" . $fromDate . "'";
         }
         if ($toDate != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('date') . "<= '" . $toDate . "'";
+                " AND " . $this->getDBColumnName(self::date) . "<= '" . $toDate . "'";
         }
 
 
         if ($orderType != '') {
             if ($orderType == 'B') {
                 $statement = $statement .
-                    " AND " . $this->getDBColumnName('type') . " IN('I','P')";
+                    " AND " . $this->getDBColumnName(self::type) . " IN('I','P')";
             } else {
                 $statement = $statement .
-                    " AND " . $this->getDBColumnName('type') . "='" . mysqli_real_escape_string($this->db->link_id(), $orderType) . "'";
+                    " AND " . $this->getDBColumnName(self::type) . "='" . mysqli_real_escape_string(
+                        $this->db->link_id(),
+                        $orderType
+                    ) . "'";
             }
         }
 
         // context of search
         if ($context == 'PI') {                // For purchase invoices exclude authorised POs and
             $statement .=                                // stock suppliers
-                " AND " . $this->getDBColumnName('supplierID') .
+                " AND " . $this->getDBColumnName(self::supplierID) .
                 " NOT IN(" . CONFIG_SALES_STOCK_SUPPLIERID . "," . CONFIG_MAINT_STOCK_SUPPLIERID . ")" .
                 " AND (" .
-                " (" . $this->getDBColumnName('type') . " IN ('P', 'C') AND " . $this->getDBColumnName('directDeliveryFlag') . "= 'N' )" .
+                " (" . $this->getDBColumnName(self::type) . " IN ('P', 'C') AND " . $this->getDBColumnName(
+                    self::directDeliveryFlag
+                ) . "= 'N' )" .
                 " OR" .
-                " (" . $this->getDBColumnName('type') . " IN ('P', 'C', 'I') AND " . $this->getDBColumnName('directDeliveryFlag') . "= 'Y' )" .
+                " (" . $this->getDBColumnName(self::type) . " IN ('P', 'C', 'I') AND " . $this->getDBColumnName(
+                    self::directDeliveryFlag
+                ) . "= 'Y' )" .
                 ")";
         } elseif ($context == 'GI') {        // for goods in exclude direct delivery
-            $statement .= " AND " . $this->getDBColumnName('directDeliveryFlag') . "<> 'Y'";
+            $statement .= " AND " . $this->getDBColumnName(self::directDeliveryFlag) . "<> 'Y'";
         }
 
         if ($lineText != '') {
             $statement .=
                 " AND MATCH (item.itm_desc, item.notes, item.itm_unit_of_sale)
-					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $lineText) . "' IN BOOLEAN MODE)";
+					AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $lineText
+                ) . "' IN BOOLEAN MODE)";
         }
 
         if ($partNo != '') {
             $statement .=
-                " AND item.itm_unit_of_sale LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $partNo) . "%'";
+                " AND item.itm_unit_of_sale LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $partNo
+                ) . "%'";
         }
         if ($supplierRef != '') {
             $statement .=
-                " AND " . $this->getDBColumnName('supplierRef') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $supplierRef) . "%'";
+                " AND " . $this->getDBColumnName(self::supplierRef) . " LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $supplierRef
+                ) . "%'";
         }
         $statement = $statement .
-            " ORDER BY " . $this->getDBColumnName('porheadID') . " DESC" .
+            " ORDER BY " . $this->getDBColumnName(self::porheadID) . " DESC" .
             " LIMIT 0,200";
 
         $this->setQueryString($statement);
@@ -156,15 +227,17 @@ class DBEJPorhead extends DBEPorhead
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName('supplierID') . "= supplier.sup_suppno" .
-            " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName('ordheadID') .
+            " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName(
+                self::supplierID
+            ) . "= supplier.sup_suppno" .
+            " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName(self::ordheadID) .
             "= ordhead.odh_ordno" .
             " LEFT JOIN consultant AS rb" .
-            " ON " . $this->getDBColumnName('userID') . " = rb.cns_consno" .
+            " ON " . $this->getDBColumnName(self::userID) . " = rb.cns_consno" .
             " LEFT JOIN consultant AS ob" .
-            " ON " . $this->getDBColumnName('orderUserID') . " = ob.cns_consno" .
+            " ON " . $this->getDBColumnName(self::orderUserID) . " = ob.cns_consno" .
             " LEFT JOIN contact" .
-            " ON " . $this->getDBColumnName('contactID') . " = contact.con_contno" .
+            " ON " . $this->getDBColumnName(self::contactID) . " = contact.con_contno" .
             " LEFT JOIN customer ON ordhead.odh_custno= customer.cus_custno" .
             " WHERE " . $this->getPKWhere()
         );
@@ -178,23 +251,29 @@ class DBEJPorhead extends DBEPorhead
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName('supplierID') . "= supplier.sup_suppno" .
-            " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName('ordheadID') .
+            " JOIN supplier ON " . $this->getTableName() . "." . $this->getDBColumnName(
+                self::supplierID
+            ) . "= supplier.sup_suppno" .
+            " LEFT JOIN ordhead ON " . $this->getTableName() . "." . $this->getDBColumnName(self::ordheadID) .
             "= ordhead.odh_ordno" .
             " LEFT JOIN consultant AS rb" .
-            " ON " . $this->getDBColumnName('userID') . " = rb.cns_consno" .
+            " ON " . $this->getDBColumnName(self::userID) . " = rb.cns_consno" .
             " LEFT JOIN consultant AS ob" .
-            " ON " . $this->getDBColumnName('orderUserID') . " = ob.cns_consno" .
+            " ON " . $this->getDBColumnName(self::orderUserID) . " = ob.cns_consno" .
             " LEFT JOIN contact" .
-            " ON " . $this->getDBColumnName('contactID') . " = contact.con_contno" .
+            " ON " . $this->getDBColumnName(self::contactID) . " = contact.con_contno" .
             " LEFT JOIN customer ON ordhead.odh_custno= customer.cus_custno" .
             " WHERE " . $this->getPKWhere() .
-            " AND " . $this->getDBColumnName('supplierID') .
+            " AND " . $this->getDBColumnName(self::supplierID) .
             " NOT IN(" . CONFIG_SALES_STOCK_SUPPLIERID . "," . CONFIG_MAINT_STOCK_SUPPLIERID . ")" .
             " AND (" .
-            " (" . $this->getDBColumnName('type') . " IN ('P', 'C') AND " . $this->getDBColumnName('directDeliveryFlag') . "= 'N' )" .
+            " (" . $this->getDBColumnName(self::type) . " IN ('P', 'C') AND " . $this->getDBColumnName(
+                self::directDeliveryFlag
+            ) . "= 'N' )" .
             " OR" .
-            " (" . $this->getDBColumnName('type') . " IN ('P', 'C', 'I') AND " . $this->getDBColumnName('directDeliveryFlag') . "= 'Y' )" .
+            " (" . $this->getDBColumnName(self::type) . " IN ('P', 'C', 'I') AND " . $this->getDBColumnName(
+                self::directDeliveryFlag
+            ) . "= 'Y' )" .
             ")"
         );
         return (parent::getRow());

@@ -19,7 +19,7 @@ require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActType.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg ["path_dbe"] . "/DBEProject.inc.php");
-require_once($cfg ["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg ["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg ["path_bu"] . "/BUSite.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
@@ -28,7 +28,7 @@ require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
-require_once($cfg ["path_dbe"] . "/DBESiteNew.inc.php");
+require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BUPrepay extends Business
@@ -277,12 +277,12 @@ class BUPrepay extends Business
                         'companyName' => $db->Record ['cus_name'],
                         'customerRef' => $db->Record ['cui_cuino'],
                         'statementDate' => Controller::dateYMDtoDMY($this->dsData->getValue('endDate')),
-                        'add1' => $dsSite->getValue('add1'),
-                        'add2' => $dsSite->getValue('add2'),
-                        'add3' => $dsSite->getValue('add3'),
-                        'town' => $dsSite->getValue('town'),
-                        'county' => $dsSite->getValue('county'),
-                        'postcode' => $dsSite->getValue('postcode'),
+                        'add1' => $dsSite->getValue(DBESite::add1),
+                        'add2' => $dsSite->getValue(DBESite::add2),
+                        'add3' => $dsSite->getValue(DBESite::add3),
+                        'town' => $dsSite->getValue(DBESite::town),
+                        'county' => $dsSite->getValue(DBESite::county),
+                        'postcode' => $dsSite->getValue(DBESite::postcode),
                         'cnc_name' => $this->dsHeader->getValue('name'),
                         'cnc_add1' => $this->dsHeader->getValue('add1'),
                         'cnc_add2' => $this->dsHeader->getValue('add2'),
@@ -399,7 +399,7 @@ class BUPrepay extends Business
                 $this->template->set_file('page', 'PrepayReport.inc.html');
 
                 // Set header fields
-                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $key, 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($this->dsData->getValue('endDate')), 'add1' => $dsSite->getValue('add1'), 'add2' => $dsSite->getValue('add2'), 'add3' => $dsSite->getValue('add3'), 'town' => $dsSite->getValue('town'), 'county' => $dsSite->getValue('county'), 'postcode' => $dsSite->getValue('postcode'), 'cnc_name' => $this->dsHeader->getValue('name'), 'cnc_add1' => $this->dsHeader->getValue('add1'), 'cnc_add2' => $this->dsHeader->getValue('add2'), 'cnc_add3' => $this->dsHeader->getValue('add3'), 'cnc_town' => $this->dsHeader->getValue('town'), 'cnc_county' => $this->dsHeader->getValue('county'), 'cnc_postcode' => $this->dsHeader->getValue('postcode'), 'cnc_phone' => $this->dsHeader->getValue('phone')));
+                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $key, 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($this->dsData->getValue('endDate')), 'add1' => $dsSite->getValue(DBESite::add1), 'add2' => $dsSite->getValue(DBESite::add2), 'add3' => $dsSite->getValue(DBESite::add3), 'town' => $dsSite->getValue(DBESite::town), 'county' => $dsSite->getValue(DBESite::county), 'postcode' => $dsSite->getValue(DBESite::postcode), 'cnc_name' => $this->dsHeader->getValue('name'), 'cnc_add1' => $this->dsHeader->getValue('add1'), 'cnc_add2' => $this->dsHeader->getValue('add2'), 'cnc_add3' => $this->dsHeader->getValue('add3'), 'cnc_town' => $this->dsHeader->getValue('town'), 'cnc_county' => $this->dsHeader->getValue('county'), 'cnc_postcode' => $this->dsHeader->getValue('postcode'), 'cnc_phone' => $this->dsHeader->getValue('phone')));
 
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
@@ -554,7 +554,7 @@ class BUPrepay extends Business
                         $dsSite
                     );
 
-                    $max_hours = $dsSite->getValue('maxTravelHours');
+                    $max_hours = $dsSite->getValue(DBESite::maxTravelHours);
 
                 } else {
 

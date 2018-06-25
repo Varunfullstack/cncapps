@@ -12,7 +12,7 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerItemDocument.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJContract.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 
 class BUCustomerItem extends Business
 {
@@ -52,7 +52,6 @@ class BUCustomerItem extends Business
         $dsData->setValue('contractText', '');
         $dsData->setValue('serialNo', '');
         $dsData->setValue('ordheadID', '');
-//		$dsData->setValue('contractID', '');
         $dsData->setValue('renewalStatus', '');
     }
 
@@ -72,7 +71,6 @@ class BUCustomerItem extends Business
             $this->dbeJCustomerItem->getRowsBySearchCriteria(
                 $dsSearchForm->getValue('customerID'),
                 $dsSearchForm->getValue('ordheadID'),
-//				$dsSearchForm->getValue('contractID'),
                 $dsSearchForm->getValue('startDate'),
                 $dsSearchForm->getValue('endDate'),
                 $itemText,
@@ -213,7 +211,7 @@ class BUCustomerItem extends Business
             $buCustomer = new BUCustomer($this);
             $buCustomer->getDeliverSiteByCustomerID($dsCustomerItem->getValue('customerID'), $dsSite, $dsContact);
             $dsCustomerItem->setUpdateModeUpdate();
-            $dsCustomerItem->setValue('siteNo', $dsSite->getValue('siteNo'));
+            $dsCustomerItem->setValue('siteNo', $dsSite->getValue(DBESite::siteNo));
             $dsCustomerItem->post();
         }
         if ($success = $this->updateDataaccessObject($dsCustomerItem, $dbeCustomerItem)) {
@@ -238,20 +236,7 @@ class BUCustomerItem extends Business
         */
         $dbeProblem = new DBEProblem($this);
         // calls for this item as a contract item (e.g. General Support Contract)
-        /*
-            $dbeProblem->setValue('contractCustomerItemID', $customerItemID);
-            if ( $dbeProblem->countRowsByColumn('contractCustomerItemID') > 0 ){
-                $return = FALSE;
-            }
-                is this item a parent for any others (i.e. A support contract)
 
-          NEEDS UPDATING FOR NEW CONTRACT_CUSTOMER_ITEM table
-            $dbeCustomerItem = new DBECustomerItem($this);
-            $dbeCustomerItem->setValue('contractID', $customerItemID);
-            if ( $dbeCustomerItem->countRowsByColumn('contractID') > 0 ){
-                $return = FALSE;
-            }
-        */
         return $return;
     }
 

@@ -161,12 +161,12 @@ class BUHTMLSCR extends BaseObject
             array(
                 'companyName' => $dsCallActivity->getValue('customerName'),
                 'callActivityID' => $dsCallActivity->getValue('callActivityID'),
-                'add1' => $dsSite->getValue('add1'),
-                'add2' => $dsSite->getValue('add2'),
-                'add3' => $dsSite->getValue('add3'),
-                'town' => $dsSite->getValue('town'),
-                'county' => $dsSite->getValue('county'),
-                'postcode' => $dsSite->getValue('postcode'),
+                'add1' => $dsSite->getValue(DBESite::add1),
+                'add2' => $dsSite->getValue(DBESite::add2),
+                'add3' => $dsSite->getValue(DBESite::add3),
+                'town' => $dsSite->getValue(DBESite::town),
+                'county' => $dsSite->getValue(DBESite::county),
+                'postcode' => $dsSite->getValue(DBESite::postcode),
                 'itSupportPhone' => CONFIG_IT_SUPPORT_PHONE,
                 'phoneSystemSupportPhone'
                 => CONFIG_PHONE_SYSTEM_SUPPORT_PHONE,

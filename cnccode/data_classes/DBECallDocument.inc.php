@@ -7,6 +7,17 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallDocument extends DBEntity
 {
+    const callDocumentID = "callDocumentID";
+    const problemID = "problemID";
+    const callActivityID = "callActivityID";
+    const description = "description";
+    const filename = "filename";
+    const file = "file";
+    const fileLength = "fileLength";
+    const fileMIMEType = "fileMIMEType";
+    const createDate = "createDate";
+    const createUserID = "createUserID";
+
     /**
      * calls constructor()
      * @access public
@@ -18,16 +29,56 @@ class DBECallDocument extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("calldocument");
-        $this->addColumn("callDocumentID", DA_ID, DA_NOT_NULL);                // following move to activity-based system
-        $this->addColumn("problemID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("callActivityID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("filename", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("file", DA_BLOB, DA_ALLOW_NULL);
-        $this->addColumn("fileLength", DA_INTEGER, DA_ALLOW_NULL);
-        $this->addColumn("fileMIMEType", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("createDate", DA_DATE, DA_NOT_NULL);
-        $this->addColumn("createUserID", DA_ID, DA_NOT_NULL);
+        $this->addColumn(
+            self::callDocumentID,
+            DA_ID,
+            DA_NOT_NULL
+        );                // following move to activity-based system
+        $this->addColumn(
+            self::problemID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::callActivityID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::filename,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::file,
+            DA_BLOB,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::fileLength,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::fileMIMEType,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createDate,
+            DA_DATE,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createUserID,
+            DA_ID,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -35,6 +86,8 @@ class DBECallDocument extends DBEntity
 
 class DBEJCallDocument extends DBECallDocument
 {
+    const createUserName = "createUserName";
+
     /**
      * calls constructor()
      * @access public
@@ -46,11 +99,18 @@ class DBEJCallDocument extends DBECallDocument
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("createUserName", DA_ID, DA_NOT_NULL, "CONCAT(firstName, ' ', lastName)");
+        $this->addColumn(
+            self::createUserName,
+            DA_ID,
+            DA_NOT_NULL,
+            "CONCAT(firstName, ' ', lastName)"
+        );
         $this->setAddColumnsOff();
     }
 
-    function getRowsByColumn($column, $sortColumn = '')
+    function getRowsByColumn($column,
+                             $sortColumn = ''
+    )
     {
         $this->setMethodName("getRowsByColumn");
         if ($column == '') {

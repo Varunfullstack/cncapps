@@ -7,6 +7,10 @@ require_once($cfg["path_dbe"] . '/DBESalesOrderDocumentWithoutFile.php');
 
 class DBESalesOrderDocument extends DBESalesOrderDocumentWithoutFile
 {
+    const filename = "filename";
+    const file = "file";
+    const fileMimeType = "fileMimeType";
+
     /**
      * portals constructor()
      * @access public
@@ -17,9 +21,21 @@ class DBESalesOrderDocument extends DBESalesOrderDocumentWithoutFile
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("filename", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("file", DA_BLOB, DA_ALLOW_NULL);
-        $this->addColumn("fileMimeType", DA_STRING, DA_NOT_NULL);
+        $this->addColumn(
+            self::filename,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::file,
+            DA_BLOB,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::fileMimeType,
+            DA_STRING,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

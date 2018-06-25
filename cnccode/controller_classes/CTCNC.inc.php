@@ -66,7 +66,7 @@ define('CTCNC_MSG_INVALID_DATE', 'Invalid date');
 
 class CTCNC extends Controller
 {
-    var $userID = '';
+    var $userID;
     var $dbeUser;
     var $dbeTeam;
     private $user;

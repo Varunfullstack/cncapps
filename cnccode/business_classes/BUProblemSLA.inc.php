@@ -164,22 +164,6 @@ class BUProblemSLA extends Business
             }
 
             $this->dbeProblem->setValue('awaitingCustomerResponseFlag', $this->awaitingCustomerResponseFlag);
-            /* Removed as per GL
-                    if (
-                      $this->dbeProblem->getValue( 'priority' ) < 4 &&
-                      $workingHours > self::workingHoursAlertLimit &&
-                      $this->dbeProblem->getValue( 'workingHoursAlertSentFlag') =='N'
-                    ){
-                      /*
-                      Email to GL and RH
-                      */
-            /*
-            $this->dbeProblem->setValue('workingHoursAlertSentFlag', 'Y' );
-
-            $this->sendWorkingHoursAlertEmail( $dsResults->getValue( 'problemID') );
-
-          }
-  */
             $this->dbeProblem->updateRow();
 
             echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
@@ -205,23 +189,6 @@ class BUProblemSLA extends Business
             }
 
             $this->dbeProblem->setValue('awaitingCustomerResponseFlag', $this->awaitingCustomerResponseFlag);
-            /*
-                    if (
-                      $this->dbeProblem->getValue( 'priority' ) < 4 &&
-                      $workingHours > self::workingHoursAlertLimit &&
-                      $this->dbeProblem->getValue( 'workingHoursAlertSentFlag') =='N'
-                    ){
-
-                      /*
-                      Email to GL and RH
-                      */
-            /*
-                      $this->dbeProblem->setValue('workingHoursAlertSentFlag', 'Y' );
-
-                      $this->sendWorkingHoursAlertEmail( $dsResults->getValue( 'problemID') );
-
-                    }
-            */
             $this->dbeProblem->updateRow();
 
             echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
@@ -251,8 +218,10 @@ class BUProblemSLA extends Business
                 $hoursUntilComplete =
                     $this->getWorkingHoursBetweenUnixDates(
 
-                        date('U'),                                                      // from now
-                        strtotime($this->dbeProblem->getValue('completeDate') . ' ' . $dbeCallActivity->getValue('endTime')),  // time on completion date
+                        date('U'),
+                        // from now
+                        strtotime($this->dbeProblem->getValue('completeDate') . ' ' . $dbeCallActivity->getValue('endTime')),
+                        // time on completion date
                         false                                                           // no pauses
                     );
                 /*
@@ -275,7 +244,8 @@ class BUProblemSLA extends Business
                         $hoursUntilComplete <= ($this->workingHoursInDay * 2) &&
                         $this->dbeProblem->getValue('completionAlertCount') < 2
                     ) {
-                        $this->dbeProblem->setValue('completionAlertCount', $this->dbeProblem->getValue('completionAlertCount') + 1);
+                        $this->dbeProblem->setValue('completionAlertCount',
+                                                    $this->dbeProblem->getValue('completionAlertCount') + 1);
                         $this->dbeProblem->updateRow();
 
                         $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
@@ -287,7 +257,7 @@ class BUProblemSLA extends Business
                             $this->sendCompletionAlertEmail(
                                 $problemID,
                                 $this->dbeProblem->getValue('completeDate'),
-                                $dbeCustomer->getValue('workStartedEmailMainFlag')
+                                $dbeCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
                             );
 
 
@@ -558,8 +528,8 @@ class BUProblemSLA extends Business
         $copyEmailToMainContact = true;
 
         if (
-            $dbeCustomer->getValue('othersEmailMainFlag') == 'N' ||
-            $dbeCustomer->getValue('autoCloseEmailMainFlag') == 'N'
+            $dbeCustomer->getValue(DBECustomer::othersEmailMainFlag) == 'N' ||
+            $dbeCustomer->getValue(DBECustomer::autoCloseEmailMainFlag) == 'N'
         ) {
             $copyEmailToMainContact = false;
         }
@@ -587,7 +557,8 @@ class BUProblemSLA extends Business
         if ($copyEmailToMainContact) {
             if (
                 $workStartedEmailMain == 'Y' &&
-                $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses($dbeJCallActivity->getValue('customerID'), $toEmail)) {
+                $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses($dbeJCallActivity->getValue('customerID'),
+                                                                                       $toEmail)) {
 
                 if ($toEmail) {
                     $toEmail .= ',';

@@ -566,10 +566,10 @@ class CTPurchaseOrder extends CTCNC
                 'emailLink' => $emailLink,
                 'raisedByName' => Controller::htmlDisplayText($dsPorhead->getValue('raisedByName')),
                 'orderedByName' => Controller::htmlDisplayText($dsPorhead->getValue('orderedByName')),
-                'orderDate' => $this->dateYMDtoDMY($dsPorhead->getValue('orderDate')),
+                'orderDate' => Controller::dateYMDtoDMY($dsPorhead->getValue('orderDate')),
                 'supplierName' => Controller::htmlInputText($dsPorhead->getValue("supplierName")),
                 'supplierLink' => $supplierLink,
-                'date' => $this->dateYMDtoDMY($dsPorhead->getValue('date')),
+                'date' => Controller::dateYMDtoDMY($dsPorhead->getValue('date')),
                 'vatCode' => Controller::htmlDisplayText($dsPorhead->getValue('vatCode')),
                 'vatRate' => Controller::htmlDisplayText($dsPorhead->getValue('vatRate')),
                 'directDeliveryFlagChecked' => $this->getChecked($dsPorhead->getValue('directDeliveryFlag')),
@@ -628,7 +628,7 @@ class CTPurchaseOrder extends CTCNC
                 $sequenceNo = $dsPorline->getValue("sequenceNo");
                 $itemDescription = $dsPorline->getValue('itemDescription');
                 if ($dsPorline->getValue('expectedDate') != '0000-00-00') {
-                    $expectedDate = $this->dateYMDtoDMY($dsPorline->getValue('expectedDate'));
+                    $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue('expectedDate'));
                 } else {
                     $expectedDate = '';
                 }
@@ -792,7 +792,7 @@ class CTPurchaseOrder extends CTCNC
                 'qtyInvoiced' => $this->dsPorline->getValue("qtyInvoiced"),
                 'curUnitCost' => $this->dsPorline->getValue("curUnitCost"),
                 'curUnitCostMessage' => $this->dsPorline->getMessage("curUnitCost"),
-                'expectedDate' => $this->dateYMDtoDMY($this->dsPorline->getValue("expectedDate")),
+                'expectedDate' => Controller::dateYMDtoDMY($this->dsPorline->getValue("expectedDate")),
                 'expectedDateMessage' => $this->dsPorline->getMessage("expectedDate")
             )
         );

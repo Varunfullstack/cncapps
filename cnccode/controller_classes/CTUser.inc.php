@@ -9,7 +9,7 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg['path_dbe'] . '/DBECustomerNew.inc.php');
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBETeam.inc.php');
 // Actions
 define('CTUSER_ACT_DISPLAY_LIST', 'userList');
@@ -290,8 +290,7 @@ class CTUser extends CTCNC
                                              PHPLIB_PERM_RENEWALS) !== FALSE) ? CT_CHECKED : '',
 
                 'changeApproverFlagChecked' => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
-
-
+                'excludeFromStatsFlagChecked' => Controller::htmlChecked($dsUser->getValue(DBEUser::excludeFromStatsFlag)),
                 'reportsChecked' => (strpos($dsUser->getValue('perms'),
                                             PHPLIB_PERM_REPORTS) !== FALSE) ? CT_CHECKED : '',
                 'teamMessage' => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
@@ -340,15 +339,15 @@ class CTUser extends CTCNC
 
         // customer selection
         $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRows('name');
+        $dbeCustomer->getRows(DBECustomer::name);
         $this->template->set_block('UserEdit', 'customerBlock', 'customers');
         while ($dbeCustomer->fetchNext()) {
-            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue("customerID")) ? CT_SELECTED : '';
+            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(DBECustomer::customerID)) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'customerSelected' => $customerSelected,
-                    'customerID' => $dbeCustomer->getValue("customerID"),
-                    'customerName' => $dbeCustomer->getValue("name")
+                    'customerID' => $dbeCustomer->getValue(DBECustomer::customerID),
+                    'customerName' => $dbeCustomer->getValue(DBECustomer::name)
                 )
             );
             $this->template->parse('customers', 'customerBlock', true);

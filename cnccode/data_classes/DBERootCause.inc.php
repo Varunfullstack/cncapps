@@ -7,6 +7,10 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBERootCause extends DBEntity
 {
+    const rootCauseID = "rootCauseID";
+    const description = "description";
+    const longDescription = "longDescription";
+
     /**
      * calls constructor()
      * @access public
@@ -18,9 +22,24 @@ class DBERootCause extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("rootcause");
-        $this->addColumn("rootCauseID", DA_ID, DA_NOT_NULL, "rtc_rootcauseno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "rtc_desc");
-        $this->addColumn("longDescription", DA_STRING, DA_NOT_NULL, "rtc_long_desc");
+        $this->addColumn(
+            self::rootCauseID,
+            DA_ID,
+            DA_NOT_NULL,
+            "rtc_rootcauseno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "rtc_desc"
+        );
+        $this->addColumn(
+            self::longDescription,
+            DA_STRING,
+            DA_NOT_NULL,
+            "rtc_long_desc"
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
