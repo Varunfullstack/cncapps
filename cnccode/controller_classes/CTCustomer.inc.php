@@ -700,14 +700,17 @@ class CTCustomer extends CTCNC
                 DBECustomer::reviewMeetingEmailSentFlag,
                 $this->getYN($value['reviewMeetingEmailSentFlag'])
             );
+
             $this->dsCustomer->setValue(
                 DBECustomer::reviewAction,
                 $value['reviewAction']
+
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewUserID,
                 $value['reviewUserID']
             );
+
             $this->dsCustomer->setValue(
                 DBECustomer::accountManagerUserID,
                 $value['accountManagerUserID']
@@ -1884,9 +1887,7 @@ ORDER BY cus_name ASC  ";
                 'droppedCustomerDate'             => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
                 ),
-                'reviewAction'                    => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewAction)
-                ),
+                'reviewAction'                    => $this->dsCustomer->getValue(DBECustomer::reviewAction),
                 'comments'                        => $this->dsCustomer->getValue(DBECustomer::comments),
                 'techNotes'                       => $this->dsCustomer->getValue(DBECustomer::techNotes),
                 'slaP1'                           => $this->dsCustomer->getValue(DBECustomer::slaP1),
@@ -2015,7 +2016,9 @@ ORDER BY cus_name ASC  ";
                 array(
                     'leadStatusID'          => $dsLeadStatus->getValue(DBELeadStatus::leadStatusID),
                     'leadStatusDescription' => $dsLeadStatus->getValue(DBELeadStatus::description),
-                    'leadStatusSelected'    => ($dsLeadStatus->getValue(DBELeadStatus::leadStatusID) == $this->dsCustomer->getValue(
+                    'leadStatusSelected'    => ($dsLeadStatus->getValue(
+                            DBELeadStatus::leadStatusID
+                        ) == $this->dsCustomer->getValue(
                             DBECustomer::leadStatusID
                         )) ? CT_SELECTED : ''
                 )
@@ -2411,7 +2414,9 @@ ORDER BY cus_name ASC  ";
                         'ClientInformationForm.php',
                         array(
                             'contactID'   => $this->dsContact->getValue(DBEContact::contactID),
-                            'contactName' => $this->dsContact->getValue(DBEContact::firstName) . ' ' . $this->dsContact->getValue(
+                            'contactName' => $this->dsContact->getValue(
+                                    DBEContact::firstName
+                                ) . ' ' . $this->dsContact->getValue(
                                     DBEContact::lastName
                                 )
                         )
@@ -2463,19 +2468,45 @@ ORDER BY cus_name ASC  ";
                         ) == $this->dsSite->getValue(
                             DBESite::deliverContactID
                         )) ? CT_CHECKED : '',
-                    'sendMailshotFlagChecked'     => $this->getChecked($this->dsContact->getValue(DBEContact::sendMailshotFlag)),
-                    'accountsFlagChecked'         => $this->getChecked($this->dsContact->getValue(DBEContact::accountsFlag)),
-                    'mailshot1FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot1Flag)),
-                    'mailshot2FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot2Flag)),
-                    'mailshot3FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot3Flag)),
-                    'mailshot4FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot4Flag)),
-                    'mailshot5FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot5Flag)),
-                    'mailshot6FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot6Flag)),
-                    'mailshot7FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot7Flag)),
-                    'mailshot8FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot8Flag)),
-                    'mailshot9FlagChecked'        => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot9Flag)),
-                    'mailshot10FlagChecked'       => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot10Flag)),
-                    'mailshot11FlagChecked'       => $this->getChecked($this->dsContact->getValue(DBEContact::mailshot11Flag)),
+                    'sendMailshotFlagChecked'     => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::sendMailshotFlag)
+                    ),
+                    'accountsFlagChecked'         => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::accountsFlag)
+                    ),
+                    'mailshot1FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot1Flag)
+                    ),
+                    'mailshot2FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot2Flag)
+                    ),
+                    'mailshot3FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot3Flag)
+                    ),
+                    'mailshot4FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot4Flag)
+                    ),
+                    'mailshot5FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot5Flag)
+                    ),
+                    'mailshot6FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot6Flag)
+                    ),
+                    'mailshot7FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot7Flag)
+                    ),
+                    'mailshot8FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot8Flag)
+                    ),
+                    'mailshot9FlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot9Flag)
+                    ),
+                    'mailshot10FlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot10Flag)
+                    ),
+                    'mailshot11FlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot11Flag)
+                    ),
                     'workStartedEmailFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),

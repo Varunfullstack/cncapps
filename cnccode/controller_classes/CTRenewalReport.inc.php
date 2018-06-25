@@ -29,9 +29,20 @@ class CTRenewalReport extends CTCNC
     var $dsSearchForm = '';
     var $page = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "sales",
             "technical"
@@ -41,8 +52,15 @@ class CTRenewalReport extends CTCNC
             exit;
         }
         $this->dsSearchForm = new DSForm ($this);
-        $this->dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $this->dsSearchForm->setValue('customerID', '');
+        $this->dsSearchForm->addColumn(
+            'customerID',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsSearchForm->setValue(
+            'customerID',
+            ''
+        );
 
     }
 
@@ -54,15 +72,17 @@ class CTRenewalReport extends CTCNC
         switch ($_REQUEST['action']) {
 
             case 'produceReport':
-                $this->page = $this->produceReport(false, false);
+                $this->page = $this->produceReport(
+                    false,
+                    false
+                );
                 break;
 
             case 'producePdfReport':
-                $this->page = $this->produceReport(false, true);
-                break;
-
-            case 'createQuote':
-                $this->createQuote();
+                $this->page = $this->produceReport(
+                    false,
+                    true
+                );
                 break;
 
             case 'Search':
@@ -118,20 +138,30 @@ class CTRenewalReport extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $urlSubmit = $this->buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
 
 
         $this->setPageTitle('Renewal Report');
 
         if ($this->dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
-            $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
+            $dsCustomer = new DataSet($this);
+            $buCustomer->getCustomerByID(
+                $this->dsSearchForm->getValue('customerID'),
+                $dsCustomer
+            );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                                                   'htmlFmt' => CT_HTML_FMT_POPUP
-                                             ));
+        $urlCustomerPopup = $this->buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
 
         $this->template->set_var(
             array(
@@ -146,7 +176,11 @@ class CTRenewalReport extends CTCNC
             )
         );
 
-        $this->template->parse('CONTENTS', 'RenewalReportSearch', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenewalReportSearch',
+            true
+        );
 
         $this->parsePage();
 
@@ -154,8 +188,13 @@ class CTRenewalReport extends CTCNC
 
     /**
      * @access private
+     * @param bool $customerID
+     * @param bool $createPdf
+     * @return mixed
      */
-    function produceReport($customerID = false, $createPdf = false)
+    function produceReport($customerID = false,
+                           $createPdf = false
+    )
     {
         $this->setMethodName('produceReport');
 
@@ -163,7 +202,10 @@ class CTRenewalReport extends CTCNC
             $this->setHTMLFmt(CT_HTML_FMT_PDF);
         }
 
-        $this->setTemplateFiles('RenewalReport', 'RenewalReport.inc');
+        $this->setTemplateFiles(
+            'RenewalReport',
+            'RenewalReport.inc'
+        );
 
         if ($customerID) {
             $calledFromSearch = true;
@@ -178,20 +220,35 @@ class CTRenewalReport extends CTCNC
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
 
-        $this->template->set_var('customerName', $dbeCustomer->getValue(DBECustomer::name));
+        $this->template->set_var(
+            'customerName',
+            $dbeCustomer->getValue(DBECustomer::name)
+        );
 
         $buRenewal = new BURenewal($this);
 
-        $items = $buRenewal->getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo, $this);
+        $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
+            $customerID,
+            $displayAccountsInfo,
+            $this
+        );
 
-        usort($items,
-            function ($a, $b) {
+        usort(
+            $items,
+            function ($a,
+                      $b
+            ) {
                 return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
-            });
+            }
+        );
 
         $lastItemTypeDescription = false;
 
-        $this->template->set_block('RenewalReport', 'itemBlock', 'items');
+        $this->template->set_block(
+            'RenewalReport',
+            'itemBlock',
+            'items'
+        );
 
         $totalCostPrice = 0;
         $totalSalePrice = 0;
@@ -259,7 +316,11 @@ class CTRenewalReport extends CTCNC
                 )
             );
 
-            $this->template->parse('items', 'itemBlock', true);
+            $this->template->parse(
+                'items',
+                'itemBlock',
+                true
+            );
         }
 
         /*
@@ -282,7 +343,10 @@ class CTRenewalReport extends CTCNC
         );
 
         if ($displayAccountsInfo) {
-            $urlCreateQuote = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => 'createQuote'));
+            $urlCreateQuote = $this->buildLink(
+                $_SERVER ['PHP_SELF'],
+                array('action' => 'createQuote')
+            );
 
 
             $this->template->set_var(
@@ -295,16 +359,26 @@ class CTRenewalReport extends CTCNC
             );
         }
         if ($createPdf) {
-            $this->template->parse('CONTENTS', 'RenewalReport', true);
+            $this->template->parse(
+                'CONTENTS',
+                'RenewalReport',
+                true
+            );
 
-            $this->template->parse("CONTENTS", "page");
+            $this->template->parse(
+                "CONTENTS",
+                "page"
+            );
 
             $output = $this->template->get("CONTENTS");
 
             require_once BASE_DRIVE . '/vendor/autoload.php';
 
             $options = new \Dompdf\Options();
-            $options->set('isRemoteEnabled', true);
+            $options->set(
+                'isRemoteEnabled',
+                true
+            );
             $dompdf = new \Dompdf\Dompdf($options);
 
 
@@ -315,95 +389,52 @@ class CTRenewalReport extends CTCNC
 
             set_time_limit(120);                           // it may take some time!
 
-            $dompdf->setPaper('a4', 'landscape');
+            $dompdf->setPaper(
+                'a4',
+                'landscape'
+            );
 
             $dompdf->render();
 
-            $dompdf->add_info('Title', 'Renewal Report - ' . $dbeCustomer->getValue(DBECustomer::name));
+            $dompdf->add_info(
+                'Title',
+                'Renewal Report - ' . $dbeCustomer->getValue(DBECustomer::name)
+            );
 
-            $dompdf->add_info('Author', 'CNC Ltd');
+            $dompdf->add_info(
+                'Author',
+                'CNC Ltd'
+            );
 
-            $dompdf->add_info('Subject', 'Renewal Report');
+            $dompdf->add_info(
+                'Subject',
+                'Renewal Report'
+            );
 
             header("Content-type:application/pdf");
             header("Content-Disposition:attachment;filename='downloaded.pdf'");
             echo $dompdf->output();
             exit;
         } elseif ($calledFromSearch) {
-            $this->template->parse('output', 'RenewalReport', true);
+            $this->template->parse(
+                'output',
+                'RenewalReport',
+                true
+            );
 
             return $this->template->get_var('output');
 
         } else {
-            $this->template->parse('CONTENTS', 'RenewalReport', true);
+            $this->template->parse(
+                'CONTENTS',
+                'RenewalReport',
+                true
+            );
 
             $this->parsePage();
         }
 
-
-    }
-
-    function createQuote()
-    {
-        /*
-        Go trhough diferent types of renewal creating a quote for each
-        */
-        if ($_REQUEST['selectedRenewal']['domain']) {
-            $buRenDomain = new BURenDomain($this);
-            $ordheadIDs[] = $buRenDomain->createRenewalsSalesOrders($_REQUEST['selectedRenewal']['domain']);
-        }
-
-        if ($_REQUEST['selectedRenewal']['contract']) {
-            $buRenContract = new BURenContract($this);
-            $ordheadIDs[] = $buRenContract->createRenewalsSalesOrders($_REQUEST['selectedRenewal']['contract']);
-        }
-
-        if ($_REQUEST['selectedRenewal']['broadband']) {
-            $buRenBroadband = new BURenBroadband($this);
-            $ordheadIDs[] = $buRenBroadband->createRenewalsSalesOrders($_REQUEST['selectedRenewal']['broadband']);
-        }
-
-        if ($_REQUEST['selectedRenewal']['quotation']) {
-            $buRenQuotation = new BURenQuotation($this);
-            $ordheadIDs[] = $buRenQuotation->createRenewalsQuotations($_REQUEST['selectedRenewal']['quotation']);
-        }
-        /*
-        Join the quotes together
-        */
-        if ($ordheadIDs) {
-
-            $buSalesOrder = new BUSalesOrder($this);
-
-            foreach ($ordheadIDs as $key => $ordheadID) {
-                if ($key == 0) {
-                    $toOrdheadID = $ordheadID; // apend to first order
-                    continue;
-                }
-                $buSalesOrder->pasteLinesFromOrder($ordheadID, $toOrdheadID, true);
-                // delete copied order
-                $buSalesOrder->deleteOrder($ordheadID);
-            }
-
-
-            $nextURL =
-                $this->buildLink(
-                    'SalesOrder.php',
-                    array(
-                        'action'    => 'displaySalesOrder',
-                        'ordheadID' => $toOrdheadID
-                    )
-                );
-        } else {
-            // nothing checked so back to display
-            $nextURL =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array()
-                );
-        }
-
-        header('Location: ' . $nextURL);
-        exit;
+        return true;
     }
 
 }// end of class
