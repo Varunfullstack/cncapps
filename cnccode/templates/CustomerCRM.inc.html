@@ -652,6 +652,7 @@
                                 size="10"
                                 maxlength="50"
                                 value="{lastName}"
+                                required
                         >
                     </td>
                     <td class="content"><input
@@ -1095,20 +1096,20 @@
             <div class="content label">
                 Comments
             </div>
-            <textarea name="form[customer][{customerID}][CrmComments]"
+            <textarea name="form[customer][{customerID}][crmComments]"
                       id="crmComments"
-            >{CrmComments}</textarea>
+            >{crmComments}</textarea>
             <script type="text/javascript">
-                reason = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
+                crmComments = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
             </script>
         </div>
         <div class="textarea">
             <div class="content label">
                 Company Background
             </div>
-            <textarea name="form[customer][{customerID}][CompanyBackground]"
+            <textarea name="form[customer][{customerID}][companyBackground]"
                       id="CompanyBackground"
-            >{CompanyBackground}</textarea>
+            >{companyBackground}</textarea>
             <script type="text/javascript">
                 reason = CKEDITOR.replace('CompanyBackground', {customConfig: '/ckeditor_config.js'});
             </script>
@@ -1117,9 +1118,9 @@
             <div class="content label">
                 Decision Maker Background
             </div>
-            <textarea name="form[customer][{customerID}][DecisionMakerBackground]"
+            <textarea name="form[customer][{customerID}][decisionMakerBackground]"
                       id="DecisionMakerBackground"
-            >{DecisionMakerBackground}</textarea>
+            >{decisionMakerBackground}</textarea>
             <script type="text/javascript">
                 reason = CKEDITOR.replace('DecisionMakerBackground', {customConfig: '/ckeditor_config.js'});
             </script>
@@ -1128,9 +1129,9 @@
             <div class="content label">
                 Opportunity Deal
             </div>
-            <textarea name="form[customer][{customerID}][OpportunityDeal]"
+            <textarea name="form[customer][{customerID}][opportunityDeal]"
                       id="OpportunityDeal"
-            >{OpportunityDeal}</textarea>
+            >{opportunityDeal}</textarea>
             <script type="text/javascript">
                 reason = CKEDITOR.replace('OpportunityDeal', {customConfig: '/ckeditor_config.js'});
             </script>
