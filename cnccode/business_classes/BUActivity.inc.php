@@ -34,6 +34,7 @@ require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg["path_dbe"]. "/DBEJPorhead.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
