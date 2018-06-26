@@ -546,7 +546,7 @@ class BUProblemSLA extends Business
         Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact or don't want to get them.
         */
 
-                $dbeContact = new DBEContact($this);
+        $dbeContact = new DBEContact($this);
 
         $dbeContact->getMainSupportRowsByCustomerID($dbeJProblem->getValue('customerID'));
 

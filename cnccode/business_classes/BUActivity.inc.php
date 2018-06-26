@@ -8480,7 +8480,6 @@ is currently a balance of ';
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dbeJProblem->getValue(DBEJProblem::customerID));
 
-
         /*
     See whether to send an email to the last activity contact
     */
@@ -8506,7 +8505,8 @@ is currently a balance of ';
 
         if ($parameters['templateName'] == 'WorkCommencedEmail' &&
             $mainSupportEmailAddresses =
-                $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue(DBEJCallActivity::customerID), $toEmail,
+                $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue(DBEJCallActivity::customerID),
+                                                          $toEmail,
                                                           DBEContact::OthersWorkStartedEmailFlag)
         ) {
             if ($toEmail) {

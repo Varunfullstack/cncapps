@@ -313,11 +313,8 @@ class CTCustomerCRM extends CTCNC
 
             if ($dsSearchForm->getValue('customerID')) {
                 $buCustomer = new BUCustomer ($this);
-                $buCustomer->getCustomerByID(
-                    $dsSearchForm->getValue('customerID'),
-                    $dsCustomer
-                );
-                $customerString = $dsCustomer->getValue(DBECustomer::name);
+                $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer
+                );$customerString = $dsCustomer->getValue(DBECustomer::name);
             }
 
             $urlCustomerPopup =
@@ -433,24 +430,16 @@ class CTCustomerCRM extends CTCNC
 
             if (!$phone) {
                 $site = new DBESite($this);
-                $site->setValue(
-                    DBESite::customerID,
-                    $customerID
-                );
-                $site->setValue(
-                    DBESite::siteNo,
-                    $results->getValue(DBEContact::siteNo)
-                );
+                $site->setValue(DBESite::customerID, $customerID
+                );$site->setValue(DBESite::siteNo, $results->getValue(DBEContact::siteNo));
                 $site->getRow();
 
                 $phone = $site->getValue(DBESite::phone);
             }
 
             $contactData = [
-                "contactName"  => $results->getValue(DBEContact::firstName) . " " . $results->getValue(
-                        DBEContact::lastName
-                    ),
-                "jobTitle"     => $results->getValue(DBEContact::position),
+                "contactName" => $results->getValue(DBEContact::firstName) . " " . $results->getValue(DBEContact::lastName),
+                "jobTitle" => $results->getValue(DBEContact::position),
                 'contactPhone' => $phone
             ];
             $data[] = array_merge(
@@ -482,31 +471,13 @@ class CTCustomerCRM extends CTCNC
 
         while (list($key, $value) = each($contactArray)) {
             $this->dsContact->setUpdateModeInsert();
-            $this->dsContact->setValue(
-                DBEContact::contactID,
-                $value['contactID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::customerID,
-                $value['customerID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::supplierID,
-                $value['supplierID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::siteNo,
-                $value['siteNo']
-            );
-            $this->dsContact->setValue(
-                DBEContact::title,
-                $value['title']
-            );
-            $this->dsContact->setValue(
-                DBEContact::lastName,
-                $value['lastName']
-            );
-            if ($this->dsContact->getValue(DBEContact::lastName) == '') {
+            $this->dsContact->setValue(DBEContact::contactID, $value['contactID']
+            );$this->dsContact->setValue(DBEContact::customerID, $value['customerID']
+            );$this->dsContact->setValue(DBEContact::supplierID, $value['supplierID']
+            );$this->dsContact->setValue(DBEContact::siteNo, $value['siteNo']
+            );$this->dsContact->setValue(DBEContact::title, $value['title']
+            );$this->dsContact->setValue(DBEContact::lastName, $value['lastName']
+            );if ($this->dsContact->getValue(DBEContact::lastName) == '') {
                 $this->setFormErrorOn();
                 $this->dsContact->setValue(
                     'LastNameClass',
@@ -675,33 +646,18 @@ class CTCustomerCRM extends CTCNC
                     CTCUSTOMER_CLS_FORM_ERROR
                 );
             }
-            $this->dsSite->setValue(
-                DBESite::add2,
-                $value['add2']
-            );
-            $this->dsSite->setValue(
-                DBESite::add3,
-                $value['add3']
-            );
-            $this->dsSite->setValue(
-                DBESite::town,
-                strtoupper($value['town'])
-            );
-            if ($this->dsSite->getValue(DBESite::town) == '') {
+            $this->dsSite->setValue(DBESite::add2, $value['add2']
+            );$this->dsSite->setValue(DBESite::add3, $value['add3']
+            );$this->dsSite->setValue(DBESite::town, strtoupper($value['town'])
+            );if ($this->dsSite->getValue(DBESite::town) == '') {
 //                $this->setFormErrorOn();
                 $this->dsSite->setValue(
                     'TownClass',
                     CTCUSTOMER_CLS_FORM_ERROR_UC
                 );
             }
-            $this->dsSite->setValue(
-                DBESite::county,
-                $value['county']
-            );
-            $this->dsSite->setValue(
-                DBESite::postcode,
-                strtoupper($value['postcode'])
-            );
+            $this->dsSite->setValue(DBESite::county, $value['county']
+            );$this->dsSite->setValue(DBESite::postcode, strtoupper($value['postcode']));
             if ($this->dsSite->getValue(DBESite::postcode) == '') {
 //                $this->setFormErrorOn();
                 $this->dsSite->setValue(
@@ -1721,14 +1677,8 @@ class CTCustomerCRM extends CTCNC
             );
 
         $site = new DBESite($this);
-        $site->setValue(
-            DBESite::siteNo,
-            $this->dsCustomer->getValue(DBECustomer::deliverSiteNo)
-        );
-        $site->setValue(
-            DBESite::customerID,
-            $this->getCustomerID()
-        );
+        $site->setValue(DBESite::siteNo, $this->dsCustomer->getValue(DBECustomer::deliverSiteNo));
+        $site->setValue(DBESite::customerID, $this->getCustomerID());
         $site->getRowByCustomerIDSiteNo();
 
         $this->template->set_var(
@@ -1805,11 +1755,11 @@ class CTCustomerCRM extends CTCNC
                 'add3' => $site->getValue(DBESite::add3),
 
                 'town'              => $site->getValue(DBESite::town),
-                'county'            => $site->getValue(DBESite::county),
+                'county' => $site->getValue(DBESite::county),
                 'postcode'          => $site->getValue(DBESite::postcode),
                 'sitePhone'         => $site->getValue(DBESite::phone),
                 'siteNo'            => $site->getValue(DBESite::siteNo),
-                'sageRef'           => $site->getValue(DBESite::sageRef),
+                'sageRef' => $site->getValue(DBESite::sageRef),
                 'debtorCode'        => $site->getValue(DBESite::debtorCode),
                 'maxTravelHours'    => $site->getValue(DBESite::maxTravelHours),
                 'deliverContactID'  => $site->getValue(DBESite::deliverContactID),
@@ -1817,9 +1767,8 @@ class CTCustomerCRM extends CTCNC
                 'activeFlag'        => $site->getValue(DBESite::activeFlag),
                 'deliveryContactID' => $site->getValue(DBESite::deliverContactID),
                 'invoiceContactID'  => $site->getValue(DBESite::deliverContactID),
-                'nonUKFlag'         => $site->getValue(DBESite::nonUKFlag),
-                ' deleteSiteText'   => null,
-                'deleteSiteURL'     => null
+                'nonUKFlag'         => $site->getValue(DBESite::nonUKFlag),' deleteSiteText'   => null,
+                'deleteSiteURL' => null
             )
         );
         if ((!$this->formError) & ($this->getAction(
@@ -1894,9 +1843,7 @@ class CTCustomerCRM extends CTCNC
                 array(
                     'reviewMeetingFrequencyMonths'            => $index,
                     'reviewMeetingFrequencyMonthsDescription' => $value,
-                    'reviewMeetingFrequencyMonthsSelected'    => $index == $this->dsCustomer->getValue(
-                        DBECustomer::reviewMeetingFrequencyMonths
-                    ) ? CT_SELECTED : ''
+                    'reviewMeetingFrequencyMonthsSelected' => $index == $this->dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse(
@@ -1946,9 +1893,7 @@ class CTCustomerCRM extends CTCNC
                 array(
                     'sectorID'          => $dsSector->getValue("sectorID"),
                     'sectorDescription' => $dsSector->getValue("description"),
-                    'sectorSelected'    => ($dsSector->getValue('sectorID') == $this->dsCustomer->getValue(
-                            DBECustomer::sectorID
-                        )) ? CT_SELECTED : ''
+                    'sectorSelected' => ($dsSector->getValue('sectorID') == $this->dsCustomer->getValue(DBECustomer::sectorID)) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse(
@@ -1969,9 +1914,7 @@ class CTCustomerCRM extends CTCNC
                 array(
                     'leadStatusID'          => $dsLeadStatus->getValue("leadStatusID"),
                     'leadStatusDescription' => $dsLeadStatus->getValue("description"),
-                    'leadStatusSelected'    => ($dsLeadStatus->getValue('leadStatusID') == $this->dsCustomer->getValue(
-                            DBECustomer::leadStatusID
-                        )) ? CT_SELECTED : ''
+                    'leadStatusSelected' => ($dsLeadStatus->getValue('leadStatusID') == $this->dsCustomer->getValue(DBECustomer::leadStatusID)) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse(
@@ -1996,11 +1939,9 @@ class CTCustomerCRM extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'reviewUserID'       => $dsUser->getValue("userID"),
-                    'reviewUserName'     => $dsUser->getValue("name"),
-                    'reviewUserSelected' => ($dsUser->getValue('userID') == $this->dsCustomer->getValue(
-                            DBECustomer::reviewUserID
-                        )) ? CT_SELECTED : ''
+                    'reviewUserID' => $dsUser->getValue("userID"),
+                    'reviewUserName' => $dsUser->getValue("name"),
+                    'reviewUserSelected' => ($dsUser->getValue('userID') == $this->dsCustomer->getValue(DBECustomer::reviewUserID)) ? CT_SELECTED : ''
                 )
             );
 
@@ -2027,11 +1968,9 @@ class CTCustomerCRM extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'accountManagerUserID'       => $dsUser->getValue("userID"),
-                    'accountManagerUserName'     => $dsUser->getValue("name"),
-                    'accountManagerUserSelected' => ($dsUser->getValue('userID') == $this->dsCustomer->getValue(
-                            DBECustomer::accountManagerUserID
-                        )) ? CT_SELECTED : ''
+                    'accountManagerUserID' => $dsUser->getValue("userID"),
+                    'accountManagerUserName' => $dsUser->getValue("name"),
+                    'accountManagerUserSelected' => ($dsUser->getValue('userID') == $this->dsCustomer->getValue(DBECustomer::accountManagerUserID)) ? CT_SELECTED : ''
                 )
             );
 
@@ -2223,10 +2162,7 @@ class CTCustomerCRM extends CTCNC
                 )
             );
         // If we can delete this site set the link
-        if ($this->buCustomer->canDeleteSite(
-            $site->getValue(DBESite::customerID),
-            $site->getValue(DBESite::siteNo)
-        )) {
+        if ($this->buCustomer->canDeleteSite($site->getValue(DBESite::customerID), $site->getValue(DBESite::siteNo))) {
             $deleteSiteURL = $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -2240,14 +2176,8 @@ class CTCustomerCRM extends CTCNC
             $deleteSiteText = '';
         }
         //Horrible hack cause I don't understand why these are empty strings when they should be zero values!
-        if ($this->dsCustomer->getValue(DBECustomer::invoiceSiteNo) == '') $this->dsCustomer->setValue(
-            DBECustomer::invoiceSiteNo,
-            '0'
-        );
-        if ($this->dsCustomer->getValue(DBECustomer::deliverSiteNo) == '') $this->dsCustomer->setValue(
-            DBECustomer::deliverSiteNo,
-            '0'
-        );
+        if ($this->dsCustomer->getValue(DBECustomer::invoiceSiteNo) == '') $this->dsCustomer->setValue(DBECustomer::invoiceSiteNo,'0');
+        if ($this->dsCustomer->getValue(DBECustomer::deliverSiteNo) == '') $this->dsCustomer->setValue(DBECustomer::deliverSiteNo,'0');
         $this->template->set_var(
             array(
                 'add1Class'      => $thing,
@@ -2266,15 +2196,11 @@ class CTCustomerCRM extends CTCNC
                 'debtorCode'     => $site->getValue(DBESite::debtorCode),
                 'maxTravelHours' => $site->getValue(DBESite::maxTravelHours),
 
-                'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue(DBECustomer::invoiceSiteNo) == $site->getValue(
-                        DBESite::siteNo
-                    )) ? CT_CHECKED : '',
-                'deliverSiteFlagChecked' => ($this->dsCustomer->getValue(DBECustomer::deliverSiteNo) == $site->getValue(
-                        DBESite::siteNo
-                    )) ? CT_CHECKED : '',
-                'activeFlagChecked'      => ($site->getValue(DBESite::activeFlag) == 'Y') ? CT_CHECKED : '',
-                'deleteSiteText'         => $deleteSiteText,
-                'deleteSiteURL'          => $deleteSiteURL
+                'invoiceSiteFlagChecked' => ($this->dsCustomer->getValue(DBECustomer::invoiceSiteNo) == $site->getValue(DBESite::siteNo)) ? CT_CHECKED : '',
+                'deliverSiteFlagChecked' => ($this->dsCustomer->getValue(DBECustomer::deliverSiteNo) == $site->getValue(DBESite::siteNo)) ? CT_CHECKED : '',
+                'activeFlagChecked' => ($site->getValue(DBESite::activeFlag) == 'Y') ? CT_CHECKED : '',
+                'deleteSiteText' => $deleteSiteText,
+                'deleteSiteURL' => $deleteSiteURL
             )
         );
 
@@ -2356,10 +2282,8 @@ class CTCustomerCRM extends CTCNC
                     $this->buildLink(
                         'ClientInformationForm.php',
                         array(
-                            'contactID'   => $this->dsContact->getValue(DBEContact::contactID),
-                            'contactName' => $this->dsContact->getValue(
-                                    DBEContact::firstName
-                                ) . ' ' . $this->dsContact->getValue(DBEContact::lastName)
+                            'contactID' => $this->dsContact->getValue(DBEContact::contactID),
+                            'contactName' => $this->dsContact->getValue(DBEContact::firstName) . ' ' . $this->dsContact->getValue(DBEContact::lastName)
                         )
                     );
                 $dearJohnURL =
@@ -2525,11 +2449,8 @@ class CTCustomerCRM extends CTCNC
                         'orderURL'  => $orderURL,
                         'ordheadID' => $ordheadID,
                         'orderType' => $this->getOrderTypeDescription($dbeJOrdhead->getValue(DBEJOrdhead::type)),
-                        'orderDate' => strftime(
-                            "%d/%m/%Y",
-                            strtotime($dbeJOrdhead->getValue(DBEJOrdhead::date))
-                        ),
-                        'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
+                        'orderDate' => strftime("%d/%m/%Y", strtotime($dbeJOrdhead->getValue(DBEJOrdhead::date))
+                        ),'custPORef' => $dbeJOrdhead->getValue(DBEJOrdhead::custPORef)
                     )
                 );
 
@@ -2543,10 +2464,7 @@ class CTCustomerCRM extends CTCNC
 
         }
         if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
-            $this->documents(
-                $this->dsCustomer->getValue(DBECustomer::customerID),
-                'CustomerEdit'
-            );
+            $this->documents($this->dsCustomer->getValue(DBECustomer::customerID),'CustomerEdit');
         }
 
         $this->template->parse(
@@ -2641,11 +2559,8 @@ class CTCustomerCRM extends CTCNC
         if ($this->getContactID() == '') {
             $this->displayFatalError('ContactID not passed');
         }
-        $this->buCustomer->getContactByID(
-            $this->getContactID(),
-            $dsContact
-        );
-        $this->setCustomerID($dsContact->getValue(DBEContact::customerID));
+        $this->buCustomer->getContactByID($this->getContactID(), $dsContact
+        );$this->setCustomerID($dsContact->getValue(DBEContact::customerID));
 
         $nextURL =
             $this->buildLink(
@@ -2698,10 +2613,10 @@ class CTCustomerCRM extends CTCNC
         $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
         if (!$this->formError) {
 
-            $this->buCustomer->updateCustomer($this->dsCustomer);
-            $this->buCustomer->updateSite($this->dsSite);
-            if (isset($this->postVars["form"]["contact"])) {
-                $this->buCustomer->updateContact($this->dsContact);
+                $this->buCustomer->updateCustomer($this->dsCustomer);
+                $this->buCustomer->updateSite($this->dsSite);
+                if (isset($this->postVars["form"]["contact"])) {
+                    $this->buCustomer->updateContact($this->dsContact);
 
             }
 
@@ -2836,10 +2751,8 @@ class CTCustomerCRM extends CTCNC
     {
         // Site selection
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue(
-            DBESite::customerID,
-            $customerID
-        );
+        $dbeSite->setValue(DBESite::customerID,
+            $customerID);
         $dbeSite->getRowsByCustomerID();
 
 
