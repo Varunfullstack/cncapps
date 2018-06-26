@@ -1,7 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.8.0] 
+## [v1.8.1] - 2018-06-26
+### Fixed
+- Issue 287 - Fix problem with sales orders
+
+## [v1.8.0] - 2018-06-26 
 ### Added
 - Issue 195 - Graph to show user productivity
 - Issue 264 - Add option for Monthly in customer review meeting frequency
