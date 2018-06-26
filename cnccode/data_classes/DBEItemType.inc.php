@@ -7,6 +7,11 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEItemType extends DBCNCEntity
 {
+
+    const itemTypeID = "itemTypeID";
+    const description = "description";
+    const stockcat = "stockcat";
+
     /**
      * calls constructor()
      * @access public
@@ -18,9 +23,24 @@ class DBEItemType extends DBCNCEntity
     {
         parent::__construct($owner);
         $this->setTableName("itemtype");
-        $this->addColumn("itemTypeID", DA_ID, DA_NOT_NULL, "ity_itemtypeno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "ity_desc");
-        $this->addColumn("stockcat", DA_STRING, DA_NOT_NULL, "ity_stockcat");
+        $this->addColumn(
+            self::itemTypeID,
+            DA_ID,
+            DA_NOT_NULL,
+            "ity_itemtypeno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "ity_desc"
+        );
+        $this->addColumn(
+            self::stockcat,
+            DA_STRING,
+            DA_NOT_NULL,
+            "ity_stockcat"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

@@ -11,7 +11,7 @@ define('BO_CLASSNAME_BASEOBJECT', 'BaseObject');
 class BaseObject
 {
     var $methodName = "";
-    var $owner = "";                    // The owner object of this object
+    var $owner;                    // The owner object of this object
 
     function __construct(&$owner)
     {

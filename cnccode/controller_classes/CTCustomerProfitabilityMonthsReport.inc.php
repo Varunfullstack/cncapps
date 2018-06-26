@@ -9,7 +9,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerProfitabilityMonthsReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerProfitabilityMonthsReport extends CTCNC
@@ -108,7 +108,7 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue(DBECustomer::Name);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(

@@ -122,13 +122,13 @@ class CTSite extends CTCNC
         if ($this->dsSite->rowCount() > 0) {
             $this->template->set_block('SiteSelect', 'siteBlock', 'sites');
             while ($this->dsSite->fetchNext()) {
-                $siteDesc = $this->dsSite->getValue(DBESite::Add1) . ' ' .
-                    $this->dsSite->getValue(DBESite::Town) . ' ' . $this->dsSite->getValue(DBESite::Postcode);
+                $siteDesc = $this->dsSite->getValue(DBESite::add1) . ' ' .
+                    $this->dsSite->getValue(DBESite::town) . ' ' . $this->dsSite->getValue(DBESite::postcode);
                 $this->template->set_var(
                     array(
                         'siteDesc'        => Controller::htmlDisplayText(($siteDesc)),
                         'submitName'      => addslashes($siteDesc), //so dblquotes don't mess javascript up
-                        'siteNo'          => $this->dsSite->getValue(DBESite::SiteNo),
+                        'siteNo'          => $this->dsSite->getValue(DBESite::siteNo),
                         // this is so the popup knows which field on the parent to update
                         'parentIDField'   => $_SESSION['siteParentIDField'],
                         'parentDescField' => $_SESSION['siteParentDescField']
@@ -173,8 +173,8 @@ class CTSite extends CTCNC
                 CTCNC_PAGE_CONTACT,
                 array(
                     'action'     => CTCNC_ACT_CONTACT_EDIT,
-                    'siteNo'     => $this->dsSite->getValue(DBESite::SiteNo),
-                    'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
+                    'siteNo'     => $this->dsSite->getValue(DBESite::siteNo),
+                    'customerID' => $this->dsSite->getValue(DBESite::customerID),
                     'htmlFmt'    => CT_HTML_FMT_POPUP
                 )
             );
@@ -183,37 +183,37 @@ class CTSite extends CTCNC
                 CTCNC_PAGE_CONTACT,
                 array(
                     'action'     => CTCNC_ACT_CONTACT_POPUP,
-                    'siteNo'     => $this->dsSite->getValue(DBESite::SiteNo),
-                    'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
+                    'siteNo'     => $this->dsSite->getValue(DBESite::siteNo),
+                    'customerID' => $this->dsSite->getValue(DBESite::customerID),
                     'htmlFmt'    => CT_HTML_FMT_POPUP
                 )
             );
         $this->template->set_var(
             array(
-                'siteNo'            => $this->dsSite->getValue(DBESite::SiteNo),
-                'customerID'        => $this->dsSite->getValue(DBESite::CustomerID),
-                'add1'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::Add1)),
+                'siteNo'            => $this->dsSite->getValue(DBESite::siteNo),
+                'customerID'        => $this->dsSite->getValue(DBESite::customerID),
+                'add1'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add1)),
                 'add1Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add1')),
-                'add2'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::Add2)),
+                'add2'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add2)),
                 'add2Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add2')),
-                'add3'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::Add3)),
+                'add3'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add3)),
                 'add3Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add3')),
-                'town'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::Town)),
+                'town'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::town)),
                 'townMessage'       => Controller::htmlDisplayText($this->dsSite->getMessage('town')),
-                'county'            => Controller::htmlInputText($this->dsSite->getValue(DBESite::County)),
+                'county'            => Controller::htmlInputText($this->dsSite->getValue(DBESite::county)),
                 'countyMessage'     => Controller::htmlDisplayText($this->dsSite->getMessage('county')),
-                'postcode'          => Controller::htmlInputText($this->dsSite->getValue(DBESite::Postcode)),
+                'postcode'          => Controller::htmlInputText($this->dsSite->getValue(DBESite::postcode)),
                 'postcodeMessage'   => Controller::htmlDisplayText($this->dsSite->getMessage('postcode')),
-                'phone'             => Controller::htmlInputText($this->dsSite->getValue(DBESite::Phone)),
+                'phone'             => Controller::htmlInputText($this->dsSite->getValue(DBESite::phone)),
                 'phoneMessage'      => Controller::htmlDisplayText($this->dsSite->getMessage('phone')),
-                'debtorCode'        => Controller::htmlInputText($this->dsSite->getValue(DBESite::DebtorCode)),
+                'debtorCode'        => Controller::htmlInputText($this->dsSite->getValue(DBESite::debtorCode)),
                 'debtorCodeMessage' => Controller::htmlDisplayText($this->dsSite->getMessage('debtorCode')),
-                'sageRef'           => Controller::htmlInputText($this->dsSite->getValue(DBESite::SageRef)),
+                'sageRef'           => Controller::htmlInputText($this->dsSite->getValue(DBESite::sageRef)),
                 'sageRefMessage'    => Controller::htmlDisplayText($this->dsSite->getMessage('sageRef')),
-                'invContactID'      => $this->dsSite->getValue(DBEJSite::InvoiceContactID),
-                'invContactName'    => $this->dsSite->getValue(DBEJSite::InvContactName),
-                'delContactName'    => $this->dsSite->getValue(DBEJSite::DelContactName),
-                'delContactID'      => $this->dsSite->getValue(DBESite::DeliverContactID),
+                'invContactID'      => $this->dsSite->getValue(DBEJSite::invoiceContactID),
+                'invContactName'    => $this->dsSite->getValue(DBEJSite::invContactName),
+                'delContactName'    => $this->dsSite->getValue(DBEJSite::delContactName),
+                'delContactID'      => $this->dsSite->getValue(DBESite::deliverContactID),
                 'urlContactPopup'   => $urlContactPopup,
                 'urlContactEdit'    => $urlContactEdit,
                 'urlSubmit'         => $urlSubmit
@@ -305,15 +305,15 @@ class CTSite extends CTCNC
                     $_REQUEST['action'] = CTCNC_ACT_SITE_EDIT;
                     break;
             }
-            $_REQUEST['customerID'] = $this->dsSite->getValue(DBESite::CustomerID);
-            $_REQUEST['siteNo'] = $this->dsSite->getValue(DBESite::SiteNo);
+            $_REQUEST['customerID'] = $this->dsSite->getValue(DBESite::customerID);
+            $_REQUEST['siteNo'] = $this->dsSite->getValue(DBESite::siteNo);
             $this->siteForm();
             exit;
         } else {                // Validation OK so update
             $this->buSite->updateSite($this->dsSite);
             // this forces update of contactID back through Javascript to parent HTML window
-            $_REQUEST['customerID'] = $this->dsSite->getValue(DBESite::CustomerID);
-            $_REQUEST['siteDesc'] = $this->dsSite->getValue(DBESite::SiteNo);
+            $_REQUEST['customerID'] = $this->dsSite->getValue(DBESite::customerID);
+            $_REQUEST['siteDesc'] = $this->dsSite->getValue(DBESite::siteNo);
             $this->displaySiteSelectPopup();
         }
         /*

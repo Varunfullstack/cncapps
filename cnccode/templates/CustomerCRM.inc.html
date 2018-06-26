@@ -1,5 +1,7 @@
 <!-- Template: CustomerEdit.inc.html -->
-<script language='JavaScript' src='.javascript/ajax.js'></script>
+<script language='JavaScript'
+        src='.javascript/ajax.js'
+></script>
 <script src="ckeditor/ckeditor.js"></script>
 <script type="text/JavaScript">
 
@@ -179,8 +181,12 @@
     })
     //-->
 </script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<link rel="stylesheet" href="/font-awesome/css/font-awesome.css"/>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<link rel="stylesheet"
+      href="/font-awesome/css/font-awesome.css"
+/>
 <style>
     textarea {
         padding: 8px;
@@ -296,11 +302,31 @@
 
 <span class="formError">{errorMessage}</span>
 <!--<a href="{deleteCustomerURL}" onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)">{deleteCustomerText}</a>-->
-<form name="form" method="post" action="{submitURL}" AUTOCOMPLETE="off" onsubmit="return checkMailShotOptions()">
-    <input type="hidden" id="customerID" name="form[customer][{customerID}][customerID]" value="{customerID}">
-    <input type="hidden" name="form[customer][{customerID}][createDate]" value="{createDate}">
-    <input type="hidden" name="form[customer][{customerID}][regNo]" value="{regNo}" size="10" maxlength="10">
-    <input type="hidden" name="form[customer][{customerID}][name]" value="{customerName}">
+<form name="form"
+      method="post"
+      action="{submitURL}"
+      AUTOCOMPLETE="off"
+      onsubmit="return checkMailShotOptions()"
+>
+    <input type="hidden"
+           id="customerID"
+           name="form[customer][{customerID}][customerID]"
+           value="{customerID}"
+    >
+    <input type="hidden"
+           name="form[customer][{customerID}][createDate]"
+           value="{createDate}"
+    >
+    <input type="hidden"
+           name="form[customer][{customerID}][regNo]"
+           value="{regNo}"
+           size="10"
+           maxlength="10"
+    >
+    <input type="hidden"
+           name="form[customer][{customerID}][name]"
+           value="{customerName}"
+    >
     <input
             name="form[customer][{customerID}][gscTopUpAmount]"
             type="hidden"
@@ -337,9 +363,18 @@
             value="{reviewMeetingEmailSentFlag}"
     >
 
-    <button {disabled} name="Go"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
-    <button {disabled} name="Button" onClick="document.location='{cancelURL}';"><i class="fa fa-ban"
-                                                                                   aria-hidden="true"></i> Cancel
+    <button {disabled}
+            name="Go"
+    ><i class="fa fa-floppy-o"
+        aria-hidden="true"
+    ></i> Save
+    </button>
+    <button {disabled}
+            name="Button"
+            onClick="document.location='{cancelURL}';"
+    ><i class="fa fa-ban"
+        aria-hidden="true"
+    ></i> Cancel
     </button>
     <BR/>
     <br/>
@@ -361,7 +396,8 @@
                 >
                 <a
                         href="javascript:;"
-                        onClick="popUpCalendar(this, reviewDate, 'dd/mm/yyyy')">
+                        onClick="popUpCalendar(this, reviewDate, 'dd/mm/yyyy')"
+                >
                     <img
                             src="images/calendar.gif"
                             width="24"
@@ -387,14 +423,21 @@
                         onchange="setFormChanged();"
                 >
                     <!-- BEGIN reviewUserBlock -->
-                    <option {reviewUserSelected} value="{reviewUserID}">{reviewUserName}</option>
+                    <option {reviewUserSelected}
+                            value="{reviewUserID}"
+                    >{reviewUserName}
+                    </option>
                     <!-- END reviewUserBlock -->
                 </select>
             </div> <!-- customerReviewTime -->
 
             <div class="customerReviewAction">
-                <textarea title="Action to be taken" {disabled} cols="120" rows="3"
-                          name="form[customer][{customerID}][reviewAction]">{reviewAction}</textarea>
+                <textarea title="Action to be taken"
+                          {disabled}
+                          cols="120"
+                          rows="3"
+                          name="form[customer][{customerID}][reviewAction]"
+                >{reviewAction}</textarea>
             </div>
 
             <div class="customerNoteHistory">
@@ -403,11 +446,14 @@
                 rows="18"
                 readonly="readonly"
                 {disabled}
-                id="customerNoteHistory"></textarea>
+                id="customerNoteHistory"
+        ></textarea>
             </div>
 
 
-            <div id="customerNoteModifiedText_holder"><i class="fa fa-user" aria-hidden="true"></i>
+            <div id="customerNoteModifiedText_holder"><i class="fa fa-user"
+                                                         aria-hidden="true"
+            ></i>
                 <div id="customerNoteModifiedText"></div>
             </div>
 
@@ -418,32 +464,71 @@
                 id="customerNoteDetails"
                 cols="120"
                 onchange="setCustomerNotesChanged()"
-                rows="12">{customerNoteDetails}
+                rows="12"
+        >{customerNoteDetails}
         </textarea>
             </div>
 
             <div class="customerNoteNav">
-                <button {disabled} type="button" name="First" aria-hidden="true" onclick="loadNote('first')"><i
-                        class="fa fa-step-backward"></i> First
+                <button {disabled}
+                        type="button"
+                        name="First"
+                        aria-hidden="true"
+                        onclick="loadNote('first')"
+                ><i
+                        class="fa fa-step-backward"
+                ></i> First
                 </button>
-                <button {disabled} type="button" name="Previous" onclick="loadNote('previous')"><i
-                        class="fa fa-backward" aria-hidden="true"></i> Back
+                <button {disabled}
+                        type="button"
+                        name="Previous"
+                        onclick="loadNote('previous')"
+                ><i
+                        class="fa fa-backward"
+                        aria-hidden="true"
+                ></i> Back
                 </button>
-                <button {disabled} type="button" name="Next" onclick="loadNote('next')">Next <i class="fa fa-forward"
-                                                                                                aria-hidden="true"></i>
+                <button {disabled}
+                        type="button"
+                        name="Next"
+                        onclick="loadNote('next')"
+                >Next <i class="fa fa-forward"
+                         aria-hidden="true"
+                ></i>
                 </button>
-                <button {disabled} type="button" name="Last" onclick="loadNote('last')">Last <i
-                        class="fa fa-step-forward" aria-hidden="true"></i></button>
+                <button {disabled}
+                        type="button"
+                        name="Last"
+                        onclick="loadNote('last')"
+                >Last <i
+                        class="fa fa-step-forward"
+                        aria-hidden="true"
+                ></i></button>
                 <div class="float-right">
-                    <button {disabled} type="button" name="Delete" onclick="deleteNote()"><i class="fa fa-trash"
-                                                                                             aria-hidden="true"></i>
+                    <button {disabled}
+                            type="button"
+                            name="Delete"
+                            onclick="deleteNote()"
+                    ><i class="fa fa-trash"
+                        aria-hidden="true"
+                    ></i>
                         Delete
                     </button>
-                    <button {disabled} type="button" name="New" onclick="newNote()"><i class="fa fa-plus-circle"
-                                                                                       aria-hidden="true"></i> New
+                    <button {disabled}
+                            type="button"
+                            name="New"
+                            onclick="newNote()"
+                    ><i class="fa fa-plus-circle"
+                        aria-hidden="true"
+                    ></i> New
                     </button>
-                    <button {disabled} type="button" name="Save" onclick="saveNote()"><i class="fa fa-floppy-o"
-                                                                                         aria-hidden="true"></i> Save
+                    <button {disabled}
+                            type="button"
+                            name="Save"
+                            onclick="saveNote()"
+                    ><i class="fa fa-floppy-o"
+                        aria-hidden="true"
+                    ></i> Save
                     </button>
                     {customerNotePopupLink}
                 </div>
@@ -455,7 +540,12 @@
     <div>
         <h3 style="clear: both;">Contacts</h3>
         <div class="contacts">
-            <table class="content" border="0" cellpadding="2" cellspacing="1" width="100%">
+            <table class="content"
+                   border="0"
+                   cellpadding="2"
+                   cellspacing="1"
+                   width="100%"
+            >
                 <tr>
                     <td class="headerLightgrey">&nbsp;</td>
                     <td class="headerLightgrey">&nbsp;</td>
@@ -487,11 +577,26 @@
                     <td class="headerLightgrey">{mailshot10FlagDesc}</td>
                 </tr>
                 <!-- BEGIN contactBlock -->
-                <input type="hidden" name="form[contact][{contactID}][contactID]" value="{contactID}">
-                <input type="hidden" name="form[contact][{contactID}][customerID]" value="{customerID}">
-                <input type="hidden" name="form[contact][{contactID}][supplierID]" value="{supplierID}">
-                <input type="hidden" name="form[contact][{contactID}][fax]" value="{fax}">
-                <input type="hidden" name="form[contact][{contactID}][discontinuedFlag]" value="{discontinuedFlag}">
+                <input type="hidden"
+                       name="form[contact][{contactID}][contactID]"
+                       value="{contactID}"
+                >
+                <input type="hidden"
+                       name="form[contact][{contactID}][customerID]"
+                       value="{customerID}"
+                >
+                <input type="hidden"
+                       name="form[contact][{contactID}][supplierID]"
+                       value="{supplierID}"
+                >
+                <input type="hidden"
+                       name="form[contact][{contactID}][fax]"
+                       value="{fax}"
+                >
+                <input type="hidden"
+                       name="form[contact][{contactID}][discontinuedFlag]"
+                       value="{discontinuedFlag}"
+                >
                 <input
                         type="hidden"
                         name="form[contact][{contactID}][mobilePhone]"
@@ -501,14 +606,19 @@
                 <tr>
                     <td class="content">
                         <A href="#"
-                           onclick="javascript:contactPopup({contactID}, 'editContact', '{customerID}','{siteNo}' )">edit</a>
+                           onclick="javascript:contactPopup({contactID}, 'editContact', '{customerID}','{siteNo}' )"
+                        >edit</a>
                     </td>
                     <td class="content">{deleteContactLink}</td>
                     <td class="content">
                         <select
-                                name="form[contact][{contactID}][siteNo]">
+                                name="form[contact][{contactID}][siteNo]"
+                        >
                             <!-- BEGIN selectSiteBlock -->
-                            <option {siteSelected} value="{selectSiteNo}">{selectSiteDesc}</option>
+                            <option {siteSelected}
+                                    value="{selectSiteNo}"
+                            >{selectSiteDesc}
+                            </option>
                             <!-- END selectSiteBlock -->
                         </select>
                     </td>
@@ -521,30 +631,38 @@
                                 value="{title}"
                         >
                     </td>
-                    <td class="content" class='{firstNameClass}'>
+                    <td class="content"
+                        class='{firstNameClass}'
+                    >
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][firstName]"
                                 size="10"
                                 maxlength="50"
                                 value="{firstName}"
+                                required
                         >
                     </td>
-                    <td class="content" class='{lastNameClass}'>
+                    <td class="content"
+                        class='{lastNameClass}'
+                    >
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][lastName]"
                                 size="10"
                                 maxlength="50"
                                 value="{lastName}"
+                                required
                         >
                     </td>
                     <td class="content"><input
-                            name="form[contact][{contactID}][position]" id="form[contact][{contactID}][position]"
+                            name="form[contact][{contactID}][position]"
+                            id="form[contact][{contactID}][position]"
                             value="{position}"
                             size="10"
                             maxlength="20"
-                            {disabled}/>
+                            {disabled}
+                    />
                     </td>
                     <td class="content">
                         <input
@@ -552,7 +670,8 @@
                                 name="form[contact][{contactID}][phone]"
                                 value="{phone}"
                                 size="10"
-                                maxlength="30">
+                                maxlength="30"
+                        >
                     </td>
                     <td class="content">
                         <input
@@ -560,7 +679,8 @@
                                 name="form[contact][{contactID}][mobilePhone]"
                                 value="{mobilePhone}"
                                 size="10"
-                                maxlength="30">
+                                maxlength="30"
+                        >
                     </td>
                     <td class="content">
                         <input
@@ -568,7 +688,8 @@
                                 name="form[contact][{contactID}][email]"
                                 value="{email}"
                                 size="25"
-                                maxlength="50">
+                                maxlength="50"
+                        >
                     </td>
                     <td class="content">
                         <input
@@ -576,7 +697,8 @@
                                 name="form[contact][{contactID}][portalPassword]"
                                 value="{portalPassword}"
                                 size="4"
-                                maxlength="10">
+                                maxlength="10"
+                        >
                     </td>
                     <td class="content">
                         <input
@@ -584,10 +706,15 @@
                                 name="form[contact][{contactID}][failedLoginCount]"
                                 value="{failedLoginCount}"
                                 size="2"
-                                maxlength="5">
+                                maxlength="5"
+                        >
                     </td>
-                    <td nowrap="nowrap" class="content"><select {disabled} name="letters_menu"
-                                                                onchange="MM_jumpMenu('_blank',this,0)">
+                    <td nowrap="nowrap"
+                        class="content"
+                    ><select {disabled}
+                             name="letters_menu"
+                             onchange="MM_jumpMenu('_blank',this,0)"
+                    >
                         <option>Send Letter</option>
                         <option value="{clientFormURL}">Appointment</option>
                         <!-- BEGIN customLetterBlock -->
@@ -600,63 +727,121 @@
                             name="form[contact][{contactID}][notes]"
                             size="5"
                             maxlength="200"
-                            value="{notes}"/>
+                            value="{notes}"
+                    />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][workStartedEmailFlag]"
-                               value="Y" {workStartedEmailFlagChecked}>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][workStartedEmailFlag]"
+                               value="Y"
+                               {workStartedEmailFlagChecked}
+                        >
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][autoCloseEmailFlag]"
-                               value="Y" {autoCloseEmailFlagChecked}>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][autoCloseEmailFlag]"
+                               value="Y"
+                               {autoCloseEmailFlagChecked}
+                        >
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][accountsFlag]" value="Y"
-                               {accountsFlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][accountsFlag]"
+                               value="Y"
+                               {accountsFlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][sendMailshotFlag]" value="Y"
-                               {sendMailshotFlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][sendMailshotFlag]"
+                               value="Y"
+                               {sendMailshotFlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot1Flag]" value="Y"
-                               {mailshot1FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot1Flag]"
+                               value="Y"
+                               {mailshot1FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot2Flag]" value="Y"
-                               {mailshot2FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot2Flag]"
+                               value="Y"
+                               {mailshot2FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot3Flag]" value="Y"
-                               {mailshot3FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot3Flag]"
+                               value="Y"
+                               {mailshot3FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot4Flag]" value="Y"
-                               {mailshot4FlagChecked} class="stmCheckBox"/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot4Flag]"
+                               value="Y"
+                               {mailshot4FlagChecked}
+                               class="stmCheckBox"
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot5Flag]" value="Y"
-                               {mailshot5FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot5Flag]"
+                               value="Y"
+                               {mailshot5FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot6Flag]" value="Y"
-                               {mailshot6FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot6Flag]"
+                               value="Y"
+                               {mailshot6FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot7Flag]" value="Y"
-                               {mailshot7FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot7Flag]"
+                               value="Y"
+                               {mailshot7FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot8Flag]" value="Y"
-                               {mailshot8FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot8Flag]"
+                               value="Y"
+                               {mailshot8FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot9Flag]" value="Y"
-                               {mailshot9FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot9Flag]"
+                               value="Y"
+                               {mailshot9FlagChecked}
+                        />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot10Flag]" value="Y"
-                               {mailshot10FlagChecked}/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot10Flag]"
+                               value="Y"
+                               {mailshot10FlagChecked}
+                        />
                     </td>
                 </tr>
                 <!-- END contactBlock -->
@@ -670,25 +855,60 @@
     <div id="col1">
         <div class="content label">Site Information</div>
         <DIV class="site">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][sageRef]" value="{sageRef}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][siteNo]" value="{siteNo}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][customerID]" value="{customerID}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][debtorCode]" value="{debtorCode}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][activeFlag]" value="{activeFlag}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][maxTravelHours]" value="{maxTravelHours}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][deliverContactID]" value="{deliverContactID}">
-            <input type="hidden" name="form[site][{customerID}{siteNo}][nonUKFlag]" value="{nonUKFlag}">
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][sageRef]"
+                   value="{sageRef}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][siteNo]"
+                   value="{siteNo}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][customerID]"
+                   value="{customerID}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][debtorCode]"
+                   value="{debtorCode}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][activeFlag]"
+                   value="{activeFlag}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][maxTravelHours]"
+                   value="{maxTravelHours}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][deliverContactID]"
+                   value="{deliverContactID}"
+            >
+            <input type="hidden"
+                   name="form[site][{customerID}{siteNo}][nonUKFlag]"
+                   value="{nonUKFlag}"
+            >
 
-            <table class="content" border="0" cellpadding="2" cellspacing="1" width="10%">
+            <table class="content"
+                   border="0"
+                   cellpadding="2"
+                   cellspacing="1"
+                   width="10%"
+            >
                 <tr>
-                    <td class="content" width="13%">Site Address</td>
-                    <td class="content" width="87%">
+                    <td class="content"
+                        width="13%"
+                    >Site Address
+                    </td>
+                    <td class="content"
+                        width="87%"
+                    >
                         <input
                                 {disabled}
                                 name="form[site][{customerID}{siteNo}][add1]"
                                 value="{add1}"
                                 size="35"
-                                maxlength="35"></td>
+                                maxlength="35"
+                        ></td>
                 </tr>
                 <tr>
                     <td class="content">&nbsp;</td>
@@ -698,7 +918,8 @@
                                 name="form[site][{customerID}{siteNo}][add2]"
                                 value="{add2}"
                                 size="35"
-                                maxlength="35"></td>
+                                maxlength="35"
+                        ></td>
                 </tr>
                 <tr>
                     <td class="content">&nbsp;</td>
@@ -708,7 +929,8 @@
                                 name="form[site][{customerID}{siteNo}][add3]"
                                 value="{add3}"
                                 size="35"
-                                maxlength="35"/></td>
+                                maxlength="35"
+                        /></td>
                 </tr>
                 <tr>
                     <td class="content">Town</td>
@@ -718,7 +940,8 @@
                                 name="form[site][{customerID}{siteNo}][town]"
                                 value="{town}"
                                 size="25"
-                                maxlength="25"></td>
+                                maxlength="25"
+                        ></td>
                 </tr>
                 <tr>
                     <td class="content">County</td>
@@ -728,7 +951,8 @@
                                 name="form[site][{customerID}{siteNo}][county]"
                                 value="{county}"
                                 size="25"
-                                maxlength="25"></td>
+                                maxlength="25"
+                        ></td>
                 </tr>
                 <tr>
                     <td class="content">Postcode</td>
@@ -738,7 +962,8 @@
                                 name="form[site][{customerID}{siteNo}][postcode]"
                                 value="{postcode}"
                                 size="15"
-                                maxlength="15"></td>
+                                maxlength="15"
+                        ></td>
                 </tr>
                 <tr>
                     <td class="content">Phone</td>
@@ -747,7 +972,8 @@
                                name="form[site][{customerID}{siteNo}][sitePhone]"
                                value="{sitePhone}"
                                size="35"
-                               maxlength="35">
+                               maxlength="35"
+                        >
                     </td>
                 </tr>
 
@@ -760,18 +986,22 @@
             </table>
         </div> <!-- site -->
         <div class="content label">Lead Information</div>
-        <table class="content" style="width: 346px">
+        <table class="content"
+               style="width: 346px"
+        >
             <tr>
                 <td class="content">
                     <div class="content">Lead Status</div>
                 </td>
                 <td class="content">
                     <select
-                            name="form[customer][{customerID}][customerLeadStatusID]">
+                            name="form[customer][{customerID}][customerLeadStatusID]"
+                    >
                         <option>-- Pick an Option --</option>
                         <!-- BEGIN customerLeadStatusBlock -->
                         <option {customerLeadStatusSelected}
-                                value="{customerLeadStatusID}">
+                                value="{customerLeadStatusID}"
+                        >
                             {customerLeadStatusName}
                         </option>
                         <!-- END customerLeadStatusBlock -->
@@ -782,11 +1012,16 @@
                 <td class="content">
                     <div class="content">Email Opt Out</div>
                 </td>
-                <td class="content"><input type="checkbox" name="form[customer][{customerID}][mailshotFlag]"
-                                           value="Y" {mailshotFlagChecked}/></td>
+                <td class="content"><input type="checkbox"
+                                           name="form[customer][{customerID}][mailshotFlag]"
+                                           value="Y"
+                                           {mailshotFlagChecked}
+                /></td>
             </tr>
             <tr>
-                <td class="content"><label for="dateMeetingConfirmed" class="content">Meeting Confirmed</label></td>
+                <td class="content"><label for="dateMeetingConfirmed"
+                                           class="content"
+                >Meeting Confirmed</label></td>
                 <td class="content"><input
                         {disabled}
                         type="date"
@@ -796,7 +1031,9 @@
                 ></td>
             </tr>
             <tr>
-                <td class="content"><label for="meetingDateTime" class="content">
+                <td class="content"><label for="meetingDateTime"
+                                           class="content"
+                >
                     Meeting Date
                 </label></td>
                 <td class="content"><input
@@ -813,29 +1050,41 @@
                 <td class="content">
                     <div class="content">Invite Sent</div>
                 </td>
-                <td class="content"><input type="checkbox" name="form[customer][{customerID}][InviteSent]"
-                                           value="Y" {InviteSent}/></td>
+                <td class="content"><input type="checkbox"
+                                           name="form[customer][{customerID}][InviteSent]"
+                                           value="Y"
+                                           {InviteSent}
+                /></td>
             </tr>
             <tr>
                 <td class="content">
                     <div class="content">Report Processed</div>
                 </td>
-                <td class="content"><input type="checkbox" name="form[customer][{customerID}][ReportProcessed]"
-                                           value="Y" {ReportProcessed}/></td>
+                <td class="content"><input type="checkbox"
+                                           name="form[customer][{customerID}][ReportProcessed]"
+                                           value="Y"
+                                           {ReportProcessed}
+                /></td>
             </tr>
             <tr>
                 <td class="content">
                     <div class="content">Report Sent</div>
                 </td>
-                <td class="content"><input type="checkbox" name="form[customer][{customerID}][ReportSent]"
-                                           value="Y" {ReportSent}/>
+                <td class="content"><input type="checkbox"
+                                           name="form[customer][{customerID}][ReportSent]"
+                                           value="Y"
+                                           {ReportSent}
+                />
                 </td>
             </tr>
             <tr>
                 <td class="content">
                     <div class="content">Rating</div>
                 </td>
-                <td class="content"><input type="number" value="{Rating}" name="form[customer][{customerID}][Rating]">
+                <td class="content"><input type="number"
+                                           value="{Rating}"
+                                           name="form[customer][{customerID}][Rating]"
+                >
                 </td>
             </tr>
         </table>
@@ -847,17 +1096,20 @@
             <div class="content label">
                 Comments
             </div>
-            <textarea name="form[customer][{customerID}][CrmComments]" id="crmComments">{CrmComments}</textarea>
+            <textarea name="form[customer][{customerID}][crmComments]"
+                      id="crmComments"
+            >{crmComments}</textarea>
             <script type="text/javascript">
-                reason = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
+                crmComments = CKEDITOR.replace('crmComments', {customConfig: '/ckeditor_config.js'});
             </script>
         </div>
         <div class="textarea">
             <div class="content label">
                 Company Background
             </div>
-            <textarea name="form[customer][{customerID}][CompanyBackground]"
-                      id="CompanyBackground">{CompanyBackground}</textarea>
+            <textarea name="form[customer][{customerID}][companyBackground]"
+                      id="CompanyBackground"
+            >{companyBackground}</textarea>
             <script type="text/javascript">
                 reason = CKEDITOR.replace('CompanyBackground', {customConfig: '/ckeditor_config.js'});
             </script>
@@ -866,8 +1118,9 @@
             <div class="content label">
                 Decision Maker Background
             </div>
-            <textarea name="form[customer][{customerID}][DecisionMakerBackground]"
-                      id="DecisionMakerBackground">{DecisionMakerBackground}</textarea>
+            <textarea name="form[customer][{customerID}][decisionMakerBackground]"
+                      id="DecisionMakerBackground"
+            >{decisionMakerBackground}</textarea>
             <script type="text/javascript">
                 reason = CKEDITOR.replace('DecisionMakerBackground', {customConfig: '/ckeditor_config.js'});
             </script>
@@ -876,14 +1129,20 @@
             <div class="content label">
                 Opportunity Deal
             </div>
-            <textarea name="form[customer][{customerID}][OpportunityDeal]"
-                      id="OpportunityDeal">{OpportunityDeal}</textarea>
+            <textarea name="form[customer][{customerID}][opportunityDeal]"
+                      id="OpportunityDeal"
+            >{opportunityDeal}</textarea>
             <script type="text/javascript">
                 reason = CKEDITOR.replace('OpportunityDeal', {customConfig: '/ckeditor_config.js'});
             </script>
         </div>
-        <button {disabled} name="Go" style="padding: 5px 10px; font-size: 16px;"><i
-                class="fa fa-floppy-o" aria-hidden="true"></i> Save Changes
+        <button {disabled}
+                name="Go"
+                style="padding: 5px 10px; font-size: 16px;"
+        ><i
+                class="fa fa-floppy-o"
+                aria-hidden="true"
+        ></i> Save Changes
         </button>
     </div>
 

@@ -16,7 +16,7 @@ page_open(
 		''
 	)
 );
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg['path_gc'] . '/Controller.inc.php');
 $buCustomer = new BUCustomer($this);
@@ -57,18 +57,18 @@ $firstName = $dsContact->getValue('firstName');
 $addressee = $dsContact->getValue('title').' '.$firstName[0].' '.$dsContact->getValue('lastName');
 echo Controller::htmlDisplayText($addressee).'<BR/>';
 echo Controller::htmlDisplayText($dsCustomer->getValue('name')).'<BR/>';
-echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add1)).'<BR/>';
-if ($dsSite->getValue(DBESite::Add2) != ''){
-	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add2)).'<BR/>';
+echo Controller::htmlDisplayText($dsSite->getValue(DBESite::add1)).'<BR/>';
+if ($dsSite->getValue(DBESite::add2) != ''){
+	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::add2)).'<BR/>';
 }
-if ($dsSite->getValue(DBESite::Add3) != ''){
-	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Add3)).'<BR/>';
+if ($dsSite->getValue(DBESite::add3) != ''){
+	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::add3)).'<BR/>';
 }
-echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Town)).'<BR/>';
-if ($dsSite->getValue(DBESite::County) != ''){
-	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::County)).'<BR/>';
+echo Controller::htmlDisplayText($dsSite->getValue(DBESite::town)).'<BR/>';
+if ($dsSite->getValue(DBESite::county) != ''){
+	echo Controller::htmlDisplayText($dsSite->getValue(DBESite::county)).'<BR/>';
 }
-echo Controller::htmlDisplayText($dsSite->getValue(DBESite::Postcode)).'<BR/>';
+echo Controller::htmlDisplayText($dsSite->getValue(DBESite::postcode)).'<BR/>';
 /*
 Body
 */

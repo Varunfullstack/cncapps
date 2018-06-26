@@ -7,6 +7,13 @@ require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 
 class DBEJUser extends DBEUser
 {
+
+    const signatureFilename = "signatureFilename";
+    const jobTitle = "jobTitle";
+    const firstName = "firstName";
+    const lastName = "lastName";
+    const activeFlag = "activeFlag";
+
     /**
      * calls constructor()
      * @access public
@@ -18,11 +25,31 @@ class DBEJUser extends DBEUser
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("signatureFilename", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("jobTitle", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("firstName", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("lastName", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("activeFlag", DA_YN, DA_NOT_NULL);
+        $this->addColumn(
+            self::signatureFilename,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::jobTitle,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::firstName,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::lastName,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::activeFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
         $this->setAddColumnsOff();
     }
 
@@ -36,7 +63,8 @@ class DBEJUser extends DBEUser
         $this->setMethodName("getRows");
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName() . '=userext.userID' .
+            " FROM " . $this->getTableName() . ' LEFT JOIN userext ON ' . $this->getTableName(
+            ) . '.' . $this->getPKDBName() . '=userext.userID' .
             ' WHERE activeFlag = "Y"'
         );
         return (parent::getRows());
@@ -45,7 +73,8 @@ class DBEJUser extends DBEUser
     function getRow()
     {
         $this->setMethodName("getRow");
-        $this->setQueryString("SELECT " . $this->getDBColumnNamesAsString() .
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             ' LEFT JOIN userext ON ' . $this->getTableName() . '.' . $this->getPKDBName() . '=userext.userID' .
             " WHERE " . $this->getPKWhere()

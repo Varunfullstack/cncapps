@@ -14,7 +14,7 @@ require_once($cfg["path_dbe"] . "/DBEOrdlinePO.inc.php"); // for Puchase orders
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBEVat.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
 require_once($cfg["path_bu"] . "/BURenQuotation.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
@@ -91,10 +91,10 @@ class BUSalesOrder extends Business
             if (!$ret) {
                 $this->raiseError('order not found');
             }
-            $dbeJOrdline->setValue('ordheadID', $ordheadID);
-            $dbeJOrdline->getRowsByColumn('ordheadID', 'sequenceNo');
+            $dbeJOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
+            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID, DBEJOrdline::sequenceNo);
             $this->getData($dbeJOrdline, $dsJOrdline);
-            $dsJOrdline->sortAscending('sequenceNo');
+            $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
             $buCustomer = new BUCustomer($this);
             $buCustomer->getContactByID($dsOrdhead->getValue('delContactID'), $dsDeliveryContact);
         }
@@ -207,7 +207,6 @@ class BUSalesOrder extends Business
             $this->dbeJQuotation->setValue('ordheadID', $ordheadID);
             $this->dbeJQuotation->getRowsByOrdheadID();
             $ret = ($this->getData($this->dbeJQuotation, $dsResults));
-            //$dsResults->sortAscending('versionNo');
         }
         return $ret;
     }
@@ -335,7 +334,11 @@ class BUSalesOrder extends Business
     /**
      * Initialse fields for new quote
      * @parameter integer $customerID
-     * @return bool : Success
+     * @param $dsOrdhead
+     * @param $dsOrdline
+     * @param $dsCustomer
+     * @param string $type
+     * @return void : Success
      * @access public
      */
     function initialiseQuote(&$dsOrdhead, &$dsOrdline, &$dsCustomer, $type = 'Q')
@@ -347,50 +350,48 @@ class BUSalesOrder extends Business
         $dsOrdhead->copyColumnsFrom($dbeOrdhead);
         $dsOrdhead->setUpdateModeInsert();
         $dsOrdhead->addColumn('customerName', DA_STRING, DA_NOT_NULL);
-        $dsOrdhead->setValue('customerName', $dsCustomer->getValue(DBECustomer::Name));
-        $dsOrdhead->setValue('customerID', $dsCustomer->getValue(DBECustomer::CustomerID));
-        $dsOrdhead->setValue('type', $type);
+        $dsOrdhead->setValue('customerName', $dsCustomer->getValue(DBECustomer::name));
+        $dsOrdhead->setValue(DBEOrdhead::customerID, $dsCustomer->getValue(DBECustomer::customerID));
+        $dsOrdhead->setValue(DBEOrdhead::type, $type);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
         $vatCode = $dsHeader->getValue('stdVATCode');
-        $dsOrdhead->setValue('vatCode', $vatCode);
+        $dsOrdhead->setValue(DBEOrdhead::vatCode, $vatCode);
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatRate = $dbeVat->getValue((integer)$vatCode[1]); // get 2nd part of code and use as column no
-        $dsOrdhead->setValue('vatRate', $vatRate);
-        $dsOrdhead->setValue('date', date('Y-m-d'));
+        $dsOrdhead->setValue(DBEOrdhead::vatRate, $vatRate);
+        $dsOrdhead->setValue(DBEOrdhead::date, date('Y-m-d'));
 
         if ($type == 'Q') {
-            $dsOrdhead->setValue('quotationCreateDate', date('Y-m-d'));
+            $dsOrdhead->setValue(DBEOrdhead::quotationCreateDate, date('Y-m-d'));
         }
         // If the order customer is an internal stock location then we set pay method to no invoice
         if (
-            ($dsOrdhead->getValue('customerID') == CONFIG_SALES_STOCK_CUSTOMERID) OR
-            ($dsOrdhead->getValue('customerID') == CONFIG_MAINT_STOCK_CUSTOMERID)
+            ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) OR
+            ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_MAINT_STOCK_CUSTOMERID)
         ) {
-//	 		$dsOrdhead->setValue('payMethod', 'N'); // switch to paymentTermsID
-            $dsOrdhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_NO_INVOICE);    // switch to paymentTermsID
+            $dsOrdhead->setValue(DBEOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_NO_INVOICE);    // switch to paymentTermsID
         } else {
-// 			$dsOrdhead->setValue('payMethod', 'F');	// switch to paymentTermsID
-            $dsOrdhead->setValue('paymentTermsID', CONFIG_PAYMENT_TERMS_30_DAYS);    // switch to paymentTermsID
+            $dsOrdhead->setValue(DBEOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_30_DAYS);    // switch to paymentTermsID
         }
-        $dsOrdhead->setValue('partInvoice', 'Y');
-        $dsOrdhead->setValue('addItem', 'Y');
-        $dsOrdhead->setValue('requestedDate', '0000-00-00');
-        $dsOrdhead->setValue('promisedDate', '0000-00-00');
-        $dsOrdhead->setValue('expectedDate', '0000-00-00');
-        $dsOrdhead->setValue('invSiteNo', $dsCustomer->getValue(DBECustomer::InvoiceSiteNo));
-        $dsOrdhead->setValue('updatedTime', date('Y-m-d H:i:s'));
+        $dsOrdhead->setValue(DBEOrdhead::partInvoice, 'Y');
+        $dsOrdhead->setValue(DBEOrdhead::addItem, 'Y');
+        $dsOrdhead->setValue(DBEOrdhead::requestedDate, '0000-00-00');
+        $dsOrdhead->setValue(DBEOrdhead::promisedDate, '0000-00-00');
+        $dsOrdhead->setValue(DBEOrdhead::expectedDate, '0000-00-00');
+        $dsOrdhead->setValue(DBEOrdhead::invSiteNo, $dsCustomer->getValue(DBECustomer::invoiceSiteNo));
+        $dsOrdhead->setValue(DBEOrdhead::updatedTime, date('Y-m-d H:i:s'));
         $this->setInvoiceSiteAndContact(
-            $dsCustomer->getValue(DBECustomer::CustomerID),
-            $dsCustomer->getValue(DBECustomer::InvoiceSiteNo),
+            $dsCustomer->getValue(DBECustomer::customerID),
+            $dsCustomer->getValue(DBECustomer::invoiceSiteNo),
             $dsOrdhead
         );
-        $dsOrdhead->setValue('delSiteNo', $dsCustomer->getValue(DBECustomer::DeliverSiteNo));
+        $dsOrdhead->setValue(DBEOrdhead::delSiteNo, $dsCustomer->getValue(DBECustomer::deliverSiteNo));
         $this->setDeliverySiteAndContact(
-            $dsCustomer->getValue(DBECustomer::CustomerID),
-            $dsCustomer->getValue(DBECustomer::DeliverSiteNo),
+            $dsCustomer->getValue(DBECustomer::customerID),
+            $dsCustomer->getValue(DBECustomer::deliverSiteNo),
             $dsOrdhead
         );
         $dsOrdhead->post();
@@ -407,14 +408,14 @@ class BUSalesOrder extends Business
 
         $buCustomer->getSiteByCustomerIDSiteNo($customerID, $siteNo, $dsSite);
         $dsOrdhead->setValue('invSiteNo', $siteNo);
-        $dsOrdhead->setValue('invAdd1', $dsSite->getValue(DBESite::Add1));
-        $dsOrdhead->setValue('invAdd2', $dsSite->getValue(DBESite::Add2));
-        $dsOrdhead->setValue('invAdd3', $dsSite->getValue(DBESite::Add3));
-        $dsOrdhead->setValue('invTown', $dsSite->getValue(DBESite::Town));
-        $dsOrdhead->setValue('invCounty', $dsSite->getValue(DBESite::County));
-        $dsOrdhead->setValue('invPostcode', $dsSite->getValue(DBESite::Postcode));
-        $dsOrdhead->setValue('invSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact);
+        $dsOrdhead->setValue('invAdd1', $dsSite->getValue(DBESite::add1));
+        $dsOrdhead->setValue('invAdd2', $dsSite->getValue(DBESite::add2));
+        $dsOrdhead->setValue('invAdd3', $dsSite->getValue(DBESite::add3));
+        $dsOrdhead->setValue('invTown', $dsSite->getValue(DBESite::town));
+        $dsOrdhead->setValue('invCounty', $dsSite->getValue(DBESite::county));
+        $dsOrdhead->setValue('invPostcode', $dsSite->getValue(DBESite::postcode));
+        $dsOrdhead->setValue('invSitePhone', $dsSite->getValue(DBESite::phone));
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::invoiceContactID), $dsContact);
         $dsOrdhead->setValue('invContactID', $dsContact->getValue('contactID'));
         $dsOrdhead->setValue('invContactName', $dsContact->getValue('lastName'));
         $dsOrdhead->setValue('invContactSalutation', $dsContact->getValue('firstName'));
@@ -430,14 +431,14 @@ class BUSalesOrder extends Business
 
         $buCustomer->getSiteByCustomerIDSiteNo($customerID, $siteNo, $dsSite);
         $dsOrdhead->setValue('delSiteNo', $siteNo);
-        $dsOrdhead->setValue('delAdd1', $dsSite->getValue(DBESite::Add1));
-        $dsOrdhead->setValue('delAdd2', $dsSite->getValue(DBESite::Add2));
-        $dsOrdhead->setValue('delAdd3', $dsSite->getValue(DBESite::Add3));
-        $dsOrdhead->setValue('delTown', $dsSite->getValue(DBESite::Town));
-        $dsOrdhead->setValue('delCounty', $dsSite->getValue(DBESite::County));
-        $dsOrdhead->setValue('delPostcode', $dsSite->getValue(DBESite::Postcode));
-        $dsOrdhead->setValue('delSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::DeliverContactID), $dsContact);
+        $dsOrdhead->setValue('delAdd1', $dsSite->getValue(DBESite::add1));
+        $dsOrdhead->setValue('delAdd2', $dsSite->getValue(DBESite::add2));
+        $dsOrdhead->setValue('delAdd3', $dsSite->getValue(DBESite::add3));
+        $dsOrdhead->setValue('delTown', $dsSite->getValue(DBESite::town));
+        $dsOrdhead->setValue('delCounty', $dsSite->getValue(DBESite::county));
+        $dsOrdhead->setValue('delPostcode', $dsSite->getValue(DBESite::postcode));
+        $dsOrdhead->setValue('delSitePhone', $dsSite->getValue(DBESite::phone));
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::deliverContactID), $dsContact);
         $dsOrdhead->setValue('delContactID', $dsContact->getValue('contactID'));
         $dsOrdhead->setValue('delContactName', $dsContact->getValue('lastName'));
         $dsOrdhead->setValue('delContactSalutation', $dsContact->getValue('firstName'));
@@ -464,14 +465,14 @@ class BUSalesOrder extends Business
         );
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue('invSiteNo', $siteNo);
-        $dbeOrdhead->setValue('invAdd1', $dsSite->getValue(DBESite::Add1));
-        $dbeOrdhead->setValue('invAdd2', $dsSite->getValue(DBESite::Add2));
-        $dbeOrdhead->setValue('invAdd3', $dsSite->getValue(DBESite::Add3));
-        $dbeOrdhead->setValue('invTown', $dsSite->getValue(DBESite::Town));
-        $dbeOrdhead->setValue('invCounty', $dsSite->getValue(DBESite::County));
-        $dbeOrdhead->setValue('invPostcode', $dsSite->getValue(DBESite::Postcode));
-        $dbeOrdhead->setValue('invSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::InvoiceContactID), $dsContact);
+        $dbeOrdhead->setValue('invAdd1', $dsSite->getValue(DBESite::add1));
+        $dbeOrdhead->setValue('invAdd2', $dsSite->getValue(DBESite::add2));
+        $dbeOrdhead->setValue('invAdd3', $dsSite->getValue(DBESite::add3));
+        $dbeOrdhead->setValue('invTown', $dsSite->getValue(DBESite::town));
+        $dbeOrdhead->setValue('invCounty', $dsSite->getValue(DBESite::county));
+        $dbeOrdhead->setValue('invPostcode', $dsSite->getValue(DBESite::postcode));
+        $dbeOrdhead->setValue('invSitePhone', $dsSite->getValue(DBESite::phone));
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::invoiceContactID), $dsContact);
         $dbeOrdhead->setValue('invContactID', $dsContact->getValue('contactID'));
         $dbeOrdhead->setValue('invContactName', $dsContact->getValue('lastName'));
         $dbeOrdhead->setValue('invContactSalutation', $dsContact->getValue('firstName'));
@@ -500,14 +501,14 @@ class BUSalesOrder extends Business
         );
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue('delSiteNo', $siteNo);
-        $dbeOrdhead->setValue('delAdd1', $dsSite->getValue(DBESite::Add1));
-        $dbeOrdhead->setValue('delAdd2', $dsSite->getValue(DBESite::Add2));
-        $dbeOrdhead->setValue('delAdd3', $dsSite->getValue(DBESite::Add3));
-        $dbeOrdhead->setValue('delTown', $dsSite->getValue(DBESite::Town));
-        $dbeOrdhead->setValue('delCounty', $dsSite->getValue(DBESite::County));
-        $dbeOrdhead->setValue('delPostcode', $dsSite->getValue(DBESite::Postcode));
-        $dbeOrdhead->setValue('delSitePhone', $dsSite->getValue(DBESite::Phone));
-        $buCustomer->getContactByID($dsSite->getValue(DBESite::DeliverContactID), $dsContact);
+        $dbeOrdhead->setValue('delAdd1', $dsSite->getValue(DBESite::add1));
+        $dbeOrdhead->setValue('delAdd2', $dsSite->getValue(DBESite::add2));
+        $dbeOrdhead->setValue('delAdd3', $dsSite->getValue(DBESite::add3));
+        $dbeOrdhead->setValue('delTown', $dsSite->getValue(DBESite::town));
+        $dbeOrdhead->setValue('delCounty', $dsSite->getValue(DBESite::county));
+        $dbeOrdhead->setValue('delPostcode', $dsSite->getValue(DBESite::postcode));
+        $dbeOrdhead->setValue('delSitePhone', $dsSite->getValue(DBESite::phone));
+        $buCustomer->getContactByID($dsSite->getValue(DBESite::deliverContactID), $dsContact);
         $dbeOrdhead->setValue('delContactID', $dsContact->getValue('contactID'));
         $dbeOrdhead->setValue('delContactName', $dsContact->getValue('lastName'));
         $dbeOrdhead->setValue('delContactSalutation', $dsContact->getValue('firstName'));

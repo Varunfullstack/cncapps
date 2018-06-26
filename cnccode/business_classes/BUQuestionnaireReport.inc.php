@@ -107,14 +107,11 @@ class BUQuestionnaireReport extends Business
 
         $results = $this->db->query($sql);
 
+        $questions = [];
         while ($row = $results->fetch_assoc()) {
-
             $questions[] = $row;
-
         }
-
         return $questions;
-
     }
 
     function getRatingPercentage($questionID, $rating, $total)
@@ -326,13 +323,23 @@ class BUQuestionnaireReport extends Business
 
             $template->set_var(
                 array(
-                    'ratingTotal' => $total,
+                    'ratingTotal'         => $total,
                     'questionDescription' => $value['que_desc'],
-                    'rating1Percent' => number_format($this->getRatingPercentage($value['que_questionno'], 1, $total)),
-                    'rating2Percent' => number_format($this->getRatingPercentage($value['que_questionno'], 2, $total)),
-                    'rating3Percent' => number_format($this->getRatingPercentage($value['que_questionno'], 3, $total)),
-                    'rating4Percent' => number_format($this->getRatingPercentage($value['que_questionno'], 4, $total)),
-                    'rating5Percent' => number_format($this->getRatingPercentage($value['que_questionno'], 5, $total))
+                    'rating1Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      1,
+                                                                                      $total)),
+                    'rating2Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      2,
+                                                                                      $total)),
+                    'rating3Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      3,
+                                                                                      $total)),
+                    'rating4Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      4,
+                                                                                      $total)),
+                    'rating5Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      5,
+                                                                                      $total))
                 )
             );
 
@@ -354,10 +361,14 @@ class BUQuestionnaireReport extends Business
 
             $template->set_var(
                 array(
-                    'ynTotal' => $total,
+                    'ynTotal'             => $total,
                     'questionDescription' => $value['que_desc'],
-                    'yesPercent' => number_format($this->getRatingPercentage($value['que_questionno'], 'Y', $total)),
-                    'noPercent' => number_format($this->getRatingPercentage($value['que_questionno'], 'N', $total))
+                    'yesPercent'          => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      'Y',
+                                                                                      $total)),
+                    'noPercent'           => number_format($this->getRatingPercentage($value['que_questionno'],
+                                                                                      'N',
+                                                                                      $total))
                 )
             );
 
@@ -374,9 +385,9 @@ class BUQuestionnaireReport extends Business
             $template->set_var(
                 array(
                     'freeTextQuestion' => $row->que_desc,
-                    'freeTextAnswer' => str_replace('\\', '', $row->ans_answer),
-                    'freeTextName' => str_replace('\\', '', $row->ans_name),
-                    'freeTextDate' => str_replace('\\', '', $row->answerDate),
+                    'freeTextAnswer'   => str_replace('\\', '', $row->ans_answer),
+                    'freeTextName'     => str_replace('\\', '', $row->ans_name),
+                    'freeTextDate'     => str_replace('\\', '', $row->answerDate),
                     'freeTextCustomer' => $row->cus_name
                 )
             );
@@ -388,9 +399,9 @@ class BUQuestionnaireReport extends Business
         $template->set_var(
             array(
                 'questionnaireDescription' => $questionnaire->qur_desc,
-                'rating1Description' => $questionnaire->qur_rating_1_desc,
-                'rating5Description' => $questionnaire->qur_rating_5_desc,
-                'period' => $this->getPeriod()
+                'rating1Description'       => $questionnaire->qur_rating_1_desc,
+                'rating5Description'       => $questionnaire->qur_rating_5_desc,
+                'period'                   => $this->getPeriod()
             )
         );
 
@@ -416,10 +427,10 @@ class BUQuestionnaireReport extends Business
 
             $template->set_var(
                 array(
-                    'customer' => $row->customer,
+                    'customer'       => $row->customer,
                     'requestContact' => $row->requestContact,
-                    'surveyContact' => $row->surveyContact,
-                    'srNumbers' => $row->srNumbers
+                    'surveyContact'  => $row->surveyContact,
+                    'srNumbers'      => $row->srNumbers
                 )
             );
 

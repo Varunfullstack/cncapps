@@ -60,10 +60,10 @@ class BUDespatch extends Business
             $this->raiseError('ordheadID not passed');
         } else {
             $dbeJOrdline = new DBEJOrdline($this);
-            $dbeJOrdline->setValue('ordheadID', $ordheadID);
-            $dbeJOrdline->getRowsByColumn('ordheadID');
+            $dbeJOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
+            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID);
             $ret = ($this->getData($dbeJOrdline, $dsOrdline));
-            $dsOrdline->columnSort('sequenceNo');
+            $dsOrdline->columnSort(DBEOrdline::sequenceNo);
         }
         return $ret;
     }
@@ -78,7 +78,7 @@ class BUDespatch extends Business
         $dsOrdline->initialise();
         while ($dsOrdline->fetchNext()) {
             $dsDespatch->setUpdateModeInsert();
-            $dsDespatch->setValue('sequenceNo', $dsOrdline->getValue('sequenceNo'));
+            $dsDespatch->setValue('sequenceNo', $dsOrdline->getValue(DBEJOrdline::sequenceNo));
             $dsDespatch->setValue('qtyToDespatch', 0);    // comment line
             $dsDespatch->post();
         }
@@ -107,15 +107,15 @@ class BUDespatch extends Business
         $dsDespatch->initialise();
         $buSalesOrder = new BUSalesOrder($this);
         $buSalesOrder->getOrdheadByID($ordheadID, $dsOrdhead);
-        $partInvoice = ($dsOrdhead->getValue('partInvoice') == 'Y');
+        $partInvoice = ($dsOrdhead->getValue(DBEJOrdhead::partInvoice) == 'Y');
         $this->getLinesByID($ordheadID, $dsOrdline);
 
 // Check Whether The Order Will Be Complete Following This Despatch
         $fullyDespatched = TRUE;
         while ($dsDespatch->fetchNext()) {
             $dsOrdline->fetchNext();
-            if ($dsOrdline->getValue('lineType') == 'I') {
-                $qtyOutstanding = $dsOrdline->getValue('qtyOrdered') - $dsOrdline->getValue('qtyDespatched');
+            if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
+                $qtyOutstanding = $dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(DBEOrdline::qtyDespatched);
                 if ($qtyOutstanding - $dsDespatch->getValue('qtyToDespatch') != 0) {
                     $fullyDespatched = FALSE;
                     break;
@@ -139,7 +139,7 @@ class BUDespatch extends Business
                 continue;
             }
             if (
-                $dsOrdline->getValue('lineType') == 'I' // exclude comment lines
+                $dsOrdline->getValue(DBEOrdline::lineType) == 'I' // exclude comment lines
             ) {
 
                 if (!$onlyCreateDespatchNote) {
@@ -159,9 +159,9 @@ class BUDespatch extends Business
             $dbeOrdhead = new DBEOrdhead($this);
             $dbeOrdhead->getRow($ordheadID);
             if ($fullyDespatched) {
-                $dbeOrdhead->setValue('type', 'C');
+                $dbeOrdhead->setValue(DBEOrdhead::type, 'C');
             } else {
-                $dbeOrdhead->setValue('type', 'P');
+                $dbeOrdhead->setValue(DBEOrdhead::type, 'P');
             }
             $dbeOrdhead->updateRow();
             unset($dbeOrdhead);
@@ -170,9 +170,9 @@ class BUDespatch extends Business
 
             // do we generate invoices for these payment terms?
             $dbePaymentTerms = new DBEPaymentTerms($this);
-            $dbePaymentTerms->getRow($dsOrdhead->getValue('paymentTermsID'));
+            $dbePaymentTerms->getRow($dsOrdhead->getValue(DBEJOrdhead::paymentTermsID));
 
-            if ($dbePaymentTerms->getValue('generateInvoiceFlag') == 'Y') {
+            if ($dbePaymentTerms->getValue(DBEPaymentTerms::generateInvoiceFlag) == 'Y') {
                 // Last despatch for this non part-invoice order so generate invoice for whole
                 if (!$partInvoice AND $fullyDespatched) {
                     $buInvoice = new BUInvoice($this);
@@ -184,7 +184,7 @@ class BUDespatch extends Business
                     $invheadID = $buInvoice->createInvoiceFromDespatch($dsOrdhead, $dsOrdline, $dsDespatch);
                     unset($buInvoice);
                 }
-            } // end if ( $dbePaymentTerms->getValue('generateInvoiceFlag') == 'Y' )
+            } // end
 
         } // !$onlyCreateDespatchNote && $ordlineUpdated
 
@@ -194,15 +194,15 @@ class BUDespatch extends Business
         if (
             !$onlyCreateDespatchNote &&
             (
-                $dsOrdline->getValue('itemID') == CONFIG_DEF_PREPAY_ITEMID OR
-                $dsOrdline->getValue('itemID') == CONFIG_DEF_PREPAY_TOPUP_ITEMID)
+                $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_ITEMID OR
+                $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_TOPUP_ITEMID)
         ) {
             // create an activity row
 
             $buActivity = new BUActivity($this);
             $buActivity->createTopUpActivity(
-                $dsOrdhead->getValue('customerID'),
-                $dsOrdline->getValue('curTotalSale'),
+                $dsOrdhead->getValue(DBEOrdhead::customerID),
+                $dsOrdline->getValue(DBEOrdline::curTotalSale),
                 $invheadID
             );
         }
@@ -212,13 +212,13 @@ class BUDespatch extends Business
 
         $deliveryNoteFile = FALSE;
 
-        if ($dsDeliveryMethod->getValue('sendNoteFlag') == 'Y') {
+        if ($dsDeliveryMethod->getValue(DBEDeliveryMethod::sendNoteFlag) == 'Y') {
 
             if ($ordlineUpdated) {
 
                 $buContact = new BUContact($this);
 
-                $buContact->getContactByID($dsOrdhead->getValue('delContactID'), $dsContact);
+                $buContact->getContactByID($dsOrdhead->getValue(DBEOrdhead::delContactID), $dsContact);
 
                 $deliveryNoteFile = $this->createDeliveryNote($dsOrdhead, $dsOrdline, $dsDespatch, $dsContact, $dsDeliveryMethod, $fullyDespatched);
             }
@@ -238,13 +238,13 @@ class BUDespatch extends Business
     {
         // create record on delivery note table
         $dbeDeliveryNote = new DBEDeliveryNote($this);
-        $dbeDeliveryNote->setValue('ordheadID', $dsOrdhead->getValue('ordheadID'));
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::ordheadID, $dsOrdhead->getValue(DBEOrdhead::ordheadID));
         $noteNo = $dbeDeliveryNote->getNextNoteNo();
 
         $dbeDeliveryNote->setPKValue('0');
-        $dbeDeliveryNote->setValue('ordheadID', $dsOrdhead->getValue('ordheadID'));
-        $dbeDeliveryNote->setValue('noteNo', $noteNo);
-        $dbeDeliveryNote->setValue('dateTime', date('Y-m-d H:i:s'));
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::ordheadID, $dsOrdhead->getValue(DBEOrdhead::ordheadID));
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::noteNo, $noteNo);
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::dateTime, date('Y-m-d H:i:s'));
         $dbeDeliveryNote->insertRow();
         $buPDFDeliveryNote = new BUPDFDeliveryNote(
             $this,
@@ -262,15 +262,15 @@ class BUDespatch extends Business
     function updateOrdline($ordheadID, &$dsOrdline, &$dsDespatch)
     {
         $dbeOrdline = &$this->dbeOrdline;
-        $dbeOrdline->setValue('ordheadID', $ordheadID);
-        $dbeOrdline->setValue('sequenceNo', $dsOrdline->getValue('sequenceNo'));
+        $dbeOrdline->setValue(DBEOrdline::ordheadID, $ordheadID);
+        $dbeOrdline->setValue(DBEOrdline::sequenceNo, $dsOrdline->getValue(DBEOrdline::sequenceNo));
         $dbeOrdline->getRow();
         $dbeOrdline->setValue(
-            'qtyDespatched',
-            $dsOrdline->getValue('qtyDespatched') + $dsDespatch->getValue('qtyToDespatch')
+            DBEOrdline::qtyDespatched,
+            $dsOrdline->getValue(DBEOrdline::qtyDespatched) + $dsDespatch->getValue('qtyToDespatch')
         );
-        $dbeOrdline->setValue('qtyLastDespatched', $dsDespatch->getValue('qtyToDespatch'));
-        $dbeOrdline->setValue('description', $dsOrdline->getValue('description'));
+        $dbeOrdline->setValue(DBEOrdline::qtyLastDespatched, $dsDespatch->getValue('qtyToDespatch'));
+        $dbeOrdline->setValue(DBEOrdline::description, $dsOrdline->getValue(DBEOrdline::description));
         $dbeOrdline->updateRow();
     }
 
@@ -282,8 +282,8 @@ class BUDespatch extends Business
             $this->raiseError('ordheadID not passed');
         }
         $dbeDeliveryNote = new DBEDeliveryNote($this);
-        $dbeDeliveryNote->setValue('ordheadID', $ordheadID);
-        $dbeDeliveryNote->getRowsByColumn('ordheadID');
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::ordheadID, $ordheadID);
+        $dbeDeliveryNote->getRowsByColumn(DBEDeliveryNote::ordheadID);
         $ret = ($this->getData($dbeDeliveryNote, $dsDeliveryNote));
         $dsDeliveryNote->columnSort('dateTime', SORT_DESC);
         return $ret;
@@ -305,23 +305,6 @@ class BUDespatch extends Business
         require_once($GLOBALS["cfg"]["path_dbe"] . "/DBEPorhead.inc.php");
         return $dbePorhead->countNonReceievedRowsByOrdheadID($ID);
     }
-    /*
-        function getRenewalRowByOrdheadID($ordheadID, &$dsOrdline){
-            $this->setMethodName('getRenewalRowsByOrdheadID');
-            $ret= FALSE;
-            if ($ordheadID==''){
-                $this->raiseError('ordheadID not passed');
-            }
-            else{
-                $dbeJOrdline=new DBEJOrdline($this);
-                $dbeJOrdline->setValue('ordheadID', $ordheadID);
-                $dbeJOrdline->getRenewalRowByOrdheadID('ordheadID');
-                $ret = ($this->getData($dbeJOrdline, $dsOrdline));
-                $dsOrdline->columnSort('sequenceNo');
-            }
-            return $ret;
-        }
-    */
 
 }// End of class
 ?>

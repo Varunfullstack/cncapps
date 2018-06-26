@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerAnalysisReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerAnalysisReport extends CTCNC
@@ -211,7 +211,7 @@ class CTCustomerAnalysisReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue(DBECustomer::Name);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
@@ -229,87 +229,5 @@ class CTCustomerAnalysisReport extends CTCNC
         $this->template->parse('CONTENTS', 'CustomerAnalysisReport', true);
         $this->parsePage();
     }
-    /**
-     * Display search form
-     * @access private
-     */
-    /*
-     function displaySearchForm() {
-     $this->setMethodName ( 'displaySearchForm' );
-
-
-     $this->buCustomerAnalysisReport->initialiseSearchForm ( $dsSearchForm );
-
-     if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
-
-       if (! $dsSearchForm->populateFromArray ( $_REQUEST ['searchForm'] )) {
-
-         $this->setFormErrorOn ();
-
-       }
-
-     }
-
-         $this->setTemplateFiles ( array ('CustomerAnalysisReport' => 'CustomerAnalysisReport.inc' ) );
-
-         $urlCustomerPopup = $this->buildLink ( CTCNC_PAGE_CUSTOMER, array ('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP ) );
-
-         $urlSubmit = $this->buildLink ( $_SERVER ['PHP_SELF'], array ('action' => CTCNC_ACT_SEARCH ) );
-
-         $this->setPageTitle ( 'CustomerAnalysis Report' );
-
-         if ($dsSearchForm->rowCount () == 0) {
-             $this->buCustomerAnalysisReport->initialiseSearchForm ( $dsSearchForm );
-         }
-
-         if ($dsSearchForm->getValue ( 'customerID' ) != 0) {
-             $buCustomer = new BUCustomer ( $this );
-             $buCustomer->getCustomerByID ( $dsSearchForm->getValue ( 'customerID' ), $dsCustomer );
-             $customerString = $dsCustomer->getValue ( 'name' );
-         }
-
-     if ( $this->results ){
-
-       if( $_REQUEST[ ] == 'Screen Report' ){
-
-
-       }else{
-
-         Header('Content-type: text/plain');
-         Header('Content-Disposition: attachment; filename=CustomerAnalysisReport.csv');
-
-         echo "Category,Sales(GBP),Cost(GBP),Labour(GBP),Labour(hours)\r\n";
-
-         foreach ( $this->results as $contractName => $row ){
-
-           echo "\"" . $contractName . "\",";
-           foreach ( $row as $value ){
-             echo $value . ",";
-           }
-           echo "\r\n";
-         }
-         exit;
-       }
-     }
-
-         $this->template->set_var (
-       array (
-         'formError'       => $this->formError,
-         'customerID'      => $dsSearchForm->getValue ( 'customerID' ),
-         'customerString'  => $customerString,
-         'startYearMonth'  => $dsSearchForm->getValue('startYearMonth'),
-         'startYearMonthMessage'   => $dsSearchForm->getMessage('startYearMonth'),
-         'endYearMonth'    => $dsSearchForm->getValue('endYearMonth'),
-         'endYearMonthMessage'   => $dsSearchForm->getMessage('endYearMonth'),
-         'urlCustomerPopup'=> $urlCustomerPopup,
-         'urlSubmit'       => $urlSubmit,
-         )
-       );
-
-         $this->template->parse ( 'CONTENTS', 'CustomerAnalysisReport', true );
-         $this->parsePage ();
-     } // end function displaySearchForm
- */
-
 } // end of class
 ?>

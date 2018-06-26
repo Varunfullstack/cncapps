@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerReviewMeeting.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_bu'] . '/BUContact.inc.php');
 require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');
@@ -102,13 +102,13 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $nonEditableTemplate->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::Name),
+                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
                         'meetingDate'  => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
-                        'slaP1'        => $dsCustomer->getValue(DBECustomer::SlaP1),
-                        'slaP2'        => $dsCustomer->getValue(DBECustomer::SlaP2),
-                        'slaP3'        => $dsCustomer->getValue(DBECustomer::SlaP3),
-                        'slaP4'        => $dsCustomer->getValue(DBECustomer::SlaP4),
-                        'slaP5'        => $dsCustomer->getValue(DBECustomer::SlaP5)
+                        'slaP1'        => $dsCustomer->getValue(DBECustomer::slaP1),
+                        'slaP2'        => $dsCustomer->getValue(DBECustomer::slaP2),
+                        'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
+                        'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
+                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5)
                     )
                 );
 
@@ -120,7 +120,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $supportedUsersData = $this->getSupportedUsersData($buContact,
                                                                    $customerId,
-                                                                   $dsCustomer->getValue(DBECustomer::Name));
+                                                                   $dsCustomer->getValue(DBECustomer::name));
 
                 $nonEditableTemplate->set_var("supportContactInfo", $supportedUsersData['data']);
 
@@ -149,36 +149,6 @@ class CTCustomerReviewMeeting extends CTCNC
                                        ));
                 $textTemplate->set_var('thirdPartyServerAccess', $this->getThirdPartyServerAccessBody($customerId));
                 $textTemplate->set_var('reviewMeetingFrequency', $this->getReviewMeetingFrequencyBody($dsCustomer));
-
-//                /*
-//                End SR Performance Statistics
-//                */
-//                $textTemplate->set_block('page', 'serverBlock', 'servers');
-//
-//                $buCustomerItem->getServersByCustomerID($dsSearchForm->getValue('customerID'), $dsServer);
-//
-//                while ($dsServer->fetchNext()) {
-//
-//                    if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
-//                        $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
-//                    } else {
-//                        $purchaseDate = '';
-//                    }
-//
-//                    $textTemplate->set_var(
-//                        array(
-//                            'itemDescription' => $dsServer->getValue('itemDescription'),
-//                            'serialNo' => $dsServer->getValue('serialNo'),
-//                            'serverName' => $dsServer->getValue('serverName'),
-//                            'purchaseDate' => $purchaseDate,
-//                        )
-//                    );
-//
-//                    $textTemplate->parse('servers', 'serverBlock', true);
-//
-//                } // end while
-
-
                 $textTemplate->set_block('page', 'managementReviewBlock', 'reviews');
 
                 $buActivity->getManagementReviewsInPeriod(
@@ -322,7 +292,7 @@ class CTCustomerReviewMeeting extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue(DBECustomer::Name);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         echo "<script> var graphData = " . json_encode($graphData, JSON_NUMERIC_CHECK) . "</script>";

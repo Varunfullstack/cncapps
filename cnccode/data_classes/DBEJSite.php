@@ -10,8 +10,8 @@ require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 
 class DBEJSite extends DBESite
 {
-    const InvContactName = "invContactName";
-    const DelContactName = "delContactName";
+    const invContactName = "invContactName";
+    const delContactName = "delContactName";
 
     /**
      * calls constructor()
@@ -24,11 +24,11 @@ class DBEJSite extends DBESite
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn(self::InvContactName,
+        $this->addColumn(self::invContactName,
                          DA_STRING,
                          DA_ALLOW_NULL,
                          "CONCAT(icontact.con_first_name,' ',icontact.con_last_name)");
-        $this->addColumn(self::DelContactName,
+        $this->addColumn(self::delContactName,
                          DA_STRING,
                          DA_ALLOW_NULL,
                          "CONCAT(dcontact.con_first_name,' ',dcontact.con_last_name)");
@@ -51,19 +51,19 @@ class DBEJSite extends DBESite
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " LEFT JOIN contact AS icontact" .
-            " ON " . $this->getDBColumnName(DBESite::InvoiceContactID) . " = icontact.con_contno" .
+            " ON " . $this->getDBColumnName(DBESite::invoiceContactID) . " = icontact.con_contno" .
             " LEFT JOIN contact AS dcontact" .
-            " ON " . $this->getDBColumnName(DBESite::DeliverContactID) . " = dcontact.con_contno" .
-            " WHERE (" . $this->getDBColumnName(DBESite::Add1) . " LIKE '%" . $desc . "%'" .
-            " OR " . $this->getDBColumnName(DBESite::Town) . " LIKE '%" . $desc . "%'" .
-            " OR " . $this->getDBColumnName(DBESite::Postcode) . " LIKE '%" . $desc . "%')" .
-            " AND " . $this->getDBColumnName(DBESite::CustomerID) . "=" . $this->getFormattedValue(DBESite::CustomerID);
+            " ON " . $this->getDBColumnName(DBESite::deliverContactID) . " = dcontact.con_contno" .
+            " WHERE (" . $this->getDBColumnName(DBESite::add1) . " LIKE '%" . $desc . "%'" .
+            " OR " . $this->getDBColumnName(DBESite::town) . " LIKE '%" . $desc . "%'" .
+            " OR " . $this->getDBColumnName(DBESite::postcode) . " LIKE '%" . $desc . "%')" .
+            " AND " . $this->getDBColumnName(DBESite::customerID) . "=" . $this->getFormattedValue(DBESite::customerID);
 
         if ($activeFlag == 'Y') {
             $queryString .= ' AND add_active_flag = "Y"';
         }
 
-        $queryString .= ' ORDER BY ' . $this->getDBColumnName(DBESite::Add1);
+        $queryString .= ' ORDER BY ' . $this->getDBColumnName(DBESite::add1);
 
         $this->setQueryString($queryString);
 
@@ -79,11 +79,11 @@ class DBEJSite extends DBESite
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " LEFT JOIN contact AS icontact" .
-            " ON " . $this->getDBColumnName(DBESite::InvoiceContactID) . " = icontact.con_contno" .
+            " ON " . $this->getDBColumnName(DBESite::invoiceContactID) . " = icontact.con_contno" .
             " LEFT JOIN contact AS dcontact" .
-            " ON " . $this->getDBColumnName(DBESite::DeliverContactID) . " = dcontact.con_contno" .
-            " WHERE " . $this->getDBColumnName(DBESite::CustomerID) . "=" . $this->getFormattedValue(DBESite::CustomerID) .
-            " AND " . $this->getDBColumnName(DBESite::SiteNo) . "=" . $this->getFormattedValue(DBEJSite::SiteNo)
+            " ON " . $this->getDBColumnName(DBESite::deliverContactID) . " = dcontact.con_contno" .
+            " WHERE " . $this->getDBColumnName(DBESite::customerID) . "=" . $this->getFormattedValue(DBESite::customerID) .
+            " AND " . $this->getDBColumnName(DBESite::siteNo) . "=" . $this->getFormattedValue(DBEJSite::siteNo)
         );
         $ret = (parent::getRow());
         return $ret;
@@ -97,10 +97,10 @@ class DBEJSite extends DBESite
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " LEFT JOIN contact AS icontact" .
-            " ON " . $this->getDBColumnName(DBESite::InvoiceContactID) . " = icontact.con_contno" .
+            " ON " . $this->getDBColumnName(DBESite::invoiceContactID) . " = icontact.con_contno" .
             " LEFT JOIN contact AS dcontact" .
-            " ON " . $this->getDBColumnName(DBESite::DeliverContactID) . " = dcontact.con_contno" .
-            " WHERE " . $this->getDBColumnName($column) . "=" . $this->getFormattedValue(DBESite::CustomerID);
+            " ON " . $this->getDBColumnName(DBESite::deliverContactID) . " = dcontact.con_contno" .
+            " WHERE " . $this->getDBColumnName($column) . "=" . $this->getFormattedValue(DBESite::customerID);
 
         if ($activeFlag == 'Y') {
             $queryString .= ' AND add_active_flag = "Y"';

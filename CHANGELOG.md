@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.8.0] 
 ### Added
 - Issue 195 - Graph to show user productivity
 - Issue 264 - Add option for Monthly in customer review meeting frequency
@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 260 - Remove Spend/Category from the Reports Menu
 ## Fixed
 - Issue 262 - Problems With Customer CRM losing information
+- Issue 261 - Find out why activities end up with caa_status of O and resolve
 
 ## [v1.7.5] - 2018-06-06
 ### Fixed

@@ -1,41 +1,41 @@
 <?php
 /**
-DM Leter
-*/
+ * DM Leter
+ */
 require_once("config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once('../phplib4/template_PEAR.inc');
-include( $_SERVER['DOCUMENT_ROOT'] . '/fckeditor/fckeditor.php') ;
+include($_SERVER['DOCUMENT_ROOT'] . '/fckeditor/fckeditor.php');
 GLOBAL $cfg;
 page_open(
-	array(
-		'sess' => PHPLIB_CLASSNAME_SESSION,
-		'auth' => PHPLIB_CLASSNAME_AUTH,
-		'',
-		''
-	)
+    array(
+        'sess' => PHPLIB_CLASSNAME_SESSION,
+        'auth' => PHPLIB_CLASSNAME_AUTH,
+        '',
+        ''
+    )
 );
 
 if (!isset($_REQUEST['contactID'])) {
-	die ('contactID not passed');
+    die ('contactID not passed');
 }
 if (!isset($_REQUEST['letterTemplate'])) {
-	die ('letterTemplate not passed');
+    die ('letterTemplate not passed');
 }
 
 $templateName = $_REQUEST['letterTemplate'];
 
-$templatePath = LETTER_TEMPLATE_DIR . "/custom/" . $templateName ;
+$templatePath = LETTER_TEMPLATE_DIR . "/custom/" . $templateName;
 
-if (!file_exists( $templatePath ) ){
-	die ($templatePath . ' not found');
+if (!file_exists($templatePath)) {
+    die ($templatePath . ' not found');
 }
 
 /* set up template */
-$template=new Template_PHPLIB( LETTER_TEMPLATE_DIR . "/custom/", 'remove');
+$template = new Template_PHPLIB(LETTER_TEMPLATE_DIR . "/custom/", 'remove');
 
-$template->setFile( 'Page', $templateName );
+$template->setFile('Page', $templateName);
 
 $buCustomer = new BUCustomer($this);
 $buCustomer->getContactByID($_REQUEST['contactID'], $dsContact);
@@ -44,85 +44,92 @@ $dsContact->fetchNext();
 $buCustomer->getCustomerByID($dsContact->getValue('customerID'), $dsCustomer);
 $dsCustomer->fetchNext();
 
-$name = $dsContact->getValue('title') . ' ' . $dsContact->getValue('lastName');
+$name = $dsContact->getValue(DBEContact::title) . ' ' . $dsContact->getValue(DBEContact::lastName);
 
 
-$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue('customerID'), $dsContact->getValue('siteNo'), $dsSite);
+$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue(DBEContact::customerID),
+                                       $dsContact->getValue(DBEContact::siteNo),
+                                       $dsSite);
 
-if ( $dsContact->getValue('firstName') ){
-	$firstName = $dsContact->getValue('firstName');
-	$addressee = $dsContact->getValue('title').' '.$firstName[0].' '.$dsContact->getValue('lastName');
+if ($dsContact->getValue(DBEContact::firstName)) {
+    $firstName = $dsContact->getValue(DBEContact::firstName);
+    $addressee = $dsContact->getValue(DBEContact::title) . ' ' . $firstName[0] . ' ' . $dsContact->getValue(DBEContact::lastName);
+} else {
+    $addressee = $dsContact->getValue(DBEContact::title) . ' ' . $dsContact->getValue(DBEContact::lastName);
 }
-else{
-	$addressee = $dsContact->getValue('title'). ' ' .$dsContact->getValue('lastName');
-}
 
-$dbeUser=new DBEUser($this);
-$dbeUser->setValue('userID', $GLOBALS['auth']->is_authenticated() );
+$dbeUser = new DBEUser($this);
+$dbeUser->setValue('userID', $GLOBALS['auth']->is_authenticated());
 $dbeUser->getRow();
 
 $address =
-	$dsCustomer->getValue('name') . "<BR/>" .
-	$dsSite->getValue(DBESite::Add1) . "<BR/>";
+    $dsCustomer->getValue(DBECustomer::name) . "<BR/>" .
+    $dsSite->getValue(DBESite::add1) . "<BR/>";
 
-if ($dsSite->getValue(DBESite::Add2) != ''){
-	$address .= $dsSite->getValue(DBESite::Add2) . "<BR/>";
+if ($dsSite->getValue(DBESite::add2) != '') {
+    $address .= $dsSite->getValue(DBESite::add2) . "<BR/>";
 }
-if ($dsSite->getValue(DBESite::Add3) != ''){
-	$address .= $dsSite->getValue(DBESite::Add3) . "<BR/>";
+if ($dsSite->getValue(DBESite::add3) != '') {
+    $address .= $dsSite->getValue(DBESite::add3) . "<BR/>";
 }
-$address .= $dsSite->getValue(DBESite::Town) . "<BR/>";
-if ($dsSite->getValue(DBESite::County) != ''){
-	$address .= $dsSite->getValue(DBESite::County) . "<BR/>";
+$address .= $dsSite->getValue(DBESite::town) . "<BR/>";
+if ($dsSite->getValue(DBESite::county) != '') {
+    $address .= $dsSite->getValue(DBESite::county) . "<BR/>";
 }
-$address .= $dsSite->getValue(DBESite::Postcode) . "<BR/>";
+$address .= $dsSite->getValue(DBESite::postcode) . "<BR/>";
 
 
 $template->setVar(
-	array(
-		'title'	=> $dsContact->getValue('title'),
-		'name'	=> $name,
-		'formalName'	=> $formalName,
-		'firstName'	=> $dsContact->getValue('firstName'),
-		'lastName'	=> $dsContact->getValue('lastName'),
-		'addressee'	=> $addressee,
-		'customer'	=> $dsCustomer->getValue('name'),
-		'address'		=> $address,
-		'date'			=> date('l, jS F Y'),
-		'userFirstName'	=> $dbeUser->getValue('firstName'),
-		'userLastName'	=> $dbeUser->getValue('lastName'),
-		'userJobTitle'	=> $dbeUser->getValue('jobTitle')
-	)
+    array(
+        'title'         => $dsContact->getValue(DBEContact::title),
+        'name'          => $name,
+        'formalName'    => $formalName,
+        'firstName'     => $dsContact->getValue(DBEContact::firstName),
+        'lastName'      => $dsContact->getValue(DBEContact::lastName),
+        'addressee'     => $addressee,
+        'customer'      => $dsCustomer->getValue(DBECustomer::name),
+        'address'       => $address,
+        'date'          => date('l, jS F Y'),
+        'userFirstName' => $dbeUser->getValue(DBEUser::firstName),
+        'userLastName'  => $dbeUser->getValue(DBEUser::lastName),
+        'userJobTitle'  => $dbeUser->getValue(DBEUser::jobTitle)
+    )
 );
 
 $template->parse('output', 'Page', true);
 $file = $template->getVar('output');
 
-$oFCKeditor = new FCKeditor('letterText') ;
+$oFCKeditor = new FCKeditor('letterText');
 $oFCKeditor->BasePath = '/FCKeditor/';
 $oFCKeditor->Height = '800px';
-$oFCKeditor->Value = $file; 
-/*
-$oFCKeditor->Value		= $address . "<P>" . date('l, jS F Y') ."</P><P>" . "Dear " . $dsContact->getValue('title').' '.$dsContact->getValue('lastName'). ",</P>" . $letterBody;
-*/
+$oFCKeditor->Value = $file;
 ?>
-<html>
-<head>
-<title>Client Letter</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="LetterForm.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-<h1><?php echo $templateName ?> to <?php echo $dsContact->getValue('firstName').' '.$dsContact->getValue('lastName') ?></h1>
-<h2><?php echo stripslashes($_REQUEST['contactName'])?></h2>
-<table width="800" border="0" class="singleBorder">
-	<tr>
-		<td class="promptText">
-		<?php $oFCKeditor->Create() ?>
-		</td>
-	</tr>
-</table>
-<p>&nbsp;</p>
-</body>
-</html>
+    <html>
+    <head>
+        <title>Client Letter</title>
+        <meta http-equiv="Content-Type"
+              content="text/html; charset=utf-8"
+        >
+        <link href="LetterForm.css"
+              rel="stylesheet"
+              type="text/css"
+        >
+    </head>
+    <body>
+    <h1><?php echo $templateName ?>
+        to <?php echo $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName) ?></h1>
+    <h2><?php echo stripslashes($_REQUEST['contactName']) ?></h2>
+    <table width="800"
+           border="0"
+           class="singleBorder"
+    >
+        <tr>
+            <td class="promptText">
+                <?php $oFCKeditor->Create() ?>
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+    </body>
+    </html>
 <?php page_close(); ?>

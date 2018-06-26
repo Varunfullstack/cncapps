@@ -64,12 +64,12 @@ class BUScoTrans extends Business
                 do {
                     fwrite(
                         $pointer,
-                        $dsScoTrans->getValue('Statement') . ";\n"
+                        $dsScoTrans->getValue(DBEScoTrans::statement) . ";\n"
                     );
                     // Remove DB row
-                    $this->dbeScoTrans->setValue('ScoTransID', $dsScoTrans->getValue('ScoTransID'));
+                    $this->dbeScoTrans->setValue(DBEScoTrans::scoTransID, $dsScoTrans->getValue(DBEScoTrans::scoTransID));
                     $this->dbeScoTrans->deleteRow();
-                    $this->writeLog('Created ' . $fileName . ':' . $dsScoTrans->getValue('Statement') . ' on SCO BOX');
+                    $this->writeLog('Created ' . $fileName . ':' . $dsScoTrans->getValue(DBEScoTrans::statement) . ' on SCO BOX');
                 } while ($dsScoTrans->fetchNext());
                 fclose($pointer);
             }

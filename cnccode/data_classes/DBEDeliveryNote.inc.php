@@ -7,6 +7,12 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEDeliveryNote extends DBEntity
 {
+
+    const deliveryNoteID = "deliveryNoteID";
+    const ordheadID = "ordheadID";
+    const noteNo = "noteNo";
+    const dateTime = "dateTime";
+
     /**
      * calls constructor()
      * @access public
@@ -18,10 +24,26 @@ class DBEDeliveryNote extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("deliverynote");
-        $this->addColumn("deliveryNoteID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("ordheadID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("noteNo", DA_INTEGER, DA_NOT_NULL);
-        $this->addColumn("dateTime", DA_DATETIME, DA_NOT_NULL);
+        $this->addColumn(
+            self::deliveryNoteID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::ordheadID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::noteNo,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::dateTime,
+            DA_DATETIME,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -29,8 +51,8 @@ class DBEDeliveryNote extends DBEntity
     function getNextNoteNo()
     {
         $this->setQueryString(
-            'SELECT MAX(' . $this->getDBColumnName('noteNo') . ') + 1 FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . '=' . $this->getFormattedValue('ordheadID')
+            'SELECT MAX(' . $this->getDBColumnName(self::noteNo) . ') + 1 FROM ' . $this->getTableName() .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . '=' . $this->getFormattedValue(self::ordheadID)
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -47,11 +69,13 @@ class DBEDeliveryNote extends DBEntity
     function deleteRowsByOrderID()
     {
         $this->setMethodName('deleteRowsByOrderID');
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
-            'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getFormattedValue('ordheadID')
+            'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName(
+                self::ordheadID
+            ) . ' = ' . $this->getFormattedValue(self::ordheadID)
         );
         return (parent::runQuery());
     }
