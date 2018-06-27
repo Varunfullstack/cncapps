@@ -68,13 +68,34 @@ define(
     'dispCustPopup'
 );
 // Messages
-define('CTCUSTOMER_MSG_CUSTTRING_REQ', 'Please enter search parameters');
-define('CTCUSTOMER_MSG_NONE_FND', 'No customers found'
-);define('CTCUSTOMER_MSG_CUS_NOT_FND', 'Customer not found'
-);define('CTCUSTOMER_CLS_FORM_ERROR', 'contactError');
-define('CTCUSTOMER_CLS_TABLE_EDIT_HEADER', 'tableEditHeader'
-);define('CTCUSTOMER_CLS_FORM_ERROR_UC', 'formErrorUC');                // upper case
-define('CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC', 'tableEditHeaderUC');
+define(
+    'CTCUSTOMER_MSG_CUSTTRING_REQ',
+    'Please enter search parameters'
+);
+define(
+    'CTCUSTOMER_MSG_NONE_FND',
+    'No customers found'
+);
+define(
+    'CTCUSTOMER_MSG_CUS_NOT_FND',
+    'Customer not found'
+);
+define(
+    'CTCUSTOMER_CLS_FORM_ERROR',
+    'contactError'
+);
+define(
+    'CTCUSTOMER_CLS_TABLE_EDIT_HEADER',
+    'tableEditHeader'
+);
+define(
+    'CTCUSTOMER_CLS_FORM_ERROR_UC',
+    'formErrorUC'
+);                // upper case
+define(
+    'CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC',
+    'tableEditHeaderUC'
+);
 // Form text
 define(
     'CTCUSTOMER_TXT_ADD_SITE',
@@ -149,7 +170,11 @@ class CTCustomer extends CTCNC
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
-        $this->dsContact->addColumn('TitleClass', DA_STRING, DA_ALLOW_NULL);
+        $this->dsContact->addColumn(
+            'TitleClass',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
         $this->dsContact->addColumn(
             'TitleClass',
             DA_STRING,
@@ -170,7 +195,11 @@ class CTCustomer extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
-        $this->dsContact->addColumn('EmailClass', DA_STRING, DA_ALLOW_NULL);
+        $this->dsContact->addColumn(
+            'EmailClass',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
         $this->dsSite = new DataSet($this);
         $this->dsSite->setIgnoreNULLOn();
         $this->dsSite->copyColumnsFrom($this->buCustomer->dbeSite);
@@ -305,8 +334,19 @@ class CTCustomer extends CTCNC
                     'FirstNameClass',
                     null
                 );
+            }
+
+            if ($this->dsContact->getValue(DBEContact::lastName) == '') {
+                $this->setFormErrorOn();
+                $this->dsContact->setValue(
+                    'LastNameClass',
+                    CTCUSTOMER_CLS_FORM_ERROR
+                );
             } else {
-                $this->dsContact->setValue('LastNameClass', null);
+                $this->dsContact->setValue(
+                    'LastNameClass',
+                    null
+                );
             }
 
             $validEmail = true;
@@ -1798,8 +1838,8 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_var(
             array(
-                'urlContactPopup' => $urlContactPopup,
-                'bodyTagExtras' => $bodyTagExtras,
+                'urlContactPopup'                 => $urlContactPopup,
+                'bodyTagExtras'                   => $bodyTagExtras,
                 /* hidden */
                 'reviewMeetingEmailSentFlag'      => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingEmailSentFlag
@@ -1836,15 +1876,6 @@ ORDER BY cus_name ASC  ";
                 ),
                 'prospectFlagChecked'             => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::prospectFlag)
-                ),
-                'othersEmailMainFlagChecked'      => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::othersEmailMainFlag)
-                ),
-                'workStartedEmailMainFlagChecked' => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
-                ),
-                'autoCloseEmailMainFlagChecked'   => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)
                 ),
                 'pcxFlagChecked'                  => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
@@ -2515,7 +2546,9 @@ ORDER BY cus_name ASC  ";
                     'othersAutoCloseEmailFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::OthersAutoCloseEmailFlag)
                     ),
-                    'reviewUserChecked'                 => $this->getChecked($this->dsContact->getValue(DBEContact::reviewUser)),
+                    'reviewUserChecked'                 => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::reviewUser)
+                    ),
                     'clientFormURL'                     => $clientFormURL,
                     'dearJohnURL'                       => $dearJohnURL,
                     'dmLetterURL'                       => $dmLetterURL,
