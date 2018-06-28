@@ -256,8 +256,11 @@ class BUProblemSLA extends Business
 
                             $this->sendCompletionAlertEmail(
                                 $problemID,
-                                $this->dbeProblem->getValue('completeDate')
+                                $this->dbeProblem->getValue(DBEProblem::completeDate),
+                                $dbeCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
                             );
+
+
                         } // end if hours until complete
 
 
@@ -546,7 +549,7 @@ class BUProblemSLA extends Business
         Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact or don't want to get them.
         */
 
-                $dbeContact = new DBEContact($this);
+        $dbeContact = new DBEContact($this);
 
         $dbeContact->getMainSupportRowsByCustomerID($dbeJProblem->getValue('customerID'));
 

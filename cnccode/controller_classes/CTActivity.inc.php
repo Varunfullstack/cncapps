@@ -1254,7 +1254,10 @@ class CTActivity extends CTCNC
         $this->setMethodName('displayActivity');
         $this->setPageTitle('Activity');
 
-        $this->buActivity->getActivityByID($_REQUEST['callActivityID'], $dsCallActivity);
+        $this->buActivity->getActivityByID(
+            $_REQUEST['callActivityID'],
+            $dsCallActivity
+        );
         $callActivityID = $dsCallActivity->getValue('callActivityID');
 
         $problemID = $dsCallActivity->getValue('problemID');

@@ -312,24 +312,6 @@ class CTCustomer extends CTCNC
                 DBEContact::firstName,
                 $value['firstName']
             );
-
-            if ($this->dsContact->getValue(DBEContact::firstName) == '') {
-                $this->setFormErrorOn();
-                $this->dsContact->setValue(
-                    'FirstNameClass',
-                    CTCUSTOMER_CLS_FORM_ERROR
-                );
-            } else {
-                $this->dsContact->setValue(
-                    'FirstNameClass',
-                    null
-                );
-            }
-
-            $validEmail = true;
-            $email = $value['email'] == '' ? null : $value['email'];
-
-
             $this->dsContact->setValue(
                 'EmailClass',
                 null
@@ -1815,109 +1797,100 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_var(
             array(
-                'urlContactPopup'                 => $urlContactPopup,
-                'bodyTagExtras'                   => $bodyTagExtras,
+                'urlContactPopup'                => $urlContactPopup,
+                'bodyTagExtras'                  => $bodyTagExtras,
                 /* hidden */
-                'reviewMeetingEmailSentFlag'      => $this->dsCustomer->getValue(
+                'reviewMeetingEmailSentFlag'     => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingEmailSentFlag
                 ),
-                'customerNotePopupLink'           => $this->getCustomerNotePopupLink($this->getCustomerID()),
-                'showInactiveContactsURL'         => $showInactiveContactsURL,
-                'showInactiveSitesURL'            => $showInactiveSitesURL,
-                'customerID'                      => $this->dsCustomer->getValue(DBECustomer::customerID),
-                'customerName'                    => $this->dsCustomer->getValue(DBECustomer::name),
-                'reviewCount'                     => $this->buCustomer->getReviewCount(),
-                'customerFolderLink'              => $customerFolderLink,
-                'customerNameClass'               => $this->dsCustomer->getValue('NameClass'),
-                'SectorMessage'                   => $this->dsCustomer->getValue('SectorMessage'),
-                'regNo'                           => $this->dsCustomer->getValue(DBECustomer::regNo),
-                'mailshotFlagChecked'             => $this->getChecked(
+                'customerNotePopupLink'          => $this->getCustomerNotePopupLink($this->getCustomerID()),
+                'showInactiveContactsURL'        => $showInactiveContactsURL,
+                'showInactiveSitesURL'           => $showInactiveSitesURL,
+                'customerID'                     => $this->dsCustomer->getValue(DBECustomer::customerID),
+                'customerName'                   => $this->dsCustomer->getValue(DBECustomer::name),
+                'reviewCount'                    => $this->buCustomer->getReviewCount(),
+                'customerFolderLink'             => $customerFolderLink,
+                'customerNameClass'              => $this->dsCustomer->getValue('NameClass'),
+                'SectorMessage'                  => $this->dsCustomer->getValue('SectorMessage'),
+                'regNo'                          => $this->dsCustomer->getValue(DBECustomer::regNo),
+                'mailshotFlagChecked'            => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
-                'referredFlagChecked'             => $this->getChecked(
+                'referredFlagChecked'            => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
-                'specialAttentionFlagChecked'     => $this->getChecked(
+                'specialAttentionFlagChecked'    => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'         => Controller::dateYMDtoDMY(
+                'specialAttentionEndDate'        => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
                 ),
-                'specialAttentionEndDateMessage'  => $this->dsCustomer->getValue('specialAttentionEndDateMessage'),
-                'lastReviewMeetingDate'           => Controller::dateYMDtoDMY(
+                'specialAttentionEndDateMessage' => $this->dsCustomer->getValue('specialAttentionEndDateMessage'),
+                'lastReviewMeetingDate'          => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
                 ),
-                'lastReviewMeetingDateMessage'    => $this->dsCustomer->getValue('lastReviewMeetingDateMessage'),
-                'support24HourFlagChecked'        => $this->getChecked(
+                'lastReviewMeetingDateMessage'   => $this->dsCustomer->getValue('lastReviewMeetingDateMessage'),
+                'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
-                'prospectFlagChecked'             => $this->getChecked(
+                'prospectFlagChecked'            => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::prospectFlag)
                 ),
-                'othersEmailMainFlagChecked'      => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::othersEmailMainFlag)
-                ),
-                'workStartedEmailMainFlagChecked' => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
-                ),
-                'autoCloseEmailMainFlagChecked'   => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)
-                ),
-                'pcxFlagChecked'                  => $this->getChecked(
+                'pcxFlagChecked'                 => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
                 ),
-                'createDate'                      => $this->dsCustomer->getValue(DBECustomer::createDate),
-                'mailshot2FlagDesc'               => $this->buCustomer->dsHeader->getValue(
+                'createDate'                     => $this->dsCustomer->getValue(DBECustomer::createDate),
+                'mailshot2FlagDesc'              => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot2FlagDesc
                 ),
-                'mailshot3FlagDesc'               => $this->buCustomer->dsHeader->getValue(
+                'mailshot3FlagDesc'              => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot3FlagDesc
                 ),
-                'mailshot4FlagDesc'               => $this->buCustomer->dsHeader->getValue(
+                'mailshot4FlagDesc'              => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot4FlagDesc
                 ),
-                'mailshot8FlagDesc'               => $this->buCustomer->dsHeader->getValue(
+                'mailshot8FlagDesc'              => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot8FlagDesc
                 ),
-                'mailshot9FlagDesc'               => $this->buCustomer->dsHeader->getValue(
+                'mailshot9FlagDesc'              => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot9FlagDesc
                 ),
-                'mailshot11FlagDesc'              => $this->buCustomer->dsHeader->getValue(
+                'mailshot11FlagDesc'             => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot11FlagDesc
                 ),
-                'submitURL'                       => $submitURL,
-                'renewalLink'                     => $renewalLink,
-                'passwordLink'                    => $passwordLink,
-                'deleteCustomerURL'               => $deleteCustomerURL,
-                'deleteCustomerText'              => $deleteCustomerText,
-                'cancelURL'                       => $cancelURL,
-                'disabled'                        => $this->hasPermissions(
+                'submitURL'                      => $submitURL,
+                'renewalLink'                    => $renewalLink,
+                'passwordLink'                   => $passwordLink,
+                'deleteCustomerURL'              => $deleteCustomerURL,
+                'deleteCustomerText'             => $deleteCustomerText,
+                'cancelURL'                      => $cancelURL,
+                'disabled'                       => $this->hasPermissions(
                     PHPLIB_PERM_SALES
                 ) ? '' : CTCNC_HTML_DISABLED,
-                'gscTopUpAmount'                  => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
-                'noOfServers'                     => $this->dsCustomer->getValue(DBECustomer::noOfServers),
-                'noOfSites'                       => $this->dsCustomer->getValue(DBECustomer::noOfSites),
-                'modifyDate'                      => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                      => Controller::dateYMDtoDMY(
+                'gscTopUpAmount'                 => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
+                'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
+                'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
+                'reviewDate'                     => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewDate)
                 ),
-                'reviewTime'                      => Controller::dateYMDtoDMY(
+                'reviewTime'                     => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewTime)
                 ),
-                'becameCustomerDate'              => Controller::dateYMDtoDMY(
+                'becameCustomerDate'             => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
                 ),
-                'droppedCustomerDate'             => Controller::dateYMDtoDMY(
+                'droppedCustomerDate'            => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
                 ),
-                'reviewAction'                    => $this->dsCustomer->getValue(DBECustomer::reviewAction),
-                'comments'                        => $this->dsCustomer->getValue(DBECustomer::comments),
-                'techNotes'                       => $this->dsCustomer->getValue(DBECustomer::techNotes),
-                'slaP1'                           => $this->dsCustomer->getValue(DBECustomer::slaP1),
-                'slaP2'                           => $this->dsCustomer->getValue(DBECustomer::slaP2),
-                'slaP3'                           => $this->dsCustomer->getValue(DBECustomer::slaP3),
-                'slaP4'                           => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5)
+                'reviewAction'                   => $this->dsCustomer->getValue(DBECustomer::reviewAction),
+                'comments'                       => $this->dsCustomer->getValue(DBECustomer::comments),
+                'techNotes'                      => $this->dsCustomer->getValue(DBECustomer::techNotes),
+                'slaP1'                          => $this->dsCustomer->getValue(DBECustomer::slaP1),
+                'slaP2'                          => $this->dsCustomer->getValue(DBECustomer::slaP2),
+                'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
+                'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
+                'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5)
             )
         );
         if ((!$this->formError) & ($this->getAction(
@@ -2240,9 +2213,17 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_block(
             'CustomerEdit',
+            'supportLevelBlock',
+            'selectSupportLevel'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'contactBlock',
             'contacts'
         );      // have to declare innermost block first
+
+
 
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_DISP_SUCCESS)) {                                                      // Only get from DB if not displaying form error(s)
@@ -2378,6 +2359,7 @@ ORDER BY cus_name ASC  ";
                 ''
             );
 
+
             $this->parseContactSelector(
                 $this->dsSite->getValue(DBESite::deliverContactID),
                 $this->dsContact,
@@ -2411,6 +2393,13 @@ ORDER BY cus_name ASC  ";
                 'selectSites',
                 ''
             );
+
+            $this->template->set_block(
+                'CustomerEdit',
+                'selectSupportLevel',
+                ''
+            );
+
             $this->template->set_block(
                 'CustomerEdit',
                 'customLetters',
@@ -2523,21 +2512,11 @@ ORDER BY cus_name ASC  ";
                     'autoCloseEmailFlagChecked'         => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
                     ),
-                    'othersEmailFlagChecked'            => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::OthersEmailFlag)
-                    ),
-                    'othersWorkStartedEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::OthersWorkStartedEmailFlag)
-                    ),
-                    'othersAutoCloseEmailFlagChecked'   => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::OthersAutoCloseEmailFlag)
-                    ),
-                    'reviewUserChecked'                 => $this->getChecked($this->dsContact->getValue(DBEContact::reviewUser)),
-                    'clientFormURL'                     => $clientFormURL,
-                    'dearJohnURL'                       => $dearJohnURL,
-                    'dmLetterURL'                       => $dmLetterURL,
-                    'customLetter1URL'                  => $customLetter1URL,
-                    'deleteContactLink'                 => $deleteContactLink
+                    'clientFormURL'               => $clientFormURL,
+                    'dearJohnURL'                 => $dearJohnURL,
+                    'dmLetterURL'                 => $dmLetterURL,
+                    'customLetter1URL'            => $customLetter1URL,
+                    'deleteContactLink'           => $deleteContactLink
                 )
             );
 
@@ -2545,6 +2524,12 @@ ORDER BY cus_name ASC  ";
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
             );
+
+
+            $this->supportLevelDropDown(
+                $this->dsContact->getValue(DBEContact::supportLevel)
+            );
+
 
             /*
             Display all the custom letters
@@ -3110,6 +3095,33 @@ ORDER BY cus_name ASC  ";
         } // end if
 
 
+    }
+
+    private function supportLevelDropDown($supportLevelValue)
+    {
+        // Site selection
+        $supportLevels = [
+            ["value" => null, "description" => "None"],
+            ["value" => DBEContact::supportLevelMain, "description" => "Main"],
+            ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
+            ["value" => DBEContact::supportLevelSupportDelegate, "description" => "Delegate"],
+        ];
+        foreach ($supportLevels as $supportLevel) {
+            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : '';
+
+            $this->template->set_var(
+                array(
+                    'supportLevelSelected'    => $supportLevelSelected,
+                    'supportLevelValue'       => $supportLevel['value'],
+                    'supportLevelDescription' => $supportLevel['description']
+                )
+            );
+            $this->template->parse(
+                'selectSupportLevel',
+                'supportLevelBlock',
+                true
+            );
+        }
     } // end function documents
 
 }// end of class
