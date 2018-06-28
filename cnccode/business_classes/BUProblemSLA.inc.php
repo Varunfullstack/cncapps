@@ -551,8 +551,8 @@ class BUProblemSLA extends Business
         $dbeContact->getMainSupportRowsByCustomerID($dbeJProblem->getValue('customerID'));
 
         while ($dbeContact->fetchNext()) {
-            if ($dbeContact->getValue(DBEContact::OthersEmailFlag) == 'Y' &&
-                $dbeContact->getValue(DBEContact::OthersAutoCloseEmailFlag)) {
+            if ($dbeContact->getValue(DBEContact::othersEmailFlag) == 'Y' &&
+                $dbeContact->getValue(DBEContact::othersAutoCloseEmailFlag)) {
                 if ($toEmail) {
                     $toEmail .= ",";
                 }
