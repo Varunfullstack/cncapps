@@ -6,6 +6,163 @@
 <script type="text/JavaScript">
 
     $(function () {
+
+
+        var config = {
+            modules: 'security',
+            inlineErrorMessageCallback: function (error, element) {
+
+            },
+            scrollToTopOnError: false
+        };
+        $.validate(config);
+
+        $.formUtils.addValidator({
+            name: 'emailOrEmpty',
+            validatorFunction: function (email) {
+
+                if (email === '') {
+                    return true;
+                }
+
+                var emailParts = email.toLowerCase().split('@'),
+                    localPart = emailParts[0],
+                    domain = emailParts[1];
+
+                if (localPart && domain) {
+
+                    if (localPart.indexOf('"') === 0) {
+                        var len = localPart.length;
+                        localPart = localPart.replace(/\"/g, '');
+                        if (localPart.length !== (len - 2)) {
+                            return false; // It was not allowed to have more than two apostrophes
+                        }
+                    }
+
+                    return $.formUtils.validators.validate_domain.validatorFunction(emailParts[1]) &&
+                        localPart.indexOf('.') !== 0 &&
+                        localPart.substring(localPart.length - 1, localPart.length) !== '.' &&
+                        localPart.indexOf('..') === -1 &&
+                        !(/[^\w\+\.\-\#\-\_\~\!\$\&\'\(\)\*\+\,\;\=\:]/.test(localPart));
+                }
+
+                return false;
+            },
+            errorMessage: '',
+            errorMessageKey: 'badEmail'
+        });
+
+        $.formUtils.addValidator({
+            name: 'atLeastOne',
+            validatorFunction: function (value, $el, config, language, $form) {
+                var test = $('[data-type="' + $el.data().type + '"]');
+                var isValid = false;
+
+                test.each(function () {
+                    var elm = $(this);
+                    var isMe = elm.get(0) === $el.get(0);
+
+                    if (elm.prop('checked')) {
+                        isValid = true;
+                    }
+
+                    if (!$el.data().toBeValidated && !isMe) {
+                        elm.data("toBeValidated", true);
+                        elm.validate();
+                    }
+                });
+                $el.data("toBeValidated", false);
+
+                return isValid;
+            },
+            errorMessage: '',
+            errorMessageKey: 'atLeastOne'
+        });
+
+        $.formUtils.addValidator({
+            name: 'atLeastOneAtMostOne',
+            validatorFunction: function (value, $el, config, language, $form) {
+                var test = $('[data-type="' + $el.data().type + '"]');
+
+                var checkedCount = 0;
+
+                test.each(function () {
+                    var elm = $(this);
+                    var isMe = elm.get(0) === $el.get(0);
+
+                    if (elm.prop('checked')) {
+                        checkedCount++;
+                    }
+
+                    if (!$el.data().toBeValidated && !isMe) {
+                        elm.data("toBeValidated", true);
+                        elm.validate();
+                    }
+                });
+                $el.data("toBeValidated", false);
+                return checkedCount === 1;
+            },
+            errorMessage: '',
+            errorMessageKey: 'atLeastOne'
+        });
+
+        $.formUtils.addValidator({
+            name: 'atLeastOneMain',
+            validatorFunction: function (value, $el, config, language, $form) {
+                var test = $('[data-type="' + $el.data().type + '"]');
+
+                var checkedCount = 0;
+
+                test.each(function () {
+                    var elm = $(this);
+                    var isMe = elm.get(0) === $el.get(0);
+
+                    if (elm.val() === 'main') {
+                        checkedCount++;
+                    }
+
+                    if (!$el.data().toBeValidated && !isMe) {
+                        elm.data("toBeValidated", true);
+                        elm.validate();
+                    }
+                });
+                $el.data("toBeValidated", false);
+                return checkedCount > 0;
+            }
+        });
+
+
+        var assignClass = function () {
+            var elem = $(this);
+            var tr = elem.closest('tr');
+
+
+            if (elem[0].value === 'main') {
+                // we want to show the
+                tr.find('.onlyMain').show();
+                tr.addClass('redText');
+            } else {
+                tr.find('.onlyMain').hide();
+                tr.removeClass('redText');
+            }
+        };
+
+        $('body').on('change', '[data-type="mainSelector"]', assignClass);
+
+        $('[data-type="mainSelector"]').each(assignClass);
+
+        var types = {};
+
+        $('[data-validation="atLeastOne"], [data-validation="atLeastOneAtMostOne"]').each(function (index) {
+            var $this = $(this);
+
+            if (typeof types[$this.data().type] === 'undefined') {
+                $this.validate();
+                types[$this.data().type] = true;
+            }
+        });
+
+
         window.specialAttentionEndDate = $('#specialAttentionEndDate').get(0);
         window.lastReviewMeetingDate = $('#lastReviewMeetingDate').get(0);
         window.reviewDate = $('#reviewDate').get(0);
@@ -759,8 +916,11 @@
                     </td>
                     <td class="content">
                         <input {disabled}
-                               type="checkbox" name="form[contact][{contactID}][mailshot2Flag]" value="Y"
-                               {mailshot2FlagChecked}/>
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot2Flag]"
+                               value="Y"
+                               {mailshot2FlagChecked}
+                        />
                     </td>
                     <td class="content">
                         <input {disabled}
@@ -771,8 +931,13 @@
                         />
                     </td>
                     <td class="content">
-                        <input {disabled} type="checkbox" name="form[contact][{contactID}][mailshot4Flag]" value="Y"
-                               {mailshot4FlagChecked} class="stmCheckBox"/>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot4Flag]"
+                               value="Y"
+                               {mailshot4FlagChecked}
+                               class="stmCheckBox"
+                        />
                     </td>
                     <td class="content">
                         <input {disabled}
@@ -780,7 +945,8 @@
                                type="checkbox"
                                name="form[contact][{contactID}][mailshot9Flag]"
                                value="Y"
-                               {mailshot9FlagChecked}/>
+                               {mailshot9FlagChecked}
+                        />
 
                     </td>
                 </tr>

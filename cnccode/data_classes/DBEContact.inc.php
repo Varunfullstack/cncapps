@@ -282,8 +282,8 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             ", case when supportLevel = 'main' then 0
               when supportLevel = 'support' then 1
-              else null
-              end as orderSupport ".
+              else 2
+              end as orderSupport " .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
 
@@ -307,8 +307,8 @@ class DBEContact extends DBCNCEntity
                 ) . " = " . self::supportLevelSupport;    // only nominated support contacts
         }
 
-        $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
 
+        $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
         $this->setQueryString($query);
 
         return (parent::getRows());

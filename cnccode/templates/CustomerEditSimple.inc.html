@@ -341,11 +341,6 @@
     .redText td input, .redText td textarea, .redText td select, .redText td button {
         color: red !important;
     }
-
-    .float-right {
-        text-align: right;
-        float: right
-    }
 </style>
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
@@ -1273,9 +1268,6 @@
         </div> <!-- customerEditSites -->
         <br/>
         <br/>
-        <script>
-
-        </script>
         <h3 style="clear: both;">Contacts</h3>
         <div class="contacts"
              id="contactsTable"
@@ -1308,15 +1300,16 @@
                     <td class="headerLightgrey">Others Work</td>
                     <td class="headerLightgrey">Others Close</td>
                     <td class="headerLightgrey">Accounts</td>
-                    <td class="headerLightgrey">Mailshot</td>
-                    <td class="headerLightgrey">Support Level</td>
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot4FlagDesc}</td>
+                    <td class="headerLightgrey">Support Level</td>
+                    <td class="headerLightgrey">HR</td>
+                    <td class="headerLightgrey">Review</td>
                     <td class="headerLightgrey">{mailshot8FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot11FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
-                    <td class="headerLightgrey">Review</td>
+                    <td class="headerLightgrey">Mailshot</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -1484,6 +1477,7 @@
                                name="form[contact][{contactID}][workStartedEmailFlag]"
                                value="Y"
                                {workStartedEmailFlagChecked}
+                               class="checkboxAlign"
                         >
                     </td>
                     <td>
@@ -1538,46 +1532,6 @@
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][sendMailshotFlag]"
-                               value="Y"
-                               {sendMailshotFlagChecked}
-                        />
-                    </td>
-                    <td>
-                        <select
-                                name="form[contact][{contactID}][supportLevel]"
-                                data-validation="atLeastOneMain" data-type="mainSelector"
-                        >
-                            <!-- BEGIN supportLevelBlock -->
-                            <option {supportLevelSelected}
-                                    value="{supportLevelValue}"
-                            >
-                                {supportLevelDescription}
-                            </option>
-                            <!-- END supportLevelBlock -->
-                        </select>
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][hrUser]"
-                               value="Y"
-                               {hrUserFlagChecked}
-                        />
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][reviewUser]"
-                               value="Y"
-                               {reviewUserFlagChecked}
-                               data-validation="atLeastOne"
-                               data-type="review"
-                        />
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
                                name="form[contact][{contactID}][mailshot2Flag]"
                                value="Y"
                                {mailshot2FlagChecked}
@@ -1605,6 +1559,40 @@
                         />
                     </td>
                     <td>
+                        <select
+                                name="form[contact][{contactID}][supportLevel]"
+                                data-validation="atLeastOneMain"
+                                data-type="mainSelector"
+                        >
+                            <!-- BEGIN supportLevelBlock -->
+                            <option {supportLevelSelected}
+                                    value="{supportLevelValue}"
+                            >
+                                {supportLevelDescription}
+                            </option>
+                            <!-- END supportLevelBlock -->
+                        </select>
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][hrUser]"
+                               value="Y"
+                               {hrUserFlagChecked}
+                        />
+                    </td>
+
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][reviewUser]"
+                               value="Y"
+                               {reviewUserFlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="review"
+                        />
+                    </td>
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][mailshot8Flag]"
@@ -1626,31 +1614,34 @@
                                name="form[contact][{contactID}][mailshot9Flag]"
                                value="Y"
                                {mailshot9FlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="reports"
                         />
                     </td>
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][reviewUser]"
+                               name="form[contact][{contactID}][sendMailshotFlag]"
                                value="Y"
-                               {reviewUserChecked}
+                               {sendMailshotFlagChecked}
                         />
                     </td>
                 </tr>
+
                 <!-- END contactBlock -->
                 </tbody>
             </table>
-            <input {disabled}
-                   type="submit"
-                   name="Go"
-                   value="Save"
-            >
-            <input name="Button"
-                   type="button"
-                   value="Cancel"
-                   onClick="document.location='{cancelURL}';"
-            >
         </div>
+        <input {disabled}
+               type="submit"
+               name="Go"
+               value="Save"
+        >
+        <input name="Button"
+               type="button"
+               value="Cancel"
+               onClick="document.location='{cancelURL}';"
+        >
     </div>
 </form>
 

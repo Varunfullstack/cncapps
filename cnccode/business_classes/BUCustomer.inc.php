@@ -307,7 +307,11 @@ class BUCustomer extends Business
         if ($contactID == '') {
             $this->raiseError('contactID not passed');
         }
-        return ($this->getDatasetByPK($contactID, $this->dbeContact, $dsResults));
+        return ($this->getDatasetByPK(
+            $contactID,
+            $this->dbeContact,
+            $dsResults
+        ));
     }
 
     function duplicatedEmail($email,
@@ -348,46 +352,6 @@ class BUCustomer extends Business
         $row = $result->fetch_assoc();
         return $row['count'] > 0;
     }
-
-    function duplicatedEmail($email,
-                             $contactID
-    )
-    {
-        if ($email === '') {
-            return true;
-        }
-        $query = "select count(con_contno) as count from contact where con_email = ? ";
-
-        $paramTypes = 's';
-        $params = [
-            $email,
-        ];
-
-        if ($contactID) {
-            $query .= " and con_contno <> ? ";
-            $paramTypes .= "i";
-            $params[] = +$contactID;
-        }
-
-        $params = array_merge(
-            [$paramTypes],
-            $params
-        );
-        $refArray = [];
-        foreach ($params as $key => $value) $refArray[$key] = &$params[$key];
-
-        $statement = $this->db->prepare($query);
-        call_user_func_array(
-            [$statement, 'bind_param'],
-            $refArray
-        );
-        $result = $statement->execute() ? $statement->get_result() : false;
-
-        $statement->close();
-        $row = $result->fetch_assoc();
-        return $row['count'] > 0;
-    }
-
 
     /**
      * Get all customer types
