@@ -307,4 +307,14 @@
             </addColumn>
         </rollback>
     </changeSet>
+    <changeSet id="pavwebdev" author="issue215-1528799226-28">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="hrUser"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="hrUser" defaultValue="N" type="char(1)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
