@@ -317,7 +317,7 @@ class CTCustomer extends CTCNC
             );
             $this->dsContact->setValue(
                 DBEContact::discontinuedFlag,
-                $value['discontinuedFlag']
+               $this->getYN($value['discontinuedFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::sendMailshotFlag,
