@@ -34,11 +34,12 @@ class DBEContact extends DBCNCEntity
     const workStartedEmailFlag = "workStartedEmailFlag";
     const autoCloseEmailFlag = "autoCloseEmailFlag";
     const failedLoginCount = "failedLoginCount";
-    const OthersEmailFlag = 'othersEmailMainFlag';
-    const OthersWorkStartedEmailFlag = "WorkStartedEmailFlag";
-    const OthersAutoCloseEmailFlag = "AutoCloseEmailFlag";
+    const othersEmailFlag = 'othersEmailMainFlag';
+    const othersWorkStartedEmailFlag = "WorkStartedEmailFlag";
+    const othersAutoCloseEmailFlag = "AutoCloseEmailFlag";
     const reviewUser = "reviewUser";
     const supportLevel = "supportLevel";
+    const hrUser = "hrUser";
 
 
     const supportLevelMain = 'main';
@@ -219,22 +220,22 @@ class DBEContact extends DBCNCEntity
             "con_failed_login_count"
         );
         $this->addColumn(
-            self::OthersEmailFlag,
+            self::othersEmailFlag,
             DA_YN_FLAG,
             DA_NOT_NULL,
-            "othersEmailsFlag"
+            "othersEmailFlag"
         );
         $this->addColumn(
-            self::OthersWorkStartedEmailFlag,
+            self::othersWorkStartedEmailFlag,
             DA_YN,
             DA_ALLOW_NULL,
-            "othersWorkStartedFlag"
+            "othersWorkStartedEmailFlag"
         );
         $this->addColumn(
-            self::OthersAutoCloseEmailFlag,
+            self::othersAutoCloseEmailFlag,
             DA_YN,
             DA_ALLOW_NULL,
-            "autoCloseEmailsFlag"
+            "othersAutoCloseEmailFlag"
         );
         $this->addColumn(
             self::reviewUser,
@@ -248,6 +249,14 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
             'supportLevel'
         );
+
+        $this->addColumn(
+            self::hrUser,
+            DA_YN,
+            DA_NOT_NULL,
+            "hrUser"
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -290,11 +299,11 @@ class DBEContact extends DBCNCEntity
 
         if ($supportOnly) {
             $query .= " AND " . $this->getDBColumnName(
-                    self::mailshot5Flag
-                ) . " = 'Y'";    // only nominated support contacts
+                    self::supportLevel
+                ) . " = " . self::supportLevelSupport;    // only nominated support contacts
         }
 
-        $query .= " ORDER con_first_name, con_last_name";
+        $query .= " ORDER by con_first_name, con_last_name";
 
         $this->setQueryString($query);
 

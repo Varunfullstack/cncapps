@@ -1697,7 +1697,7 @@ class BUActivity extends Business
         if ($mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
             $dbeJCallActivity->getValue('customerID'),
             $toEmail,
-            DBEContact::OthersEmailFlag
+            DBEContact::othersEmailFlag
         )
         ) {
 
@@ -8507,7 +8507,7 @@ is currently a balance of ';
             $mainSupportEmailAddresses =
                 $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue(DBEJCallActivity::customerID),
                                                           $toEmail,
-                                                          DBEContact::OthersWorkStartedEmailFlag)
+                                                          DBEContact::othersWorkStartedEmailFlag)
         ) {
             if ($toEmail) {
                 $toEmail .= ',';

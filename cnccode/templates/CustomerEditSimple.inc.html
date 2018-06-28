@@ -127,6 +127,30 @@
             errorMessageKey: 'atLeastOne'
         });
 
+        $.formUtils.addValidator({
+            name: 'atLeastOneMain',
+            validatorFunction: function (value, $el, config, language, $form) {
+                var test = $('[data-type="' + $el.data().type + '"]');
+
+                var checkedCount = 0;
+
+                test.each(function () {
+                    var elm = $(this);
+                    var isMe = elm.get(0) === $el.get(0);
+
+                    if (elm.val() === 'main') {
+                        checkedCount++;
+                    }
+
+                    if (!$el.data().toBeValidated && !isMe) {
+                        elm.data("toBeValidated", true);
+                        elm.validate();
+                    }
+                });
+                $el.data("toBeValidated", false);
+                return checkedCount > 0;
+            }
+        });
 
         window.specialAttentionEndDate = $('#specialAttentionEndDate').get(0);
         window.lastReviewMeetingDate = $('#lastReviewMeetingDate').get(0);
@@ -137,7 +161,7 @@
             var tr = elem.closest('tr');
 
 
-            if (elem[0].checked) {
+            if (elem[0].value === 'main') {
                 // we want to show the
                 tr.find('.onlyMain').show();
                 tr.addClass('redText');
@@ -147,9 +171,9 @@
             }
         };
 
-        $('body').on('change', '.contactMain', assignClass);
+        $('body').on('change', '[data-type="mainSelector"]', assignClass);
 
-        $('.contactMain').each(assignClass);
+        $('[data-type="mainSelector"]').each(assignClass);
 
         var types = {};
 
@@ -1285,6 +1309,7 @@
                     <td class="headerLightgrey">Others Close</td>
                     <td class="headerLightgrey">Accounts</td>
                     <td class="headerLightgrey">Mailshot</td>
+                    <td class="headerLightgrey">Support Level</td>
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot4FlagDesc}</td>
@@ -1433,16 +1458,17 @@
                                 maxlength="5"
                         >
                     </td>
-                    <td nowrap="nowrap"><select {disabled}
-                                                name="letters_menu"
-                                                onchange="MM_jumpMenu('_blank',this,0)"
-                    >
-                        <option>Send Letter</option>
-                        <option value="{clientFormURL}">Appointment</option>
-                        <!-- BEGIN customLetterBlock -->
-                        <option value="{customLetterURL}">{customLetterName}</option>
-                        <!-- END customLetterBlock -->
-                    </select>
+                    <td nowrap="nowrap">
+                        <select {disabled}
+                                name="letters_menu"
+                                onchange="MM_jumpMenu('_blank',this,0)"
+                        >
+                            <option>Send Letter</option>
+                            <option value="{clientFormURL}">Appointment</option>
+                            <!-- BEGIN customLetterBlock -->
+                            <option value="{customLetterURL}">{customLetterName}</option>
+                            <!-- END customLetterBlock -->
+                        </select>
                     </td>
                     <td><input
                             {disabled}
@@ -1498,6 +1524,7 @@
                                class="onlyMain"
                         >
                     </td>
+
                     <td>
                         <input {disabled}
                                type="checkbox"
@@ -1514,6 +1541,38 @@
                                name="form[contact][{contactID}][sendMailshotFlag]"
                                value="Y"
                                {sendMailshotFlagChecked}
+                        />
+                    </td>
+                    <td>
+                        <select
+                                name="form[contact][{contactID}][supportLevel]"
+                                data-validation="atLeastOneMain" data-type="mainSelector"
+                        >
+                            <!-- BEGIN supportLevelBlock -->
+                            <option {supportLevelSelected}
+                                    value="{supportLevelValue}"
+                            >
+                                {supportLevelDescription}
+                            </option>
+                            <!-- END supportLevelBlock -->
+                        </select>
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][hrUser]"
+                               value="Y"
+                               {hrUserFlagChecked}
+                        />
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][reviewUser]"
+                               value="Y"
+                               {reviewUserFlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="review"
                         />
                     </td>
                     <td>
