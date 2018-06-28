@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.8.2] - 2018-06-28
+### Fixed
+- Issue 289 - Fix issues 
+
 ## [v1.8.1] - 2018-06-26
 ### Fixed
 - Issue 287 - Fix problem with sales orders

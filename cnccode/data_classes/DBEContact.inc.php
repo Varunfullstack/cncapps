@@ -294,8 +294,7 @@ class DBEContact extends DBCNCEntity
                 ) . " = 'Y'";    // only nominated support contacts
         }
 
-        $query .= " ORDER BY con_mailflag10 DESC, con_first_name, con_last_name";
-
+        $query .= " ORDER BY con_siteno, con_mailflag10 DESC, con_first_name, con_last_name";
         $this->setQueryString($query);
 
         return (parent::getRows());
