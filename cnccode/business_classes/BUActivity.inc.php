@@ -3222,7 +3222,7 @@ class BUActivity extends Business
                         $ordheadID = $dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID);
                     }
                 }
-                $sequenceNo = 0;
+
                 if ($ordheadID) {
 
                     $buSalesOrder->getOrderByOrdheadID(
