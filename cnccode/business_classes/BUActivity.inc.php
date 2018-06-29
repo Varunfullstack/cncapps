@@ -34,7 +34,7 @@ require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_dbe"]. "/DBEJPorhead.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
@@ -3172,6 +3172,7 @@ class BUActivity extends Business
         $lastProblemID = false;
         $lastUserID = false;
         $lastDate = false;
+        $consultantName = '';
 
         while ($dbeJCallActivity->fetchNext()) {
 
@@ -3367,7 +3368,6 @@ class BUActivity extends Business
 
             $lastProblemID = $problemID;
 
-            $consultantName = '';
             if ($lastUserID != $dbeJCallActivity->getValue(
                     DBEJCallActivity::userID
                 ) or $lastDate != $dbeJCallActivity->getValue(
@@ -3415,7 +3415,6 @@ class BUActivity extends Business
             );
 
             if ($normalHours > 0) {
-
                 $description = $consultantName . ' - Consultancy';
                 $sequenceNo++;
                 $dbeOrdline->setValue(
