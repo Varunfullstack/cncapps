@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.8.3] - 2018-06-29
+### Fixed
+- Issue 290 - T&M processing error for multiple activity
+
 ## [v1.8.2] - 2018-06-28
 ### Fixed
 - Issue 289 - Fix issues 
