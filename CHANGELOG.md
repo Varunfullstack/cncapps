@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
-### Changed
-- Issue 215 - Contact Management within CNCAPPS
+## [v1.8.3] - 2018-06-29
+### Fixed
+- Issue 290 - T&M processing error for multiple activity
 
 ## [v1.8.2] - 2018-06-28
 ### Fixed
