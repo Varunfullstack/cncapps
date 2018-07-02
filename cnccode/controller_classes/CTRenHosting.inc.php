@@ -9,7 +9,7 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenHosting.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
@@ -133,8 +133,8 @@ class CTRenHosting extends CTCNC
                     array(
                         'customerName' => $dsRenHosting->getValue('customerName'),
                         'itemDescription' => $dsRenHosting->getValue('itemDescription'),
-                        'invoiceFromDate' => $this->dateYMDtoDMY($dsRenHosting->getValue('invoiceFromDate')),
-                        'invoiceToDate' => $this->dateYMDtoDMY($dsRenHosting->getValue('invoiceToDate')),
+                        'invoiceFromDate' => Controller::dateYMDtoDMY($dsRenHosting->getValue('invoiceFromDate')),
+                        'invoiceToDate' => Controller::dateYMDtoDMY($dsRenHosting->getValue('invoiceToDate')),
                         'urlEdit' => $urlEdit,
                         'urlList' => $urlList,
                         'txtEdit' => $txtEdit
@@ -350,7 +350,7 @@ class CTRenHosting extends CTCNC
                 'itemID' => Controller::htmlDisplayText($dsRenHosting->getValue('itemID')),
                 'itemDescription' => Controller::htmlDisplayText($dsRenHosting->getValue('itemDescription')),
                 'invoiceFromDate' => $dsRenHosting->getValue('invoiceFromDate'),
-                'installationDate' => $this->dateYMDtoDMY($dsRenHosting->getValue('installationDate')),
+                'installationDate' => Controller::dateYMDtoDMY($dsRenHosting->getValue('installationDate')),
                 'invoiceToDate' => $dsRenHosting->getValue('invoiceToDate'),
                 'invoicePeriodMonths' => Controller::htmlInputText($dsRenHosting->getValue('invoicePeriodMonths')),
                 'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('invoicePeriodMonths')),

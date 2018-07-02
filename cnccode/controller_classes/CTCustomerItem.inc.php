@@ -7,7 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_bu'] . '/BUSite.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -221,20 +221,20 @@ class CTCustomerItem extends CTCNC
         if ($dsSearchForm->rowCount() == 0) {
             $this->buCustomerItem->initialiseSearchForm($dsSearchForm);
         }
-        if ($dsSearchForm->getValue('customerID') != '') {
+        if ($dsSearchForm->getValue(DBECustomerItem::customerID) != '') {
             $buCustomer = new BUCustomer($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $buCustomer->getCustomerByID($dsSearchForm->getValue(DBECustomerItem::customerID), $dsCustomer);
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $this->template->set_var(
             array(
-                'customerID' => $dsSearchForm->getValue('customerID'),
+                'customerID' => $dsSearchForm->getValue(DBECustomerItem::customerID),
                 'customerString' => $customerString,
-                'customerItemID' => Controller::htmlDisplayText($dsSearchForm->getValue('customerItemID')),
-                'ordheadID' => Controller::htmlDisplayText($dsSearchForm->getValue('ordheadID')),
+                'customerItemID' => Controller::htmlDisplayText($dsSearchForm->getValue(DBECustomerItem::customerItemID)),
+                'ordheadID' => Controller::htmlDisplayText($dsSearchForm->getValue(DBECustomerItem::ordheadID)),
                 'ordheadIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('ordheadID')),
-                'serialNo' => Controller::htmlDisplayText($dsSearchForm->getValue('serialNo')),
-                'itemText' => Controller::htmlDisplayText($dsSearchForm->getValue('itemText')),
+                'serialNo' => Controller::htmlDisplayText($dsSearchForm->getValue(DBECustomerItem::serialNo)),
+                'itemText' => Controller::htmlDisplayText($dsSearchForm->getValue("itemText")),
                 'contractText' => Controller::htmlDisplayText($dsSearchForm->getValue('contractText')),
                 'urlCreate' => $urlCreateCustomerItem,
                 'customerPopupURL' => $customerPopupURL,
@@ -1174,7 +1174,7 @@ class CTCustomerItem extends CTCNC
             }
 
 
-            $_REQUEST['customerItemID'] = $this->dsCustomerItem->getValue('customerItemID');
+            $_REQUEST['customerItemID'] = $this->dsCustomerItem->getValue(DBECustomerItem::customerItemID);
 
             $this->display();
             exit;

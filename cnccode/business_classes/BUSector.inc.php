@@ -63,8 +63,8 @@ class BUSector extends Business
     {
         $dbeCustomer = new DBECustomer($this);
         // validate no activities of this type
-        $dbeCustomer->setValue('sectorID', $ID);
-        if ($dbeCustomer->countRowsByColumn('sectorID') < 1) {
+        $dbeCustomer->setValue(DBECustomer::sectorID, $ID);
+        if ($dbeCustomer->countRowsByColumn(DBECustomer::sectorID) < 1) {
             return TRUE;
         } else {
             return FALSE;

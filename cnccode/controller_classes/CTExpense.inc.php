@@ -126,7 +126,6 @@ class CTExpense extends CTCNC
 
         $buActivity = new BUActivity($this);
         $buActivity->getActivityByID($_REQUEST['callActivityID'], $dsCallActivity);
-//		$buActivity->getCallByID($dsCallActivity->getValue('callID'), $dsCall);
 
         $urlCreate =
             $this->buildLink(
@@ -149,7 +148,6 @@ class CTExpense extends CTCNC
         $this->template->set_var(
             array(
                 'callActivityID' => $dsCallActivity->getValue('callActivityID'),
-//				'ordheadID' => $dsCall->getValue('ordheadID'),
                 'date' => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
                 'activityType' => Controller::htmlDisplayText($dsCallActivity->getValue('activityType')),
                 'customerName' => Controller::htmlDisplayText($dsCallActivity->getValue('customerName')),
@@ -229,8 +227,6 @@ class CTExpense extends CTCNC
         $callActivityID = $dsExpense->getValue('callActivityID');
         $buActivity = new BUActivity($this);
         $buActivity->getActivityByID($callActivityID, $dsCallActivity);
-//		$buActivity->getCallByID($dsCallActivity->getValue('callID'), $dsCall);
-
         $urlUpdateExpense =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -254,11 +250,7 @@ class CTExpense extends CTCNC
         $this->template->set_var(
             array(
                 'expenseID' => $_REQUEST['expenseID'],
-//				'callID' => $dsCall->getValue('callID'),
-//				'callActEngineerID' => $dsExpense->getValue('callActEngineerID'),
                 'callActivityID' => $dsExpense->getValue('callActivityID'),
-                //			'callID' => $dsCall->getValue('callID'),
-//				'ordheadID' => $dsCall->getValue('ordheadID'),
                 'date' => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
                 'activityType' => Controller::htmlDisplayText($dsCallActivity->getValue('activityType')),
                 'customerName' => Controller::htmlDisplayText($dsCallActivity->getValue('customerName')),

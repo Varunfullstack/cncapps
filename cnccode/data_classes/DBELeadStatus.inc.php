@@ -7,6 +7,10 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBELeadStatus extends DBEntity
 {
+
+    const leadStatusID = "leadStatusID";
+    const description = "description";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +22,18 @@ class DBELeadStatus extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("leadstatus");
-        $this->addColumn("leadStatusID", DA_ID, DA_NOT_NULL, "lst_leadstatusno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "lst_desc");
+        $this->addColumn(
+            self::leadStatusID,
+            DA_ID,
+            DA_NOT_NULL,
+            "lst_leadstatusno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "lst_desc"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

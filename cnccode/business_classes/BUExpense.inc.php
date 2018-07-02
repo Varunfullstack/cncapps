@@ -475,7 +475,6 @@ class BUExpense extends Business
         hours.
         */
 
-        //   $otAdjustHourHHMM = common_convertDecimalToHHMM( $dsHeader->getValue('otAdjustHour') );
 
         $queryString = "
     SELECT 

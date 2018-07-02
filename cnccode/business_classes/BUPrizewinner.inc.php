@@ -11,7 +11,7 @@ require_once($cfg["path_dbe"] . "/DBEJPrizewinner.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . "/BUContact.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 
 class BUPrizewinner extends Business
 {
@@ -75,7 +75,7 @@ class BUPrizewinner extends Business
         $template->set_file('page', 'PrizewinnerWinnersEmail.inc.html');
 
         $winnerName = $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName');
-        $winnerCompany = $dsCustomer->getValue('name');
+        $winnerCompany = $dsCustomer->getValue(DBECustomer::name);
 
         $template->setVar(
             array(
@@ -134,7 +134,7 @@ class BUPrizewinner extends Business
                 $template->setVar(
                     array(
                         'contactName' => $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName'),
-                        'contactCompany' => $dsCustomer->getValue('name'),
+                        'contactCompany' => $dsCustomer->getValue(DBECustomer::name),
                         'winnerName' => $winnerName,
                         'winnerCompanyName' => $winnerCompany
                     )

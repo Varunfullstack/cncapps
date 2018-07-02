@@ -6,7 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrderDocument.inc.php');
@@ -750,7 +750,7 @@ class CTSalesOrder extends CTCNC
         $this->template->set_var('rowNum', 1); // just so that javascript does not error!
         if ($this->getCustomerID() != '') {
             $this->buCustomer->getCustomerByID($this->getCustomerID(), $dsCustomer);
-            $this->setCustomerString($dsCustomer->getValue('name'));
+            $this->setCustomerString($dsCustomer->getValue(DBECustomer::name));
         }
         $this->template->set_var(
             array(
@@ -1380,7 +1380,6 @@ class CTSalesOrder extends CTCNC
                             $page,
                             array(
                                 'action' => 'editFromSalesOrder',
-//								'customerItemID' =>	$dsOrdhead->getValue('renewalCustomerItemID'),
                                 'ordheadID' => $dsOrdhead->getValue('ordheadID'),
                                 'sequenceNo' => $dsOrdline->getValue("sequenceNo")
                             )
@@ -1535,7 +1534,7 @@ class CTSalesOrder extends CTCNC
                         }
                     }
                     $this->template->parse('salesOrderLine', 'SalesOrderItemLine');
-                } // if ($dsOrdline->getValue("lineType")=="I")
+                }
                 else {
                     if (!$readOnly) {
                         $this->template->parse('salesOrderLineIcons', 'SalesOrderLineIcons', true);
@@ -2509,7 +2508,7 @@ class CTSalesOrder extends CTCNC
                     $buPDF->printStringRJAt(173, Controller::formatNumberCur($total));
                     if ($dsOrdline->getValue('itemID') != 0) {                        // some item lines in old system did not have a related item record
                         $this->buItem->getItemByID($dsOrdline->getValue('itemID'), $dsItem);
-                    } // if ($dsOrdline->getValue('itemID') != '')
+                    }
                 } else {
                     $buPDF->printStringAt(40, $dsOrdline->getValue('description')); // comment line
                 }
@@ -2667,7 +2666,7 @@ class CTSalesOrder extends CTCNC
                         if ($dsItem->getValue('notes')) {
                             $description .= "\n" . str_replace(chr(13), '', $dsItem->getValue('notes'));
                         }
-                    } // if ($dsOrdline->getValue('itemID') != '')
+                    }
 
                 } else {
                     // comment line
@@ -2845,17 +2844,17 @@ class CTSalesOrder extends CTCNC
     function parseSiteSelector($siteNo, &$dsSite, $blockVar, $block)
     {
         while ($dsSite->fetchNext()) {
-            $siteSelected = ($dsSite->getValue('siteNo') == $siteNo) ? CT_SELECTED : '';
+            $siteSelected = ($dsSite->getValue(DBESite::siteNo) == $siteNo) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     $block . 'Selected' => $siteSelected,
-                    $block . 'SiteNo' => $dsSite->getValue('siteNo'),
-                    $block . 'Add1' => $dsSite->getValue('add1'),
-                    $block . 'Add2' => $dsSite->getValue('add2'),
-                    $block . 'Add3' => $dsSite->getValue('add3'),
-                    $block . 'Town' => $dsSite->getValue('town'),
-                    $block . 'County' => $dsSite->getValue('county'),
-                    $block . 'Postcode' => $dsSite->getValue('postcode')
+                    $block . 'SiteNo' => $dsSite->getValue(DBESite::siteNo),
+                    $block . 'Add1' => $dsSite->getValue(DBESite::add1),
+                    $block . 'Add2' => $dsSite->getValue(DBESite::add2),
+                    $block . 'Add3' => $dsSite->getValue(DBESite::add3),
+                    $block . 'Town' => $dsSite->getValue(DBESite::town),
+                    $block . 'County' => $dsSite->getValue(DBESite::county),
+                    $block . 'Postcode' => $dsSite->getValue(DBESite::postcode)
                 )
             );
             $this->template->parse($blockVar, $block, true);
@@ -3210,7 +3209,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                         $buPDF->setFontSize(10);
                         $buPDF->setFont();
                     }
-                } // if ($dsOrdline->getValue('itemID') != '')
+                }
             } else {
                 $buPDF->printStringAt(40, $dsOrdline->getValue('description')); // comment line
             }
@@ -3441,7 +3440,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->set_var(
             array(
-                'etaDate' => $this->dateYMDtoDMY($dsInput->getValue('etaDate')),
+                'etaDate' => Controller::dateYMDtoDMY($dsInput->getValue('etaDate')),
                 'etaDateMessage' => $dsInput->getMessage('etaDate'),
 
                 'serviceRequestText' => $dsInput->getValue('serviceRequestText'),

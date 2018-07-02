@@ -8,6 +8,9 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEDBSequence extends DBEntity
 {
+const seqName = "SeqName";
+const nextID = "NextID";
+
     /**
      * Constructor
      * @access public
@@ -19,30 +22,30 @@ class DBEDBSequence extends DBEntity
         parent::__construct($owner);
         $this->setTableName("db_sequence");
         // Create the columns with their DB alias'
-        $this->addColumn("SeqName", DA_STRING, DA_NOT_NULL, "seq_name");
-        $this->addColumn("NextID", DA_INTEGER, DA_NOT_NULL, "nextid");
+        $this->addColumn(self::seqName, DA_STRING, DA_NOT_NULL, "seq_name");
+        $this->addColumn(self::nextID, DA_INTEGER, DA_NOT_NULL, "nextid");
         $this->setAddColumnsOff();
-        $this->setPK("SeqName");    // Primary key
+        $this->setPK(self::seqName);    // Primary key
     }
 
     function setSeqName($seqName)
     {
-        $this->setValue("SeqName", $seqName);
+        $this->setValue(self::seqName, $seqName);
     }
 
     function getSeqName()
     {
-        return $this->getValue("SeqName");
+        return $this->getValue(self::seqName);
     }
 
     function setNextID($nextID)
     {
-        $this->setValue("NextID", $nextID);
+        $this->setValue(self::nextID, $nextID);
     }
 
     function getNextID()
     {
-        return $this->getValue("NextID");
+        return $this->getValue(self::nextID);
     }
 
     /**

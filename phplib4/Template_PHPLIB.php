@@ -227,7 +227,12 @@ class Template_PHPLIB
 
             if (!empty($varname))
                 if ($this->debug) print "scalar: set *$varname* to *$value*<br>\n";
-
+            if ($varname == 'noOfPcs') {
+                echo 'varname is ' . $varname;
+                echo '<br>';
+                echo 'value is ' . $value;
+                echo '<br>';
+            }
             $this->_varKeys[$varname] = $this->_varname($varname);
             ($append) ? $this->_varVals[$varname] .= $value : $this->_varVals[$varname] = $value;
 
@@ -291,8 +296,8 @@ class Template_PHPLIB
     {
         if (!is_array($handle)) {
             $str = $this->subst($handle);
-
             ($append) ? $this->setVar($target, $this->getVar($target) . $str) : $this->setVar($target, $str);
+
         } else {
             reset($handle);
 
@@ -464,7 +469,9 @@ class Template_PHPLIB
             while (list(, $v) = each($this->file_fallbacks)) {
                 if (file_exists($v . basename($filename))) return $v . basename($filename);
             }
-            $this->halt(sprintf("filename: file %s does not exist in the fallback paths %s.", $filename, implode(",", $this->file_fallbacks)));
+            $this->halt(sprintf("filename: file %s does not exist in the fallback paths %s.",
+                                $filename,
+                                implode(",", $this->file_fallbacks)));
             return false;
         } else {
             $this->halt(sprintf("filename: file %s does not exist.", $filename));

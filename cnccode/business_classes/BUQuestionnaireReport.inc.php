@@ -107,14 +107,11 @@ class BUQuestionnaireReport extends Business
 
         $results = $this->db->query($sql);
 
+        $questions = [];
         while ($row = $results->fetch_assoc()) {
-
             $questions[] = $row;
-
         }
-
         return $questions;
-
     }
 
     function getRatingPercentage($questionID, $rating, $total)
