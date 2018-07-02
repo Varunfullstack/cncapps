@@ -384,6 +384,17 @@ class CTCustomer extends CTCNC
                 DBEContact::accountsFlag,
                 $this->getYN($value['accountsFlag'])
             );
+
+            $this->dsContact->setValue(
+                DBEContact::supportLevel,
+                $value['supportLevel']
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::reviewUser,
+                $this->getYN($value['reviewUser'])
+            );
+
             $this->dsContact->setValue(
                 DBEContact::discontinuedFlag,
                 $this->getYN($value['discontinuedFlag'])
@@ -424,6 +435,31 @@ class CTCustomer extends CTCNC
                 DBEContact::reviewUser,
                 $this->getYN($value['reviewUser'])
             );
+
+            $this->dsContact->setValue(
+                DBEContact::othersEmailFlag,
+                $this->getYN($value['othersEmailFlag'])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact:: othersAutoCloseEmailFlag,
+                $this->getYN($value['othersAutoCloseEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersWorkStartedEmailFlag,
+                $this->getYN($value['othersWorkStartedEmailFlag'])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::hrUser,
+                $this->getYN($value['hrUser'])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::sendMailshotFlag,
+                $this->getYN($value['sendMailshotFlag'])
+            );
+
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
                 $value['failedLoginCount']
@@ -2526,22 +2562,38 @@ ORDER BY cus_name ASC  ";
                     'mailshot11FlagChecked'       => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot11Flag)
                     ),
+                    'reviewUserFlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::reviewUser)
+                    ),
                     'workStartedEmailFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),
                     'autoCloseEmailFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
                     ),
-                    'othersEmailFlag'   => $this->getChecked(
+                    'othersEmailFlagChecked'      => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersEmailFlag)
                     ),
 
+                    'othersAutoCloseEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersAutoCloseEmailFlag)
+                    ),
 
-                    'clientFormURL'               => $clientFormURL,
-                    'dearJohnURL'                 => $dearJohnURL,
-                    'dmLetterURL'                 => $dmLetterURL,
-                    'customLetter1URL'            => $customLetter1URL,
-                    'deleteContactLink'           => $deleteContactLink
+                    'othersWorkStartedEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
+                    ),
+
+                    'hrUserFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::hrUser)
+                    ),
+                    'topUpValidation'   => $this->buCustomer->hasPrepayContract(
+                        DBEContact::customerID
+                    ) ? 'data-validation="atLeastOne"' : '',
+                    'clientFormURL'     => $clientFormURL,
+                    'dearJohnURL'       => $dearJohnURL,
+                    'dmLetterURL'       => $dmLetterURL,
+                    'customLetter1URL'  => $customLetter1URL,
+                    'deleteContactLink' => $deleteContactLink
                 )
             );
 
@@ -3122,7 +3174,7 @@ ORDER BY cus_name ASC  ";
 
     }
 
-    private function supportLevelDropDown($supportLevelValue)
+    protected function supportLevelDropDown($supportLevelValue)
     {
         // Site selection
         $supportLevels = [

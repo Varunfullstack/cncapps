@@ -1,12 +1,35 @@
 <!-- Template: ContactEdit.inc.html -->
-<form name="contactForm" method="post" action="{urlSubmit}" AUTOCOMPLETE="off">
-    <input type="hidden" name="contact[1][contactID]" value="{contactID}">
-    <input type="hidden" name="contact[1][supplierID]" value="{supplierID}">
-    <input type="hidden" name="contact[1][customerID]" value="{customerID}">
-    <input type="hidden" name="contact[1][siteNo]" value="{siteNo}">
-    <table width="100%" border="0" cellspacing="0" cellpadding="1">
+<form name="contactForm"
+      method="post"
+      action="{urlSubmit}"
+      AUTOCOMPLETE="off"
+>
+    <input type="hidden"
+           name="contact[1][contactID]"
+           value="{contactID}"
+    >
+    <input type="hidden"
+           name="contact[1][supplierID]"
+           value="{supplierID}"
+    >
+    <input type="hidden"
+           name="contact[1][customerID]"
+           value="{customerID}"
+    >
+    <input type="hidden"
+           name="contact[1][siteNo]"
+           value="{siteNo}"
+    >
+    <table width="100%"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="20%" class="promptText">First Name</td>
+            <td width="20%"
+                class="promptText"
+            >First Name
+            </td>
             <td class="field">
                 <input
                         type="text"
@@ -132,20 +155,6 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Fax</td>
-            <td class="field">
-                <input
-                        type="text"
-                        name="contact[1][fax]"
-                        id="fax"
-                        value="{fax}"
-                        size="50"
-                        maxlength="50"
-                >
-                <font class="formErrorMessage">{faxMessage}</font>
-            </td>
-        </tr>
-        <tr>
             <td class="promptText">Notes</td>
             <td class="field">
                 <input
@@ -162,67 +171,170 @@
         <tr>
             <td class="promptText">Work Started Emails?</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][workStartedEmailFlag]" value="Y" {workStartedEmailFlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][workStartedEmailFlag]"
+                       value="Y"
+                       {workStartedEmailFlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">Auto-close Emails?</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][autoCloseEmailFlag]" value="Y" {autoCloseEmailFlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][autoCloseEmailFlag]"
+                       value="Y"
+                       {autoCloseEmailFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Emails?</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="contact[1][othersEmailMainFlag]"
+                       value="Y"
+                       {othersEmailFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Work Started Emails?</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="contact[1][othersWorkStartedEmailFlag]"
+                       value="Y"
+                       {othersWorkStartedEmailFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Auto-close Emails?</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="contact[1][othersAutoCloseEmailFlag]"
+                       value="Y"
+                       {othersAutoCloseEmailFlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">Accounts Contact?</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][accountsFlag]" value="Y" {accountsFlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][accountsFlag]"
+                       value="Y"
+                       {accountsFlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">Discontinued</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][discontinuedFlag]" value="Y" {discontinuedFlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][discontinuedFlag]"
+                       value="Y"
+                       {discontinuedFlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">Send Mailshots</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][sendMailshotFlag]" value="Y" {sendMailshotFlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][sendMailshotFlag]"
+                       value="Y"
+                       {sendMailshotFlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">{mailshot2FlagDesc}</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][mailshot2Flag]" value="Y" {mailshot2FlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][mailshot2Flag]"
+                       value="Y"
+                       {mailshot2FlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">{mailshot3FlagDesc}</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][mailshot3Flag]" value="Y" {mailshot3FlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][mailshot3Flag]"
+                       value="Y"
+                       {mailshot3FlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">{mailshot4FlagDesc}</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][mailshot4Flag]" value="Y" {mailshot4FlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][mailshot4Flag]"
+                       value="Y"
+                       {mailshot4FlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">HR user</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="contact[1][hrUser]"
+                       value="Y"
+                       {hrUserFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Review user</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="contact[1][reviewUser]"
+                       value="Y"
+                       {reviewUserFlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">{mailshot8FlagDesc}</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][mailshot8Flag]" value="Y" {mailshot8FlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][mailshot8Flag]"
+                       value="Y"
+                       {mailshot8FlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">{mailshot11FlagDesc}</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="contact[1][mailshot11Flag]"
+                       value="Y"
+                       {mailshot11FlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td class="promptText">{mailshot9FlagDesc}</td>
             <td class="field">
-                <input type="checkbox" name="contact[1][mailshot9Flag]" value="Y" {mailshot9FlagChecked}>
+                <input type="checkbox"
+                       name="contact[1][mailshot9Flag]"
+                       value="Y"
+                       {mailshot9FlagChecked}
+                >
             </td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td align="left">
-                <input type="submit" name="Submit" value="Submit">
+                <input type="submit"
+                       name="Submit"
+                       value="Submit"
+                >
             </td>
         </tr>
     </table>

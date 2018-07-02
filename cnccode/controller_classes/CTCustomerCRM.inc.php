@@ -1210,6 +1210,9 @@ class CTCustomerCRM extends CTCustomer
                 'mailshot4FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
                 'mailshot8FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
                 'mailshot9FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
+                'mailshot11FlagDesc'             => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot11FlagDesc
+                ),
                 'submitURL'           => $submitURL,
                 'renewalLink'         => $renewalLink,
                 'passwordLink'        => $passwordLink,
@@ -1612,6 +1615,12 @@ class CTCustomerCRM extends CTCustomer
 
         $this->template->set_block(
             'CustomerEdit',
+            'supportLevelBlock',
+            'selectSupportLevel'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'contactBlock',
             'contacts'
         );      // have to declare innermost block first
@@ -1781,6 +1790,12 @@ class CTCustomerCRM extends CTCustomer
                 ''
             );
 
+            $this->template->set_block(
+                'CustomerEdit',
+                'selectSupportLevel',
+                ''
+            );
+
             if ($this->dsContact->getValue(DBEContact::contactID) == 0) { // New contact so no delete link
                 $deleteContactURL = '';
                 $deleteContactLink = '';
@@ -1830,6 +1845,7 @@ class CTCustomerCRM extends CTCustomer
                     'customerID'                  => $this->dsContact->getValue(DBEContact::customerID),
                     'supplierID'                  => $this->dsContact->getValue(DBEContact::supplierID),
                     'title'                       => $this->dsContact->getValue(DBEContact::title),
+                    'titleClass'                  => $this->dsContact->getValue('TitleClass'),
                     'firstName'                   => $this->dsContact->getValue(DBEContact::firstName),
                     'lastName'                    => $this->dsContact->getValue(DBEContact::lastName),
                     'firstNameClass'              => $this->dsContact->getValue('FirstNameClass'),
@@ -1841,14 +1857,19 @@ class CTCustomerCRM extends CTCustomer
                     'portalPassword'              => $this->dsContact->getValue(DBEContact::portalPassword),
                     'failedLoginCount'            => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                       => $this->dsContact->getValue(DBEContact::email),
+                    'emailClass'                  => $this->dsContact->getValue("EmailClass"),
                     'notes'                       => $this->dsContact->getValue(DBEContact::notes),
                     'discontinuedFlag'            => $this->dsContact->getValue(DBEContact::discontinuedFlag),
                     'invoiceContactFlagChecked'   => ($this->dsContact->getValue(
                             DBEContact::contactID
-                        ) == $this->dsSite->getValue(DBESite::invoiceContactID)) ? CT_CHECKED : '',
+                        ) == $this->dsSite->getValue(
+                            DBESite::invoiceContactID
+                        )) ? CT_CHECKED : '',
                     'deliverContactFlagChecked'   => ($this->dsContact->getValue(
                             DBEContact::contactID
-                        ) == $this->dsSite->getValue(DBESite::deliverContactID)) ? CT_CHECKED : '',
+                        ) == $this->dsSite->getValue(
+                            DBESite::deliverContactID
+                        )) ? CT_CHECKED : '',
                     'sendMailshotFlagChecked'     => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::sendMailshotFlag)
                     ),
@@ -1870,23 +1891,51 @@ class CTCustomerCRM extends CTCustomer
                     'mailshot9FlagChecked'        => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot9Flag)
                     ),
+                    'mailshot11FlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot11Flag)
+                    ),
+                    'reviewUserFlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::reviewUser)
+                    ),
                     'workStartedEmailFlagChecked' => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),
                     'autoCloseEmailFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
                     ),
-                    'clientFormURL'               => $clientFormURL,
-                    'dearJohnURL'                 => $dearJohnURL,
-                    'dmLetterURL'                 => $dmLetterURL,
-                    'customLetter1URL'            => $customLetter1URL,
-                    'deleteContactLink'           => $deleteContactLink
+                    'othersEmailFlagChecked'      => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersEmailFlag)
+                    ),
+
+                    'othersAutoCloseEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersAutoCloseEmailFlag)
+                    ),
+
+                    'othersWorkStartedEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
+                    ),
+
+                    'hrUserFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::hrUser)
+                    ),
+                    'topUpValidation'   => $this->buCustomer->hasPrepayContract(
+                        DBEContact::customerID
+                    ) ? 'data-validation="atLeastOne"' : '',
+                    'clientFormURL'     => $clientFormURL,
+                    'dearJohnURL'       => $dearJohnURL,
+                    'dmLetterURL'       => $dmLetterURL,
+                    'customLetter1URL'  => $customLetter1URL,
+                    'deleteContactLink' => $deleteContactLink
                 )
             );
 
             $this->siteDropdown(
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
+            );
+
+            $this->supportLevelDropDown(
+                $this->dsContact->getValue(DBEContact::supportLevel)
             );
 
             /*

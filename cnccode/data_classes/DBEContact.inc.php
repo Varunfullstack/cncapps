@@ -35,8 +35,8 @@ class DBEContact extends DBCNCEntity
     const autoCloseEmailFlag = "autoCloseEmailFlag";
     const failedLoginCount = "failedLoginCount";
     const othersEmailFlag = 'othersEmailMainFlag';
-    const othersWorkStartedEmailFlag = "WorkStartedEmailFlag";
-    const othersAutoCloseEmailFlag = "AutoCloseEmailFlag";
+    const othersWorkStartedEmailFlag = "othersWorkStartedEmailFlag";
+    const othersAutoCloseEmailFlag = "othersAutoCloseEmailFlag";
     const reviewUser = "reviewUser";
     const supportLevel = "supportLevel";
     const hrUser = "hrUser";

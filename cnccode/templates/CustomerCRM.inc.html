@@ -3,6 +3,7 @@
         src='.javascript/ajax.js'
 ></script>
 <script src="ckeditor/ckeditor.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"></script>
 <script type="text/JavaScript">
 
     $(function () {
@@ -455,6 +456,28 @@
             width: 530px;
         }
     }
+
+    table.content tbody td {
+        background-color: #F4f4f2;
+        text-align: left;
+        padding: 5px;
+        vertical-align: top;
+        white-space: nowrap;
+    }
+
+    .contactError input {
+        border-color: red;
+    }
+
+    td.has-error {
+        background-color: red !important;
+    }
+
+    .redText td input, .redText td textarea, .redText td select, .redText td button {
+        color: red !important;
+    }
+
+
 </style>
 
 <span class="formError">{errorMessage}</span>
@@ -695,14 +718,18 @@
 
     </div> <!-- customerEditMain -->
     <div>
+
         <h3 style="clear: both;">Contacts</h3>
-        <div class="contacts">
+        <div class="contacts"
+             id="contactsTable"
+        >
             <table class="content"
                    border="0"
                    cellpadding="2"
                    cellspacing="1"
                    width="100%"
             >
+                <thead>
                 <tr>
                     <td class="headerLightgrey">&nbsp;</td>
                     <td class="headerLightgrey">&nbsp;</td>
@@ -720,14 +747,23 @@
                     <td class="headerLightgrey">Notes</td>
                     <td class="headerLightgrey">Work Started?</td>
                     <td class="headerLightgrey">Auto-close?</td>
+                    <td class="headerLightgrey">Others</td>
+                    <td class="headerLightgrey">Others Work</td>
+                    <td class="headerLightgrey">Others Close</td>
                     <td class="headerLightgrey">Accounts</td>
-                    <td class="headerLightgrey">Mailshot</td>
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot4FlagDesc}</td>
+                    <td class="headerLightgrey">Support Level</td>
+                    <td class="headerLightgrey">HR</td>
+                    <td class="headerLightgrey">Review</td>
                     <td class="headerLightgrey">{mailshot8FlagDesc}</td>
+                    <td class="headerLightgrey">{mailshot11FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
+                    <td class="headerLightgrey">Mailshot</td>
                 </tr>
+                </thead>
+                <tbody>
                 <!-- BEGIN contactBlock -->
                 <input type="hidden"
                        name="form[contact][{contactID}][contactID]"
@@ -756,15 +792,16 @@
                 >
 
                 <tr>
-                    <td class="content">
+                    <td>
                         <A href="#"
                            onclick="javascript:contactPopup({contactID}, 'editContact', '{customerID}','{siteNo}' )"
                         >edit</a>
                     </td>
-                    <td class="content">{deleteContactLink}</td>
-                    <td class="content">
+                    <td>{deleteContactLink}</td>
+                    <td>
                         <select
                                 name="form[contact][{contactID}][siteNo]"
+                                data-validation="required"
                         >
                             <!-- BEGIN selectSiteBlock -->
                             <option {siteSelected}
@@ -774,18 +811,18 @@
                             <!-- END selectSiteBlock -->
                         </select>
                     </td>
-                    <td class="content">
+                    <td class="{titleClass}">
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][title]"
                                 size="2"
                                 maxlength="10"
                                 value="{title}"
+                                required
+                                data-validation="required"
                         >
                     </td>
-                    <td class="content"
-                        class='{firstNameClass}'
-                    >
+                    <td class='{firstNameClass}'>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][firstName]"
@@ -793,11 +830,10 @@
                                 maxlength="50"
                                 value="{firstName}"
                                 required
+                                data-validation="required"
                         >
                     </td>
-                    <td class="content"
-                        class='{lastNameClass}'
-                    >
+                    <td class='{lastNameClass}'>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][lastName]"
@@ -805,18 +841,20 @@
                                 maxlength="50"
                                 value="{lastName}"
                                 required
+                                data-validation="required"
                         >
                     </td>
-                    <td class="content"><input
-                            name="form[contact][{contactID}][position]"
-                            id="form[contact][{contactID}][position]"
-                            value="{position}"
-                            size="10"
-                            maxlength="20"
-                            {disabled}
-                    />
+                    <td>
+                        <input
+                                name="form[contact][{contactID}][position]"
+                                id="form[contact][{contactID}][position]"
+                                value="{position}"
+                                size="10"
+                                maxlength="20"
+                                {disabled}
+                        />
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][phone]"
@@ -825,7 +863,7 @@
                                 maxlength="30"
                         >
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][mobilePhone]"
@@ -834,16 +872,19 @@
                                 maxlength="30"
                         >
                     </td>
-                    <td class="content">
+                    <td class='{emailClass}'>
                         <input
                                 {disabled}
+                                type="email"
                                 name="form[contact][{contactID}][email]"
                                 value="{email}"
                                 size="25"
                                 maxlength="50"
+                                data-validation="emailOrEmpty server"
+                                data-validation-url="/validateUniqueEmail.php"
                         >
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][portalPassword]"
@@ -852,7 +893,7 @@
                                 maxlength="10"
                         >
                     </td>
-                    <td class="content">
+                    <td>
                         <input
                                 {disabled}
                                 name="form[contact][{contactID}][failedLoginCount]"
@@ -861,20 +902,19 @@
                                 maxlength="5"
                         >
                     </td>
-                    <td nowrap="nowrap"
-                        class="content"
-                    ><select {disabled}
-                             name="letters_menu"
-                             onchange="MM_jumpMenu('_blank',this,0)"
-                    >
-                        <option>Send Letter</option>
-                        <option value="{clientFormURL}">Appointment</option>
-                        <!-- BEGIN customLetterBlock -->
-                        <option value="{customLetterURL}">{customLetterName}</option>
-                        <!-- END customLetterBlock -->
-                    </select>
+                    <td nowrap="nowrap">
+                        <select {disabled}
+                                name="letters_menu"
+                                onchange="MM_jumpMenu('_blank',this,0)"
+                        >
+                            <option>Send Letter</option>
+                            <option value="{clientFormURL}">Appointment</option>
+                            <!-- BEGIN customLetterBlock -->
+                            <option value="{customLetterURL}">{customLetterName}</option>
+                            <!-- END customLetterBlock -->
+                        </select>
                     </td>
-                    <td class="content"><input
+                    <td><input
                             {disabled}
                             name="form[contact][{contactID}][notes]"
                             size="5"
@@ -882,15 +922,16 @@
                             value="{notes}"
                     />
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][workStartedEmailFlag]"
                                value="Y"
                                {workStartedEmailFlagChecked}
+                               class="checkboxAlign"
                         >
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][autoCloseEmailFlag]"
@@ -898,31 +939,58 @@
                                {autoCloseEmailFlagChecked}
                         >
                     </td>
-                    <td class="content">
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersEmailFlag]"
+                               value="Y"
+                               {othersEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersWorkStartedEmailFlag]"
+                               value="Y"
+                               {othersWorkStartedEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersAutoCloseEmailFlag]"
+                               value="Y"
+                               {othersAutoCloseEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][accountsFlag]"
                                value="Y"
                                {accountsFlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="accounts"
                         />
                     </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][sendMailshotFlag]"
-                               value="Y"
-                               {sendMailshotFlagChecked}
-                        />
-                    </td>
-                    <td class="content">
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][mailshot2Flag]"
                                value="Y"
                                {mailshot2FlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="invoice"
                         />
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][mailshot3Flag]"
@@ -930,31 +998,92 @@
                                {mailshot3FlagChecked}
                         />
                     </td>
-                    <td class="content">
+                    <td>
                         <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][mailshot4Flag]"
                                value="Y"
                                {mailshot4FlagChecked}
                                class="stmCheckBox"
+                               data-validation="atLeastOneAtMostOne"
+                               data-type="statement"
                         />
                     </td>
-                    <td class="content">
+                    <td>
+                        <select
+                                name="form[contact][{contactID}][supportLevel]"
+                                data-validation="atLeastOneMain"
+                                data-type="mainSelector"
+                        >
+                            <!-- BEGIN supportLevelBlock -->
+                            <option {supportLevelSelected}
+                                    value="{supportLevelValue}"
+                            >
+                                {supportLevelDescription}
+                            </option>
+                            <!-- END supportLevelBlock -->
+                        </select>
+                    </td>
+                    <td>
                         <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][hrUser]"
+                               value="Y"
+                               {hrUserFlagChecked}
+                        />
+                    </td>
 
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][reviewUser]"
+                               value="Y"
+                               {reviewUserFlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="review"
+                        />
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot8Flag]"
+                               value="Y"
+                               {mailshot8FlagChecked}
+                               data-type="topUp"
+                               {topUpValidation}
+                        />
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][mailshot11Flag]"
+                               value="Y"
+                               {mailshot11FlagChecked}
+                        />
+                    </td>
+                    <td>
+                        <input {disabled}
                                type="checkbox"
                                name="form[contact][{contactID}][mailshot9Flag]"
                                value="Y"
                                {mailshot9FlagChecked}
+                               data-validation="atLeastOne"
+                               data-type="reports"
                         />
-
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][sendMailshotFlag]"
+                               value="Y"
+                               {sendMailshotFlagChecked}
+                        />
                     </td>
                 </tr>
+
                 <!-- END contactBlock -->
+                </tbody>
             </table>
-
-
-            <!--<input name="Button" type="button" value="Cancel" onClick="document.location='{cancelURL}';">-->
         </div>
     </div>
 

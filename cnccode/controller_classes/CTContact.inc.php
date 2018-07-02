@@ -10,17 +10,44 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 // Messages
-define('CTCONTACT_MSG_CONTACTID_NOT_PASSED', 'ContactID not passed');
-define('CTCONTACT_MSG_SUPPLIERID_NOT_PASSED', 'SupplierID not passed');
-define('CTCONTACT_MSG_CONTACT_ARRAY_NOT_PASSED', 'Contact array not passed');
-define('CTCONTACT_MSG_NONE_FND', 'No contacts found');
-define('CTCONTACT_MSG_CONTACT_NOT_FND', 'Contact not found');
+define(
+    'CTCONTACT_MSG_CONTACTID_NOT_PASSED',
+    'ContactID not passed'
+);
+define(
+    'CTCONTACT_MSG_SUPPLIERID_NOT_PASSED',
+    'SupplierID not passed'
+);
+define(
+    'CTCONTACT_MSG_CONTACT_ARRAY_NOT_PASSED',
+    'Contact array not passed'
+);
+define(
+    'CTCONTACT_MSG_NONE_FND',
+    'No contacts found'
+);
+define(
+    'CTCONTACT_MSG_CONTACT_NOT_FND',
+    'Contact not found'
+);
 // Actions
-define('CTCONTACT_ACT_CONTACT_INSERT', 'insertContact');
-define('CTCONTACT_ACT_CONTACT_UPDATE', 'updateContact');
+define(
+    'CTCONTACT_ACT_CONTACT_INSERT',
+    'insertContact'
+);
+define(
+    'CTCONTACT_ACT_CONTACT_UPDATE',
+    'updateContact'
+);
 // Page text
-define('CTCONTACT_TXT_NEW_CONTACT', 'Create Contact');
-define('CTCONTACT_TXT_UPDATE_CONTACT', 'Update Contact');
+define(
+    'CTCONTACT_TXT_NEW_CONTACT',
+    'Create Contact'
+);
+define(
+    'CTCONTACT_TXT_UPDATE_CONTACT',
+    'Update Contact'
+);
 
 class CTContact extends CTCNC
 {
@@ -32,9 +59,20 @@ class CTContact extends CTCNC
      */
     var $dsContact = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "sales",
             "technical"
@@ -130,14 +168,26 @@ class CTContact extends CTCNC
             );
         }
         if ($this->dsContact->rowCount() == 1) {
-            $this->setTemplateFiles('ContactSelect', 'ContactSelectOne.inc');
+            $this->setTemplateFiles(
+                'ContactSelect',
+                'ContactSelectOne.inc'
+            );
         }
         if ($this->dsContact->rowCount() == 0) {
-            $this->template->set_var('contactName', $_REQUEST['contactName']);
-            $this->setTemplateFiles('ContactSelect', 'ContactSelectNone.inc');
+            $this->template->set_var(
+                'contactName',
+                $_REQUEST['contactName']
+            );
+            $this->setTemplateFiles(
+                'ContactSelect',
+                'ContactSelectNone.inc'
+            );
         }
         if ($this->dsContact->rowCount() > 1) {
-            $this->setTemplateFiles('ContactSelect', 'ContactSelectPopup.inc');
+            $this->setTemplateFiles(
+                'ContactSelect',
+                'ContactSelectPopup.inc'
+            );
         }
         $this->template->set_var(
             array(
@@ -147,7 +197,11 @@ class CTContact extends CTCNC
 // Parameters
         $this->setPageTitle('Contact Selection');
         if ($this->dsContact->rowCount() > 0) {
-            $this->template->set_block('ContactSelect', 'contactBlock', 'contacts');
+            $this->template->set_block(
+                'ContactSelect',
+                'contactBlock',
+                'contacts'
+            );
             while ($this->dsContact->fetchNext()) {
                 $name = $this->dsContact->getValue("firstName") . ' ' . $this->dsContact->getValue("lastName");
                 $this->template->set_var(
@@ -157,7 +211,11 @@ class CTContact extends CTCNC
                         'contactID'   => $this->dsContact->getValue("contactID")
                     )
                 );
-                $this->template->parse('contacts', 'contactBlock', true);
+                $this->template->parse(
+                    'contacts',
+                    'contactBlock',
+                    true
+                );
             }
         }
         $this->template->set_var(
@@ -166,7 +224,11 @@ class CTContact extends CTCNC
                 'parentDescField' => $_SESSION['contactParentDescField']
             )
         );
-        $this->template->parse('CONTENTS', 'ContactSelect', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ContactSelect',
+            true
+        );
         $this->parsePage();
     }
 
@@ -188,57 +250,152 @@ class CTContact extends CTCNC
         // template
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-        $this->setTemplateFiles('ContactEdit', 'ContactEdit.inc');
+        $this->setTemplateFiles(
+            'ContactEdit',
+            'ContactEdit.inc'
+        );
         $this->template->set_var(
             array(
-                'contactID'                   => $this->dsContact->getValue('contactID'),
-                'supplierID'                  => $this->dsContact->getValue('supplierID'),
-                'customerID'                  => $this->dsContact->getValue('customerID'),
-                'siteNo'                      => $this->dsContact->getValue('siteNo'),
-                'firstName'                   => Controller::htmlInputText($this->dsContact->getValue('firstName')),
-                'firstNameMessage'            => Controller::htmlDisplayText($this->dsContact->getMessage('firstName')),
-                'lastName'                    => Controller::htmlInputText($this->dsContact->getValue('lastName')),
-                'lastNameMessage'             => Controller::htmlDisplayText($this->dsContact->getMessage('lastName')),
-                'position'                    => Controller::htmlInputText($this->dsContact->getValue('position')),
-                'positionMessage'             => Controller::htmlDisplayText($this->dsContact->getMessage('position')),
-                'title'                       => Controller::htmlInputText($this->dsContact->getValue('title')),
-                'titleMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('title')),
-                'email'                       => Controller::htmlInputText($this->dsContact->getValue('email')),
-                'emailMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('email')),
-                'portalPassword'              => Controller::htmlInputText($this->dsContact->getValue('portalPassword')),
-                'portalPasswordMessage'       => Controller::htmlDisplayText($this->dsContact->getMessage('portalPassword')),
-                'failedLoginCount'            => Controller::htmlDisplayText($this->dsContact->getValue('failedLoginCount')),
-                'failedLoginCountMessage'     => Controller::htmlDisplayText($this->dsContact->getMessage('failedLoginCount')),
-                'notes'                       => Controller::htmlInputText($this->dsContact->getValue('notes')),
-                'notesMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('notes')),
-                'phone'                       => Controller::htmlDisplayText($this->dsContact->getValue('phone')),
-                'phoneMessage'                => Controller::htmlDisplayText($this->dsContact->getMessage('phone')),
-                'mobilePhone'                 => Controller::htmlDisplayText($this->dsContact->getValue('mobilePhone')),
-                'mobilePhoneMessage'          => Controller::htmlDisplayText($this->dsContact->getMessage('mobilePhone')),
-                'fax'                         => Controller::htmlDisplayText($this->dsContact->getValue('fax')),
-                'faxMessage'                  => Controller::htmlDisplayText($this->dsContact->getMessage('fax')),
-                'workStartedEmailFlagChecked' => Controller::htmlChecked($this->dsContact->getValue('workStartedEmailFlag')),
-                'autoCloseEmailFlagChecked'   => Controller::htmlChecked($this->dsContact->getValue('autoCloseEmailFlag')),
-                'accountsFlagChecked'         => Controller::htmlChecked($this->dsContact->getValue('accountsFlag')),
-                'sendMailshotFlagChecked'     => Controller::htmlChecked($this->dsContact->getValue('sendMailshotFlag')),
-                'discontinuedFlagChecked'     => Controller::htmlChecked($this->dsContact->getValue('discontinuedFlag')),
-                'mailshot2FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
-                'mailshot3FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
-                'mailshot4FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
-                'mailshot8FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
-                'mailshot9FlagDesc'           => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
-                'mailshot11FlagDesc'          => Controller::htmlDisplayText($dsHeader->getValue('mailshot11FlagDesc')),
-                'mailshot2FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot2Flag')),
-                'mailshot3FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot3Flag')),
-                'mailshot4FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot4Flag')),
-                'mailshot8FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot8Flag')),
-                'mailshot9FlagChecked'        => Controller::htmlChecked($this->dsContact->getValue('mailshot9Flag')),
-                'mailshot11FlagChecked'       => Controller::htmlChecked($this->dsContact->getValue('mailshot11Flag')),
-                'urlSubmit'                   => $urlSubmit,
+                'contactID'                         => $this->dsContact->getValue(DBEContact::contactID),
+                'supplierID'                        => $this->dsContact->getValue(DBEContact::supplierID),
+                'customerID'                        => $this->dsContact->getValue(DBEContact::customerID),
+                'siteNo'                            => $this->dsContact->getValue(DBEContact::siteNo),
+                'firstName'                         => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::firstName)
+                ),
+                'firstNameMessage'                  => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('firstName')
+                ),
+                'lastName'                          => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::lastName)
+                ),
+                'lastNameMessage'                   => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('lastName')
+                ),
+                'position'                          => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::position)
+                ),
+                'positionMessage'                   => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('position')
+                ),
+                'title'                             => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::title)
+                ),
+                'titleMessage'                      => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('title')
+                ),
+                'email'                             => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::email)
+                ),
+                'emailMessage'                      => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('email')
+                ),
+                'portalPassword'                    => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::portalPassword)
+                ),
+                'portalPasswordMessage'             => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('portalPassword')
+                ),
+                'failedLoginCount'                  => Controller::htmlDisplayText(
+                    $this->dsContact->getValue(DBEContact::failedLoginCount)
+                ),
+                'failedLoginCountMessage'           => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('failedLoginCount')
+                ),
+                'notes'                             => Controller::htmlInputText(
+                    $this->dsContact->getValue(DBEContact::notes)
+                ),
+                'notesMessage'                      => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('notes')
+                ),
+                'phone'                             => Controller::htmlDisplayText(
+                    $this->dsContact->getValue(DBEContact::phone)
+                ),
+                'phoneMessage'                      => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('phone')
+                ),
+                'mobilePhone'                       => Controller::htmlDisplayText(
+                    $this->dsContact->getValue(DBEContact::mobilePhone)
+                ),
+                'mobilePhoneMessage'                => Controller::htmlDisplayText(
+                    $this->dsContact->getMessage('mobilePhone')
+                ),
+                'workStartedEmailFlagChecked'       => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
+                ),
+                'autoCloseEmailFlagChecked'         => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
+                ),
+                'accountsFlagChecked'               => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::accountsFlag)
+                ),
+                'sendMailshotFlagChecked'           => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::sendMailshotFlag)
+                ),
+                'discontinuedFlagChecked'           => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::discontinuedFlag)
+                ),
+                'othersEmailFlagChecked'            => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::othersEmailFlag)
+                ),
+                'othersWorkStartedEmailFlagChecked' => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
+                ),
+                'othersAutoCloseEmailFlagChecked'   => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::othersAutoCloseEmailFlag)
+                ),
+                'hrUserFlagChecked'   => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::hrUser)
+                ),
+                 'reviewUserFlagChecked'   => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::reviewUser)
+                ),
+
+                'mailshot2FlagDesc'                 => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot2FlagDesc)
+                ),
+                'mailshot3FlagDesc'                 => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot3FlagDesc)
+                ),
+                'mailshot4FlagDesc'                 => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot4FlagDesc)
+                ),
+                'mailshot8FlagDesc'                 => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot8FlagDesc)
+                ),
+                'mailshot9FlagDesc'                 => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot9FlagDesc)
+                ),
+                'mailshot11FlagDesc'                => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::mailshot11FlagDesc)
+                ),
+                'mailshot2FlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot2Flag)
+                ),
+                'mailshot3FlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot3Flag)
+                ),
+                'mailshot4FlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot4Flag)
+                ),
+                'mailshot8FlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot8Flag)
+                ),
+                'mailshot9FlagChecked'              => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot9Flag)
+                ),
+                'mailshot11FlagChecked'             => Controller::htmlChecked(
+                    $this->dsContact->getValue(DBEContact::mailshot11Flag)
+                ),
+                'urlSubmit'                         => $urlSubmit,
                 //				'urlCancel' => $urlCancel
             )
         );
-        $this->template->parse('CONTENTS', 'ContactEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ContactEdit',
+            true
+        );
         $this->parsePage();
     }
 
@@ -259,10 +416,12 @@ class CTContact extends CTCNC
             if (($_REQUEST['customerID'] != '') AND ($_REQUEST['siteNo'] == '')) {
                 $this->raiseError('siteNo not passed');
             }
-            $this->buContact->initialiseNewContact($_REQUEST['supplierID'],
-                                                   $_REQUEST['customerID'],
-                                                   $_REQUEST['siteNo'],
-                                                   $this->dsContact);
+            $this->buContact->initialiseNewContact(
+                $_REQUEST['supplierID'],
+                $_REQUEST['customerID'],
+                $_REQUEST['siteNo'],
+                $this->dsContact
+            );
         }
         return (
         $this->buildLink(
@@ -289,7 +448,10 @@ class CTContact extends CTCNC
             if (empty($_REQUEST['contactID'])) {
                 $this->displayFatalError(CTCONTACT_MSG_CONTACTID_NOT_PASSED);
             }
-            if (!$this->buContact->getContactByID($_REQUEST['contactID'], $this->dsContact)) {
+            if (!$this->buContact->getContactByID(
+                $_REQUEST['contactID'],
+                $this->dsContact
+            )) {
                 $this->displayFatalError(CTCONTACT_MSG_CONTACT_NOT_FND);
             }
         }
@@ -307,7 +469,11 @@ class CTContact extends CTCNC
     function parsePayMethodSelector($payMethodID)
     {
         $this->buContact->getAllPayMethods($dsPayMethod);
-        $this->template->set_block('ContactEdit', 'payMethodBlock', 'payMethods');
+        $this->template->set_block(
+            'ContactEdit',
+            'payMethodBlock',
+            'payMethods'
+        );
         while ($dsPayMethod->fetchNext()) {
             $this->template->set_var(
                 array(
@@ -316,7 +482,11 @@ class CTContact extends CTCNC
                     'payMethodSelected'    => ($payMethodID == $dsPayMethod->getValue('payMethodID')) ? CT_SELECTED : ''
                 )
             );
-            $this->template->parse('payMethods', 'payMethodBlock', true);
+            $this->template->parse(
+                'payMethods',
+                'payMethodBlock',
+                true
+            );
         }
     }
 
