@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Fixed
-- Issue 271 - CustomerAnalysis Report error handling
+### Removed
+- Issue 282 - Remove DNS records from domain name
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
