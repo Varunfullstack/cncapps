@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 271 - CustomerAnalysis Report error handling
+
 ## [v1.8.3] - 2018-06-29
 ### Fixed
 - Issue 290 - T&M processing error for multiple activity
