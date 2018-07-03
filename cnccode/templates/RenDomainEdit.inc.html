@@ -1,198 +1,213 @@
 <!-- Template: RenDomainEdit.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
-function checkFunctionKey(field){
-  if (event.keyCode == 120){      // F9 - edit
-    switch (field.id){
-      case "itemDescription":
-        if (document.getElementById("itemID").value != "0"){
-          window.open(
-            '{urlItemEdit}&itemID=' +
-            escape(document.getElementById("itemID").value) +
-            '&parentIDField=itemID' +
-            '&parentDescField=itemDescription',
-            'item',
-            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-          );
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {      // F9 - edit
+            switch (field.id) {
+                case "itemDescription":
+                    if (document.getElementById("itemID").value != "0") {
+                        window.open(
+                            '{urlItemEdit}&itemID=' +
+                            escape(document.getElementById("itemID").value) +
+                            '&parentIDField=itemID' +
+                            '&parentDescField=itemDescription',
+                            'item',
+                            'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+            }
         }
-        break;
+        return;
     }
-   }
-   return;
-}
-function validateItemDescription(){
-  if (Trim(document.getElementById("itemDescription").value) != ""){
-    window.open('{urlItemPopup}&itemDescription=' +
-    escape(document.getElementById("itemDescription").value) +
-    '&parentIDField=itemID' +
-    '&parentSlaResponseHoursField=slaResponseHours' +
-    '&parentDescField=itemDescription',
-    'items','scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
-  }
-}
+
+    function validateItemDescription() {
+        if (Trim(document.getElementById("itemDescription").value) != "") {
+            window.open('{urlItemPopup}&itemDescription=' +
+                escape(document.getElementById("itemDescription").value) +
+                '&parentIDField=itemID' +
+                '&parentSlaResponseHoursField=slaResponseHours' +
+                '&parentDescField=itemDescription',
+                'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
+        }
+    }
 </script>
-<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
-</table>
-<FORM  method="post" action="{urlUpdate}" name="renDomain" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="renDomain[1][customerItemID]"
-			value="{customerItemID}"
-		>
-    <input
-      type="hidden"
-      name="renDomain[1][customerID]"
-      value="{customerID}"
-    >
-		<input
-			type="hidden"
-			name="renDomain[1][customerName]"
-			value="{customerName}"
-		>
-    <input
-      type="hidden"
-      name="renDomain[1][siteName]"
-      value="{siteName}"
-    >
-    <input
-      type="hidden"
-      name="renDomain[1][siteNo]"
-      value="{siteNo}"
-    >
-    <input
-      type="hidden"
-      name="renDomain[1][salePrice]"
-      value="{salePrice}"
-    >
-    <input
-      type="hidden"
-      name="renDomain[1][costPrice]"
-      value="{costPrice}"
-    >
-		<tr> 
-			<td width="167" class="promptText" align="right">Customer</td>
-			<td width="523" class="fieldText">{customerName}</td>
-		</tr>
+<TABLE width="200px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
     <TR>
-      <TD class="promptText">Site</TD>
-      <td class="fieldText">{siteName}</td>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDelete}">{txtDelete}</a></TD>
     </TR>
-    <tr>
-      <td class="promptText">Item</td>
-      <td class="field"> <input
-        type="hidden"
-        name="renDomain[1][itemID]"
-        id="itemID"
-        value="{itemID}"
-      > <input
-        type="text"
-        {readonly}
-        name="renDomain[1][itemDescription]"
-        id="itemDescription"
-        value="{itemDescription}"
-        onChange="javascript:validateItemDescription()"
-        onKeydown="javascript:checkFunctionKey(itemDescription)"
-        size="50"
-        maxlength="50"
-      > <font class="formErrorMessage">{itemDescriptionMessage}</font> </td>
-    </tr>
-    {pricePerMonth}
-		<tr>
-				<td class="promptText">Domain</td>
-				<td class="fieldText"><input
-					name="renDomain[1][notes]"
-					{readonly}					
-					type="text" value="{notes}"
-					title="Will appear as a comment line on the generated sales order before the item line"
-					size="45"
-					maxlength="45">
-					<span class="formErrorMessage">{notesMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Start Date</td>
-				<td class="fieldText"><input
-					name="renDomain[1][installationDate]"
-					type="text" value="{installationDate}"
-					{readonly}
-					size="50"
-					maxlength="50">
-								<span class="formErrorMessage">{installationDateMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Total Invoiced (months)</td>
-				<td class="fieldText"><input
-					name="renDomain[1][totalInvoiceMonths]"
-					type="text" value="{totalInvoiceMonths}"
-					{readonly}
-					size="10"
-					maxlength="10">
-								<span class="formErrorMessage">{totalInvoiceMonthsMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Invoice Interval	(months)</td>
-				<td class="fieldText"><input
-					name="renDomain[1][invoicePeriodMonths]"
-					type="text" value="{invoicePeriodMonths}"
-					{readonly}
-					size="10"
-					maxlength="10">
-								<span class="formErrorMessage">{invoicePeriodMonthsMessage}</span> </td>
-		</tr>
-		<tr>
-				<td class="promptText">Next Invoice Period</td>
-				<td class="fieldText">{invoiceFromDate} to {invoiceToDate}</td>
-		</tr>
-    {declined}
-    <tr>
-      <td valign="top" class="promptText">Internal Notes</td>
-      <td colspan="2">
-        <textarea cols="80" rows="10" name="renDomain[1][internalNotes]">{internalNotes}</textarea>
-      </td>
-    </tr>
-    
-		<tr>
-				<td>&nbsp;</td>
-				<td class="formErrorMessage">&nbsp;</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage">
-        <input type="submit" {readonly} name="Submit" value="Update">
-        <a href="{urlPrintContract}"  title="Print Support Contract">{txtPrintContract}</a>
-      </td>
-		</tr>
-	</table>
+</table>
+<FORM method="post"
+      action="{urlUpdate}"
+      name="renDomain"
+      AUTOCOMPLETE="OFF"
+>
+    <table width="700px"
+           border="0"
+    >
+        <input
+                type="hidden"
+                name="renDomain[1][customerItemID]"
+                value="{customerItemID}"
+        >
+        <input
+                type="hidden"
+                name="renDomain[1][customerID]"
+                value="{customerID}"
+        >
+        <input
+                type="hidden"
+                name="renDomain[1][customerName]"
+                value="{customerName}"
+        >
+        <input
+                type="hidden"
+                name="renDomain[1][siteName]"
+                value="{siteName}"
+        >
+        <input
+                type="hidden"
+                name="renDomain[1][siteNo]"
+                value="{siteNo}"
+        >
+        <input
+                type="hidden"
+                name="renDomain[1][salePrice]"
+                value="{salePrice}"
+        >
+        <input
+                type="hidden"
+                name="renDomain[1][costPrice]"
+                value="{costPrice}"
+        >
+        <tr>
+            <td width="167"
+                class="promptText"
+                align="right"
+            >Customer
+            </td>
+            <td width="523"
+                class="fieldText"
+            >{customerName}
+            </td>
+        </tr>
+        <TR>
+            <TD class="promptText">Site</TD>
+            <td class="fieldText">{siteName}</td>
+        </TR>
+        <tr>
+            <td class="promptText">Item</td>
+            <td class="field"><input
+                    type="hidden"
+                    name="renDomain[1][itemID]"
+                    id="itemID"
+                    value="{itemID}"
+            > <input
+                    type="text"
+                    {readonly}
+                    name="renDomain[1][itemDescription]"
+                    id="itemDescription"
+                    value="{itemDescription}"
+                    onChange="javascript:validateItemDescription()"
+                    onKeydown="javascript:checkFunctionKey(itemDescription)"
+                    size="50"
+                    maxlength="50"
+            > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
+        </tr>
+        {pricePerMonth}
+        <tr>
+            <td class="promptText">Domain</td>
+            <td class="fieldText"><input
+                    name="renDomain[1][notes]"
+                    {readonly}
+                    type="text"
+                    value="{notes}"
+                    title="Will appear as a comment line on the generated sales order before the item line"
+                    size="45"
+                    maxlength="45"
+            >
+                <span class="formErrorMessage">{notesMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Start Date</td>
+            <td class="fieldText"><input
+                    name="renDomain[1][installationDate]"
+                    type="text"
+                    value="{installationDate}"
+                    {readonly}
+                    size="50"
+                    maxlength="50"
+            >
+                <span class="formErrorMessage">{installationDateMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Total Invoiced (months)</td>
+            <td class="fieldText"><input
+                    name="renDomain[1][totalInvoiceMonths]"
+                    type="text"
+                    value="{totalInvoiceMonths}"
+                    {readonly}
+                    size="10"
+                    maxlength="10"
+            >
+                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Invoice Interval (months)</td>
+            <td class="fieldText"><input
+                    name="renDomain[1][invoicePeriodMonths]"
+                    type="text"
+                    value="{invoicePeriodMonths}"
+                    {readonly}
+                    size="10"
+                    maxlength="10"
+            >
+                <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Next Invoice Period</td>
+            <td class="fieldText">{invoiceFromDate} to {invoiceToDate}</td>
+        </tr>
+        {declined}
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Internal Notes
+            </td>
+            <td colspan="2">
+                <textarea cols="80"
+                          rows="10"
+                          name="renDomain[1][internalNotes]"
+                >{internalNotes}</textarea>
+            </td>
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage">
+                <input type="submit"
+                       {readonly}
+                       name="Submit"
+                       value="Update"
+                >
+                <a href="{urlPrintContract}"
+                   title="Print Support Contract"
+                >{txtPrintContract}</a>
+            </td>
+        </tr>
+    </table>
 </form>
-<h3>A Records</h3>
-  <table class="content" width="700px" border="0">
-    <thead>
-      <tr> 
-        <th>Type</th>
-        <th>Name</th>
-        <th>Destination IP</th>
-        <th>Function</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-      </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN arecordBlock -->
-    <tr> 
-      <td class="content">{arecordType}</td>
-      <td class="content">{arecordName}</td>
-      <td class="content">{arecordDestinationIp}</td>
-      <td class="content">{arecordFunction}</td>
-      <td class="content"><a href="{urlEditArecord}">Edit</a></td>
-      <td class="content"><a href="{urlDeleteArecord}"  onClick="if(!confirm('Are you sure you want to remove this record?')) return(false)">Delete</a></td>
-    </tr>
-    <!-- END arecordBlock -->
-    <tr> 
-      <td colspan="6"><a href="{urlAddArecord}">Add new</a></td>
-    </tr>
-    </tbody>
-  </table>
 <!-- End Template: RenDomainEdit.inc.html -->
