@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Changed
-- Issue 272 - Contract Analysis Report error handling
+### Fixed
+- Issue 271 - CustomerAnalysis Report error handling
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
