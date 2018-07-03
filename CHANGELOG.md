@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Fixed
-- Issue 279 - Contracts not populating on Search page
+### Added
+- Issue 280 - Restore ability to create customer documentation folder
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
