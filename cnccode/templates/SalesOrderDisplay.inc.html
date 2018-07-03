@@ -17,7 +17,9 @@
         }
     }
 </script>
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 {salesOrderLineEditJS} {salesOrderSiteEditJS}
 <script language='JavaScript'>
     $(function () {
@@ -147,75 +149,183 @@
         }
     }
 </script>
-<TABLE width="1000px" border="0" cellpadding="2" cellspacing="1">
+<TABLE width="1000px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
     <TR>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDeleteOrder}"
-                                                               onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)">{txtDeleteOrder}</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDeleteOrder}"
+            onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)"
+        >{txtDeleteOrder}</a>
         </TD>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
         </TD>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlInvoices}">{txtInvoices}</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlInvoices}">{txtInvoices}</a>
         </TD>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDespatch}">{txtDespatch}</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDespatch}">{txtDespatch}</a>
         </TD>
-        <TD width="100px" class="navigateLink" valign="top"> {linkServiceRequest}
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        > {linkServiceRequest}
         </TD>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlRenewalReport}" target="_blank">{txtRenewalReport}</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlRenewalReport}"
+            target="_blank"
+        >{txtRenewalReport}</a>
         </TD>
-        <TD width="100px" class="navigateLink" valign="top"><a href="#"
-                                                               onclick="customerNotePopup()">{txtCustomerNote}</a></TD>
-        <TD width="100px" class="navigateLink" valign="top">{currentDocumentsLink}
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="#"
+            onclick="customerNotePopup()"
+        >{txtCustomerNote}</a></TD>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        >
         </TD>
-        <TD width="100px" valign="top">{uncSalesOrderConf}</TD>
+        <TD width="100px"
+            valign="top"
+        >{uncSalesOrderConf}
+        </TD>
     </TR>
 </table>
 <br/>
 {salesOrderHeadDisplay} {salesOrderDisplayNewLine}
-<form name="quickQuoteForm" method="POST" enctype="multipart/form-data" action="{urlSubmitOrderLines}">
-    <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-    <input type="hidden" name="form[serviceRequestCustomerItemID]" value="{serviceRequestCustomerItemID}">
-    <input type="hidden" name="form[serviceRequestText]" value="{serviceRequestText}">
-    <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-    <INPUT type="hidden" id="ordheadID" name="ordheadID" value="{ordheadID}">
-    <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-    <table class="singleBorder" width="970" border="0" cellspacing="1" cellpadding="1">
+<form name="quickQuoteForm"
+      method="POST"
+      enctype="multipart/form-data"
+      action="{urlSubmitOrderLines}"
+>
+    <input type="hidden"
+           name="form[ordheadID]"
+           value="{ordheadID}"
+    >
+    <input type="hidden"
+           name="form[serviceRequestCustomerItemID]"
+           value="{serviceRequestCustomerItemID}"
+    >
+    <input type="hidden"
+           name="form[serviceRequestText]"
+           value="{serviceRequestText}"
+    >
+    <input type="hidden"
+           name="form[ordheadID]"
+           value="{ordheadID}"
+    >
+    <INPUT type="hidden"
+           id="ordheadID"
+           name="ordheadID"
+           value="{ordheadID}"
+    >
+    <INPUT type="hidden"
+           id="updatedTime"
+           name="updatedTime"
+           value="{updatedTime}"
+    >
+    <table class="singleBorder"
+           width="970"
+           border="0"
+           cellspacing="1"
+           cellpadding="1"
+    >
         <tr>
-            <td width="16px" class="listHeadText"><input type="checkbox" name="Toggle"
-                                                         onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)">
+            <td width="16px"
+                class="listHeadText"
+            ><input type="checkbox"
+                    name="Toggle"
+                    onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)"
+            >
             </td>
-            <td width="10px" class="listHeadText">&nbsp;</td>
-            <td width="242px" class="listHeadText">Description</td>
-            <td width="57px" class="listHeadText">Part No</td>
-            <td width="125px" class="listHeadText">Supplier</td>
-            <td width="50px" class="listHeadText">
+            <td width="10px"
+                class="listHeadText"
+            >&nbsp;
+            </td>
+            <td width="242px"
+                class="listHeadText"
+            >Description
+            </td>
+            <td width="57px"
+                class="listHeadText"
+            >Part No
+            </td>
+            <td width="125px"
+                class="listHeadText"
+            >Supplier
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Qty</DIV>
             </td>
-            <td width="50px" class="listHeadText">
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Cost(&pound;)</DIV>
             </td>
-            <td width="50px" class="listHeadText">
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Total(&pound;)</DIV>
             </td>
-            <td width="50px" class="listHeadText">
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Sale(&pound;)</DIV>
             </td>
-            <td width="50px" class="listHeadText">
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Total(&pound;)</DIV>
             </td>
-            <td width="50px" class="listHeadText">
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Profit(&pound;)</DIV>
             </td>
-            <td width="50px" class="listHeadText">
+            <td width="50px"
+                class="listHeadText"
+            >
                 <DIV align="right">Profit(%)</DIV>
             </td>
-            <td width="100px" class="orderLineClass">
+            <td width="100px"
+                class="orderLineClass"
+            >
                 <div align="left">{salesOrderDisplayCreatePO}{salesOrderDisplayUpdateLines}</div>
             </td>
         </tr>
         <!-- BEGIN orderLineBlock -->
-        <INPUT type="hidden" id="lineType" name="ordline[{sequenceNo}][lineType]" value="{lineType}">
-        <INPUT type="hidden" id="description" name="ordline[{sequenceNo}][description]" value="{description}">
-        <INPUT type="hidden" id="supplierName" name="ordline[{sequenceNo}][supplierName]" value="{supplierName}">
+        <INPUT type="hidden"
+               id="lineType"
+               name="ordline[{sequenceNo}][lineType]"
+               value="{lineType}"
+        >
+        <INPUT type="hidden"
+               id="description"
+               name="ordline[{sequenceNo}][description]"
+               value="{description}"
+        >
+        <INPUT type="hidden"
+               id="supplierName"
+               name="ordline[{sequenceNo}][supplierName]"
+               value="{supplierName}"
+        >
         {salesOrderLine}
         <!-- END orderLineBlock -->
         <tr>
@@ -237,7 +347,12 @@
         </tr>
         <tr>
             <td colspan="7">
-                <img src="./images/arrow_ltr.gif" border="0" width="38" height="22" alt="With selected lines:"/>
+                <img src="./images/arrow_ltr.gif"
+                     border="0"
+                     width="38"
+                     height="22"
+                     alt="With selected lines:"
+                />
 
                 <input
                         type="hidden"
@@ -254,7 +369,10 @@
                         onChange="selectionChanged()"
                 >
                     <!-- BEGIN actionBlock -->
-                    <option {SELECTED} value="{action}">{actionDescription}</option>
+                    <option {SELECTED}
+                            value="{action}"
+                    >{actionDescription}
+                    </option>
                     <!-- END actionBlock -->
                 </select>
                 <input
@@ -291,21 +409,43 @@
     {salesOrderGenerateQuotes}
 </form>
 {salesOrderDisplayQuotes}
-<table width="700px" border="0" cellspacing="0" cellpadding="1">
+<table width="700px"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
     <tr>
-        <form name="ordheadinv" method="post" action="{urlUpdateInvAddress}">
-            <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-            <td valign="top" class="mainHeadText">
-                <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+        <form name="ordheadinv"
+              method="post"
+              action="{urlUpdateInvAddress}"
+        >
+            <INPUT type="hidden"
+                   id="updatedTime"
+                   name="updatedTime"
+                   value="{updatedTime}"
+            >
+            <td valign="top"
+                class="mainHeadText"
+            >
+                <table class="singleBorder"
+                       width="348px"
+                       border="0"
+                       cellspacing="1"
+                       cellpadding="2"
+                >
                     <tr>
-                        <td valign="top" class="listHeadText">
+                        <td valign="top"
+                            class="listHeadText"
+                        >
                             <div align="center">Invoice
                                 Address
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td valign="top" class="mainHeadText"><P class="addressLine">{invAdd1}</P>
+                        <td valign="top"
+                            class="mainHeadText"
+                        ><P class="addressLine">{invAdd1}</P>
                             <P class="addressLine">{invAdd2}</P>
                             <P class="addressLine">{invAdd3}</P>
                             <P class="addressLine">{invTown}</P>
@@ -313,9 +453,16 @@
                             <P class="addressLine">{invPostcode}</P></td>
                     </tr>
                     <tr>
-                        <td class="mainHeadText"><input type="hidden" name="form[ordheadID]" id="ordheadID"
-                                                        value="{ordheadID}">
-                            <input type="hidden" name="form[siteNo]" id="invSiteNo" value="{invSiteNo}">
+                        <td class="mainHeadText"><input type="hidden"
+                                                        name="form[ordheadID]"
+                                                        id="ordheadID"
+                                                        value="{ordheadID}"
+                        >
+                            <input type="hidden"
+                                   name="form[siteNo]"
+                                   id="invSiteNo"
+                                   value="{invSiteNo}"
+                            >
                             <input
                                     type="text"
                                     name="form[invSiteDesc]"
@@ -341,19 +488,35 @@
                 </table>
             </td>
         </form>
-        <form name="ordheaddel" method="post" action="{urlUpdateDelAddress}">
-            <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
+        <form name="ordheaddel"
+              method="post"
+              action="{urlUpdateDelAddress}"
+        >
+            <INPUT type="hidden"
+                   id="updatedTime"
+                   name="updatedTime"
+                   value="{updatedTime}"
+            >
             <td valign="top">
-                <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+                <table class="singleBorder"
+                       width="348px"
+                       border="0"
+                       cellspacing="1"
+                       cellpadding="2"
+                >
                     <tr>
-                        <td valign="top" class="listHeadText">
+                        <td valign="top"
+                            class="listHeadText"
+                        >
                             <div align="center">Delivery
                                 Address
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td valign="top" class="mainHeadText"><P class="addressLine">{delAdd1}</P>
+                        <td valign="top"
+                            class="mainHeadText"
+                        ><P class="addressLine">{delAdd1}</P>
                             <P class="addressLine">{delAdd2}</P>
                             <P class="addressLine">{delAdd3}</P>
                             <P class="addressLine">{delTown}</P>
@@ -361,8 +524,15 @@
                             <P class="addressLine">{delPostcode}</P></td>
                     </tr>
                     <tr>
-                        <td class="mainHeadText"><input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-                            <input type="hidden" name="form[siteNo]" id="delSiteNo" value="{delSiteNo}">
+                        <td class="mainHeadText"><input type="hidden"
+                                                        name="form[ordheadID]"
+                                                        value="{ordheadID}"
+                        >
+                            <input type="hidden"
+                                   name="form[siteNo]"
+                                   id="delSiteNo"
+                                   value="{delSiteNo}"
+                            >
                             <input
                                     type="text"
                                     name="form[delSiteDesc]"
@@ -377,8 +547,12 @@
                                     type="text"
                                     name="blah"
                                     style="display:none"
-                            > <input type="button" name="SubmitDelAdd" value="Select" onClick="form.submit();"
-                                     {readOnly}>
+                            > <input type="button"
+                                     name="SubmitDelAdd"
+                                     value="Select"
+                                     onClick="form.submit();"
+                                     {readOnly}
+                            >
                         </td>
                     </tr>
                 </table>
@@ -386,43 +560,91 @@
         </form>
     </tr>
 </table>
-<table width="700px" border="0" cellspacing="0" cellpadding="1">
+<table width="700px"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
     <tr>
-        <td width="50%" class="mainHeadText">
-            <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+        <td width="50%"
+            class="mainHeadText"
+        >
+            <table class="singleBorder"
+                   width="348px"
+                   border="0"
+                   cellspacing="1"
+                   cellpadding="2"
+            >
                 <tr>
-                    <td colspan="2" valign="top" class="listHeadText">
+                    <td colspan="2"
+                        valign="top"
+                        class="listHeadText"
+                    >
                         <div align="center">Invoice
                             Contact
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Contact</td>
-                    <td width="400px" class="mainHeadText">{invContact}</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Contact
+                    </td>
+                    <td width="400px"
+                        class="mainHeadText"
+                    >{invContact}
+                    </td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Email</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Email
+                    </td>
                     <td class="mainHeadText"><a href="mailto:{invContactEmail}">{invContactEmail}</a></td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">DDI</td>
+                    <td width="60px"
+                        class="promptText"
+                    >DDI
+                    </td>
                     <td class="mainHeadText"><a href="tel:{invContactPhone}">{invContactPhone}</a></td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Switchboard</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Switchboard
+                    </td>
                     <td class="mainHeadText"><a href="tel:{invSitePhone}">{invSitePhone}</a></td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Fax</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Fax
+                    </td>
                     <td class="mainHeadText">{invContactFax}</td>
                 </tr>
                 <tr>
-                    <form name="invcon" method="post" action="{urlUpdateInvContact}">
-                        <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-                        <td colspan="2" class="mainHeadText"><input type="hidden" name="form[ordheadID]" id="ordheadID"
-                                                                    value="{ordheadID}">
-                            <input type="hidden" name="form[contactID]" id="invContactID" value="{invContactID}">
+                    <form name="invcon"
+                          method="post"
+                          action="{urlUpdateInvContact}"
+                    >
+                        <INPUT type="hidden"
+                               id="updatedTime"
+                               name="updatedTime"
+                               value="{updatedTime}"
+                        >
+                        <td colspan="2"
+                            class="mainHeadText"
+                        ><input type="hidden"
+                                name="form[ordheadID]"
+                                id="ordheadID"
+                                value="{ordheadID}"
+                        >
+                            <input type="hidden"
+                                   name="form[contactID]"
+                                   id="invContactID"
+                                   value="{invContactID}"
+                            >
                             <input
                                     type="text"
                                     name="form[invContactName]"
@@ -437,46 +659,94 @@
                                     type="text"
                                     name="blah"
                                     style="display:none"
-                            > <input type="button" name="SubmitInvContact" value="Select" onClick="form.submit();"
-                                     {readOnly}>
+                            > <input type="button"
+                                     name="SubmitInvContact"
+                                     value="Select"
+                                     onClick="form.submit();"
+                                     {readOnly}
+                            >
                         </td>
                     </form>
                 </tr>
             </table>
         </TD>
-        <td width="50%" class="mainHeadText">
-            <table class="singleBorder" width="348px" border="0" cellspacing="1" cellpadding="2">
+        <td width="50%"
+            class="mainHeadText"
+        >
+            <table class="singleBorder"
+                   width="348px"
+                   border="0"
+                   cellspacing="1"
+                   cellpadding="2"
+            >
                 <tr>
-                    <td colspan="2" valign="top" class="listHeadText">
+                    <td colspan="2"
+                        valign="top"
+                        class="listHeadText"
+                    >
                         <div align="center">Delivery Contact</div>
                     </td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Contact</td>
-                    <td width="400px" class="mainHeadText">{delContact}</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Contact
+                    </td>
+                    <td width="400px"
+                        class="mainHeadText"
+                    >{delContact}
+                    </td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Email</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Email
+                    </td>
                     <td class="mainHeadText"><a href="mailto:{delContactEmail}">{delContactEmail}</a></td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">DDI</td>
+                    <td width="60px"
+                        class="promptText"
+                    >DDI
+                    </td>
                     <td class="mainHeadText"><a href="tel:{delContactPhone}">{delContactPhone}</a></td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Switchboard</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Switchboard
+                    </td>
                     <td class="mainHeadText"><a href="tel:{delSitePhone}">{delSitePhone}</a></td>
                 </tr>
                 <tr>
-                    <td width="60px" class="promptText">Fax</td>
+                    <td width="60px"
+                        class="promptText"
+                    >Fax
+                    </td>
                     <td class="mainHeadText">{delContactFax}</td>
                 </tr>
                 <tr>
-                    <form name="delcon" method="post" action="{urlUpdateDelContact}">
-                        <INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-                        <td colspan="2" class="mainHeadText"><input type="hidden" name="form[ordheadID]" id="ordheadID"
-                                                                    value="{ordheadID}">
-                            <input type="hidden" name="form[contactID]" id="delContactID" value="{delContactID}">
+                    <form name="delcon"
+                          method="post"
+                          action="{urlUpdateDelContact}"
+                    >
+                        <INPUT type="hidden"
+                               id="updatedTime"
+                               name="updatedTime"
+                               value="{updatedTime}"
+                        >
+                        <td colspan="2"
+                            class="mainHeadText"
+                        ><input type="hidden"
+                                name="form[ordheadID]"
+                                id="ordheadID"
+                                value="{ordheadID}"
+                        >
+                            <input type="hidden"
+                                   name="form[contactID]"
+                                   id="delContactID"
+                                   value="{delContactID}"
+                            >
                             <input
                                     type="text"
                                     name="form[delContactName]"
@@ -491,8 +761,12 @@
                                     type="text"
                                     name="blah"
                                     style="display:none"
-                            > <input type="button" name="SubmitDelContact" value="Select" onClick="form.submit();"
-                                     {readOnly}>
+                            > <input type="button"
+                                     name="SubmitDelContact"
+                                     value="Select"
+                                     onClick="form.submit();"
+                                     {readOnly}
+                            >
                         </td>
                     </form>
                 </tr>
