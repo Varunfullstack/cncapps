@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Removed
-- Issue 282 - Remove DNS records from domain name
+### Changed
+- Issue 281 - Add headings for the contract page popup.
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
