@@ -8,6 +8,17 @@ require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
 class DBEJContract extends DBECustomerItem
 {
+
+const itemDescription = "itemDescription";
+const itemTypeID = "itemTypeID";
+const renewalTypeID = "renewalTypeID";
+const renewalType = "renewalType";
+const postcode = "postcode";
+const invoiceFromDate = "invoiceFromDate";
+const invoiceToDate = "invoiceToDate";
+const invoiceFromDateYMD = "invoiceFromDateYMD";
+const invoiceToDateYMD = "invoiceToDateYMD";
+
     /**
      * calls constructor()
      * @access public
@@ -19,27 +30,27 @@ class DBEJContract extends DBECustomerItem
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "itm_desc");
-        $this->addColumn("itemTypeID", DA_ID, DA_ALLOW_NULL, "itm_itemtypeno");
-        $this->addColumn("renewalTypeID", DA_STRING, DA_ALLOW_NULL, "renewalType.renewalTypeID");
-        $this->addColumn("renewalType", DA_STRING, DA_ALLOW_NULL, "renewalType.description");
-        $this->addColumn("postcode", DA_STRING, DA_ALLOW_NULL, "add_postcode");
-        $this->addColumn("adslPhone", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("invoiceFromDate",
+        $this->addColumn(self::itemDescription, DA_STRING, DA_ALLOW_NULL, "itm_desc");
+        $this->addColumn(self::itemTypeID, DA_ID, DA_ALLOW_NULL, "itm_itemtypeno");
+        $this->addColumn(self::renewalTypeID, DA_STRING, DA_ALLOW_NULL, "renewalType.renewalTypeID");
+        $this->addColumn(self::renewalType, DA_STRING, DA_ALLOW_NULL, "renewalType.description");
+        $this->addColumn(self::postcode, DA_STRING, DA_ALLOW_NULL, "add_postcode");
+        $this->addColumn(self::adslPhone, DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(self::invoiceFromDate,
                          DA_DATE,
                          DA_NOT_NULL,
                          "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')");
-        $this->addColumn("invoiceToDate",
+        $this->addColumn(self::invoiceToDate,
                          DA_DATE,
                          DA_NOT_NULL,
                          "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')");
 
-        $this->addColumn("invoiceFromDateYMD",
+        $this->addColumn(self::invoiceFromDateYMD,
                          DA_DATE,
                          DA_NOT_NULL,
                          "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
 
-        $this->addColumn("invoiceToDateYMD",
+        $this->addColumn(self::invoiceToDateYMD,
                          DA_DATE,
                          DA_NOT_NULL,
                          "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
