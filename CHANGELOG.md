@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 280 - Restore ability to create customer documentation folder
+
 ## [v1.8.3] - 2018-06-29
 ### Fixed
 - Issue 290 - T&M processing error for multiple activity
