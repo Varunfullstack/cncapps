@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.8.4] - 2018-07-04
-### Fixed
-- Issue 292 - Skip Sales Order on Activity.php shows debug information
+## [unreleased]
+### Changed
+- Issue 274 - Set system updated SRs to status Awaiting CNC
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
