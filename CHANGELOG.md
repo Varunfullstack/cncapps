@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.8.4] - 2018-07-04
+### Fixed
+- Issue 292 - Skip Sales Order on Activity.php shows debug information
+
 ## [v1.8.3] - 2018-06-29
 ### Fixed
 - Issue 290 - T&M processing error for multiple activity
