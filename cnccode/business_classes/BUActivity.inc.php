@@ -7638,10 +7638,18 @@ is currently a balance of ';
                 /*
         Prepopulate reason
         */
-                $reason =
-                    '<p>System:</p><p>Version:</p><p>Summary of problem:</p><p>Change requested:</p>';
-                $reason .=
-                    '<p>Method to test change is successful:</p><p>Reversion plan if unsuccessful:</p>';
+
+                $reason = "
+<table>
+<tbody>
+<tr><td>System:</td><td></td></tr>
+<tr><td>Summary of problem:</td><td></td></tr>
+<tr><td>Change Requested:</td><td></td></tr>
+<tr><td>Method to test change if successful:</td><td></td></tr>
+<tr><td>Reversion plan if unsuccessful:</td><td></td></tr>
+</tbody>
+</table>";
+
             }
         }
 

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 291 - Technical Change Request formatting change
+
 ## [v1.8.3] - 2018-06-29
 ### Fixed
 - Issue 290 - T&M processing error for multiple activity
