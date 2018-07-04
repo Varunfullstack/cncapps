@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 274 - Set system updated SRs to status Awaiting CNC
+- Issue 270 - Technical Change Request to default to Awaiting CNC
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
