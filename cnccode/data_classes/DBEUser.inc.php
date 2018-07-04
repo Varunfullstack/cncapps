@@ -52,39 +52,174 @@ class DBEUser extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("consultant");
-        $this->addColumn(self::userID, DA_ID, DA_NOT_NULL, "cns_consno");
-        $this->addColumn(self::managerID, DA_ID, DA_ALLOW_NULL, "cns_manager");
-        $this->addColumn(self::name, DA_STRING, DA_NOT_NULL, "cns_name");
-        $this->addColumn(self::salutation, DA_STRING, DA_ALLOW_NULL, "cns_salutation");
-        $this->addColumn(self::add1, DA_STRING, DA_ALLOW_NULL, "cns_add1");
-        $this->addColumn(self::add2, DA_STRING, DA_ALLOW_NULL, "cns_add2");
-        $this->addColumn(self::add3, DA_STRING, DA_ALLOW_NULL, "cns_add3");
-        $this->addColumn(self::town, DA_STRING, DA_ALLOW_NULL, "cns_town");
-        $this->addColumn(self::county, DA_STRING, DA_ALLOW_NULL, "cns_county");
-        $this->addColumn(self::postcode, DA_STRING, DA_ALLOW_NULL, "cns_postcode");
-        $this->addColumn(self::username, DA_STRING, DA_NOT_NULL, "cns_logname");
-        $this->addColumn(self::employeeNo, DA_STRING, DA_ALLOW_NULL, "cns_employee_no");
-        $this->addColumn(self::petrolRate, DA_FLOAT, DA_ALLOW_NULL, "cns_petrol_rate");
-        $this->addColumn(self::perms, DA_STRING, DA_ALLOW_NULL, "cns_perms");
-        $this->addColumn(self::signatureFilename, DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn(self::jobTitle, DA_STRING, DA_NOT_NULL);
-        $this->addColumn(self::firstName, DA_STRING, DA_NOT_NULL);
-        $this->addColumn(self::lastName, DA_STRING, DA_NOT_NULL);
-        $this->addColumn(self::activeFlag, DA_YN, DA_NOT_NULL, 'consultant.activeFlag');
-        $this->addColumn(self::weekdayOvertimeFlag, DA_YN, DA_NOT_NULL); // does user get overtime in weekdays
-        $this->addColumn(self::helpdeskFlag,
-                         DA_YN,
-                         DA_NOT_NULL,
-                         'cns_helpdesk_flag'); // does user get overtime in weekdays
-        $this->addColumn(self::customerID, DA_ID, DA_ALLOW_NULL);
-        $this->addColumn(self::hourlyPayRate, DA_FLOAT, DA_ALLOW_NULL, "cns_hourly_pay_rate");
-        $this->addColumn(self::teamID, DA_ID, DA_ALLOW_NULL, 'consultant.teamID');
-        $this->addColumn(self::receiveSdManagerEmailFlag, DA_YN, DA_NOT_NULL);
-        $this->addColumn(self::changePriorityFlag, DA_YN, DA_NOT_NULL);
-        $this->addColumn(self::appearInQueueFlag, DA_YN, DA_NOT_NULL);
-        $this->addColumn(self::standardDayHours, DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn(self::changeApproverFlag, DA_YN, DA_NOT_NULL);
-        $this->addColumn(self::excludeFromStatsFlag, DA_YN, DA_NOT_NULL);
+        $this->addColumn(
+            self::userID,
+            DA_ID,
+            DA_NOT_NULL,
+            "cns_consno"
+        );
+        $this->addColumn(
+            self::managerID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "cns_manager"
+        );
+        $this->addColumn(
+            self::name,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cns_name"
+        );
+        $this->addColumn(
+            self::salutation,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_salutation"
+        );
+        $this->addColumn(
+            self::add1,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_add1"
+        );
+        $this->addColumn(
+            self::add2,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_add2"
+        );
+        $this->addColumn(
+            self::add3,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_add3"
+        );
+        $this->addColumn(
+            self::town,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_town"
+        );
+        $this->addColumn(
+            self::county,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_county"
+        );
+        $this->addColumn(
+            self::postcode,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_postcode"
+        );
+        $this->addColumn(
+            self::username,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cns_logname"
+        );
+        $this->addColumn(
+            self::employeeNo,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_employee_no"
+        );
+        $this->addColumn(
+            self::petrolRate,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "cns_petrol_rate"
+        );
+        $this->addColumn(
+            self::perms,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cns_perms"
+        );
+        $this->addColumn(
+            self::signatureFilename,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::jobTitle,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::firstName,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::lastName,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::activeFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            'consultant.activeFlag'
+        );
+        $this->addColumn(
+            self::weekdayOvertimeFlag,
+            DA_YN,
+            DA_NOT_NULL
+        ); // does user get overtime in weekdays
+        $this->addColumn(
+            self::helpdeskFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            'cns_helpdesk_flag'
+        ); // does user get overtime in weekdays
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::hourlyPayRate,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "cns_hourly_pay_rate"
+        );
+        $this->addColumn(
+            self::teamID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            'consultant.teamID'
+        );
+        $this->addColumn(
+            self::receiveSdManagerEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::changePriorityFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::appearInQueueFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::standardDayHours,
+            DA_FLOAT,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::changeApproverFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::excludeFromStatsFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -129,8 +264,8 @@ class DBEUser extends DBEntity
 
     function getPermission($page)
     {
-        $sql = "select * from permissions inner join " . $this->getTableName() . " on " . $this->getPKName() . " = permissions.userID where page = '$page'";
-        var_dump($sql);
+        $sql = "select * from permissions inner join " . $this->getTableName() . " on " . $this->getPKName(
+            ) . " = permissions.userID where page = '$page'";
         $this->setQueryString($sql);
 
         return (parent::getRows());

@@ -447,7 +447,6 @@ class DBEJCallActivity extends DBECallActivity
             " WHERE caa_callactivityno IN  (" . $IDs . ") AND callactivity.caa_problemno <> 0" .
             " ORDER BY caa_problemno, caa_consno";
         $this->setQueryString($query);
-        var_dump($query);
         return (parent::getRows());
     }
 
