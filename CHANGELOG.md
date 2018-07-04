@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 278 - Consider a negative 2nd Site date check to be a failure
+- Issue 285 - Change length limit to customer item 'Item Text' field
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
