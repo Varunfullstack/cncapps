@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 278 - Consider a negative 2nd Site date check to be a failure
+
 ## [v1.8.3] - 2018-06-29
 ### Fixed
 - Issue 290 - T&M processing error for multiple activity
