@@ -43,6 +43,11 @@ class BUPortalCustomerDocument extends Business
         return ($this->getData($this->dbePortalCustomerDocument, $dsResults));
     }
 
+    /**
+     * @param int|string $customerID
+     * @param DataSet $dsResults
+     * @return bool
+     */
     function getDocumentsByCustomerID($customerID, &$dsResults)
     {
         $this->dbePortalCustomerDocument->setValue('customerID', $customerID);

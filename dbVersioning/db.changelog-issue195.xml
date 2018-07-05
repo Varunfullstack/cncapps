@@ -1,0 +1,43 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue195-1524127856-0">
+        <tagDatabase tag="issue195"/>
+    </changeSet>
+    <changeSet id="issue195-1524127856-1" author="pavwebdev">
+        <sqlFile endDelimiter="#" path="/getToLogHoursFunction.sql" stripComments="true"/>
+        <rollback>
+            <sql>
+                drop function if exists getToLogHours;
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue195-1524127856-2" author="pavwebdev">
+        <sqlFile endDelimiter="#" path="/getLoggedTimeAvgFunction.sql" stripComments="true"/>
+        <rollback>
+            <sql>
+                drop function if exists getLoggedTimeAvg;
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue195-1524127856-3" author="pavwebdev">
+        <sqlFile endDelimiter="#" path="/getLoggedTimeTotalFunction.sql" stripComments="true"/>
+        <rollback>
+            <sql>
+                drop function if exists getLoggedTimeTotal;
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue195-1524127856-4" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="consultant" columnName="excludeFromStatsFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="excludeFromStatsFlag" type="char(1)" value="N"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

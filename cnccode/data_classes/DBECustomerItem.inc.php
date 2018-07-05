@@ -7,6 +7,93 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomerItem extends DBCNCEntity
 {
+    const customerItemID = "customerItemID";
+    const customerID = "customerID";
+    const siteNo = "siteNo";
+    const itemID = "itemID";
+    const warrantyID = "warrantyID";
+    const userID = "userID";
+    const serialNo = "serialNo";
+    const serverName = "serverName";
+    const despatchDate = "despatchDate";
+    const ordheadID = "ordheadID";
+    const porheadID = "porheadID";
+    const curUnitSale = "curUnitSale";
+    const curUnitCost = "curUnitCost";
+    const sOrderDate = "sOrderDate";
+    const users = "users";
+    const expiryDate = "expiryDate";
+    const curGSCBalance = "curGSCBalance";
+    const renewalStatus = "renewalStatus";
+    const customerItemNotes = "customerItemNotes";
+    const slaResponseHours = "slaResponseHours";
+    const months = "months";
+    const salePricePerMonth = "salePricePerMonth";
+    const adslPhone = "adslPhone";
+    const macCode = "macCode";
+    const reference = "reference";
+    const defaultGateway = "defaultGateway";
+    const networkAddress = "networkAddress";
+    const subnetMask = "subnetMask";
+    const routerIPAddress = "routerIPAddress";
+    const hostingUserName = "hostingUserName";
+    const userName = "userName";
+    const password = "password";
+    const etaDate = "etaDate";
+    const installationDate = "installationDate";
+    const costPricePerMonth = "costPricePerMonth";
+    const ispID = "ispID";
+    const dualBroadbandFlag = "dualBroadbandFlag";
+    const dnsCompany = "dnsCompany";
+    const ipCurrentNo = "ipCurrentNo";
+    const mx = "mx";
+    const secureServer = "secureServer";
+    const vpns = "vpns";
+    const oma = "oma";
+    const owa = "owa";
+    const remotePortal = "remotePortal";
+    const smartHost = "smartHost";
+    const preparationRecords = "preparationRecords";
+    const assignedTo = "assignedTo";
+    const initialSpeedTest = "initialSpeedTest";
+    const preMigrationNotes = "preMigrationNotes";
+    const postMigrationNotes = "postMigrationNotes";
+    const docsUpdatedAndChecksCompleted = "docsUpdatedAndChecksCompleted";
+    const invoicePeriodMonths = "invoicePeriodMonths";
+    const totalInvoiceMonths = "totalInvoiceMonths";
+    const declinedFlag = "declinedFlag";
+    const bandwidthAllowance = "bandwidthAllowance";
+    const notes = "notes";
+    const hostingCompany = "hostingCompany";
+    const osPlatform = "osPlatform";
+    const domainNames = "domainNames";
+    const controlPanelUrl = "controlPanelUrl";
+    const ftpAddress = "ftpAddress";
+    const ftpUsername = "ftpUsername";
+    const wwwAddress = "wwwAddress";
+    const websiteDeveloper = "websiteDeveloper";
+    const secondsiteLocationPath = "secondsiteLocationPath";
+    const secondsiteServerDriveLetters = "secondsiteServerDriveLetters";
+    const secondsiteStorageUsedGb = "secondsiteStorageUsedGb";
+    const secondsiteValidationSuspendUntilDate = "secondsiteValidationSuspendUntilDate";
+    const secondsiteSuspendedDate = "secondsiteSuspendedDate";
+    const secondsiteSuspendedByUserID = "secondsiteSuspendedByUserID";
+    const secondsiteImageDelayDays = "secondsiteImageDelayDays";
+    const secondsiteImageDelayDate = "secondsiteImageDelayDate";
+    const secondsiteImageDelayUserID = "secondsiteImageDelayUserID";
+    const secondsiteLocalExcludeFlag = "secondsiteLocalExcludeFlag";
+    const dateGenerated = "dateGenerated";
+    const startDate = "startDate";
+    const qty = "qty";
+    const salePrice = "salePrice";
+    const costPrice = "costPrice";
+    const comment = "comment";
+    const grantNumber = "grantNumber";
+    const renQuotationTypeID = "renQuotationTypeID";
+    const internalNotes = "internalNotes";
+    const autoGenerateContractInvoice = "autoGenerateContractInvoice";
+
+
     /**
      * calls constructor()
      * @access public
@@ -18,105 +105,109 @@ class DBECustomerItem extends DBCNCEntity
     {
         parent::__construct($owner);
         $this->setTableName("custitem");
-        $this->addColumn("customerItemID", DA_ID, DA_NOT_NULL, "custitem.cui_cuino");
-        $this->addColumn("customerID", DA_INTEGER, DA_NOT_NULL, "custitem.cui_custno");
-        $this->addColumn("siteNo", DA_INTEGER, DA_NOT_NULL, "custitem.cui_siteno");
-        $this->addColumn("itemID", DA_INTEGER, DA_NOT_NULL, "custitem.cui_itemno");
-        $this->addColumn("warrantyID", DA_INTEGER, DA_NOT_NULL, "custitem.cui_man_contno");
-        $this->addColumn("userID", DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_consno");
-        $this->addColumn("serialNo", DA_STRING, DA_ALLOW_NULL, "custitem.cui_serial");
-        $this->addColumn("serverName", DA_STRING, DA_ALLOW_NULL, "custitem.cui_cust_ref");
-        $this->addColumn("despatchDate", DA_DATE, DA_ALLOW_NULL, "custitem.cui_desp_date");
-        $this->addColumn("ordheadID", DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_ordno");
-        $this->addColumn("porheadID", DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_porno");
-        $this->addColumn("curUnitSale", DA_FLOAT, DA_ALLOW_NULL, "custitem.cui_sale_price");
-        $this->addColumn("curUnitCost", DA_FLOAT, DA_ALLOW_NULL, "custitem.cui_cost_price");
-        $this->addColumn("sOrderDate", DA_DATE, DA_ALLOW_NULL, "custitem.cui_ord_date");
-        $this->addColumn("users", DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_users");
-        $this->addColumn("expiryDate", DA_DATE, DA_ALLOW_NULL, "custitem.cui_expiry_date"); // only has a value if this is a contract customer item
-        $this->addColumn("curGSCBalance", DA_FLOAT, DA_ALLOW_NULL, "custitem.curGSCBalance");        // only has a value if this is a contract customer item
-        $this->addColumn("renewalStatus", DA_STRING, DA_ALLOW_NULL, "custitem.renewalStatus");      // R=Renewed, D=Renewal Declined
-        $this->addColumn("customerItemNotes", DA_MEMO, DA_ALLOW_NULL, "custitem.itemNotes");
-        $this->addColumn("slaResponseHours", DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_sla_response_hours");
-
-        /* broadband */
-        $this->addColumn("months", DA_INTEGER, DA_ALLOW_NULL, 'custitem.months');
-        $this->addColumn("salePricePerMonth", DA_FLOAT, DA_ALLOW_NULL, "custitem.salePricePerMonth");
-        $this->addColumn("adslPhone", DA_STRING, DA_ALLOW_NULL, "custitem.adslPhone");
-        $this->addColumn("macCode", DA_STRING, DA_ALLOW_NULL, "custitem.macCode");
-        $this->addColumn("reference", DA_STRING, DA_ALLOW_NULL, "custitem.reference");
-        $this->addColumn("defaultGateway", DA_STRING, DA_ALLOW_NULL, "custitem.defaultGateway");
-        $this->addColumn("networkAddress", DA_STRING, DA_ALLOW_NULL, "custitem.networkAddress");
-        $this->addColumn("subnetMask", DA_STRING, DA_ALLOW_NULL, "custitem.subnetMask");
-        $this->addColumn("routerIPAddress", DA_STRING, DA_ALLOW_NULL, "custitem.routerIPAddress");
-        $this->addColumn("hostingUserName", DA_STRING, DA_ALLOW_NULL, "custitem.hostingUserName");
-        $this->addColumn("userName", DA_STRING, DA_ALLOW_NULL, "custitem.userName");
-        $this->addColumn("password", DA_STRING, DA_ALLOW_NULL, "custitem.password");
-        $this->addColumn("etaDate", DA_DATE, DA_ALLOW_NULL, "custitem.etaDate");
-        $this->addColumn("installationDate", DA_DATE, DA_ALLOW_NULL, "custitem.installationDate");
-        $this->addColumn("costPricePerMonth", DA_FLOAT, DA_ALLOW_NULL, "custitem.costPricePerMonth");
-        $this->addColumn("ispID", DA_STRING, DA_ALLOW_NULL, "custitem.ispID");
-        $this->addColumn("dualBroadbandFlag", DA_YN, DA_ALLOW_NULL, "custitem.dualBroadbandFlag");
-        $this->addColumn("dnsCompany", DA_STRING, DA_ALLOW_NULL, "custitem.dnsCompany");
-        $this->addColumn("ipCurrentNo", DA_STRING, DA_ALLOW_NULL, "custitem.ipCurrentNo");
-        $this->addColumn("mx", DA_STRING, DA_ALLOW_NULL, "custitem.mx");
-        $this->addColumn("secureServer", DA_STRING, DA_ALLOW_NULL, "custitem.secureServer");
-        $this->addColumn("vpns", DA_STRING, DA_ALLOW_NULL, "custitem.vpns");
-        $this->addColumn("oma", DA_STRING, DA_ALLOW_NULL, "custitem.oma");
-        $this->addColumn("owa", DA_STRING, DA_ALLOW_NULL, "custitem.owa");
-        $this->addColumn("remotePortal", DA_STRING, DA_ALLOW_NULL, "custitem.remotePortal");
-        $this->addColumn("smartHost", DA_STRING, DA_ALLOW_NULL, "custitem.smartHost");
-        $this->addColumn("preparationRecords", DA_STRING, DA_ALLOW_NULL, "custitem.preparationRecords");
-        $this->addColumn("assignedTo", DA_STRING, DA_ALLOW_NULL, "custitem.assignedTo");
-        $this->addColumn("initialSpeedTest", DA_STRING, DA_ALLOW_NULL, "custitem.initialSpeedTest");
-        $this->addColumn("preMigrationNotes", DA_MEMO, DA_ALLOW_NULL, "custitem.preMigrationNotes");
-        $this->addColumn("postMigrationNotes", DA_MEMO, DA_ALLOW_NULL, "custitem.postMigrationNotes");
-        $this->addColumn("docsUpdatedAndChecksCompleted", DA_STRING, DA_ALLOW_NULL, "custitem.docsUpdatedAndChecksCompleted");
-        $this->addColumn("invoicePeriodMonths", DA_INTEGER, DA_ALLOW_NULL, "custitem.invoicePeriodMonths");
-        $this->addColumn("totalInvoiceMonths", DA_INTEGER, DA_ALLOW_NULL, "custitem.totalInvoiceMonths");
-        $this->addColumn("declinedFlag", DA_YN, DA_ALLOW_NULL, "custitem.declinedFlag");
-        $this->addColumn("bandwidthAllowance", DA_STRING, DA_ALLOW_NULL, "custitem.bandwidthAllowance");
-
-        /* contract */
-        $this->addColumn("notes", DA_MEMO, DA_ALLOW_NULL, 'custitem.notes');
-        $this->addColumn("hostingCompany", DA_STRING, DA_ALLOW_NULL, "custitem.hostingCompany");
-        $this->addColumn("osPlatform", DA_STRING, DA_ALLOW_NULL, "custitem.osPlatform");
-        $this->addColumn("domainNames", DA_STRING, DA_ALLOW_NULL, "custitem.domainNames");
-        $this->addColumn("controlPanelUrl", DA_STRING, DA_ALLOW_NULL, "custitem.controlPanelUrl");
-        $this->addColumn("ftpAddress", DA_STRING, DA_ALLOW_NULL, "custitem.ftpAddress");
-        $this->addColumn("ftpUsername", DA_STRING, DA_ALLOW_NULL, "custitem.ftpUsername");
-        $this->addColumn("wwwAddress", DA_STRING, DA_ALLOW_NULL, "custitem.wwwAddress");
-        $this->addColumn("websiteDeveloper", DA_STRING, DA_ALLOW_NULL, "custitem.websiteDeveloper");
-        $this->addColumn("secondsiteLocationPath", DA_STRING, DA_ALLOW_NULL, "custitem.secondsiteLocationPath");
-        $this->addColumn("secondsiteServerDriveLetters", DA_STRING, DA_ALLOW_NULL, "custitem.secondsiteServerDriveLetters");
-        $this->addColumn("secondsiteStorageUsedGb", DA_STRING, DA_ALLOW_NULL, "custitem.secondsiteStorageUsedGb");
-        $this->addColumn("secondsiteValidationSuspendUntilDate", DA_DATE, DA_ALLOW_NULL, "custitem.secondsiteValidationSuspendUntilDate");
-
-        $this->addColumn("secondsiteSuspendedDate", DA_DATE, DA_ALLOW_NULL, "custitem.secondsiteSuspendedDate");
-
-        $this->addColumn("secondsiteSuspendedByUserID", DA_ID, DA_ALLOW_NULL, "custitem.secondsiteSuspendedByUserID");
-
-        $this->addColumn("secondsiteImageDelayDays", DA_INTEGER, DA_ALLOW_NULL, "custitem.secondsiteImageDelayDays");
-
-        $this->addColumn("secondsiteImageDelayDate", DA_DATE, DA_ALLOW_NULL, "custitem.secondsiteImageDelayDate");
-
-        $this->addColumn("secondsiteImageDelayUserID", DA_ID, DA_ALLOW_NULL, "custitem.secondsiteImageDelayUserID");
-
-        $this->addColumn("secondsiteLocalExcludeFlag", DA_YN, DA_ALLOW_NULL, "custitem.secondsiteLocalExcludeFlag");
-        /* domain */
-        $this->addColumn("dateGenerated", DA_STRING, DA_ALLOW_NULL, "custitem.dateGenerated");
-        /* quotation */
-        $this->addColumn("startDate", DA_DATE, DA_ALLOW_NULL, "custitem.startDate");
-        $this->addColumn("qty", DA_INTEGER, DA_ALLOW_NULL, "custitem.qty");
-        $this->addColumn("salePrice", DA_FLOAT, DA_ALLOW_NULL, "custitem.salePrice");
-        $this->addColumn("costPrice", DA_FLOAT, DA_ALLOW_NULL, "custitem.costPrice");
-        $this->addColumn("comment", DA_STRING, DA_ALLOW_NULL, "custitem.comment");
-        $this->addColumn("grantNumber", DA_STRING, DA_ALLOW_NULL, "custitem.grantNumber");
-        $this->addColumn("renQuotationTypeID", DA_ID, DA_NOT_NULL, 'custitem.renQuotationTypeID');
-
-        $this->addColumn("internalNotes", DA_MEMO, DA_ALLOW_NULL, 'custitem.cui_internal_notes');
-
-        $this->addColumn("autoGenerateContractInvoice", DA_YN, DA_ALLOW_NULL, "custitem.autoGenerateContractInvoice");
+        $this->addColumn(self::customerItemID, DA_ID, DA_NOT_NULL, "custitem.cui_cuino");
+        $this->addColumn(self::customerID, DA_INTEGER, DA_NOT_NULL, "custitem.cui_custno");
+        $this->addColumn(self::siteNo, DA_INTEGER, DA_NOT_NULL, "custitem.cui_siteno");
+        $this->addColumn(self::itemID, DA_INTEGER, DA_NOT_NULL, "custitem.cui_itemno");
+        $this->addColumn(self::warrantyID, DA_INTEGER, DA_NOT_NULL, "custitem.cui_man_contno");
+        $this->addColumn(self::userID, DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_consno");
+        $this->addColumn(self::serialNo, DA_STRING, DA_ALLOW_NULL, "custitem.cui_serial");
+        $this->addColumn(self::serverName, DA_STRING, DA_ALLOW_NULL, "custitem.cui_cust_ref");
+        $this->addColumn(self::despatchDate, DA_DATE, DA_ALLOW_NULL, "custitem.cui_desp_date");
+        $this->addColumn(self::ordheadID, DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_ordno");
+        $this->addColumn(self::porheadID, DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_porno");
+        $this->addColumn(self::curUnitSale, DA_FLOAT, DA_ALLOW_NULL, "custitem.cui_sale_price");
+        $this->addColumn(self::curUnitCost, DA_FLOAT, DA_ALLOW_NULL, "custitem.cui_cost_price");
+        $this->addColumn(self::sOrderDate, DA_DATE, DA_ALLOW_NULL, "custitem.cui_ord_date");
+        $this->addColumn(self::users, DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_users");
+        $this->addColumn(self::expiryDate,
+                         DA_DATE,
+                         DA_ALLOW_NULL,
+                         "custitem.cui_expiry_date"); // only has a value if this is a contract customer item
+        $this->addColumn(self::curGSCBalance,
+                         DA_FLOAT,
+                         DA_ALLOW_NULL,
+                         "custitem.curGSCBalance");        // only has a value if this is a contract customer item
+        $this->addColumn(self::renewalStatus,
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "custitem.renewalStatus");      // R=Renewed, D=Renewal Declined
+        $this->addColumn(self::customerItemNotes, DA_MEMO, DA_ALLOW_NULL, "custitem.itemNotes");
+        $this->addColumn(self::slaResponseHours, DA_INTEGER, DA_ALLOW_NULL, "custitem.cui_sla_response_hours");
+        $this->addColumn(self::months, DA_INTEGER, DA_ALLOW_NULL, 'custitem.months');
+        $this->addColumn(self::salePricePerMonth, DA_FLOAT, DA_ALLOW_NULL, "custitem.salePricePerMonth");
+        $this->addColumn(self::adslPhone, DA_STRING, DA_ALLOW_NULL, "custitem.adslPhone");
+        $this->addColumn(self::macCode, DA_STRING, DA_ALLOW_NULL, "custitem.macCode");
+        $this->addColumn(self::reference, DA_STRING, DA_ALLOW_NULL, "custitem.reference");
+        $this->addColumn(self::defaultGateway, DA_STRING, DA_ALLOW_NULL, "custitem.defaultGateway");
+        $this->addColumn(self::networkAddress, DA_STRING, DA_ALLOW_NULL, "custitem.networkAddress");
+        $this->addColumn(self::subnetMask, DA_STRING, DA_ALLOW_NULL, "custitem.subnetMask");
+        $this->addColumn(self::routerIPAddress, DA_STRING, DA_ALLOW_NULL, "custitem.routerIPAddress");
+        $this->addColumn(self::hostingUserName, DA_STRING, DA_ALLOW_NULL, "custitem.hostingUserName");
+        $this->addColumn(self::userName, DA_STRING, DA_ALLOW_NULL, "custitem.userName");
+        $this->addColumn(self::password, DA_STRING, DA_ALLOW_NULL, "custitem.password");
+        $this->addColumn(self::etaDate, DA_DATE, DA_ALLOW_NULL, "custitem.etaDate");
+        $this->addColumn(self::installationDate, DA_DATE, DA_ALLOW_NULL, "custitem.installationDate");
+        $this->addColumn(self::costPricePerMonth, DA_FLOAT, DA_ALLOW_NULL, "custitem.costPricePerMonth");
+        $this->addColumn(self::ispID, DA_STRING, DA_ALLOW_NULL, "custitem.ispID");
+        $this->addColumn(self::dualBroadbandFlag, DA_YN, DA_ALLOW_NULL, "custitem.dualBroadbandFlag");
+        $this->addColumn(self::dnsCompany, DA_STRING, DA_ALLOW_NULL, "custitem.dnsCompany");
+        $this->addColumn(self::ipCurrentNo, DA_STRING, DA_ALLOW_NULL, "custitem.ipCurrentNo");
+        $this->addColumn(self::mx, DA_STRING, DA_ALLOW_NULL, "custitem.mx");
+        $this->addColumn(self::secureServer, DA_STRING, DA_ALLOW_NULL, "custitem.secureServer");
+        $this->addColumn(self::vpns, DA_STRING, DA_ALLOW_NULL, "custitem.vpns");
+        $this->addColumn(self::oma, DA_STRING, DA_ALLOW_NULL, "custitem.oma");
+        $this->addColumn(self::owa, DA_STRING, DA_ALLOW_NULL, "custitem.owa");
+        $this->addColumn(self::remotePortal, DA_STRING, DA_ALLOW_NULL, "custitem.remotePortal");
+        $this->addColumn(self::smartHost, DA_STRING, DA_ALLOW_NULL, "custitem.smartHost");
+        $this->addColumn(self::preparationRecords, DA_STRING, DA_ALLOW_NULL, "custitem.preparationRecords");
+        $this->addColumn(self::assignedTo, DA_STRING, DA_ALLOW_NULL, "custitem.assignedTo");
+        $this->addColumn(self::initialSpeedTest, DA_STRING, DA_ALLOW_NULL, "custitem.initialSpeedTest");
+        $this->addColumn(self::preMigrationNotes, DA_MEMO, DA_ALLOW_NULL, "custitem.preMigrationNotes");
+        $this->addColumn(self::postMigrationNotes, DA_MEMO, DA_ALLOW_NULL, "custitem.postMigrationNotes");
+        $this->addColumn(self::docsUpdatedAndChecksCompleted,
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "custitem.docsUpdatedAndChecksCompleted");
+        $this->addColumn(self::invoicePeriodMonths, DA_INTEGER, DA_ALLOW_NULL, "custitem.invoicePeriodMonths");
+        $this->addColumn(self::totalInvoiceMonths, DA_INTEGER, DA_ALLOW_NULL, "custitem.totalInvoiceMonths");
+        $this->addColumn(self::declinedFlag, DA_YN, DA_ALLOW_NULL, "custitem.declinedFlag");
+        $this->addColumn(self::bandwidthAllowance, DA_STRING, DA_ALLOW_NULL, "custitem.bandwidthAllowance");
+        $this->addColumn(self::notes, DA_MEMO, DA_ALLOW_NULL, 'custitem.notes');
+        $this->addColumn(self::hostingCompany, DA_STRING, DA_ALLOW_NULL, "custitem.hostingCompany");
+        $this->addColumn(self::osPlatform, DA_STRING, DA_ALLOW_NULL, "custitem.osPlatform");
+        $this->addColumn(self::domainNames, DA_STRING, DA_ALLOW_NULL, "custitem.domainNames");
+        $this->addColumn(self::controlPanelUrl, DA_STRING, DA_ALLOW_NULL, "custitem.controlPanelUrl");
+        $this->addColumn(self::ftpAddress, DA_STRING, DA_ALLOW_NULL, "custitem.ftpAddress");
+        $this->addColumn(self::ftpUsername, DA_STRING, DA_ALLOW_NULL, "custitem.ftpUsername");
+        $this->addColumn(self::wwwAddress, DA_STRING, DA_ALLOW_NULL, "custitem.wwwAddress");
+        $this->addColumn(self::websiteDeveloper, DA_STRING, DA_ALLOW_NULL, "custitem.websiteDeveloper");
+        $this->addColumn(self::secondsiteLocationPath, DA_STRING, DA_ALLOW_NULL, "custitem.secondsiteLocationPath");
+        $this->addColumn(self::secondsiteServerDriveLetters,
+                         DA_STRING,
+                         DA_ALLOW_NULL,
+                         "custitem.secondsiteServerDriveLetters");
+        $this->addColumn(self::secondsiteStorageUsedGb, DA_STRING, DA_ALLOW_NULL, "custitem.secondsiteStorageUsedGb");
+        $this->addColumn(self::secondsiteValidationSuspendUntilDate,
+                         DA_DATE,
+                         DA_ALLOW_NULL,
+                         "custitem.secondsiteValidationSuspendUntilDate");
+        $this->addColumn(self::secondsiteSuspendedDate, DA_DATE, DA_ALLOW_NULL, "custitem.secondsiteSuspendedDate");
+        $this->addColumn(self::secondsiteSuspendedByUserID, DA_ID, DA_ALLOW_NULL, "custitem.secondsiteSuspendedByUserID");
+        $this->addColumn(self::secondsiteImageDelayDays, DA_INTEGER, DA_ALLOW_NULL, "custitem.secondsiteImageDelayDays");
+        $this->addColumn(self::secondsiteImageDelayDate, DA_DATE, DA_ALLOW_NULL, "custitem.secondsiteImageDelayDate");
+        $this->addColumn(self::secondsiteImageDelayUserID, DA_ID, DA_ALLOW_NULL, "custitem.secondsiteImageDelayUserID");
+        $this->addColumn(self::secondsiteLocalExcludeFlag, DA_YN, DA_ALLOW_NULL, "custitem.secondsiteLocalExcludeFlag");
+        $this->addColumn(self::dateGenerated, DA_STRING, DA_ALLOW_NULL, "custitem.dateGenerated");
+        $this->addColumn(self::startDate, DA_DATE, DA_ALLOW_NULL, "custitem.startDate");
+        $this->addColumn(self::qty, DA_INTEGER, DA_ALLOW_NULL, "custitem.qty");
+        $this->addColumn(self::salePrice, DA_FLOAT, DA_ALLOW_NULL, "custitem.salePrice");
+        $this->addColumn(self::costPrice, DA_FLOAT, DA_ALLOW_NULL, "custitem.costPrice");
+        $this->addColumn(self::comment, DA_STRING, DA_ALLOW_NULL, "custitem.comment");
+        $this->addColumn(self::grantNumber, DA_STRING, DA_ALLOW_NULL, "custitem.grantNumber");
+        $this->addColumn(self::renQuotationTypeID, DA_ID, DA_NOT_NULL, 'custitem.renQuotationTypeID');
+        $this->addColumn(self::internalNotes, DA_MEMO, DA_ALLOW_NULL, 'custitem.cui_internal_notes');
+        $this->addColumn(self::autoGenerateContractInvoice, DA_YN, DA_ALLOW_NULL, "custitem.autoGenerateContractInvoice");
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -134,8 +225,8 @@ class DBECustomerItem extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . "=" . $customerID .
-            " AND " . $this->getDBColumnName('itemID') . "=" . $itemID
+            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
+            " AND " . $this->getDBColumnName(self::itemID) . "=" . $itemID
         );
         return (parent::getRows());
     }
@@ -152,8 +243,8 @@ class DBECustomerItem extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . "=" . $customerID .
-            " AND " . $this->getDBColumnName('itemID') . "=" . $itemID
+            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
+            " AND " . $this->getDBColumnName(self::itemID) . "=" . $itemID
         );
         return (parent::getRows());
     }
@@ -167,9 +258,9 @@ class DBECustomerItem extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . "=" . $customerID .
-            " AND " . $this->getDBColumnName('itemID') . "=" . CONFIG_DEF_PREPAY_ITEMID .
-            " AND " . $this->getDBColumnName('renewalStatus') . "<> 'D'"
+            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
+            " AND " . $this->getDBColumnName(self::itemID) . "=" . CONFIG_DEF_PREPAY_ITEMID .
+            " AND " . $this->getDBColumnName(self::renewalStatus) . "<> 'D'"
         );
         return (parent::getRow());
     }
@@ -189,9 +280,9 @@ class DBECustomerItem extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('expiryDate') . "<= DATE_ADD(NOW(), INTERVAL " . $days . " DAY)" .
-            " AND " . $this->getDBColumnName('expiryDate') . ">= NOW()" .
-            " AND " . $this->getDBColumnName('renewalStatus') . "= ''"
+            " WHERE " . $this->getDBColumnName(self::expiryDate) . "<= DATE_ADD(NOW(), INTERVAL " . $days . " DAY)" .
+            " AND " . $this->getDBColumnName(self::expiryDate) . ">= NOW()" .
+            " AND " . $this->getDBColumnName(self::renewalStatus) . "= ''"
         );
         return (parent::getRows());
     }

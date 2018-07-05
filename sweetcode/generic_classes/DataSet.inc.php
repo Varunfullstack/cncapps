@@ -14,6 +14,7 @@ define('DATASET_MSG_NOT_NUMERIC', 'Must be a number');
 define('DATASET_MSG_BAD_DATE_FORMAT', 'Please use DD/MM/YYYY');
 define('DATASET_MSG_INVALID_DATE', 'This date is not valid');
 define('DATASET_MSG_BAD_TIME', 'Please enter a valid time (HH:MM)');
+define('DATASET_MSG_INVALID', 'The given value does not conform with the format');
 
 class DataSet extends DataAccess
 {
@@ -402,51 +403,62 @@ class DataSet extends DataAccess
                         $this->setValue($fieldName, '');
                     } else {                // this is a not null column with a value so validate the data type
                         // Column type validation
-                        switch ($columnType) {
-                            case DA_DATE:
-                                if ($value != '') {
-                                    if (preg_match_all("/([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})/", $value, $regs)) {
-                                        $day = (int)$regs[1][0];
-                                        $month = (int)$regs[2][0];
-                                        $year = (int)$regs[3][0];
-                                        if (checkdate($month, $day, $year)) {
-                                            $this->setValue($fieldName, $year . '-' . $month . '-' . $day);
+
+                        $validationFunction = $this->getValidationFunction($fieldName);
+                        if ($validationFunction) {
+                            if (!$validationFunction($value)) {
+                                $this->setMessage($fieldName, DATASET_MSG_INVALID);
+                                $ret = FALSE;
+                            } else {
+                                $this->setValue($fieldName, $value);
+                            }
+                        } else {
+                            switch ($columnType) {
+                                case DA_DATE:
+                                    if ($value != '') {
+                                        if (preg_match_all("/([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})/", $value, $regs)) {
+                                            $day = (int)$regs[1][0];
+                                            $month = (int)$regs[2][0];
+                                            $year = (int)$regs[3][0];
+                                            if (checkdate($month, $day, $year)) {
+                                                $this->setValue($fieldName, $year . '-' . $month . '-' . $day);
+                                            } else {
+                                                $this->setValue($fieldName, $value);
+                                                $this->setMessage($fieldName, DATASET_MSG_INVALID_DATE);
+                                                $ret = FALSE;
+                                            }
                                         } else {
                                             $this->setValue($fieldName, $value);
-                                            $this->setMessage($fieldName, DATASET_MSG_INVALID_DATE);
+                                            $this->setMessage($fieldName, DATASET_MSG_BAD_DATE_FORMAT);
                                             $ret = FALSE;
                                         }
                                     } else {
-                                        $this->setValue($fieldName, $value);
-                                        $this->setMessage($fieldName, DATASET_MSG_BAD_DATE_FORMAT);
-                                        $ret = FALSE;
+                                        $value = '0000-00-00';    // signifies no date
                                     }
-                                } else {
-                                    $value = '0000-00-00';    // signifies no date
-                                }
-                                break;
-                            case DA_TIME:
-                                if ($value != '') {
-                                    if (!$this->isTime($value)) {
-                                        $this->setMessage($fieldName, DATASET_MSG_BAD_TIME);
+                                    break;
+                                case DA_TIME:
+                                    if ($value != '') {
+                                        if (!$this->isTime($value)) {
+                                            $this->setMessage($fieldName, DATASET_MSG_BAD_TIME);
+                                            $ret = FALSE;
+                                        }
+                                        $this->setValue($fieldName, $value);
+                                    }
+                                    break;
+                                case DA_INTEGER:
+                                case DA_ID:
+                                case DA_FLOAT:
+                                    $value = trim($value);                // remove trailing spaces
+                                    if (!is_numeric($value)) {
+                                        $this->setMessage($fieldName, DATASET_MSG_NOT_NUMERIC);
                                         $ret = FALSE;
                                     }
                                     $this->setValue($fieldName, $value);
-                                }
-                                break;
-                            case DA_INTEGER:
-                            case DA_ID:
-                            case DA_FLOAT:
-                                $value = trim($value);                // remove trailing spaces
-                                if (!is_numeric($value)) {
-                                    $this->setMessage($fieldName, DATASET_MSG_NOT_NUMERIC);
-                                    $ret = FALSE;
-                                }
-                                $this->setValue($fieldName, $value);
-                                break;
-                            default:
-                                $this->setValue($fieldName, $value);
-                                break;
+                                    break;
+                                default:
+                                    $this->setValue($fieldName, $value);
+                                    break;
+                            }
                         }
                     }
                 }
@@ -497,7 +509,10 @@ class DataSet extends DataAccess
     {
         if ($dateDMY != '') {
             $dateArray = explode('/', $dateDMY);
-            return ($dateArray[2] . '-' . str_pad($dateArray[1], 2, '0', STR_PAD_LEFT) . '-' . str_pad($dateArray[0], 2, '0', STR_PAD_LEFT));
+            return ($dateArray[2] . '-' . str_pad($dateArray[1], 2, '0', STR_PAD_LEFT) . '-' . str_pad($dateArray[0],
+                                                                                                       2,
+                                                                                                       '0',
+                                                                                                       STR_PAD_LEFT));
         } else {
             return '';
         }
@@ -528,6 +543,23 @@ class DataSet extends DataAccess
                 $this->quoteForColumnValues;
         }
         return $colString;
+    }
+
+    /**
+     * @param $ixPassedColumn
+     * @return Callable
+     */
+    private function getValidationFunction($ixPassedColumn)
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            $ret = $this->colValidation[$ixColumn];
+        } else {
+            $this->raiseError("GetValidationFunction(): Column " . $ixPassedColumn . " out of range");
+            $ret = DA_OUT_OF_RANGE;
+        }
+        return $ret;
+
     }
 }
 

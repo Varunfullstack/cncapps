@@ -1,0 +1,171 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src=".javascript/handlebars-v4.0.11.js"></script>
+<script type="text/javascript" src=".javascript/mustache.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
+        integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o=" crossorigin="anonymous"></script>
+<style>
+    .chart {
+        width: 100%;
+        min-height: 200px;
+    }
+
+    .item {
+        width: 30%;
+        margin: 8px;
+    }
+
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+
+</style>
+<script id="member-item-template" type="text/template">
+    <div class="item">
+        <button class="details" type="button" data-user-id="{% userID %}">Show Details</button>
+        <br>
+        <div id="{% id %}" class="chart">
+
+        </div>
+    </div>
+</script>
+<script type="text/javascript">
+    var userLevel = {userLevel};
+    var userID = {userID};
+    var isManager = {isManager};
+    var defaultTeam = userLevel <= 3 ? userLevel : 1;
+
+    $(function () {
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages': ['corechart']});
+
+        var teamSelector = $('#teamSelector');
+
+        if (isManager) {
+            teamSelector.show();
+        } else {
+            defaultTeam = userLevel;
+        }
+
+        $('body').on('click', '.details', function () {
+            var userId = $(this).data().userId;
+            var today = moment();
+            var sixtyDaysAgo = moment().subtract(60, 'days');
+            document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
+        });
+
+        teamSelector.change(function () {
+            drawIndividualCharts($(this).val());
+        });
+        Mustache.tags = ['{%', '%}'];
+
+
+        function drawIndividualCharts(teamId) {
+            var that = this;
+            this.ajaxOptions = {
+                url: '?action=lastWeekHelpDesk',
+                dataType: 'json',
+                data: {days: this.days, team: teamId}
+            };
+            this.data = $.ajax(this.ajaxOptions);
+            this.container = $('#teamIndividualCharts');
+            this.container.html('');
+            this.source = document.getElementById("member-item-template").innerHTML;
+            this.data.then(function (data) {
+                data.forEach(function (item) {
+
+
+                    var id = teamId + '-' + item.userID;
+                    var context = {
+                        name: item.userName,
+                        id: id,
+                        userID: item.userID
+                    };
+
+                    var html = Mustache.to_html(that.source, context);
+                    that.container.append(html);
+
+                    var test = that.container.find('#' + id);
+
+                    var storedOptions = {
+                        title: item.userName,
+                        trendlines: {0: {}},
+                        legend: 'none'
+                    };
+
+                    var chart = new google.visualization.ColumnChart(test[0]);
+
+
+                    var dataTable = new google.visualization.DataTable(
+                        {cols: item.cols, rows: convertToActualDate(item.rows)}
+                    );
+
+                    chart.draw(dataTable, storedOptions);
+                })
+            })
+
+
+        }
+
+        function convertToActualDate(rows) {
+
+            rows.forEach(function (row) {
+                row.c[0].v = moment(row.c[0].v).toDate();
+            });
+            return rows;
+        }
+
+
+        google.charts.setOnLoadCallback(function () {
+            drawIndividualCharts(teamSelector.val());
+        });
+    })
+
+</script>
+<style>
+    .membersSelectors {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+    }
+
+    .memberItem {
+        display: flex;
+        width: 160px;
+        flex-direction: row;
+        height: 50px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .memberItem .name {
+        flex: 0 0 50%;
+    }
+
+    .memberItem .selectors {
+        flex: 0 0 50%;
+    }
+
+    .memberItem .selector {
+        flex-direction: row;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .memberItem .selector .item {
+        flex: 0 0 50%;
+    }
+</style>
+<br>
+<select name="team" class="teamSelector" id="teamSelector" hidden>
+    <option value="1" selected>Help Desk Team</option>
+    <option value="2">Escalations Team</option>
+    <option value="3">Implementations Team</option>
+</select>
+<br>
+<br>
+<div id="teamIndividualCharts" class="container">
+
+</div>

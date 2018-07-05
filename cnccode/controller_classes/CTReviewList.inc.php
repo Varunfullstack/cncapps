@@ -8,7 +8,7 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 
 class CTReviewList extends CTCNC
 {
@@ -67,13 +67,13 @@ class CTReviewList extends CTCNC
                     $this->buildLink(
                         'CustomerCRM.php',
                         array(
-                            'action' => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue('customerID')
+                            'action'     => 'displayEditForm',
+                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
                         )
                     );
 
-                if ($dsCustomer->getValue('reviewUserID')) {
-                    $buUser->getUserByID($dsCustomer->getValue('reviewUserID'), $dsUser);
+                if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
+                    $buUser->getUserByID($dsCustomer->getValue(DBECustomer::reviewUserID), $dsUser);
                     $user = $dsUser->getValue('name');
                 } else {
                     $user = false;
@@ -87,13 +87,13 @@ class CTReviewList extends CTCNC
                 $this->template->set_var(
 
                     array(
-                        'customerName' => $dsCustomer->getValue('name'),
-                        'reviewDate' => (new DateTime($dsCustomer->getValue('reviewDate')))->format('d/m/Y'),
-                        'reviewTime' => $dsCustomer->getValue('reviewTime'),
-                        'reviewAction' => substr($dsCustomer->getValue('reviewAction'), 0, 50),
-                        'reviewUser' => $user,
-                        'linkURL' => $linkURL,
-                        'reportURL' => $reportUrl
+                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
+                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::reviewDate)))->format('d/m/Y'),
+                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
+                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::reviewAction), 0, 50),
+                        'reviewUser'   => $user,
+                        'linkURL'      => $linkURL,
+                        'reportURL'    => $reportUrl
                     )
 
                 );

@@ -7,21 +7,21 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomer extends DBCNCEntity
 {
-    const CustomerID = "CustomerID";
-    const Name = "Name";
-    const RegNo = "RegNo";
-    const InvoiceSiteNo = "InvoiceSiteNo";
-    const DeliverSiteNo = "DeliverSiteNo";
-    const MailshotFlag = "MailshotFlag";
-    const CreateDate = "CreateDate";
-    const ReferredFlag = "ReferredFlag";
-    const PCXFlag = "PCXFlag";
-    const CustomerTypeID = "CustomerTypeID";
-    const ProspectFlag = "ProspectFlag";
-//    const OthersEmailMainFlag = "OthersEmailMainFlag";
-//    const WorkStartedEmailMainFlag = "WorkStartedEmailMainFlag";
-//    const AutoCloseEmailMainFlag = "AutoCloseEmailMainFlag";
-    const GSCTopUpAmount = "GSCTopUpAmount";
+    const customerID = "customerID";
+    const name = "name";
+    const regNo = "regNo";
+    const invoiceSiteNo = "invoiceSiteNo";
+    const deliverSiteNo = "deliverSiteNo";
+    const mailshotFlag = "mailshotFlag";
+    const createDate = "createDate";
+    const referredFlag = "referredFlag";
+    const pcxFlag = "pcxFlag";
+    const customerTypeID = "customerTypeID";
+    const prospectFlag = "prospectFlag";
+//    const othersEmailMainFlag = "othersEmailMainFlag";
+//    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
+//    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
+    const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
     const noOfPCs = "noOfPCs";
@@ -45,22 +45,23 @@ class DBECustomer extends DBCNCEntity
     const slaP3 = "slaP3";
     const slaP4 = "slaP4";
     const slaP5 = "slaP5";
-    const reviewMeetingFrequencyMonths = "reviewMeetingFrequencyMonths";
+    const sendContractEmail = "sendContractEmail";
+    const sendTandcEmail = "sendTandcEmail";
     const lastReviewMeetingDate = "lastReviewMeetingDate";
-    const reviewMeetingEmailSentFlag = "reviewMeetingEmailSentFlag";
+    const reviewMeetingFrequencyMonths = "reviewMeetingFrequencyMonths";
     const accountManagerUserID = "accountManagerUserID";
-    const CustomerLeadStatusID = "CustomerLeadStatusID";
-    const DateMeetingConfirmed = 'DateMeetingConfirmed';
-    const MeetingDateTime = 'MeetingDateTime';
-    const InviteSent = 'InviteSent';
-    const ReportProcessed = 'ReportProcessed';
-    const ReportSent = 'ReportSent';
-    const CrmComments = 'CrmComments';
-    const CompanyBackground = 'CompanyBackground';
-    const DecisionMakerBackground = 'DecisionMakerBackground';
-    const OpportunityDeal = 'OpportunityDeal';
-    const Rating = 'Rating';
-
+    const reviewMeetingEmailSentFlag = "reviewMeetingEmailSentFlag";
+    const customerLeadStatusID = "customerLeadStatusID";
+    const dateMeetingConfirmed = 'dateMeetingConfirmed';
+    const meetingDateTime = 'meetingDateTime';
+    const inviteSent = 'inviteSent';
+    const reportProcessed = 'reportProcessed';
+    const reportSent = 'reportSent';
+    const crmComments = 'crmComments';
+    const companyBackground = 'companyBackground';
+    const decisionMakerBackground = 'decisionMakerBackground';
+    const opportunityDeal = 'opportunityDeal';
+    const rating = 'rating';
 
     /**
      * calls constructor()
@@ -73,59 +74,313 @@ class DBECustomer extends DBCNCEntity
     {
         parent::__construct($owner);
         $this->setTableName("Customer");
-        $this->addColumn(self::CustomerID, DA_ID, DA_NOT_NULL, "cus_custno");
-        $this->addColumn(self::Name, DA_STRING, DA_NOT_NULL, "cus_name");
-        $this->addColumn(self::RegNo, DA_STRING, DA_NOT_NULL, "cus_reg_no");
-        $this->addColumn(self::InvoiceSiteNo, DA_ID, DA_ALLOW_NULL, "cus_inv_siteno");
-        $this->addColumn(self::DeliverSiteNo, DA_ID, DA_ALLOW_NULL, "cus_del_siteno"); // have to be strings so zero sites don't go empty
-        $this->addColumn(self::MailshotFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_mailshot");
-        $this->addColumn(self::CreateDate, DA_DATE, DA_NOT_NULL, "cus_create_date");
-        $this->addColumn(self::ReferredFlag, DA_YN_FLAG, DA_ALLOW_NULL, "cus_referred");
-        $this->addColumn(self::PCXFlag, DA_YN_FLAG, DA_ALLOW_NULL, "cus_pcx");
-        $this->addColumn(self::CustomerTypeID, DA_ID, DA_NOT_NULL, "cus_ctypeno");
-        $this->addColumn(self::ProspectFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_prospect");
-//        $this->addColumn(self::OthersEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_others_email_main_flag");
-//        $this->addColumn(self::WorkStartedEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_work_started_email_main_flag");
-//        $this->addColumn(self::AutoCloseEmailMainFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_auto_close_email_main_flag");
-        $this->addColumn(self::GSCTopUpAmount, DA_FLOAT, DA_NOT_NULL);                        // amount to top up general support contract by
-        $this->addColumn(self::modifyDate, DA_DATETIME, DA_ALLOW_NULL);                        // amount to
-        $this->addColumn(self::modifyUserID, DA_INTEGER, DA_ALLOW_NULL);
-        $this->addColumn(self::noOfPCs, DA_INTEGER, DA_ALLOW_NULL);
-        $this->addColumn(self::noOfServers, DA_INTEGER, DA_ALLOW_NULL);
-        $this->addColumn(self::noOfSites, DA_INTEGER, DA_ALLOW_NULL);
-        $this->addColumn(self::comments, DA_MEMO, DA_ALLOW_NULL);
-        $this->addColumn(self::reviewDate, DA_DATE, DA_ALLOW_NULL);
-        $this->addColumn(self::reviewTime, DA_TIME, DA_ALLOW_NULL);
-        $this->addColumn(self::reviewAction, DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn(self::reviewUserID, DA_ID, DA_ALLOW_NULL);
-        $this->addColumn(self::sectorID, DA_ID, DA_NOT_NULL, "cus_sectorno");
-        $this->addColumn(self::becameCustomerDate, DA_DATE, DA_ALLOW_NULL, 'cus_became_customer_date');
-        $this->addColumn(self::droppedCustomerDate, DA_DATE, DA_ALLOW_NULL, 'cus_dropped_customer_date');
-        $this->addColumn(self::leadStatusID, DA_ID, DA_ALLOW_NULL, 'cus_leadstatusno');
-        $this->addColumn(self::techNotes, DA_STRING, DA_ALLOW_NULL, 'cus_tech_notes');
-        $this->addColumn(self::specialAttentionFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_special_attention_flag");
-        $this->addColumn(self::specialAttentionEndDate, DA_DATE, DA_ALLOW_NULL, 'cus_special_attention_end_date');
-        $this->addColumn(self::support24HourFlag, DA_YN_FLAG, DA_NOT_NULL, "cus_support_24_hour_flag");
-        $this->addColumn(self::slaP1, DA_INTEGER, DA_NOT_NULL, "cus_sla_p1");
-        $this->addColumn(self::slaP2, DA_INTEGER, DA_NOT_NULL, "cus_sla_p2");
-        $this->addColumn(self::slaP3, DA_INTEGER, DA_NOT_NULL, "cus_sla_p3");
-        $this->addColumn(self::slaP4, DA_INTEGER, DA_NOT_NULL, "cus_sla_p4");
-        $this->addColumn(self::slaP5, DA_INTEGER, DA_NOT_NULL, "cus_sla_p5");
-        $this->addColumn(self::reviewMeetingFrequencyMonths, DA_INTEGER, DA_ALLOW_NULL, 'cus_review_meeting_frequency_months');
-        $this->addColumn(self::lastReviewMeetingDate, DA_DATE, DA_ALLOW_NULL, 'cus_last_review_meeting_date');
-        $this->addColumn(self::reviewMeetingEmailSentFlag, DA_YN, DA_ALLOW_NULL, 'cus_review_meeting_email_sent_flag');
-        $this->addColumn(self::accountManagerUserID, DA_ID, DA_ALLOW_NULL, "cus_account_manager_consno");
-        $this->addColumn(self::CustomerLeadStatusID, DA_ID, DA_ALLOW_NULL, "customer_lead_status_id");
-        $this->addColumn(self::DateMeetingConfirmed, DA_DATE, DA_ALLOW_NULL, 'date_meeting_confirmed');
-        $this->addColumn(self::MeetingDateTime, DA_DATETIME, DA_ALLOW_NULL, 'meeting_datetime');
-        $this->addColumn(self::InviteSent, DA_BOOLEAN, DA_NOT_NULL, "invite_sent");
-        $this->addColumn(self::ReportProcessed, DA_BOOLEAN, DA_NOT_NULL, "report_processed");
-        $this->addColumn(self::ReportSent, DA_BOOLEAN, DA_NOT_NULL, "report_sent");
-        $this->addColumn(self::CrmComments, DA_STRING, DA_ALLOW_NULL, "crm_comments");
-        $this->addColumn(self::CompanyBackground, DA_STRING, DA_ALLOW_NULL, "company_background");
-        $this->addColumn(self::DecisionMakerBackground, DA_STRING, DA_ALLOW_NULL, "decision_maker_background");
-        $this->addColumn(self::OpportunityDeal, DA_STRING, DA_ALLOW_NULL, "opportunity_deal");
-        $this->addColumn(self::Rating, DA_INTEGER, DA_ALLOW_NULL, "rating");
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_NOT_NULL,
+            "cus_custno"
+        );
+        $this->addColumn(
+            self::name,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            self::regNo,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cus_reg_no"
+        );
+        $this->addColumn(
+            self::invoiceSiteNo,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "cus_inv_siteno"
+        );
+        $this->addColumn(
+            self::deliverSiteNo,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "cus_del_siteno"
+        ); // have to be strings so zero sites don't go empty
+        $this->addColumn(
+            self::mailshotFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL,
+            "cus_mailshot"
+        );
+        $this->addColumn(
+            self::createDate,
+            DA_DATE,
+            DA_NOT_NULL,
+            "cus_create_date"
+        );
+        $this->addColumn(
+            self::referredFlag,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL,
+            "cus_referred"
+        );
+        $this->addColumn(
+            self::pcxFlag,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL,
+            "cus_pcx"
+        );
+        $this->addColumn(
+            self::customerTypeID,
+            DA_ID,
+            DA_NOT_NULL,
+            "cus_ctypeno"
+        );
+        $this->addColumn(
+            self::prospectFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL,
+            "cus_prospect"
+        );
+        $this->addColumn(
+            self::gscTopUpAmount,
+            DA_FLOAT,
+            DA_NOT_NULL
+        );                        // amount to top up general support contract by
+        $this->addColumn(
+            self::modifyDate,
+            DA_DATETIME,
+            DA_ALLOW_NULL
+        );                        // amount to
+        $this->addColumn(
+            self::modifyUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::noOfPCs,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::noOfServers,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::noOfSites,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::comments,
+            DA_MEMO,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::reviewDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::reviewTime,
+            DA_TIME,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::reviewAction,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::reviewUserID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::sectorID,
+            DA_ID,
+            DA_NOT_NULL,
+            "cus_sectorno"
+        );
+        $this->addColumn(
+            self::becameCustomerDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'cus_became_customer_date'
+        );
+        $this->addColumn(
+            self::droppedCustomerDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'cus_dropped_customer_date'
+        );
+        $this->addColumn(
+            self::leadStatusID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            'cus_leadstatusno'
+        );
+        $this->addColumn(
+            self::techNotes,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'cus_tech_notes'
+        );
+        $this->addColumn(
+            self::specialAttentionFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL,
+            "cus_special_attention_flag"
+        );
+        $this->addColumn(
+            self::specialAttentionEndDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'cus_special_attention_end_date'
+        );
+        $this->addColumn(
+            self::support24HourFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL,
+            "cus_support_24_hour_flag"
+        );
+        $this->addColumn(
+            self::slaP1,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_sla_p1"
+        );
+        $this->addColumn(
+            self::slaP2,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_sla_p2"
+        );
+        $this->addColumn(
+            self::slaP3,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_sla_p3"
+        );
+        $this->addColumn(
+            self::slaP4,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_sla_p4"
+        );
+        $this->addColumn(
+            self::slaP5,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_sla_p5"
+        );
+        $this->addColumn(
+            self::sendContractEmail,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_send_contract_email"
+        );
+        $this->addColumn(
+            self::sendTandcEmail,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "cus_send_tandc_email"
+        );
+        $this->addColumn(
+            self::lastReviewMeetingDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'cus_last_review_meeting_date'
+        );
+        $this->addColumn(
+            self::reviewMeetingFrequencyMonths,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'cus_review_meeting_frequency_months'
+        );
+        $this->addColumn(
+            self::lastReviewMeetingDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'cus_last_review_meeting_date'
+        );
+        $this->addColumn(
+            self::reviewMeetingEmailSentFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            'cus_review_meeting_email_sent_flag'
+        );
+        $this->addColumn(
+            self::accountManagerUserID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "cus_account_manager_consno"
+        );
+        $this->addColumn(
+            self::customerLeadStatusID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "customer_lead_status_id"
+        );
+        $this->addColumn(
+            self::dateMeetingConfirmed,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'date_meeting_confirmed'
+        );
+        $this->addColumn(
+            self::meetingDateTime,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
+            'meeting_datetime'
+        );
+        $this->addColumn(
+            self::inviteSent,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "invite_sent"
+        );
+        $this->addColumn(
+            self::reportProcessed,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "report_processed"
+        );
+        $this->addColumn(
+            self::reportSent,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "report_sent"
+        );
+        $this->addColumn(
+            self::crmComments,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "crm_comments"
+        );
+        $this->addColumn(
+            self::companyBackground,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "company_background"
+        );
+        $this->addColumn(
+            self::decisionMakerBackground,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "decision_maker_background"
+        );
+        $this->addColumn(
+            self::opportunityDeal,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "opportunity_deal"
+        );
+        $this->addColumn(
+            self::rating,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "rating"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -144,19 +399,18 @@ class DBECustomer extends DBCNCEntity
      * @return bool Success
      */
     function getRowsByNameMatch(
-        $contact,
-        $phoneNo,
-        $name,
-        $address,
-        $newCustomerFromDate,
-        $newCustomerToDate,
-        $droppedCustomerFromDate,
-        $droppedCustomerToDate
+        $contact = null,
+        $phoneNo = null,
+        $name = null,
+        $address = null,
+        $newCustomerFromDate = null,
+        $newCustomerToDate = null,
+        $droppedCustomerFromDate = null,
+        $droppedCustomerToDate = null
     )
     {
 
         $this->setMethodName("getRowsByNameMatch");
-        $ret = FALSE;
         if ($contact == '' & $phoneNo == '' & $name == '' & $address == '' & $newCustomerFromDate == '' & $newCustomerToDate == '' & $droppedCustomerFromDate == '' & $droppedCustomerToDate == '') {
             $this->raiseError('Either contact, phone, customer name, address or dates must be set');
         }
@@ -201,27 +455,41 @@ class DBECustomer extends DBCNCEntity
 
         if ($newCustomerFromDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('becameCustomerDate') . ">='" . mysqli_real_escape_string($this->db->link_id(), $newCustomerFromDate) . "'";
+                " AND " . $this->getDBColumnName(self::becameCustomerDate) . ">='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $newCustomerFromDate
+                ) . "'";
         }
         if ($newCustomerToDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('becameCustomerDate') . "<='" . mysqli_real_escape_string($this->db->link_id(), $newCustomerToDate) . "'";
+                " AND " . $this->getDBColumnName(self::becameCustomerDate) . "<='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $newCustomerToDate
+                ) . "'";
         }
 
         if ($droppedCustomerFromDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('droppedCustomerDate') . ">='" . mysqli_real_escape_string($this->db->link_id(), $droppedCustomerFromDate) . "'";
+                " AND " . $this->getDBColumnName(self::droppedCustomerDate) . ">='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $droppedCustomerFromDate
+                ) . "'";
         }
         if ($droppedCustomerToDate != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('droppedCustomerDate') . "<='" . mysqli_real_escape_string($this->db->link_id(), $droppedCustomerToDate) . "'";
+                " AND " . $this->getDBColumnName(self::droppedCustomerDate) . "<='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $droppedCustomerToDate
+                ) . "'";
         }
 
         if ($name != '') {
-            $queryString .= " AND " . $this->getDBColumnName('Name') . " LIKE '%" . $name . "%'";
+            $queryString .= " AND " . $this->getDBColumnName(self::name) . " LIKE '%" . $name . "%'";
         }
 
-        $queryString .= " GROUP BY " . $this->getDBColumnName('CustomerID') . " ORDER BY " . $this->getDBColumnName('Name');
+        $queryString .= " GROUP BY " . $this->getDBColumnName(self::customerID) . " ORDER BY " . $this->getDBColumnName(
+                self::name
+            );
 
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
@@ -234,10 +502,9 @@ class DBECustomer extends DBCNCEntity
      * @access public
      * @return bool Success
      */
-    function getReviewProspectRow($prospect = true)
+    function getReviewProspectRow()
     {
         $this->setMethodName("getReviewProspectRow");
-        $ret = FALSE;
 
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
@@ -264,7 +531,6 @@ class DBECustomer extends DBCNCEntity
     function countReviewRows()
     {
         $this->setMethodName("countReviewRows");
-        $ret = FALSE;
         $queryString =
             "SELECT COUNT(*)
 			 FROM " . $this->getTableName();
@@ -333,6 +599,65 @@ class DBECustomer extends DBCNCEntity
 
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
+        return $ret;
+    }
+
+    function getReviewList($userID,
+                           $sortColumn = false
+    )
+    {
+        $this->setMethodName("getReviewList");
+        $queryString =
+
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            "	WHERE			
+				( reviewDate IS NOT NULL and reviewDate <> '0000-00-00' )
+				and reviewDate <= CURDATE()";
+
+        if ($userID) {
+            $queryString .= "
+				AND reviewUserID = " . $userID;
+        }
+        if ($sortColumn) {
+            $queryString .= " order by $sortColumn";
+
+        } else {
+            $queryString .= "
+				order by
+					reviewDate, reviewTime";
+        }
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    function getRenewalRequests()
+    {
+        $this->setMethodName("getRenewalRequests");
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::sendContractEmail) . " <> ''";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    function getTandcRequests()
+    {
+
+        $this->setMethodName("getTandcRequests");
+        $queryString =
+
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::sendTandcEmail) . " <> ''";
+
+        $this->setQueryString($queryString);
+        $ret = (self::getRows());
         return $ret;
     }
 }

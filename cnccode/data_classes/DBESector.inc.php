@@ -7,6 +7,9 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESector extends DBEntity
 {
+    const sectorID = "sectorID";
+    const description = "description";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +21,8 @@ class DBESector extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("sector");
-        $this->addColumn("sectorID", DA_ID, DA_NOT_NULL, 'sec_sectorno');
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, 'sec_desc');
+        $this->addColumn(self::sectorID, DA_ID, DA_NOT_NULL, 'sec_sectorno');
+        $this->addColumn(self::description, DA_STRING, DA_NOT_NULL, 'sec_desc');
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

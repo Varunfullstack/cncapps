@@ -6,8 +6,8 @@
  * Time: 17:04
  */
 
+
  // I don´t like conflicts
- 
  
 if (!isset($argv[0])) {
     die('This script may only be called from the os command line');

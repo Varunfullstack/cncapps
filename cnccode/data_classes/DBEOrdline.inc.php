@@ -7,6 +7,23 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdline extends DBEntity
 {
+    const lineType = "lineType";
+    const ordheadID = "ordheadID";
+    const sequenceNo = "sequenceNo";
+    const customerID = "customerID";
+    const itemID = "itemID";
+    const stockcat = "stockcat";
+    const description = "description";
+    const qtyOrdered = "qtyOrdered";
+    const qtyDespatched = "qtyDespatched";
+    const qtyLastDespatched = "qtyLastDespatched";
+    const supplierID = "supplierID";
+    const curUnitCost = "curUnitCost";
+    const curTotalCost = "curTotalCost";
+    const curUnitSale = "curUnitSale";
+    const curTotalSale = "curTotalSale";
+    const renewalCustomerItemID = "renewalCustomerItemID";
+
     /**
      * calls constructor()
      * @access public
@@ -18,22 +35,102 @@ class DBEOrdline extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("ordline");
-        $this->addColumn("lineType", DA_STRING, DA_NOT_NULL, "odl_type");
-        $this->addColumn("ordheadID", DA_ID, DA_NOT_NULL, "odl_ordno");
-        $this->addColumn("sequenceNo", DA_INTEGER, DA_NOT_NULL, "odl_item_no");
-        $this->addColumn("customerID", DA_ID, DA_NOT_NULL, "odl_custno");
-        $this->addColumn("itemID", DA_ID, DA_ALLOW_NULL, "odl_itemno");
-        $this->addColumn("stockcat", DA_STRING, DA_ALLOW_NULL, "odl_stockcat");
-        $this->addColumn("description", DA_STRING, DA_ALLOW_NULL, "odl_desc");
-        $this->addColumn("qtyOrdered", DA_FLOAT, DA_ALLOW_NULL, "odl_qty_ord");
-        $this->addColumn("qtyDespatched", DA_FLOAT, DA_ALLOW_NULL, "odl_qty_desp");
-        $this->addColumn("qtyLastDespatched", DA_FLOAT, DA_ALLOW_NULL, "odl_qty_last_desp");
-        $this->addColumn("supplierID", DA_ID, DA_ALLOW_NULL, "odl_suppno");
-        $this->addColumn("curUnitCost", DA_FLOAT, DA_ALLOW_NULL, "odl_d_unit");
-        $this->addColumn("curTotalCost", DA_FLOAT, DA_ALLOW_NULL, "odl_d_total");
-        $this->addColumn("curUnitSale", DA_FLOAT, DA_ALLOW_NULL, "odl_e_unit");
-        $this->addColumn("curTotalSale", DA_FLOAT, DA_ALLOW_NULL, "odl_e_total");
-        $this->addColumn("renewalCustomerItemID", DA_ID, DA_ALLOW_NULL, "odl_renewal_cuino");
+        $this->addColumn(
+            self::lineType,
+            DA_STRING,
+            DA_NOT_NULL,
+            "odl_type"
+        );
+        $this->addColumn(
+            self::ordheadID,
+            DA_ID,
+            DA_NOT_NULL,
+            "odl_ordno"
+        );
+        $this->addColumn(
+            self::sequenceNo,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "odl_item_no"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_NOT_NULL,
+            "odl_custno"
+        );
+        $this->addColumn(
+            self::itemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "odl_itemno"
+        );
+        $this->addColumn(
+            self::stockcat,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odl_stockcat"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odl_desc"
+        );
+        $this->addColumn(
+            self::qtyOrdered,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_qty_ord"
+        );
+        $this->addColumn(
+            self::qtyDespatched,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_qty_desp"
+        );
+        $this->addColumn(
+            self::qtyLastDespatched,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_qty_last_desp"
+        );
+        $this->addColumn(
+            self::supplierID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "odl_suppno"
+        );
+        $this->addColumn(
+            self::curUnitCost,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_d_unit"
+        );
+        $this->addColumn(
+            self::curTotalCost,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_d_total"
+        );
+        $this->addColumn(
+            self::curUnitSale,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_e_unit"
+        );
+        $this->addColumn(
+            self::curTotalSale,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "odl_e_total"
+        );
+        $this->addColumn(
+            self::renewalCustomerItemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "odl_renewal_cuino"
+        );
         $this->setAddColumnsOff();
     }
 
@@ -43,7 +140,9 @@ class DBEOrdline extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
-            'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID')
+            'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName(
+                'ordheadID'
+            ) . ' = ' . $this->getValue('ordheadID')
         );
         return (parent::runQuery());
     }
@@ -68,7 +167,10 @@ class DBEOrdline extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         if ($this->getValue('sequenceNo') == '') {
-            $this->setValue('sequenceNo', 0);
+            $this->setValue(
+                'sequenceNo',
+                0
+            );
         }
         $sequenceNo = $this->getDBColumnName('sequenceNo');
         $ordheadID = $this->getDBColumnName('ordheadID');
@@ -95,7 +197,10 @@ class DBEOrdline extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         if ($this->getValue('sequenceNo') == '') {
-            $this->setValue('sequenceNo', 0);
+            $this->setValue(
+                'sequenceNo',
+                0
+            );
         }
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
@@ -121,7 +226,10 @@ class DBEOrdline extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         if ($this->getValue('sequenceNo') == '') {
-            $this->setValue('sequenceNo', 0);
+            $this->setValue(
+                'sequenceNo',
+                0
+            );
         }
         // current row into temporary buffer row: sequenceNo = -99
         $this->setQueryString(
@@ -182,7 +290,9 @@ class DBEOrdline extends DBEntity
         return (parent::getRows());
     }
 
-    function getRowBySequence($ordheadID, $sequenceNo)
+    function getRowBySequence($ordheadID,
+                              $sequenceNo
+    )
     {
         $this->setMethodName("getRow");
 

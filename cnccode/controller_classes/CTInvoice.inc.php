@@ -168,7 +168,7 @@ class CTInvoice extends CTCNC
         $urlCustomerPopup = $this->buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
@@ -199,25 +199,25 @@ class CTInvoice extends CTCNC
         if ($dsSearchForm->getValue('customerID') != '') {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $this->template->set_var(
             array(
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'ordheadID' => Controller::htmlDisplayText($dsSearchForm->getValue('ordheadID')),
-                'invheadID' => Controller::dateYMDtoDMY($dsSearchForm->getValue('invheadID')),
-                'ordheadIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('ordheadID')),
-                'invheadIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('invheadID')),
-                'printedFlagChecked' => $this->getChecked($dsSearchForm->getValue('printedFlag')),
-                'startDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('startDate')),
-                'startDateMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('startDate')),
-                'endDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('endDate')),
-                'endDateMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('endDate')),
-                'urlCreateInvoice' => $urlCreateInvoice,
+                'customerID'          => $dsSearchForm->getValue('customerID'),
+                'customerString'      => $customerString,
+                'ordheadID'           => Controller::htmlDisplayText($dsSearchForm->getValue('ordheadID')),
+                'invheadID'           => Controller::dateYMDtoDMY($dsSearchForm->getValue('invheadID')),
+                'ordheadIDMessage'    => Controller::htmlDisplayText($dsSearchForm->getMessage('ordheadID')),
+                'invheadIDMessage'    => Controller::htmlDisplayText($dsSearchForm->getMessage('invheadID')),
+                'printedFlagChecked'  => $this->getChecked($dsSearchForm->getValue('printedFlag')),
+                'startDate'           => Controller::dateYMDtoDMY($dsSearchForm->getValue('startDate')),
+                'startDateMessage'    => Controller::htmlDisplayText($dsSearchForm->getMessage('startDate')),
+                'endDate'             => Controller::dateYMDtoDMY($dsSearchForm->getValue('endDate')),
+                'endDateMessage'      => Controller::htmlDisplayText($dsSearchForm->getMessage('endDate')),
+                'urlCreateInvoice'    => $urlCreateInvoice,
                 'urlCreateCreditNote' => $urlCreateCreditNote,
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit
+                'urlCustomerPopup'    => $urlCustomerPopup,
+                'urlSubmit'           => $urlSubmit
             )
         );
         $this->template->set_block('InvoiceSearch', 'invoiceTypeBlock', 'invoiceTypes');
@@ -236,7 +236,7 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTCNC_ACT_DISPLAY_INVOICE,
+                            'action'    => CTCNC_ACT_DISPLAY_INVOICE,
                             'invheadID' => $dsSearchResults->getValue($invheadIDCol)
                         )
                     );
@@ -244,11 +244,11 @@ class CTInvoice extends CTCNC
                 $this->template->set_var(
                     array(
                         'listCustomerName' => $customerName,
-                        'listInvoiceURL' => $invoiceURL,
-                        'listInvheadID' => $dsSearchResults->getValue($invheadIDCol),
-                        'listOrdheadID' => $dsSearchResults->getValue($ordheadIDCol),
-                        'listInvoiceType' => $this->invoiceTypeArray[$dsSearchResults->getValue($typeCol)],
-                        'listCustomerRef' => $dsSearchResults->getValue($custPORefCol)
+                        'listInvoiceURL'   => $invoiceURL,
+                        'listInvheadID'    => $dsSearchResults->getValue($invheadIDCol),
+                        'listOrdheadID'    => $dsSearchResults->getValue($ordheadIDCol),
+                        'listInvoiceType'  => $this->invoiceTypeArray[$dsSearchResults->getValue($typeCol)],
+                        'listCustomerRef'  => $dsSearchResults->getValue($custPORefCol)
                     )
                 );
                 $this->template->parse('invoices', 'invoiceBlock', true);
@@ -315,15 +315,15 @@ class CTInvoice extends CTCNC
         // the field is named startDate because we are reusing the printRange form
         $this->template->set_var(
             array(
-                'invoiceCount' => Controller::htmlDisplayText($dsInvoiceValues->getValue('count')),
-                'invoiceSale' => Controller::htmlDisplayText($dsInvoiceValues->getValue('saleValue')),
-                'invoiceCost' => Controller::htmlDisplayText($dsInvoiceValues->getValue('costValue')),
-                'creditCount' => Controller::htmlDisplayText($dsCreditValues->getValue('count')),
-                'creditSale' => Controller::htmlDisplayText($dsCreditValues->getValue('saleValue')),
-                'creditCost' => Controller::htmlDisplayText($dsCreditValues->getValue('costValue')),
-                'startDate' => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('startDate')),
+                'invoiceCount'     => Controller::htmlDisplayText($dsInvoiceValues->getValue('count')),
+                'invoiceSale'      => Controller::htmlDisplayText($dsInvoiceValues->getValue('saleValue')),
+                'invoiceCost'      => Controller::htmlDisplayText($dsInvoiceValues->getValue('costValue')),
+                'creditCount'      => Controller::htmlDisplayText($dsCreditValues->getValue('count')),
+                'creditSale'       => Controller::htmlDisplayText($dsCreditValues->getValue('saleValue')),
+                'creditCost'       => Controller::htmlDisplayText($dsCreditValues->getValue('costValue')),
+                'startDate'        => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('startDate')),
                 'startDateMessage' => Controller::htmlDisplayText($this->dsPrintRange->getMessage('startDate')),
-                'urlSubmit' => $urlSubmit
+                'urlSubmit'        => $urlSubmit
             )
         );
         $this->template->parse('CONTENTS', 'InvoicePrintUnprinted', true);
@@ -481,7 +481,7 @@ class CTInvoice extends CTCNC
         $urlCustomerPopup = $this->buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
@@ -489,23 +489,23 @@ class CTInvoice extends CTCNC
         if ($this->dsPrintRange->getValue('customerID') != '') {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($this->dsPrintRange->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
             array(
-                'customerID' => $this->dsPrintRange->getValue('customerID'),
-                'customerString' => $customerString,
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'startDate' => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('startDate')),
-                'startDateMessage' => Controller::htmlDisplayText($this->dsPrintRange->getMessage('startDate')),
-                'endDate' => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('endDate')),
-                'endDateMessage' => Controller::htmlDisplayText($this->dsPrintRange->getMessage('endDate')),
-                'startInvheadID' => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('startInvheadID')),
+                'customerID'            => $this->dsPrintRange->getValue('customerID'),
+                'customerString'        => $customerString,
+                'urlCustomerPopup'      => $urlCustomerPopup,
+                'startDate'             => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('startDate')),
+                'startDateMessage'      => Controller::htmlDisplayText($this->dsPrintRange->getMessage('startDate')),
+                'endDate'               => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('endDate')),
+                'endDateMessage'        => Controller::htmlDisplayText($this->dsPrintRange->getMessage('endDate')),
+                'startInvheadID'        => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('startInvheadID')),
                 'startInvheadIDMessage' => Controller::htmlDisplayText($this->dsPrintRange->getMessage('startInvheadID')),
-                'endInvheadID' => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('endInvheadID')),
-                'endInvheadIDMessage' => Controller::htmlDisplayText($this->dsPrintRange->getMessage('endInvheadID')),
-                'urlSubmit' => $urlSubmit
+                'endInvheadID'          => Controller::dateYMDtoDMY($this->dsPrintRange->getValue('endInvheadID')),
+                'endInvheadIDMessage'   => Controller::htmlDisplayText($this->dsPrintRange->getMessage('endInvheadID')),
+                'urlSubmit'             => $urlSubmit
             )
         );
         $this->template->parse('CONTENTS', 'InvoiceReprint', true);
@@ -590,7 +590,7 @@ class CTInvoice extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTINVOICE_ACT_UPDATE_HEADER,
+                    'action'    => CTINVOICE_ACT_UPDATE_HEADER,
                     'invheadID' => $invheadID
                 )
             );
@@ -598,16 +598,16 @@ class CTInvoice extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
-                    'action' => CTCNC_ACT_CONTACT_POPUP,
+                    'action'     => CTCNC_ACT_CONTACT_POPUP,
                     'customerID' => $dsInvhead->getValue('customerID'),
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'htmlFmt'    => CT_HTML_FMT_POPUP
                 )
             );
         $urlContactEdit =
             $this->buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
-                    'action' => CTCNC_ACT_CONTACT_EDIT,
+                    'action'  => CTCNC_ACT_CONTACT_EDIT,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -615,7 +615,7 @@ class CTInvoice extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_SITE,
                 array(
-                    'action' => CTCNC_ACT_SITE_EDIT,
+                    'action'  => CTCNC_ACT_SITE_EDIT,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -623,7 +623,7 @@ class CTInvoice extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_SITE,
                 array(
-                    'action' => CTCNC_ACT_SITE_POPUP,
+                    'action'  => CTCNC_ACT_SITE_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -645,7 +645,7 @@ class CTInvoice extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTINVOICE_ACT_DELETE_INVOICE,
+                    'action'    => CTINVOICE_ACT_DELETE_INVOICE,
                     'invheadID' => $invheadID
                 )
             );
@@ -655,11 +655,11 @@ class CTInvoice extends CTCNC
         $this->setPageTitle($this->invoiceTypeArray[$dsInvhead->getValue('type')]);
         $this->setTemplateFiles(
             array(
-                'InvoiceDisplay' => 'InvoiceDisplay.inc',
-                'InvoiceSiteEditJS' => 'InvoiceSiteEditJS.inc',
-                'InvoiceHeadDisplay' => 'InvoiceHeadDisplay.inc',
+                'InvoiceDisplay'      => 'InvoiceDisplay.inc',
+                'InvoiceSiteEditJS'   => 'InvoiceSiteEditJS.inc',
+                'InvoiceHeadDisplay'  => 'InvoiceHeadDisplay.inc',
                 'SalesOrderLineIcons' => 'SalesOrderLineIcons.inc',
-                'AddFirstLineIcon' => 'AddFirstLineIcon.inc'
+                'AddFirstLineIcon'    => 'AddFirstLineIcon.inc'
             )
         );
         // link to Sales Order
@@ -671,7 +671,7 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         CTCNC_PAGE_SALESORDER,
                         array(
-                            'action' => CTCNC_ACT_DISP_SALESORDER,
+                            'action'    => CTCNC_ACT_DISP_SALESORDER,
                             'ordheadID' => $dsInvhead->getValue('ordheadID')
                         )
                     );
@@ -688,7 +688,7 @@ class CTInvoice extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => CTINVOICE_ACT_PRINT_ONE_INVOICE,
+                        'action'    => CTINVOICE_ACT_PRINT_ONE_INVOICE,
                         'invheadID' => $invheadID
                     )
                 );
@@ -698,7 +698,7 @@ class CTInvoice extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'regeneratePdf',
+                        'action'    => 'regeneratePdf',
                         'invheadID' => $invheadID
                     )
                 );
@@ -714,39 +714,38 @@ class CTInvoice extends CTCNC
         $ordheadID = ($dsInvhead->getValue('ordheadID') != 0 ? $dsInvhead->getValue('ordheadID') : '');
         $this->template->set_var(
             array(
-                'customerID' => $dsInvhead->getValue('customerID'),
-                'type' => $dsInvhead->getValue('type'),
-                'invheadID' => $invheadID,
-                'contactID' => $dsInvhead->getValue('contactID'),
-                'contactName' => Controller::htmlInputText($dsInvhead->getValue('firstName') . ' ' . $dsInvhead->getValue('lastName')),
-//				'payMethod' => Controller::htmlInputText($dsInvhead->getValue('payMethod')),
-                'datePrinted' => $this->dateYMDtoDMY($datePrinted),
-                'custPORef' => Controller::htmlInputText($dsInvhead->getValue('custPORef')),
-                'customerName' => Controller::htmlDisplayText($dsInvhead->getValue('customerName')),
-                'vatCode' => Controller::htmlDisplayText($dsInvhead->getValue('vatCode')),
-                'vatRate' => Controller::htmlDisplayText($dsInvhead->getValue('vatRate')),
-                'add1' => Controller::htmlDisplayText($dsInvhead->getValue('add1')),
-                'add2' => Controller::htmlDisplayText($dsInvhead->getValue('add2')),
-                'add3' => Controller::htmlDisplayText($dsInvhead->getValue('add3')),
-                'town' => Controller::htmlDisplayText($dsInvhead->getValue('town')),
-                'county' => Controller::htmlDisplayText($dsInvhead->getValue('county')),
-                'postcode' => Controller::htmlDisplayText($dsInvhead->getValue('postcode')),
-                'siteNo' => $dsInvhead->getValue('siteNo'),
-                'DISABLED' => $disabled,
-                'urlSitePopup' => $urlSitePopup,
-                'urlSiteEdit' => $urlSiteEdit,
-                'urlContactPopup' => $urlContactPopup,
-                'urlContactEdit' => $urlContactEdit,
+                'customerID'       => $dsInvhead->getValue('customerID'),
+                'type'             => $dsInvhead->getValue('type'),
+                'invheadID'        => $invheadID,
+                'contactID'        => $dsInvhead->getValue('contactID'),
+                'contactName'      => Controller::htmlInputText($dsInvhead->getValue('firstName') . ' ' . $dsInvhead->getValue('lastName')),
+                'datePrinted'      => Controller::dateYMDtoDMY($datePrinted),
+                'custPORef'        => Controller::htmlInputText($dsInvhead->getValue('custPORef')),
+                'customerName'     => Controller::htmlDisplayText($dsInvhead->getValue('customerName')),
+                'vatCode'          => Controller::htmlDisplayText($dsInvhead->getValue('vatCode')),
+                'vatRate'          => Controller::htmlDisplayText($dsInvhead->getValue('vatRate')),
+                'add1'             => Controller::htmlDisplayText($dsInvhead->getValue('add1')),
+                'add2'             => Controller::htmlDisplayText($dsInvhead->getValue('add2')),
+                'add3'             => Controller::htmlDisplayText($dsInvhead->getValue('add3')),
+                'town'             => Controller::htmlDisplayText($dsInvhead->getValue('town')),
+                'county'           => Controller::htmlDisplayText($dsInvhead->getValue('county')),
+                'postcode'         => Controller::htmlDisplayText($dsInvhead->getValue('postcode')),
+                'siteNo'           => $dsInvhead->getValue('siteNo'),
+                'DISABLED'         => $disabled,
+                'urlSitePopup'     => $urlSitePopup,
+                'urlSiteEdit'      => $urlSiteEdit,
+                'urlContactPopup'  => $urlContactPopup,
+                'urlContactEdit'   => $urlContactEdit,
                 'urlUpdateContact' => $urlUpdateContact,
                 'urlUpdateAddress' => $urlUpdateAddress,
-                'urlUpdateHeader' => $urlUpdateHeader,
+                'urlUpdateHeader'  => $urlUpdateHeader,
                 'urlDeleteInvoice' => $urlDeleteInvoice,
                 'txtDeleteInvoice' => $txtDeleteInvoice,
-                'urlHome' => $urlHome,
-                'urlSalesOrder' => $urlSalesOrder,
-                'txtSalesOrder' => $txtSalesOrder,
-                'urlPrint' => $urlPrint,
-                'txtPrint' => $txtPrint,
+                'urlHome'          => $urlHome,
+                'urlSalesOrder'    => $urlSalesOrder,
+                'txtSalesOrder'    => $txtSalesOrder,
+                'urlPrint'         => $urlPrint,
+                'txtPrint'         => $txtPrint,
                 'urlRegeneratePdf' => $urlRegeneratePdf,
                 'txtRegeneratePdf' => $txtRegeneratePdf
             )
@@ -756,8 +755,8 @@ class CTInvoice extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => CTINVOICE_ACT_ADD_LINE,
-                        'invheadID' => $invheadID,
+                        'action'     => CTINVOICE_ACT_ADD_LINE,
+                        'invheadID'  => $invheadID,
                         'sequenceNo' => 1
                     )
                 );
@@ -769,8 +768,8 @@ class CTInvoice extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => CTINVOICE_ACT_ADD_LINE,
-                        'invheadID' => $invheadID,
+                        'action'     => CTINVOICE_ACT_ADD_LINE,
+                        'invheadID'  => $invheadID,
                         'sequenceNo' => 1
                     )
                 );
@@ -787,12 +786,12 @@ class CTInvoice extends CTCNC
                 if ($dsInvline->getValue("lineType") == 'C') {            // comment
                     $this->template->set_var(
                         array(
-                            'itemID' => '',
-                            'qty' => '',
-                            'curUnitCost' => '',
-                            'curUnitSale' => '',
-                            'curCostTotal' => '',
-                            'curSaleTotal' => '',
+                            'itemID'         => '',
+                            'qty'            => '',
+                            'curUnitCost'    => '',
+                            'curUnitSale'    => '',
+                            'curCostTotal'   => '',
+                            'curSaleTotal'   => '',
                             'orderLineClass' => 'orderLineComment'
                         )
                     );
@@ -803,12 +802,12 @@ class CTInvoice extends CTCNC
                     $curCostGrandTotal += $curCostTotal;
                     $this->template->set_var(
                         array(
-                            'itemID' => $dsInvline->getValue('itemID'),
-                            'qty' => Controller::formatNumber($dsInvline->getValue('qty')),
-                            'curUnitCost' => Controller::formatNumber($dsInvline->getValue('curUnitCost')),
-                            'curCostTotal' => Controller::formatNumber($curCostTotal),
-                            'curUnitSale' => Controller::formatNumber($dsInvline->getValue('curUnitSale')),
-                            'curSaleTotal' => Controller::formatNumber($curSaleTotal),
+                            'itemID'         => $dsInvline->getValue('itemID'),
+                            'qty'            => Controller::formatNumber($dsInvline->getValue('qty')),
+                            'curUnitCost'    => Controller::formatNumber($dsInvline->getValue('curUnitCost')),
+                            'curCostTotal'   => Controller::formatNumber($curCostTotal),
+                            'curUnitSale'    => Controller::formatNumber($dsInvline->getValue('curUnitSale')),
+                            'curSaleTotal'   => Controller::formatNumber($curSaleTotal),
                             'orderLineClass' => 'orderLineClass'
                         )
                     );
@@ -817,8 +816,8 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTINVOICE_ACT_EDIT_LINE,
-                            'invheadID' => $invheadID,
+                            'action'     => CTINVOICE_ACT_EDIT_LINE,
+                            'invheadID'  => $invheadID,
                             'sequenceNo' => $sequenceNo
                         )
                     );
@@ -827,8 +826,8 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTINVOICE_ACT_ADD_LINE,
-                            'invheadID' => $invheadID,
+                            'action'     => CTINVOICE_ACT_ADD_LINE,
+                            'invheadID'  => $invheadID,
                             'sequenceNo' => ($sequenceNo + 1)    // new line below current
                         )
                     );
@@ -836,8 +835,8 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTINVOICE_ACT_MOVE_LINE_UP,
-                            'invheadID' => $invheadID,
+                            'action'     => CTINVOICE_ACT_MOVE_LINE_UP,
+                            'invheadID'  => $invheadID,
                             'sequenceNo' => $sequenceNo
                         )
                     );
@@ -845,8 +844,8 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTINVOICE_ACT_MOVE_LINE_DOWN,
-                            'invheadID' => $invheadID,
+                            'action'     => CTINVOICE_ACT_MOVE_LINE_DOWN,
+                            'invheadID'  => $invheadID,
                             'sequenceNo' => $sequenceNo
                         )
                     );
@@ -854,8 +853,8 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTINVOICE_ACT_DELETE_LINE,
-                            'invheadID' => $invheadID,
+                            'action'     => CTINVOICE_ACT_DELETE_LINE,
+                            'invheadID'  => $invheadID,
                             'sequenceNo' => $sequenceNo
                         )
                     );
@@ -864,12 +863,12 @@ class CTInvoice extends CTCNC
                 $removeDescription = str_replace('\'', '', $removeDescription);
                 $this->template->set_var(
                     array(
-                        'urlMoveLineUp' => $urlMoveLineUp,
-                        'urlMoveLineDown' => $urlMoveLineDown,
+                        'urlMoveLineUp'     => $urlMoveLineUp,
+                        'urlMoveLineDown'   => $urlMoveLineDown,
                         'removeDescription' => $removeDescription,
-                        'urlEditLine' => $urlEditLine,
-                        'urlDeleteLine' => $urlDeleteLine,
-                        'urlAddLine' => $urlAddLine
+                        'urlEditLine'       => $urlEditLine,
+                        'urlDeleteLine'     => $urlDeleteLine,
+                        'urlAddLine'        => $urlAddLine
                     )
                 );
                 $this->template->parse('salesOrderLineIcons', 'SalesOrderLineIcons', true);
@@ -898,8 +897,8 @@ class CTInvoice extends CTCNC
             $this->template->set_var(
                 array(
                     'payMethodSelected' => $payMethodSelected,
-                    'paymentTermsID' => $dbePaymentTerms->getValue('paymentTermsID'),
-                    'payMethodDesc' => $dbePaymentTerms->getValue('description')
+                    'paymentTermsID'    => $dbePaymentTerms->getValue('paymentTermsID'),
+                    'payMethodDesc'     => $dbePaymentTerms->getValue('description')
                 )
             );
             $this->template->parse('payMethods', 'payMethodBlock', true);
@@ -948,7 +947,7 @@ class CTInvoice extends CTCNC
         $this->setTemplateFiles(
             array(
                 'InvoiceLineEdit' => 'InvoiceLineEdit.inc'//,
-//				'InvoiceLineEditJS' =>  'InvoiceLineEditJS.inc' // javascript
+                //				'InvoiceLineEditJS' =>  'InvoiceLineEditJS.inc' // javascript
             )
         );
         $this->invoiceLineForm();
@@ -959,20 +958,18 @@ class CTInvoice extends CTCNC
 
     function invoiceLineForm($parentPage = 'InvoiceLineEdit')
     {
-        // Lines
         $this->template->set_var(
             array(
-//				'stockcat' => $this->dsInvline->getValue("stockcat"),
-                'customerName' => $this->dsInvhead->getValue("customerName"),
-                'itemID' => $this->dsInvline->getValue("itemID"),
-                'description' => htmlspecialchars($this->dsInvline->getValue("description")),
-                'descriptionMessage' => $this->dsInvline->getMessage("description"),
-                'qty' => $this->dsInvline->getValue("qty"),
-                'qtyMessage' => $this->dsInvline->getMessage("qty"),
-                'curUnitCost' => $this->dsInvline->getValue("curUnitCost"),
-                'curUnitSale' => $this->dsInvline->getValue("curUnitSale"),
-                'curUnitCostMessage' => $this->dsInvline->getMessage("curUnitCost"),
-                'curUnitSaleMessage' => $this->dsInvline->getMessage("curUnitSale")
+'customerName'       => $this->dsInvhead->getValue("customerName"),
+'itemID'             => $this->dsInvline->getValue("itemID"),
+'description'        => htmlspecialchars($this->dsInvline->getValue("description")),
+'descriptionMessage' => $this->dsInvline->getMessage("description"),
+'qty'                => $this->dsInvline->getValue("qty"),
+'qtyMessage'         => $this->dsInvline->getMessage("qty"),
+'curUnitCost'        => $this->dsInvline->getValue("curUnitCost"),
+'curUnitSale'        => $this->dsInvline->getValue("curUnitSale"),
+'curUnitCostMessage' => $this->dsInvline->getMessage("curUnitCost"),
+'curUnitSaleMessage' => $this->dsInvline->getMessage("curUnitSale")
             )
         );
         if ($_REQUEST['action'] == CTINVOICE_ACT_EDIT_LINE) {
@@ -994,16 +991,16 @@ class CTInvoice extends CTCNC
             $this->buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'invheadID' => $this->dsInvhead->getValue('invheadID'),
-                                 'action' => CTCNC_ACT_DISPLAY_INVOICE
+                                 'action'    => CTCNC_ACT_DISPLAY_INVOICE
                              )
             );
         $this->template->set_var(
             array(
-                'sequenceNo' => $this->dsInvline->getValue("sequenceNo"),
+                'sequenceNo'    => $this->dsInvline->getValue("sequenceNo"),
                 'ordSequenceNo' => $this->dsInvline->getValue("ordSequenceNo"),
-                'invheadID' => $this->dsInvline->getValue("invheadID"),
-                'urlSubmit' => $urlSubmit,
-                'urlCancel' => $urlCancel
+                'invheadID'     => $this->dsInvline->getValue("invheadID"),
+                'urlSubmit'     => $urlSubmit,
+                'urlCancel'     => $urlCancel
             )
         );
         // Line Type selector
@@ -1018,8 +1015,8 @@ class CTInvoice extends CTCNC
             $this->template->set_var(
                 array(
                     'lineTypeSelected' => $lineTypeSelected,
-                    'lineType' => $key,
-                    'lineTypeDesc' => $value
+                    'lineType'         => $key,
+                    'lineTypeDesc'     => $value
                 )
             );
             $this->template->parse('lineTypes', 'lineTypeBlock', true);
@@ -1035,8 +1032,8 @@ class CTInvoice extends CTCNC
             $this->template->set_var(
                 array(
                     'stockcatSelected' => $stockcatSelected,
-                    'stockcat' => $stockcat,
-                    'stockcatDesc' => $stockcat . ' (' . $dbeStockcat->getValue('description') . ')'
+                    'stockcat'         => $stockcat,
+                    'stockcatDesc'     => $stockcat . ' (' . $dbeStockcat->getValue('description') . ')'
                 )
             );
             $this->template->parse('stockcats', 'stockcatBlock', true);
@@ -1068,8 +1065,6 @@ class CTInvoice extends CTCNC
         }
         $this->formError = !$this->dsInvline->populateFromArray($_REQUEST['invline']);
         // Validate Item line
-//		$this->setOrdheadID($this->dsInvline->getValue('ordheadID'));
-
         if ($this->formError) {                    // Form error so redisplay edit form
             if ($_REQUEST['action'] == CTINVOICE_ACT_INSERT_LINE) {
                 $_REQUEST['action'] = CTINVOICE_ACT_ADD_LINE;
@@ -1144,8 +1139,9 @@ class CTInvoice extends CTCNC
                 $urlNext =                        // there is still one or more invoices so display it/them
                     $this->buildLink($_SERVER['PHP_SELF'],
                                      array(
-                                         'action' => CTCNC_ACT_SEARCH,
-                                         'ordheadID' => $dsInvhead->getValue('ordheadID') // if this is set then will show
+                                         'action'    => CTCNC_ACT_SEARCH,
+                                         'ordheadID' => $dsInvhead->getValue('ordheadID')
+                                         // if this is set then will show
                                      )                                                                                                                    // remaining invoices for SO
                     );
             } else {                                        // no more invoices for order so display order
@@ -1153,7 +1149,7 @@ class CTInvoice extends CTCNC
                     $this->buildLink(
                         CTCNC_PAGE_SALESORDER,
                         array(
-                            'action' => CTCNC_ACT_DISP_SALESORDER,
+                            'action'    => CTCNC_ACT_DISP_SALESORDER,
                             'ordheadID' => $dsInvhead->getValue('ordheadID')
                         )
                     );
@@ -1217,7 +1213,7 @@ class CTInvoice extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'invheadID' => $invheadID,
-                    'action' => CTCNC_ACT_DISPLAY_INVOICE
+                    'action'    => CTCNC_ACT_DISPLAY_INVOICE
                 )
             );
         header('Location: ' . $urlNext);
@@ -1234,8 +1230,8 @@ class CTInvoice extends CTCNC
             $invoiceTypeSelected = ($invoiceType == $key) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
-                    'invoiceTypeSelected' => $invoiceTypeSelected,
-                    'invoiceType' => $key,
+                    'invoiceTypeSelected'    => $invoiceTypeSelected,
+                    'invoiceType'            => $key,
                     'invoiceTypeDescription' => $value
                 )
             );

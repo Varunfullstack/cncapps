@@ -5,6 +5,28 @@ This project changes will be shown here.
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
 
+## [v1.8.2] - 2018-06-28
+### Fixed
+- Issue 289 - Fix issues 
+
+## [v1.8.1] - 2018-06-26
+### Fixed
+- Issue 287 - Fix problem with sales orders
+
+## [v1.8.0] - 2018-06-26 
+### Added
+- Issue 195 - Graph to show user productivity
+- Issue 264 - Add option for Monthly in customer review meeting frequency
+### Changed
+- Issue 236 - Enhance Sales By Customer report 
+- Issue 239 - New navigation buttons in the activity pages
+- Issue 243 - Amend Contract Document details
+### Removed
+- Issue 260 - Remove Spend/Category from the Reports Menu
+## Fixed
+- Issue 262 - Problems With Customer CRM losing information
+- Issue 261 - Find out why activities end up with caa_status of O and resolve
+
 ## [v1.7.5] - 2018-06-06
 ### Fixed
 - Issue 265 - Daily Report sending some customer data to wrong people

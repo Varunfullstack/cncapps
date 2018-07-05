@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
@@ -131,7 +131,7 @@ class CTServiceDeskReportCustomer extends CTCNC
         if ($this->dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
                                              array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
