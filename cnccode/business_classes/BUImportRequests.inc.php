@@ -56,7 +56,10 @@ class BUImportRequests extends Business
             echo 'Start processing ' . $db->Record['automatedRequestID'] . "<BR/>";
 
             $errorString = '';
-            if ($this->processMessage($db->Record, $errorString)) {      // error string returned
+            if ($this->processMessage(
+                $db->Record,
+                $errorString
+            )) {      // error string returned
                 echo $automatedRequestID . " processed successfully<BR/>";
                 $processedMessages++;
             } else {
@@ -78,9 +81,10 @@ class BUImportRequests extends Business
         if (count($toDelete)) {
             echo 'Deleting requests';
             $sql = "DELETE FROM automated_request
-                    WHERE automatedRequestId IN (" . implode(',', $toDelete) . ")";
-
-            var_dump($sql);
+                    WHERE automatedRequestId IN (" . implode(
+                    ',',
+                    $toDelete
+                ) . ")";
             $db->query($sql);
         }
 
@@ -90,12 +94,22 @@ class BUImportRequests extends Business
 
     }
 
-    protected function processMessage($record, &$errorString)
+    protected function processMessage($record,
+                                      &$errorString
+    )
     {
-        return $this->buActivity->processAutomaticRequest($record, $errorString);
+        return $this->buActivity->processAutomaticRequest(
+            $record,
+            $errorString
+        );
     }
 
-    function sendFailureEmail($sender, $dateTime, $subject, $body, $errorString)
+    function sendFailureEmail($sender,
+                              $dateTime,
+                              $subject,
+                              $body,
+                              $errorString
+    )
     {
         global $cfg;
 
@@ -104,30 +118,55 @@ class BUImportRequests extends Business
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $toEmail = "CNCServiceDesk@cnc-ltd.co.uk";
 
-        $template = new Template($cfg["path_templates"], "remove");
-        $template->set_file('page', 'ImportRequestFailedEmail.inc.html');
-        $template->set_var('sender', $sender);
-        $template->set_var('dateTime', $dateTime);
-        $template->set_var('subject', $subject);
-        $template->set_var('body', $body);
-        $template->set_var('errorString', $errorString);
-        $template->parse('output', 'page', true);
+        $template = new Template(
+            $cfg["path_templates"],
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'ImportRequestFailedEmail.inc.html'
+        );
+        $template->set_var(
+            'sender',
+            $sender
+        );
+        $template->set_var(
+            'dateTime',
+            $dateTime
+        );
+        $template->set_var(
+            'subject',
+            $subject
+        );
+        $template->set_var(
+            'body',
+            $body
+        );
+        $template->set_var(
+            'errorString',
+            $errorString
+        );
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
         $body = $template->get_var('output');
 
         $hdrs = array(
-            'From' => $senderEmail,
-            'To' => $toEmail,
-            'Subject' => "Automated import failure from $sender",
-            'Date' => date("r"),
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => "Automated import failure from $sender",
+            'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
         $buMail->mime->setHTMLBody($body);
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
