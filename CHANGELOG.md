@@ -3,7 +3,11 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 285 - Change length limit to customer item 'Item Text' field
+- Issue 267 - Auto Service Completion for Starters & Leavers
+
+## [v1.8.4] - 2018-07-04
+### Fixed
+- Issue 292 - Skip Sales Order on Activity.php shows debug information
 
 ## [v1.8.3] - 2018-06-29
 ### Fixed
