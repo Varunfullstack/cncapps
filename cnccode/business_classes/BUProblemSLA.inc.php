@@ -91,7 +91,7 @@ class BUProblemSLA extends Business
 
         $this->srAutocompleteThresholdHours = $dsHeader->getValue('srAutocompleteThresholdHours');
         $this->startersLeaversAutoCompleteThresholdHours = $dsHeader->getValue(
-           DBEHeader::srStartersLeaversAutoCompleteThresholdHours
+            DBEHeader::srStartersLeaversAutoCompleteThresholdHours
         );
 
         $this->workingHoursInDay =
@@ -290,15 +290,24 @@ class BUProblemSLA extends Business
                 /*
                 Autocomplete NON-T&M SRs that have activity duration of less than one hour and have reached their complete date
                 */
-
                 $dbeCustomer = $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
-
                 $buCustomerItem = new BUCustomerItem($this);
-
-                if ($buCustomerItem->customerHasValidServerCareContract($this->dbeProblem->getValue('customerID'))) {
+                if ($serverCareContractID = $buCustomerItem->getValidServerCareContractID(
+                    $this->dbeProblem->getValue('customerID')
+                )) {
 
                     if ($fixedDate <= strtotime('-4 days')) {
+                        $startersLeavers = [62, 58];
 
+                        if (in_array(
+                            $this->dbeProblem->getValue(DBEProblem::rootCauseID),
+                            $startersLeavers
+                        )) {
+
+                            $this->dbeProblem->setValue(DBEJProblem::contractCustomerItemID, $serverCareContractID);
+                            $this->dbeProblem->updateRow();
+                            $this->buActivity->setProblemToCompleted($problemID);
+                        }
                     }
 
                 };

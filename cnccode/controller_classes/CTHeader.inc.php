@@ -393,7 +393,7 @@ class CTHeader extends CTCNC
                 ),
 
                 'srStartersLeaversAutoCompleteThresholdHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('srStartersLeaversAutoCompleteThresholdHoursMessage')
+                    $dsHeader->getMessage('srStartersLeaversAutoCompleteThresholdHours')
                 ),
 
                 'srPromptContractThresholdHours' => Controller::htmlInputText(
