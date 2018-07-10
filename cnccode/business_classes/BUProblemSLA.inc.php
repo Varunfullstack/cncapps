@@ -290,7 +290,8 @@ class BUProblemSLA extends Business
                 /*
                 Autocomplete NON-T&M SRs that have activity duration of less than one hour and have reached their complete date
                 */
-                $dbeCustomer = $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
+
+                $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
                 $buCustomerItem = new BUCustomerItem($this);
                 if ($serverCareContractID = $buCustomerItem->getValidServerCareContractID(
                     $this->dbeProblem->getValue('customerID')
