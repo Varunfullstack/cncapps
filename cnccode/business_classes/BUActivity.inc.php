@@ -7603,6 +7603,7 @@ is currently a balance of ';
      * @param bool $setEndTimeToNow
      * @param $userID
      * @param bool $moveToUsersQueue
+     * @param bool $resetAwaitingCustomerResponse
      * @return string
      */
     function createFollowOnActivity(
