@@ -122,7 +122,7 @@ class BUContact extends Business
                     $this->dbeContact->getRowsByCustomerID($customerID);
                 }
             } else {                                                // try to match
-                $this->dbeContact->getCustomerRowsByNameMatch($matchString);
+                $this->dbeContact->getCustomerRowsByNameMatch($customerID, $matchString);
             }
             $ret = ($this->getData($this->dbeContact, $dsResults));
             $dsResults->columnSort('lastName', 'firstName');

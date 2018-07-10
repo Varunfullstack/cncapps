@@ -427,13 +427,16 @@ class DBEContact extends DBCNCEntity
      * @access public
      * @return bool Success
      */
-    function getCustomerRowsByNameMatch($match)
+    function getCustomerRowsByNameMatch($customerId,
+                                        $match
+    )
     {
         $this->setMethodName("getCustomerRowsByNameMatch");
         $ret = FALSE;
-        if ($this->getValue(self::customerID) == '') {
-            $this->raiseError('customerID not set');
-        }
+        $this->setValue(
+            self::customerID,
+            $customerId
+        );
         if ($match == '') {
             $this->raiseError('$match not set');
         }

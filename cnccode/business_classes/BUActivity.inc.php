@@ -6957,7 +6957,9 @@ is currently a balance of ';
                             $details,
                             false,
                             true,
-                            USER_SYSTEM
+                            USER_SYSTEM,
+                            false,
+                            true
                         );
 
                         if ($record['attachment'] == 'Y') {
@@ -7612,7 +7614,8 @@ is currently a balance of ';
         $ifUnallocatedSetToCurrentUser = true,
         $setEndTimeToNow = false,
         $userID,
-        $moveToUsersQueue = false
+        $moveToUsersQueue = false,
+        $resetAwaitingCustomerResponse = false
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
@@ -7854,11 +7857,27 @@ is currently a balance of ';
             DBEJCallActivity::serverGuard,
             $dbeCallActivity->getValue(DBEJCallActivity::serverGuard)
         );
+
+        if ($resetAwaitingCustomerResponse) {
+
+            $dbeProblem->setValue(
+                DBEJProblem::awaitingCustomerResponseFlag,
+                'N'
+            );
+            $dbeProblem->updateRow();
+
+            $dbeCallActivity->setValue(
+                DBECallActivity::awaitingCustomerResponseFlag,
+                'N'
+            );
+        }
+
         $dbeCallActivity->insertRow();
 
         $ret = $dbeCallActivity->getPKValue();
 
         $this->highActivityAlertCheck($dbeProblem->getValue(DBEJProblem::problemID));
+
 
         if ($passedReason) {
             $this->updatedByAnotherUser(
