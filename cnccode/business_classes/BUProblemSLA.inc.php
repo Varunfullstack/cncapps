@@ -291,55 +291,28 @@ class BUProblemSLA extends Business
                 Autocomplete NON-T&M SRs that have activity duration of less than one hour and have reached their complete date
                 */
 
-                var_dump('this is SR ' . $problemID);
-                echo '<br>';
-
                 $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
                 $buCustomerItem = new BUCustomerItem($this);
+                $startersLeavers = [62, 58];
                 if ($serverCareContractID = $buCustomerItem->getValidServerCareContractID(
-                    $this->dbeProblem->getValue('customerID')
-                )) {
-                    echo '<div>';
-                    echo 'it does have a valid contract id:' . $serverCareContractID;
-                    echo '</div>';
-
-                    if ($fixedDate <= strtotime('-4 days')) {
-                        echo '<div>';
-                        echo 'fixed date is more than 4 days ago' . $fixedDate;
-                        echo '</div>';
-                        $startersLeavers = [62, 58];
-
-                        if (in_array(
-                            $this->dbeProblem->getValue(DBEProblem::rootCauseID),
-                            $startersLeavers
-                        )) {
-
-                            echo '<div>';
-                            echo 'activity is leavers/starters it is ' .$this->dbeProblem->getValue(DBEProblem::rootCauseID);
-                            echo '</div>';
-                            $this->dbeProblem->setValue(
-                                DBEJProblem::contractCustomerItemID,
-                                $serverCareContractID
-                            );
-                            $this->dbeProblem->updateRow();
-                            $this->buActivity->setProblemToCompleted($problemID);
-                        } else {
-                            echo '<div>';
-                            echo 'activity is NOT leavers/starters it is ' .$this->dbeProblem->getValue(DBEProblem::rootCauseID);
-                            echo '</div>';
-                        }
-                    } else {
-                        echo '<div>';
-                        echo 'fixed date is no more than 4 days ago' . $fixedDate;
-                        echo '</div>';
-                    }
-
-                } else {
-                    echo '<div>';
-                    echo 'it does not have a valid contract';
-                    echo '</div>';
-                };
-
+                        $this->dbeProblem->getValue('customerID')
+                    ) &&
+                    $this->dbeProblem->getValue(
+                        DBEProblem::totalActivityDurationHours
+                    ) <= $this->startersLeaversAutoCompleteThresholdHours &&
+                    $fixedDate <= strtotime('-4 days') &&
+                    in_array(
+                        $this->dbeProblem->getValue(DBEProblem::rootCauseID),
+                        $startersLeavers
+                    )
+                ) {
+                    $this->dbeProblem->setValue(
+                        DBEJProblem::contractCustomerItemID,
+                        $serverCareContractID
+                    );
+                    $this->dbeProblem->updateRow();
+                    $this->buActivity->setProblemToCompleted($problemID);
+                }
 
                 if (
                     $this->dbeProblem->getValue('contractCustomerItemID') != 0 &&
