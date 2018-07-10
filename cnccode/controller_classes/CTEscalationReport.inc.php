@@ -16,21 +16,44 @@ class CTEscalationReport extends CTCNC
     private $dsSearchForm = '';
     private $buEscalationReport;
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "reports",
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
+
+        if (!$this->isUserSDManager()) {
+
+            $roles = [
+                "reports",
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
         }
         $this->buEscalationReport = new BUEscalationReport($this);
 
         $this->dsSearchForm = new DSForm ($this);
-        $this->dsSearchForm->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsSearchForm->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+        $this->dsSearchForm->addColumn(
+            'fromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsSearchForm->addColumn(
+            'toDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
     }
 
     /**
@@ -61,12 +84,21 @@ class CTEscalationReport extends CTCNC
 
         if ($this->dsSearchForm->getValue('fromDate') == '') {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('fromDate', date('Y-m-d', strtotime("-1 month")));
+            $this->dsSearchForm->setValue(
+                'fromDate',
+                date(
+                    'Y-m-d',
+                    strtotime("-1 month")
+                )
+            );
             $this->dsSearchForm->post();
         }
         if (!$this->dsSearchForm->getValue('toDate')) {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('toDate', date('Y-m-d'));
+            $this->dsSearchForm->setValue(
+                'toDate',
+                date('Y-m-d')
+            );
             $this->dsSearchForm->post();
         }
 
@@ -79,24 +111,31 @@ class CTEscalationReport extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $urlSubmit = $this->buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
 
         $this->setPageTitle('Escalation Report');
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'fromDate' => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $this->dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $this->dsSearchForm->getMessage('toDate'),
-                'urlSubmit' => $urlSubmit,
-                'teamReport' => $teamReport,
+                'formError'        => $this->formError,
+                'fromDate'         => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('fromDate')),
+                'fromDateMessage'  => $this->dsSearchForm->getMessage('fromDate'),
+                'toDate'           => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('toDate')),
+                'toDateMessage'    => $this->dsSearchForm->getMessage('toDate'),
+                'urlSubmit'        => $urlSubmit,
+                'teamReport'       => $teamReport,
                 'technicianReport' => $technicianReport
             )
         );
 
-        $this->template->parse('CONTENTS', 'EscalationReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'EscalationReport',
+            true
+        );
 
         $this->parsePage();
 
