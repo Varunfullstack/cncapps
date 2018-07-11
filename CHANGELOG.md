@@ -17,6 +17,7 @@ This project changes will be shown here.
 - Issue 280 - Restore ability to create customer documentation folder
 ### Removed
 - Issue 282 - Remove DNS records from domain name
+- Issue 283 - Remove Documentation link from Quotation Page
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
