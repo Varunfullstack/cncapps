@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 285 - Change length limit to customer item 'Item Text' field
 - Issue 267 - Auto Service Completion for Starters & Leavers
+- Issue 277 - Move reports to Technical menu for SD Managers
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
