@@ -6058,12 +6058,63 @@ class CTActivity extends CTCNC
             $onlyWithLinkedItems
         );
 
+        $itemTypes = [];
+
+        $items = [];
+
+        while ($dsContract->fetchNext()) {
+            $itemTypeID = $dsContract->getValue(DBEJContract::itemTypeID);
+
+            if (!$itemTypes[$itemTypeID]) {
+                $dbeItemType = new DBEItemType($this);
+
+                $dbeItemType->getRow($itemTypeID);
+                $itemTypes[$itemTypeID] = [
+                    DBEItemType::description => $dbeItemType->getValue(DBEItemType::description)
+                ];
+            }
+
+            $items[] = [
+                "itemTypeDescription"         => $itemTypes[$itemTypeID][DBEItemType::description],
+                DBEJContract::customerItemID  => $dsContract->getValue(DBEJContract::customerItemID),
+                DBEJContract::itemDescription => $dsContract->getValue(DBEJContract::itemDescription),
+                DBEJContract::adslPhone       => $dsContract->getValue(DBEJContract::adslPhone),
+                DBEJContract::notes           => $dsContract->getValue(DBEJContract::notes),
+                DBEJContract::postcode        => $dsContract->getValue(DBEJContract::postcode),
+                DBEJContract::serialNo        => $dsContract->getValue(DBEJContract::serialNo)
+            ];
+        }
+
+        usort(
+            $items,
+            function ($a,
+                      $b
+            ) {
+                return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
+            }
+        );
+
+        $lastItemTypeDescription = false;
+
         $this->template->set_block(
             $templateName,
             $blockName,
             'contracts'
         );
-        while ($dsContract->fetchNext()) {
+        foreach ($items as $item) {
+
+
+            if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
+                $itemTypeHeader = '<tr><td colspan="2"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
+            } else {
+                $itemTypeHeader = '';
+            }
+            $lastItemTypeDescription = $item['itemTypeDescription'];
+            $this->template->set_var(
+                array(
+                    'itemTypeHeader' => $itemTypeHeader
+                )
+            );
 
             $this->template->set_var(
                 array(
@@ -6076,19 +6127,18 @@ class CTActivity extends CTCNC
                     'CustomerItem.php',
                     array(
                         'action'         => 'displayRenewalContract',
-                        'customerItemID' => $dsContract->getValue('customerItemID')
+                        'customerItemID' => $item[DBEJContract::customerItemID]
                     )
                 );
 
-            $description = $dsContract->getValue("itemDescription") . ' ' . $dsContract->getValue(
-                    'adslPhone'
-                ) . ' ' . $dsContract->getValue('notes') . ' ' . $dsContract->getValue('postcode');
+            $description = $item[DBEJContract::itemDescription] . ' ' . $item[DBEJContract::adslPhone] . ' ' .
+                $item[DBEJContract::notes] . ' ' . $item[DBEJContract::postcode];
 
             $this->template->set_var(
                 array(
-                    'contractCustomerItemID'  => $dsContract->getValue("customerItemID"),
+                    'contractCustomerItemID'  => $item[DBEJContract::customerItemID],
                     'contractItemDescription' => $description,
-                    'serialNo'                => $dsContract->getValue("serialNo"),
+                    'serialNo'                => $item[DBEJContract::serialNo],
                     'urlRenewalContract'      => $urlRenewalContract
                 )
             );
