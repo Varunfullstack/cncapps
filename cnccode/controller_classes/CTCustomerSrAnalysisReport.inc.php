@@ -17,15 +17,28 @@ class CTCustomerSrAnalysisReport extends CTCNC
     var $dsSearchForm = '';
     var $dsResults = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "reports",
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "reports",
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
         }
         $this->buCustomerSrAnalysisReport = new BUCustomerSrAnalysisReport ($this);
     }
@@ -59,13 +72,22 @@ class CTCustomerSrAnalysisReport extends CTCNC
                 if ($dsSearchForm->getValue('fromDate') == '') {
 
                     $dsSearchForm->setUpdateModeUpdate();
-                    $dsSearchForm->setValue('fromDate', date('Y-m-d', strtotime("-1 year")));
+                    $dsSearchForm->setValue(
+                        'fromDate',
+                        date(
+                            'Y-m-d',
+                            strtotime("-1 year")
+                        )
+                    );
                     $dsSearchForm->post();
                 }
 
                 if (!$dsSearchForm->getValue('toDate')) {
                     $dsSearchForm->setUpdateModeUpdate();
-                    $dsSearchForm->setValue('toDate', date('Y-m-d'));
+                    $dsSearchForm->setValue(
+                        'toDate',
+                        date('Y-m-d')
+                    );
                     $dsSearchForm->post();
                 }
 
@@ -98,8 +120,14 @@ class CTCustomerSrAnalysisReport extends CTCNC
                             foreach ($value as $priority => $data) {
 
                                 echo $data['count'] . ',' .
-                                    number_format($data['hoursResponded'], 1) . ',' .
-                                    number_format($data['hoursFix'], 1) . ',';
+                                    number_format(
+                                        $data['hoursResponded'],
+                                        1
+                                    ) . ',' .
+                                    number_format(
+                                        $data['hoursFix'],
+                                        1
+                                    ) . ',';
                             }
                             echo $type . "\n";
                         }
@@ -112,11 +140,14 @@ class CTCustomerSrAnalysisReport extends CTCNC
 
         $this->setPageTitle('Customer SR Analysis Report');
 
-        $this->setTemplateFiles('ServiceRequestReport', 'ServiceRequestReport.inc');
+        $this->setTemplateFiles(
+            'ServiceRequestReport',
+            'ServiceRequestReport.inc'
+        );
         $urlCustomerPopup = $this->buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
@@ -124,17 +155,22 @@ class CTCustomerSrAnalysisReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $dsSearchForm->getMessage('toDate'),
-                'urlCustomerPopup' => $urlCustomerPopup)
+                'formError'        => $this->formError,
+                'customerID'       => $dsSearchForm->getValue('customerID'),
+                'customerString'   => $customerString,
+                'fromDate'         => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
+                'fromDateMessage'  => $dsSearchForm->getMessage('fromDate'),
+                'toDate'           => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
+                'toDateMessage'    => $dsSearchForm->getMessage('toDate'),
+                'urlCustomerPopup' => $urlCustomerPopup
+            )
         );
 
-        $this->template->parse('CONTENTS', 'ServiceRequestReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestReport',
+            true
+        );
         $this->parsePage();
 
     } // end function displaySearchForm
