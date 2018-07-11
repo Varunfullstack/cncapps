@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 267 - Auto Service Completion for Starters & Leavers
 - Issue 277 - Move reports to Technical menu for SD Managers
 - Issue 272 - Contract Analysis Report error handling
+- Issue 270 - Technical Change Request to default to Awaiting CNC
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 ### Added
