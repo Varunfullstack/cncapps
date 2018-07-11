@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 267 - Auto Service Completion for Starters & Leavers
+- Issue 277 - Move reports to Technical menu for SD Managers
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
