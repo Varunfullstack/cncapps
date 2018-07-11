@@ -3155,7 +3155,20 @@ class CTActivity extends CTCNC
             }
 
             $_SESSION[$this->sessionKey]['completeDate'] = '';
-            $_SESSION[$this->sessionKey]['queueNo'] = 1;
+
+            $isAddToQueue = false;
+            if (isset($_REQUEST["hdQ"])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 1;
+                $isAddToQueue = true;
+            }
+            if (isset($_REQUEST["escQ"])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 2;
+                $isAddToQueue = true;
+            }
+            if (isset($_REQUEST["imtQ"])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 3;
+                $isAddToQueue = true;
+            }
             $_SESSION[$this->sessionKey]['date'] = date(CONFIG_MYSQL_DATE);
             $_SESSION[$this->sessionKey]['startTime'] = date('H:i');
 
@@ -3172,7 +3185,6 @@ class CTActivity extends CTCNC
 
 
             if (count($error) == 0) {
-
                 /* Create initial activity */
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
 
@@ -3190,8 +3202,7 @@ class CTActivity extends CTCNC
                 /*
           Add to queue so return to dashboard
           */
-                if (isset($_REQUEST['AddToQueue'])) {
-
+                if ($isAddToQueue) {
                     $nextURL =
                         $this->buildLink(
                             'CurrentActivityReport.php',
@@ -3219,22 +3230,7 @@ class CTActivity extends CTCNC
                     header('Location: ' . $nextURL);
                     exit;
                 }
-                /*
-          Escalate so create escalation activity
-          */
-                if (isset($_REQUEST['Escalate'])) {
-
-                    $this->buActivity->escalateProblemByCallActivityID($dsCallActivity->getValue('callActivityID'));
-
-                    $nextURL =
-                        $this->buildLink(
-                            'CurrentActivityReport.php',
-                            array()
-                        );
-
-                    header('Location: ' . $nextURL);
-                    exit;
-                }
+                exit;
             }
 
         }// end IF POST
@@ -3255,7 +3251,7 @@ class CTActivity extends CTCNC
             )
         );
 
-        // Parameters
+// Parameters
         $this->setPageTitle("Record " . CONFIG_SERVICE_REQUEST_DESC . " Details");
 
         $_SESSION[$this->sessionKey]['callActTypeID'] = CONFIG_INITIAL_ACTIVITY_TYPE_ID;
@@ -4231,7 +4227,9 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }// end changeRequestApproval
 
-    private function activityTypeDropdown($callActTypeID)
+    private
+    function activityTypeDropdown($callActTypeID
+    )
     {
         $dbeJCallActType = new DBECallActType($this);
         $buUser = new BUUser($this);
@@ -5330,7 +5328,8 @@ class CTActivity extends CTCNC
      * Sends a site visit confirmation email to the activity contact
      * @access private
      */
-    private function sendVisitEmail()
+    private
+    function sendVisitEmail()
     {
         $this->setMethodName('sendVisitEmail');
         $this->buActivity->sendSiteVisitEmail($_REQUEST['callActivityID']);
@@ -6500,7 +6499,9 @@ class CTActivity extends CTCNC
         exit;
     }
 
-    private function redirectToGather($callActivityID)
+    private
+    function redirectToGather($callActivityID
+    )
     {
         $urlNext =
             $this->buildLink(
@@ -6514,7 +6515,8 @@ class CTActivity extends CTCNC
         exit;
     }
 
-    private function toggleMonitoringFlag()
+    private
+    function toggleMonitoringFlag()
     {
         if (!$_REQUEST['callActivityID']) {
 
@@ -6532,12 +6534,15 @@ class CTActivity extends CTCNC
 
     }
 
-    private function checkMonitoring($problemID)
+    private
+    function checkMonitoring($problemID
+    )
     {
         return $this->buActivity->checkMonitoringFlag($problemID);
     }
 
-    private function unhideSR()
+    private
+    function unhideSR()
     {
 
         if (!$_REQUEST['callActivityID']) {
