@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 285 - Change length limit to customer item 'Item Text' field
+- Issue 267 - Auto Service Completion for Starters & Leavers
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
