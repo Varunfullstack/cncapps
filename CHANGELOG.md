@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 270 - Technical Change Request to default to Awaiting CNC
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
+- Issue 271 - CustomerAnalysis Report error handling
 ### Added
 - Issue 280 - Restore ability to create customer documentation folder
 
