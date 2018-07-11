@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 285 - Change length limit to customer item 'Item Text' field
+
 ## [v1.8.4] - 2018-07-04
 ### Fixed
 - Issue 292 - Skip Sales Order on Activity.php shows debug information
