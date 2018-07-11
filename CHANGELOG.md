@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-### [unreleased]
-### Added
-- Issue 121 - CNC014 - Add ability to log a new SR directly into a team
+## [unreleased]
+### Changed
+- Issue 293 - Team Performance Calculations Update To Include Previous Month
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
