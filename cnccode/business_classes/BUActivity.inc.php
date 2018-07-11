@@ -4939,9 +4939,15 @@ is currently a balance of ';
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
+
+        $queueNo = 1;
+        if (isset($_SESSION[$sessionKey]['queueNo'])) {
+            $queueNo = $_SESSION[$sessionKey]['queueNo'];
+        }
+
         $dbeProblem->setValue(
             DBEProblem::queueNo,
-            1
+            $queueNo
         ); // initial queue number
         $dbeProblem->setValue(
             DBEProblem::priority,
