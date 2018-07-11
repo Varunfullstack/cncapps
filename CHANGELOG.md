@@ -9,6 +9,8 @@ This project changes will be shown here.
 - Issue 272 - Contract Analysis Report error handling
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
+### Added
+- Issue 280 - Restore ability to create customer documentation folder
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed

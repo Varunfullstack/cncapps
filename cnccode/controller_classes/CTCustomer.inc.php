@@ -317,7 +317,7 @@ class CTCustomer extends CTCNC
             );
             $this->dsContact->setValue(
                 DBEContact::discontinuedFlag,
-               $this->getYN($value['discontinuedFlag'])
+                $this->getYN($value['discontinuedFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::sendMailshotFlag,
@@ -1705,12 +1705,9 @@ ORDER BY cus_name ASC  ";
             $customLetterTemplates = false;
         }
 
-        if ($customerFolderPath = $this->buCustomer->customerFolderExists(
+        if (!$this->buCustomer->customerFolderExists(
             $this->dsCustomer->getValue(DBECustomer::customerID)
         )) {
-            $customerFolderLink =
-                '<a href="file:' . $customerFolderPath . '" target="_blank" title="Open Folder">Open Folder</a>';
-        } else {
             $urlCreateCustomerFolder =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
