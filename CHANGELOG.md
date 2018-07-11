@@ -15,6 +15,8 @@ This project changes will be shown here.
 - Issue 271 - CustomerAnalysis Report error handling
 ### Added
 - Issue 280 - Restore ability to create customer documentation folder
+### Removed
+- Issue 282 - Remove DNS records from domain name
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
