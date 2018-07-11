@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 285 - Change length limit to customer item 'Item Text' field
 - Issue 267 - Auto Service Completion for Starters & Leavers
 - Issue 277 - Move reports to Technical menu for SD Managers
+- Issue 272 - Contract Analysis Report error handling
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
