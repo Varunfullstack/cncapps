@@ -1,23 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
-### Changed
-- Issue 285 - Change length limit to customer item 'Item Text' field
-- Issue 267 - Auto Service Completion for Starters & Leavers
-- Issue 277 - Move reports to Technical menu for SD Managers
-- Issue 272 - Contract Analysis Report error handling
-- Issue 270 - Technical Change Request to default to Awaiting CNC
-- Issue 278 - Consider a negative 2nd Site date check to be a failure
-- Issue 281 - Add headings for the contract page popup.
-### Fixed
-- Issue 275 - Permissions error for PortalDocument
-- Issue 271 - CustomerAnalysis Report error handling
+### [unreleased]
 ### Added
-- Issue 280 - Restore ability to create customer documentation folder
-### Removed
-- Issue 282 - Remove DNS records from domain name
-- Issue 283 - Remove Documentation link from Quotation Page
+- Issue 121 - CNC014 - Add ability to log a new SR directly into a team
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
