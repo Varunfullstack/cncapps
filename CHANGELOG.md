@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 270 - Technical Change Request to default to Awaiting CNC
 - Issue 278 - Consider a negative 2nd Site date check to be a failure
 - Issue 281 - Add headings for the contract page popup.
+- Issue 293 - Team Performance Calculations Update To Include Previous Month
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
