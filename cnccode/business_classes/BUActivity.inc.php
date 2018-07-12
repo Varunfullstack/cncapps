@@ -2436,9 +2436,10 @@ class BUActivity extends Business
         user_time_log";
 
         if ($startDate) {
-            $sql .= "where loggedDate > '" . $startDate->format('Y-m-d') . "'";
+            $sql .= " where loggedDate > '" . $startDate->format('Y-m-d') . "'";
         }
 
+        $sql.= " order by loggedDate asc, userID";
         $result = $this->db->query($sql);
         while ($record = $result->fetch_assoc()) {
             echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . "<BR/>";
