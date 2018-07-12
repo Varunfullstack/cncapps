@@ -414,7 +414,11 @@ class CTActivity extends CTCNC
                 break;
 
             case 'updateHistoricUserTimeLogs':
-                $this->updateHistoricUserTimeLogs();
+                $startDateData = @$_REQUEST['startDate'];
+
+                $startDate = new DateTime($startDateData);
+
+                $this->updateHistoricUserTimeLogs($startDate);
                 break;
             case 'test':
                 $this->buActivity->sendSalesRequestAlertEmail(
@@ -6217,9 +6221,9 @@ class CTActivity extends CTCNC
         echo date('H') . ':' . date('i');
     }
 
-    function updateHistoricUserTimeLogs()
+    function updateHistoricUserTimeLogs(DateTime $startDate = null)
     {
-        $this->buActivity->updateAllHistoricUserLoggedHours();
+        $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
     }
 

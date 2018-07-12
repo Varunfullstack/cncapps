@@ -2427,7 +2427,7 @@ class BUActivity extends Business
   Send an alert email if number of activities per SR per day exceeds system max
   */
 
-    function updateAllHistoricUserLoggedHours()
+    function updateAllHistoricUserLoggedHours(DateTime $startDate = null)
     {
         $sql =
             "SELECT
@@ -2435,6 +2435,10 @@ class BUActivity extends Business
         loggedDate
       FROM
         user_time_log";
+
+        if ($startDate) {
+            $sql .= "where loggedDate > '" . $startDate->format('Y-m-d') . "'";
+        }
 
         $result = $this->db->query($sql);
         while ($record = $result->fetch_assoc()) {
