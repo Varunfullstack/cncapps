@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 269 - Live fixed SR target & total.
+
 ## [v1.8.4] - 2018-07-04
 ### Fixed
 - Issue 292 - Skip Sales Order on Activity.php shows debug information
