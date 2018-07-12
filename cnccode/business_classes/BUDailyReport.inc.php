@@ -880,6 +880,9 @@ WHERE pro_priority = 5
                     "serviceRequests" => []
                 ];
             }
+
+
+
             $contactsData[$row['contactID']]['serviceRequests'][] = $row;
         }
 
