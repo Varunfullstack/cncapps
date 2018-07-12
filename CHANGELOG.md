@@ -15,6 +15,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
+- Issue 279 - Contracts not populating on Search page
 ### Added
 - Issue 280 - Restore ability to create customer documentation folder
 - Issue 121 - CNC014 - Add ability to log a new SR directly into a team

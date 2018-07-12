@@ -114,6 +114,11 @@ define(
     'sendVisitEmail'
 );
 
+define(
+    'CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER',
+    'contractsForClient'
+);
+
 class CTActivity extends CTCNC
 {
 
@@ -436,10 +441,41 @@ class CTActivity extends CTCNC
                     header('Location: ' . $_SERVER['HTTP_REFERER']);
                 }
                 break;
+            case CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER:
+
+                $customerID = $_REQUEST['customerID'];
+
+                $buCustomerItem = new BUCustomerItem($this);
+                $dsContract = new DataSet($this);
+                $buCustomerItem->getContractsByCustomerID(
+                    $customerID,
+                    $dsContract
+                );
+
+                $data = [];
+
+                while ($dsContract->fetchNext()) {
+
+                    if (!isset($data[$dsContract->getValue('renewalType')])) {
+                        $data[$dsContract->getValue('renewalType')] = [];
+                    }
+                    $data[$dsContract->getValue('renewalType')][] = [
+                        "description" => $dsContract->getValue("itemDescription") . ' ' . $dsContract->getValue(
+                                'adslPhone'
+                            ) . ' ' . $dsContract->getValue('notes') . ' ' . $dsContract->getValue('postcode'),
+                        "id"          => $dsContract->getValue(DBEJContract::customerItemID)
+
+                    ];
+
+                }
+                echo json_encode($data);
+
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
                 break;
+
         }
     }
 
@@ -636,10 +672,17 @@ class CTActivity extends CTCNC
             $urlCreateActivity = $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'activityCreate1'
+                    'action' => CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER
                 )
             );
         }// if (!$this->hasPermission('PHPLIB_PERM_CUSTOMER'){
+
+        $fetchContractsURL = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'contractsForClient'
+            )
+        );
 
         $this->setTemplateFiles(
             'ActivitySearch',
@@ -705,6 +748,7 @@ class CTActivity extends CTCNC
                 'rowsFound'                   => $dsSearchResults->rowCount(),
                 'urlCreateActivity'           => $urlCreateActivity,
                 'urlCustomerPopup'            => $urlCustomerPopup,
+                'fetchContractsURL'           => $fetchContractsURL,
                 'managementReviewOnlyChecked' => Controller::htmlChecked(
                     $dsSearchForm->getValue('managementReviewOnly')
                 ),
@@ -1033,6 +1077,7 @@ class CTActivity extends CTCNC
             );
         }
     }
+
 
     function contractDropdown(
         $customerID,
