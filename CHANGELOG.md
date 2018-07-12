@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 293 - Team Performance Calculations Update To Include Previous Month
+- Issue 296 - Change Open SR Report so non main contacts only see their SRs
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
