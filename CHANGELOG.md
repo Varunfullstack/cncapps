@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Changed
-- Issue 294 - User performance graph tweaks
+### Added
+- Issue 269 - Live fixed SR target & total.
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
