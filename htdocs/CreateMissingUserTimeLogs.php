@@ -16,4 +16,5 @@ require_once($cfg["path_bu"]."/BUActivity.inc.php");
 
 $buActivity= new BUActivity( $this );
 $buActivity->createUserTimeLogsForMissingUsers();
+$buActivity->updateAllHistoricUserLoggedHours()
 ?>
