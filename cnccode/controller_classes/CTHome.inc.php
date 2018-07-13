@@ -126,16 +126,20 @@ class CTHome extends CTCNC
         */
 
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+
             $this->displaySalesFigures();
+
         }
 
         $this->displayProjects();
 
-        $this->displayFixedAndReopen();
+        $this->displayFirstTimeFixFigures();
+
         $this->displayTeamPerformanceReport();
 
         if ($this->buUser->isSdManager($this->userID)) {
             $this->displayAllUsersPerformanceReport();
+
         } else {
             $this->displayUserPerformanceReport();
         }
@@ -144,107 +148,6 @@ class CTHome extends CTCNC
 
 
         $this->parsePage();
-    }
-
-    function displayFixedAndReopen()
-    {
-        $this->setTemplateFiles(
-            'FixedAndReopened',
-            'HomeFixedAndReopened.inc'
-        );
-        global $db;
-        /** @var mysqli_result $query */
-        $query = $db->query(
-            "SELECT 
-              SUM(fixer.`teamID` = 1) AS hdFixed,
-              SUM(fixer.teamID	= 2) AS escFixed,
-              SUM(fixer.teamID = 4) AS imtFixed ,
-              SUM(fixer.`teamID` IN (1,2,4)) AS totalFixed
-            FROM
-              problem 
-              LEFT JOIN consultant fixer 
-                ON problem.`pro_fixed_consno` = fixer.`cns_consno` 
-            WHERE DATE(problem.`pro_fixed_date`) = CURRENT_DATE 
-              AND pro_status = 'F' 
-              AND problem.`pro_custno` <> 282
-              AND fixer.`cns_consno` <> 67
-              GROUP BY DATE(problem.pro_fixed_date)"
-        );
-
-        $result = $query->fetch_assoc();
-        $this->template->set_var(
-            array(
-                "hdFixed"    => Controller::formatNumber(
-                    $result['hdFixed'],
-                    0
-                ),
-                "escFixed"   => Controller::formatNumber(
-                    $result['escFixed'],
-                    0
-                ),
-                "imtFixed"   => Controller::formatNumber(
-                    $result['imtFixed'],
-                    0
-                ),
-                "totalFixed" => Controller::formatNumber(
-                    $result['totalFixed'],
-                    0
-                ),
-            )
-        );
-
-        $query = $db->query(
-            "SELECT 
-              SUM(teamID = 1) AS hdReopened,
-              SUM(teamID = 2) AS escReopened,
-              SUM(teamID = 4) AS imtReopened,
-              SUM(teamID IN (1, 2, 4)) AS totalReopened
-            FROM
-              (SELECT 
-                pro_problemno,
-                reopener.teamID,
-                MAX(fixedActivity.created) 
-              FROM
-                problem 
-                JOIN callactivity fixedActivity 
-                  ON fixedActivity.caa_problemno = problem.pro_problemno 
-                  AND fixedActivity.caa_callacttypeno = 57 
-                JOIN consultant reopener 
-                  ON fixedActivity.`caa_consno` = reopener.`cns_consno` 
-              WHERE problem.`pro_custno` <> 282 
-                AND problem.`pro_reopened_flag` = 'Y' 
-                AND reopener.`cns_consno` <> 67 
-                AND problem.pro_reopened_date = CURRENT_DATE 
-              GROUP BY pro_problemno) test "
-        );
-
-        $result = $query->fetch_assoc();
-        $this->template->set_var(
-            array(
-                "hdReopened"    => Controller::formatNumber(
-                    $result['hdReopened'],
-                    0
-                ),
-                "escReopened"   => Controller::formatNumber(
-                    $result['escReopened'],
-                    0
-                ),
-                "imtReopened"   => Controller::formatNumber(
-                    $result['imtReopened'],
-                    0
-                ),
-                "totalReopened" => Controller::formatNumber(
-                    $result['totalReopened'],
-                    0
-                ),
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'FixedAndReopened',
-            true
-        );
     }
 
     function displaySalesFigures()
@@ -1129,6 +1032,215 @@ class CTHome extends CTCNC
             (new DateTime($endDate))
         );
         return $data;
+
+    }
+
+    private function displayFirstTimeFixFigures()
+    {
+        $this->setTemplateFiles(
+            'firstTimeFigures',
+            'FirstTimeFigures'
+        );
+
+        $this->template->set_block(
+            'firstTimeFigures',
+            'firstTimeFixBlock',
+            'figures'
+        );
+
+        global $db;
+
+        $result = $db->query(
+            "SELECT 
+  CONCAT(
+    fixer.`firstName`,
+    ' ',
+    fixer.`lastName`
+  ) AS NAME,
+  SUM(
+    TIME_TO_SEC(
+      TIMEDIFF(
+        fixedActivity.caa_starttime,
+        remoteSupport.caa_endtime
+      )
+    ) <= (5 * 60)
+  ) AS firstTimeFix,
+  SUM(1) AS attemptedFirstTimeFix
+FROM
+  problem 
+  JOIN consultant fixer 
+    ON fixer.`cns_consno` = problem.`pro_fixed_consno` 
+  JOIN callactivity initial 
+    ON initial.caa_problemno = problem.pro_problemno 
+    AND initial.caa_callacttypeno = 51 
+  JOIN callactivity remoteSupport 
+    ON remoteSupport.caa_problemno = problem.pro_problemno 
+    AND remoteSupport.caa_callacttypeno = 8 
+  JOIN callactivity fixedActivity 
+    ON fixedActivity.caa_problemno = problem.pro_problemno 
+    AND fixedActivity.caa_callacttypeno = 57 
+WHERE pro_priority <= 4 
+  AND pro_status = 'F' 
+  AND 
+  (SELECT 
+    COUNT(*) 
+  FROM
+    callactivity remoteTest 
+  WHERE remoteTest.caa_problemno = pro_problemno 
+    AND remoteTest.caa_callacttypeno = 8) = 1 
+  AND 
+  (SELECT 
+    COUNT(*) 
+  FROM
+    callactivity fixedActivityTest 
+  WHERE fixedActivityTest.caa_problemno = pro_problemno 
+    AND fixedActivityTest.caa_callacttypeno = 57) = 1 
+  AND remoteSupport.caa_date = initial.caa_date 
+  AND fixedActivity.caa_date = initial.caa_date 
+  AND initial.caa_date = CURRENT_DATE
+  AND problem.pro_custno <> 282 
+  AND remoteSupport.caa_consno = initial.caa_consno 
+  AND fixedActivity.caa_consno = initial.caa_consno 
+  AND TIME_TO_SEC(
+    TIMEDIFF(
+      remoteSupport.caa_starttime,
+      initial.caa_endtime
+    )
+  ) <= (5 * 60) 
+ AND fixer.`teamID` = 1
+GROUP BY initial.caa_date,
+  problem.`pro_fixed_consno` "
+        );
+
+
+        while ($row = $result->fetch_assoc()) {
+            var_dump($row);
+
+            $this->template->set_var(
+                [
+                    'name'                  => $row['name'],
+                    'firstTimeFix'          => $row['firstTimeFix'],
+                    'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
+                ]
+            );
+
+            $this->template->parse(
+                'figures',
+                'firstTimeFixBlock',
+                true
+            );
+        }
+
+
+        $result = $db->query(
+            "SELECT 
+  ROUND(
+    SUM(firstTimeFixed) / phonedThroughRequests,
+    2
+  )*100 AS firstTimeFixAchievedPct,
+  ROUND(
+    SUM(attemptedFirstTimeFixed) / phonedThroughRequests,
+    2
+  )*100 AS firstTimeFixAttemptedPct
+FROM
+  (SELECT 
+    initial.caa_date AS DATE,
+    CONCAT(
+      fixer.`firstName`,
+      ' ',
+      fixer.`lastName`
+    ) AS NAME,
+    SUM(
+      TIME_TO_SEC(
+        TIMEDIFF(
+          fixedActivity.caa_starttime,
+          remoteSupport.caa_endtime
+        )
+      ) <= (5 * 60)
+    ) AS firstTimeFixed,
+    SUM(1) AS attemptedFirstTimeFixed,
+    (SELECT 
+      COUNT(*) 
+    FROM
+      problem 
+      JOIN callactivity initial 
+        ON initial.caa_problemno = problem.pro_problemno 
+        AND initial.caa_callacttypeno = 51 
+      JOIN consultant 
+        ON initial.`caa_consno` = consultant.`cns_consno` 
+    WHERE initial.caa_date = CURRENT_DATE 
+      AND consultant.`teamID` = 1 
+      AND problem.pro_custno <> 282) AS phonedThroughRequests 
+  FROM
+    problem 
+    JOIN consultant fixer 
+      ON fixer.`cns_consno` = problem.`pro_fixed_consno` 
+    JOIN callactivity initial 
+      ON initial.caa_problemno = problem.pro_problemno 
+      AND initial.caa_callacttypeno = 51 
+    JOIN callactivity remoteSupport 
+      ON remoteSupport.caa_problemno = problem.pro_problemno 
+      AND remoteSupport.caa_callacttypeno = 8 
+    JOIN callactivity fixedActivity 
+      ON fixedActivity.caa_problemno = problem.pro_problemno 
+      AND fixedActivity.caa_callacttypeno = 57 
+  WHERE pro_priority <= 4 
+    AND pro_status = 'F' 
+    AND 
+    (SELECT 
+      COUNT(*) 
+    FROM
+      callactivity remoteTest 
+    WHERE remoteTest.caa_problemno = pro_problemno 
+      AND remoteTest.caa_callacttypeno = 8) = 1 
+    AND 
+    (SELECT 
+      COUNT(*) 
+    FROM
+      callactivity fixedActivityTest 
+    WHERE fixedActivityTest.caa_problemno = pro_problemno 
+      AND fixedActivityTest.caa_callacttypeno = 57) = 1 
+    AND remoteSupport.caa_date = initial.caa_date 
+    AND fixedActivity.caa_date = initial.caa_date 
+    AND initial.caa_date = CURRENT_DATE 
+    AND problem.pro_custno <> 282 
+    AND remoteSupport.caa_consno = initial.caa_consno 
+    AND fixedActivity.caa_consno = initial.caa_consno 
+    AND TIME_TO_SEC(
+      TIMEDIFF(
+        remoteSupport.caa_starttime,
+        initial.caa_endtime
+      )
+    ) <= (5 * 60) 
+    AND fixer.`teamID` = 1 
+  GROUP BY initial.caa_date,
+    problem.`pro_fixed_consno`) test 
+GROUP BY phonedThroughRequests "
+        );
+
+        $data = $result->fetch_assoc();
+
+        if (!$data) {
+            $firstTimeFixAchievedPct = 'N/A';
+            $firstTimeFixAttemptedPct = 'N/A';
+        } else {
+            $firstTimeFixAchievedPct = $data['firstTimeFixAchievedPct'];
+            $firstTimeFixAttemptedPct = $data['firstTimeFixAttemptedPct'];
+        }
+
+        $this->template->set_var(
+            [
+                'firstTimeFixAchievedPct'  => $firstTimeFixAchievedPct,
+                'firstTimeFixAttemptedPct' => $firstTimeFixAttemptedPct,
+            ]
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'firstTimeFigures',
+            true
+        );
+
 
     }
 }// end of class
