@@ -174,10 +174,69 @@ class CTHome extends CTCNC
         $result = $query->fetch_assoc();
         $this->template->set_var(
             array(
-                "hdFixed"    => Controller::formatNumber($result['hdFixed']),
-                "escFixed"   => Controller::formatNumber($result['escFixed']),
-                "imtFixed"   => Controller::formatNumber($result['imtFixed']),
-                "totalFixed" => Controller::formatNumber($result['totalFixed']),
+                "hdFixed"    => Controller::formatNumber(
+                    $result['hdFixed'],
+                    0
+                ),
+                "escFixed"   => Controller::formatNumber(
+                    $result['escFixed'],
+                    0
+                ),
+                "imtFixed"   => Controller::formatNumber(
+                    $result['imtFixed'],
+                    0
+                ),
+                "totalFixed" => Controller::formatNumber(
+                    $result['totalFixed'],
+                    0
+                ),
+            )
+        );
+
+        $query = $db->query(
+            "SELECT 
+              SUM(teamID = 1) AS hdReopened,
+              SUM(teamID = 2) AS escReopened,
+              SUM(teamID = 4) AS imtReopened,
+              SUM(teamID IN (1, 2, 4)) AS totalReopened
+            FROM
+              (SELECT 
+                pro_problemno,
+                reopener.teamID,
+                MAX(fixedActivity.created) 
+              FROM
+                problem 
+                JOIN callactivity fixedActivity 
+                  ON fixedActivity.caa_problemno = problem.pro_problemno 
+                  AND fixedActivity.caa_callacttypeno = 57 
+                JOIN consultant reopener 
+                  ON fixedActivity.`caa_consno` = reopener.`cns_consno` 
+              WHERE problem.`pro_custno` <> 282 
+                AND problem.`pro_reopened_flag` = 'Y' 
+                AND reopener.`cns_consno` <> 67 
+                AND problem.pro_reopened_date = CURRENT_DATE 
+              GROUP BY pro_problemno) test "
+        );
+
+        $result = $query->fetch_assoc();
+        $this->template->set_var(
+            array(
+                "hdReopened"    => Controller::formatNumber(
+                    $result['hdReopened'],
+                    0
+                ),
+                "escReopened"   => Controller::formatNumber(
+                    $result['escReopened'],
+                    0
+                ),
+                "imtReopened"   => Controller::formatNumber(
+                    $result['imtReopened'],
+                    0
+                ),
+                "totalReopened" => Controller::formatNumber(
+                    $result['totalReopened'],
+                    0
+                ),
             )
         );
 
