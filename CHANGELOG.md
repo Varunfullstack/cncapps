@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 266 - Helpdesk Manager Dashboard View
+
 ## [v1.8.4] - 2018-07-04
 ### Fixed
 - Issue 292 - Skip Sales Order on Activity.php shows debug information
