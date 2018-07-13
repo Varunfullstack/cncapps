@@ -1252,7 +1252,7 @@ WHERE pro_priority = 5
                   contact.`con_first_name` AS contactName,
                   contact.con_email as contactEmail,
                   contact.`con_contno` AS contactID,
-                  customer.cus_name as customerName,
+                  customer.cus_name as customerName
                 FROM
                   problem 
                   INNER JOIN contact 
