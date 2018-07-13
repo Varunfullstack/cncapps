@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Added
-- Issue 269 - Live fixed SR target & total.
+### Changed
+- Issue 284 - Investigate length of fields allowed in quotes
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
