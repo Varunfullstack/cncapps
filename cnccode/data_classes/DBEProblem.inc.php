@@ -55,6 +55,7 @@ class DBEProblem extends DBEntity
     const hdPauseCount = "hdPauseCount";
     const managementReviewReason = "managementReviewReason";
     const startedUserID = "startedUserID";
+    const reopenedDate = "reopenedDate";
 
     /**
      * calls constructor()
@@ -65,76 +66,306 @@ class DBEProblem extends DBEntity
      * @internal param $void
      * @see constructor()
      */
-    function __construct(&$owner, $pkID = false)
+    function __construct(&$owner,
+                         $pkID = false
+    )
     {
         parent::__construct($owner);
         $this->setTableName("problem");
-        $this->addColumn(self::problemID, DA_ID, DA_NOT_NULL, "pro_problemno");
-        $this->addColumn(self::customerID, DA_INTEGER, DA_ALLOW_NULL, "pro_custno");
-        $this->addColumn(self::priority, DA_INTEGER, DA_ALLOW_NULL, "pro_priority");
-        $this->addColumn(self::userID, DA_INTEGER, DA_ALLOW_NULL, "pro_consno");
-        $this->addColumn(self::status, DA_STRING, DA_ALLOW_NULL, "pro_status");
-        $this->addColumn(self::dateRaised, DA_INTEGER, DA_ALLOW_NULL, "pro_date_raised");
-        $this->addColumn(self::fixedUserID, DA_INTEGER, DA_ALLOW_NULL, "pro_fixed_consno");
-        $this->addColumn(self::fixedDate, DA_DATE, DA_ALLOW_NULL, "pro_fixed_date");
-        $this->addColumn(self::respondedHours, DA_FLOAT, DA_ALLOW_NULL, "pro_responded_hours");
-        $this->addColumn(self::workingHours, DA_FLOAT, DA_ALLOW_NULL, "pro_working_hours");
-        $this->addColumn(self::sentSlaAlertFlag, DA_YN, DA_ALLOW_NULL, "pro_sent_sla_alert_flag");
-        $this->addColumn(self::internalNotes, DA_MEMO, DA_ALLOW_NULL, "pro_internal_notes");
-        $this->addColumn(self::completionAlertCount, DA_INTEGER, DA_ALLOW_NULL, "pro_completion_alert_count");
-        $this->addColumn(self::completeDate, DA_DATE, DA_ALLOW_NULL, "pro_complete_date");
-        $this->addColumn(self::hideFromCustomerFlag, DA_STRING, DA_ALLOW_NULL, "pro_hide_from_customer_flag");
-        $this->addColumn(self::alarmDate, DA_DATE, DA_ALLOW_NULL, "pro_alarm_date");
-        $this->addColumn(self::alarmTime, DA_TIME, DA_ALLOW_NULL, "pro_alarm_time");
-        $this->addColumn(self::totalActivityDurationHours,
-                         DA_FLOAT,
-                         DA_ALLOW_NULL,
-                         "pro_total_activity_duration_hours");
-        $this->addColumn(self::totalTravelActivityDurationHours,
-                         DA_FLOAT,
-                         DA_ALLOW_NULL,
-                         "pro_total_travel_activity_duration_hours");
-        $this->addColumn(self::chargeableActivityDurationHours,
-                         DA_FLOAT,
-                         DA_ALLOW_NULL,
-                         "pro_chargeable_activity_duration_hours");
-        $this->addColumn(self::slaResponseHours, DA_FLOAT, DA_ALLOW_NULL, "pro_sla_response_hours");
-        $this->addColumn(self::escalatedFlag, DA_YN, DA_ALLOW_NULL, "pro_escalated_flag");
-        $this->addColumn(self::escalatedUserID, DA_INTEGER, DA_ALLOW_NULL, "pro_escalated_consno");
-        $this->addColumn(self::reopenedFlag, DA_YN, DA_ALLOW_NULL, "pro_reopened_flag");
-        $this->addColumn(self::contractCustomerItemID, DA_INTEGER, DA_ALLOW_NULL, "pro_contract_cuino");
-        $this->addColumn(self::contactID, DA_INTEGER, DA_ALLOW_NULL, "pro_contno");
-        $this->addColumn(self::technicianWeighting, DA_INTEGER, DA_ALLOW_NULL, "pro_technician_weighting");
-        $this->addColumn(self::rejectedUserID, DA_INTEGER, DA_ALLOW_NULL, "pro_rejected_consno");
-        $this->addColumn(self::doNextFlag, DA_YN, DA_ALLOW_NULL, "pro_do_next_flag");
-        $this->addColumn(self::rootCauseID, DA_INTEGER, DA_ALLOW_NULL, "pro_rootcauseno");
-        $this->addColumn(self::workingHoursAlertSentFlag, DA_YN, DA_ALLOW_NULL, "pro_working_hours_alert_sent_flag");
-        $this->addColumn(self::awaitingCustomerResponseFlag,
-                         DA_YN,
-                         DA_ALLOW_NULL,
-                         "pro_awaiting_customer_response_flag");
-        $this->addColumn(self::workingHoursCalculatedToTime,
-                         DA_YN,
-                         DA_ALLOW_NULL,
-                         "pro_working_hours_calculated_to_time");
-        $this->addColumn(self::monitorAgentName, DA_STRING, DA_ALLOW_NULL, "pro_monitor_agent_name");
-        $this->addColumn(self::monitorName, DA_STRING, DA_ALLOW_NULL, "pro_monitor_name");
-        $this->addColumn(self::projectID, DA_INTEGER, DA_ALLOW_NULL, "pro_projectno");
-        $this->addColumn(self::linkedSalesOrderID, DA_INTEGER, DA_ALLOW_NULL, "pro_linked_ordno");
-        $this->addColumn(self::criticalFlag, DA_YN, DA_ALLOW_NULL, "pro_critical_flag");
-        $this->addColumn(self::queueNo, DA_INTEGER, DA_ALLOW_NULL, "pro_queue_no");
-        $this->addColumn(self::hdLimitMinutes,
-                         DA_INTEGER,
-                         DA_NOT_NULL,
-                         "pro_hd_limit_minutes"); // Helpdesk team remaining hours
-        $this->addColumn(self::esLimitMinutes, DA_INTEGER, DA_NOT_NULL, "pro_es_limit_minutes");
-        $this->addColumn(self::imLimitMinutes, DA_INTEGER, DA_NOT_NULL, "pro_im_limit_minutes");
-        $this->addColumn(self::hdTimeAlertFlag, DA_YN, DA_ALLOW_NULL, "pro_hd_time_alert_flag");
-        $this->addColumn(self::esTimeAlertFlag, DA_YN, DA_ALLOW_NULL, "pro_es_time_alert_flag");
-        $this->addColumn(self::imTimeAlertFlag, DA_YN, DA_ALLOW_NULL, "pro_im_time_alert_flag");
-        $this->addColumn(self::hdPauseCount, DA_INTEGER, DA_ALLOW_NULL, "pro_hd_pause_count");
-        $this->addColumn(self::managementReviewReason, DA_MEMO, DA_ALLOW_NULL, "pro_management_review_reason");
-        $this->addColumn(self::startedUserID, DA_INTEGER, DA_ALLOW_NULL, "pro_started_consno");
+        $this->addColumn(
+            self::problemID,
+            DA_ID,
+            DA_NOT_NULL,
+            "pro_problemno"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_custno"
+        );
+        $this->addColumn(
+            self::priority,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_priority"
+        );
+        $this->addColumn(
+            self::userID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_consno"
+        );
+        $this->addColumn(
+            self::status,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_status"
+        );
+        $this->addColumn(
+            self::dateRaised,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_date_raised"
+        );
+        $this->addColumn(
+            self::fixedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_fixed_consno"
+        );
+        $this->addColumn(
+            self::fixedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pro_fixed_date"
+        );
+        $this->addColumn(
+            self::respondedHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_responded_hours"
+        );
+        $this->addColumn(
+            self::workingHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_working_hours"
+        );
+        $this->addColumn(
+            self::sentSlaAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_sent_sla_alert_flag"
+        );
+        $this->addColumn(
+            self::internalNotes,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            "pro_internal_notes"
+        );
+        $this->addColumn(
+            self::completionAlertCount,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_completion_alert_count"
+        );
+        $this->addColumn(
+            self::completeDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pro_complete_date"
+        );
+        $this->addColumn(
+            self::hideFromCustomerFlag,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_hide_from_customer_flag"
+        );
+        $this->addColumn(
+            self::alarmDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pro_alarm_date"
+        );
+        $this->addColumn(
+            self::alarmTime,
+            DA_TIME,
+            DA_ALLOW_NULL,
+            "pro_alarm_time"
+        );
+        $this->addColumn(
+            self::totalActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_total_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::totalTravelActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_total_travel_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::chargeableActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_chargeable_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::slaResponseHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_sla_response_hours"
+        );
+        $this->addColumn(
+            self::escalatedFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_escalated_flag"
+        );
+        $this->addColumn(
+            self::escalatedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_escalated_consno"
+        );
+        $this->addColumn(
+            self::reopenedFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_reopened_flag"
+        );
+        $this->addColumn(
+            self::reopenedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'pro_reopened_date'
+        );
+        $this->addColumn(
+            self::contractCustomerItemID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_contract_cuino"
+        );
+        $this->addColumn(
+            self::contactID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_contno"
+        );
+        $this->addColumn(
+            self::technicianWeighting,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_technician_weighting"
+        );
+        $this->addColumn(
+            self::rejectedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_rejected_consno"
+        );
+        $this->addColumn(
+            self::doNextFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_do_next_flag"
+        );
+        $this->addColumn(
+            self::rootCauseID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_rootcauseno"
+        );
+        $this->addColumn(
+            self::workingHoursAlertSentFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_working_hours_alert_sent_flag"
+        );
+        $this->addColumn(
+            self::awaitingCustomerResponseFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_awaiting_customer_response_flag"
+        );
+        $this->addColumn(
+            self::workingHoursCalculatedToTime,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_working_hours_calculated_to_time"
+        );
+        $this->addColumn(
+            self::monitorAgentName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_monitor_agent_name"
+        );
+        $this->addColumn(
+            self::monitorName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_monitor_name"
+        );
+        $this->addColumn(
+            self::projectID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_projectno"
+        );
+        $this->addColumn(
+            self::linkedSalesOrderID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_linked_ordno"
+        );
+        $this->addColumn(
+            self::criticalFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_critical_flag"
+        );
+        $this->addColumn(
+            self::queueNo,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_queue_no"
+        );
+        $this->addColumn(
+            self::hdLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pro_hd_limit_minutes"
+        ); // Helpdesk team remaining hours
+        $this->addColumn(
+            self::esLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pro_es_limit_minutes"
+        );
+        $this->addColumn(
+            self::imLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pro_im_limit_minutes"
+        );
+        $this->addColumn(
+            self::hdTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_hd_time_alert_flag"
+        );
+        $this->addColumn(
+            self::esTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_es_time_alert_flag"
+        );
+        $this->addColumn(
+            self::imTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_im_time_alert_flag"
+        );
+        $this->addColumn(
+            self::hdPauseCount,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_hd_pause_count"
+        );
+        $this->addColumn(
+            self::managementReviewReason,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            "pro_management_review_reason"
+        );
+        $this->addColumn(
+            self::startedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_started_consno"
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {
@@ -142,7 +373,10 @@ class DBEProblem extends DBEntity
         }
     }
 
-    public function getManagementReviews($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
+    public function getManagementReviews($customerID,
+                                         DateTimeInterface $startDate,
+                                         DateTimeInterface $endDate
+    )
     {
 
         $this->setQueryString(
