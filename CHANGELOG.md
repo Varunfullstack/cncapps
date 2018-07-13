@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Added
-- Issue 266 - Helpdesk Manager Dashboard View
+- Issue 297 - First Time Fix figures
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
