@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Changed
-- Issue 284 - Investigate length of fields allowed in quotes
+### Added
+- Issue 266 - Helpdesk Manager Dashboard View
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
