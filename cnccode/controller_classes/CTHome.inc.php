@@ -146,65 +146,44 @@ class CTHome extends CTCNC
         $this->parsePage();
     }
 
-    function displayFixedAndReopen(){
+    function displayFixedAndReopen()
+    {
         $this->setTemplateFiles(
             'FixedAndReopened',
             'HomeFixedAndReopened.inc'
         );
-
-        $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
-
-        $dbeSalesOrderTotals->getRow();
-        $profit = $dbeSalesOrderTotals->getValue('saleValue') - $dbeSalesOrderTotals->getValue('costValue');
-        $this->template->set_var(
-            array(
-                'soSale'   => Controller::formatNumber($dbeSalesOrderTotals->getValue('saleValue')),
-                'soCost'   => Controller::formatNumber($dbeSalesOrderTotals->getValue('costValue')),
-                'soProfit' => Controller::formatNumber($profit)
-            )
+        global $db;
+        /** @var mysqli_result $query */
+        $query = $db->query(
+            "SELECT 
+              SUM(fixer.`teamID` = 1) AS hdFixed,
+              SUM(fixer.teamID	= 2) AS escFixed,
+              SUM(fixer.teamID = 4) AS imtFixed ,
+              SUM(fixer.`teamID` IN (1,2,4)) AS totalFixed
+            FROM
+              problem 
+              LEFT JOIN consultant fixer 
+                ON problem.`pro_fixed_consno` = fixer.`cns_consno` 
+            WHERE DATE(problem.`pro_fixed_date`) = CURRENT_DATE 
+              AND pro_status = 'F' 
+              AND problem.`pro_custno` <> 282
+              AND fixer.`cns_consno` <> 67
+              GROUP BY DATE(problem.pro_fixed_date)"
         );
-        $profitTotal = $profit;
-        $saleTotal = $dbeSalesOrderTotals->getValue('saleValue');
-        $costTotal = $dbeSalesOrderTotals->getValue('costValue');
 
-        $dbeInvoiceTotals = new DBEInvoiceTotals($this);
-        $dbeInvoiceTotals->getCurrentMonthTotals();
-        $profit = $dbeInvoiceTotals->getValue('saleValue') - $dbeInvoiceTotals->getValue('costValue');
+        $result = $query->fetch_assoc();
         $this->template->set_var(
             array(
-                'invPrintedSale'   => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
-                'invPrintedCost'   => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
-                'invPrintedProfit' => Controller::formatNumber($profit)
-            )
-        );
-        $profitTotal += $profit;
-        $saleTotal += $dbeInvoiceTotals->getValue('saleValue');
-        $costTotal += $dbeInvoiceTotals->getValue('costValue');
-
-        $dbeInvoiceTotals->getUnprintedTotals();
-        $profit = $dbeInvoiceTotals->getValue('saleValue') - $dbeInvoiceTotals->getValue('costValue');
-        $this->template->set_var(
-            array(
-                'invUnprintedSale'   => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
-                'invUnprintedCost'   => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
-                'invUnprintedProfit' => Controller::formatNumber($profit)
-            )
-        );
-        $profitTotal += $profit;
-        $saleTotal += $dbeInvoiceTotals->getValue('saleValue');
-        $costTotal += $dbeInvoiceTotals->getValue('costValue');
-
-        $this->template->set_var(
-            array(
-                'saleTotal'   => Controller::formatNumber($saleTotal),
-                'costTotal'   => Controller::formatNumber($costTotal),
-                'profitTotal' => Controller::formatNumber($profitTotal)
+                "hdFixed"    => Controller::formatNumber($result['hdFixed']),
+                "escFixed"   => Controller::formatNumber($result['escFixed']),
+                "imtFixed"   => Controller::formatNumber($result['imtFixed']),
+                "totalFixed" => Controller::formatNumber($result['totalFixed']),
             )
         );
 
         $this->template->parse(
             'CONTENTS',
-            'SalesFigures',
+            'FixedAndReopened',
             true
         );
     }
