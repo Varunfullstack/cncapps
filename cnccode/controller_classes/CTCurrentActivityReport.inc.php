@@ -32,17 +32,33 @@ class CTCurrentActivityReport extends CTCNC
     const PURPLE = '#dcbdff';
     const ORANGE = '#FFE6AB';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg,
+                         $checkPermissions = true
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
 
-        $roles = [
-            "technical",
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
+        if ($checkPermissions) {
+
+            $roles = [
+                "technical",
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
         }
+
 
         $this->buActivity = new BUActivity($this);
 
@@ -56,10 +72,12 @@ class CTCurrentActivityReport extends CTCNC
 
             $userRow =
                 array(
-                    'userID' => $dbeUser->getValue('userID'),
+                    'userID'   => $dbeUser->getValue('userID'),
                     'userName' => $dbeUser->getValue('name'),
-                    'fullName' => $dbeUser->getValue('firstName') . ' ' . $dbeUser->getValue('lastName'
-                        ));
+                    'fullName' => $dbeUser->getValue('firstName') . ' ' . $dbeUser->getValue(
+                            'lastName'
+                        )
+                );
 
             $this->allocatedUser[$dbeUser->getValue('userID')] = $userRow;
 
@@ -280,10 +298,17 @@ class CTCurrentActivityReport extends CTCNC
     function allocateUser()
     {
         $dbeUser = new DBEUser ($this);
-        $dbeUser->setValue('userID', $this->userID);
+        $dbeUser->setValue(
+            'userID',
+            $this->userID
+        );
         $dbeUser->getRow();
 
-        $this->buActivity->allocateUserToRequest($_REQUEST['problemID'], $_REQUEST['userID'], $dbeUser);
+        $this->buActivity->allocateUserToRequest(
+            $_REQUEST['problemID'],
+            $_REQUEST['userID'],
+            $dbeUser
+        );
 
         $urlNext =
             $this->buildLink(
@@ -360,11 +385,18 @@ class CTCurrentActivityReport extends CTCNC
         );
 
 
-        $this->setTemplateFiles('CurrentActivityReport', 'CurrentActivityReport.inc');
+        $this->setTemplateFiles(
+            'CurrentActivityReport',
+            'CurrentActivityReport.inc'
+        );
 
         $openSrsByUser = $this->buActivity->getOpenSrsByUser();
 
-        $this->template->set_block('CurrentActivityReport', 'userSrCountBlock', 'userSrCount');
+        $this->template->set_block(
+            'CurrentActivityReport',
+            'userSrCountBlock',
+            'userSrCount'
+        );
 
         foreach ($openSrsByUser as $row) {
 
@@ -372,11 +404,15 @@ class CTCurrentActivityReport extends CTCNC
 
                 array(
                     'openSrInitials' => $row['initials'],
-                    'openSrCount' => $row['count']
+                    'openSrCount'    => $row['count']
                 )
             );
 
-            $this->template->parse('userSrCount', 'userSrCountBlock', true);
+            $this->template->parse(
+                'userSrCount',
+                'userSrCountBlock',
+                true
+            );
 
         }
 
@@ -390,7 +426,11 @@ class CTCurrentActivityReport extends CTCNC
 
         if ($customerRaisedRequests->Record) {
 
-            $this->template->set_block('CurrentActivityReport', 'customerRequestsBlock', 'customerRequests');
+            $this->template->set_block(
+                'CurrentActivityReport',
+                'customerRequestsBlock',
+                'customerRequests'
+            );
 
             do {
 
@@ -398,7 +438,7 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         'Activity.php',
                         array(
-                            'action' => 'createRequestFromCustomerRequest',
+                            'action'                => 'createRequestFromCustomerRequest',
                             'cpr_customerproblemno' => $customerRaisedRequests->Record['cpr_customerproblemno']
                         )
                     );
@@ -418,7 +458,7 @@ class CTCurrentActivityReport extends CTCNC
                         $this->buildLink(
                             'Activity.php',
                             array(
-                                'action' => 'updateRequestFromCustomerRequest',
+                                'action'                => 'updateRequestFromCustomerRequest',
                                 'cpr_customerproblemno' => $customerRaisedRequests->Record['cpr_customerproblemno']
                             )
                         );
@@ -440,7 +480,7 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         'CurrentActivityReport.php',
                         array(
-                            'action' => 'deleteCustomerRequest',
+                            'action'                => 'deleteCustomerRequest',
                             'cpr_customerproblemno' => $customerRaisedRequests->Record['cpr_customerproblemno']
                         )
                     );
@@ -449,7 +489,7 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         'SalesOrder.php',
                         array(
-                            'action' => 'search',
+                            'action'     => 'search',
                             'customerID' => $customerRaisedRequests->Record['con_custno']
                         )
                     );
@@ -459,7 +499,7 @@ class CTCurrentActivityReport extends CTCNC
                         $this->buildLink(
                             'Activity.php',
                             array(
-                                'action' => 'displayServiceRequest',
+                                'action'    => 'displayServiceRequest',
                                 'problemID' => $customerRaisedRequests->Record['cpr_problemno']
                             )
                         );
@@ -471,7 +511,10 @@ class CTCurrentActivityReport extends CTCNC
                 }
 
 
-                $truncatedReason = $this->truncate($customerRaisedRequests->Record['cpr_reason'], 150);
+                $truncatedReason = CTCurrentActivityReport::truncate(
+                    $customerRaisedRequests->Record['cpr_reason'],
+                    150
+                );
 
                 if ($customerRaisedRequests->Record['cpr_source'] == 'S') {
 
@@ -488,9 +531,9 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         'Activity.php',
                         array(
-                            'action' => 'customerProblemPopup',
+                            'action'            => 'customerProblemPopup',
                             'customerProblemID' => $customerRaisedRequests->Record['cpr_customerproblemno'],
-                            'htmlFmt' => CT_HTML_FMT_POPUP
+                            'htmlFmt'           => CT_HTML_FMT_POPUP
                         )
                     );
 
@@ -498,42 +541,73 @@ class CTCurrentActivityReport extends CTCNC
                 $this->template->set_var(
 
                     array(
-                        'urlDetailsPopup' => $urlDetailsPopup,
-                        'cpCustomerProblemID' => $customerRaisedRequests->Record['cpr_customerproblemno'],
-                        'cpNewButton' => $newButton,
-                        'cpUpdateButton' => $updateButton,
-                        'cpCustomerName' => $customerRaisedRequests->Record['cus_name'],
-                        'cpContactName' => $customerRaisedRequests->Record['con_first_name'] . ' ' . $customerRaisedRequests->Record['con_last_name'],
-                        'cpDate' => $customerRaisedRequests->Record['cpr_date'],
-                        'cpServiceRequestID' => $txtServiceRequestID,
-                        'cpUrlServiceRequest' => $urlServiceRequest,
-                        'cpPriority' => $customerRaisedRequests->Record['cpr_priority'],
-                        'cpTruncatedReason' => $truncatedReason,
-                        'cpFullReason' => $customerRaisedRequests->Record['cpr_reason'],
-                        'cpUrlCustomer' => $urlCustomer,
+                        'urlDetailsPopup'          => $urlDetailsPopup,
+                        'cpCustomerProblemID'      => $customerRaisedRequests->Record['cpr_customerproblemno'],
+                        'cpNewButton'              => $newButton,
+                        'cpUpdateButton'           => $updateButton,
+                        'cpCustomerName'           => $customerRaisedRequests->Record['cus_name'],
+                        'cpContactName'            => $customerRaisedRequests->Record['con_first_name'] . ' ' . $customerRaisedRequests->Record['con_last_name'],
+                        'cpDate'                   => $customerRaisedRequests->Record['cpr_date'],
+                        'cpServiceRequestID'       => $txtServiceRequestID,
+                        'cpUrlServiceRequest'      => $urlServiceRequest,
+                        'cpPriority'               => $customerRaisedRequests->Record['cpr_priority'],
+                        'cpTruncatedReason'        => $truncatedReason,
+                        'cpFullReason'             => $customerRaisedRequests->Record['cpr_reason'],
+                        'cpUrlCustomer'            => $urlCustomer,
                         'urlDeleteCustomerRequest' => $urlDeleteCustomerRequest,
-                        'cpBgColor' => $bgColour,
-                        'cpCount' => $count
+                        'cpBgColor'                => $bgColour,
+                        'cpCount'                  => $count
                     )
 
                 );
 
-                $this->template->parse('customerRequests', 'customerRequestsBlock', true);
+                $this->template->parse(
+                    'customerRequests',
+                    'customerRequestsBlock',
+                    true
+                );
 
             } while ($customerRaisedRequests->next_record());
 
         }
 
-        $this->template->set_var('customerPortalCount', $count);
+        $this->template->set_var(
+            'customerPortalCount',
+            $count
+        );
 
-        $this->template->set_var('displayToBeLoggedFlag', ($_SESSION['displayToBeLoggedFlag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue1Flag', ($_SESSION['displayQueue1Flag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue2Flag', ($_SESSION['displayQueue2Flag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue3Flag', ($_SESSION['displayQueue3Flag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue4Flag', ($_SESSION['displayQueue4Flag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue5Flag', ($_SESSION['displayQueue5Flag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue6Flag', ($_SESSION['displayQueue6Flag'] == 0) ? '0' : '1');
-        $this->template->set_var('displayQueue7Flag', ($_SESSION['displayQueue7Flag'] == 0) ? '0' : '1');
+        $this->template->set_var(
+            'displayToBeLoggedFlag',
+            ($_SESSION['displayToBeLoggedFlag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue1Flag',
+            ($_SESSION['displayQueue1Flag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue2Flag',
+            ($_SESSION['displayQueue2Flag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue3Flag',
+            ($_SESSION['displayQueue3Flag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue4Flag',
+            ($_SESSION['displayQueue4Flag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue5Flag',
+            ($_SESSION['displayQueue5Flag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue6Flag',
+            ($_SESSION['displayQueue6Flag'] == 0) ? '0' : '1'
+        );
+        $this->template->set_var(
+            'displayQueue7Flag',
+            ($_SESSION['displayQueue7Flag'] == 0) ? '0' : '1'
+        );
 
 
         $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . 's');
@@ -548,56 +622,74 @@ class CTCurrentActivityReport extends CTCNC
         if ($_SESSION['selectedCustomerID']) {
             $this->renderQueue(6);  //Fixed
         } else {
-            $this->template->set_block('CurrentActivityReport', 'queue6Block', 'requests6');
+            $this->template->set_block(
+                'CurrentActivityReport',
+                'queue6Block',
+                'requests6'
+            );
             $this->template->set_var(
 
                 array(
 
-                    'workOnClick' => '',
-                    'hoursRemaining' => '',
-                    'updatedBgColor' => '',
-                    'priorityBgColor' => '',
-                    'hoursRemainingBgColor' => '',
+                    'workOnClick'                => '',
+                    'hoursRemaining'             => '',
+                    'updatedBgColor'             => '',
+                    'priorityBgColor'            => '',
+                    'hoursRemainingBgColor'      => '',
                     'totalActivityDurationHours' => '',
-                    'hdRemaining' => '',
-                    'esRemaining' => '',
-                    'imRemaining' => '',
-                    'hdColor' => '',
-                    'esColor' => '',
-                    'imColor' => '',
-                    'urlCustomer' => '',
-                    'time' => '',
-                    'date' => '',
-                    'problemID' => '',
-                    'reason' => '',
-                    'urlProblemHistoryPopup' => '',
-                    'engineerDropDown' => '',
-                    'engineerName' => '',
-                    'customerName' => '',
-                    'customerNameDisplayClass' => '',
-                    'urlViewActivity' => '',
+                    'hdRemaining'                => '',
+                    'esRemaining'                => '',
+                    'imRemaining'                => '',
+                    'hdColor'                    => '',
+                    'esColor'                    => '',
+                    'imColor'                    => '',
+                    'urlCustomer'                => '',
+                    'time'                       => '',
+                    'date'                       => '',
+                    'problemID'                  => '',
+                    'reason'                     => '',
+                    'urlProblemHistoryPopup'     => '',
+                    'engineerDropDown'           => '',
+                    'engineerName'               => '',
+                    'customerName'               => '',
+                    'customerNameDisplayClass'   => '',
+                    'urlViewActivity'            => '',
                     'linkAllocateAdditionalTime' => '',
-                    'slaResponseHours' => '',
-                    'priority' => '',
-                    'alarmDateTime' => '',
-                    'bgColour' => '',
-                    'workBgColor' => '',
+                    'slaResponseHours'           => '',
+                    'priority'                   => '',
+                    'alarmDateTime'              => '',
+                    'bgColour'                   => '',
+                    'workBgColor'                => '',
 
                 )
 
             );
-            $this->template->parse('requests6', 'queue6Block', true);
+            $this->template->parse(
+                'requests6',
+                'queue6Block',
+                true
+            );
 
         }
 
         $this->renderQueue(7); // Future
 
-        $this->template->set_block('CurrentActivityReport', 'userFilterBlock', 'users');
+        $this->template->set_block(
+            'CurrentActivityReport',
+            'userFilterBlock',
+            'users'
+        );
 
         $loggedInUserID = $this->userID;
 
-        usort($this->filterUser,
-            function ($a, $b) use ($loggedInUserID) {
+        usort(
+            $this->filterUser,
+            function ($a,
+                      $b
+            ) use
+            (
+                $loggedInUserID
+            ) {
 
                 if ($a['userID'] == $loggedInUserID) {
                     return -1;
@@ -606,7 +698,10 @@ class CTCurrentActivityReport extends CTCNC
                 if ($b['userID'] == $loggedInUserID) {
                     return 1;
                 }
-                return strcasecmp($a['fullName'], $b['fullName']);
+                return strcasecmp(
+                    $a['fullName'],
+                    $b['fullName']
+                );
             }
         );
 
@@ -620,23 +715,34 @@ class CTCurrentActivityReport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'filterUserName' => $value['fullName'],
-                    'filterUserID' => $value['userID'],
+                    'filterUserName'     => $value['fullName'],
+                    'filterUserID'       => $value['userID'],
                     'filterUserSelected' => $userSelected
                 )
             );
 
-            $this->template->parse('users', 'userFilterBlock', true);
+            $this->template->parse(
+                'users',
+                'userFilterBlock',
+                true
+            );
         }
         /*
         Priority Filter
         */
-        $this->template->set_block('CurrentActivityReport', 'priorityFilterBlock', 'priorityFilters');
+        $this->template->set_block(
+            'CurrentActivityReport',
+            'priorityFilterBlock',
+            'priorityFilters'
+        );
 
         foreach ($this->buActivity->priorityArray as $key => $value) {
 
             if (
-            in_array($key, $_SESSION['priorityFilter'])
+            in_array(
+                $key,
+                $_SESSION['priorityFilter']
+            )
             ) {
                 $checked = 'checked';
             } else {
@@ -645,12 +751,16 @@ class CTCurrentActivityReport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'priority' => $key,
+                    'priority'        => $key,
                     'priorityChecked' => $checked
                 )
             );
 
-            $this->template->parse('priorityFilters', 'priorityFilterBlock', true);
+            $this->template->parse(
+                'priorityFilters',
+                'priorityFilterBlock',
+                true
+            );
 
         }
         // end priority filter
@@ -658,7 +768,11 @@ class CTCurrentActivityReport extends CTCNC
         /*
         customer filter
         */
-        $this->template->set_block('CurrentActivityReport', 'customerFilterBlock', 'customers');
+        $this->template->set_block(
+            'CurrentActivityReport',
+            'customerFilterBlock',
+            'customers'
+        );
 
         if ($this->customerFilterList) {
             asort($this->customerFilterList);
@@ -672,12 +786,16 @@ class CTCurrentActivityReport extends CTCNC
                 $this->template->set_var(
                     array(
                         'filterCustomerIDSelected' => $customerIDSelected,
-                        'filterCustomerID' => $customerID,
-                        'filterCustomerName' => $customerName
+                        'filterCustomerID'         => $customerID,
+                        'filterCustomerName'       => $customerName
                     )
                 );
 
-                $this->template->parse('customers', 'customerFilterBlock', true);
+                $this->template->parse(
+                    'customers',
+                    'customerFilterBlock',
+                    true
+                );
             }
         }
         /*
@@ -705,15 +823,19 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'urlResetFilter' => $urlResetFilter,
+                'urlResetFilter'  => $urlResetFilter,
                 'urlShowMineOnly' => $urlShowMineOnly,
-                'urlSetFilter' => $urlSetFilter
+                'urlSetFilter'    => $urlSetFilter
             )
 
         );
 
 
-        $this->template->parse('CONTENTS', 'CurrentActivityReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'CurrentActivityReport',
+            true
+        );
 
 
         $this->parsePage();
@@ -724,14 +846,21 @@ class CTCurrentActivityReport extends CTCNC
     {
         if ($queueNo == 6) {
             /* fixed awaiting closure */
-            $this->buActivity->getProblemsByStatus('F', $dsResults, false);
+            $this->buActivity->getProblemsByStatus(
+                'F',
+                $dsResults,
+                false
+            );
 
         } elseif ($queueNo == 7) {
             /* future dated */
             $this->buActivity->getFutureProblems($dsResults);
 
         } else {
-            $this->buActivity->getProblemsByQueueNo($queueNo, $dsResults);
+            $this->buActivity->getProblemsByQueueNo(
+                $queueNo,
+                $dsResults
+            );
 
         }
 
@@ -748,7 +877,11 @@ class CTCurrentActivityReport extends CTCNC
 
         $blockName = 'queue' . $queueNo . 'Block';
 
-        $this->template->set_block('CurrentActivityReport', $blockName, 'requests' . $queueNo);
+        $this->template->set_block(
+            'CurrentActivityReport',
+            $blockName,
+            'requests' . $queueNo
+        );
 
         $rowCount = 0;
 
@@ -757,13 +890,18 @@ class CTCurrentActivityReport extends CTCNC
             $this->customerFilterList[$dsResults->getValue('customerID')] = $dsResults->getValue('customerName');
 
             if (
-            !in_array($dsResults->getValue('priority'), $_SESSION['priorityFilter'])
+            !in_array(
+                $dsResults->getValue('priority'),
+                $_SESSION['priorityFilter']
+            )
             ) {
                 continue;
             }
 
 
-            if ($_SESSION['selectedCustomerID'] && $_SESSION['selectedCustomerID'] != $dsResults->getValue('customerID')) {
+            if ($_SESSION['selectedCustomerID'] && $_SESSION['selectedCustomerID'] != $dsResults->getValue(
+                    'customerID'
+                )) {
                 continue;
             }
             $userID = $dsResults->getValue('userID');
@@ -784,9 +922,9 @@ class CTCurrentActivityReport extends CTCNC
                 $this->buildLink(
                     'Activity.php',
                     array(
-                        'action' => 'reasonPopup',
+                        'action'    => 'reasonPopup',
                         'problemID' => $dsResults->getValue('problemID'),
-                        'htmlFmt' => CT_HTML_FMT_POPUP
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
                     )
                 );
 
@@ -794,7 +932,7 @@ class CTCurrentActivityReport extends CTCNC
                 $this->buildLink(
                     'Activity.php',
                     array(
-                        'action' => 'displayLastActivity',
+                        'action'    => 'displayLastActivity',
                         'problemID' => $dsResults->getValue('problemID')
                     )
                 );
@@ -813,7 +951,7 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         'Activity.php',
                         array(
-                            'action' => 'allocateAdditionalTime',
+                            'action'    => 'allocateAdditionalTime',
                             'problemID' => $dsResults->getValue('problemID')
                         )
                     );
@@ -881,7 +1019,7 @@ class CTCurrentActivityReport extends CTCNC
                 $this->buildLink(
                     'SalesOrder.php',
                     array(
-                        'action' => 'search',
+                        'action'     => 'search',
                         'customerID' => $dsResults->getValue('customerID')
                     )
                 );
@@ -895,7 +1033,7 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'escalate',
+                            'action'    => 'escalate',
                             'problemID' => $dsResults->getValue('problemID')
                         )
                     );
@@ -914,7 +1052,7 @@ class CTCurrentActivityReport extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'deescalate',
+                            'action'    => 'deescalate',
                             'problemID' => $dsResults->getValue('problemID')
                         )
                     );
@@ -931,7 +1069,9 @@ class CTCurrentActivityReport extends CTCNC
 
             if ($dsResults->getValue('alarmDate') && $dsResults->getValue('alarmDate') != '0000-00-00') {
 
-                $alarmDateTimeDisplay = Controller::dateYMDtoDMY($dsResults->getValue('alarmDate')) . ' ' . $dsResults->getValue('alarmTime');
+                $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
+                        $dsResults->getValue('alarmDate')
+                    ) . ' ' . $dsResults->getValue('alarmTime');
 
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
@@ -962,7 +1102,7 @@ class CTCurrentActivityReport extends CTCNC
                         $this->buildLink(
                             'Activity.php',
                             array(
-                                'action' => 'createFollowOnActivity',
+                                'action'         => 'createFollowOnActivity',
                                 'callActivityID' => $dsResults->getValue('callActivityID')
                             )
 
@@ -979,9 +1119,9 @@ class CTCurrentActivityReport extends CTCNC
                         $this->buildLink(
                             'CurrentActivityReport.php',
                             array(
-                                'action' => 'setFilter',
+                                'action'             => 'setFilter',
                                 'selectedCustomerID' => $dsResults->getValue('customerID'),
-                                'selectedUserID' => ''
+                                'selectedUserID'     => ''
                             )
                         );
 
@@ -1004,7 +1144,10 @@ class CTCurrentActivityReport extends CTCNC
             $imUsedMinutes = $buActivity->getIMTeamUsedTime($problemID);
 
             $dbeProblem = new DBEProblem($this);
-            $dbeProblem->setValue(DBEProblem::problemID, $problemID);
+            $dbeProblem->setValue(
+                DBEProblem::problemID,
+                $problemID
+            );
             $dbeProblem->getRow();
 
             $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
@@ -1016,51 +1159,67 @@ class CTCurrentActivityReport extends CTCNC
             $imRemaining = $imAssignedMinutes - $imUsedMinutes;
 
 
-            $hoursRemaining = number_format($dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
-                                            1);
+            $hoursRemaining = number_format(
+                $dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
+                1
+            );
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
             $this->template->set_var(
 
                 array(
-                    'queueOptions' => implode($queueOptions),
-                    'workOnClick' => $workOnClick,
-                    'hoursRemaining' => $hoursRemaining,
-                    'updatedBgColor' => $updatedBgColor,
-                    'priorityBgColor' => $priorityBgColor,
-                    'hoursRemainingBgColor' => $hoursRemainingBgColor,
+                    'queueOptions'               => implode($queueOptions),
+                    'workOnClick'                => $workOnClick,
+                    'hoursRemaining'             => $hoursRemaining,
+                    'updatedBgColor'             => $updatedBgColor,
+                    'priorityBgColor'            => $priorityBgColor,
+                    'hoursRemainingBgColor'      => $hoursRemainingBgColor,
                     'totalActivityDurationHours' => $totalActivityDurationHours,
-                    'hdRemaining' => $hdRemaining,
-                    'esRemaining' => $esRemaining,
-                    'imRemaining' => $imRemaining,
-                    'hdColor' => $this->pickColor($hdRemaining),
-                    'esColor' => $this->pickColor($esRemaining),
-                    'imColor' => $this->pickColor($imRemaining),
-                    'urlCustomer' => $urlCustomer,
-                    'time' => $dsResults->getValue('lastStartTime'),
-                    'date' => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
-                    'problemID' => $dsResults->getValue('problemID'),
-                    'reason' => $this->truncate($dsResults->getValue('reason'), 150),
-                    'urlProblemHistoryPopup' => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
-                    'engineerDropDown' => $this->getAllocatedUserDropdown($dsResults->getValue('problemID'),
-                                                                          $dsResults->getValue('userID')),
-                    'engineerName' => $dsResults->getValue('engineerName'),
-                    'customerName' => $dsResults->getValue('customerName'),
+                    'hdRemaining'                => $hdRemaining,
+                    'esRemaining'                => $esRemaining,
+                    'imRemaining'                => $imRemaining,
+                    'hdColor'                    => $this->pickColor($hdRemaining),
+                    'esColor'                    => $this->pickColor($esRemaining),
+                    'imColor'                    => $this->pickColor($imRemaining),
+                    'urlCustomer'                => $urlCustomer,
+                    'time'                       => $dsResults->getValue('lastStartTime'),
+                    'date'                       => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
+                    'problemID'                  => $dsResults->getValue('problemID'),
+                    'reason'                     => CTCurrentActivityReport::truncate(
+                        $dsResults->getValue('reason'),
+                        150
+                    ),
+                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
+                    'engineerDropDown'           => $this->getAllocatedUserDropdown(
+                        $dsResults->getValue('problemID'),
+                        $dsResults->getValue('userID')
+                    ),
+                    'engineerName'               => $dsResults->getValue('engineerName'),
+                    'customerName'               => $dsResults->getValue('customerName'),
                     'customerNameDisplayClass'
-                    => $this->getCustomerNameDisplayClass($dsResults->getValue('specialAttentionFlag'),
-                                                          $dsResults->getValue('specialAttentionEndDate')),
-                    'urlViewActivity' => $urlViewActivity,
+                                                 => $this->getCustomerNameDisplayClass(
+                        $dsResults->getValue('specialAttentionFlag'),
+                        $dsResults->getValue('specialAttentionEndDate')
+                    ),
+                    'urlViewActivity'            => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
-                    'slaResponseHours' => number_format($dsResults->getValue('slaResponseHours'), 1),
-                    'priority' => Controller::htmlDisplayText($dsResults->getValue('priority')),
-                    'alarmDateTime' => $alarmDateTimeDisplay,
-                    'bgColour' => $bgColour,
-                    'workBgColor' => $workBgColor
+                    'slaResponseHours'           => number_format(
+                        $dsResults->getValue('slaResponseHours'),
+                        1
+                    ),
+                    'priority'                   => Controller::htmlDisplayText($dsResults->getValue('priority')),
+                    'alarmDateTime'              => $alarmDateTimeDisplay,
+                    'bgColour'                   => $bgColour,
+                    'workBgColor'                => $workBgColor
 
                 )
 
             );
 
-            $this->template->parse('requests' . $queueNo, $blockName, true);
+            $this->template->parse(
+                'requests' . $queueNo,
+                $blockName,
+                true
+            );
 
 
         } // end while
@@ -1068,14 +1227,14 @@ class CTCurrentActivityReport extends CTCNC
         $this->template->set_var(
             array(
                 'queue' . $queueNo . 'Count' => $rowCount,
-                'queue' . $queueNo . 'Name' => $this->buActivity->workQueueDescriptionArray[$queueNo],
+                'queue' . $queueNo . 'Name'  => $this->buActivity->workQueueDescriptionArray[$queueNo],
 
             )
         );
     } // end render queue
 
 
-    private function pickColor($value)
+    protected function pickColor($value)
     {
         if ($value <= 5) {
             return 'red';
@@ -1144,7 +1303,9 @@ class CTCurrentActivityReport extends CTCNC
         return $bgColour;
     }
 
-    function getAlarmColour($alarmDate, $alarmTime)
+    function getAlarmColour($alarmDate,
+                            $alarmTime
+    )
     {
 
         if ($alarmDate && $alarmDate != '0000-00-00') {
@@ -1172,7 +1333,9 @@ class CTCurrentActivityReport extends CTCNC
      *
      * @param mixed $selectedID
      */
-    function getAllocatedUserDropdown($problemID, $selectedID)
+    function getAllocatedUserDropdown($problemID,
+                                      $selectedID
+    )
     {
 
         // user selection
@@ -1182,8 +1345,8 @@ class CTCurrentActivityReport extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'allocateUser',
-                    'userID' => '0',
+                    'action'    => 'allocateUser',
+                    'userID'    => '0',
                     'problemID' => $problemID
                 )
             );
@@ -1197,8 +1360,8 @@ class CTCurrentActivityReport extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'allocateUser',
-                        'userID' => $value['userID'],
+                        'action'    => 'allocateUser',
+                        'userID'    => $value['userID'],
                         'problemID' => $problemID
                     )
                 );
@@ -1211,20 +1374,14 @@ class CTCurrentActivityReport extends CTCNC
 
     }
 
-    function truncate($reason, $length = 100)
-    {
-        return substr(common_stripEverything($reason), 0, $length);
-
-    }
-
     function getProblemHistoryLink($problemID)
     {
         $url = $this->buildLink(
             'Activity.php',
             array(
-                'action' => 'problemHistoryPopup',
+                'action'    => 'problemHistoryPopup',
                 'problemID' => $problemID,
-                'htmlFmt' => CT_HTML_FMT_POPUP
+                'htmlFmt'   => CT_HTML_FMT_POPUP
             )
         );
 
@@ -1232,7 +1389,9 @@ class CTCurrentActivityReport extends CTCNC
 
     }
 
-    function getCustomerNameDisplayClass($specialAttentionFlag, $specialAttentionEndDate)
+    function getCustomerNameDisplayClass($specialAttentionFlag,
+                                         $specialAttentionEndDate
+    )
     {
         if (
             $specialAttentionFlag == 'Y' &&
@@ -1263,7 +1422,10 @@ class CTCurrentActivityReport extends CTCNC
         $problemID = $_REQUEST['problemID'];
         $newQueue = $_REQUEST['queue'];
 
-        $this->buActivity->escalateProblemByProblemID($problemID, $newQueue);
+        $this->buActivity->escalateProblemByProblemID(
+            $problemID,
+            $newQueue
+        );
 
         $urlNext =
             $this->buildLink(

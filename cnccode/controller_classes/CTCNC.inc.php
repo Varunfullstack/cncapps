@@ -247,6 +247,18 @@ class CTCNC extends Controller
         );
     }
 
+    static function truncate($reason,
+                             $length = 100
+    )
+    {
+        return substr(
+            common_stripEverything($reason),
+            0,
+            $length
+        );
+
+    }
+
     protected function isSdManager()
     {
         return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';

@@ -1,3 +1,11 @@
+<script>
+    $(function () {
+        $('.userAllocation').change(function () {
+            console.log(this.value);
+            window.location = this.value;
+        })
+    })
+</script>
 <table id="queue1"
        class="table-bordered oddRows"
        width="100%"
@@ -5,7 +13,7 @@
     <thead>
     <tr valign="center">
         <th class="listHeadText"
-            colspan="4"
+            colspan="2"
             width="34%"
         >
             <div align="left">{queue1Name} ({queue1Count})</div>
@@ -15,7 +23,6 @@
         >
             <div align="left">Priority</div>
         </th>
-        <th class="listHeadText">&nbsp;</th>
         <th class="listHeadText">
             <div align="left">Open Hours</div>
         </th>
@@ -23,7 +30,7 @@
             <div align="left">Time Spent</div>
         </th>
         <th class="listHeadText">
-            <div align="left">Time Budget</div>
+            <div align="left">Number Of Activities</div>
         </th>
         <th class="listHeadText">
             <div align="left">Description</div>
@@ -37,27 +44,8 @@
     </tr>
     </thead>
     <tbody>
-    <!-- BEGIN queue1Block -->
+    <!-- BEGIN queueShortest_SLA_RemainingBlock -->
     <tr valign="center">
-
-        <td width="3%"
-            bgColor="{workBgColor}"
-        >
-            <INPUT
-                    type="button"
-                    value="Work"
-                    title="Log activity against this SR"
-                    onClick="{workOnClick}"
-            >
-        </td>
-
-        <td width="3%">
-            <select class="queueSelector"
-                    data-problemId="{problemID}"
-            >
-                {queueOptions}
-            </select></td>
-
         <td width="2%"
             bgcolor="{bgColour}"
             class="problemId"
@@ -80,39 +68,20 @@
         >
             <div align="center">{priority}</div>
         </td>
-
-        <td>{linkAllocateAdditionalTime}</td>
-
         <td width="5%"
             bgcolor="{hoursRemainingBgColor}"
             title="Green = Awaiting Customer Blue = CNC Yellow = Not Started"
         >
             <div align="center">{hoursRemaining}</div>
         </td>
+
         <td width="5%"
             align="center"
         >{totalActivityDurationHours}
         </td>
-        <td width="15%"
-            align="left"
-        >
-                <span style="cursor: pointer"
-                      class="requestAdditionalTime"
-                      data-problemId="{problemID}"
-                >
-                    <img src="images/clock.gif"
-                         alt="Clock"
-                         width="24"
-                         height="25"
-                         title="Request Time"
-                    >
-                </span>
-
-            <span style="color: {hdColor}">HD:{hdRemaining}</span>
-            <span style="color: {esColor}">ES:{esRemaining}</span>
-            <span style="color: {imColor}">IM:{imRemaining}</span>
+        <td width="5%">
+            <div align="center">{activityCount}</div>
         </td>
-
         <td width="37%">
             <A
                     href="#"
@@ -138,6 +107,6 @@
         </td>
 
     </tr>
-    <!-- END queue1Block -->
+    <!-- END queueShortest_SLA_RemainingBlock -->
     </tbody>
 </table>
