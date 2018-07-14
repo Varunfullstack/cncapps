@@ -3057,11 +3057,11 @@ class CTActivity extends CTCNC
                 array(
                     'problemID'              => $dsActiveSrs->getValue("problemID"),
                     'dateRaised'             => Controller::dateYMDtoDMY($dsActiveSrs->getValue('dateRaised')),
-                    'reason'                 => $this->truncate(
+                    'reason'                 => self::truncate(
                         $dsActiveSrs->getValue("reason"),
                         100
                     ),
-                    'lastReason'             => $this->truncate(
+                    'lastReason'             => self::truncate(
                         $dsActiveSrs->getValue("lastReason"),
                         100
                     ),
@@ -3098,18 +3098,6 @@ class CTActivity extends CTCNC
         );
 
         $this->parsePage();
-
-    }
-
-    function truncate($reason,
-                      $length = 100
-    )
-    {
-        return substr(
-            common_stripEverything($reason),
-            0,
-            $length
-        );
 
     }
 

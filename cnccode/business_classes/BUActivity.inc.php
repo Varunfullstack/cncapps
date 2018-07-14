@@ -10482,6 +10482,37 @@ is currently a balance of ';
         return true;
     }
 
+    public function getShortestSLARemainingProblems($problems,
+                                                    $limit
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getNotStartedRows($limit);
+
+        $this->getData(
+            $dbeJProblem,
+            $problems
+        );
+    }
+
+    public function getActivityCount($problemID,
+                                     $ignoreOperation = true
+    )
+    {
+        $dbejCallActivity = new DBEJCallActivity($this);
+        $dbejCallActivity->getRowsByProblemID(
+            $problemID,
+            true,
+            !$ignoreOperation
+        );
+        $count = 0;
+        while ($thing = $dbejCallActivity->fetchNext()) {
+            $count++;
+        }
+        return $count;
+    }
+
 
 } // End of class
 ?>
