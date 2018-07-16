@@ -23,6 +23,10 @@ This project changes will be shown here.
 - Issue 282 - Remove DNS records from domain name
 - Issue 283 - Remove Documentation link from Quotation Page
 
+## [v1.8.5]
+### Fixed
+- Issue 299 - Show link to create customer folder if it doesn't exist
+
 ## [v1.8.4] - 2018-07-04
 ### Fixed
 - Issue 292 - Skip Sales Order on Activity.php shows debug information
