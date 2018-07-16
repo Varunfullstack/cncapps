@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.8.5]
+## [v1.8.5] - 2018-07-16
 ### Fixed
 - Issue 299 - Show link to create customer folder if it doesn't exist
 
