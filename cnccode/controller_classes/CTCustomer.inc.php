@@ -1708,6 +1708,7 @@ ORDER BY cus_name ASC  ";
         if (!$this->buCustomer->customerFolderExists(
             $this->dsCustomer->getValue(DBECustomer::customerID)
         )) {
+
             $urlCreateCustomerFolder =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],

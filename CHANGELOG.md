@@ -1,9 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
-### Added
-- Issue 297 - First Time Fix figures
+## [v1.8.5]
+### Fixed
+- Issue 299 - Show link to create customer folder if it doesn't exist
 
 ## [v1.8.4] - 2018-07-04
 ### Fixed
