@@ -1141,7 +1141,8 @@ GROUP BY initial.caa_date,
   ROUND(
     SUM(attemptedFirstTimeFixed) / phonedThroughRequests,
     2
-  )*100 AS firstTimeFixAttemptedPct
+  )*100 AS firstTimeFixAttemptedPct,
+  phonedThroughRequests
 FROM
   (SELECT 
     initial.caa_date AS DATE,
@@ -1232,6 +1233,7 @@ GROUP BY phonedThroughRequests "
             [
                 'firstTimeFixAchievedPct'  => $firstTimeFixAchievedPct,
                 'firstTimeFixAttemptedPct' => $firstTimeFixAttemptedPct,
+                'phonedThroughRequests'    => $data['phonedThroughRequests']
             ]
         );
 
