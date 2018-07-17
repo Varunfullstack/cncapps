@@ -1223,8 +1223,8 @@ GROUP BY phonedThroughRequests "
             $firstTimeFixAchievedPct = 'N/A';
             $firstTimeFixAttemptedPct = 'N/A';
         } else {
-            $firstTimeFixAchievedPct = $data['firstTimeFixAchievedPct'];
-            $firstTimeFixAttemptedPct = $data['firstTimeFixAttemptedPct'];
+            $firstTimeFixAchievedPct = round($data['firstTimeFixAchievedPct']);
+            $firstTimeFixAttemptedPct = round($data['firstTimeFixAttemptedPct']);
         }
 
         $this->template->set_var(
