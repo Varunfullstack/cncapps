@@ -10476,13 +10476,17 @@ is currently a balance of ';
         return true;
     }
 
-    public function getShortestSLARemainingProblems($problems,
-                                                    $limit
+    public function getSDDashBoardData($problems,
+                                       $limit,
+                                       $order = 'shortestSLARemaining'
     )
     {
         $dbeJProblem = new DBEJProblem($this);
 
-        $dbeJProblem->getNotStartedRows($limit);
+        $dbeJProblem->getDashBoardRows(
+            $limit,
+            $order
+        );
 
         $this->getData(
             $dbeJProblem,
@@ -10505,6 +10509,20 @@ is currently a balance of ';
             $count++;
         }
         return $count;
+    }
+
+    public function getOldestUpdatesSRs($problems,
+                                        $limit
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getOldestUpdatesSRRows($limit);
+
+        $this->getData(
+            $dbeJProblem,
+            $problems
+        );
     }
 
 

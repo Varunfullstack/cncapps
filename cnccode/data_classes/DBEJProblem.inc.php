@@ -573,7 +573,9 @@ class DBEJProblem extends DBEProblem
         return parent::getRows();
     }
 
-    public function getNotStartedRows($limit)
+    public function getDashBoardRows($limit = 10,
+                                     $orderBy = 'shortestSLARemaining'
+    )
     {
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
@@ -597,13 +599,34 @@ class DBEJProblem extends DBEProblem
             
         WHERE " . $this->getDBColumnName(self::respondedHours) . ' = 0 && ' . $this->getDBColumnName(
                 self::status
-            ) . ' = "I" order by hoursRemaining desc';
+            ) . ' = "I" and ' . $this->getDBColumnName(self::priority) . ' <= 4 and ' . $this->getDBColumnName(
+                self::priority
+            ) . ' > 0 and ' . $this->getDBColumnName(self::customerID) . ' <> 282';
+
+        switch ($orderBy) {
+            case 'shortestSLARemaining':
+                {
+                    $sql .= ' order by hoursRemaining desc';
+                    break;
+                }
+            case 'oldestUpdatedSR':
+                {
+                    $sql .= ' order by last.caa_date asc, last.caa_starttime desc';
+                    break;
+                }
+            case 'mostHoursLogged':
+                {
+                    $sql .= ' order by ' . $this->getDBColumnName(self::totalActivityDurationHours) . ' desc';
+                    break;
+                }
+        }
+
+        $sql .= ' limit ' . $limit;
+
         $this->setQueryString($sql);
 
         return (parent::getRow());
     }
-
-
 }
 
 ?>
