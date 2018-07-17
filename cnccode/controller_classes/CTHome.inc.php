@@ -1114,8 +1114,6 @@ GROUP BY initial.caa_date,
 
 
         while ($row = $result->fetch_assoc()) {
-            var_dump($row);
-
             $this->template->set_var(
                 [
                     'name'                  => $row['name'],
