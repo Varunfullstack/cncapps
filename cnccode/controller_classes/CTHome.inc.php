@@ -1053,75 +1053,91 @@ class CTHome extends CTCNC
         $result = $db->query(
             "SELECT 
   CONCAT(
-    fixer.`firstName`,
+    engineer.`firstName`,
     ' ',
-    fixer.`lastName`
+    engineer.`lastName`
   ) AS name,
   SUM(
-    TIME_TO_SEC(
-      TIMEDIFF(
-        fixedActivity.caa_starttime,
-        remoteSupport.caa_endtime
-      )
-    ) <= (5 * 60)
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        callactivity 
+      WHERE callactivity.caa_problemno = problem.pro_problemno 
+        AND callactivity.caa_callacttypeno = 8 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            callactivity.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND callactivity.`caa_consno` = engineer.`cns_consno`),
+      0
+    )
+  ) AS attemptedFirstTimeFix,
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        problem test 
+        JOIN callactivity initial 
+          ON initial.caa_problemno = test.pro_problemno 
+          AND initial.caa_callacttypeno = 51 
+        JOIN callactivity remoteSupport 
+          ON remoteSupport.caa_problemno = test.pro_problemno 
+          AND remoteSupport.caa_callacttypeno = 8 
+        JOIN callactivity fixedActivity 
+          ON fixedActivity.caa_problemno = test.pro_problemno 
+          AND fixedActivity.caa_callacttypeno = 57 
+      WHERE test.pro_problemno = problem.`pro_problemno` 
+        AND remoteSupport.caa_consno = engineer.`cns_consno` 
+        AND fixedActivity.caa_consno = engineer.`cns_consno` 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            remoteSupport.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            fixedActivity.caa_starttime,
+            remoteSupport.caa_endtime
+          )
+        ) <= (5 * 60)),
+      0
+    )
   ) AS firstTimeFix,
-  SUM(1) AS attemptedFirstTimeFix
+  SUM(1) AS totalRaised  
 FROM
   problem 
-  JOIN consultant fixer 
-    ON fixer.`cns_consno` = problem.`pro_fixed_consno` 
   JOIN callactivity initial 
     ON initial.caa_problemno = problem.pro_problemno 
     AND initial.caa_callacttypeno = 51 
-  JOIN callactivity remoteSupport 
-    ON remoteSupport.caa_problemno = problem.pro_problemno 
-    AND remoteSupport.caa_callacttypeno = 8 
-  JOIN callactivity fixedActivity 
-    ON fixedActivity.caa_problemno = problem.pro_problemno 
-    AND fixedActivity.caa_callacttypeno = 57 
-WHERE pro_priority <= 4 
-  AND pro_status = 'F' 
-  AND 
-  (SELECT 
-    COUNT(*) 
-  FROM
-    callactivity remoteTest 
-  WHERE remoteTest.caa_problemno = pro_problemno 
-    AND remoteTest.caa_callacttypeno = 8) = 1 
-  AND 
-  (SELECT 
-    COUNT(*) 
-  FROM
-    callactivity fixedActivityTest 
-  WHERE fixedActivityTest.caa_problemno = pro_problemno 
-    AND fixedActivityTest.caa_callacttypeno = 57) = 1 
-  AND remoteSupport.caa_date = initial.caa_date 
-  AND fixedActivity.caa_date = initial.caa_date 
-  AND initial.caa_date = CURRENT_DATE
-  AND problem.pro_custno <> 282 
-  AND remoteSupport.caa_consno = initial.caa_consno 
-  AND fixedActivity.caa_consno = initial.caa_consno 
-  AND TIME_TO_SEC(
-    TIMEDIFF(
-      remoteSupport.caa_starttime,
-      initial.caa_endtime
-    )
-  ) <= (5 * 60) 
- AND fixer.`teamID` = 1
-GROUP BY initial.caa_date,
-  problem.`pro_fixed_consno` "
+  JOIN consultant engineer 
+    ON initial.`caa_consno` = engineer.`cns_consno` 
+WHERE problem.`pro_custno` <> 282 
+  AND initial.caa_date = CURRENT_DATE 
+  AND engineer.`teamID` = 1 
+GROUP BY engineer.`cns_consno`  order by engineer.firstName"
         );
 
-
+        $totalRaised = 0;
+        $totalAttempted = 0;
+        $totalAchieved = 0;
         while ($row = $result->fetch_assoc()) {
             $this->template->set_var(
                 [
                     'name'                  => $row['name'],
                     'firstTimeFix'          => $row['firstTimeFix'],
                     'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
+                    'totalRaised'           => $row['totalRaised']
                 ]
             );
 
+            $totalRaised += $row['totalRaised'];
+            $totalAttempted += $row['attemptedFirstTimeFix'];
+            $totalAchieved += $row['firstTimeFix'];
             $this->template->parse(
                 'figures',
                 'firstTimeFixBlock',
@@ -1129,109 +1145,15 @@ GROUP BY initial.caa_date,
             );
         }
 
-
-        $result = $db->query(
-            "SELECT 
-  ROUND(
-    SUM(firstTimeFixed) / phonedThroughRequests,
-    2
-  )*100 AS firstTimeFixAchievedPct,
-  ROUND(
-    SUM(attemptedFirstTimeFixed) / phonedThroughRequests,
-    2
-  )*100 AS firstTimeFixAttemptedPct,
-  phonedThroughRequests
-FROM
-  (SELECT 
-    initial.caa_date AS DATE,
-    CONCAT(
-      fixer.`firstName`,
-      ' ',
-      fixer.`lastName`
-    ) AS NAME,
-    SUM(
-      TIME_TO_SEC(
-        TIMEDIFF(
-          fixedActivity.caa_starttime,
-          remoteSupport.caa_endtime
-        )
-      ) <= (5 * 60)
-    ) AS firstTimeFixed,
-    SUM(1) AS attemptedFirstTimeFixed,
-    (SELECT 
-      COUNT(*) 
-    FROM
-      problem 
-      JOIN callactivity initial 
-        ON initial.caa_problemno = problem.pro_problemno 
-        AND initial.caa_callacttypeno = 51 
-      JOIN consultant 
-        ON initial.`caa_consno` = consultant.`cns_consno` 
-    WHERE initial.caa_date = CURRENT_DATE 
-      AND consultant.`teamID` = 1 
-      AND problem.pro_custno <> 282) AS phonedThroughRequests 
-  FROM
-    problem 
-    JOIN consultant fixer 
-      ON fixer.`cns_consno` = problem.`pro_fixed_consno` 
-    JOIN callactivity initial 
-      ON initial.caa_problemno = problem.pro_problemno 
-      AND initial.caa_callacttypeno = 51 
-    JOIN callactivity remoteSupport 
-      ON remoteSupport.caa_problemno = problem.pro_problemno 
-      AND remoteSupport.caa_callacttypeno = 8 
-    JOIN callactivity fixedActivity 
-      ON fixedActivity.caa_problemno = problem.pro_problemno 
-      AND fixedActivity.caa_callacttypeno = 57 
-  WHERE pro_priority <= 4 
-    AND pro_status = 'F' 
-    AND 
-    (SELECT 
-      COUNT(*) 
-    FROM
-      callactivity remoteTest 
-    WHERE remoteTest.caa_problemno = pro_problemno 
-      AND remoteTest.caa_callacttypeno = 8) = 1 
-    AND 
-    (SELECT 
-      COUNT(*) 
-    FROM
-      callactivity fixedActivityTest 
-    WHERE fixedActivityTest.caa_problemno = pro_problemno 
-      AND fixedActivityTest.caa_callacttypeno = 57) = 1 
-    AND remoteSupport.caa_date = initial.caa_date 
-    AND fixedActivity.caa_date = initial.caa_date 
-    AND initial.caa_date = CURRENT_DATE 
-    AND problem.pro_custno <> 282 
-    AND remoteSupport.caa_consno = initial.caa_consno 
-    AND fixedActivity.caa_consno = initial.caa_consno 
-    AND TIME_TO_SEC(
-      TIMEDIFF(
-        remoteSupport.caa_starttime,
-        initial.caa_endtime
-      )
-    ) <= (5 * 60) 
-    AND fixer.`teamID` = 1 
-  GROUP BY initial.caa_date,
-    problem.`pro_fixed_consno`) test 
-GROUP BY phonedThroughRequests "
-        );
-
-        $data = $result->fetch_assoc();
-
-        if (!$data) {
-            $firstTimeFixAchievedPct = 'N/A';
-            $firstTimeFixAttemptedPct = 'N/A';
-        } else {
-            $firstTimeFixAchievedPct = round($data['firstTimeFixAchievedPct']);
-            $firstTimeFixAttemptedPct = round($data['firstTimeFixAttemptedPct']);
-        }
-
         $this->template->set_var(
             [
-                'firstTimeFixAchievedPct'  => $firstTimeFixAchievedPct,
-                'firstTimeFixAttemptedPct' => $firstTimeFixAttemptedPct,
-                'phonedThroughRequests'    => $data['phonedThroughRequests']
+                'firstTimeFixAttemptedPct' => $totalRaised > 0 ? round(
+                    ($totalAttempted / $totalRaised) * 100
+                ) : 'N/A',
+                'firstTimeFixAchievedPct'  => $totalRaised > 0 ? round(
+                    ($totalAchieved / $totalRaised) * 100
+                ) : 'N/A',
+                'phonedThroughRequests'    => $totalRaised
             ]
         );
 
