@@ -597,18 +597,24 @@ class DBEJProblem extends DBEProblem
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
-        WHERE " . $this->getDBColumnName(self::respondedHours) . ' = 0 && ' . $this->getDBColumnName(
-                self::status
-            ) . ' = "I" and ' . $this->getDBColumnName(self::priority) . ' <= 4 and ' . $this->getDBColumnName(
+        WHERE " . $this->getDBColumnName(self::respondedHours) . ' = 0  and ' . $this->getDBColumnName(
                 self::priority
-            ) . ' > 0 and ' . $this->getDBColumnName(self::customerID) . ' <> 282';
+            ) . ' <= 4 and ' . $this->getDBColumnName(
+                self::priority
+            ) . ' > 0 and ' . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
+                self::status
+            ) . ' in ("I","P") ';
 
         switch ($orderBy) {
             case 'shortestSLARemaining':
                 {
-                    $sql .= ' order by hoursRemaining desc';
+
+                    $sql .= ' and ' . $this->getDBColumnName(
+                            self::status
+                        ) . ' = "I" order by hoursRemaining desc';
                     break;
                 }
+
             case 'oldestUpdatedSR':
                 {
                     $sql .= ' order by last.caa_date asc, last.caa_starttime desc';
@@ -617,6 +623,11 @@ class DBEJProblem extends DBEProblem
             case 'mostHoursLogged':
                 {
                     $sql .= ' order by ' . $this->getDBColumnName(self::totalActivityDurationHours) . ' desc';
+                    break;
+                }
+            case 'longestOpenSR':
+                {
+                    $sql .= ' order by hoursRemaining desc';
                     break;
                 }
         }

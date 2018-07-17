@@ -97,6 +97,22 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             'Most_Hours_Logged'
         );
 
+
+        $query = "SELECT 
+  DISTINCT caa_consno,
+  SUM(1) AS engineers,
+  pro_problemno
+FROM
+  problem 
+  JOIN callactivity 
+    ON problem.`pro_problemno` = caa_problemno 
+    AND caa_callacttypeno IN (18, 8) 
+WHERE pro_status IN (\"I\", \"P\") 
+  AND caa_date = DATE(CURRENT_DATE)
+  AND caa_starttime >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 HOUR),'%H:%i')
+  GROUP BY pro_problemno
+  ORDER BY engineers DESC";
+
         $this->template->parse(
             'CONTENTS',
             'SDManagerDashboard',
