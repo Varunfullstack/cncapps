@@ -65,14 +65,25 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         );
 
         $buProblem->getSDDashBoardData(
-        $problems,
-        5,
-        'oldestUpdatedSR'
-    );
+            $problems,
+            5,
+            'oldestUpdatedSR'
+        );
 
         $this->renderQueue(
             $problems,
             'Oldest_Updated_SRs'
+        );
+
+        $buProblem->getSDDashBoardData(
+            $problems,
+            5,
+            'longestOpenSR'
+        );
+
+        $this->renderQueue(
+            $problems,
+            'Longest_Open_SR'
         );
 
         $buProblem->getSDDashBoardData(
