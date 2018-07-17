@@ -1056,7 +1056,7 @@ class CTHome extends CTCNC
     fixer.`firstName`,
     ' ',
     fixer.`lastName`
-  ) AS NAME,
+  ) AS name,
   SUM(
     TIME_TO_SEC(
       TIMEDIFF(
