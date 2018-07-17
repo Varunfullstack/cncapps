@@ -53,14 +53,37 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem = new BUActivity($this);
         $problems = new DataSet($this);
         $limit = 10;
-        $buProblem->getShortestSLARemainingProblems(
+        $buProblem->getSDDashBoardData(
             $problems,
-            $limit
+            $limit,
+            'shortestSLARemaining'
         );
 
         $this->renderQueue(
             $problems,
             'Shortest_SLA_Remaining'
+        );
+
+        $buProblem->getSDDashBoardData(
+        $problems,
+        5,
+        'oldestUpdatedSR'
+    );
+
+        $this->renderQueue(
+            $problems,
+            'Oldest_Updated_SRs'
+        );
+
+        $buProblem->getSDDashBoardData(
+            $problems,
+            5,
+            'mostHoursLogged'
+        );
+
+        $this->renderQueue(
+            $problems,
+            'Most_Hours_Logged'
         );
 
         $this->template->parse(
@@ -242,13 +265,23 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
         } // end while
 
+
         $this->template->set_var(
             array(
                 'queue' . $name . 'Count' => $rowCount,
-                'queue' . $name . 'Name'  => $name,
+                'queue' . $name . 'Name'  => $this->humanize($name),
 
             )
         );
     } // end render queue
+
+    function humanize($string)
+    {
+        return str_replace(
+            '_',
+            ' ',
+            $string
+        );
+    }
 }// end of class
 ?>
