@@ -20,6 +20,7 @@ This project changes will be shown here.
 - Issue 280 - Restore ability to create customer documentation folder
 - Issue 121 - CNC014 - Add ability to log a new SR directly into a team
 - Issue 297 - First Time Fix figures
+- Issue 269 - Live fixed SR target & total.
 ### Removed
 - Issue 282 - Remove DNS records from domain name
 - Issue 283 - Remove Documentation link from Quotation Page

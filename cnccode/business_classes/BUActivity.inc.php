@@ -7744,6 +7744,11 @@ is currently a balance of ';
                     DBEJProblem::reopenedFlag,
                     'Y'
                 );
+                
+                $dbeProblem->setValue(
+                    DBEJProblem::reopenedDate,
+                    (new DateTime())->format('Y-m-d')
+                );
 
                 if ($dbeProblem->getValue(DBEJProblem::fixedUserID) != USER_SYSTEM) {
                     /*
