@@ -597,7 +597,7 @@ class DBEJProblem extends DBEProblem
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
-        WHERE " . $this->getDBColumnName(self::respondedHours) . ' = 0  and ' . $this->getDBColumnName(
+        WHERE  " . $this->getDBColumnName(
                 self::priority
             ) . ' <= 4 and ' . $this->getDBColumnName(
                 self::priority
@@ -640,7 +640,8 @@ class DBEJProblem extends DBEProblem
     }
 
     public function getDashBoardEngineersInSRRows($engineersMaxCount = 3,
-                                                  $pastHours = 24
+                                                  $pastHours = 24,
+                                                  $limit = 5
     )
     {
         $sql =
@@ -663,7 +664,7 @@ class DBEJProblem extends DBEProblem
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
-        WHERE " . $this->getDBColumnName(self::respondedHours) . ' = 0  and ' . $this->getDBColumnName(
+        WHERE " . $this->getDBColumnName(
                 self::priority
             ) . ' <= 4 and ' . $this->getDBColumnName(
                 self::priority
@@ -681,12 +682,13 @@ FROM
     ON problem.`pro_problemno` = caa_problemno 
     AND caa_callacttypeno IN (18, 8) 
 WHERE pro_status IN ('I', 'P') 
-  AND caa_date = DATE(CURRENT_DATE)
-  AND caa_starttime >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL $pastHours HOUR),'%H:%i')
+  AND caa_date = DATE(DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR))
+  AND caa_starttime >= DATE_FORMAT(DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR),'%H:%i')
   GROUP BY pro_problemno
   ORDER BY engineers DESC) test WHERE test.engineers >= $engineersMaxCount)";
 
-        var_dump($sql);
+        $sql .= " limit 5";
+
         $this->setQueryString($sql);
 
         return (parent::getRow());

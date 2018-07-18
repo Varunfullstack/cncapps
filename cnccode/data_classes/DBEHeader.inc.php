@@ -562,10 +562,14 @@ class DBEHeader extends DBEntity
         );
         $this->addColumn(
             self::SDDashboardEngineersInSREngineersMaxCount,
+            DA_INTEGER,
+            DA_NOT_NULL,
             'hed_sd_dashboard_engineers_in_sr_engineers_max_count'
         );
         $this->addColumn(
             self::SDDashboardEngineersInSRInPastHours,
+            DA_INTEGER,
+            DA_NOT_NULL,
             'hed_sd_dashboard_engineers_in_sr_in_past_hours'
         );
         $this->setPK(0);
