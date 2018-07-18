@@ -10519,14 +10519,16 @@ is currently a balance of ';
 
     public function getSDDashBoardEngineersInSRData($problems,
                                                     $engineersMaxCount = 3,
-                                                    $pastHours = 24
+                                                    $pastHours = 24,
+                                                    $limit = 5
     )
     {
         $dbeJProblem = new DBEJProblem($this);
 
         $dbeJProblem->getDashBoardEngineersInSRRows(
             $engineersMaxCount,
-            $pastHours
+            $pastHours,
+            $limit
         );
 
         $this->getData(

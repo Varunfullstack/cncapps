@@ -99,7 +99,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
         $dbeHeader = new DBEHeader($this);
 
-        $dbeHeader->fetchFirst();
+        $dbeHeader->getRow(1);
 
         $engineersMaxCount = $dbeHeader->getValue(DBEHeader::SDDashboardEngineersInSREngineersMaxCount);
         $pastHours = $dbeHeader->getValue(DBEHeader::SDDashboardEngineersInSRInPastHours);
@@ -107,9 +107,16 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem->getSDDashBoardEngineersInSRData(
             $problems,
             $engineersMaxCount,
-            $pastHours
+            $pastHours,
+            5
         );
-        var_dump($problems);
+
+        $this->renderQueue(
+            $problems,
+            'Activities_By_XX_Engineers_In_XX_Hours'
+        );
+
+        $this->renderOpenSRByCustomer();
 
         $this->template->parse(
             'CONTENTS',
@@ -307,6 +314,67 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             ' ',
             $string
         );
+    }
+
+    private function renderOpenSRByCustomer()
+    {
+        $rowCount = 0;
+
+        $blockName = 'OpenSRByCustomerBlock';
+
+        $this->template->set_block(
+            'SDManagerDashboard',
+            $blockName,
+            'requests' . $blockName
+        );
+
+        global $db;
+        /** @var mysqli_result $result */
+        $result = $db->query(
+            'SELECT 
+              cus_custno,
+              cus_name,
+              (SELECT 
+                COUNT(pro_problemno) 
+              FROM
+                problem 
+              WHERE problem.`pro_custno` = customer.`cus_custno` 
+                AND problem.`pro_status` IN ("I", "P")) openSRCount 
+            FROM
+              customer WHERE cus_custno <> 282
+            ORDER BY openSRCount DESC 
+            LIMIT 10'
+        );
+
+        while ($row = $result->fetch_assoc()) {
+
+            $rowCount++;
+
+            $urlCustomer =
+                $this->buildLink(
+                    'SalesOrder.php',
+                    array(
+                        'action'     => 'search',
+                        'customerID' => $row['cus_custno']
+                    )
+                );
+
+            $this->template->set_var(
+
+                array(
+                    'urlCustomer'  => $urlCustomer,
+                    'customerName' => $row['cus_name'],
+                    'srCount'      => $row["openSRCount"]
+                )
+
+            );
+
+            $this->template->parse(
+                'requests' . $blockName,
+                $blockName,
+                true
+            );
+        }
     }
 }// end of class
 ?>
