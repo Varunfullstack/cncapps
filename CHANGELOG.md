@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 281 - Add headings for the contract page popup.
 - Issue 293 - Team Performance Calculations Update To Include Previous Month
 - Issue 291 - Technical Change Request formatting change
+- Issue 274 - Set system updated SRs to status Awaiting CNC
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
@@ -40,7 +41,7 @@ This project changes will be shown here.
 ## [v1.8.2] - 2018-06-28
 ### Fixed
 - Issue 289 - Fix issues 
-
+ 
 ## [v1.8.1] - 2018-06-26
 ### Fixed
 - Issue 287 - Fix problem with sales orders
