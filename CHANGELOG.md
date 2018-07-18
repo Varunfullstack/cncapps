@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 293 - Team Performance Calculations Update To Include Previous Month
 - Issue 291 - Technical Change Request formatting change
 - Issue 274 - Set system updated SRs to status Awaiting CNC
+- Issue 294 - User performance graph tweaks
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
