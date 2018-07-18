@@ -638,6 +638,60 @@ class DBEJProblem extends DBEProblem
 
         return (parent::getRow());
     }
+
+    public function getDashBoardEngineersInSRRows($engineersMaxCount = 3,
+                                                  $pastHours = 24
+    )
+    {
+        $sql =
+            "SELECT " . $this->getDBColumnNamesAsString() . ', ' . $this->getDBColumnName(
+                self::workingHours
+            ) . ' - ' . $this->getDBColumnName(self::slaResponseHours) . ' as hoursRemaining' .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+           LEFT JOIN consultant ON cns_consno = pro_consno
+
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+            " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            ) 
+            
+        WHERE " . $this->getDBColumnName(self::respondedHours) . ' = 0  and ' . $this->getDBColumnName(
+                self::priority
+            ) . ' <= 4 and ' . $this->getDBColumnName(
+                self::priority
+            ) . ' > 0 and ' . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
+                self::status
+            ) . " in ('I','P') and pro_problemno in (
+            SELECT test.pro_problemno FROM (
+SELECT 
+  DISTINCT caa_consno,
+  SUM(1) AS engineers,
+  pro_problemno
+FROM
+  problem 
+  JOIN callactivity 
+    ON problem.`pro_problemno` = caa_problemno 
+    AND caa_callacttypeno IN (18, 8) 
+WHERE pro_status IN ('I', 'P') 
+  AND caa_date = DATE(CURRENT_DATE)
+  AND caa_starttime >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL $pastHours HOUR),'%H:%i')
+  GROUP BY pro_problemno
+  ORDER BY engineers DESC) test WHERE test.engineers >= $engineersMaxCount)";
+
+        var_dump($sql);
+        $this->setQueryString($sql);
+
+        return (parent::getRow());
+
+    }
 }
 
 ?>

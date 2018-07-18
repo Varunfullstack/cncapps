@@ -10511,18 +10511,23 @@ is currently a balance of ';
         return $count;
     }
 
-    public function getOldestUpdatesSRs($problems,
-                                        $limit
+    public function getSDDashBoardEngineersInSRData($problems,
+                                                    $engineersMaxCount = 3,
+                                                    $pastHours = 24
     )
     {
         $dbeJProblem = new DBEJProblem($this);
 
-        $dbeJProblem->getOldestUpdatesSRRows($limit);
+        $dbeJProblem->getDashBoardEngineersInSRRows(
+            $engineersMaxCount,
+            $pastHours
+        );
 
         $this->getData(
             $dbeJProblem,
             $problems
         );
+
     }
 
 
