@@ -385,15 +385,8 @@ class CTHeader extends CTCNC
                     $dsHeader->getValue('srAutocompleteThresholdHours')
                 ),
 
-                'srAutocompleteThresholdHoursMessage'         => Controller::htmlDisplayText(
+                'srAutocompleteThresholdHoursMessage' => Controller::htmlDisplayText(
                     $dsHeader->getMessage('srAutocompleteThresholdHours')
-                ),
-                'srStartersLeaversAutoCompleteThresholdHours' => Controller::htmlInputText(
-                    $dsHeader->getValue(DBEHeader::srStartersLeaversAutoCompleteThresholdHours)
-                ),
-
-                'srStartersLeaversAutoCompleteThresholdHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('srStartersLeaversAutoCompleteThresholdHours')
                 ),
 
                 'srPromptContractThresholdHours' => Controller::htmlInputText(
@@ -404,36 +397,44 @@ class CTHeader extends CTCNC
                     $dsHeader->getMessage('srPromptContractThresholdHours')
                 ),
 
-                'customerContactWarnHours' => Controller::htmlInputText(
+                'customerContactWarnHours'                                       => Controller::htmlInputText(
                     $dsHeader->getValue('customerContactWarnHours')
                 ),
-
-                'customerContactWarnHoursMessage' => Controller::htmlDisplayText(
+                'customerContactWarnHoursMessage'                                => Controller::htmlDisplayText(
                     $dsHeader->getMessage('customerContactWarnHours')
                 ),
-
-                'remoteSupportWarnHours' => Controller::htmlInputText($dsHeader->getValue('remoteSupportWarnHours')),
-
-                'remoteSupportWarnHoursMessage'      => Controller::htmlDisplayText(
+                'remoteSupportWarnHours'                                         => Controller::htmlInputText(
+                    $dsHeader->getValue('remoteSupportWarnHours')
+                ),
+                'remoteSupportWarnHoursMessage'                                  => Controller::htmlDisplayText(
                     $dsHeader->getMessage('remoteSupportWarnHours')
                 ),
-                'customerReviewMeetingText'          => Controller::htmlInputText(
+                'customerReviewMeetingText'                                      => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
-                DBEHeader::RemoteSupportMinWarnHours => Controller::htmlInputText(
+                DBEHeader::RemoteSupportMinWarnHours                             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours)
                 ),
-
-                DBEHeader::RemoteSupportMinWarnHours . 'Message' => Controller::htmlDisplayText(
+                DBEHeader::RemoteSupportMinWarnHours . 'Message'                 => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::RemoteSupportMinWarnHours)
                 ),
-
-                DBEHeader::backupTargetSuccessRate => Controller::htmlInputText(
+                DBEHeader::backupTargetSuccessRate                               => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::backupTargetSuccessRate)
                 ),
-
-                'urlItemPopup' => $urlItemPopup,
-                'urlUpdate'    => $urlUpdate
+                DBEHeader::SDDashboardEngineersInSREngineersMaxCount             => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
+                ),
+                DBEHeader::SDDashboardEngineersInSRInPastHours                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSRInPastHours)
+                ),
+                DBEHeader::SDDashboardEngineersInSREngineersMaxCount . "Message" => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
+                ),
+                DBEHeader::SDDashboardEngineersInSRInPastHours . "Message"       => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::SDDashboardEngineersInSRInPastHours)
+                ),
+                'urlItemPopup'                                                   => $urlItemPopup,
+                'urlUpdate'                                                      => $urlUpdate
             )
         );
 
