@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 291 - Technical Change Request formatting change
 - Issue 274 - Set system updated SRs to status Awaiting CNC
 - Issue 294 - User performance graph tweaks
+- Issue 284 - Investigate length of fields allowed in quotes
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
