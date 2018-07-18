@@ -792,6 +792,8 @@ class CTCustomerItem extends CTCNC
 
                 'secondsiteLocationPath' => $dsCustomerItem->getValue('secondsiteLocationPath'),
                 'secondsiteLocationPathMessage' => Controller::htmlDisplayText($dsCustomerItem->getMessage('secondsiteLocationPath')),
+                'secondSiteReplicationPath' => $dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationPath),
+                'secondSiteReplicationPathMessage' => Controller::htmlDisplayText($dsCustomerItem->getMessage(DBECustomerItem::secondSiteReplicationPath)),
                 'secondsiteValidationSuspendUntilDate' => Controller::dateYMDtoDMY($dsCustomerItem->getValue('secondsiteValidationSuspendUntilDate')),
                 'secondsiteValidationSuspendUntilDateMessage' => Controller::htmlDisplayText($dsCustomerItem->getMessage('secondsiteValidationSuspendUntilDate')),
 

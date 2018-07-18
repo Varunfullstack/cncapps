@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Fixed
-- Issue 300 - Error adding passwords from Sales Password page
+### Changed
+- Issue 249 - 2nd Site Replication check process
 
 ## [v1.8.5] - 2018-07-16
 ### Fixed
