@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Changed
-- Issue 249 - 2nd Site Replication check process
+### Fixed
+- Issue 276 - Occasional formatting issues for Monitored SR emails
 
 ## [v1.8.5] - 2018-07-16
 ### Fixed
