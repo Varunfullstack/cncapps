@@ -10,15 +10,23 @@
 ></script>
 <a href="Activity.php?action=activityCreate1">Log New Request</a>
 <br>
-<a href="SDManagerDashboard.php">SD Manager Dashboard</a>
+<div id="SDManagerLinks"
+     hidden
+>
+    <a href="SDManagerDashboard.php">SD Manager Dashboard</a>
+    <a href="SDManagerDashboard.php?showP5=true">P5</a>
+</div>
 <style>
     .oddRows tr:nth-child(odd) {
         background-color: rgb(250, 250, 250) !important;
     }
-
 </style>
 <script>
     $(function () {
+
+        if ({isSDManager}) {
+            $('#SDManagerLinks').show();
+        }
         $('.requestAdditionalTime').click(function () {
 
             var reason = prompt('Please provide your reason for requesting additional time.(Required)');
