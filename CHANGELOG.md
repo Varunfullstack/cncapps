@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 276 - Occasional formatting issues for Monitored SR emails
+
 ## [v1.8.5] - 2018-07-16
 ### Fixed
 - Issue 299 - Show link to create customer folder if it doesn't exist
