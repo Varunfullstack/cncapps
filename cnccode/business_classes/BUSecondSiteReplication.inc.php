@@ -63,8 +63,16 @@ class BUSecondsiteReplication extends BUSecondsite
                 }
 
                 if ($server['secondsiteImageDelayDays']) {
+
+                    $days = $server['secondsiteImageDelayDays'];
+                    $dbeHeader = new DBEHeader($this);
+                    $dbeHeader->getRow();
+
+                    $additionalDays = $dbeHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance);
+
+                    $days += $additionalDays;
                     $timeToLookFrom = strtotime(
-                        '-' . $server['secondsiteImageDelayDays'] . ' days',
+                        '-' . $days . ' days',
                         $defaultTimeToLookFrom
                     );
                     $this->delayedCheckServers[] = $server;
