@@ -613,5 +613,27 @@ class CTSecondSite extends CTCNC
         $this->parsePage();
 
     }
+
+    protected function getImageTime($time)
+    {
+        if (!$time) {
+            return 'N/A';
+        }
+        return strftime(
+            "%d/%m/%Y %H:%M:%S",
+            strtotime($time)
+        );
+    }
+
+    protected function getImageAge($time)
+    {
+        if (!$time) {
+            return 'N/A';
+        }
+        return number_format(
+            (time() - strtotime($time)) / 86400,
+            0
+        );
+    }
 }// end of class
 ?>
