@@ -574,7 +574,8 @@ class DBEJProblem extends DBEProblem
     }
 
     public function getDashBoardRows($limit = 10,
-                                     $orderBy = 'shortestSLARemaining'
+                                     $orderBy = 'shortestSLARemaining',
+                                     $isP5 = false
     )
     {
         $sql =
@@ -597,13 +598,22 @@ class DBEJProblem extends DBEProblem
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
-        WHERE  " . $this->getDBColumnName(
-                self::priority
-            ) . ' <= 4 and ' . $this->getDBColumnName(
-                self::priority
-            ) . ' > 0 and ' . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
+        WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
             ) . ' in ("I","P") ';
+
+
+        if ($isP5) {
+            $sql .= 'and ' . $this->getDBColumnName(
+                    self::priority
+                ) . ' = 5 ';
+        } else {
+            $sql .= 'and ' . $this->getDBColumnName(
+                    self::priority
+                ) . ' <= 4 and ' . $this->getDBColumnName(
+                    self::priority
+                ) . ' > 0 ';
+        }
 
         switch ($orderBy) {
             case 'shortestSLARemaining':
@@ -641,7 +651,8 @@ class DBEJProblem extends DBEProblem
 
     public function getDashBoardEngineersInSRRows($engineersMaxCount = 3,
                                                   $pastHours = 24,
-                                                  $limit = 5
+                                                  $limit = 5,
+                                                  $isP5 = false
     )
     {
         $sql =
@@ -664,13 +675,24 @@ class DBEJProblem extends DBEProblem
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
-        WHERE " . $this->getDBColumnName(
-                self::priority
-            ) . ' <= 4 and ' . $this->getDBColumnName(
-                self::priority
-            ) . ' > 0 and ' . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
+        WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
-            ) . " in ('I','P') and pro_problemno in (
+            ) . " in ('I','P') ";
+
+        if ($isP5) {
+            $sql .= ' and ' . $this->getDBColumnName(
+                    self::priority
+                ) . ' = 5 ';
+        } else {
+            $sql .= ' and ' . $this->getDBColumnName(
+                    self::priority
+                ) . ' <= 4 and ' . $this->getDBColumnName(
+                    self::priority
+                ) . ' > 0 ';
+        }
+
+
+        $sql .= " and pro_problemno in (
             SELECT test.pro_problemno FROM (
 SELECT 
   DISTINCT caa_consno,
@@ -682,13 +704,22 @@ FROM
     ON problem.`pro_problemno` = caa_problemno 
     AND caa_callacttypeno IN (18, 8) 
 WHERE pro_status IN ('I', 'P') 
-  AND caa_date = DATE(DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR))
-  AND caa_starttime >= DATE_FORMAT(DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR),'%H:%i')
+  AND caa_date > DATE(
+    DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR)
+  ) 
+  OR (
+    caa_date = DATE(
+      DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR)
+    ) 
+    AND caa_starttime >= DATE_FORMAT(
+      DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR),
+      ' % H:%i'
+    )
+  ) 
   GROUP BY pro_problemno
   ORDER BY engineers DESC) test WHERE test.engineers >= $engineersMaxCount)";
 
-        $sql .= " limit 5";
-
+        $sql .= " limit $limit";
         $this->setQueryString($sql);
 
         return (parent::getRow());

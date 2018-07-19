@@ -825,7 +825,8 @@ class CTCurrentActivityReport extends CTCNC
             array(
                 'urlResetFilter'  => $urlResetFilter,
                 'urlShowMineOnly' => $urlShowMineOnly,
-                'urlSetFilter'    => $urlSetFilter
+                'urlSetFilter'    => $urlSetFilter,
+                'isSDManager'     => $this->loggedInUserIsSdManager
             )
 
         );

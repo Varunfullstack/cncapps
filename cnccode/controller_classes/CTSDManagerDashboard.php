@@ -44,7 +44,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     function display()
     {
 
-        $this->setPageTitle('SD Manager Dashboard');
+        $isP5 = isset($_REQUEST['showP5']);
+        $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : ''));
 
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard')
@@ -56,7 +57,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem->getSDDashBoardData(
             $problems,
             $limit,
-            'shortestSLARemaining'
+            'shortestSLARemaining',
+            $isP5
         );
 
         $this->renderQueue(
@@ -67,7 +69,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem->getSDDashBoardData(
             $problems,
             5,
-            'oldestUpdatedSR'
+            'oldestUpdatedSR',
+            $isP5
         );
 
         $this->renderQueue(
@@ -78,7 +81,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem->getSDDashBoardData(
             $problems,
             5,
-            'longestOpenSR'
+            'longestOpenSR',
+            $isP5
         );
 
         $this->renderQueue(
@@ -89,7 +93,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem->getSDDashBoardData(
             $problems,
             5,
-            'mostHoursLogged'
+            'mostHoursLogged',
+            $isP5
         );
 
         $this->renderQueue(
@@ -108,12 +113,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $problems,
             $engineersMaxCount,
             $pastHours,
-            5
+            5,
+            $isP5
         );
+
 
         $this->renderQueue(
             $problems,
-            'Activities_By_XX_Engineers_In_XX_Hours'
+            'Activities_By_XX_Engineers_In_XX_Hours',
+            "Activities By $engineersMaxCount or more engineers in $pastHours Hours"
         );
 
         $this->renderOpenSRByCustomer();
@@ -128,10 +136,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
 
     private function renderQueue($problems,
-                                 $name
+                                 $name,
+                                 $title = null
     )
     {
         $rowCount = 0;
+
+        if (!$title) {
+            $title = $this->humanize($name);
+        }
 
         $blockName = 'queue' . $name . 'Block';
 
@@ -301,7 +314,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $this->template->set_var(
             array(
                 'queue' . $name . 'Count' => $rowCount,
-                'queue' . $name . 'Name'  => $this->humanize($name),
+                'queue' . $name . 'Name'  => $title,
 
             )
         );
