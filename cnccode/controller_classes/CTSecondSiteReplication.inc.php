@@ -165,7 +165,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
         $passed = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_PASSED);
 
-        $this->setPageTitle('2nd Site');
+        $this->setPageTitle('2nd Site Replication');
 
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteReplicationList.inc'));
 
