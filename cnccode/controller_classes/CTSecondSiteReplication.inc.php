@@ -180,24 +180,26 @@ class CTSecondSiteReplication extends CTSecondSite
 
         foreach ($outOfDate as $record) {
 
-            $imageTime = $record['imageTime'] ? strftime(
+            $imageTime = $record['replicationImageTime'] ? strftime(
                 "%d/%m/%Y %H:%M:%S",
                 strtotime($record['imageTime'])
             ) : 'N/A';
 
-            $imageAgeDays = $record['imageTime'] ? number_format(
-                (time() - strtotime($record['imageTime'])) / 86400,
+            $imageAgeDays = $record['replicationImageTime'] ? number_format(
+                (time() - strtotime($record['replicationImageTime'])) / 86400,
                 0
             ) : 'N/A';
 
             $this->template->set_var(
+                
+
 
                 array(
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
-                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'serverPath'   => $record['secondSiteReplicationPath'],
                     'imageName'    => $record['imageName'],
-                    'imagePath'    => $record['imagePath'],
+                    'imagePath'    => $record['replicationImagePath'],
                     'imageTime'    => $imageTime,
                     'imageAgeDays' => $imageAgeDays,
                     'urlServer'    => $this->getEditUrl($record['server_cuino']),
@@ -226,7 +228,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 array(
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
-                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'serverPath'   => $record['secondSiteReplicationPath'],
                     'imageName'    => $record['imageName'],
                     'urlServer'    => $this->getEditUrl($record['server_cuino']),
                     'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
@@ -254,7 +256,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 array(
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
-                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'serverPath'   => $record['secondSiteReplicationPath'],
                     'imageName'    => $record['imageName'],
                     'urlServer'    => $this->getEditUrl($record['server_cuino']),
                     'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
@@ -283,7 +285,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 array(
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
-                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'serverPath'   => $record['secondSiteReplicationPath'],
                     'imagePath'    => $record['imagePath'],
                     'imageName'    => $record['imageName'],
                     'urlServer'    => $this->getEditUrl($record['server_cuino']),
