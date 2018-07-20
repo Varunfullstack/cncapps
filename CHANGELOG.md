@@ -21,6 +21,7 @@ This project changes will be shown here.
 - Issue 271 - CustomerAnalysis Report error handling
 - Issue 279 - Contracts not populating on Search page
 - Issue 300 - Error adding passwords from Sales Password page
+- Issue 276 - Occasional formatting issues for Monitored SR emails
 ### Added
 - Issue 280 - Restore ability to create customer documentation folder
 - Issue 121 - CNC014 - Add ability to log a new SR directly into a team

@@ -10412,6 +10412,22 @@ is currently a balance of ';
 
         $body = $template->get_var('output');
 
+        $body = preg_replace(
+            '/[\x00-\x1F\x7F-\xFF]/',
+            '',
+            $body
+        );
+        $body = preg_replace(
+            '/[\x00-\x1F\x7F]/',
+            '',
+            $body
+        );
+        $body = preg_replace(
+            '/[\x00-\x1F\x7F]/u',
+            '',
+            $body
+        );
+
         foreach ($monitoringPeople as $monitoringPerson) {
             $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
 
@@ -10424,6 +10440,7 @@ is currently a balance of ';
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
+
 
             $buMail->mime->setHTMLBody($body);
 
