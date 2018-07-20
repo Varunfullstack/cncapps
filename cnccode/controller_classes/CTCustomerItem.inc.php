@@ -1145,6 +1145,17 @@ class CTCustomerItem extends CTCNC
                     $imageAgeDays = '';
                 }
 
+                if ($dsSecondsiteImage->getValue('replicationStatus') && $dsSecondsiteImage->getValue(
+                        'replicationImageTime'
+                    ) > 0) {
+                    $replicationImageAgeDays = number_format(
+                        (time() - strtotime($dsSecondsiteImage->getValue('replicationImageTime'))) / 86400,
+                        0
+                    );
+                } else {
+                    $replicationImageAgeDays = '';
+                }
+
                 $this->template->set_var(
                     array(
                         'secondsiteImageID'         => $dsSecondsiteImage->getValue('secondsiteImageID'),
@@ -1154,7 +1165,8 @@ class CTCustomerItem extends CTCNC
                         'imageAgeDays'              => $imageAgeDays,
                         'editSecondsiteImageLink'   => $editSecondsiteImageLink,
                         'deleteSecondsiteImageLink' => $deleteSecondsiteImageLink,
-                        'deleteSecondsiteImageText' => $deleteSecondsiteImageText
+                        'deleteSecondsiteImageText' => $deleteSecondsiteImageText,
+                        'replicationImageAgeDays'   => $replicationImageAgeDays
                     )
                 );
 
