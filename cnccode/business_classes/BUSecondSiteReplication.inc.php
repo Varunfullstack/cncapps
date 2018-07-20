@@ -560,9 +560,9 @@ class BUSecondsiteReplication extends BUSecondsite
         ser.secondSiteReplicationPath,
         ssi.secondsiteImageID,
         ssi.imageName,
-        ssi.replicationStatus as status,
-        ssi.replicationImagePath as imagePath,
-        ssi.replicationImageTime as imageTime
+        ssi.replicationStatus ,
+        ssi.replicationImagePath ,
+        ssi.replicationImageTime
       FROM
         custitem ci
         JOIN customer c ON c.cus_custno = ci.cui_custno
