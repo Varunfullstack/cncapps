@@ -191,7 +191,6 @@ class CTSecondSiteReplication extends CTSecondSite
             ) : 'N/A';
 
             $this->template->set_var(
-                
 
 
                 array(
@@ -310,7 +309,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
         foreach ($suspended as $record) {
 
-            if ($record['replicationImageTime'] != '0000-00-00 00:00:00') {
+            if ($record['replicationImageTime'] && $record['replicationImageTime'] != '0000-00-00 00:00:00') {
                 $imageTime = strftime(
                     "%d/%m/%Y %H:%M:%S",
                     strtotime($record['replicationImageTime'])
