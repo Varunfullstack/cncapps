@@ -10509,6 +10509,66 @@ is currently a balance of ';
         return true;
     }
 
+    public function getSDDashBoardData($problems,
+                                       $limit,
+                                       $order = 'shortestSLARemaining',
+                                       $isP5 = false
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getDashBoardRows(
+            $limit,
+            $order,
+            $isP5
+        );
+
+        $this->getData(
+            $dbeJProblem,
+            $problems
+        );
+    }
+
+    public function getActivityCount($problemID,
+                                     $ignoreOperation = true
+    )
+    {
+        $dbejCallActivity = new DBEJCallActivity($this);
+        $dbejCallActivity->getRowsByProblemID(
+            $problemID,
+            true,
+            !$ignoreOperation
+        );
+        $count = 0;
+        while ($thing = $dbejCallActivity->fetchNext()) {
+            $count++;
+        }
+        return $count;
+    }
+
+    public function getSDDashBoardEngineersInSRData($problems,
+                                                    $engineersMaxCount = 3,
+                                                    $pastHours = 24,
+                                                    $limit = 5,
+                                                    $isP5 = false
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getDashBoardEngineersInSRRows(
+            $engineersMaxCount,
+            $pastHours,
+            $limit,
+            $isP5
+        );
+
+        $this->getData(
+            $dbeJProblem,
+            $problems
+        );
+
+    }
+
 
 } // End of class
 ?>

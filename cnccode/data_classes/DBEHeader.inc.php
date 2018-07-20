@@ -85,6 +85,7 @@ class DBEHeader extends DBEntity
     const serviceDeskNotification24hBegin = "serviceDeskNotification24hBegin";
     const serviceDeskNotification24hEnd = "serviceDeskNotification24hEnd";
     const srStartersLeaversAutoCompleteThresholdHours = "srStartersLeaversAutoCompleteThresholdHours";
+    const SDDashboardEngineersInSRInPastHours = "SDDashboardEngineersInSRInPastHours";
 
 
     /**
@@ -564,6 +565,18 @@ class DBEHeader extends DBEntity
             DA_FLOAT,
             DA_NOT_NULL,
             'hed_srStartersLeaversAutoCompleteThresholdHours'
+        );
+        $this->addColumn(
+            self::SDDashboardEngineersInSREngineersMaxCount,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            'hed_sd_dashboard_engineers_in_sr_engineers_max_count'
+        );
+        $this->addColumn(
+            self::SDDashboardEngineersInSRInPastHours,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            'hed_sd_dashboard_engineers_in_sr_in_past_hours'
         );
         $this->setPK(0);
         $this->setAddColumnsOff();

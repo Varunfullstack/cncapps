@@ -234,17 +234,28 @@ class CTCNC extends Controller
 
         $this->user = new BUUser($this);
 
-        parent::__construct(
-            $requestMethod,
-            $postVars,
-            $getVars,
-            $cookieVars,
-            $cfg,
-            "",
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "",
             "",
             "",
             ""
         );
+    }
+
+    static function truncate($reason,
+                             $length = 100
+    )
+    {
+        return substr(
+            common_stripEverything($reason),
+            0,
+            $length
+        );
+
+    }
+
+    protected function isSdManager()
+    {
+        return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';
     }
 
     function canAccess($roles)
