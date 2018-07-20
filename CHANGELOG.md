@@ -2,8 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Fixed
-- Issue 276 - Occasional formatting issues for Monitored SR emails
+### Changed
+- Issue 298 - Single Fixed Explanation within a Service Request
 
 ## [v1.8.5] - 2018-07-16
 ### Fixed
