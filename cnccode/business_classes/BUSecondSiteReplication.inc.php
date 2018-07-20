@@ -62,23 +62,20 @@ class BUSecondsiteReplication extends BUSecondsite
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-                if ($server['secondsiteImageDelayDays']) {
 
-                    $days = $server['secondsiteImageDelayDays'];
-                    $dbeHeader = new DBEHeader($this);
-                    $dbeHeader->getRow();
+                $days = @$server['secondsiteImageDelayDays'];
+                $dsHeader = new DataSet($this);
+                $buHeader = new BUHeader($this);
+                $buHeader->getHeader($dsHeader);
 
-                    $additionalDays = $dbeHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance);
+                $additionalDays = $dsHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance);
 
-                    $days += $additionalDays;
-                    $timeToLookFrom = strtotime(
-                        '-' . $days . ' days',
-                        $defaultTimeToLookFrom
-                    );
-                    $this->delayedCheckServers[] = $server;
-                } else {
-                    $timeToLookFrom = $defaultTimeToLookFrom;
-                }
+                $days += $additionalDays;
+                $timeToLookFrom = strtotime(
+                    '-' . $days . ' days',
+                    $defaultTimeToLookFrom
+                );
+                $this->delayedCheckServers[] = $server;
 
                 $images = $this->getImagesByServer($server['server_cuino']);
 
