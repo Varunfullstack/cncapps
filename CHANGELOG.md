@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 298 - Single Fixed Explanation within a Service Request
+- Issue 302 - 7 Day report to include awaiting status 
 
 ## [v1.8.5] - 2018-07-16
 ### Fixed
