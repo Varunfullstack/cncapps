@@ -182,7 +182,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
             $imageTime = $record['replicationImageTime'] ? strftime(
                 "%d/%m/%Y %H:%M:%S",
-                strtotime($record['imageTime'])
+                strtotime($record['replicationImageTime'])
             ) : 'N/A';
 
             $imageAgeDays = $record['replicationImageTime'] ? number_format(
