@@ -83,7 +83,7 @@ class BUSecondsiteReplication extends BUSecondsite
                     !$server['secondSiteReplicationPath'] OR
                     count($images) == 0
                 ) {
-                    $error = 'Incomplete 2nd Site replication contract information';
+                    $error = '2nd Site Replication Path Error Or No Images';
                     if (!$isSuspended) {
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
