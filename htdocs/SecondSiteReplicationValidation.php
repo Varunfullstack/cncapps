@@ -27,7 +27,7 @@ $template = new Template(
 
 $template->set_file(
     'page',
-    'secondSiteCompletedEmail.inc.html'
+    'secondSiteReplicationCompletedEmail.inc.html'
 );
 
 $template->set_block(
@@ -73,39 +73,6 @@ foreach ($buSecondsite->log as $logEntry) {
 
 $template->set_block(
     'page',
-    'delayedCheckServerBlock',
-    'delayedServers'
-);
-
-$servers = $buSecondsite->getDelayedCheckServers();
-foreach ($servers as $server) {
-    $dsHeader = new DataSet($this);
-    $buHeader = new BUHeader($this);
-    $buHeader->getHeader($dsHeader);
-    $days = $server['secondsiteImageDelayDays'];
-    $additionalDays = $dsHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance);
-
-    $days += $additionalDays;
-
-    $template->set_var(
-        array(
-            'customerName' => $server['cus_name'],
-            'serverName'   => $server['serverName'],
-            'delayDays'    => $days,
-            'delayUser'    => $server['delayUser'],
-            'delayDate'    => $server['secondsiteImageDelayDate']
-        )
-    );
-    $template->parse(
-        'delayedServers',
-        'delayedCheckServerBlock',
-        true
-    );
-
-}
-
-$template->set_block(
-    'page',
     'suspendedCheckServerBlock',
     'suspendedServers'
 );
@@ -126,30 +93,6 @@ foreach ($servers as $server) {
     $template->parse(
         'suspendedServers',
         'suspendedCheckServerBlock',
-        true
-    );
-
-}
-
-$template->set_block(
-    'page',
-    'excludedLocalServerBlock',
-    'excludedLocalServers'
-);
-
-$servers = $buSecondsite->getExcludedLocalServers();
-
-foreach ($servers as $server) {
-
-    $template->set_var(
-        array(
-            'customerName' => $server['cus_name'],
-            'serverName'   => $server['serverName']
-        )
-    );
-    $template->parse(
-        'excludedLocalServers',
-        'excludedLocalServerBlock',
         true
     );
 
