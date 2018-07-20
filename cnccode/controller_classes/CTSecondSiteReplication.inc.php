@@ -286,7 +286,7 @@ class CTSecondSiteReplication extends CTSecondSite
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
                     'serverPath'   => $record['secondSiteReplicationPath'],
-                    'imagePath'    => $record['imagePath'],
+                    'imagePath'    => $record['replicationImagePath'],
                     'imageName'    => $record['imageName'],
                     'urlServer'    => $this->getEditUrl($record['server_cuino']),
                     'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
@@ -310,14 +310,14 @@ class CTSecondSiteReplication extends CTSecondSite
 
         foreach ($suspended as $record) {
 
-            if ($record['imageTime'] != '0000-00-00 00:00:00') {
+            if ($record['replicationImageTime'] != '0000-00-00 00:00:00') {
                 $imageTime = strftime(
                     "%d/%m/%Y %H:%M:%S",
-                    strtotime($record['imageTime'])
+                    strtotime($record['replicationImageTime'])
                 );
 
                 $imageAgeDays = number_format(
-                    (time() - strtotime($record['imageTime'])) / 86400,
+                    (time() - strtotime($record['replicationImageTime'])) / 86400,
                     0
                 );
             } else {
@@ -342,7 +342,7 @@ class CTSecondSiteReplication extends CTSecondSite
                     'customerName'   => $record['cus_name'],
                     'serverName'     => $record['serverName'],
                     'serverPath'     => $record['secondSiteReplicationLocationPath'],
-                    'imagePath'      => $record['imagePath'],
+                    'imagePath'      => $record['replicationImagePath'],
                     'imageName'      => $record['imageName'],
                     'suspendedUntil' => $suspendedUntil,
                     'imageTime'      => $imageTime,
@@ -369,9 +369,9 @@ class CTSecondSiteReplication extends CTSecondSite
 
         foreach ($passed as $record) {
 
-            $imageTime = $this->getImageTime($record['imageTime']);
+            $imageTime = $this->getImageTime($record['replicationImageTime']);
 
-            $imageAgeDays = $this->getImageAge($record['imageTime']);
+            $imageAgeDays = $this->getImageAge($record['replicationImageTime']);
 
             $this->template->set_var(
 
@@ -380,7 +380,7 @@ class CTSecondSiteReplication extends CTSecondSite
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
                     'imageName'    => $record['imageName'],
-                    'imagePath'    => $record['imagePath'],
+                    'imagePath'    => $record['replicationImagePath'],
                     'imageTime'    => $imageTime,
                     'imageAgeDays' => $imageAgeDays
                 )
