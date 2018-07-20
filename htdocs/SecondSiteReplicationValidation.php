@@ -122,10 +122,10 @@ $template->setVar(
 $template->parse('output', 'page', true);
 
 $html = $template->get_var('output');
-$subject = '2nd Site Validation Completed';
+$subject = '2nd Site Replication Validation Completed';
 
 if($testRun){
-    $subject = '2nd Site Test Run Completed';
+    $subject = '2nd Site Replication Test Run Completed';
 }
 
 
