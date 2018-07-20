@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Issue 302 - 7 Day report to include awaiting status 
+- Issue 232 - Improve Uploading Files to Service Request Activities
 
 ## [v1.8.5] - 2018-07-16
 ### Fixed
