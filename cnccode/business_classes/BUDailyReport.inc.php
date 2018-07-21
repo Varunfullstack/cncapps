@@ -256,6 +256,7 @@ class BUDailyReport extends Business
                         'lastUpdatedDate'  => $row[6],
                         'priority'         => $row[7],
                         'teamName'         => $row[8],
+                        'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
                         'urlRequest'       => $urlRequest
                     )
                 );
@@ -279,6 +280,7 @@ class BUDailyReport extends Business
                         'lastUpdatedDate'  => $row[6],
                         'priority'         => $row[7],
                         'teamName'         => $row[8],
+                        'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
                     )
                 );
 
@@ -608,7 +610,9 @@ class BUDailyReport extends Business
         pro_total_activity_duration_hours AS `timeSpentHours`,
         last.caa_date as lastUpdatedDate,
         pro_priority as `priority`,
-        team.name AS teamName
+        team.name AS teamName,
+        pro_awaiting_customer_response_flag,
+        pro_status
       FROM
         problem 
         JOIN customer 
