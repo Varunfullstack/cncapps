@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 294 - User performance graph tweaks
 - Issue 284 - Investigate length of fields allowed in quotes
 - Issue 296 - Change Open SR Report so non main contacts only see their SRs
+- Issue 249 - 2nd Site Replication check process
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling

@@ -1,6 +1,10 @@
 <!-- Template: InvoiceDisplay.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 
 <script language='JavaScript'>
@@ -23,6 +27,7 @@
             )
         }
     }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {      // F9 - edit
             switch (field.id) {
@@ -53,6 +58,7 @@
         }
         return;
     }
+
     function validateItemDescription() {
         if (Trim(document.getElementById("itemDescription").value) != "") {
             window.open('{urlItemPopup}&itemDescription=' +
@@ -63,6 +69,7 @@
                 'items', 'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0')
         }
     }
+
     function validateCustomerName() {
         if (Trim(document.getElementById("customerName").value) != "") {
             window.open('{urlCustomerPopup}&customerString=' +
@@ -73,14 +80,25 @@
         }
     }
 </script>
-<TABLE width="106" border="0" cellpadding="2" cellspacing="1">
+<TABLE width="106"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
     <TR>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlDeleteInvoice}"
-                                                               onClick="if(!confirm('Are you sure you want to remove this invoice?')) return(false)">{txtDeleteCustomerItem}</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDeleteInvoice}"
+            onClick="if(!confirm('Are you sure you want to remove this invoice?')) return(false)"
+        >{txtDeleteCustomerItem}</a>
         </TD>
     </TR>
 </table>
-<form name="customerItem" method="post" action="{urlSubmit}">
+<form name="customerItem"
+      method="post"
+      action="{urlSubmit}"
+>
     <!-- the next 2 are dummies to stop item selection javascript from failing -->
     <input
             type="hidden"
@@ -118,7 +136,11 @@
             id="custItemRef"
             value="{custItemRef}"
     >
-    <TABLE width="600px" border="0" cellpadding="1" cellspacing="1">
+    <TABLE width="600px"
+           border="0"
+           cellpadding="1"
+           cellspacing="1"
+    >
         <tr>
             <td class="promptText">Customer Item No</td>
             <td class="field">{customerItemID}</td>
@@ -200,7 +222,10 @@
             >
                 <option value="0">None</option>
                 <!-- BEGIN warrantyBlock -->
-                <option {warrantySelected} value="{warrantyID}">{warrantyDescription}</option>
+                <option {warrantySelected}
+                        value="{warrantyID}"
+                >{warrantyDescription}
+                </option>
                 <!-- END warrantyBlock -->
             </select></td>
         </tr>
@@ -214,7 +239,8 @@
               value="{serverName}"
               {readonly}
               size="50"
-              maxlength="50">
+              maxlength="50"
+      >
       </span>
             </TD>
         </TR>
@@ -244,10 +270,20 @@
                         {secondsiteReadonly}
                         {readonly}
 
-                        value="{secondsiteValidationSuspendUntilDate}" size="10" maxlength="10"
+                        value="{secondsiteValidationSuspendUntilDate}"
+                        size="10"
+                        maxlength="10"
                 ><a href="javascript:;"
-                    onClick="if ('{readonly}' != 'readonly' ) popUpCalendar(this, secondsiteValidationSuspendUntilDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+                    onClick="if ('{readonly}' != 'readonly' ) popUpCalendar(this, secondsiteValidationSuspendUntilDate, 'dd/mm/yyyy')"
+            ><img
+                    src="images/calendar.gif"
+                    width="24"
+                    height="22"
+                    hspace="0"
+                    vspace="0"
+                    border="0"
+                    align="absmiddle"
+            ></a>
                 <font class="formErrorMessage">{secondsiteValidationSuspendUntilDateMessage}</font>
                 {suspendedByText}
             </td>
@@ -257,12 +293,17 @@
             <td class="promptText">2nd Site images</td>
             <td>
                 <a href="{addSecondsiteImageUrl}">{addSecondsiteImageText}</a>
-                <table class="content" border="0" cellpadding="2" cellspacing="1">
+                <table class="content"
+                       border="0"
+                       cellpadding="2"
+                       cellspacing="1"
+                >
                     <tr>
                         <td>Name</td>
                         <td>Status</td>
-                        <td>Image Time</td>
-                        <td>Age(Days)</td>
+                        <td>Backup Image Time</td>
+                        <td>Backup Age(Days)</td>
+                        <td>Replication Age(Days)</td>
                         <td class="headerLightgrey">&nbsp;</td>
                     </tr>
                     <!-- BEGIN secondsiteImageBlock -->
@@ -271,8 +312,10 @@
                         <td class="contentWrap">{status}</td>
                         <td class="content">{imageTime}</td>
                         <td class="content">{imageAgeDays}</td>
+                        <td class="content">{replicationImageAgeDays}</td>
                         <td class="content"><A href="{editSecondsiteImageLink}">edit</A> <A
-                                href="{deleteSecondsiteImageLink}">{deleteSecondsiteImageText}</A></td>
+                                href="{deleteSecondsiteImageLink}"
+                        >{deleteSecondsiteImageText}</A></td>
                     </tr>
                     <!-- END secondsiteImageBlock -->
                 </table>
@@ -281,7 +324,7 @@
 
 
         <tr>
-            <td class="promptText">2nd Site Location Path</td>
+            <td class="promptText">2nd Site Backup Path</td>
             <td colspan="2">
                 <input
                         name="customerItem[1][secondsiteLocationPath]"
@@ -289,10 +332,29 @@
                         type="text"
                         {secondsiteReadonly}
                         {readonly}
-                        value="{secondsiteLocationPath}" size="50" maxlength="150"
+                        value="{secondsiteLocationPath}"
+                        size="50"
+                        maxlength="150"
                 >
                 <font class="formErrorMessage">{secondsiteLocationPathMessage}</font>
                 <span class="formErrorMessage">{secondSiteLocationPathValidationText}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">2nd Site Replication Path</td>
+            <td colspan="2">
+                <input
+                        name="customerItem[1][secondSiteReplicationPath]"
+                        id="secondSiteReplicationPath"
+                        type="text"
+                        {secondsiteReadonly}
+                        {readonly}
+                        value="{secondSiteReplicationPath}"
+                        size="50"
+                        maxlength="150"
+                >
+                <span class="formErrorMessage">{secondSiteReplicationPathMessage}</span>
+                <span class="formErrorMessage">{secondSiteReplicationPathValidationText}</span>
             </td>
         </tr>
 
@@ -306,7 +368,10 @@
                         name="customerItem[1][secondsiteImageDelayDays]"
                 >
                     <!-- BEGIN secondsiteImageDelayDaysBlock -->
-                    <option {delayDaysSelected} value="{delayDaysValue}">{delayDaysDescription}</option>
+                    <option {delayDaysSelected}
+                            value="{delayDaysValue}"
+                    >{delayDaysDescription}
+                    </option>
                     <!-- END secondsiteImageDelayDaysBlock -->
                 </select>
                 <font class="formErrorMessage">{secondsiteImageDelayDaysMessage}</font>
@@ -336,8 +401,17 @@
                     value="{sOrderDate}"
                     size="10"
                     maxlength="10"
-            > <a href="javascript:;" onClick="popUpCalendar(this, sOrderDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+            > <a href="javascript:;"
+                 onClick="popUpCalendar(this, sOrderDate, 'dd/mm/yyyy')"
+            ><img
+                    src="images/calendar.gif"
+                    width="24"
+                    height="22"
+                    hspace="0"
+                    vspace="0"
+                    border="0"
+                    align="absmiddle"
+            ></a>
                 <font class="formErrorMessage">{sOrderDateMessage}</font></TD>
         </TR>
         <TR>
@@ -353,10 +427,16 @@
             > <font class="formErrorMessage">{porheadIDMessage}</font></TD>
         </TR>
         <tr>
-            <td valign="top" class="promptText">Internal Notes</td>
+            <td valign="top"
+                class="promptText"
+            >Internal Notes
+            </td>
             <td colspan="2">
-                <textarea {readonly} cols="80" rows="10"
-                          name="customerItem[1][internalNotes]">{internalNotes}</textarea>
+                <textarea {readonly}
+                          cols="80"
+                          rows="10"
+                          name="customerItem[1][internalNotes]"
+                >{internalNotes}</textarea>
             </td>
         </tr>
         <tr>
@@ -380,19 +460,30 @@
         </tr>
         <!-- END contractBlock -->
         <tr>
-            <td valign="top" class="promptText">Notes</td>
+            <td valign="top"
+                class="promptText"
+            >Notes
+            </td>
             <td colspan="2">
-                <textarea {readonly} cols="80" rows="10"
-                          name="customerItem[1][customerItemNotes]">{customerItemNotes}</textarea>
+                <textarea {readonly}
+                          cols="80"
+                          rows="10"
+                          name="customerItem[1][customerItemNotes]"
+                >{customerItemNotes}</textarea>
             </td>
         </tr>
 
         <tr>
             <td>&nbsp;</td>
             <td colspan="2">
-                <input type="submit" name="Update" value="Save">
-                <a href="{urlDelete}" title="Delete customer item"
-                   onClick="if(!confirm('Are you sure you want to delete this record?')) return(false)">{txtDelete}</a>
+                <input type="submit"
+                       name="Update"
+                       value="Save"
+                >
+                <a href="{urlDelete}"
+                   title="Delete customer item"
+                   onClick="if(!confirm('Are you sure you want to delete this record?')) return(false)"
+                >{txtDelete}</a>
             </td>
         </tr>
     </table>

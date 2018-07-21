@@ -3,79 +3,14 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
+require_once($cfg["path_bu"] . '/BUSecondsite.inc.php');
 
-class BUSecondsite extends Business
+class BUSecondsiteReplication extends BUSecondsite
 {
-
-    var $dbeSecondsiteImage;
-    var $buActivity;
-    var $log;
-    var $serverCount = 0;
-    var $imageCount = 0;
-    public $suspendedServerCount = 0;
-    public $serverErrorCount = 0;
-    public $imageErrorCount = 0;
-    public $imagePassesCount = 0;
-    protected $suspendedCheckServers = [];
-    var $delayedCheckServers = [];
-    var $excludedLocalServers = [];
-    /** @var mysqli $db */
-    var $db;
-    /* todo:
-    var $imagePassCount;
-    var $imageFailCount;
-    var $serverConfigErrorCount;
-    */
-
-    const STATUS_PASSED = 'PASSED';
-    const STATUS_SERVER_NOT_FOUND = 'SERVER_NOT_FOUND';
-    const STATUS_IMAGE_NOT_FOUND = 'IMAGE_NOT_FOUND';
-    const STATUS_BAD_CONFIG = 'BAD_CONFIG';
-    const STATUS_OUT_OF_DATE = 'OUT_OF_DATE';
-    const STATUS_SUSPENDED = 'SUSPENDED';
-
-    const LOG_TYPE_ERROR_PATH_MISSING = 0;
-    const LOG_TYPE_ERROR_INCOMPLETE = 1;
-    const LOG_TYPE_ERROR_NO_IMAGE = 2;
-    const LOG_TYPE_SUCCESS = 3;
-    const LOG_TYPE_SUSPENDED = 4;
-    const START_IMAGE_TIME = '19:00';
-
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->dbeSecondsiteImage = new DBESecondsiteImage($this);
-    }
-
-    function getActivityModel()
-    {
-        if (!$this->buActivity) {
-            $this->buActivity = new BUActivity($this);
-        }
-        return $this->buActivity;
-    }
-
-
-    public function getDelayedCheckServers()
-    {
-        return $this->delayedCheckServers;
-    }
-
-    public function getSuspendedCheckServers()
-    {
-        return $this->suspendedCheckServers;
-    }
-
-    public function getExcludedLocalServers()
-    {
-        return $this->excludedLocalServers;
-    }
-
-    function logMessage($message,
-                        $type = self::LOG_TYPE_SUCCESS
-    )
-    {
-        $this->log[] = array('type' => $type, 'message' => $message);
     }
 
     /**
@@ -127,23 +62,28 @@ class BUSecondsite extends Business
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-                if ($server['secondsiteImageDelayDays']) {
-                    $timeToLookFrom = strtotime(
-                        '-' . $server['secondsiteImageDelayDays'] . ' days',
-                        $defaultTimeToLookFrom
-                    );
-                    $this->delayedCheckServers[] = $server;
-                } else {
-                    $timeToLookFrom = $defaultTimeToLookFrom;
-                }
+
+                $days = @$server['secondsiteImageDelayDays'];
+                $dsHeader = new DataSet($this);
+                $buHeader = new BUHeader($this);
+                $buHeader->getHeader($dsHeader);
+
+                $additionalDays = $dsHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance);
+
+                $days += $additionalDays;
+                $timeToLookFrom = strtotime(
+                    '-' . $days . ' days',
+                    $defaultTimeToLookFrom
+                );
+                $this->delayedCheckServers[] = $server;
 
                 $images = $this->getImagesByServer($server['server_cuino']);
 
                 if (
-                    !$server['secondsiteLocationPath'] OR
+                    !$server['secondSiteReplicationPath'] OR
                     count($images) == 0
                 ) {
-                    $error = '2nd Site Backup Path Error Or No Images';
+                    $error = '2nd Site Replication Path Error Or No Images';
                     if (!$isSuspended) {
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
@@ -161,7 +101,7 @@ class BUSecondsite extends Business
 
                 } else {
 
-                    $networkPath = $server['secondsiteLocationPath'];
+                    $networkPath = $server['secondSiteReplicationPath'];
                     if (!file_exists($networkPath)) {
                         $error = 'Location is not available';
 
@@ -179,29 +119,19 @@ class BUSecondsite extends Business
                                 $server['server_cuino'],
                                 self::STATUS_SERVER_NOT_FOUND
                             );
-
-                            if (!$customerItemID && !$testRun) {
-                                $buActivity = $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
-                                    $server['custno'],
-                                    $server['serverName'],
-                                    $server['server_cuino'],
-                                    $server['cui_cuino'],
-                                    $networkPath
-                                );
-                            }
                         }
                     }
                 }
             }
 
-            if ($error && !$customerItemID && !$isSuspended && !$testRun) {
-                $this->sendBadConfigurationEmail(
-                    $server,
-                    $error,
-                    $networkPath
-                );
-
-            }
+//            if ($error && !$customerItemID && !$isSuspended && !$testRun) {
+//                $this->sendBadConfigurationEmail(
+//                    $server,
+//                    $error,
+//                    $networkPath
+//                );
+//
+//            }
 
             if (!$error && !$excludeFromChecks) {
 
@@ -319,55 +249,35 @@ class BUSecondsite extends Business
                             );
 
                         } else {
-                            $imageAgeDays = number_format(
-                                (time() - strtotime($mostRecentFileTime)) / 86400,
-                                0
+                            if (!$isSuspended) {
+                                $this->imagePassesCount++;
+                            }
+                            /*
+                            Passed all verification checks.
+                            */
+                            $this->logMessage(
+                                $server['cus_name'] . ' ' . $server['serverName'] . ' Up-to-date image ' . $mostRecentFileName . ' ' . DATE(
+                                    'd/m/Y H:i:s',
+                                    $mostRecentFileTime
+                                ),
+                                self::LOG_TYPE_SUCCESS
                             );
 
-                            if ($imageAgeDays < 0) {
-                                $this->imageErrorCount++;
-                                $errorMessage = $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE(
-                                        'd/m/Y H:i:s',
-                                        $mostRecentFileTime
-                                    );
-                                $this->logMessage(
-                                    $errorMessage,
-                                    self::STATUS_OUT_OF_DATE
-                                );
-                            } else {
-                                if (!$isSuspended) {
-                                    $this->imagePassesCount++;
-                                }
+                            $status = self::STATUS_PASSED;
 
-
-                                /*
-                                Passed all verification checks.
-                                */
-                                $this->logMessage(
-                                    $server['cus_name'] . ' ' . $server['serverName'] . ' Up-to-date image ' . $mostRecentFileName . ' ' . DATE(
-                                        'd/m/Y H:i:s',
-                                        $mostRecentFileTime
-                                    ),
-                                    self::LOG_TYPE_SUCCESS
-                                );
-
-                                $status = self::STATUS_PASSED;
-
-                                $this->setImageStatus(
-                                    $image['secondSiteImageID'],
-                                    $status,
-                                    $mostRecentFileName,
-                                    date(
-                                        'Y-m-d H:i:s',
-                                        $mostRecentFileTime
-                                    )
-                                );
-                                /*
-                                Note: If this server is suspended then it's status will now be set back to passed
-                                and the suspended date reset.
-                                */
-                            }
-
+                            $this->setImageStatus(
+                                $image['secondSiteImageID'],
+                                $status,
+                                $mostRecentFileName,
+                                date(
+                                    'Y-m-d H:i:s',
+                                    $mostRecentFileTime
+                                )
+                            );
+                            /*
+                            Note: If this server is suspended then it's status will now be set back to passed
+                            and the suspended date reset.
+                            */
                         }
 
                     }
@@ -378,177 +288,21 @@ class BUSecondsite extends Business
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
-
-                    $buActivity = $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
-                        $server['custno'],
-                        $server['serverName'],
-                        $server['server_cuino'],
-                        $server['cui_cuino'],
-                        $missingLetters,
-                        $missingImages
-                    );
-
-                }
+//                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
+//
+//                    $buActivity = $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
+//                        $server['custno'],
+//                        $server['serverName'],
+//                        $server['server_cuino'],
+//                        $server['cui_cuino'],
+//                        $missingLetters,
+//                        $missingImages
+//                    );
+//
+//                }
             } // if not error
 
         } // end foreach contracts
-
-        if (!$customerItemID && !$testRun) {
-            /** @var dbSweetcode $db */
-            $db = $GLOBALS['db'];
-
-            //check if we have already stored information for today
-            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now())";
-
-            $db->query($query);
-            $db->next_record();
-            $data = $db->Record;
-
-            if ($data['created_at']) {
-                return;
-            }
-
-            $query = "INSERT INTO backup_performance_log (
-                      created_at,
-                      servers,
-                      images,
-                      server_errors,
-                      image_errors,
-                      suspended_servers,
-                      passes,
-                      success_rate
-                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?)";
-            $db->preparedQuery(
-                $query,
-                [
-                    [
-                        "type"  => "i",
-                        "value" => $this->serverCount
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->imageCount
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->serverErrorCount,
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->imageErrorCount,
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->suspendedServerCount,
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->imagePassesCount,
-                    ],
-                    [
-                        "type"  => "d",
-                        "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
-                    ]
-
-                ]
-            );
-
-
-        }
-    }
-
-    function isSuspended($server)
-    {
-        if (
-            $server['secondsiteValidationSuspendUntilDate'] &&
-            $server['secondsiteValidationSuspendUntilDate'] != '0000-00-00' &&
-            $server['secondsiteValidationSuspendUntilDate'] > date('Y-m-d')
-        ) {
-
-            $message = 'Image validation suspended until ' . $server['secondsiteValidationSuspendUntilDate'];
-            $this->logMessage(
-                $server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message,
-                self::LOG_TYPE_SUSPENDED
-            );
-
-            $this->suspendedCheckServers[] = $server;
-
-            $this->setImageStatusByServer(
-                $server['server_cuino'],
-                self::STATUS_SUSPENDED
-            );
-
-            $ret = true;
-        } else {
-            $ret = false;
-        }
-        return $ret;
-
-    }
-
-    function resetSuspendedUntilDate($cuino)
-    {
-        $queryString =
-            "UPDATE
-    custitem 
-    SET
-    secondsiteValidationSuspendUntilDate = NULL
-    WHERE
-    cui_cuino = $cuino";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-
-    }
-
-    function preg_ls($path = ".",
-                     $pat = "/.*/"
-    )
-    {
-        // it's going to be used repeatedly, ensure we compile it for speed.
-        $pat = preg_replace(
-            "|(/.*/[^S]*)|s",
-            "\\1S",
-            $pat
-        );
-        //Remove trailing slashes from path
-        while (substr(
-                $path,
-                -1,
-                1
-            ) == "/") $path = substr(
-            $path,
-            0,
-            -1
-        );
-        //also, make sure that $path is a directory and repair any screwups
-        if (!is_dir($path)) $path = dirname($path);
-        //assert either truth or falsehoold of $rec, allow no scalars to mean truth
-        //get a directory handle
-
-        //initialise the output array
-        $ret = Array();
-
-        if ($d = dir($path)) {
-            //loop, reading until there's no more to read
-            while (false !== ($e = $d->read())) {
-                //Ignore parent- and self-links
-                if (($e == ".") || ($e == "..")) {
-                    continue;
-                }
-                //If it matches, include it
-                if (preg_match(
-                    $pat,
-                    $e
-                )) {
-                    $ret[] = $path . "/" . $e;
-                }
-            }
-        }
-        //finally, return the array
-        return $ret;
     }
 
     function sendBadConfigurationEmail($server,
@@ -625,54 +379,6 @@ class BUSecondsite extends Business
     }
 
 
-    /**
-     * Get the size of file, platform- and architecture-independant.
-     * This function supports 32bit and 64bit architectures and works fith large files > 2 GB
-     * The return value type depends on platform/architecture: (float) when PHP_INT_SIZE < 8 or (int) otherwise
-     * @param   resource $fp
-     * @return  mixed (int|float) File size on success or (bool) FALSE on error
-     */
-    function my_filesize($filepath)
-    {
-        $return = false;
-        $fp = fopen(
-            $filepath,
-            'r'
-        );
-        if (is_resource($fp)) {
-            if (PHP_INT_SIZE < 8) {
-                // 32bit
-                if (0 === fseek(
-                        $fp,
-                        0,
-                        SEEK_END
-                    )) {
-                    $return = 0.0;
-                    $step = 0x7FFFFFFF;
-                    while ($step > 0) {
-                        if (0 === fseek(
-                                $fp,
-                                -$step,
-                                SEEK_CUR
-                            )) {
-                            $return += floatval($step);
-                        } else {
-                            $step >>= 1;
-                        }
-                    }
-                }
-            } elseif (0 === fseek(
-                    $fp,
-                    0,
-                    SEEK_END
-                )) {
-                // 64bit
-                $return = ftell($fp);
-            }
-        }
-        return $return;
-    }
-
     function setImageStatus($secondSiteImageID,
                             $status,
                             $imagePath = '',
@@ -683,9 +389,9 @@ class BUSecondsite extends Business
             "UPDATE
         secondsite_image 
       SET
-        status = '$status',
-        imagePath = '" . addslashes($imagePath) . "',
-        imageTime = '$imageTime'
+        replicationStatus = '$status',
+        replicationImagePath = '" . addslashes($imagePath) . "',
+        replicationImageTime = '$imageTime'
       WHERE
         secondSiteImageID = $secondSiteImageID";
 
@@ -702,7 +408,7 @@ class BUSecondsite extends Business
             "UPDATE
         secondsite_image 
       SET
-        status = '$status'
+        replicationStatus = '$status'
       WHERE
         customerItemID = $customerItemID";
 
@@ -720,11 +426,9 @@ class BUSecondsite extends Business
             "SELECT
         secondSiteImageID,
         imageName,
-        status
-
+        replicationStatus
       FROM
         secondsite_image
-
       WHERE
         customerItemID = $customerItemID";
 
@@ -753,7 +457,7 @@ class BUSecondsite extends Business
         i.itm_itemtypeno,
         ser.cui_cuino AS server_cuino,
         ser.cui_cust_ref AS serverName,
-        ser.secondsiteLocationPath,
+        ser.secondSiteReplicationPath,
         ser.secondsiteValidationSuspendUntilDate,
         ser.secondsiteImageDelayDays,
         ser.secondsiteLocalExcludeFlag,
@@ -761,7 +465,6 @@ class BUSecondsite extends Business
         ser.secondsiteImageDelayDate,
         suspenduser.cns_name AS suspendUser,
         ser.secondsiteSuspendedDate
-
       FROM
         custitem ci
         JOIN customer c ON c.cus_custno = ci.cui_custno
@@ -854,12 +557,12 @@ class BUSecondsite extends Business
         ser.secondsiteValidationSuspendUntilDate,
         ser.secondsiteImageDelayDays,
         ser.secondsiteLocalExcludeFlag,
+        ser.secondSiteReplicationPath,
         ssi.secondsiteImageID,
         ssi.imageName,
-        ssi.status,
-        ssi.imagePath,
-        ssi.imageTime
-
+        ssi.replicationStatus ,
+        ssi.replicationImagePath ,
+        ssi.replicationImageTime
       FROM
         custitem ci
         JOIN customer c ON c.cus_custno = ci.cui_custno
@@ -871,7 +574,7 @@ class BUSecondsite extends Business
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
         AND ci.declinedFlag <> 'Y'
-        AND status = '$status'
+        AND replicationStatus = '$status'
       
       ORDER BY c.cus_name, serverName, ssi.imageName";
 
