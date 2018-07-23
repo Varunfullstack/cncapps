@@ -1,32 +1,14 @@
 <!-- Template: HomeDetailCharts.inc.html -->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
-        integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o=" crossorigin="anonymous"></script>
+<script type="text/javascript"
+        src="https://www.gstatic.com/charts/loader.js"
+></script>
 <script type="text/javascript">
     dateFormat = 'dd/mm/yy';
 
 
     $(function () {
-
-        function getDate(element) {
-            var date;
-            try {
-                date = $.datepicker.parseDate(dateFormat, element.value);
-            } catch (error) {
-                date = null;
-            }
-
-            return date;
-        }
-
         var startDatePicker = $('#startDatePicker');
         var endDatePicker = $('#endDatePicker');
-
-        console.log(moment('{startDate}').format('DD/MM/YYYY'));
-
         startDatePicker.datepicker({
                 dateFormat: 'dd/mm/yy',
                 defaultDate: moment('{startDate}').toDate(),
@@ -173,11 +155,15 @@
 </h1>
 <div>
     <label style="width: 80px">Start Date:</label>
-    <input type="text" id="startDatePicker">
+    <input type="text"
+           id="startDatePicker"
+    >
 </div>
 <div>
     <label style="width: 80px">End Date:</label>
-    <input type="text" id="endDatePicker">
+    <input type="text"
+           id="endDatePicker"
+    >
 </div>
 <br>
 <div id="chart_div"></div>

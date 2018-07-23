@@ -131,8 +131,27 @@ class CTHome extends CTCNC
 
         $this->displayProjects();
 
-        $this->displayFixedAndReopen();
-        $this->displayFirstTimeFixFigures();
+        $this->setTemplateFiles(
+            'dashboardTest',
+            'DashboardStats'
+        );
+
+
+        $firstTimeFixFigures = $this->displayFirstTimeFixFigures();
+        $fixedReopen = $this->displayFixedAndReopen();
+        $this->template->set_var(
+            [
+                "thing1" => $fixedReopen,
+                "thing2" => $firstTimeFixFigures
+            ]
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'dashboardTest',
+            true
+        );
+
+
         $this->displayTeamPerformanceReport();
 
         if ($this->buUser->isSdManager($this->userID)) {
@@ -149,9 +168,14 @@ class CTHome extends CTCNC
 
     function displayFixedAndReopen()
     {
-        $this->setTemplateFiles(
+
+        $template = new Template (
+            $GLOBALS ["cfg"] ["path_templates"],
+            "remove"
+        );
+        $template->setFile(
             'FixedAndReopened',
-            'HomeFixedAndReopened.inc'
+            'HomeFixedAndReopened.inc.html'
         );
         global $db;
         /** @var mysqli_result $query */
@@ -173,7 +197,7 @@ class CTHome extends CTCNC
         );
 
         $result = $query->fetch_assoc();
-        $this->template->set_var(
+        $template->set_var(
             array(
                 "hdFixed"    => Controller::formatNumber(
                     $result['hdFixed'],
@@ -220,7 +244,7 @@ class CTHome extends CTCNC
         );
 
         $result = $query->fetch_assoc();
-        $this->template->set_var(
+        $template->set_var(
             array(
                 "hdReopened"    => Controller::formatNumber(
                     $result['hdReopened'],
@@ -241,11 +265,13 @@ class CTHome extends CTCNC
             )
         );
 
-        $this->template->parse(
-            'CONTENTS',
+        $template->parse(
+            'OUTPUT',
             'FixedAndReopened',
             true
         );
+
+        return $template->getVar('OUTPUT');
     }
 
     function displaySalesFigures()
@@ -1256,11 +1282,11 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
         );
 
         $this->template->parse(
-            'CONTENTS',
+            'OUTPUT',
             'firstTimeFigures',
             true
         );
-
+        return $this->template->getVar('OUTPUT');
 
     }
 }// end of class

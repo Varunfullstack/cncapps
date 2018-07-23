@@ -181,9 +181,6 @@
     })
     //-->
 </script>
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
 />
@@ -393,20 +390,9 @@
                         value="{reviewDate}"
                         size="10"
                         maxlength="10"
+                        class="jqueryCalendar"
+                        autocomplete="off"
                 >
-                <a
-                        href="javascript:;"
-                        onClick="popUpCalendar(this, reviewDate, 'dd/mm/yyyy')"
-                >
-                    <img
-                            src="images/calendar.gif"
-                            width="24"
-                            height="22"
-                            hspace="0"
-                            vspace="0"
-                            border="0"
-                            align="absmiddle"
-                    > </a>
                 Time
                 <input
                         {disabled}

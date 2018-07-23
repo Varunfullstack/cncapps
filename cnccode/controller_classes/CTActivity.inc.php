@@ -587,7 +587,6 @@ class CTActivity extends CTCNC
             $this->dsSearchForm->post();
         } elseif (isset($_REQUEST['activity'])) {
             if (!$this->dsSearchForm->populateFromArray($_REQUEST['activity'])) {
-
                 $this->setFormErrorOn();
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
@@ -725,8 +724,6 @@ class CTActivity extends CTCNC
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-
-
         $this->template->set_var(
             array(
                 'formError'                   => $this->formError,
@@ -3295,7 +3292,6 @@ class CTActivity extends CTCNC
 
         if ($this->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
             $disabled = ''; // not
-            $calendarLinkDate = '<a href="javascript:;" onclick="popUpCalendar(this, dateRaised, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
         } else {
             $disabled = CTCNC_HTML_DISABLED;
             $calendarLinkDate = '';
@@ -3809,7 +3805,6 @@ class CTActivity extends CTCNC
 
             if ($dsCallActivity->getValue('callActTypeID') != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
                 $setTimeNowLink = '<a href="javascript:;"  onclick="setServerTime(endTime);"><img src="images/clock.gif" alt="Clock" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" title="Set end time now" /></a>';
-                $calendarLinkDate = '<a href="javascript:;" onclick="popUpCalendar(this, date, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
             }
 
             $calendarLinkCompleteDate = '<a href="javascript:;" onclick="popUpCalendar(this, completeDate, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
@@ -5640,21 +5635,6 @@ class CTActivity extends CTCNC
                     'callActivityID' => $_REQUEST['callActivityID']
                 )
             );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         $this->template->set_var(

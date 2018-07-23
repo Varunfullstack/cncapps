@@ -1,7 +1,10 @@
 <!-- Template: CustomerReviewMeeting.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
 {data}
 <script language='JavaScript'>
     $(function () {
@@ -279,10 +282,19 @@
 
 
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="get" action="{urlSubmit}">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -309,7 +321,9 @@
             > <font class="formErrorMessage"> {customerIDMessage} </font></td>
         </tr>
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Start Month/Year</div>
             </td>
             <td>
@@ -323,7 +337,9 @@
                 > <font class="formErrorMessage"> {startYearMonthMessage} </font></td>
         </tr>
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">End Month/Year</div>
             </td>
             <td>
@@ -337,7 +353,9 @@
                 > <font class="formErrorMessage"> {endYearMonthMessage} </font></td>
         </tr>
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Review Meeting Date</div>
             </td>
             <td>
@@ -349,15 +367,18 @@
                         placeholder="d/m/y"
                         size="10"
                         maxlength="10"
-                ><a href="javascript:;" onclick="popUpCalendar(this, meetingDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0"
-                    align="absmiddle"/></a>
+                        class="jqueryCalendar"
+                        autocomplete="off"
+                >
                 <font class="formErrorMessage"> {meetingDateMessage} </font></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Generate">
+                <input type="submit"
+                       name="Search"
+                       value="Generate"
+                >
         </tr>
     </table>
 </form>
@@ -365,8 +386,14 @@
 <!-- A4 PAGE WITH MARGINS 890px WIDE BY 1305px HIGH -->
 <div style="width: 920px; float: left">
     <div id="reportContent">{nonEditableText}</div>
-    <textarea id="editableText" name="editableText">{editableText}</textarea>
-    <input type="button" name="create-pdf" id="create-pdf" value="Create PDF">
+    <textarea id="editableText"
+              name="editableText"
+    >{editableText}</textarea>
+    <input type="button"
+           name="create-pdf"
+           id="create-pdf"
+           value="Create PDF"
+    >
     <script type="text/javascript">
         reason = CKEDITOR.replace('editableText', {
                 height: '800px',

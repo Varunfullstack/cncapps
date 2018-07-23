@@ -1,6 +1,7 @@
 <!-- Template: searchSearch.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
     $(function () {
         window.fromDate = $('#fromDate').get(0);
@@ -57,10 +58,19 @@
     This report shows how many quotes were converted into orders.
 </div>
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="POST" action="{urlSubmit}">
-    <table width="300px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="POST"
+      action="{urlSubmit}"
+>
+    <table width="300px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -101,10 +111,12 @@
                     value="{fromDate}"
                     size="10"
                     maxlength="10"
-                    onkeypress="javascript:submitOnReturn()">
-                <a href="javascript:;" onclick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"/></a> <font class="formErrorMessage">{fromDateMessage}</font></td>
+                    onkeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
+                <font class="formErrorMessage">{fromDateMessage}</font>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
@@ -117,23 +129,32 @@
                     value="{toDate}"
                     size="10"
                     maxlength="10"
-                    onkeypress="javascript:submitOnReturn()">
-                <a href="javascript:;" onclick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" alt="calendar" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"/></a> <font class="formErrorMessage">{toDateMessage}</font></td>
+                    onkeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
+                <font class="formErrorMessage">{toDateMessage}</font>
+            </td>
         </tr>
 
 
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Search">
+                <input type="submit"
+                       name="Search"
+                       value="Search"
+                >
         </tr>
     </table>
     <p>&nbsp;</p>
 
 </form>
-<table width="600px" border="0" cellspacing="1" cellpadding="1">
+<table width="600px"
+       border="0"
+       cellspacing="1"
+       cellpadding="1"
+>
     <tr>
         <th align="left">Year</th>
         <th align="left">Month</th>
