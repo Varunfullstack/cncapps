@@ -3,27 +3,62 @@
 <BR/><BR/>
 <script src="CommonJS.js"></script>
 <script src="ckeditor/ckeditor.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 
 <P id="autoUpdateLabel"></P>
-<form name="detailsForm" method="post" action="{submitURL}" enctype="multipart/form-data">
+<form name="detailsForm"
+      method="post"
+      action="{submitURL}"
+      enctype="multipart/form-data"
+>
     <!-- dont think this is required: remove if not
       <input type="hidden" name="callActivityID" id="callActivityID" value="
     {callActivityID}" />
     -->
-    <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
-    <input type="hidden" name="customerID" id="customerID" value="{customerID}">
-    <input type="hidden" name="priority" id="priority" value="{priority}">
+    <input type="hidden"
+           name="MAX_FILE_SIZE"
+           value="6291456"
+    >
+    <input type="hidden"
+           name="customerID"
+           id="customerID"
+           value="{customerID}"
+    >
+    <input type="hidden"
+           name="priority"
+           id="priority"
+           value="{priority}"
+    >
 
     <table>
         <tr>
             <td>&nbsp;</td>
-            <td colspan="3" valign="top">
-                <input name="AddToQueue" type="submit" id="AddToQueue" value="Add to Queue">
-                <input name="StartWork" type="submit" id="StartWork" value="Start Work">
-                <input name="Escalate" type="submit" id="Escalate" value="Escalate"
-                       onClick="return (window.confirm('Are you sure you want to escalate this SR?'))">
-                <input name="Back" type="button" value="Cancel" onclick="document.location='{backURL}';">
+            <td colspan="3"
+                valign="top"
+            >
+                <input name="AddToQueue"
+                       type="submit"
+                       id="AddToQueue"
+                       value="Add to Queue"
+                >
+                <input name="StartWork"
+                       type="submit"
+                       id="StartWork"
+                       value="Start Work"
+                >
+                <input name="Escalate"
+                       type="submit"
+                       id="Escalate"
+                       value="Escalate"
+                       onClick="return (window.confirm('Are you sure you want to escalate this SR?'))"
+                >
+                <input name="Back"
+                       type="button"
+                       value="Cancel"
+                       onclick="document.location='{backURL}';"
+                >
             </td>
         </tr>
 
@@ -39,7 +74,10 @@
                 <option value="">Please Select</option>
                 <!-- BEGIN contactBlock -->
                 {optGroupOpen}
-                <option {contactSelected} value="{contactID}">{contactName} {startMainContactStyle}</option>
+                <option {contactSelected}
+                        value="{contactID}"
+                >{contactName} {startMainContactStyle}
+                </option>
                 {optGroupClose}
                 <!-- END contactBlock -->
             </select>
@@ -73,7 +111,10 @@
                 >
                     <option value="99">Please Select</option>
                     <!-- BEGIN siteBlock -->
-                    <option {siteSelected} value="{siteNo}">{siteDesc}</option>
+                    <option {siteSelected}
+                            value="{siteNo}"
+                    >{siteDesc}
+                    </option>
                     <!-- END siteBlock -->
                 </select>
                 <span class="formErrorMessage">{siteNoMessage}</span>
@@ -106,7 +147,10 @@
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN priorityBlock -->
-                    <option {prioritySelected} value="{priority}">{priorityDesc}</option>
+                    <option {prioritySelected}
+                            value="{priority}"
+                    >{priorityDesc}
+                    </option>
                     <!-- END priorityBlock -->
                 </select>
                 <span class="formErrorMessage">{priorityMessage}</span>
@@ -114,8 +158,12 @@
 
             <td class="promptText">Hide Entire SR From Customer</td>
             <td class="field">
-                <input type="checkbox" name="hideFromCustomerFlag" value="Y" {hideFromCustomerFlagChecked}
-                       title="Hide this SR from customer">
+                <input type="checkbox"
+                       name="hideFromCustomerFlag"
+                       value="Y"
+                       {hideFromCustomerFlagChecked}
+                       title="Hide this SR from customer"
+                >
                 <span class="formErrorMessage">{hideFromCustomerFlagMessage}</span>
             </td>
         </tr>
@@ -127,7 +175,10 @@
             <td colspan="4"><span class="formErrorMessage">{reasonMessage}</span></td>
         </tr>
         <tr>
-            <td colspan="4" class="promptTextLeft">Details</td>
+            <td colspan="4"
+                class="promptTextLeft"
+            >Details
+            </td>
         </tr>
         <tr>
             <td colspan="4">
@@ -142,7 +193,10 @@
             <td colspan="4"><span class="formErrorMessage">{internalNotesMessage}</span></td>
         </tr>
         <tr>
-            <td colspan="4" class="promptTextLeft">Internal Notes</td>
+            <td colspan="4"
+                class="promptTextLeft"
+            >Internal Notes
+            </td>
         </tr>
         <tr>
             <td colspan="4">
@@ -158,21 +212,33 @@
             </td>
         </tr>
         <tr>
-            <td colspan="4" valign="top">&nbsp;</td>
+            <td colspan="4"
+                valign="top"
+            >&nbsp;
+            </td>
         </tr>
 
         <tr>
-            <td colspan="4" class="promptTextLeft"><h3>Upload document</h3></td>
+            <td colspan="4"
+                class="promptTextLeft"
+            ><h3>Upload document</h3></td>
         </tr>
 
         <tr>
             <td class="promptTextLeft">Description</td>
             <td colspan="4">
-                <input name="uploadDescription" type="text" size="45" maxlength="50" value="{uploadDescription}">
+                <input name="uploadDescription"
+                       type="text"
+                       size="45"
+                       maxlength="50"
+                       value="{uploadDescription}"
+                >
                 <input
                         name="userfile"
                         type="file"
                         value="{userfile}"
+                        class="dragUploader"
+                        data-description="uploadDescription"
                 >
             </td>
         </tr>
@@ -186,12 +252,30 @@
 
         <tr>
             <td>&nbsp;</td>
-            <td colspan="3" valign="top">
-                <input name="AddToQueue" type="submit" id="AddToQueue" value="Add to Queue">
-                <input name="StartWork" type="submit" id="StartWork" value="Start Work">
-                <input name="Escalate" type="submit" id="Escalate" value="Escalate"
-                       onClick="return (window.confirm('Are you sure you want to escalate this SR?'))">
-                <input name="Back" type="button" value="Cancel" onclick="document.location='{backURL}';">
+            <td colspan="3"
+                valign="top"
+            >
+                <input name="AddToQueue"
+                       type="submit"
+                       id="AddToQueue"
+                       value="Add to Queue"
+                >
+                <input name="StartWork"
+                       type="submit"
+                       id="StartWork"
+                       value="Start Work"
+                >
+                <input name="Escalate"
+                       type="submit"
+                       id="Escalate"
+                       value="Escalate"
+                       onClick="return (window.confirm('Are you sure you want to escalate this SR?'))"
+                >
+                <input name="Back"
+                       type="button"
+                       value="Cancel"
+                       onclick="document.location='{backURL}';"
+                >
             </td>
         </tr>
     </table>

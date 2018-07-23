@@ -1,5 +1,7 @@
 <!-- Template: ActivityDisplay.inc.html -->
-<link rel="stylesheet" href="/font-awesome/css/font-awesome.css"/>
+<link rel="stylesheet"
+      href="/font-awesome/css/font-awesome.css"
+/>
 <style>
 
     a.button {
@@ -12,8 +14,12 @@
     }
 
 </style>
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script type="text/JavaScript">
     <!--
     function MM_jumpMenu(targ, selObj, restore) { //v3.0
@@ -41,70 +47,128 @@
     }
 </script>
 {activityWizardHeader} {contractListPopupLink}
-<table width="1000" border="0" cellspacing="2" cellpadding="2">
+<table width="1000"
+       border="0"
+       cellspacing="2"
+       cellpadding="2"
+>
     <tr>
         <td>
-            <table class="singleBorder" align="center" width="100%" border="0" cellspacing="1" cellpadding="1">
+            <table class="singleBorder"
+                   align="center"
+                   width="100%"
+                   border="0"
+                   cellspacing="1"
+                   cellpadding="1"
+            >
                 <TR>
                     <TD>
-                        <table width="100%" border="0" cellspacing="1" cellpadding="1">
+                        <table width="100%"
+                               border="0"
+                               cellspacing="1"
+                               cellpadding="1"
+                        >
                             <tr>
-                                <td nowrap="nowrap" width="30">{linkFirstActivity}</td>
-                                <td nowrap="nowrap" width="60">{linkPreviousActivity}</td>
-                                <td nowrap="nowrap" width="60"><select name="menu1"
-                                                                       onchange="MM_jumpMenu('parent',this,0)">
+                                <td nowrap="nowrap"
+                                    width="30"
+                                >{linkFirstActivity}
+                                </td>
+                                <td nowrap="nowrap"
+                                    width="60"
+                                >{linkPreviousActivity}
+                                </td>
+                                <td nowrap="nowrap"
+                                    width="60"
+                                ><select name="menu1"
+                                         onchange="MM_jumpMenu('parent',this,0)"
+                                >
                                     <!-- BEGIN jumpBlock -->
-                                    <option value="{urlJumpToActivity}" {selected}>{callActivityID} - {dateEngineer} -
+                                    <option value="{urlJumpToActivity}"
+                                            {selected}
+                                    >{callActivityID} - {dateEngineer} -
                                         {contactName} - {activityType}
                                     </option>
                                     <!-- END jumpBlock -->
                                 </select></td>
-                                <td nowrap="nowrap" width="60"><strong>{thisRowNumber}</strong> of {activityChainCount}
+                                <td nowrap="nowrap"
+                                    width="60"
+                                ><strong>{thisRowNumber}</strong> of {activityChainCount}
                                 </td>
-                                <td nowrap="nowrap" width="30">{linkNextActivity}</td>
-                                <td nowrap="nowrap" width="30">{linkLastActivity}</td>
+                                <td nowrap="nowrap"
+                                    width="30"
+                                >{linkNextActivity}
+                                </td>
+                                <td nowrap="nowrap"
+                                    width="30"
+                                >{linkLastActivity}
+                                </td>
                             </tr>
                         </table>
                     </TD>
                 </tr>
                 <tr>
                     <td>
-                        <table width="100%" border="0" cellspacing="1" cellpadding="1">
+                        <table width="100%"
+                               border="0"
+                               cellspacing="1"
+                               cellpadding="1"
+                        >
                             <tr>
                                 <td valign="top">
-                                    <input type="checkbox" name="callActivity[1][criticalFlag]" {disabled}
-                                           id="criticalFlag" value="Y" {criticalFlagChecked}
+                                    <input type="checkbox"
+                                           name="callActivity[1][criticalFlag]"
+                                           {disabled}
+                                           id="criticalFlag"
+                                           value="Y"
+                                           {criticalFlagChecked}
                                            title="This SR is critical"
-                                           onclick="window.location='{urlToggleCriticalFlag}'">
+                                           onclick="window.location='{urlToggleCriticalFlag}'"
+                                    >
                                     <label for="criticalFlag">Critical SR</label>
                                 </td>
                                 <td valign="top">
-                                    <input type="checkbox" name="callActivity[1][monitoringFlag]" {disabled}
-                                           id="monitoringFlag" value="Y" {monitoringFlagChecked}
+                                    <input type="checkbox"
+                                           name="callActivity[1][monitoringFlag]"
+                                           {disabled}
+                                           id="monitoringFlag"
+                                           value="Y"
+                                           {monitoringFlagChecked}
                                            title="This SR is being monitored"
-                                           onclick="window.location='{urlToggleMonitoringFlag}'">
+                                           onclick="window.location='{urlToggleMonitoringFlag}'"
+                                    >
                                     <label for="monitoringFlag">Monitor SR</label>
                                 </td>
                                 <td valign="top">
-                                    <input type="checkbox" name="checkbox" id="includeTravel"
+                                    <input type="checkbox"
+                                           name="checkbox"
+                                           id="includeTravel"
                                            value="checkbox"
                                            onclick="window.location='{urlToggleIncludeTravel}'"
-                                           {includeTravelChecked}/>
+                                           {includeTravelChecked}
+                                    />
                                     <label for="includeTravel">Show Travel</label>
                                 </td>
 
-                                <td valign="top"><input type="checkbox" name="toggleIncludeOperationalTasks"
-                                                        id="toggleIncludeOperationalTasks" value="checkbox"
+                                <td valign="top"><input type="checkbox"
+                                                        name="toggleIncludeOperationalTasks"
+                                                        id="toggleIncludeOperationalTasks"
+                                                        value="checkbox"
                                                         onclick="window.location='{urlToggleIncludeOperationalTasks}'"
-                                                        {includeOperationalTasksChecked}/><label
-                                        for="toggleIncludeOperationalTasks">Show Operational Tasks</label>
+                                                        {includeOperationalTasksChecked}
+                                /><label
+                                        for="toggleIncludeOperationalTasks"
+                                >Show Operational Tasks</label>
                                 </td>
 
-                                <td valign="top"><input type="checkbox" name="checkbox" id="includeServerGuardUpdates"
+                                <td valign="top"><input type="checkbox"
+                                                        name="checkbox"
+                                                        id="includeServerGuardUpdates"
                                                         value="checkbox"
                                                         onclick="window.location='{urlToggleIncludeServerGuardUpdates}'"
-                                                        {includeServerGuardUpdatesChecked}/><label
-                                        for="includeServerGuardUpdates">Show ServerGuard Updates</label>
+                                                        {includeServerGuardUpdatesChecked}
+                                /><label
+                                        for="includeServerGuardUpdates"
+                                >Show ServerGuard Updates</label>
                                 </td>
 
                                 <td>Activity hours: {totalActivityDurationHours}</td>
@@ -118,41 +182,99 @@
         </td>
     </tr>
 </table>
-<TABLE width="1000" border="0" cellpadding="2" cellspacing="1">
+<TABLE width="1000"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
     <TR>
-        <TD width="90" valign="top" nowrap="nowrap" class="navigateLink">
+        <TD width="90"
+            valign="top"
+            nowrap="nowrap"
+            class="navigateLink"
+        >
             {followLink}
         </TD>
-        <TD width="90" valign="top" nowrap="nowrap" class="navigateLink">
+        <TD width="90"
+            valign="top"
+            nowrap="nowrap"
+            class="navigateLink"
+        >
             {travelLink}</A>
         </TD>
-        <TD width="90" class="navigateLink" valign="top">
-            <A href="{urlEditActivity}" title="Edit activity details">{txtEditActivity}</A></TD>
-        <TD width="90" class="navigateLink" valign="top">{deleteLink}</TD>
-        <TD width="90" class="navigateLink" valign="top">
-            <A href="{urlViewExpenses}" title="View/Edit Expenses">{txtViewExpenses}</A></TD>
-        <TD width="90" class="navigateLink" valign="top">
-            <A href="{urlUnhideSR}" title="Unhide SR from customer"
+        <TD width="90"
+            class="navigateLink"
+            valign="top"
+        >
+            <A href="{urlEditActivity}"
+               title="Edit activity details"
+            >{txtEditActivity}</A></TD>
+        <TD width="90"
+            class="navigateLink"
+            valign="top"
+        >{deleteLink}
+        </TD>
+        <TD width="90"
+            class="navigateLink"
+            valign="top"
+        >
+            <A href="{urlViewExpenses}"
+               title="View/Edit Expenses"
+            >{txtViewExpenses}</A></TD>
+        <TD width="90"
+            class="navigateLink"
+            valign="top"
+        >
+            <A href="{urlUnhideSR}"
+               title="Unhide SR from customer"
                onClick="if(!confirm('This will unhide the SR from the customer and can\'t be undone, are you sure?')) return(false)"
             >{txtUnhideSR}</A>
         </TD>
-        <TD width="90" class="navigateLink" valign="top">
-            <A href="{urlAddToCalendar}" title="Add to calendar">{txtAddToCalendar}</A>
+        <TD width="90"
+            class="navigateLink"
+            valign="top"
+        >
+            <A href="{urlAddToCalendar}"
+               title="Add to calendar"
+            >{txtAddToCalendar}</A>
         </TD>
-        <TD width="90" valign="top" nowrap="nowrap" class="navigateLink">
-            <A href="{urlSendVistEmail}" title="Send client a visit confirmation email"
-               onClick="if(!confirm('Are you sure you want to send the client a confirmation email?')) return(false)">{txtSendVisitEmail}</A>
+        <TD width="90"
+            valign="top"
+            nowrap="nowrap"
+            class="navigateLink"
+        >
+            <A href="{urlSendVistEmail}"
+               title="Send client a visit confirmation email"
+               onClick="if(!confirm('Are you sure you want to send the client a confirmation email?')) return(false)"
+            >{txtSendVisitEmail}</A>
         </TD>
-        <TD width="90" valign="top" nowrap="nowrap" class="navigateLink">
-            <a href="#" onclick="managerCommentPopup()">{txtManagerComment}</a>
+        <TD width="90"
+            valign="top"
+            nowrap="nowrap"
+            class="navigateLink"
+        >
+            <a href="#"
+               onclick="managerCommentPopup()"
+            >{txtManagerComment}</a>
         </TD>
-        <TD width="90" class="navigateLink" valign="top">
-            <A href="{urlChangeRequest}" title="Change Request">{txtChangeRequest}</A>
+        <TD width="90"
+            class="navigateLink"
+            valign="top"
+        >
+            <A href="{urlChangeRequest}"
+               title="Change Request"
+            >{txtChangeRequest}</A>
         </TD>
 </table>
-<table class="singleBorder" width="1000" border="0">
+<table class="singleBorder"
+       width="1000"
+       border="0"
+>
     <tr>
-        <td colspan="4" class="hiddenText">{hiddenText}</td>
+        <td colspan="4"
+            class="hiddenText"
+        >{hiddenText}
+        </td>
     </tr>
     <tr>
         <td class="promptText">ID</td>
@@ -191,21 +313,40 @@
     </tr>
     <tr>
         <td class="promptText">Root Cause</td>
-        <td class="fieldText" valign="top">{rootCauseDescription}</td>
-        <td class="promptText" valign="top">Complete Date</td>
+        <td class="fieldText"
+            valign="top"
+        >{rootCauseDescription}
+        </td>
+        <td class="promptText"
+            valign="top"
+        >Complete Date
+        </td>
         <td>{completeDate}</td>
     </tr>
     <tr>
-        <td colspan="4" bgcolor="{currentUserBgColor}" align="center" valign="top">{currentUser}</td>
+        <td colspan="4"
+            bgcolor="{currentUserBgColor}"
+            align="center"
+            valign="top"
+        >{currentUser}
+        </td>
     </tr>
     <tr>
-        <td colspan="4" class="promptTextLeft" valign="top">Details</td>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >Details
+        </td>
     </tr>
     <tr>
         <td colspan="4">{reason}</td>
     </tr>
     <tr>
-        <td colspan="4" class="promptTextLeft" valign="top">Notes</td>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >Notes
+        </td>
     </tr>
     <tr>
         <td colspan="4">{internalNotes}</td>
@@ -213,7 +354,10 @@
 
 </table>
 <H3>Contracts</H3>
-<table border="0" cellspacing="0" cellpadding="1">
+<table border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
     <!-- BEGIN contractBlock -->
     <tr class="singleBorder">
         <td><a href="javascript:popup('{urlRenewalContract}')">{contractItemDescription}</a></td>
@@ -222,49 +366,99 @@
     <!-- END contractBlock -->
 </table>
 <BR/>
-<table class="singleBorder" width="1000" border="0">
+<table class="singleBorder"
+       width="1000"
+       border="0"
+>
     <tr>
         <td class="listHead"> Documents</td>
     </tr>
     <tr>
         <td>
-            <table class="singleBorder" width="100%">
+            <table class="singleBorder"
+                   width="100%"
+            >
                 <tr>
-                    <td width="29%" class="listHeadText">Description</td>
-                    <td width="28%" class="listHeadText">File</td>
-                    <td width="18%" class="listHeadText">Date</td>
-                    <td width="14%" class="listHeadText">User</td>
-                    <td width="14%" class="listHeadText">&nbsp;</td>
+                    <td width="29%"
+                        class="listHeadText"
+                    >Description
+                    </td>
+                    <td width="28%"
+                        class="listHeadText"
+                    >File
+                    </td>
+                    <td width="18%"
+                        class="listHeadText"
+                    >Date
+                    </td>
+                    <td width="14%"
+                        class="listHeadText"
+                    >User
+                    </td>
+                    <td width="14%"
+                        class="listHeadText"
+                    >&nbsp;
+                    </td>
                 </tr>
                 <!-- BEGIN documentBlock -->
-                <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
-                    <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
+                <tr valign="top"
+                    onMouseOver="this.bgColor='#ffffcc';"
+                    onMouseOut="this.bgColor='';"
+                >
+                    <td nowrap="nowrap"><A href="{urlViewFile}"
+                                           title="View attached document"
+                                           target="_blank"
+                    >{description}</A>
                     </td>
-                    <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
+                    <td nowrap="nowrap"><A href="{urlViewFile}"
+                                           title="View attached document"
+                                           target="_blank"
+                    >{filename}</A>
                     </td>
                     <td nowrap="nowrap">{createDate}</td>
                     <td nowrap="nowrap">{createUserName}</td>
-                    <td><A href="{urlDeleteFile}" title="Delete attached document"
-                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                    <td><A href="{urlDeleteFile}"
+                           title="Delete attached document"
+                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"
+                    >{txtDeleteFile}</A>
                     </td>
                 </tr>
                 <!-- END documentBlock -->
                 <tr style="height: 10px !important;">
                     <td colspan="5"></td>
                 </tr>
-                <form name="uploadFile" action="{urlUploadFile}" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
+                <form name="uploadFile"
+                      action="{urlUploadFile}"
+                      method="post"
+                      enctype="multipart/form-data"
+                >
+                    <input type="hidden"
+                           name="MAX_FILE_SIZE"
+                           value="6291456"
+                    >
                     <!-- max 6 mbyte -->
                     <tr>
-                        <td class=""><input name="uploadDescription" type="text" size="45" maxlength="50"
-                                            value="{uploadDescription}">
+                        <td class=""><input name="uploadDescription"
+                                            type="text"
+                                            size="45"
+                                            maxlength="50"
+                                            value="{uploadDescription}"
+                        >
                         </td>
-                        <td><input
-                                name="userfile"
-                                type="file"
-                                value="{userfile}"
-                                size="30"></td>
-                        <td colspan="2"><input type="submit" name="Submit2" value="Upload"></td>
+                        <td>
+                            <input
+                                    name="userfile"
+                                    type="file"
+                                    value="{userfile}"
+                                    size="30"
+                                    class="dragUploader"
+                                    data-description="uploadDescription"
+                            >
+                        </td>
+                        <td colspan="2"><input type="submit"
+                                               name="Submit2"
+                                               value="Upload"
+                        ></td>
                         <td>&nbsp;</td>
                     </tr>
                 </form>
@@ -273,13 +467,21 @@
     </tr>
 </table>
 <BR/>
-<table class="singleBorder" width="1000" border="0">
+<table class="singleBorder"
+       width="1000"
+       border="0"
+>
     <tr>
-        <td colspan="4" class="listHead">Expenses</td>
+        <td colspan="4"
+            class="listHead"
+        >Expenses
+        </td>
     </tr>
     <tr>
         <td>
-            <table class="singleBorder" width="100%">
+            <table class="singleBorder"
+                   width="100%"
+            >
                 <tr>
                     <td class="listHeadText">Expense</td>
                     <td class="listHeadText">Miles</td>
@@ -287,7 +489,10 @@
                     <td class="listHeadText">VAT included</td>
                 </tr>
                 <!-- BEGIN expenseBlock -->
-                <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+                <tr valign="top"
+                    onMouseOver="this.bgColor='#ffffcc';"
+                    onMouseOut="this.bgColor='';"
+                >
                     <td class="orderLineItem">
                         <DIV align="left">{expenseType}</DIV>
                     </td>
@@ -306,24 +511,44 @@
                     <td class="listHeadText">Total</td>
                     <td class="listHeadText">&nbsp;</td>
                     <td class="listHeadText">{totalValue}</td>
-                    <td colspan="2" class="listHeadText">&nbsp;</td>
+                    <td colspan="2"
+                        class="listHeadText"
+                    >&nbsp;
+                    </td>
                 </tr>
             </table>
         </td>
     </tr>
 </table>
-<form method="post" action="{urlMessageToSales}" name="messageToSales" AUTOCOMPLETE="off">
-    <input type="hidden" name="callActivityID" value="{callActivityID}"/>
+<form method="post"
+      action="{urlMessageToSales}"
+      name="messageToSales"
+      AUTOCOMPLETE="off"
+>
+    <input type="hidden"
+           name="callActivityID"
+           value="{callActivityID}"
+    />
     <table>
         <tr>
-            <td colspan="4" class="promptTextLeft" valign="top">Parts Used / Message to Sales/</td>
-        </tr>
-        <tr>
-            <td colspan="4"><textarea name="message" cols="110" rows="20"></textarea>
+            <td colspan="4"
+                class="promptTextLeft"
+                valign="top"
+            >Parts Used / Message to Sales/
             </td>
         </tr>
         <tr>
-            <td colspan="4"><input type="submit" name="Submit" value="Send"></td>
+            <td colspan="4"><textarea name="message"
+                                      cols="110"
+                                      rows="20"
+            ></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4"><input type="submit"
+                                   name="Submit"
+                                   value="Send"
+            ></td>
         </tr>
     </table>
 </form>

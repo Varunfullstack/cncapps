@@ -29,17 +29,35 @@
 <table width="100%">
     <tr>
         <td>{activityWizardHeader} {contractListPopupLink} {historyLink}</td>
-        <td align="right" id="autoUpdateLabel"></td>
+        <td align="right"
+            id="autoUpdateLabel"
+        ></td>
     </tr>
 </table>
-<FORM method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off">
-    <input type="hidden" name="problemID" value="{problemID}">
-    <input type="hidden" name="customerID" value="{customerID}">
+<FORM method="post"
+      action="{urlUpdateActivity}"
+      name="callActivity"
+      AUTOCOMPLETE="off"
+>
+    <input type="hidden"
+           name="problemID"
+           value="{problemID}"
+    >
+    <input type="hidden"
+           name="customerID"
+           value="{customerID}"
+    >
 
-    <table class="singleBorder" width="900" border="0">
+    <table class="singleBorder"
+           width="900"
+           border="0"
+    >
         <tr>
             <td class="promptText">ID</td>
-            <td colspan="3" class="mainHeadText">{customerID}_{callActivityID}</td>
+            <td colspan="3"
+                class="mainHeadText"
+            >{customerID}_{callActivityID}
+            </td>
         </tr>
         <tr>
             <td class="promptText">Customer</td>
@@ -54,7 +72,10 @@
                 >
                     <option value="">Not known</option>
                     <!-- BEGIN rootCauseBlock -->
-                    <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+                    <option {rootCauseSelected}
+                            value="{rootCauseID}"
+                    >{rootCauseDescription}
+                    </option>
                     <!-- END rootCauseBlock -->
                 </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
             </td>
@@ -81,50 +102,98 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="submit" name="Submit" value="Save">
+                <input type="submit"
+                       name="Submit"
+                       value="Save"
+                >
             </td>
         </tr>
     </table>
 </FORM>
-<form method="post" action="{uploadURL}" name="uploadFile" AUTOCOMPLETE="off" enctype="multipart/form-data">
-    <table class="singleBorder" width="900" border="0">
+<form method="post"
+      action="{uploadURL}"
+      name="uploadFile"
+      AUTOCOMPLETE="off"
+      enctype="multipart/form-data"
+>
+    <table class="singleBorder"
+           width="900"
+           border="0"
+    >
         <tr>
             <td class="listHead">Documents</td>
         </tr>
         <tr>
             <td>
-                <table class="singleBorder" width="100%">
+                <table class="singleBorder"
+                       width="100%"
+                >
                     <tr>
-                        <td width="29%" class="listHeadText">Description</td>
-                        <td width="28%" class="listHeadText">File</td>
-                        <td width="18%" class="listHeadText">Date</td>
-                        <td width="14%" class="listHeadText">User</td>
-                        <td width="14%" class="listHeadText">&nbsp;</td>
+                        <td width="29%"
+                            class="listHeadText"
+                        >Description
+                        </td>
+                        <td width="28%"
+                            class="listHeadText"
+                        >File
+                        </td>
+                        <td width="18%"
+                            class="listHeadText"
+                        >Date
+                        </td>
+                        <td width="14%"
+                            class="listHeadText"
+                        >User
+                        </td>
+                        <td width="14%"
+                            class="listHeadText"
+                        >&nbsp;
+                        </td>
                     </tr>
                     <!-- BEGIN documentBlock -->
-                    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
-                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
+                    <tr valign="top"
+                        onMouseOver="this.bgColor='#ffffcc';"
+                        onMouseOut="this.bgColor='';"
+                    >
+                        <td nowrap="nowrap"><A href="{urlViewFile}"
+                                               title="View attached document"
+                                               target="_blank"
+                        >{description}</A>
                         </td>
-                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
+                        <td nowrap="nowrap"><A href="{urlViewFile}"
+                                               title="View attached document"
+                                               target="_blank"
+                        >{filename}</A>
                         </td>
                         <td nowrap="nowrap">{createDate}</td>
                         <td nowrap="nowrap">{createUserName}</td>
-                        <td><A href="{urlDeleteFile}&isGather=true" title="Delete attached document"
-                               onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                        <td><A href="{urlDeleteFile}&isGather=true"
+                               title="Delete attached document"
+                               onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"
+                        >{txtDeleteFile}</A>
                         </td>
                     </tr>
                     <!-- END documentBlock -->
                     <tr>
                         <td class="promptTextLeft">Description</td>
                         <td colspan="4">
-                            <input name="uploadDescription" type="text" size="45" maxlength="50"
-                                   value="{uploadDescription}">
+                            <input name="uploadDescription"
+                                   type="text"
+                                   size="45"
+                                   maxlength="50"
+                                   value="{uploadDescription}"
+                            >
                             <input
                                     name="userfile"
                                     type="file"
                                     value="{userfile}"
+                                    class="dragUploader"
+                                    data-description="uploadDescription"
                             >
-                            <input type="submit" name="gatherFixed" value="Upload">
+                            <input type="submit"
+                                   name="gatherFixed"
+                                   value="Upload"
+                            >
                             <span class="promptTextLeft">
                             {uploadErrors}
                             </span>
@@ -136,17 +205,32 @@
     </table>
 </form>
 <h3>Message to Sales</h3>
-<input type="hidden" name="callActivityID" value="{callActivityID}"/>
+<input type="hidden"
+       name="callActivityID"
+       value="{callActivityID}"
+/>
 <table>
     <tr>
-        <td colspan="4" class="promptTextLeft" valign="top">Parts Used / Message to Sales/</td>
-    </tr>
-    <tr>
-        <td colspan="4"><textarea name="message" id="message" cols="110" rows="20"></textarea>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >Parts Used / Message to Sales/
         </td>
     </tr>
     <tr>
-        <td colspan="4"><input type="button" name="messageToSales" id="messageToSales" value="Send"></td>
+        <td colspan="4"><textarea name="message"
+                                  id="message"
+                                  cols="110"
+                                  rows="20"
+        ></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4"><input type="button"
+                               name="messageToSales"
+                               id="messageToSales"
+                               value="Send"
+        ></td>
     </tr>
 </table>
 </form>
