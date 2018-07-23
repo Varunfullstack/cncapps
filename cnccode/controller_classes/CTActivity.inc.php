@@ -5586,6 +5586,15 @@ class CTActivity extends CTCNC
             'ServiceRequestFixedEdit'
         );
 
+        if (!isset($_REQUEST['resolutionSummary'])) {
+            $dbeJCallActivity = $this->buActivity->getActivitiesByProblemID($dsCallActivity->getValue('problemID'));
+            while ($dbeJCallActivity->fetchNext()) {
+                if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
+                    $_REQUEST['resolutionSummary'] = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
+                }
+            }
+        }
+
         $uploadURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -5595,6 +5604,22 @@ class CTActivity extends CTCNC
                     'callActivityID' => $_REQUEST['callActivityID']
                 )
             );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         $this->template->set_var(
             array(

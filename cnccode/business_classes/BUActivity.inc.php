@@ -8136,8 +8136,6 @@ is currently a balance of ';
 
         $dbeJCallActivity = $this->getActivitiesByProblemID($problemID);
 
-        $details = "";
-
         while ($dbeJCallActivity->fetchNext()) {
             if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
                 $dbeCallActivity = new DBECallActivity($this);
@@ -8147,7 +8145,6 @@ is currently a balance of ';
                     11
                 );
 
-                $details .= $dbeJCallActivity->getValue(DBEJCallActivity::reason);
                 $dbeCallActivity->setValue(
                     DBEJCallActivity::reason,
                     '<div>Fixed Explanation</div>' . $dbeJCallActivity->getValue(DBEJCallActivity::reason)
@@ -8156,8 +8153,6 @@ is currently a balance of ';
                 $dbeCallActivity->updateRow();
             }
         }
-
-        $resolutionSummary = $details . $resolutionSummary;
 
         $this->createFixedActivity(
             $problemID,
