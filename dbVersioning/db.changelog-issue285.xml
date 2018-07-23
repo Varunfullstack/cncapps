@@ -8,5 +8,6 @@
     </changeSet>
     <changeSet author="pavwebdev" id="issue285-1531213570-1">
         <modifyDataType tableName="item" columnName="itm_desc" newDataType="varchar(70)"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
