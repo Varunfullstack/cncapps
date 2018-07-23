@@ -19,6 +19,7 @@ This project changes will be shown here.
 - Issue 249 - 2nd Site Replication check process
 - Issue 302 - 7 Day report to include awaiting status 
 - Issue 298 - Single Fixed Explanation within a Service Request
+- Issue 232 - Improve Uploading Files to Service Request Activities
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
