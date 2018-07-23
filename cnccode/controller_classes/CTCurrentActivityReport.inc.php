@@ -820,13 +820,12 @@ class CTCurrentActivityReport extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array('action' => 'showMineOnly')
             );
-
         $this->template->set_var(
             array(
                 'urlResetFilter'  => $urlResetFilter,
                 'urlShowMineOnly' => $urlShowMineOnly,
                 'urlSetFilter'    => $urlSetFilter,
-                'isSDManager'     => $this->loggedInUserIsSdManager
+                'isSDManager'     => $this->loggedInUserIsSdManager ? 'true' : 'false'
             )
 
         );
