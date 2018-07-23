@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.9.0]
 ### Changed
 - Issue 232 - Improve Uploading Files to Service Request Activities
 
