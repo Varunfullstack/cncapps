@@ -3,41 +3,47 @@
         font-size: 16px;
         font-weight: bold;
     }
+
+    .firstTimeFixContainer {
+        float: right;
+    }
 </style>
-<h2>
-    HD First Time Fixes
-</h2>
-<table class="firstTimeFix">
-    <thead>
-    <tr>
-        <td>
-            Name
-        </td>
-        <td>
-            Raised
-        </td>
-        <td>
-            Attempted
-        </td>
-        <td>
-            Achieved
-        </td>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN firstTimeFixBlock -->
-    <tr>
-        <td>{name}</td>
-        <td>{totalRaised}</td>
-        <td>{attemptedFirstTimeFix}</td>
-        <td>{firstTimeFix}</td>
-    </tr>
-    <!-- END firstTimeFixBlock -->
-    <tr>
-        <td style="font-weight: bold;font-size: 16px">Total</td>
-        <td>{phonedThroughRequests}</td>
-        <td>{firstTimeFixAttemptedPct}%</td>
-        <td>{firstTimeFixAchievedPct}%</td>
-    </tr>
-    </tbody>
-</table>
+<div class="firstTimeFixContainer">
+    <h3>
+        HD First Time Fixes
+    </h3>
+    <table class="firstTimeFix">
+        <thead>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Raised
+            </td>
+            <td>
+                Attempted
+            </td>
+            <td>
+                Achieved
+            </td>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN firstTimeFixBlock -->
+        <tr>
+            <td>{name}</td>
+            <td>{totalRaised}</td>
+            <td>{attemptedFirstTimeFix}</td>
+            <td>{firstTimeFix}</td>
+        </tr>
+        <!-- END firstTimeFixBlock -->
+        <tr>
+            <td style="font-weight: bold;font-size: 16px">Total</td>
+            <td>{phonedThroughRequests}</td>
+            <td>{firstTimeFixAttemptedPct}%</td>
+            <td>{firstTimeFixAchievedPct}%</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

@@ -2,14 +2,8 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
+<script src=".javascript/fromDateToDate.js"></script>
 <script language='JavaScript'>
-    $(function () {
-        window.fromDate = $('#fromDate').get(0);
-        window.toDate = $('#toDate').get(0);
-    });
     var state = 'none'; // display status
     var savedCustomerString;
 
@@ -342,46 +336,29 @@
                        size="10"
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
-            > <a
-                    href="javascript:;"
-                    onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"
-            ><img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            ></a> <font
+                       class="jqueryCalendar"
+                       autocomplete="off"
+            > <span
                     class="formErrorMessage"
-            >{fromDateMessage}</font></td>
+            >{fromDateMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">to</div>
             </td>
-            <td><input type="text"
+            <td>
+                <input type="text"
                        name="activity[1][toDate]"
                        id="toDate"
                        value="{toDate}"
                        size="10"
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
-            > <a
-                    href="javascript:;"
-                    onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"
-            ><img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            ></a> <font
-                    class="formErrorMessage"
-            >{toDateMessage}</font></td>
+                       class="jqueryCalendar"
+                       autocomplete="off"
+                >
+                <span class="formErrorMessage">{toDateMessage}</span>
+            </td>
         </tr>
         <tr>
             <td>&nbsp;</td>
