@@ -8122,6 +8122,7 @@ is currently a balance of ';
             $problemID
         );
 
+
         if (!$fixedUserID) {
             $fixedUserID = $this->loggedInUserID;
         }
@@ -8165,6 +8166,27 @@ is currently a balance of ';
         $dbeProblem->updateRow();
 
         $this->closeActivitiesWithEndTime($problemID);
+
+        $dbeJCallActivity = $this->getActivitiesByProblemID($problemID);
+
+        while ($dbeJCallActivity->fetchNext()) {
+            if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
+                $dbeCallActivity = new DBECallActivity($this);
+                $dbeCallActivity->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActivityID));
+                $dbeCallActivity->setValue(
+                    DBEJCallActivity::callActTypeID,
+                    11
+                );
+
+                $dbeCallActivity->setValue(
+                    DBEJCallActivity::reason,
+                    '<div>Fixed Explanation</div>' . $dbeJCallActivity->getValue(DBEJCallActivity::reason)
+                );
+
+                $dbeCallActivity->updateRow();
+            }
+        }
+
         $this->createFixedActivity(
             $problemID,
             $resolutionSummary

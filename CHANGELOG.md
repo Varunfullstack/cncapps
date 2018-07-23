@@ -18,6 +18,7 @@ This project changes will be shown here.
 - Issue 296 - Change Open SR Report so non main contacts only see their SRs
 - Issue 249 - 2nd Site Replication check process
 - Issue 302 - 7 Day report to include awaiting status 
+- Issue 298 - Single Fixed Explanation within a Service Request
 ### Fixed
 - Issue 275 - Permissions error for PortalDocument
 - Issue 271 - CustomerAnalysis Report error handling
