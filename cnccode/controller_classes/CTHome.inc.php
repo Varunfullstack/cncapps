@@ -1195,7 +1195,7 @@ class CTHome extends CTCNC
             initial.caa_endtime
           )
         ) <= (5 * 60) 
-        AND callactivity.`caa_consno` = engineer.`cns_consno`),
+        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1),
       0
     )
   ) AS attemptedFirstTimeFix,
@@ -1229,7 +1229,7 @@ class CTHome extends CTCNC
             fixedActivity.caa_starttime,
             remoteSupport.caa_endtime
           )
-        ) <= (5 * 60)),
+        ) <= (5 * 60) limit 1),
       0
     )
   ) AS firstTimeFix,
