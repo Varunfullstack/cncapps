@@ -1175,16 +1175,19 @@ class BUActivity extends Business
           WHERE con_contno = " . $dsCallActivity->getValue(DBEJCallActivity::contactID);
 
             $oldNotes = $this->db->query($sql)->fetch_object()->con_notes;
-
             if (
                 $oldNotes != $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
             ) {
-                $sql =
-                    "UPDATE contact
-              SET con_notes = '" . $dsCallActivity->getValue(DBEJCallActivity::contactNotes) .
-                    "' WHERE con_contno = " . $dsCallActivity->getValue(DBEJCallActivity::contactID);
 
-                $this->db->query($sql);
+                $dbeContact = new DBEContact($this);
+
+                $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
+                
+                $dbeContact->setValue(
+                    DBEContact::notes,
+                    $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
+                );
+                $dbeContact->updateRow();
             }
         }
         if ($dsCallActivity->getValue(DBEJCallActivity::techNotes) && $dsCallActivity->getValue(
