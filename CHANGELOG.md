@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 259 - Contact changes audit log
+
 ## [v1.8.5] - 2018-07-16
 ### Fixed
 - Issue 299 - Show link to create customer folder if it doesn't exist
