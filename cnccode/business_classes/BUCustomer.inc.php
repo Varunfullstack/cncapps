@@ -462,7 +462,6 @@ class BUCustomer extends Business
         $dsContact->setValue(DBEContact::discontinuedFlag, 'N');
         $dsContact->setValue(DBEContact::sendMailshotFlag, 'Y');
         $dsContact->setValue(DBEContact::accountsFlag, 'N');
-        $dsContact->setValue(DBEContact::statementFlag, 'N');
         $dsContact->setValue(DBEContact::mailshot1Flag, $this->dsHeader->getValue(DBEHeader::mailshot1FlagDef));
         $dsContact->setValue(DBEContact::mailshot2Flag, $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef));
         $dsContact->setValue(DBEContact::mailshot3Flag, $this->dsHeader->getValue(DBEHeader::mailshot3FlagDef));
