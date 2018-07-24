@@ -13,14 +13,11 @@
             </not>
         </preConditions>
         <createTable tableName="contactAuditLog">
-            <column name="id" type="int(11)">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="version" type="int(11)" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="action" type="CHAR(8)"/>
-            <column name="createdAt" type="timestamp" defaultValue="CURRENT_TIMESTAMP"/>
+            <column name="createdAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="userId" type="int(11)"/>
+            <column name="contactId" type="int(11)"/>
+            <column name="con_contno" type="int(11)"/>
             <column name="con_siteno" remarks="Default Site FK (only if Customer)" type="SMALLINT"/>
             <column name="con_custno" remarks="Customer PK (optional)" type="INT"/>
             <column name="con_suppno" remarks="Supplier PK (optional)" type="INT"/>
@@ -36,10 +33,6 @@
             <column name="con_fax" remarks="Fax" type="CHAR(25)"/>
             <column name="con_mailshot" remarks="Send Mailshots?" type="CHAR(1)"/>
             <column defaultValue="" name="con_accounts_flag" remarks="Is member of Accounts?" type="CHAR(1)">
-                <constraints nullable="false"/>
-            </column>
-            <column defaultValue="" name="con_statement_flag" remarks="Should receive PrePay statements?"
-                    type="CHAR(1)">
                 <constraints nullable="false"/>
             </column>
             <column name="con_discontinued" remarks="Is no longer active?" type="CHAR(1)"/>
@@ -62,6 +55,13 @@
                     type="CHAR(1)"/>
             <column name="con_mailflag11" remarks="Refer to header table for meaning" type="CHAR(1)"/>
         </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue259-1532422717-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_statement_flag"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_statement_flag"/>
+        <rollback/>
     </changeSet>
 
 </databaseChangeLog>
