@@ -61,7 +61,11 @@
             <columnExists tableName="contact" columnName="con_statement_flag"/>
         </preConditions>
         <dropColumn tableName="contact" columnName="con_statement_flag"/>
-        <rollback/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_statement_flag" type="CHAR(1)" beforeColumn="con_discontinued" remarks="Should receive PrePay statements?"/>
+            </addColumn>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
