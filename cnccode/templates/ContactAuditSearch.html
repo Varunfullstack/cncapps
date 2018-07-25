@@ -1,0 +1,143 @@
+<!-- Template: Customer.inc.html -->
+<script type='application/javascript'
+        src='CommonJS.js'
+></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<script type="application/javascript">
+    $(function () {
+        window.newCustomerFromDate = $('#newCustomerFromDate').get(0);
+        window.newCustomerToDate = $('#newCustomerToDate').get(0);
+        window.droppedCustomerFromDate = $('#droppedCustomerFromDate').get(0);
+        window.droppedCustomerToDate = $('#droppedCustomerToDate').get(0);
+    });
+</script>
+<script type="application/javascript">
+
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{customerPopupURL}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.form.customerID.value = "";
+        }
+    }
+
+    function createQuote() {
+        if (document.searchForm.customerID.value != "") {
+            document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
+        }
+    }
+
+    function createOrder() {
+        if (document.searchForm.customerID.value != "") {
+            document.location = '{createOrderURL}&customerID=' + escape(document.searchForm.customerID.value)
+        }
+    }
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+</script>
+
+<form name="form"
+      method="post"
+      action="{submitURL}"
+>
+    <table border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td class="promptText">Customer Name</td>
+            <td>
+                <input
+                        type="hidden"
+                        name="customerID"
+                        id="customerID"
+                        value="{customerID}"
+                >
+                <input type="text"
+                       name="form[customerString]"
+                       value="{customerString}"
+                       id="customerString"
+                       onFocus="javascript:saveCustomerString()"
+                       onBlur="javascript:validateCustomerString()"
+                       onKeypress="javascript:validateCustomerStringOnReturn()"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Created Between</div>
+            </td>
+            <td>
+                <input
+                        type="text"
+                        name="form[newCustomerFromDate]"
+                        id="newCustomerFromDate"
+                        value="{newCustomerFromDate}"
+                        size="10"
+                        maxlength="10"
+                        onKeypress="javascript:submitOnReturn()"
+                >
+                <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
+                and <input
+                    type="text"
+                    name="form[newCustomerToDate]"
+                    id="newCustomerToDate"
+                    value="{newCustomerToDate}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            >
+                <font class="formErrorMessage">{newCustomerToDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td valign="top">&nbsp;</td>
+            <td><input type="submit"
+                       name="Go"
+                       value="Search"
+            > <input name="Button"
+                     type="button"
+                     value="New"
+                     onClick="document.location='{createURL}';"
+            >
+                <font class="formErrorMessage">{customerStringMessage}</font></td>
+        </tr>
+
+    </table>
+</form>
+<table width="100%"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
+    <!-- BEGIN customerBlock -->
+    <tr>
+        <td><A HREF="{customerURL}">{customerName}</A></td>
+    </tr>
+    <!-- END customerBlock -->
+</table>
+<!-- End Template: Customer.inc.html -->
