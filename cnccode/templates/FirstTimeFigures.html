@@ -7,6 +7,12 @@
     .firstTimeFixContainer {
         float: right;
     }
+
+    .totalRow td {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
 </style>
 <div class="firstTimeFixContainer">
     <h3>
@@ -38,8 +44,8 @@
             <td>{firstTimeFix}</td>
         </tr>
         <!-- END firstTimeFixBlock -->
-        <tr>
-            <td style="font-weight: bold;font-size: 16px">Total</td>
+        <tr class="totalRow">
+            <td>Total</td>
             <td>{phonedThroughRequests}</td>
             <td>{firstTimeFixAttemptedPct}%</td>
             <td>{firstTimeFixAchievedPct}%</td>
