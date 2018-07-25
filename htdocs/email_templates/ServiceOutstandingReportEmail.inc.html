@@ -1,25 +1,28 @@
 <html>
 <!-- Service requests fixed the previous day -->
-  <head>
-  <style type="text/css">
-  <!--
-  BODY, P, TD, TH {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9pt;
-  }
-  .singleBorder {
-    border: #e1e1f0 2px solid;
-  }
-  TABLE {
-    border-spacing: 1px;
-  }
-  -->
-  </style>
-  </head>
-  <body>
-    <h1>Service Requests Open For More Than {daysAgo} Days</h1>
-    <table>
-      <tr>
+<head>
+    <style type="text/css">
+        <!--
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+
+        -->
+    </style>
+</head>
+<body>
+<h1>Service Requests Open For More Than {daysAgo} Days</h1>
+<table>
+    <tr>
         <th>Customer</th>
         <th>Incident No</th>
         <th>Details</th>
@@ -29,9 +32,10 @@
         <th>Time Spent(hours)</th>
         <th>Priority</th>
         <th>Last Updated</th>
-      </tr>
-<!-- BEGIN requestBlock -->
-      <tr>
+        <th>Awaiting</th>
+    </tr>
+    <!-- BEGIN requestBlock -->
+    <tr>
         <td align="center">{customer}</td>
         <td align="center"><a href="{urlRequest}">{serviceRequestID}</a></td>
         <td align="center">{description}</td>
@@ -41,9 +45,10 @@
         <td align="center">{timeSpentHours}</td>
         <td align="center">{priority}</td>
         <td align="center">{lastUpdatedDate}</td>
-      </tr>
-<!-- END requestBlock -->
-    </table>
-  </body>
+        <td align="center">{awaiting}</td>
+    </tr>
+    <!-- END requestBlock -->
+</table>
+</body>
 </html>
 

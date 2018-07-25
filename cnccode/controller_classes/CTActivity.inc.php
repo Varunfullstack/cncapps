@@ -114,6 +114,11 @@ define(
     'sendVisitEmail'
 );
 
+define(
+    'CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER',
+    'contractsForClient'
+);
+
 class CTActivity extends CTCNC
 {
 
@@ -414,7 +419,11 @@ class CTActivity extends CTCNC
                 break;
 
             case 'updateHistoricUserTimeLogs':
-                $this->updateHistoricUserTimeLogs();
+                $startDateData = @$_REQUEST['startDate'];
+
+                $startDate = new DateTime($startDateData);
+
+                $this->updateHistoricUserTimeLogs($startDate);
                 break;
             case 'test':
                 $this->buActivity->sendSalesRequestAlertEmail(
@@ -436,10 +445,41 @@ class CTActivity extends CTCNC
                     header('Location: ' . $_SERVER['HTTP_REFERER']);
                 }
                 break;
+            case CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER:
+
+                $customerID = $_REQUEST['customerID'];
+
+                $buCustomerItem = new BUCustomerItem($this);
+                $dsContract = new DataSet($this);
+                $buCustomerItem->getContractsByCustomerID(
+                    $customerID,
+                    $dsContract
+                );
+
+                $data = [];
+
+                while ($dsContract->fetchNext()) {
+
+                    if (!isset($data[$dsContract->getValue('renewalType')])) {
+                        $data[$dsContract->getValue('renewalType')] = [];
+                    }
+                    $data[$dsContract->getValue('renewalType')][] = [
+                        "description" => $dsContract->getValue("itemDescription") . ' ' . $dsContract->getValue(
+                                'adslPhone'
+                            ) . ' ' . $dsContract->getValue('notes') . ' ' . $dsContract->getValue('postcode'),
+                        "id"          => $dsContract->getValue(DBEJContract::customerItemID)
+
+                    ];
+
+                }
+                echo json_encode($data);
+
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
                 break;
+
         }
     }
 
@@ -547,7 +587,6 @@ class CTActivity extends CTCNC
             $this->dsSearchForm->post();
         } elseif (isset($_REQUEST['activity'])) {
             if (!$this->dsSearchForm->populateFromArray($_REQUEST['activity'])) {
-
                 $this->setFormErrorOn();
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
@@ -636,10 +675,17 @@ class CTActivity extends CTCNC
             $urlCreateActivity = $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'activityCreate1'
+                    'action' => CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER
                 )
             );
         }// if (!$this->hasPermission('PHPLIB_PERM_CUSTOMER'){
+
+        $fetchContractsURL = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'contractsForClient'
+            )
+        );
 
         $this->setTemplateFiles(
             'ActivitySearch',
@@ -678,8 +724,6 @@ class CTActivity extends CTCNC
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-
-
         $this->template->set_var(
             array(
                 'formError'                   => $this->formError,
@@ -705,6 +749,7 @@ class CTActivity extends CTCNC
                 'rowsFound'                   => $dsSearchResults->rowCount(),
                 'urlCreateActivity'           => $urlCreateActivity,
                 'urlCustomerPopup'            => $urlCustomerPopup,
+                'fetchContractsURL'           => $fetchContractsURL,
                 'managementReviewOnlyChecked' => Controller::htmlChecked(
                     $dsSearchForm->getValue('managementReviewOnly')
                 ),
@@ -1033,6 +1078,7 @@ class CTActivity extends CTCNC
             );
         }
     }
+
 
     function contractDropdown(
         $customerID,
@@ -3017,11 +3063,11 @@ class CTActivity extends CTCNC
                 array(
                     'problemID'              => $dsActiveSrs->getValue("problemID"),
                     'dateRaised'             => Controller::dateYMDtoDMY($dsActiveSrs->getValue('dateRaised')),
-                    'reason'                 => $this->truncate(
+                    'reason'                 => self::truncate(
                         $dsActiveSrs->getValue("reason"),
                         100
                     ),
-                    'lastReason'             => $this->truncate(
+                    'lastReason'             => self::truncate(
                         $dsActiveSrs->getValue("lastReason"),
                         100
                     ),
@@ -3058,18 +3104,6 @@ class CTActivity extends CTCNC
         );
 
         $this->parsePage();
-
-    }
-
-    function truncate($reason,
-                      $length = 100
-    )
-    {
-        return substr(
-            common_stripEverything($reason),
-            0,
-            $length
-        );
 
     }
 
@@ -3119,7 +3153,20 @@ class CTActivity extends CTCNC
             }
 
             $_SESSION[$this->sessionKey]['completeDate'] = '';
-            $_SESSION[$this->sessionKey]['queueNo'] = 1;
+
+            $isAddToQueue = false;
+            if (isset($_REQUEST["hdQ"])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 1;
+                $isAddToQueue = true;
+            }
+            if (isset($_REQUEST["escQ"])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 2;
+                $isAddToQueue = true;
+            }
+            if (isset($_REQUEST["imtQ"])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 3;
+                $isAddToQueue = true;
+            }
             $_SESSION[$this->sessionKey]['date'] = date(CONFIG_MYSQL_DATE);
             $_SESSION[$this->sessionKey]['startTime'] = date('H:i');
 
@@ -3136,7 +3183,6 @@ class CTActivity extends CTCNC
 
 
             if (count($error) == 0) {
-
                 /* Create initial activity */
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
 
@@ -3154,8 +3200,7 @@ class CTActivity extends CTCNC
                 /*
           Add to queue so return to dashboard
           */
-                if (isset($_REQUEST['AddToQueue'])) {
-
+                if ($isAddToQueue) {
                     $nextURL =
                         $this->buildLink(
                             'CurrentActivityReport.php',
@@ -3183,22 +3228,7 @@ class CTActivity extends CTCNC
                     header('Location: ' . $nextURL);
                     exit;
                 }
-                /*
-          Escalate so create escalation activity
-          */
-                if (isset($_REQUEST['Escalate'])) {
-
-                    $this->buActivity->escalateProblemByCallActivityID($dsCallActivity->getValue('callActivityID'));
-
-                    $nextURL =
-                        $this->buildLink(
-                            'CurrentActivityReport.php',
-                            array()
-                        );
-
-                    header('Location: ' . $nextURL);
-                    exit;
-                }
+                exit;
             }
 
         }// end IF POST
@@ -3219,7 +3249,7 @@ class CTActivity extends CTCNC
             )
         );
 
-        // Parameters
+// Parameters
         $this->setPageTitle("Record " . CONFIG_SERVICE_REQUEST_DESC . " Details");
 
         $_SESSION[$this->sessionKey]['callActTypeID'] = CONFIG_INITIAL_ACTIVITY_TYPE_ID;
@@ -3262,7 +3292,6 @@ class CTActivity extends CTCNC
 
         if ($this->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
             $disabled = ''; // not
-            $calendarLinkDate = '<a href="javascript:;" onclick="popUpCalendar(this, dateRaised, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
         } else {
             $disabled = CTCNC_HTML_DISABLED;
             $calendarLinkDate = '';
@@ -3776,7 +3805,6 @@ class CTActivity extends CTCNC
 
             if ($dsCallActivity->getValue('callActTypeID') != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
                 $setTimeNowLink = '<a href="javascript:;"  onclick="setServerTime(endTime);"><img src="images/clock.gif" alt="Clock" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" title="Set end time now" /></a>';
-                $calendarLinkDate = '<a href="javascript:;" onclick="popUpCalendar(this, date, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
             }
 
             $calendarLinkCompleteDate = '<a href="javascript:;" onclick="popUpCalendar(this, completeDate, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
@@ -4207,7 +4235,9 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }// end changeRequestApproval
 
-    private function activityTypeDropdown($callActTypeID)
+    private
+    function activityTypeDropdown($callActTypeID
+    )
     {
         $dbeJCallActType = new DBECallActType($this);
         $buUser = new BUUser($this);
@@ -5313,7 +5343,8 @@ class CTActivity extends CTCNC
      * Sends a site visit confirmation email to the activity contact
      * @access private
      */
-    private function sendVisitEmail()
+    private
+    function sendVisitEmail()
     {
         $this->setMethodName('sendVisitEmail');
         $this->buActivity->sendSiteVisitEmail($_REQUEST['callActivityID']);
@@ -5586,6 +5617,15 @@ class CTActivity extends CTCNC
             'ServiceRequestFixedEdit'
         );
 
+        if (!isset($_REQUEST['resolutionSummary'])) {
+            $dbeJCallActivity = $this->buActivity->getActivitiesByProblemID($dsCallActivity->getValue('problemID'));
+            while ($dbeJCallActivity->fetchNext()) {
+                if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
+                    $_REQUEST['resolutionSummary'] = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
+                }
+            }
+        }
+
         $uploadURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -5595,6 +5635,7 @@ class CTActivity extends CTCNC
                     'callActivityID' => $_REQUEST['callActivityID']
                 )
             );
+
 
         $this->template->set_var(
             array(
@@ -6058,12 +6099,63 @@ class CTActivity extends CTCNC
             $onlyWithLinkedItems
         );
 
+        $itemTypes = [];
+
+        $items = [];
+
+        while ($dsContract->fetchNext()) {
+            $itemTypeID = $dsContract->getValue(DBEJContract::itemTypeID);
+
+            if (!$itemTypes[$itemTypeID]) {
+                $dbeItemType = new DBEItemType($this);
+
+                $dbeItemType->getRow($itemTypeID);
+                $itemTypes[$itemTypeID] = [
+                    DBEItemType::description => $dbeItemType->getValue(DBEItemType::description)
+                ];
+            }
+
+            $items[] = [
+                "itemTypeDescription"         => $itemTypes[$itemTypeID][DBEItemType::description],
+                DBEJContract::customerItemID  => $dsContract->getValue(DBEJContract::customerItemID),
+                DBEJContract::itemDescription => $dsContract->getValue(DBEJContract::itemDescription),
+                DBEJContract::adslPhone       => $dsContract->getValue(DBEJContract::adslPhone),
+                DBEJContract::notes           => $dsContract->getValue(DBEJContract::notes),
+                DBEJContract::postcode        => $dsContract->getValue(DBEJContract::postcode),
+                DBEJContract::serialNo        => $dsContract->getValue(DBEJContract::serialNo)
+            ];
+        }
+
+        usort(
+            $items,
+            function ($a,
+                      $b
+            ) {
+                return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
+            }
+        );
+
+        $lastItemTypeDescription = false;
+
         $this->template->set_block(
             $templateName,
             $blockName,
             'contracts'
         );
-        while ($dsContract->fetchNext()) {
+        foreach ($items as $item) {
+
+
+            if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
+                $itemTypeHeader = '<tr><td colspan="2"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
+            } else {
+                $itemTypeHeader = '';
+            }
+            $lastItemTypeDescription = $item['itemTypeDescription'];
+            $this->template->set_var(
+                array(
+                    'itemTypeHeader' => $itemTypeHeader
+                )
+            );
 
             $this->template->set_var(
                 array(
@@ -6076,19 +6168,18 @@ class CTActivity extends CTCNC
                     'CustomerItem.php',
                     array(
                         'action'         => 'displayRenewalContract',
-                        'customerItemID' => $dsContract->getValue('customerItemID')
+                        'customerItemID' => $item[DBEJContract::customerItemID]
                     )
                 );
 
-            $description = $dsContract->getValue("itemDescription") . ' ' . $dsContract->getValue(
-                    'adslPhone'
-                ) . ' ' . $dsContract->getValue('notes') . ' ' . $dsContract->getValue('postcode');
+            $description = $item[DBEJContract::itemDescription] . ' ' . $item[DBEJContract::adslPhone] . ' ' .
+                $item[DBEJContract::notes] . ' ' . $item[DBEJContract::postcode];
 
             $this->template->set_var(
                 array(
-                    'contractCustomerItemID'  => $dsContract->getValue("customerItemID"),
+                    'contractCustomerItemID'  => $item[DBEJContract::customerItemID],
                     'contractItemDescription' => $description,
-                    'serialNo'                => $dsContract->getValue("serialNo"),
+                    'serialNo'                => $item[DBEJContract::serialNo],
                     'urlRenewalContract'      => $urlRenewalContract
                 )
             );
@@ -6217,9 +6308,9 @@ class CTActivity extends CTCNC
         echo date('H') . ':' . date('i');
     }
 
-    function updateHistoricUserTimeLogs()
+    function updateHistoricUserTimeLogs(DateTime $startDate = null)
     {
-        $this->buActivity->updateAllHistoricUserLoggedHours();
+        $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
     }
 
@@ -6433,7 +6524,9 @@ class CTActivity extends CTCNC
         exit;
     }
 
-    private function redirectToGather($callActivityID)
+    private
+    function redirectToGather($callActivityID
+    )
     {
         $urlNext =
             $this->buildLink(
@@ -6447,7 +6540,8 @@ class CTActivity extends CTCNC
         exit;
     }
 
-    private function toggleMonitoringFlag()
+    private
+    function toggleMonitoringFlag()
     {
         if (!$_REQUEST['callActivityID']) {
 
@@ -6465,12 +6559,15 @@ class CTActivity extends CTCNC
 
     }
 
-    private function checkMonitoring($problemID)
+    private
+    function checkMonitoring($problemID
+    )
     {
         return $this->buActivity->checkMonitoringFlag($problemID);
     }
 
-    private function unhideSR()
+    private
+    function unhideSR()
     {
 
         if (!$_REQUEST['callActivityID']) {

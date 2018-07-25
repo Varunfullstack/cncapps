@@ -3,12 +3,21 @@
     This shows how many SRs have been worked on for a particular customer in a given time frame.
 </div>
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="get" action="{urlSubmit}">
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+>
 
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
 
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Number of Days</div>
             </td>
             <td>
@@ -23,7 +32,9 @@
         </tr>
 
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Start Date</div>
             </td>
             <td>
@@ -34,11 +45,15 @@
                         placeholder="d/m/y"
                         size="9"
                         maxlength="10"
+                        class="jqueryCalendar"
+                        autocomplete="off"
                 > <font class="formErrorMessage">{fromDateMessage} </font></td>
         </tr>
 
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">End Date</div>
             </td>
             <td>
@@ -49,14 +64,23 @@
                         placeholder="d/m/y"
                         size="9"
                         maxlength="10"
+                        class="jqueryCalendar"
+                        autocomplete="off"
                 > <font class="formErrorMessage">{toDateMessage} </font></td>
         </tr>
 
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Run" onClick="submit();">
-                <input type="reset" name="Clear" value="Clear"></td>
+                <input type="submit"
+                       name="Search"
+                       value="Run"
+                       onClick="submit();"
+                >
+                <input type="reset"
+                       name="Clear"
+                       value="Clear"
+                ></td>
         </tr>
     </table>
     <p>&nbsp;</p>

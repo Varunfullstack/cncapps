@@ -218,6 +218,19 @@
         </tr>
 
         <tr>
+            <td class="promptText">Starters / Leavers Auto-complete Threshold Hours</td>
+            <td class="field"><input
+                    {DISABLED} required
+                    type="text"
+                    title="Activity hours below which SRs are automatically set to completed by the system if reason is starter/leaver"
+                    name="header[1][srStartersLeaversAutoCompleteThresholdHours]"
+                    value="{srStartersLeaversAutoCompleteThresholdHours}"
+                    size="5"
+                    maxlength="5"
+            > <span class="formErrorMessage">{srStartersLeaversAutoCompleteThresholdHoursMessage}</span></td>
+        </tr>
+
+        <tr>
             <td class="promptText">P4 SR Prompt for Contract Threshold Hours</td>
             <td class="field"><input
                     {DISABLED} required
@@ -299,7 +312,6 @@
                         maxlength="5"
                 > <span class="formErrorMessage">{hdTeamTargetFixQtyPerMonthMessage}</span></td>
         </tr>
-
         <tr>
             <td class="promptText">Escalation Team Target Log %</td>
             <td class="field">
@@ -451,6 +463,32 @@
                         size="5"
                         maxlength="5"
                 > <span class="formErrorMessage">{imTeamTargetFixQtyPerMonthMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">SD Dashboard Engineers In SR Engineers Min Count</td>
+            <td class="field">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][SDDashboardEngineersInSREngineersMaxCount]"
+                        value="{SDDashboardEngineersInSREngineersMaxCount}"
+                        title="The minimum number of engineers that will be accounted for the SD Dashboard Engineers table"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{SDDashboardEngineersInSREngineersMaxCountMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">SD Dashboard Engineers In SR In Past Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED} required
+                        type="text"
+                        name="header[1][SDDashboardEngineersInSRInPastHours]"
+                        value="{SDDashboardEngineersInSRInPastHours}"
+                        title="The amount of hours to run the report for in the past (e.g. last 24 hours)"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{SDDashboardEngineersInSRInPastHoursMessage}</span></td>
         </tr>
 
         <tr>
@@ -615,6 +653,19 @@
                         maxlength="5"
                         required
                 > <span class="formErrorMessage">{backupTargetSuccessRateMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">2S Replication Additional Delay Allowance</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="number"
+                        name="header[1][secondSiteReplicationAdditionalDelayAllowance]"
+                        value="{secondSiteReplicationAdditionalDelayAllowance}"
+                        title="The extra days added to the delay allowance"
+                        required
+                > <span class="formErrorMessage">{secondSiteReplicationAdditionalDelayAllowanceMessage}</span>
             </td>
         </tr>
         <tr>
