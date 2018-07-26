@@ -8,5 +8,6 @@
     </changeSet>
     <changeSet author="pavwebdev" id="issue284-1527669157-1">
         <modifyDataType tableName="ordline" columnName="odl_desc" newDataType="varchar(70)"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

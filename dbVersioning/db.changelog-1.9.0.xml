@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="release1.9.0-1532513772-0">
+        <tagDatabase tag="Release-1.9.0"/>
+    </changeSet>
+    <include file="db.changelog-issue285.xml"/>
+    <include file="db.changelog-issue267.xml"/>
+    <include file="db.changelog-issue269.xml"/>
+    <include file="db.changelog-issue284.xml"/>
+    <include file="db.changelog-issue266.xml"/>
+    <include file="db.changelog-issue249.xml"/>
+    <changeSet author="pavwebdev" id="release1.9.0-1532513772-1">
+        <modifyDataType tableName="invline" columnName="inl_desc" newDataType="varchar(70)"/>
+    </changeSet>
+</databaseChangeLog>

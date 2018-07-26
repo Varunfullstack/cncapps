@@ -2,9 +2,6 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
 <script type="text/javascript"
         src="ckeditor/ckeditor.js"
 ></script>
@@ -241,19 +238,10 @@
                             size="10"
                             maxlength="10"
                             onchange="setFormChanged();"
+                            class="jqueryCalendar"
+                            autocomplete="off"
                     />
-                    <a href="javascript:;"
-                       onclick="popUpCalendar(this, alarmDate, 'dd/mm/yyyy')"
-                    ><img
-                            src="images/calendar.gif"
-                            alt="Calendar"
-                            width="24"
-                            height="22"
-                            hspace="0"
-                            vspace="0"
-                            border="0"
-                            align="absmiddle"
-                    /></a><span class="formErrorMessage">{alarmDateMessage}</span>
+                    <span class="formErrorMessage">{alarmDateMessage}</span>
                     <input
                             type="text"
                             title="Time to re-activate this request"
@@ -374,6 +362,8 @@
                     size="10"
                     maxlength="10"
                     onchange="setFormChanged();"
+                    class="jqueryCalendar"
+                    autocomplete="off"
             />
                 {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
             </td>
