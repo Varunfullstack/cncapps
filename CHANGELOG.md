@@ -1,11 +1,48 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.9.0]
-### Changed
-- Issue 232 - Improve Uploading Files to Service Request Activities
+## [v1.9.1] - 2018-07-26
+### Fixed
+- 2nd Site Backup out of date calculations
+- Fix and improve holiday time logging calculations
+- Fix problem with item description quote page
 
-## [v1.8.5] - 2018-07-16
+## [v1.9.0] - 2018-07-25
+### Changed
+- Issue 285 - Change length limit to customer item 'Item Text' field
+- Issue 267 - Auto Service Completion for Starters & Leavers
+- Issue 277 - Move reports to Technical menu for SD Managers
+- Issue 272 - Contract Analysis Report error handling
+- Issue 270 - Technical Change Request to default to Awaiting CNC
+- Issue 278 - Consider a negative 2nd Site date check to be a failure
+- Issue 281 - Add headings for the contract page popup.
+- Issue 293 - Team Performance Calculations Update To Include Previous Month
+- Issue 291 - Technical Change Request formatting change
+- Issue 274 - Set system updated SRs to status Awaiting CNC
+- Issue 294 - User performance graph tweaks
+- Issue 284 - Investigate length of fields allowed in quotes
+- Issue 296 - Change Open SR Report so non main contacts only see their SRs
+- Issue 249 - 2nd Site Replication check process
+- Issue 302 - 7 Day report to include awaiting status 
+- Issue 298 - Single Fixed Explanation within a Service Request
+- Issue 232 - Improve Uploading Files to Service Request Activities
+### Fixed
+- Issue 275 - Permissions error for PortalDocument
+- Issue 271 - CustomerAnalysis Report error handling
+- Issue 279 - Contracts not populating on Search page
+- Issue 300 - Error adding passwords from Sales Password page
+- Issue 276 - Occasional formatting issues for Monitored SR emails 
+### Added
+- Issue 280 - Restore ability to create customer documentation folder
+- Issue 121 - CNC014 - Add ability to log a new SR directly into a team
+- Issue 297 - First Time Fix figures
+- Issue 269 - Live fixed SR target & total.
+- Issue 266 - Helpdesk Manager Dashboard View
+### Removed
+- Issue 282 - Remove DNS records from domain name
+- Issue 283 - Remove Documentation link from Quotation Page
+
+## [v1.8.5]
 ### Fixed
 - Issue 299 - Show link to create customer folder if it doesn't exist
 
@@ -20,7 +57,7 @@ This project changes will be shown here.
 ## [v1.8.2] - 2018-06-28
 ### Fixed
 - Issue 289 - Fix issues 
-
+ 
 ## [v1.8.1] - 2018-06-26
 ### Fixed
 - Issue 287 - Fix problem with sales orders
