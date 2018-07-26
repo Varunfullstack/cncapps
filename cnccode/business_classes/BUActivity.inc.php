@@ -10016,12 +10016,6 @@ is currently a balance of ';
      */
     function createUserTimeLogsForMissingUsers($date = null)
     {
-        ?>
-        <div>
-            Date received is <?= $date ?>
-        </div>
-        <?php
-
         if (!$date) {
             $date = new DateTime();
         } else {
@@ -10034,12 +10028,6 @@ is currently a balance of ';
                 $date->format('Y-m-d'),
                 $bankHolidays
             ) || $date->format('N') > 5) {
-
-            ?>
-            <div>
-                Date received is a bank holiday or a weekend
-            </div>
-            <?php
             return; // ignore holidays
         }
 
@@ -10073,7 +10061,6 @@ is currently a balance of ';
         if (!$date) {
             $date = new DateTime();
         }
-        var_dump($date);
         $db->query(
             "SELECT
         team.level as teamLevel,
@@ -10100,7 +10087,6 @@ is currently a balance of ';
         $loggedHours = $standardDayHours * ($targetPercentage / 100);
 
         $dateFormatted = $date->format('Y-m-d');
-        var_dump($dateFormatted);
         $sql =
             "INSERT IGNORE INTO user_time_log
         (
