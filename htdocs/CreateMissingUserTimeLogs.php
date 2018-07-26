@@ -13,8 +13,9 @@ require_once("config.inc.php");
 
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
+$date = @$_REQUEST['date'];
 
 $buActivity = new BUActivity($this);
-$buActivity->createUserTimeLogsForMissingUsers();
+$buActivity->createUserTimeLogsForMissingUsers($date);
 $buActivity->updateAllHistoricUserLoggedHours(new DateTime('-15 days'));
 ?>
