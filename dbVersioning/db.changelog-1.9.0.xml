@@ -14,5 +14,16 @@
     <include file="db.changelog-issue249.xml"/>
     <changeSet author="pavwebdev" id="release1.9.0-1532513772-1">
         <modifyDataType tableName="invline" columnName="inl_desc" newDataType="varchar(70)"/>
+        <rollback>
+            <modifyDataType tableName="invline" columnName="inl_desc" newDataType="char(45)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.9.0-1532513772-1">
+        <modifyDataType tableName="item" columnName="itm_desc"
+                        newDataType="varchar(70) CHARACTER SET utf8 COLLATE utf8_general_ci "/>
+        <rollback>
+            <modifyDataType tableName="item" columnName="itm_desc"
+                            newDataType="varchar(70) CHARACTER SET utf8 COLLATE utf8_general_ci "/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
