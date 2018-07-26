@@ -10034,13 +10034,22 @@ is currently a balance of ';
                 $date->format('Y-m-d'),
                 $bankHolidays
             ) || $date->format('N') > 5) {
+
+            ?>
+            <div>
+                Date received is a bank holiday or a weekend
+            </div>
+            <?php
             return; // ignore holidays
         }
 
 
         $this->dbeUser->getRows(true);
         while ($this->dbeUser->fetchNext()) {
-            $this->createUserTimeLogRecord($this->dbeUser->getValue(DBEUser::userID));
+            $this->createUserTimeLogRecord(
+                $this->dbeUser->getValue(DBEUser::userID),
+                $date
+            );
         }
 
     }
@@ -10053,6 +10062,7 @@ is currently a balance of ';
      * start time.
      *
      * @param mixed $userID
+     * @param DateTime|null $date
      */
     function createUserTimeLogRecord($userID,
                                      DateTime $date = null
