@@ -10046,7 +10046,7 @@ is currently a balance of ';
         if (!$date) {
             $date = new DateTime();
         }
-
+        var_dump($date);
         $db->query(
             "SELECT
         team.level as teamLevel,
