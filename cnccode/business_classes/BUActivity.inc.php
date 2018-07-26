@@ -10012,10 +10012,16 @@ is currently a balance of ';
      *
      * Called by a timed process last thing at night to ensure all active users
      * have a log entry for each working day.
-     *
+     * @param string $date
      */
     function createUserTimeLogsForMissingUsers($date = null)
     {
+        ?>
+        <div>
+            Date received is <?= $date ?>
+        </div>
+        <?php
+
         if (!$date) {
             $date = new DateTime();
         } else {
