@@ -103,7 +103,6 @@ class BUSecondsite extends Business
         $this->serverCount = count($servers);
 
         foreach ($servers as $server) {
-
             $error = false;
             $networkPath = false;
             $excludeFromChecks = false;
@@ -215,6 +214,7 @@ class BUSecondsite extends Business
                     if (!$isSuspended) {
                         $this->imageCount++;
                     }
+
                     if (strlen($image['imageName']) == 1) {
 
                         $pattern = '/' . $server['serverName'] . '_' . $image['imageName'];
@@ -232,7 +232,6 @@ class BUSecondsite extends Business
                     if (count($matchedFiles) == 0) {
 
                         $allServerImagesPassed = false;
-
                         if (!$isSuspended) {
                             $this->imageErrorCount++;
                             /*
@@ -280,10 +279,10 @@ class BUSecondsite extends Business
                             }
                         }
 
+
                         if (!$currentFileFound) {
 
                             $allServerImagesPassed = false;
-
                             if (!$isSuspended) {
                                 $this->imageErrorCount++;
 
@@ -319,8 +318,9 @@ class BUSecondsite extends Business
                             );
 
                         } else {
+
                             $imageAgeDays = number_format(
-                                (time() - strtotime($mostRecentFileTime)) / 86400,
+                                (time() - $mostRecentFileTime) / 86400,
                                 0
                             );
 
@@ -334,6 +334,17 @@ class BUSecondsite extends Business
                                     $errorMessage,
                                     self::STATUS_OUT_OF_DATE
                                 );
+                                $status = self::STATUS_OUT_OF_DATE;
+                                $this->setImageStatus(
+                                    $image['secondSiteImageID'],
+                                    $status,
+                                    $mostRecentFileName,
+                                    date(
+                                        'Y-m-d H:i:s',
+                                        $mostRecentFileTime
+                                    )
+                                );
+
                             } else {
                                 if (!$isSuspended) {
                                     $this->imagePassesCount++;

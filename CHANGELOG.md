@@ -1,7 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.9.0]
+## [v1.9.1] - 2018-07-26
+### Fixed
+- 2nd Site Backup out of date calculations
+- Fix and improve holiday time logging calculations
+- Fix problem with item description quote page
+
+## [v1.9.0] - 2018-07-25
 ### Changed
 - Issue 285 - Change length limit to customer item 'Item Text' field
 - Issue 267 - Auto Service Completion for Starters & Leavers
@@ -25,7 +31,7 @@ This project changes will be shown here.
 - Issue 271 - CustomerAnalysis Report error handling
 - Issue 279 - Contracts not populating on Search page
 - Issue 300 - Error adding passwords from Sales Password page
-- Issue 276 - Occasional formatting issues for Monitored SR emails
+- Issue 276 - Occasional formatting issues for Monitored SR emails 
 ### Added
 - Issue 280 - Restore ability to create customer documentation folder
 - Issue 121 - CNC014 - Add ability to log a new SR directly into a team
