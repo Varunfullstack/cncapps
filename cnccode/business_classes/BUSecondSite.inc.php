@@ -357,7 +357,7 @@ class BUSecondsite extends Business
                         } else {
 
                             $imageAgeDays = number_format(
-                                (time() - strtotime($mostRecentFileTime)) / 86400,
+                                (time() - $mostRecentFileTime) / 86400,
                                 0
                             );
 
