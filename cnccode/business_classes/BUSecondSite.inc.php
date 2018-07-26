@@ -215,6 +215,15 @@ class BUSecondsite extends Business
                     if (!$isSuspended) {
                         $this->imageCount++;
                     }
+
+                    ?>
+                    <div>
+                        Checking Image: <?= $image['imageName'] ?>
+                    </div>
+                    <div>
+                        Time to look from <?= $timeToLookFrom ?>
+                    </div>
+                    <?php
                     if (strlen($image['imageName']) == 1) {
 
                         $pattern = '/' . $server['serverName'] . '_' . $image['imageName'];
@@ -232,7 +241,11 @@ class BUSecondsite extends Business
                     if (count($matchedFiles) == 0) {
 
                         $allServerImagesPassed = false;
-
+                        ?>
+                        <div>
+                            Image Not Found
+                        </div>
+                        <?php
                         if (!$isSuspended) {
                             $this->imageErrorCount++;
                             /*
@@ -274,15 +287,36 @@ class BUSecondsite extends Business
                                 $mostRecentFileName = $file;
                             }
 
+                            ?>
+                            <div>
+                                Checking File: <?= $file ?>
+                            </div>
+                            <div>
+                                file time <?= $fileModifyTime ?>
+                            </div>
+                            <?php
+
                             if ($fileModifyTime >= $timeToLookFrom) {
                                 $currentFileFound = true;
+                                ?>
+                                <div>
+                                    we have found a file modified after or at the same time timeToLookFrom
+                                </div>
+                                <?php
                                 break;      // got it
                             }
                         }
 
+
                         if (!$currentFileFound) {
 
                             $allServerImagesPassed = false;
+
+                            ?>
+                            <div>
+                                we didn't find any files that are updated that follow the criteria
+                            </div>
+                            <?php
 
                             if (!$isSuspended) {
                                 $this->imageErrorCount++;
@@ -319,10 +353,21 @@ class BUSecondsite extends Business
                             );
 
                         } else {
+
                             $imageAgeDays = number_format(
                                 (time() - strtotime($mostRecentFileTime)) / 86400,
                                 0
                             );
+
+
+                            ?>
+                            <div>
+                                we did find some files that are updated that follow the criteria
+                            </div>
+                            <div>
+                                image days is <?= $imageAgeDays ?>
+                            </div>
+                            <?php
 
                             if ($imageAgeDays < 0) {
                                 $this->imageErrorCount++;
@@ -334,6 +379,17 @@ class BUSecondsite extends Business
                                     $errorMessage,
                                     self::STATUS_OUT_OF_DATE
                                 );
+                                $status = self::STATUS_OUT_OF_DATE;
+                                $this->setImageStatus(
+                                    $image['secondSiteImageID'],
+                                    $status,
+                                    $mostRecentFileName,
+                                    date(
+                                        'Y-m-d H:i:s',
+                                        $mostRecentFileTime
+                                    )
+                                );
+
                             } else {
                                 if (!$isSuspended) {
                                     $this->imagePassesCount++;
