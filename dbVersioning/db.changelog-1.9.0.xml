@@ -14,5 +14,26 @@
     <include file="db.changelog-issue249.xml"/>
     <changeSet author="pavwebdev" id="release1.9.0-1532513772-1">
         <modifyDataType tableName="invline" columnName="inl_desc" newDataType="varchar(70)"/>
+        <rollback>
+            <modifyDataType tableName="invline" columnName="inl_desc" newDataType="char(45)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.9.0-1532513772-2">
+        <modifyDataType tableName="item" columnName="itm_desc"
+                        newDataType="varchar(70) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.9.0-1532513772-3">
+        <preConditions>
+            <not>
+                <columnExists tableName="user_time_log" columnName="holiday"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="user_time_log">
+            <column name="holiday" type="bool" defaultValue="0"/>
+        </addColumn>
+        <sql>
+            UPDATE user_time_log SET holiday = 1 WHERE startedTime = '00:00:00' AND dayHours/loggedHours = 1.25
+        </sql>
     </changeSet>
 </databaseChangeLog>
