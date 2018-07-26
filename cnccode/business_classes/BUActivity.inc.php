@@ -9987,14 +9987,20 @@ is currently a balance of ';
      * have a log entry for each working day.
      *
      */
-    function createUserTimeLogsForMissingUsers()
+    function createUserTimeLogsForMissingUsers($date = null)
     {
-        $bankHolidays = common_getUkBankHolidays(date('Y'));
+        if (!$date) {
+            $date = new DateTime();
+        } else {
+            $date = new DateTime($date);
+        }
+
+        $bankHolidays = common_getUkBankHolidays($date->format('Y'));
 
         if (in_array(
-                date('Y-m-d'),
+                $date->format('Y-m-d'),
                 $bankHolidays
-            ) || date('N') > 5) {
+            ) || $date->format('N') > 5) {
             return; // ignore holidays
         }
 
@@ -10015,9 +10021,15 @@ is currently a balance of ';
      *
      * @param mixed $userID
      */
-    function createUserTimeLogRecord($userID)
+    function createUserTimeLogRecord($userID,
+                                     DateTime $date = null
+    )
     {
         global $db;
+
+        if (!$date) {
+            $date = new DateTime();
+        }
 
         $db->query(
             "SELECT
@@ -10044,6 +10056,8 @@ is currently a balance of ';
 
         $loggedHours = $standardDayHours * ($targetPercentage / 100);
 
+        $dateFormatted = $date->format('Y-m-d');
+
         $sql =
             "INSERT IGNORE INTO user_time_log
         (
@@ -10059,7 +10073,7 @@ is currently a balance of ';
         (
           $userID,
           $teamLevel,
-          DATE( NOW() ),
+          $dateFormatted,
           $loggedHours,
           $standardDayHours,
           '00:00:00',
