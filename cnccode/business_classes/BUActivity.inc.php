@@ -10116,7 +10116,7 @@ is currently a balance of ';
         (
           $userID,
           $teamLevel,
-          $dateFormatted,
+          '$dateFormatted',
           $loggedHours,
           $standardDayHours,
           '00:00:00',
