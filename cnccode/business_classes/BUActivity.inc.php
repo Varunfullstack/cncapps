@@ -10073,7 +10073,7 @@ is currently a balance of ';
         $loggedHours = $standardDayHours * ($targetPercentage / 100);
 
         $dateFormatted = $date->format('Y-m-d');
-
+        var_dump($dateFormatted);
         $sql =
             "INSERT IGNORE INTO user_time_log
         (
