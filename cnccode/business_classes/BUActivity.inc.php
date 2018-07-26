@@ -2439,8 +2439,8 @@ class BUActivity extends Business
         if ($startDate) {
             $sql .= " where loggedDate > '" . $startDate->format('Y-m-d') . "'";
         }
-
-        $sql.= " order by loggedDate asc, userID";
+        $sql .= " and holiday = 0 ";
+        $sql .= " order by loggedDate asc, userID";
         $result = $this->db->query($sql);
         while ($record = $result->fetch_assoc()) {
             echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . "<BR/>";
@@ -7753,7 +7753,7 @@ is currently a balance of ';
                     DBEJProblem::reopenedFlag,
                     'Y'
                 );
-                
+
                 $dbeProblem->setValue(
                     DBEJProblem::reopenedDate,
                     (new DateTime())->format('Y-m-d')
@@ -10079,7 +10079,8 @@ is currently a balance of ';
         `loggedDate`,
         `loggedHours`,
         `dayHours`,
-        `startedTime` 
+        `startedTime` ,
+        holiday
         ) 
       VALUES 
         (
@@ -10088,7 +10089,8 @@ is currently a balance of ';
           DATE( NOW() ),
           $loggedHours,
           $standardDayHours,
-          '00:00:00'
+          '00:00:00',
+          1
         )";
 
         $db->query($sql);

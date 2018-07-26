@@ -23,4 +23,14 @@
                         newDataType="varchar(70) CHARACTER SET utf8 COLLATE utf8_general_ci"/>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="release1.9.0-1532513772-2">
+        <preConditions>
+            <not>
+                <columnExists tableName="user_time_log" columnName="holiday"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="user_time_log">
+            <column name="holiday" type="bool" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
