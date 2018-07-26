@@ -103,7 +103,9 @@ class BUSecondsite extends Business
         $this->serverCount = count($servers);
 
         foreach ($servers as $server) {
-
+            if ($server['serverName'] !== 'AJCTX') {
+                continue;
+            }
             $error = false;
             $networkPath = false;
             $excludeFromChecks = false;
