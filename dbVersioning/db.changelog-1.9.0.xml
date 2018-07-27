@@ -35,5 +35,6 @@
         <sql>
             UPDATE user_time_log SET holiday = 1 WHERE startedTime = '00:00:00' AND dayHours/loggedHours = 1.25
         </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
