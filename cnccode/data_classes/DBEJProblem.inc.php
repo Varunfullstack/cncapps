@@ -692,32 +692,38 @@ class DBEJProblem extends DBEProblem
         }
 
 
-        $sql .= " and pro_problemno in (
-            SELECT test.pro_problemno FROM (
-SELECT 
-  DISTINCT caa_consno,
-  SUM(1) AS engineers,
-  pro_problemno
-FROM
-  problem 
-  JOIN callactivity 
-    ON problem.`pro_problemno` = caa_problemno 
-    AND caa_callacttypeno IN (18, 8) 
-WHERE pro_status IN ('I', 'P') 
-  AND caa_date > DATE(
-    DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR)
-  ) 
-  OR (
-    caa_date = DATE(
-      DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR)
-    ) 
-    AND caa_starttime >= DATE_FORMAT(
-      DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR),
-      ' % H:%i'
-    )
-  ) 
-  GROUP BY pro_problemno
-  ORDER BY engineers DESC) test WHERE test.engineers >= $engineersMaxCount)";
+        $sql .= " and pro_problemno IN 
+  (SELECT 
+    test.pro_problemno 
+  FROM
+    (SELECT 
+      pro_problemno,
+      SUM(1) AS engineers 
+    FROM
+      (SELECT DISTINCT 
+        caa_consno,
+        pro_problemno 
+      FROM
+        problem 
+        JOIN callactivity 
+          ON problem.`pro_problemno` = caa_problemno 
+          AND caa_callacttypeno IN (18, 8) 
+      WHERE pro_status IN ('I', 'P') 
+        AND caa_date > DATE(
+          DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR)
+        ) 
+        OR (
+          caa_date = DATE(
+            DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR)
+          ) 
+          AND caa_starttime >= DATE_FORMAT(
+            DATE_SUB(CURRENT_DATE, INTERVAL $pastHours HOUR),
+            ' % H:%i'
+          )
+        )) engineersProblems 
+    GROUP BY pro_problemno 
+    ORDER BY engineers DESC) test 
+  WHERE test.engineers >= $engineersMaxCount) ";
 
         $sql .= " limit $limit";
         $this->setQueryString($sql);

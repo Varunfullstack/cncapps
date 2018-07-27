@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.9.2] - 2018-07-27
+### Fixed
+- Fixed problem with XX engineers in XX hours query
+- jQuery DatePicker to show Monday as first day of the week
+- Fixed issue with conflicting jQuery versions
+### Added
+- Added Monthly First Time Fix figures
+- Added Weekly Fixed and Reopened figures
+
 ## [v1.9.1] - 2018-07-26
 ### Fixed
 - 2nd Site Backup out of date calculations

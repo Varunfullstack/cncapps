@@ -10012,23 +10012,32 @@ is currently a balance of ';
      *
      * Called by a timed process last thing at night to ensure all active users
      * have a log entry for each working day.
-     *
+     * @param string $date
      */
-    function createUserTimeLogsForMissingUsers()
+    function createUserTimeLogsForMissingUsers($date = null)
     {
-        $bankHolidays = common_getUkBankHolidays(date('Y'));
+        if (!$date) {
+            $date = new DateTime();
+        } else {
+            $date = new DateTime($date);
+        }
+
+        $bankHolidays = common_getUkBankHolidays($date->format('Y'));
 
         if (in_array(
-                date('Y-m-d'),
+                $date->format('Y-m-d'),
                 $bankHolidays
-            ) || date('N') > 5) {
+            ) || $date->format('N') > 5) {
             return; // ignore holidays
         }
 
 
         $this->dbeUser->getRows(true);
         while ($this->dbeUser->fetchNext()) {
-            $this->createUserTimeLogRecord($this->dbeUser->getValue(DBEUser::userID));
+            $this->createUserTimeLogRecord(
+                $this->dbeUser->getValue(DBEUser::userID),
+                $date
+            );
         }
 
     }
@@ -10041,11 +10050,17 @@ is currently a balance of ';
      * start time.
      *
      * @param mixed $userID
+     * @param DateTime|null $date
      */
-    function createUserTimeLogRecord($userID)
+    function createUserTimeLogRecord($userID,
+                                     DateTime $date = null
+    )
     {
         global $db;
 
+        if (!$date) {
+            $date = new DateTime();
+        }
         $db->query(
             "SELECT
         team.level as teamLevel,
@@ -10071,6 +10086,7 @@ is currently a balance of ';
 
         $loggedHours = $standardDayHours * ($targetPercentage / 100);
 
+        $dateFormatted = $date->format('Y-m-d');
         $sql =
             "INSERT IGNORE INTO user_time_log
         (
@@ -10086,7 +10102,7 @@ is currently a balance of ';
         (
           $userID,
           $teamLevel,
-          DATE( NOW() ),
+          '$dateFormatted',
           $loggedHours,
           $standardDayHours,
           '00:00:00',
