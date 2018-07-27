@@ -1270,15 +1270,24 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
             );
         }
 
+        $monthlyFigures = $this->getRunningMonthFirstTimeFixedFigures();
+
         $this->template->set_var(
             [
-                'firstTimeFixAttemptedPct' => $totalRaised > 0 ? round(
+                'firstTimeFixAttemptedPct'        => $totalRaised > 0 ? round(
                     ($totalAttempted / $totalRaised) * 100
                 ) : 'N/A',
-                'firstTimeFixAchievedPct'  => $totalRaised > 0 ? round(
+                'firstTimeFixAchievedPct'         => $totalRaised > 0 ? round(
                     ($totalAchieved / $totalRaised) * 100
                 ) : 'N/A',
-                'phonedThroughRequests'    => $totalRaised
+                'phonedThroughRequests'           => $totalRaised,
+                'monthlyFirstTimeFixAttemptedPct' => $monthlyFigures['totalRaised'] ? round(
+                    ($monthlyFigures['attemptedFirstTimeFix'] / $monthlyFigures['totalRaised']) * 100
+                ) : 'N/A',
+                'monthlyFirstTimeFixAchievedPct'  => $monthlyFigures['totalRaised'] > 0 ? round(
+                    ($monthlyFigures['firstTimeFix'] / $monthlyFigures['totalRaised']) * 100
+                ) : 'N/A',
+                'monthlyPhonedThroughRequests'    => $monthlyFigures['totalRaised'],
             ]
         );
 
@@ -1289,6 +1298,80 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
         );
         return $this->template->getVar('OUTPUT');
 
+    }
+
+    function getRunningMonthFirstTimeFixedFigures()
+    {
+        $query = "SELECT 
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        callactivity 
+      WHERE callactivity.caa_problemno = problem.pro_problemno 
+        AND callactivity.caa_callacttypeno = 8 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            callactivity.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND callactivity.`caa_consno` = engineer.`cns_consno` LIMIT 1),
+      0
+    )
+  ) AS attemptedFirstTimeFix,
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        problem test 
+        JOIN callactivity initial 
+          ON initial.caa_problemno = test.pro_problemno 
+          AND initial.caa_callacttypeno = 51 
+        JOIN callactivity remoteSupport 
+          ON remoteSupport.caa_problemno = test.pro_problemno 
+          AND remoteSupport.caa_callacttypeno = 8 
+        JOIN callactivity fixedActivity 
+          ON fixedActivity.caa_problemno = test.pro_problemno 
+          AND fixedActivity.caa_callacttypeno = 57 
+      WHERE test.pro_problemno = problem.`pro_problemno` 
+        AND test.pro_status = 'F' 
+        AND remoteSupport.caa_consno = engineer.`cns_consno` 
+        AND fixedActivity.caa_consno = engineer.`cns_consno` 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            remoteSupport.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            fixedActivity.caa_starttime,
+            remoteSupport.caa_endtime
+          )
+        ) <= (5 * 60) LIMIT 1),
+      0
+    )
+  ) AS firstTimeFix,
+  SUM(1) AS totalRaised
+FROM
+  problem 
+  JOIN callactivity initial 
+    ON initial.caa_problemno = problem.pro_problemno 
+    AND initial.caa_callacttypeno = 51 
+  JOIN consultant engineer 
+    ON initial.`caa_consno` = engineer.`cns_consno` 
+WHERE problem.`pro_custno` <> 282 
+  AND EXTRACT( YEAR_MONTH FROM initial.caa_date)  = EXTRACT( YEAR_MONTH FROM CURRENT_DATE )
+  AND engineer.`teamID` = 1";
+
+        global $db;
+
+        $result = $db->query($query);
+
+        return $result->fetch_assoc();
     }
 }// end of class
 ?>
