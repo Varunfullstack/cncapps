@@ -4,7 +4,7 @@ $(function () {
                 dateFormat: 'dd/mm/yy',
                 changeMonth: true,
                 changeYear: true,
-                first: 1
+                firstDay: 1
             }
         );
     })
