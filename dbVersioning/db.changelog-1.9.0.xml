@@ -24,7 +24,7 @@
         <rollback/>
     </changeSet>
     <changeSet author="pavwebdev" id="release1.9.0-1532513772-3">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="user_time_log" columnName="holiday"/>
             </not>
