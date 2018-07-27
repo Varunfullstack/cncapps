@@ -137,12 +137,12 @@ class CTHome extends CTCNC
         );
 
 
-        $firstTimeFixFigures = $this->displayFirstTimeFixFigures();
+//        $firstTimeFixFigures = $this->displayFirstTimeFixFigures();
         $fixedReopen = $this->displayFixedAndReopen();
         $this->template->set_var(
             [
                 "thing1" => $fixedReopen,
-                "thing2" => $firstTimeFixFigures
+//                "thing2" => $firstTimeFixFigures
             ]
         );
         $this->template->parse(
