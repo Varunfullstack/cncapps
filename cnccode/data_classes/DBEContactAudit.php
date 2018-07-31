@@ -71,13 +71,15 @@ class DBEContactAudit extends DBCNCEntity
         $this->addColumn(
             self::createdByUserId,
             DA_INTEGER,
-            DA_ALLOW_NULL
+            DA_ALLOW_NULL,
+            'userId'
         );
 
         $this->addColumn(
             self::createdByContactId,
             DA_INTEGER,
-            DA_ALLOW_NULL
+            DA_ALLOW_NULL,
+            "contactId"
         );
 
         $this->addColumn(

@@ -36,7 +36,15 @@ class DBEJContactAudit extends DBEContactAudit
             self::createdByContactName,
             DA_STRING,
             DA_ALLOW_NULL,
-            'concat(consultant.con_first_name," ",consultant.con_last_name'
+            '(SELECT 
+    CONCAT(
+      contact.con_first_name,
+      " ",
+      contact.con_last_name
+    )
+  FROM
+    contact 
+  WHERE contact.con_contno = contactId)'
         );
 
         $this->addColumn(
@@ -45,21 +53,30 @@ class DBEJContactAudit extends DBEContactAudit
             DA_ALLOW_NULL,
             'customer.cus_name'
         );
-
         $this->setAddColumnsOff();
+
+
+    }
+
+    static function getConstants()
+    {
+        try {
+            $oClass = new ReflectionClass(__CLASS__);
+            return $oClass->getConstants();
+        } catch (ReflectionException $e) {
+            return [];
+        }
     }
 
     function search($customerId = null,
-                    $startDate = null,
-                    $endDate = null,
+                    DateTime $startDate = null,
+                    DateTime $endDate = null,
                     $limit = 50
     )
     {
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . '
-                LEFT JOIN contact 
-    ON contactId = contact.`con_contno` 
+            " FROM " . $this->getTableName() . ' 
     LEFT JOIN consultant ON userId = consultant.`cns_consno`
     LEFT JOIN customer ON customer.`cus_custno` = contactauditlog.con_custno
       where 1 = 1 ';
@@ -74,13 +91,13 @@ class DBEJContactAudit extends DBEContactAudit
         if ($startDate) {
             $queryString .= " and date(" . $this->getTableName() . "." . $this->getDBColumnName(
                     self::createdAt
-                ) . ") >= $startDate";
+                ) . ") >= '" . $startDate->format('Y-m-d') . "'";
         }
 
         if ($endDate) {
             $queryString .= " and date(" . $this->getTableName() . "." . $this->getDBColumnName(
                     self::createdAt
-                ) . ") <= $endDate";
+                ) . ") <= '" . $endDate->format('Y-m-d') . "'";
         }
 
         if ($limit) {
@@ -88,5 +105,7 @@ class DBEJContactAudit extends DBEContactAudit
         }
 
         $this->setQueryString($queryString);
+
+        $this->getRows();
     }
 }

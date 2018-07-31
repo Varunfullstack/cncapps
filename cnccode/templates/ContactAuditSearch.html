@@ -1,18 +1,27 @@
 <!-- Template: Customer.inc.html -->
 <script type='application/javascript'
         src='CommonJS.js'
-></script>
+>
+</script>
 <script language='JavaScript'
         src='popcalendar/popcalendar.js'
-></script>
-<script type="application/javascript">
-    $(function () {
-        window.newCustomerFromDate = $('#newCustomerFromDate').get(0);
-        window.newCustomerToDate = $('#newCustomerToDate').get(0);
-        window.droppedCustomerFromDate = $('#droppedCustomerFromDate').get(0);
-        window.droppedCustomerToDate = $('#droppedCustomerToDate').get(0);
-    });
+>
 </script>
+<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
+<link rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+/>
+
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+></script>
 <script type="application/javascript">
 
     var savedCustomerString;
@@ -59,11 +68,186 @@
             validateCustomerString();
         }
     }
+
+    $(document).ready(function () {
+        dataTable = $('#myTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                // {
+                //     extend: 'csv',
+                //     bom: true,
+                //     exportOptions: {
+                //         orthogonal: 'data'
+                //     }
+                // },
+                {
+                    extend: 'excel'
+                }
+            ],
+            paging: false,
+            columns: [
+                {
+                    data: "createdByUserName"
+                },
+                {
+                    data: "createdByContactName"
+                },
+                {
+                    data: "customerName"
+                },
+                {
+                    data: "contactID"
+                },
+                {
+                    data: "siteNo"
+                },
+                {
+                    data: "customerID"
+                },
+                {
+                    data: "supplierID"
+                },
+                {
+                    data: "title"
+                },
+                {
+                    data: "position"
+                },
+                {
+                    data: "lastName"
+                },
+                {
+                    data: "firstName"
+                },
+                {
+                    data: "email"
+                },
+                {
+                    data: "phone"
+                },
+                {
+                    data: "mobilePhone"
+                },
+                {
+                    data: "fax"
+                },
+                {
+                    data: "portalPassword"
+                },
+                {
+                    data: "sendMailshotFlag"
+                },
+                {
+                    data: "discontinuedFlag"
+                },
+                {
+                    data: "accountsFlag"
+                },
+                {
+                    data: "mailshot1Flag"
+                },
+                {
+                    data: "mailshot2Flag"
+                },
+                {
+                    data: "mailshot3Flag"
+                },
+                {
+                    data: "mailshot4Flag"
+                },
+                {
+                    data: "mailshot5Flag"
+                },
+                {
+                    data: "mailshot6Flag"
+                },
+                {
+                    data: "mailshot7Flag"
+                },
+                {
+                    data: "mailshot8Flag"
+                },
+                {
+                    data: "mailshot9Flag"
+                },
+                {
+                    data: "mailshot10Flag"
+                },
+                {
+                    data: "mailshot11Flag"
+                },
+                {
+                    data: "notes"
+                },
+                {
+                    data: "workStartedEmailFlag"
+                },
+                {
+                    data: "autoCloseEmailFlag"
+                },
+                {
+                    data: "failedLoginCount"
+                },
+                {
+                    data: "createdByContactId"
+                },
+                {
+                    data: "createdByUserId"
+                },
+                {
+                    data: "createdAt"
+                },
+                {
+                    data: "action"
+                }
+            ]
+        });
+    });
+
+    function searchContactAudit() {
+        // get the customer ID if there's one
+
+        var customerId = $('#customerID').val();
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+
+        console.log(customerId, startDate, endDate);
+
+
+        var data = {
+            customerId: customerId ? customerId : null,
+            startDate: startDate ? startDate : null,
+            endDate: endDate ? endDate : null
+        };
+        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        $.ajax({
+            url: '?action=doSearch',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: data
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                dataTable.clear();
+                dataTable.rows.add(result);
+                dataTable.draw();
+
+            }
+        }).catch(function () {
+
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
+        return false;
+    }
 </script>
 
 <form name="form"
       method="post"
-      action="{submitURL}"
+      onsubmit="return searchContactAudit();"
 >
     <table border="0"
            cellspacing="0"
@@ -79,8 +263,6 @@
                         value="{customerID}"
                 >
                 <input type="text"
-                       name="form[customerString]"
-                       value="{customerString}"
                        id="customerString"
                        onFocus="javascript:saveCustomerString()"
                        onBlur="javascript:validateCustomerString()"
@@ -95,36 +277,32 @@
             <td>
                 <input
                         type="text"
-                        name="form[newCustomerFromDate]"
-                        id="newCustomerFromDate"
-                        value="{newCustomerFromDate}"
+                        id="startDate"
                         size="10"
                         maxlength="10"
                         onKeypress="javascript:submitOnReturn()"
+                        class="jqueryCalendar"
+                        autocomplete="off"
                 >
-                <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
                 and <input
                     type="text"
-                    name="form[newCustomerToDate]"
-                    id="newCustomerToDate"
-                    value="{newCustomerToDate}"
+                    id="endDate"
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
             >
-                <font class="formErrorMessage">{newCustomerToDateMessage}</font></td>
+            </td>
         </tr>
         <tr>
             <td valign="top">&nbsp;</td>
-            <td><input type="submit"
+            <td>
+                <input type="submit"
                        name="Go"
                        value="Search"
-            > <input name="Button"
-                     type="button"
-                     value="New"
-                     onClick="document.location='{createURL}';"
-            >
-                <font class="formErrorMessage">{customerStringMessage}</font></td>
+                >
+            </td>
         </tr>
 
     </table>
@@ -133,11 +311,51 @@
        border="0"
        cellspacing="0"
        cellpadding="1"
+       id="myTable"
 >
-  <thead>
-  <tr>
-      <th></th>
-  </tr>
-  </thead>
+    <thead>
+    <tr>
+        <th>createdByUserName</th>
+        <th>createdByContactName</th>
+        <th>customerName</th>
+        <th>contactID</th>
+        <th>siteNo</th>
+        <th>customerID</th>
+        <th>supplierID</th>
+        <th>title</th>
+        <th>position</th>
+        <th>lastName</th>
+        <th>firstName</th>
+        <th>email</th>
+        <th>phone</th>
+        <th>mobilePhone</th>
+        <th>fax</th>
+        <th>portalPassword</th>
+        <th>sendMailshotFlag</th>
+        <th>discontinuedFlag</th>
+        <th>accountsFlag</th>
+        <th>mailshot1Flag</th>
+        <th>mailshot2Flag</th>
+        <th>mailshot3Flag</th>
+        <th>mailshot4Flag</th>
+        <th>mailshot5Flag</th>
+        <th>mailshot6Flag</th>
+        <th>mailshot7Flag</th>
+        <th>mailshot8Flag</th>
+        <th>mailshot9Flag</th>
+        <th>mailshot10Flag</th>
+        <th>mailshot11Flag</th>
+        <th>notes</th>
+        <th>workStartedEmailFlag</th>
+        <th>autoCloseEmailFlag</th>
+        <th>failedLoginCount</th>
+        <th>createdByContactId</th>
+        <th>createdByUserId</th>
+        <th>createdAt</th>
+        <th>action</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
 </table>
 <!-- End Template: Customer.inc.html -->
