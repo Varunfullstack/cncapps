@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] 
+### Added
+- Create script to send emails from Labtech database
+
 ## [v1.9.2] - 2018-07-27
 ### Fixed
 - Fixed problem with XX engineers in XX hours query
