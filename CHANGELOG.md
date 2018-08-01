@@ -1,11 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased] 
-### Added
-- Create script to send emails from Labtech database
-
-## [v1.9.2] - 2018-07-27
+ ## [v1.9.2] - 2018-07-27
 ### Fixed
 - Fixed problem with XX engineers in XX hours query
 - jQuery DatePicker to show Monday as first day of the week
@@ -13,6 +9,8 @@ This project changes will be shown here.
 ### Added
 - Added Monthly First Time Fix figures
 - Added Weekly Fixed and Reopened figures
+- Create script to send emails from Labtech database
+
 
 ## [v1.9.1] - 2018-07-26
 ### Fixed
