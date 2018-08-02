@@ -93,7 +93,25 @@
                     data: "createdByContactName"
                 },
                 {
+                    data: "action"
+                },
+                {
+                    data: "createdAt"
+                },
+                {
                     data: "customerName"
+                },
+                {
+                    data: "title"
+                },
+                {
+                    data: "firstName"
+                },
+                {
+                    data: "lastName"
+                },
+                {
+                    data: "email"
                 },
                 {
                     data: "contactID"
@@ -102,25 +120,7 @@
                     data: "siteNo"
                 },
                 {
-                    data: "customerID"
-                },
-                {
-                    data: "supplierID"
-                },
-                {
-                    data: "title"
-                },
-                {
                     data: "position"
-                },
-                {
-                    data: "lastName"
-                },
-                {
-                    data: "firstName"
-                },
-                {
-                    data: "email"
                 },
                 {
                     data: "phone"
@@ -129,19 +129,7 @@
                     data: "mobilePhone"
                 },
                 {
-                    data: "fax"
-                },
-                {
-                    data: "portalPassword"
-                },
-                {
                     data: "sendMailshotFlag"
-                },
-                {
-                    data: "discontinuedFlag"
-                },
-                {
-                    data: "accountsFlag"
                 },
                 {
                     data: "mailshot1Flag"
@@ -184,21 +172,6 @@
                 },
                 {
                     data: "autoCloseEmailFlag"
-                },
-                {
-                    data: "failedLoginCount"
-                },
-                {
-                    data: "createdByContactId"
-                },
-                {
-                    data: "createdByUserId"
-                },
-                {
-                    data: "createdAt"
-                },
-                {
-                    data: "action"
                 }
             ]
         });
@@ -209,16 +182,17 @@
 
         var customerId = $('#customerID').val();
         var startDate = $('#startDate').val();
+        var firstName = $('#firstName').val();
+        var lastName = $('#lastName').val();
         var endDate = $('#endDate').val();
+        var data = {};
 
-        console.log(customerId, startDate, endDate);
+        customerId ? data.customerId = customerId : null;
+        startDate ? data.startDate = startDate : null;
+        endDate ? data.endDate = endDate : null;
+        firstName ? data.firstName = firstName : null;
+        lastName ? data.lastName = lastName : null;
 
-
-        var data = {
-            customerId: customerId ? customerId : null,
-            startDate: startDate ? startDate : null,
-            endDate: endDate ? endDate : null
-        };
         $.LoadingOverlay("show", {text: 'Running your search, please wait'});
         $.ajax({
             url: '?action=doSearch',
@@ -271,6 +245,22 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Contact First Name</td>
+            <td>
+                <input type="text"
+                       id="firstName"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Contact Last Name</td>
+            <td>
+                <input type="text"
+                       id="lastName"
+                >
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">
                 <div align="right">Created Between</div>
             </td>
@@ -315,44 +305,35 @@
 >
     <thead>
     <tr>
-        <th>createdByUserName</th>
-        <th>createdByContactName</th>
-        <th>customerName</th>
-        <th>contactID</th>
-        <th>siteNo</th>
-        <th>customerID</th>
-        <th>supplierID</th>
-        <th>title</th>
-        <th>position</th>
-        <th>lastName</th>
-        <th>firstName</th>
-        <th>email</th>
-        <th>phone</th>
-        <th>mobilePhone</th>
-        <th>fax</th>
-        <th>portalPassword</th>
-        <th>sendMailshotFlag</th>
-        <th>discontinuedFlag</th>
-        <th>accountsFlag</th>
-        <th>mailshot1Flag</th>
-        <th>mailshot2Flag</th>
-        <th>mailshot3Flag</th>
-        <th>mailshot4Flag</th>
-        <th>mailshot5Flag</th>
-        <th>mailshot6Flag</th>
-        <th>mailshot7Flag</th>
-        <th>mailshot8Flag</th>
-        <th>mailshot9Flag</th>
-        <th>mailshot10Flag</th>
-        <th>mailshot11Flag</th>
-        <th>notes</th>
-        <th>workStartedEmailFlag</th>
-        <th>autoCloseEmailFlag</th>
-        <th>failedLoginCount</th>
-        <th>createdByContactId</th>
-        <th>createdByUserId</th>
-        <th>createdAt</th>
-        <th>action</th>
+        <th>CNC Modifier</th>
+        <th>Customer Modifier</th>
+        <th>Action</th>
+        <th>Change Data</th>
+        <th>Customer</th>
+        <th>Title</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Contact ID</th>
+        <th>Site No</th>
+        <th>Position</th>
+        <th>Phone</th>
+        <th>Mobile</th>
+        <th>Mailshot</th>
+        <th>Address Book</th>
+        <th>Invoice</th>
+        <th>Newsletter</th>
+        <th>Statement</th>
+        <th>Support</th>
+        <th>Remove</th>
+        <th>Decision Maker</th>
+        <th>Top Up</th>
+        <th>Reports</th>
+        <th>Main</th>
+        <th>SR Reports</th>
+        <th>Notes</th>
+        <th>Work Started</th>
+        <th>Auto Close</th>
     </tr>
     </thead>
     <tbody>

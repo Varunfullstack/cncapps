@@ -38,7 +38,6 @@ class CTContactAudit extends CTCNC
         );
         $roles = [
             "sales",
-            "technical"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -60,7 +59,9 @@ class CTContactAudit extends CTCNC
                     $this->searchContactAudit(
                         $_REQUEST['customerId'],
                         $_REQUEST['startDate'],
-                        $_REQUEST['endDate']
+                        $_REQUEST['endDate'],
+                        $_REQUEST['firstName'],
+                        $_REQUEST['lastName']
                     )
                 );
                 break;
@@ -81,7 +82,7 @@ class CTContactAudit extends CTCNC
             'ContactAuditSearch'
         );
 // Parameters
-        $this->setPageTitle("Customer");
+        $this->setPageTitle("Contact Audit Log");
         $submitURL = $this->buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_SEARCH)
@@ -118,9 +119,11 @@ class CTContactAudit extends CTCNC
     }
 
 
-    private function searchContactAudit($customerID,
-                                        $startDate,
-                                        $endDate
+    private function searchContactAudit($customerID = null,
+                                        $startDate = null,
+                                        $endDate = null,
+                                        $firstName = null,
+                                        $lastName = null
     )
     {
         $test = new DBEJContactAudit($this);
@@ -142,7 +145,9 @@ class CTContactAudit extends CTCNC
         $test->search(
             $customerID,
             $startDate,
-            $endDate
+            $endDate,
+            $firstName,
+            $lastName
         );
 
         $result = [];

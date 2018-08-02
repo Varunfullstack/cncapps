@@ -6,6 +6,8 @@
  * Time: 12:41
  */
 
+require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
+
 class DBEContactAudit extends DBCNCEntity
 {
     const contactID = "contactID";

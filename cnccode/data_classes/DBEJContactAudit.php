@@ -71,7 +71,9 @@ class DBEJContactAudit extends DBEContactAudit
     function search($customerId = null,
                     DateTime $startDate = null,
                     DateTime $endDate = null,
-                    $limit = 50
+                    $firstName = null,
+                    $lastName = null,
+                    $limit = null
     )
     {
         $queryString =
@@ -100,10 +102,20 @@ class DBEJContactAudit extends DBEContactAudit
                 ) . ") <= '" . $endDate->format('Y-m-d') . "'";
         }
 
+
+        if ($firstName) {
+            $queryString .= " and " . $this->getDBColumnName(self::firstName) .
+                " = '" . $firstName . "'";
+        }
+
+        if ($lastName) {
+            $queryString .= " and " . $this->getDBColumnName(self::lastName) .
+                " = '" . $lastName . "'";
+        }
+
         if ($limit) {
             $queryString .= " limit $limit";
         }
-
         $this->setQueryString($queryString);
 
         $this->getRows();
