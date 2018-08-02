@@ -303,7 +303,7 @@ class BUProblemSLA extends Business
                         DBEProblem::totalActivityDurationHours
                     ) <= $this->startersLeaversAutoCompleteThresholdHours;
 
-                $fixedDateCheck = $fixedDate <= strtotime('-4 days');
+                $fixedDateCheck = $fixedDate <= time();
                 $reasonCheck = in_array(
                     $this->dbeProblem->getValue(DBEProblem::rootCauseID),
                     $startersLeavers
