@@ -294,18 +294,57 @@ class BUProblemSLA extends Business
                 $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
                 $buCustomerItem = new BUCustomerItem($this);
                 $startersLeavers = [62, 58];
-                if ($serverCareContractID = $buCustomerItem->getValidServerCareContractID(
-                        $this->dbeProblem->getValue('customerID')
-                    ) &&
-                    $this->dbeProblem->getValue(
+
+                $serverCareContractID = $serverCareContractID = $buCustomerItem->getValidServerCareContractID(
+                    $this->dbeProblem->getValue('customerID')
+                );
+
+                $thresholdCheck = $this->dbeProblem->getValue(
                         DBEProblem::totalActivityDurationHours
-                    ) <= $this->startersLeaversAutoCompleteThresholdHours &&
-                    $fixedDate <= strtotime('-4 days') &&
-                    in_array(
-                        $this->dbeProblem->getValue(DBEProblem::rootCauseID),
-                        $startersLeavers
-                    )
-                ) {
+                    ) <= $this->startersLeaversAutoCompleteThresholdHours;
+
+                $fixedDateCheck = $fixedDate <= strtotime('-4 days');
+                $reasonCheck = in_array(
+                    $this->dbeProblem->getValue(DBEProblem::rootCauseID),
+                    $startersLeavers
+                );
+
+                ?>
+                <div>
+                    Problem: <?= $problemID ?>
+                    <div>
+                        Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
+                    </div>
+                    <div>
+                        Server Care Contract id = <?= $serverCareContractID ?>
+                    </div>
+                    <div>
+                        Fixed Date = <?= $fixedDate ?>
+                    </div>
+                    <div>
+                        Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
+                            DBEProblem::totalActivityDurationHours
+                        ) ?>
+                    </div>
+                    <ul>
+                        <li>
+                            Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
+                        </li>
+                        <li>
+                            $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
+                        </li>
+                        <li>
+                            $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
+                        </li>
+                        <li>
+                            $reasonCheck: <?= $reasonCheck ? 'true' : 'false' ?>
+                        </li>
+                    </ul>
+                </div>
+                <?php
+
+
+                if ($serverCareContractID && $thresholdCheck && $fixedDateCheck && $reasonCheck) {
                     $this->dbeProblem->setValue(
                         DBEJProblem::contractCustomerItemID,
                         $serverCareContractID
@@ -390,7 +429,6 @@ class BUProblemSLA extends Business
           AND pro_status IN ('F', 'C')
           AND pro_date_raised >= '2013-01-01'";
 
-        var_dump($SQL);
         $results = $this->db->query($SQL);
 
         $ids = array();
