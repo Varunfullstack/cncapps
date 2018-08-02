@@ -312,11 +312,11 @@ class BUProblemSLA extends Business
                     );
                     $this->dbeProblem->updateRow();
                     $this->buActivity->setProblemToCompleted($problemID);
+                    continue;
                 }
 
                 if (
                     $this->dbeProblem->getValue('contractCustomerItemID') != 0 &&
-
                     $hoursUntilComplete <= 0 &
                     $this->dbeProblem->getValue('totalActivityDurationHours') <= $this->srAutocompleteThresholdHours
                 ) {
@@ -390,6 +390,7 @@ class BUProblemSLA extends Business
           AND pro_status IN ('F', 'C')
           AND pro_date_raised >= '2013-01-01'";
 
+        var_dump($SQL);
         $results = $this->db->query($SQL);
 
         $ids = array();
