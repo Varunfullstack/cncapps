@@ -1461,9 +1461,9 @@ GROUP BY engineer.`cns_consno`  order by engineer.firstName"
             ];
 
 
-            $data['totalRaised'] += $row['totalRaised'];
-            $data['totalAttempted'] += $row['attemptedFirstTimeFix'];
-            $data['totalAchieved'] += $row['firstTimeFix'];
+            $totalRaised += $row['totalRaised'];
+            $totalAttempted += $row['attemptedFirstTimeFix'];
+            $totalAchieved += $row['firstTimeFix'];
         }
 
         $monthlyFigures = $this->getRunningMonthFirstTimeFixedFigures();
