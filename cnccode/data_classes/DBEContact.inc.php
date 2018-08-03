@@ -23,7 +23,6 @@ class DBEContact extends DBCNCEntity
     const sendMailshotFlag = "sendMailshotFlag";
     const discontinuedFlag = "discontinuedFlag";
     const accountsFlag = "accountsFlag";
-    const statementFlag = "statementFlag";
     const mailshot1Flag = "mailshot1Flag";
     const mailshot2Flag = "mailshot2Flag";
     const mailshot3Flag = "mailshot3Flag";
@@ -146,12 +145,6 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             "con_accounts_flag"
-        );
-        $this->addColumn(
-            self::statementFlag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_statement_flag"
         );
         $this->addColumn(
             self::mailshot1Flag,
@@ -308,6 +301,24 @@ class DBEContact extends DBCNCEntity
      */
     function deleteRowsByCustomerID()
     {
+        //log the rows that are going to be deleted
+
+        global $db;
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $query = "insert into contactauditlog select
+                              'delete'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID    as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(
+                self::customerID
+            );
+
+        $db->query($query);
+
         $this->setMethodName("deleteRowsByCustomerID");
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('CustomerID not set');
@@ -327,6 +338,22 @@ class DBEContact extends DBCNCEntity
      */
     function deleteRowsByCustomerIDSiteNo()
     {
+        global $db;
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $query = "insert into contactauditlog select
+                              'delete'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID    as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(
+                self::customerID
+            ) .
+            " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
+
+        $db->query($query);
         $this->setMethodName("deleteRowsByCustomerIDSiteNo");
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('CustomerID not set');
@@ -612,6 +639,105 @@ class DBEContact extends DBCNCEntity
 
         $this->getRows();
         return $this;
+    }
+
+
+    function insertRow()
+    {
+        $inserted = parent::insertRow();
+
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        global $db;
+
+        if ($inserted) {
+            $query = "insert into contactauditlog select
+                              'insert'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID    as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            where con_contno = " . $this->getFormattedValue(
+                    self::contactID
+                );
+
+            $db->query($query);
+        }
+
+        return $inserted;
+    }
+
+    function updateRow()
+    {
+        global $db;
+        // pull the data before it's updated
+        $readQuery = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() . " where con_contno = " . $this->getFormattedValue(
+                self::contactID
+            );
+        $result = $db->query($readQuery);
+
+        $readRow = $result->fetch_assoc();
+
+        $stringColumns = $this->getDBColumnNamesAsString();
+
+        $columns = explode(
+            ',',
+            $stringColumns
+        );
+
+
+        $counter = 0;
+        $hasChanged = false;
+
+        while (!$hasChanged && count($columns) > $counter) {
+            if ($this->getValue($counter) != $readRow[$columns[$counter]]) {
+                $hasChanged = true;
+            }
+            $counter++;
+        }
+
+        $updated = parent::updateRow();
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+
+        if ($updated && $hasChanged) {
+            $query = "insert into contactauditlog select
+                              'update'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            where con_contno = " . $this->getFormattedValue(
+                    self::contactID
+                );
+
+            $db->query($query);
+        }
+
+        return $updated;
+    }
+
+    public function deleteRow($pkValue = null)
+    {
+        global $db;
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $query = "insert into contactauditlog select
+                              'delete'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            where con_contno = " . $this->getFormattedValue(
+                self::contactID
+            );
+
+        $db->query($query);
+
+        return parent::deleteRow($pkValue);
     }
 }
 

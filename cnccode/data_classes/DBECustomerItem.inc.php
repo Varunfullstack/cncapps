@@ -93,6 +93,7 @@ class DBECustomerItem extends DBCNCEntity
     const internalNotes = "internalNotes";
     const autoGenerateContractInvoice = "autoGenerateContractInvoice";
     const secondSiteReplicationPath = "secondSiteReplicationPath";
+    const secondSiteReplicationExcludeFlag = "secondSiteReplicationExcludeFlag";
 
 
     /**
@@ -622,6 +623,12 @@ class DBECustomerItem extends DBCNCEntity
             DA_YN,
             DA_ALLOW_NULL,
             "custitem.autoGenerateContractInvoice"
+        );
+        $this->addColumn(
+            self::secondSiteReplicationExcludeFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            'custitem.secondSiteReplicationExcludeFlag'
         );
 
         $this->setPK(0);

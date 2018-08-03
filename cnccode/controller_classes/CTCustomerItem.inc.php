@@ -878,11 +878,16 @@ class CTCustomerItem extends CTCNC
         /* Default to enable 2ndSite fields */
         $secondsiteReadonly = '';
         $secondsiteDisabled = '';
+        $secondsiteReplicationReadonly = "";
+        $secondsiteReplicationDisabled = "";
 
+        $secondsiteLocalExcludeFlagShow = 0;
+        $secondSiteReplicationExcludeFlagShow = 0;
         if (
         $buCustomerItem->serverIsUnderLocalSecondsiteContract($dsCustomerItem->getValue('customerItemID'))
         ) {
             $secondsiteLocalExcludeFlagShow = 1;
+            $secondSiteReplicationExcludeFlagShow = 1;
             /*
             if secondsiteLocalExcludeFlag is set to exclude this server from checks then disable all secondsite input fields
             */
@@ -892,8 +897,13 @@ class CTCustomerItem extends CTCNC
 
                 $secondsiteDisabled = CTCNC_HTML_DISABLED;
             }
-        } else {
-            $secondsiteLocalExcludeFlagShow = 0;
+            if ($dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationExcludeFlag) == 'Y') {
+
+                $secondsiteReplicationReadonly = CTCNC_HTML_READONLY;
+
+                $secondsiteReplicationDisabled = CTCNC_HTML_DISABLED;
+            }
+
         }
 
         $buUser = new BUUser($this);
@@ -1050,6 +1060,12 @@ class CTCustomerItem extends CTCNC
                 ),
                 'secondsiteDisabled'                      => $secondsiteDisabled,
                 'secondsiteReadonly'                      => $secondsiteReadonly,
+                "secondSiteReplicationExcludeFlagChecked" => Controller::htmlChecked(
+                    $dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationExcludeFlag)
+                ),
+                "secondSiteReplicationExcludeFlagShow"    => $secondSiteReplicationExcludeFlagShow,
+                "secondsiteReplicationReadonly"           => $secondsiteReplicationReadonly,
+                "secondsiteReplicationDisabled"           => $secondsiteReplicationDisabled,
             )
         );
 
