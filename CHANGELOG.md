@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 259 - Contact changes audit log
+- Issue 309 - 2S Replication Check Exclusion feature
 ### Fixed
 - Issue 308 - Bugs from release 1.9
 ### Changed

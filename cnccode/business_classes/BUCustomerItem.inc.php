@@ -627,19 +627,16 @@ class BUCustomerItem extends Business
     function serverIsUnderLocalSecondsiteContract($customerItemID)
     {
         global $db; //PHPLib DB object
-
-        $ret = false;
-
         $dbeJContract = new DBEJContract($this);
         $dbeJContract->getRowsByCustomerItemID($customerItemID);
 
         while ($dbeJContract->fetchNext()) {
             if ($dbeJContract->getValue('itemTypeID') == CONFIG_2NDSITE_LOCAL_ITEMTYPEID) {
-                $ret = true;
+               return true;
             }
         }// end while
 
-        return $ret;
+        return false;
     }
 
     public function getServiceDeskValidContractsByCustomerID($customerID,
