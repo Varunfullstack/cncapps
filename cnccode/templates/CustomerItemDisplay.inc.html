@@ -258,7 +258,7 @@
                 >
         </tr>
 
-        <tr>
+        <tr id="secondSiteReplicationExcludeFlagRow">
             <td class="promptText">Exclude 2nd Site Replication check on customer network</td>
             <td colspan="2">
                 <input
@@ -360,7 +360,7 @@
                         name="customerItem[1][secondSiteReplicationPath]"
                         id="secondSiteReplicationPath"
                         type="text"
-                        {secondsiteReadonly}
+                        {secondsiteReplicationReadonly}
                         {readonly}
                         value="{secondSiteReplicationPath}"
                         size="50"
@@ -511,18 +511,28 @@
             $("tr#secondsiteLocalExcludeFlag").hide();
         }
 
-        $("input#secondsiteLocalExcludeFlag").click(function () {
+        if ({secondSiteReplicationExcludeFlagShow} == 0) {
+            $("#secondSiteReplicationExcludeFlagRow").hide();
+        }
 
+        $("input#secondsiteLocalExcludeFlag").click(function () {
             if ($(this).is(':checked')) {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", true);
                 $('select#secondsiteImageDelayDays').attr("disabled", true);
-
-
             }
             else {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", false);
                 $('select#secondsiteImageDelayDays').attr("disabled", false);
             }
         });
+        $("input#secondSiteReplicationExcludeFlag").click(function () {
+            if ($(this).is(':checked')) {
+                $('input#secondSiteReplicationPath').attr("readonly", true);
+            }
+            else {
+                $('input#secondSiteReplicationPath').attr("readonly", false);
+            }
+        });
+
     });
 </script>

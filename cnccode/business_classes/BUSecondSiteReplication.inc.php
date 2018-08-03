@@ -575,7 +575,7 @@ class BUSecondsiteReplication extends BUSecondsite
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
         AND ci.declinedFlag <> 'Y'
         AND replicationStatus = '$status'
-      
+        and ser.secondSiteReplicationExcludeFlag <> 'Y'      
       ORDER BY c.cus_name, serverName, ssi.imageName";
 
         $db = $GLOBALS['db'];
