@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.10.1] - 2018-08-03
+### Fixed
+- Fixed issue with First Time Fixes totals
+
 ## [v1.10.0] - 2018-08-03
 ### Added
 - Issue 259 - Contact changes audit log
