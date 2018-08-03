@@ -24,7 +24,7 @@
         <rollback/>
     </changeSet>
     <changeSet author="pavwebdev" id="release1.9.0-1532513772-3">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="user_time_log" columnName="holiday"/>
             </not>
@@ -35,5 +35,6 @@
         <sql>
             UPDATE user_time_log SET holiday = 1 WHERE startedTime = '00:00:00' AND dayHours/loggedHours = 1.25
         </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
