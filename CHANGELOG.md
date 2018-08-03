@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.10.0] - 2018-08-03
 ### Added
 - Issue 259 - Contact changes audit log
 - Issue 309 - 2S Replication Check Exclusion feature
