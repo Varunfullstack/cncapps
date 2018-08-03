@@ -207,9 +207,7 @@ FROM
   problem 
   LEFT JOIN consultant fixer 
     ON problem.`pro_fixed_consno` = fixer.`cns_consno` 
-WHERE EXTRACT(
-    WEEK FROM problem.`pro_fixed_date`
-  ) = EXTRACT(WEEK FROM CURRENT_DATE) 
+WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7) 
   AND EXTRACT(
     YEAR FROM problem.`pro_fixed_date`
   ) = EXTRACT(YEAR FROM CURRENT_DATE) 
@@ -268,9 +266,7 @@ WHERE EXTRACT(
               WHERE problem.`pro_custno` <> 282 
                 AND problem.`pro_reopened_flag` = 'Y' 
                 AND reopener.`cns_consno` <> 67 
-                AND EXTRACT(
-                    WEEK FROM problem.`pro_reopened_date`
-                  ) = EXTRACT(WEEK FROM CURRENT_DATE) 
+                AND WEEK(problem.`pro_reopened_date`, 7) = WEEK(CURRENT_DATE, 7) 
                   AND EXTRACT(
                     YEAR FROM problem.`pro_reopened_date`
                   ) = EXTRACT(YEAR FROM CURRENT_DATE) 

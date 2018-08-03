@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 259 - Contact changes audit log
+### Fixed
+- Issue 308 - Bugs from release 1.9
 
 ## [v1.9.2] - 2018-07-27
 ### Fixed
@@ -13,6 +15,8 @@ This project changes will be shown here.
 ### Added
 - Added Monthly First Time Fix figures
 - Added Weekly Fixed and Reopened figures
+- Create script to send emails from Labtech database
+
 
 ## [v1.9.1] - 2018-07-26
 ### Fixed
