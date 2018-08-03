@@ -51,7 +51,7 @@ class BUSecondsiteReplication extends BUSecondsite
 
             if (
                 $server['itm_itemtypeno'] == CONFIG_2NDSITE_LOCAL_ITEMTYPEID &&
-                $server['secondsiteLocalExcludeFlag'] == 'Y'
+                $server['secondSiteReplicationExcludeFlag'] == 'Y'
             ) {
                 $this->excludedLocalServers[] = $server;
 

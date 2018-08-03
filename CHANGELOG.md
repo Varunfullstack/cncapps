@@ -1,7 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
- ## [v1.9.2] - 2018-07-27
+## [unreleased]
+### Added
+- Issue 309 - 2S Replication Check Exclusion feature
+
+## [v1.9.2] - 2018-07-27
 ### Fixed
 - Fixed problem with XX engineers in XX hours query
 - jQuery DatePicker to show Monday as first day of the week

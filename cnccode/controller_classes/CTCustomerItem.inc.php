@@ -1050,6 +1050,9 @@ class CTCustomerItem extends CTCNC
                 ),
                 'secondsiteDisabled'                      => $secondsiteDisabled,
                 'secondsiteReadonly'                      => $secondsiteReadonly,
+                "secondSiteReplicationExcludeFlagChecked" => Controller::htmlChecked(
+                    $dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationExcludeFlag)
+                )
             )
         );
 
