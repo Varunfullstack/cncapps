@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 259 - Contact changes audit log
 ### Fixed
 - Issue 308 - Bugs from release 1.9
+### Changed
+- Issue 314 - Increase length of mail queue recipient database field
 
 ## [v1.9.2] - 2018-07-27
 ### Fixed
