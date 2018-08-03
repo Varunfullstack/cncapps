@@ -234,13 +234,7 @@ class CTCNC extends Controller
 
         $this->user = new BUUser($this);
 
-        parent::__construct(
-            $requestMethod,
-            $postVars,
-            $getVars,
-            $cookieVars,
-            $cfg,
-            "",
+        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "",
             "",
             "",
             ""
@@ -395,6 +389,27 @@ class CTCNC extends Controller
         }
         if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
             $this->setTemplateFiles(array('ScreenTechnical' => $screenTechnicalTemplate));
+            if ($this->isUserSDManager()) {
+                $sdManagerTechnical = new Template (
+                    $GLOBALS ["cfg"] ["path_templates"],
+                    "remove"
+                );
+                $sdManagerTechnical->set_file(
+                    'sdManagerTemplate',
+                    'ScreenTechnicalSD.inc.html'
+                );
+                $sdManagerTechnical->parse(
+                    'output',
+                    'sdManagerTemplate'
+                );
+                $sdManagerTemplateText = $sdManagerTechnical->get('output');
+
+                $this->template->setVar(
+                    'technicalSD',
+                    $sdManagerTemplateText
+                );
+            }
+
             $this->template->parse(
                 'screenTechnical',
                 'ScreenTechnical',
@@ -460,6 +475,10 @@ class CTCNC extends Controller
         }
     }
 
+    function isUserSDManager()
+    {
+        return self::getDbeUser()->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y';
+    }
 
     function hasPermissions($levels)
     {

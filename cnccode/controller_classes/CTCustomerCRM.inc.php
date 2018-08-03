@@ -545,6 +545,7 @@ class CTCustomerCRM extends CTCNC
                 DBEContact::portalPassword,
                 $value['portalPassword']
             );
+
             $this->dsContact->setValue(
                 DBEContact::accountsFlag,
                 $this->getYN($value['accountsFlag'])

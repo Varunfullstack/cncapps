@@ -98,6 +98,22 @@ foreach ($servers as $server) {
 
 }
 
+$template->set_block('page', 'excludedLocalServerBlock', 'excludedLocalServers');
+
+$servers = $buSecondsite->getExcludedLocalServers();
+
+foreach ($servers as $server) {
+
+    $template->set_var(
+        array(
+            'customerName' => $server['cus_name'],
+            'serverName' => $server['serverName']
+        )
+    );
+    $template->parse('excludedLocalServers', 'excludedLocalServerBlock', true);
+
+}
+
 $template->setVar(
     array(
         'serverCount'          => $buSecondsite->serverCount,

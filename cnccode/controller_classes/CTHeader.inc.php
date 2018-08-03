@@ -365,37 +365,28 @@ class CTHeader extends CTCNC
 
                 'imTeamTargetFixHours' => Controller::htmlInputText($dsHeader->getValue('imTeamTargetFixHours')),
 
-                'imTeamMinutesInADay' => Controller::htmlDisplayText(
-                    $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+                'imTeamMinutesInADay' => Controller::htmlDisplayText($dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+
                 ),
 
-                'imTeamTargetFixHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('imTeamTargetFixHours')
-                ),
+                'imTeamTargetFixHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamTargetFixHours')),
 
-                'imTeamTargetFixQtyPerMonth' => Controller::htmlInputText(
-                    $dsHeader->getValue('imTeamTargetFixQtyPerMonth')
-                ),
+                'imTeamTargetFixQtyPerMonth' => Controller::htmlInputText($dsHeader->getValue('imTeamTargetFixQtyPerMonth')),
 
-                'imTeamTargetFixQtyPerMonthMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('imTeamTargetFixQtyPerMonth')
-                ),
+                'imTeamTargetFixQtyPerMonthMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamTargetFixQtyPerMonth')),
 
-                'srAutocompleteThresholdHours' => Controller::htmlInputText(
-                    $dsHeader->getValue('srAutocompleteThresholdHours')
-                ),
+                'srAutocompleteThresholdHours' => Controller::htmlInputText($dsHeader->getValue('srAutocompleteThresholdHours')),
 
-                'srAutocompleteThresholdHoursMessage' => Controller::htmlDisplayText(
+                'srAutocompleteThresholdHoursMessage'         => Controller::htmlDisplayText(
                     $dsHeader->getMessage('srAutocompleteThresholdHours')
                 ),
+                'srStartersLeaversAutoCompleteThresholdHours' => Controller::htmlInputText($dsHeader->getValue(DBEHeader::srStartersLeaversAutoCompleteThresholdHours)),
 
-                'srPromptContractThresholdHours' => Controller::htmlInputText(
-                    $dsHeader->getValue('srPromptContractThresholdHours')
-                ),
+                'srStartersLeaversAutoCompleteThresholdHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('srStartersLeaversAutoCompleteThresholdHours')),
 
-                'srPromptContractThresholdHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('srPromptContractThresholdHours')
-                ),
+                'srPromptContractThresholdHours' => Controller::htmlInputText($dsHeader->getValue('srPromptContractThresholdHours')),
+
+                'srPromptContractThresholdHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('srPromptContractThresholdHours')),
 
                 'customerContactWarnHours' => Controller::htmlInputText(
                     $dsHeader->getValue('customerContactWarnHours')
@@ -405,22 +396,35 @@ class CTHeader extends CTCNC
                     $dsHeader->getMessage('customerContactWarnHours')
                 ),
 
-                'remoteSupportWarnHours' => Controller::htmlInputText($dsHeader->getValue('remoteSupportWarnHours')),
-
-                'remoteSupportWarnHoursMessage'                                      => Controller::htmlDisplayText(
+                'remoteSupportWarnHours'                                         => Controller::htmlInputText(
+                    $dsHeader->getValue('remoteSupportWarnHours')
+                ),
+                'remoteSupportWarnHoursMessage'                                  => Controller::htmlDisplayText(
                     $dsHeader->getMessage('remoteSupportWarnHours')
                 ),
-                'customerReviewMeetingText'                                          => Controller::htmlInputText(
+                'customerReviewMeetingText'                                      => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
-                DBEHeader::RemoteSupportMinWarnHours                                 => Controller::htmlInputText(
+                DBEHeader::RemoteSupportMinWarnHours                             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours)
                 ),
-                DBEHeader::RemoteSupportMinWarnHours . 'Message'                     => Controller::htmlDisplayText(
+                DBEHeader::RemoteSupportMinWarnHours . 'Message'                 => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::RemoteSupportMinWarnHours)
                 ),
-                DBEHeader::backupTargetSuccessRate                                   => Controller::htmlInputText(
+                DBEHeader::backupTargetSuccessRate                               => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::backupTargetSuccessRate)
+                ),
+                DBEHeader::SDDashboardEngineersInSREngineersMaxCount             => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
+                ),
+                DBEHeader::SDDashboardEngineersInSRInPastHours                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSRInPastHours)
+                ),
+                DBEHeader::SDDashboardEngineersInSREngineersMaxCount . "Message" => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
+                ),
+                DBEHeader::SDDashboardEngineersInSRInPastHours . "Message"       => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::SDDashboardEngineersInSRInPastHours)
                 ),
                 DBEHeader::secondSiteReplicationAdditionalDelayAllowance             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::secondSiteReplicationAdditionalDelayAllowance)
@@ -428,8 +432,8 @@ class CTHeader extends CTCNC
                 DBEHeader::secondSiteReplicationAdditionalDelayAllowance . 'Message' => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::secondSiteReplicationAdditionalDelayAllowance)
                 ),
-                'urlItemPopup'                                                       => $urlItemPopup,
-                'urlUpdate'                                                          => $urlUpdate
+                'urlItemPopup'                                                   => $urlItemPopup,
+                'urlUpdate'                                                      => $urlUpdate
             )
         );
 

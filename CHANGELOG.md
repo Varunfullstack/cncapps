@@ -1,9 +1,16 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.10.0] - 2018-08-03
+### Added
+- Issue 259 - Contact changes audit log
+- Issue 309 - 2S Replication Check Exclusion feature
+### Fixed
+- Issue 308 - Bugs from release 1.9
 ### Changed
-- Issue 215 - Contact Management within CNCAPPS
+- Issue 314 - Increase length of mail queue recipient database field
+- Issue 313 - Monthly Customer Profitability Report email group update
+- Issue 307 - Dashboard figures to load asynchronously, daily fixed & first time fixes
 
 ## [v1.9.2] - 2018-07-27
 ### Fixed
@@ -13,6 +20,7 @@ This project changes will be shown here.
 ### Added
 - Added Monthly First Time Fix figures
 - Added Weekly Fixed and Reopened figures
+- Create script to send emails from Labtech database
 
 ## [v1.9.1] - 2018-07-26
 ### Fixed

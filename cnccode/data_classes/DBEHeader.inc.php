@@ -84,7 +84,10 @@ class DBEHeader extends DBEntity
     const customerReviewMeetingText = "customerReviewMeetingText";
     const serviceDeskNotification24hBegin = "serviceDeskNotification24hBegin";
     const serviceDeskNotification24hEnd = "serviceDeskNotification24hEnd";
+    const srStartersLeaversAutoCompleteThresholdHours = "srStartersLeaversAutoCompleteThresholdHours";
+    const SDDashboardEngineersInSRInPastHours = "SDDashboardEngineersInSRInPastHours";
     const secondSiteReplicationAdditionalDelayAllowance = "secondSiteReplicationAdditionalDelayAllowance";
+    const SDDashboardEngineersInSREngineersMaxCount = "SDDashboardEngineersInSREngineersMaxCount";
 
     /**
      * calls constructor()
@@ -557,6 +560,24 @@ class DBEHeader extends DBEntity
             DA_TIME,
             DA_NOT_NULL,
             "hed_sd_notification_24_7_end"
+        );
+        $this->addColumn(
+            self::srStartersLeaversAutoCompleteThresholdHours,
+            DA_FLOAT,
+            DA_NOT_NULL,
+            'hed_srStartersLeaversAutoCompleteThresholdHours'
+        );
+        $this->addColumn(
+            self::SDDashboardEngineersInSREngineersMaxCount,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            'hed_sd_dashboard_engineers_in_sr_engineers_max_count'
+        );
+        $this->addColumn(
+            self::SDDashboardEngineersInSRInPastHours,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            'hed_sd_dashboard_engineers_in_sr_in_past_hours'
         );
         $this->addColumn(
             self::secondSiteReplicationAdditionalDelayAllowance,

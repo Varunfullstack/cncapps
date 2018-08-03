@@ -23,11 +23,13 @@ class DBEContact extends DBCNCEntity
     const sendMailshotFlag = "sendMailshotFlag";
     const discontinuedFlag = "discontinuedFlag";
     const accountsFlag = "accountsFlag";
-    const statementFlag = "statementFlag";
+    const mailshot1Flag = "mailshot1Flag";
     const mailshot2Flag = "mailshot2Flag";
     const mailshot3Flag = "mailshot3Flag";
     const mailshot4Flag = "mailshot4Flag";
     const mailshot5Flag = "mailshot5Flag";
+    const mailshot6Flag = "mailshot6Flag";
+    const mailshot7Flag = "mailshot7Flag";
     const mailshot8Flag = "mailshot8Flag";
     const mailshot9Flag = "mailshot9Flag";
     const mailshot10Flag = "mailshot10Flag";
@@ -36,10 +38,6 @@ class DBEContact extends DBCNCEntity
     const workStartedEmailFlag = "workStartedEmailFlag";
     const autoCloseEmailFlag = "autoCloseEmailFlag";
     const failedLoginCount = "failedLoginCount";
-    const OthersEmailFlag = 'othersEmailMainFlag';
-    const OthersWorkStartedEmailFlag = "WorkStartedEmailFlag";
-    const OthersAutoCloseEmailFlag = "AutoCloseEmailFlag";
-    const reviewUser = "reviewUser";
 
     /**
      * calls constructor()
@@ -149,10 +147,10 @@ class DBEContact extends DBCNCEntity
             "con_accounts_flag"
         );
         $this->addColumn(
-            self::statementFlag,
+            self::mailshot1Flag,
             DA_YN,
             DA_NOT_NULL,
-            "con_statement_flag"
+            "con_mailflag1"
         );
         $this->addColumn(
             self::mailshot2Flag,
@@ -177,6 +175,18 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             "con_mailflag5"
+        );
+        $this->addColumn(
+            self::mailshot6Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag6"
+        );
+        $this->addColumn(
+            self::mailshot7Flag,
+            DA_YN,
+            DA_NOT_NULL,
+            "con_mailflag7"
         );
         $this->addColumn(
             self::mailshot8Flag,
@@ -226,10 +236,6 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
             "con_failed_login_count"
         );
-        $this->addColumn(self::OthersEmailFlag, DA_YN_FLAG, DA_NOT_NULL, "othersEmailsFlag");
-        $this->addColumn(self::OthersWorkStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "othersWorkStartedFlag");
-        $this->addColumn(self::OthersAutoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "autoCloseEmailsFlag");
-        $this->addColumn(self::reviewUser, DA_YN, DA_ALLOW_NULL, "reviewUser");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -260,10 +266,13 @@ class DBEContact extends DBCNCEntity
             $query .=
                 " AND (
 					con_mailshot = 'Y' OR
+					con_mailflag1 = 'Y' OR
 					con_mailflag2 = 'Y' OR
 					con_mailflag3 = 'Y' OR
 					con_mailflag4 = 'Y' OR
 					con_mailflag5 = 'Y' OR
+					con_mailflag6 = 'Y' OR
+					con_mailflag7 = 'Y' OR
 					con_mailflag8 = 'Y' OR
 					con_mailflag9 = 'Y' OR
 					con_mailflag10 = 'Y' or
@@ -292,6 +301,24 @@ class DBEContact extends DBCNCEntity
      */
     function deleteRowsByCustomerID()
     {
+        //log the rows that are going to be deleted
+
+        global $db;
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $query = "insert into contactauditlog select
+                              'delete'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID    as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(
+                self::customerID
+            );
+
+        $db->query($query);
+
         $this->setMethodName("deleteRowsByCustomerID");
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('CustomerID not set');
@@ -311,6 +338,22 @@ class DBEContact extends DBCNCEntity
      */
     function deleteRowsByCustomerIDSiteNo()
     {
+        global $db;
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $query = "insert into contactauditlog select
+                              'delete'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID    as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(
+                self::customerID
+            ) .
+            " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
+
+        $db->query($query);
         $this->setMethodName("deleteRowsByCustomerIDSiteNo");
         if ($this->getValue(self::customerID) == '') {
             $this->raiseError('CustomerID not set');
@@ -596,6 +639,105 @@ class DBEContact extends DBCNCEntity
 
         $this->getRows();
         return $this;
+    }
+
+
+    function insertRow()
+    {
+        $inserted = parent::insertRow();
+
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        global $db;
+
+        if ($inserted) {
+            $query = "insert into contactauditlog select
+                              'insert'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID    as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            where con_contno = " . $this->getFormattedValue(
+                    self::contactID
+                );
+
+            $db->query($query);
+        }
+
+        return $inserted;
+    }
+
+    function updateRow()
+    {
+        global $db;
+        // pull the data before it's updated
+        $readQuery = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() . " where con_contno = " . $this->getFormattedValue(
+                self::contactID
+            );
+        $result = $db->query($readQuery);
+
+        $readRow = $result->fetch_assoc();
+
+        $stringColumns = $this->getDBColumnNamesAsString();
+
+        $columns = explode(
+            ',',
+            $stringColumns
+        );
+
+
+        $counter = 0;
+        $hasChanged = false;
+
+        while (!$hasChanged && count($columns) > $counter) {
+            if ($this->getValue($counter) != $readRow[$columns[$counter]]) {
+                $hasChanged = true;
+            }
+            $counter++;
+        }
+
+        $updated = parent::updateRow();
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+
+        if ($updated && $hasChanged) {
+            $query = "insert into contactauditlog select
+                              'update'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            where con_contno = " . $this->getFormattedValue(
+                    self::contactID
+                );
+
+            $db->query($query);
+        }
+
+        return $updated;
+    }
+
+    public function deleteRow($pkValue = null)
+    {
+        global $db;
+        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        $query = "insert into contactauditlog select
+                              'delete'                  as action,
+                              current_timestamp         as createdAt,
+                              $currentLoggedInUserID as userId,
+                              null                      as contactId,
+                              contact.*
+                            from contact
+                            where con_contno = " . $this->getFormattedValue(
+                self::contactID
+            );
+
+        $db->query($query);
+
+        return parent::deleteRow($pkValue);
     }
 }
 

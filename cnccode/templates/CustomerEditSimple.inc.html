@@ -296,11 +296,15 @@
            value="Show Inactive Contacts"
            onClick="document.location='{showInactiveContactsURL}';"
     >
-    <BR/>
+    <BR>
     {customerFolderLink}
     <br>
-    {renewalLink}<BR/>
-    {passwordLink}<BR/>
+    {renewalLink}
+    <BR>
+    {passwordLink}
+    <BR>
+    {customerFolderLink}
+    <br>
 
     <div class="customerEditMain">
 
@@ -1455,8 +1459,6 @@
                                name="form[contact][{contactID}][mailshot8Flag]"
                                value="Y"
                                {mailshot8FlagChecked}
-                               data-type="topUp"
-                               {topUpValidation}
                         />
                     </td>
                     <td class="content">
