@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 308 - Bugs from release 1.9
 ### Changed
 - Issue 314 - Increase length of mail queue recipient database field
+- Issue 313 - Monthly Customer Profitability Report email group update
 
 ## [v1.9.2] - 2018-07-27
 ### Fixed
