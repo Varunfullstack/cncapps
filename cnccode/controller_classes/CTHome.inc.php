@@ -20,6 +20,8 @@ class CTHome extends CTCNC
 {
     const DetailedChartsAction = 'detailedCharts';
     const GetDetailedChartsDataAction = "getDetailedChartsData";
+    const getFirstTimeFixData = "getFirstTimeFixData";
+    const getFixedAndReopenData = "getFixedAndReopenData";
 
     private $dsHeader = '';
     private $buUser;
@@ -92,6 +94,14 @@ class CTHome extends CTCNC
                     $_REQUEST['startDate'],
                     $_REQUEST['endDate']
                 );
+                break;
+
+            case self::getFirstTimeFixData:
+                echo json_encode($this->getFirstTimeFixData());
+                break;
+
+            case self::getFixedAndReopenData:
+                echo json_encode($this->getFixedAndReopenData());
                 break;
             default:
                 $this->display();
@@ -177,6 +187,29 @@ class CTHome extends CTCNC
             'FixedAndReopened',
             'HomeFixedAndReopened.inc.html'
         );
+
+        $template->set_var(
+            [
+                "fetchDataURL" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action' => self::getFixedAndReopenData
+                    ]
+                )
+            ]
+        );
+
+        $template->parse(
+            'OUTPUT',
+            'FixedAndReopened',
+            true
+        );
+
+        return $template->getVar('OUTPUT');
+    }
+
+    private function getFixedAndReopenData()
+    {
         global $db;
         /** @var mysqli_result $query */
         $query = $db->query(
@@ -276,8 +309,8 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
         $weeklyReopened = $query->fetch_assoc();
 
 
-        $template->set_var(
-            array(
+        return
+            [
                 "dailyHdReopened"     => Controller::formatNumber(
                     $dailyReopened['hdReopened'],
                     0
@@ -343,16 +376,8 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
                     0
                 ),
 
-            )
-        );
 
-        $template->parse(
-            'OUTPUT',
-            'FixedAndReopened',
-            true
-        );
-
-        return $template->getVar('OUTPUT');
+            ];
     }
 
     function displaySalesFigures()
@@ -1247,128 +1272,14 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
             'FirstTimeFigures'
         );
 
-        $this->template->set_block(
-            'firstTimeFigures',
-            'firstTimeFixBlock',
-            'figures'
-        );
-
-        global $db;
-
-        $result = $db->query(
-            "SELECT 
-  CONCAT(
-    engineer.`firstName`,
-    ' ',
-    engineer.`lastName`
-  ) AS name,
-  SUM(
-    COALESCE(
-      (SELECT 
-        1 
-      FROM
-        callactivity 
-      WHERE callactivity.caa_problemno = problem.pro_problemno 
-        AND callactivity.caa_callacttypeno = 8 
-        AND TIME_TO_SEC(
-          TIMEDIFF(
-            callactivity.caa_starttime,
-            initial.caa_endtime
-          )
-        ) <= (5 * 60) 
-        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1),
-      0
-    )
-  ) AS attemptedFirstTimeFix,
-  SUM(
-    COALESCE(
-      (SELECT 
-        1 
-      FROM
-        problem test 
-        JOIN callactivity initial 
-          ON initial.caa_problemno = test.pro_problemno 
-          AND initial.caa_callacttypeno = 51 
-        JOIN callactivity remoteSupport 
-          ON remoteSupport.caa_problemno = test.pro_problemno 
-          AND remoteSupport.caa_callacttypeno = 8 
-        JOIN callactivity fixedActivity 
-          ON fixedActivity.caa_problemno = test.pro_problemno 
-          AND fixedActivity.caa_callacttypeno = 57 
-      WHERE test.pro_problemno = problem.`pro_problemno` 
-        AND test.pro_status = 'F' 
-        AND remoteSupport.caa_consno = engineer.`cns_consno` 
-        AND fixedActivity.caa_consno = engineer.`cns_consno` 
-        AND TIME_TO_SEC(
-          TIMEDIFF(
-            remoteSupport.caa_starttime,
-            initial.caa_endtime
-          )
-        ) <= (5 * 60) 
-        AND TIME_TO_SEC(
-          TIMEDIFF(
-            fixedActivity.caa_starttime,
-            remoteSupport.caa_endtime
-          )
-        ) <= (5 * 60) limit 1),
-      0
-    )
-  ) AS firstTimeFix,
-  SUM(1) AS totalRaised  
-FROM
-  problem 
-  JOIN callactivity initial 
-    ON initial.caa_problemno = problem.pro_problemno 
-    AND initial.caa_callacttypeno = 51 
-  JOIN consultant engineer 
-    ON initial.`caa_consno` = engineer.`cns_consno` 
-WHERE problem.`pro_custno` <> 282 
-  AND initial.caa_date = CURRENT_DATE 
-  AND engineer.`teamID` = 1 
-GROUP BY engineer.`cns_consno`  order by engineer.firstName"
-        );
-
-        $totalRaised = 0;
-        $totalAttempted = 0;
-        $totalAchieved = 0;
-        while ($row = $result->fetch_assoc()) {
-            $this->template->set_var(
-                [
-                    'name'                  => $row['name'],
-                    'firstTimeFix'          => $row['firstTimeFix'],
-                    'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
-                    'totalRaised'           => $row['totalRaised']
-                ]
-            );
-
-            $totalRaised += $row['totalRaised'];
-            $totalAttempted += $row['attemptedFirstTimeFix'];
-            $totalAchieved += $row['firstTimeFix'];
-            $this->template->parse(
-                'figures',
-                'firstTimeFixBlock',
-                true
-            );
-        }
-
-        $monthlyFigures = $this->getRunningMonthFirstTimeFixedFigures();
-
         $this->template->set_var(
             [
-                'firstTimeFixAttemptedPct'        => $totalRaised > 0 ? round(
-                    ($totalAttempted / $totalRaised) * 100
-                ) : 'N/A',
-                'firstTimeFixAchievedPct'         => $totalRaised > 0 ? round(
-                    ($totalAchieved / $totalRaised) * 100
-                ) : 'N/A',
-                'phonedThroughRequests'           => $totalRaised,
-                'monthlyFirstTimeFixAttemptedPct' => $monthlyFigures['totalRaised'] ? round(
-                    ($monthlyFigures['attemptedFirstTimeFix'] / $monthlyFigures['totalRaised']) * 100
-                ) : 'N/A',
-                'monthlyFirstTimeFixAchievedPct'  => $monthlyFigures['totalRaised'] > 0 ? round(
-                    ($monthlyFigures['firstTimeFix'] / $monthlyFigures['totalRaised']) * 100
-                ) : 'N/A',
-                'monthlyPhonedThroughRequests'    => $monthlyFigures['totalRaised'],
+                "fetchDataURL" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action' => self::getFirstTimeFixData
+                    ]
+                )
             ]
         );
 
@@ -1453,6 +1364,125 @@ WHERE problem.`pro_custno` <> 282
         $result = $db->query($query);
 
         return $result->fetch_assoc();
+    }
+
+    private function getFirstTimeFixData()
+    {
+        global $db;
+        $result = $db->query(
+            "SELECT 
+  CONCAT(
+    engineer.`firstName`,
+    ' ',
+    engineer.`lastName`
+  ) AS name,
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        callactivity 
+      WHERE callactivity.caa_problemno = problem.pro_problemno 
+        AND callactivity.caa_callacttypeno = 8 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            callactivity.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND callactivity.`caa_consno` = engineer.`cns_consno` limit 1),
+      0
+    )
+  ) AS attemptedFirstTimeFix,
+  SUM(
+    COALESCE(
+      (SELECT 
+        1 
+      FROM
+        problem test 
+        JOIN callactivity initial 
+          ON initial.caa_problemno = test.pro_problemno 
+          AND initial.caa_callacttypeno = 51 
+        JOIN callactivity remoteSupport 
+          ON remoteSupport.caa_problemno = test.pro_problemno 
+          AND remoteSupport.caa_callacttypeno = 8 
+        JOIN callactivity fixedActivity 
+          ON fixedActivity.caa_problemno = test.pro_problemno 
+          AND fixedActivity.caa_callacttypeno = 57 
+      WHERE test.pro_problemno = problem.`pro_problemno` 
+        AND test.pro_status = 'F' 
+        AND remoteSupport.caa_consno = engineer.`cns_consno` 
+        AND fixedActivity.caa_consno = engineer.`cns_consno` 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            remoteSupport.caa_starttime,
+            initial.caa_endtime
+          )
+        ) <= (5 * 60) 
+        AND TIME_TO_SEC(
+          TIMEDIFF(
+            fixedActivity.caa_starttime,
+            remoteSupport.caa_endtime
+          )
+        ) <= (5 * 60) limit 1),
+      0
+    )
+  ) AS firstTimeFix,
+  SUM(1) AS totalRaised  
+FROM
+  problem 
+  JOIN callactivity initial 
+    ON initial.caa_problemno = problem.pro_problemno 
+    AND initial.caa_callacttypeno = 51 
+  JOIN consultant engineer 
+    ON initial.`caa_consno` = engineer.`cns_consno` 
+WHERE problem.`pro_custno` <> 282 
+  AND initial.caa_date = CURRENT_DATE 
+  AND engineer.`teamID` = 1 
+GROUP BY engineer.`cns_consno`  order by engineer.firstName"
+        );
+
+        $totalRaised = 0;
+        $totalAttempted = 0;
+        $totalAchieved = 0;
+        $data = [
+            "engineers"      => [],
+            "totalRaised"    => 0,
+            "totalAttempted" => 0,
+            "totalAchieved"  => 0
+        ];
+
+        while ($row = $result->fetch_assoc()) {
+            $data["engineers"][] = [
+                'name'                  => $row['name'],
+                'firstTimeFix'          => $row['firstTimeFix'],
+                'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],
+                'totalRaised'           => $row['totalRaised']
+            ];
+
+
+            $data['totalRaised'] += $row['totalRaised'];
+            $data['totalAttempted'] += $row['attemptedFirstTimeFix'];
+            $data['totalAchieved'] += $row['firstTimeFix'];
+        }
+
+        $monthlyFigures = $this->getRunningMonthFirstTimeFixedFigures();
+
+        $data['firstTimeFixAttemptedPct'] = $totalRaised > 0 ? round(
+            ($totalAttempted / $totalRaised) * 100
+        ) : 'N/A';
+        $data['firstTimeFixAchievedPct'] = $totalRaised > 0 ? round(
+            ($totalAchieved / $totalRaised) * 100
+        ) : 'N/A';
+        $data['phonedThroughRequests'] = $totalRaised;
+        $data['monthlyFirstTimeFixAttemptedPct'] = $monthlyFigures['totalRaised'] ? round(
+            ($monthlyFigures['attemptedFirstTimeFix'] / $monthlyFigures['totalRaised']) * 100
+        ) : 'N/A';
+        $data['monthlyFirstTimeFixAchievedPct'] = $monthlyFigures['totalRaised'] > 0 ? round(
+            ($monthlyFigures['firstTimeFix'] / $monthlyFigures['totalRaised']) * 100
+        ) : 'N/A';
+        $data['monthlyPhonedThroughRequests'] = $monthlyFigures['totalRaised'];
+        return $data;
     }
 }// end of class
 ?>

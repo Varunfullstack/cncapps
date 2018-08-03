@@ -1,80 +1,99 @@
 BODY {
-	FONT-FAMILY: arial,sans-serif;
-	font-size: 1em;
+    FONT-FAMILY: arial, sans-serif;
+    font-size: 1em;
 }
+
 INPUT {
-	font-size: 1em;
+    font-size: 1em;
 }
+
 SELECT {
-	font-size: 1em;
+    font-size: 1em;
 }
+
 .checkbox, .icon {
- 	height: 1em;
-	width: 1em;
+    height: 1em;
+    width: 1em;
 }
+
 INPUT.filter {
-	width: 100%;
+    width: 100%;
 }
+
 FORM {
-	margin: 0px;
-	padding: 0px; 
+    margin: 0px;
+    padding: 0px;
 }
+
 P {
-	font-size: 1em;
+    font-size: 1em;
 }
+
 A {
-	font-size: 1em;
+    font-size: 1em;
 }
+
 DIV {
-	COLOR: #000
+    COLOR: #000
 }
+
 TD {
-	COLOR: #000
-	font-size: 1em;
+    COLOR: #000;
+    font-size: 1em;
 }
+
 TH.filter {
-	background-color: #CCCCCC;
-	font-style: normal;
-	font-weight: normal;
-	color: #336600;
-	font-size: 1em;
+    background-color: #CCCCCC;
+    font-style: normal;
+    font-weight: normal;
+    color: #336600;
+    font-size: 1em;
 }
+
 .column_heading {
-	background-color: #EAEBE9;
-	font-size: 1em;
+    background-color: #EAEBE9;
+    font-size: 1em;
 }
+
 .inactive {
-	background-color: #FFD7D7;
+    background-color: #FFD7D7;
 }
+
 .formError {
-	font-size: 1em;
-	color: #FF0066;
+    font-size: 1em;
+    color: #FF0066;
 }
+
 .formValue {
-	font-size: smaller;
-	color: black;
-	font-size: 1em;
+    font-size: smaller;
+    color: black;
+    font-size: 1em;
 }
+
 .formLabel {
-	font-size: smaller;
-	color: blue;
-	font-size: 1em;
+    font-size: smaller;
+    color: blue;
+    font-size: 1em;
 }
-.tableValue{
-	color: black;
-	font-size: 1em;
+
+.tableValue {
+    color: black;
+    font-size: 1em;
 }
-.info{
-	color: grey;
-	font-size: -1em;
-	font-family: Arial, Helvetica, sans-serif;
+
+.info {
+    color: grey;
+    font-family: Arial, Helvetica, sans-serif;
 }
+
 .errorBG {
-	background-color: #FFD7D7;
+    background-color: #FFD7D7;
 }
+
 .input_error {
-	background-color: #FF8080;
+    background-color: #FF8080;
 }
+
 tr.profitAlertClass td {
-  background-color: #F7DADF;
+    background-color: #F7DADF;
 }
