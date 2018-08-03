@@ -6,6 +6,8 @@
     <changeSet author="pavwebdev" id="release1.10.0-1532513772-0">
         <tagDatabase tag="Release-1.10.0"/>
     </changeSet>
-    <includeAll path="./1.10.0"/>
+    <include file="db.changelog-issue259.xml"/>
+    <include file="db.changelog-issue314.xml"/>
+    <include file="db.changelog-issue309.xml"/>
 </databaseChangeLog>
 
