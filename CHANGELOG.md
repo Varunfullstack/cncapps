@@ -15,7 +15,6 @@ This project changes will be shown here.
 - Added Weekly Fixed and Reopened figures
 - Create script to send emails from Labtech database
 
-
 ## [v1.9.1] - 2018-07-26
 ### Fixed
 - 2nd Site Backup out of date calculations
