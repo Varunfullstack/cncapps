@@ -51,7 +51,7 @@ class BUSecondsiteReplication extends BUSecondsite
 
             if (
                 $server['itm_itemtypeno'] == CONFIG_2NDSITE_LOCAL_ITEMTYPEID &&
-                $server['secondSiteReplicationExcludeFlag'] == 'Y'
+                $server[DBECustomerItem::secondSiteReplicationExcludeFlag] == 'Y'
             ) {
                 $this->excludedLocalServers[] = $server;
 
@@ -457,10 +457,11 @@ class BUSecondsiteReplication extends BUSecondsite
         i.itm_itemtypeno,
         ser.cui_cuino AS server_cuino,
         ser.cui_cust_ref AS serverName,
-        ser.secondSiteReplicationPath,
+        ser.secondSiteReplicationPath, 
         ser.secondsiteValidationSuspendUntilDate,
         ser.secondsiteImageDelayDays,
         ser.secondsiteLocalExcludeFlag,
+        ser.secondSiteReplicationExcludeFlag,
         delayuser.cns_name AS delayUser,
         ser.secondsiteImageDelayDate,
         suspenduser.cns_name AS suspendUser,
