@@ -82,24 +82,17 @@ class CTFirstTimeFixReport extends CTCNC
             array('action' => CTCNC_ACT_SEARCH)
         );
 
-        $this->setPageTitle('Escalation Report');
+        $this->setPageTitle('First Time Fix Report');
 
         $this->template->set_var(
             array(
-                'formError'        => $this->formError,
-                'fromDate'         => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('fromDate')),
-                'fromDateMessage'  => $this->dsSearchForm->getMessage('fromDate'),
-                'toDate'           => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('toDate')),
-                'toDateMessage'    => $this->dsSearchForm->getMessage('toDate'),
-                'urlSubmit'        => $urlSubmit,
-                'teamReport'       => $teamReport,
-                'technicianReport' => $technicianReport
+                'urlSubmit' => $urlSubmit,
             )
         );
 
         $this->template->parse(
             'CONTENTS',
-            'EscalationReport',
+            'FirstTimeFixReport',
             true
         );
 
