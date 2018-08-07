@@ -1,0 +1,35 @@
+<script>
+    function doSearch() {
+        return false;
+    }
+</script>
+<form action=""
+      onsubmit="return doSearch();"
+>
+    <div>
+        <div>
+            <label for="customerName">
+                Customer Name
+            </label>
+            <input type="text"
+                   id="customerName"
+            >
+            <input type="hidden"
+                   id="customerID"
+            >
+        </div>
+        <div>
+            <label for="engineerSelect">
+                Engineer
+            </label>
+            <select id="engineerSelect">
+                <option value="">All</option>
+                <!-- BEGIN userBlock -->
+                <option value="{userID}">
+                    {userName}
+                </option>
+                <!-- END userBlock -->
+        </div>
+    </div>
+
+</form>
