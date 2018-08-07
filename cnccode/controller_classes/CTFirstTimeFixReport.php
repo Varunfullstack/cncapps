@@ -82,11 +82,21 @@ class CTFirstTimeFixReport extends CTCNC
             array('action' => CTCNC_ACT_SEARCH)
         );
 
+        $customerPopupURL =
+            $this->buildLink(
+                CTCNC_PAGE_CUSTOMER,
+                array(
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+
         $this->setPageTitle('First Time Fix Report');
 
         $this->template->set_var(
             array(
-                'urlSubmit' => $urlSubmit,
+                'urlSubmit'        => $urlSubmit,
+                'customerPopupURL' => $customerPopupURL
             )
         );
 

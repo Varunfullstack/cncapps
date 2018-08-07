@@ -1,6 +1,28 @@
+<style>
+    label {
+        float: left;
+        width: 10em;
+        margin-right: 1em;
+    }
+</style>
 <script>
     function doSearch() {
         return false;
+    }
+
+    function validateCustomerName() {
+        if (Trim(document.getElementById("customerName").value) != "") {
+            if (document.getElementById("customerName").value != savedCustomerName) {
+                window.open('{customerPopupURL}&customerString=' +
+                    escape(document.getElementById("customerName").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerName',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.report.customerID.value = "";
+        }
     }
 </script>
 <form action=""
@@ -13,6 +35,7 @@
             </label>
             <input type="text"
                    id="customerName"
+                   onchange="validateCustomerName()"
             >
             <input type="hidden"
                    id="customerID"
