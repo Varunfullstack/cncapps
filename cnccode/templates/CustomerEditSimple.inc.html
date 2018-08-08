@@ -852,7 +852,33 @@
         >{customerNoteDetails}
         </textarea>
             </div>
+            <div>
+                <script>
+                    function selectAllToSignContracts() {
+                        console.log(event.target);
+                        event.target
+                    }
+                </script>
+                <h2>Send Contracts to be signed</h2>
+                <label for="toSignContracts">Contracts: </label>
+                <select name="contracts"
+                        id="toSignContracts"
+                        multiple
+                >
+                    <!-- BEGIN toSignContractsBlock -->
+                    {optGroupClose}
+                    {optGroupOpen}
+                    <option value="{toSignContractID}">
+                        {toSignContractName}
+                    </option>
+                    <!-- END toSignContractsBlock -->
+                    </optgroup>
+                </select>
+                <button type="button" onclick="selectAllToSignContracts()">Select All</button>
 
+                <button type="button">Preview</button>
+                <button type="button">Send</button>
+            </div>
         </div> <!-- customerEditMainRightColumn -->
 
     </div> <!-- customerEditMain -->

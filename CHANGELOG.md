@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 273 - Allow for contracts & T&Cs to be manually sent to a customer.
+
 ## [v1.10.1] - 2018-08-03
 ### Fixed
 - Fixed issue with First Time Fixes totals
