@@ -254,8 +254,6 @@ WHERE problem.`pro_custno` <> 282
         $query .= " GROUP BY engineer.`cns_consno` 
 ORDER BY engineer.firstName";
 
-
-        var_dump($query);
         $result = $db->query($query);
 
         $totalRaised = 0;
