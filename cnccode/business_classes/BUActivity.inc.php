@@ -1182,7 +1182,7 @@ class BUActivity extends Business
                 $dbeContact = new DBEContact($this);
 
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
-                
+
                 $dbeContact->setValue(
                     DBEContact::notes,
                     $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
@@ -10455,22 +10455,31 @@ is currently a balance of ';
 
         $body = $template->get_var('output');
 
-        $body = preg_replace(
-            '/[\x00-\x1F\x7F-\xFF]/',
-            '',
-            $body
-        );
-        $body = preg_replace(
-            '/[\x00-\x1F\x7F]/',
-            '',
-            $body
-        );
-        $body = preg_replace(
-            '/[\x00-\x1F\x7F]/u',
-            '',
-            $body
+//        $body = preg_replace(
+//            '/[\x00-\x1F\x7F-\xFF]/',
+//            '',
+//            $body
+//        );
+//        $body = preg_replace(
+//            '/[\x00-\x1F\x7F]/',
+//            '',
+//            $body
+//        );
+//        $body = preg_replace(
+//            '/[\x00-\x1F\x7F]/u',
+//            '',
+//            $body
+//        );
+
+        $buMail->mime->setHTMLBody($body);
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
+        $body = $buMail->mime->get($mime_params);
         foreach ($monitoringPeople as $monitoringPerson) {
             $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
 
@@ -10483,18 +10492,6 @@ is currently a balance of ';
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
-
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 
