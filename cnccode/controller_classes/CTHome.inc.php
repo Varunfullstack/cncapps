@@ -1329,7 +1329,7 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
           ON fixedActivity.caa_problemno = test.pro_problemno 
           AND fixedActivity.caa_callacttypeno = 57 
       WHERE test.pro_problemno = problem.`pro_problemno` 
-        AND test.pro_status = 'F' 
+        AND (test.pro_status = 'F' OR test.pro_status = 'C')
         AND remoteSupport.caa_consno = engineer.`cns_consno` 
         AND fixedActivity.caa_consno = engineer.`cns_consno` 
         AND TIME_TO_SEC(
@@ -1423,7 +1423,7 @@ WHERE problem.`pro_custno` <> 282
           ON fixedActivity.caa_problemno = test.pro_problemno 
           AND fixedActivity.caa_callacttypeno = 57 
       WHERE test.pro_problemno = problem.`pro_problemno` 
-        AND test.pro_status = 'F' 
+        AND (test.pro_status = 'F' OR test.pro_status = 'C')
         AND remoteSupport.caa_consno = engineer.`cns_consno` 
         AND fixedActivity.caa_consno = engineer.`cns_consno` 
         AND TIME_TO_SEC(
