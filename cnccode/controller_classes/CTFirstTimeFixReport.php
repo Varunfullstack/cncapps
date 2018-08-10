@@ -43,12 +43,18 @@ class CTFirstTimeFixReport extends CTCNC
 
                 $startDate = null;
                 if (@$_REQUEST['startDate']) {
-                    $startDate = new DateTime($_REQUEST['startDate']);
+                    $startDate = DateTime::createFromFormat(
+                        'd/m/Y',
+                        $_REQUEST['startDate']
+                    );
                 }
 
                 $endDate = null;
                 if (@$_REQUEST['endDate']) {
-                    $endDate = new DateTime($_REQUEST['endDate']);
+                    $endDate = DateTime::createFromFormat(
+                        'd/m/Y',
+                        $_REQUEST['endDate']
+                    );
                 }
                 echo json_encode(
                     $this->getFirstTimeFixData(
@@ -145,7 +151,7 @@ class CTFirstTimeFixReport extends CTCNC
     engineer.`firstName`,
     ' ',
     engineer.`lastName`
-  ) AS NAME,
+  ) AS name,
   SUM(
     COALESCE(
       (SELECT 
