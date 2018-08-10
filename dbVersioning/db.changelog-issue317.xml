@@ -17,11 +17,11 @@
                 <constraints primaryKey="true"/>
             </column>
             <column name="customerID" type="INT UNSIGNED"/>
-            <column name="software" type="varchar"/>
-            <column name="vendor" type="varchar"/>
-            <column name="phone" type="varchar"/>
-            <column name="email" type="varchar"/>
-            <column name="notes" type="varchar"/>
+            <column name="software" type="MEDIUMTEXT"/>
+            <column name="vendor" type="MEDIUMTEXT"/>
+            <column name="phone" type="MEDIUMTEXT"/>
+            <column name="email" type="MEDIUMTEXT"/>
+            <column name="notes" type="MEDIUMTEXT"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
