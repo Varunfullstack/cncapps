@@ -6,6 +6,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Signable\ApiClient;
+use Signable\DocumentWithoutTemplate;
+use Signable\Envelopes;
+use Signable\Party;
+
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -994,6 +1000,32 @@ class CTCustomer extends CTCNC
             case 'csvContractAndNumbersReport':
                 $this->csvContractAndNumbersReport();
                 break;
+            case 'previewPDF':
+
+
+                echo json_encode(
+                    [
+                        'PDFPath' => $this->generatePDFContract(
+                            $_REQUEST['customerID'],
+                            $_REQUEST['contractsIDs']
+                        )
+                    ]
+                );
+                break;
+            case 'sendPDF':
+
+
+                echo json_encode(
+                    [
+                        'status' => $this->sendPDFContract(
+                            $_REQUEST['PDFPath'],
+                            $_REQUEST['contactID'],
+                            $_REQUEST['message'],
+                            $_REQUEST['customerID']
+                        )
+                    ]
+                );
+                break;
             default:
                 $this->displaySearchForm();
                 break;
@@ -1716,7 +1748,7 @@ ORDER BY cus_name ASC  ";
         );
 
 
-        uasort(
+        usort(
             $contracts,
             function ($a,
                       $b
@@ -1742,26 +1774,26 @@ ORDER BY cus_name ASC  ";
             'toSignContracts'
         );
         $lastContractType = null;
-        foreach ($contracts as $contract) {
+        foreach ($contracts as $contact) {
 
-            if ($contract['itemTypeDescription'] != $lastContractType) {
+            if ($contact['itemTypeDescription'] != $lastContractType) {
                 if ($lastContractType) {
                     $optGroupClose = '</optgroup>';
                 } else {
                     $optGroupClose = '';
                 }
 
-                $optGroupOpen = '<optgroup label="' . $contract['itemTypeDescription'] . '">';
+                $optGroupOpen = '<optgroup label="' . $contact['itemTypeDescription'] . '">';
             } else {
                 $optGroupOpen = '';
                 $optGroupClose = '';
             }
-            $lastContractType = $contract['itemTypeDescription'];
+            $lastContractType = $contact['itemTypeDescription'];
 
             $this->template->set_var(
                 array(
-                    'toSignContractID'   => $contract['customerItemID'],
-                    'toSignContractName' => $contract['itemDescription'],
+                    'toSignContractID'   => $contact['customerItemID'],
+                    'toSignContractName' => $contact['itemDescription'],
                     'optGroupOpen'       => $optGroupOpen,
                     'optGroupClose'      => $optGroupClose
                 )
@@ -1772,6 +1804,32 @@ ORDER BY cus_name ASC  ";
                 true
             );
         }
+
+
+        $mainContacts = $this->buCustomer->getMainSupportContacts($this->getCustomerID());
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'toSignContactsBlock',
+            'toSignContacts'
+        );
+
+        foreach ($mainContacts as $contact) {
+
+            $this->template->set_var(
+                array(
+                    'toSignContactID'   => $contact['contactID'],
+                    'toSignContactName' => $contact['firstName'] . ' ' . $contact['lastName'],
+                )
+            );
+            $this->template->parse(
+                'toSignContacts',
+                'toSignContactsBlock',
+                true
+            );
+        }
+
+
         if ($_SESSION['save_page']) {
             $cancelURL = $_SESSION['save_page'];
         } else {
@@ -1897,6 +1955,7 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_var(
             array(
+                'lastContractSent'                => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
                 'urlContactPopup'                 => $urlContactPopup,
                 'bodyTagExtras'                   => $bodyTagExtras,
                 /* hidden */
@@ -3208,9 +3267,367 @@ ORDER BY cus_name ASC  ";
             } // end while
 
         } // end if
-
-
     } // end function documents
+
+    function generatePDFContract($customerID,
+                                 $contractsIDs
+    )
+    {
+        $mainPDF = new \setasign\Fpdi\Fpdi();
+        $this->addPages(
+            $mainPDF,
+            $contractsIDs
+        );
+
+        $pageCount = $mainPDF->setSourceFile(
+            PDF_RESOURCE_DIR . '/Terms & Conditions April 2018 branded.pdf'
+        );
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $pageId = $mainPDF->importPage($pageNo);
+            $s = $mainPDF->getTemplatesize($pageId);
+            $mainPDF->AddPage(
+                $s['orientation'],
+                $s
+            );
+            $mainPDF->useImportedPage($pageId);
+        }
+
+        $pageCount = $mainPDF->setSourceFile(PDF_RESOURCE_DIR . '/lastPage.pdf');
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $pageId = $mainPDF->importPage($pageNo);
+            $s = $mainPDF->getTemplatesize($pageId);
+            $mainPDF->AddPage(
+                $s['orientation'],
+                $s
+            );
+            $mainPDF->useImportedPage($pageId);
+        }
+
+        $fileName = PDF_TEMP_DIR . '/' . $customerID . '-Contracts.pdf';
+
+        $mainPDF->Output(
+            'F',
+            $fileName
+        );
+
+        $fileName = str_replace(
+            BASE_DRIVE . '/htdocs',
+            "",
+            $fileName
+        );
+
+        return $fileName;
+    }
+
+    function runIt($customerID,
+                   $firstName,
+                   $lastName,
+                   $emailAddress,
+                   $sendToSignable = false
+    )
+    {
+
+        $buCustomerItem = new BUCustomerItem($this);
+
+// Start contracts
+        $dbeJRenContract = new DBEJRenContract($this);
+        $dbeJRenContract->getRowsByCustomerID($customerID);
+        // broadband
+        $dbeJRenBroadband = new DBEJRenBroadband($this);
+        $dbeJRenBroadband->getRowsByCustomerID($customerID);
+// Hosting
+        $dbeJRenHosting = new DBEJRenHosting($this);
+        $dbeJRenHosting->getRowsByCustomerID($customerID);
+
+        $contracts = array_merge(
+            [],
+            $this->extractValidContracts($dbeJRenContract),
+            $this->extractValidContracts($dbeJRenBroadband),
+            $this->extractValidContracts($dbeJRenHosting)
+        );
+
+
+        uasort(
+            $contracts,
+            function ($a,
+                      $b
+            ) {
+                if (strcmp(
+                        $a['itemTypeDescription'],
+                        $b['itemTypeDescription']
+                    ) === 0) {
+                    return strcmp(
+                        $a['itemDescription'],
+                        $b['itemDescription']
+                    );
+                }
+                return strcmp(
+                    $a['itemTypeDescription'],
+                    $b['itemTypeDescription']
+                );
+            }
+        );
+
+
+        if ($sendToSignable) {
+
+            $buMail = new BUMail($this);
+
+            $toEmail = $emailAddress;
+
+            $hdrs = array(
+                'From'         => 'support@cnc-ltd.co.uk',
+                'To'           => $toEmail,
+                'Subject'      => "General Data Protection Regulations - Action Required",
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            // add name to top of email
+            $thisBody = "<div style='font-family: Arial, sans-serif; font-size: 10pt'>
+<p>Dear $firstName,</p>
+<p>Following on with our recent communication regarding compliance with the new General Data Protection Regulations that are coming into force on the 25th May 2018, CNC have made some changes to our terms of conditions.</p>
+<p>
+We are therefore re-issuing new contract schedules and terms and conditions to all customers that must be signed and in place ready for this new legislation.
+</p>
+<p>
+It is important that you or someone with the authority within your company to sign the attached documents does so before the above date to allow us to continue to provide the key services to your organisation.  We’ve now provided this using an e-sign option to make this process as simple as possible.
+</p>
+<p>
+These new terms and conditions include a specific section in relation to data protection and reflect the current CNC product and service offerings as well as general changes in the market place since our last issue in 2014.
+</p>
+ <p>
+If you have any questions then please do not hesitate to contact us.
+</p>
+<p>
+Many thanks. 
+</p>
+</div>
+";
+
+            $buMail->mime->setHTMLBody($thisBody);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $thisBody = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->send(
+                $emailAddress,
+                $hdrs,
+                $thisBody
+            );
+
+            $this->generateEnvelope(
+                $fileName,
+                $firstName,
+                $lastName,
+                $emailAddress,
+                $customerID
+            );
+        }
+
+        ?>
+        <div>
+            First Name: <?= $firstName ?>
+        </div>
+        <div>
+            Last Name: <?= $lastName ?>
+        </div>
+        <div>
+            Email: <?= $emailAddress ?>
+        </div>
+
+        <a href="<?= $fileName ?>">Link</a>
+        <?php
+    }
+
+
+    function addPages(\setasign\Fpdi\Fpdi $mainPDF,
+                      $contractsIDs
+    )
+    {
+
+        foreach ($contractsIDs as $contractID) {
+            // Validation and setting of variables
+
+            $buCustomerItem = new BUCustomerItem($this);
+            $buCustomerItem->getCustomerItemByID(
+                $contractID,
+                $dsContract
+            );
+            $buCustomerItem->getCustomerItemsByContractID(
+                $contractID,
+                $dsCustomerItem
+            );
+
+            $buSite = new BUSite($this);
+            $buActivity = new BUActivity($this);
+            $buCustomer = new BUCustomer($this);
+            $buCustomer->getCustomerByID(
+                $dsContract->getValue('customerID'),
+                $dsCustomer
+            );
+            $buSite->getSiteByID(
+                $dsContract->getValue('customerID'),
+                $dsContract->getValue('siteNo'),
+                $dsSite
+            );
+            $customerHasServiceDeskContract = $buCustomerItem->customerHasServiceDeskContract(
+                $dsContract->getValue('customerID')
+            );
+
+            $buPDFSupportContract =
+                new BUPDFSupportContract(
+                    $this,
+                    $dsContract,
+                    $dsCustomerItem,
+                    $dsSite,
+                    $dsCustomer,
+                    $buActivity,
+                    $customerHasServiceDeskContract
+                );
+
+            $pdfFile = $buPDFSupportContract->generateFile(false);
+
+            $pageCount = $mainPDF->setSourceFile($pdfFile);
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $pageId = $mainPDF->importPage($pageNo);
+                $s = $mainPDF->getTemplatesize($pageId);
+                $mainPDF->AddPage(
+                    $s['orientation'],
+                    $s
+                );
+                $mainPDF->useImportedPage($pageId);
+            }
+        }
+
+    }
+
+
+    function generateEnvelope($fileName,
+                              $firstName,
+                              $lastName,
+                              $email,
+                              $customerID
+    )
+    {
+
+    }
+
+    private function sendPDFContract($PDFPath,
+                                     $contactID,
+                                     $message,
+                                     $customerID
+    )
+    {
+        ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
+
+        $envDocs = [];
+
+        $file = basename($PDFPath);
+
+        $fileName = PDF_TEMP_DIR . '/' . $file;
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($contactID);
+
+        $firstName = $dbeContact->getValue(DBEContact::firstName);
+        $lastName = $dbeContact->getValue(DBEContact::lastName);
+        $email = $dbeContact->getValue(DBEContact::email);
+        global $server_type;
+        if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
+            $email = "sales@cnc-ltd.co.uk";
+        }
+
+        $envelopeDocument = new DocumentWithoutTemplate(
+            'CNC Contracts with Terms & Conditions',
+            null,
+            base64_encode(file_get_contents($fileName)),
+            "CNCContractsTCs.pdf"
+        );
+
+        $envDocs[] = $envelopeDocument;
+
+        $envelopeParties = [];
+
+        $envelopeParty = new Party(
+            $firstName . ' ' . $lastName,
+            $email,
+            'signer1',
+            'Please sign here',
+            'no',
+            false
+        );
+        $envelopeParties[] = $envelopeParty;
+
+
+        $response = Envelopes::createNewWithoutTemplate(
+            "Document #" . $customerID . "_" . uniqid(),
+            $envDocs,
+            $envelopeParties,
+            null,
+            false,
+            null,
+            0,
+            0
+        );
+
+        if ($response && $response->http == 202) {
+            $buMail = new BUMail($this);
+
+            $hdrs = array(
+                'From'         => 'support@cnc-ltd.co.uk',
+                'To'           => $email,
+                'Subject'      => "CNC Contracts and Terms & Conditions to be signed",
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $thisBody = $message;
+
+            $buMail->mime->setHTMLBody($thisBody);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $thisBody = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->send(
+                $email,
+                $hdrs,
+                $thisBody
+            );
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($customerID);
+            $dbeCustomer->setValue(
+                DBECustomer::lastContractSent,
+                "Documents last sent to " . $firstName . ' ' . $lastName . " on " .
+                (new DateTime())->format('d/m/Y h:i') .
+                " by " .
+                $this->dbeUser->getValue(DBEUser::firstName) .
+                " " .
+                $this->dbeUser->getValue(DBEUser::lastName)
+            );
+            $dbeCustomer->updateRow();
+
+            return true;
+        }
+        return false;
+    }
 
 }// end of class
 ?>
