@@ -3606,11 +3606,14 @@ Many thanks.
 
             $hdrs = $buMail->mime->headers($hdrs);
 
-            $buMail->send(
+            $sent = $buMail->send(
                 $email,
                 $hdrs,
                 $thisBody
             );
+
+            var_dump($sent);
+
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($customerID);
             $dbeCustomer->setValue(
