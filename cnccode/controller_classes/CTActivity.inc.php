@@ -2123,6 +2123,9 @@ class CTActivity extends CTCNC
                 ),
                 'passwordLink'                       => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
                 'generatePasswordLink'               => $this->getGeneratePasswordLink(),
+                'thirdPartyContactLink'              => $this->getThirdPartyContactLink(
+                    $dsCallActivity->getValue('customerID')
+                ),
                 'contractListPopupLink'              => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
                 ),
@@ -2398,6 +2401,23 @@ class CTActivity extends CTCNC
         $passwordLink = '| <a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Passwords</a>';
 
         return $passwordLink;
+    }
+
+    function getThirdPartyContactLink($customerID)
+    {
+        $thirdPartyContactLinkURL =
+            $this->buildLink(
+                'ThirdPartyContact.php',
+                array(
+                    'action'     => 'list',
+                    'customerID' => $customerID
+                )
+            );
+
+
+        $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">ThirdPartyContacts</a>';
+
+        return $thirdPartyContactLink;
     }
 
     function getGeneratePasswordLink()
@@ -3339,6 +3359,9 @@ class CTActivity extends CTCNC
                     $_SESSION[$this->sessionKey]['hideFromCustomerFlag']
                 ),
                 'passwordLink'                => $this->getPasswordLink($_SESSION[$this->sessionKey]['customerID']),
+                'thirdPartyContactLink'       => $this->getThirdPartyContactLink(
+                    $_SESSION[$this->sessionKey]['customerID']
+                ),
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,
                 'submitURL'                   => $submitURL,
@@ -4069,6 +4092,9 @@ class CTActivity extends CTCNC
                 'currentDocumentsLink'         => $currentDocumentsLink,
                 'renewalsLink'                 => $renewalsLink,
                 'passwordLink'                 => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
+                'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
+                    $dsCallActivity->getValue('customerID')
+                ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
                     $dsCallActivity->getValue('linkedSalesOrderID')
