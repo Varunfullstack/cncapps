@@ -1020,7 +1020,7 @@ class CTCustomer extends CTCNC
                         'status' => $this->sendPDFContract(
                             $_REQUEST['PDFPath'],
                             $_REQUEST['contactID'],
-                            $_REQUEST['message'],
+                            $_REQUEST['signableMessage'],
                             $_REQUEST['customerID']
                         )
                     ]
@@ -3606,13 +3606,11 @@ Many thanks.
 
             $hdrs = $buMail->mime->headers($hdrs);
 
-            $sent = $buMail->send(
+            $buMail->send(
                 $email,
                 $hdrs,
                 $thisBody
             );
-
-            var_dump($sent);
 
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($customerID);
