@@ -7,7 +7,7 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEThirdPartyContact extends DBEntity
 {
-    const ID = "thirdPartyContactID";
+    const thirdPartyContactID = "thirdPartyContactID";
     const customerID = "customerID";
     const software = "software";
     const vendor = "vendor";
@@ -27,7 +27,7 @@ class DBEThirdPartyContact extends DBEntity
         parent::__construct($owner);
         $this->setTableName("third_party_contact");
         $this->addColumn(
-            self::ID,
+            self::thirdPartyContactID,
             DA_ID,
             DA_NOT_NULL
         );

@@ -13,7 +13,7 @@
             </not>
         </preConditions>
         <createTable tableName="third_party_contact">
-            <column name="ID" type="INT UNSIGNED" autoIncrement="true">
+            <column name="ThirdPartyContactID" type="INT UNSIGNED" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="customerID" type="INT UNSIGNED"/>

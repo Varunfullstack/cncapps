@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 317 - Customer 3rd party contact information
+
 ## [v1.10.1] - 2018-08-03
 ### Fixed
 - Fixed issue with First Time Fixes totals

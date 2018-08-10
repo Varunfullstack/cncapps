@@ -168,8 +168,6 @@ class CTThirdPartyContact extends CTCNC
         );
 
         if ($dsThirdPartyContact) {
-
-
             $urlAdd =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
@@ -239,23 +237,26 @@ class CTThirdPartyContact extends CTCNC
                     );
 
                 if (strpos(
-                        $dsThirdPartyContact->getValue('notes'),
+                        $dsThirdPartyContact->getValue(DBEThirdPartyContact::notes),
                         'http'
                     ) !== false) {
                     $notes = '<A href="' . $dsThirdPartyContact->getValue(
-                            'notes'
-                        ) . '" target="_blank">' . $dsThirdPartyContact->getValue('notes') . '</a>';
+                            DBEThirdPartyContact::notes
+                        ) . '" target="_blank">' . $dsThirdPartyContact->getValue(DBEThirdPartyContact::notes) . '</a>';
                 } else {
-                    $notes = $dsThirdPartyContact->getValue('notes');
+                    $notes = $dsThirdPartyContact->getValue(DBEThirdPartyContact::notes);
                 }
 
                 $this->template->set_var(
                     array(
-                        'thirdPartyContactID' => $dsThirdPartyContact->getValue('thirdPartyContactID'),
-                        'customerID'          => $dsThirdPartyContact->getValue('customerID'),
-                        'username'            => $dsThirdPartyContact->getValue('username'),
-                        'service'             => $dsThirdPartyContact->getValue('service'),
-                        'thirdPartyContact'   => $dsThirdPartyContact->getValue('thirdPartyContact'),
+                        'thirdPartyContactID' => $dsThirdPartyContact->getValue(
+                            DBEThirdPartyContact::thirdPartyContactID
+                        ),
+                        'customerID'          => $dsThirdPartyContact->getValue(DBEThirdPartyContact::customerID),
+                        'software'            => $dsThirdPartyContact->getValue(DBEThirdPartyContact::software),
+                        'vendor'              => $dsThirdPartyContact->getValue(DBEThirdPartyContact::vendor),
+                        'phone'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::phone),
+                        'email'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::email),
                         'notes'               => $notes,
                         'urlEdit'             => $urlEdit,
                         'urlDelete'           => $urlDelete
@@ -267,6 +268,7 @@ class CTThirdPartyContact extends CTCNC
                     'thirdPartyContactBlock',
                     true
                 );
+
             }//while $dsThirdPartyContact->fetchNext()
             $this->template->parse(
                 'CONTENTS',
@@ -274,6 +276,7 @@ class CTThirdPartyContact extends CTCNC
                 true
             );
         }
+
         $this->parsePage();
     }
 
@@ -345,17 +348,14 @@ class CTThirdPartyContact extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerID'               => $dsThirdPartyContact->getValue('customerID'),
-                'thirdPartyContactID'      => $dsThirdPartyContact->getValue('thirdPartyContactID'),
-                'username'                 => $dsThirdPartyContact->getValue('username'),
-                'usernameMessage'          => $dsThirdPartyContact->getMessage('username'),
-                'service'                  => $dsThirdPartyContact->getValue('service'),
-                'serviceMessage'           => $dsThirdPartyContact->getMessage('service'),
-                'thirdPartyContact'        => $dsThirdPartyContact->getValue('thirdPartyContact'),
-                'thirdPartyContactMessage' => $dsThirdPartyContact->getMessage('thirdPartyContact'),
-                'notes'                    => $dsThirdPartyContact->getValue('notes'),
-                'notesMessage'             => $dsThirdPartyContact->getMessage('notes'),
-                'urlEdit'                  => $urlEdit
+                'customerID'          => $dsThirdPartyContact->getValue(DBEThirdPartyContact::customerID),
+                'thirdPartyContactID' => $dsThirdPartyContact->getValue(DBEThirdPartyContact::thirdPartyContactID),
+                'software'            => $dsThirdPartyContact->getValue(DBEThirdPartyContact::software),
+                'vendor'              => $dsThirdPartyContact->getValue(DBEThirdPartyContact::vendor),
+                'phone'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::phone),
+                'email'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::email),
+                'notes'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::notes),
+                'urlEdit'             => $urlEdit
             )
         );
 

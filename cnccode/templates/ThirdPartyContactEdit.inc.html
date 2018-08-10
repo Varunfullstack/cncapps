@@ -1,0 +1,88 @@
+<!-- Template: thirdPartyContactEdit.inc.html -->
+<FORM method="post"
+      action="{urlUpdate}"
+      name="thirdPartyContact"
+      AUTOCOMPLETE="OFF"
+>
+    <table width="700px"
+           border="0"
+    >
+        <input
+                type="hidden"
+                name="thirdPartyContact[1][customerID]"
+                value="{customerID}"
+        >
+        <input
+                type="hidden"
+                name="thirdPartyContact[1][thirdPartyContactID]"
+                value="{thirdPartyContactID}"
+        >
+        <tr>
+            <td class="promptText">Software</td>
+            <td class="fieldText"><input
+                    name="thirdPartyContact[1][software]"
+                    type="text"
+                    value="{software}"
+                    title="e.g. login name"
+                    size="100"
+                    maxlength="100"
+            >
+                <span class="formErrorMessage">{softwareMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Vendor</td>
+            <td class="fieldText"><input
+                    name="thirdPartyContact[1][vendor]"
+                    type="text"
+                    value="{vendor}"
+                    title="e.g. login name"
+                    size="100"
+                    maxlength="100"
+            >
+                <span class="formErrorMessage">{vendorMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Phone</td>
+            <td class="fieldText"><input
+                    name="thirdPartyContact[1][phone]"
+                    type="text"
+                    value="{phone}"
+                    title="e.g. login name"
+                    size="100"
+                    maxlength="100"
+            >
+                <span class="formErrorMessage">{phoneMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Email</td>
+            <td class="fieldText"><input
+                    name="thirdPartyContact[1][email]"
+                    type="text"
+                    value="{email}"
+                    title="e.g. login name"
+                    size="100"
+                    maxlength="100"
+            >
+                <span class="formErrorMessage">{emailMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Notes</td>
+            <td class="fieldText"><input
+                    name="thirdPartyContact[1][notes]"
+                    type="text"
+                    value="{notes}"
+                    title="e.g. login name"
+                    size="100"
+                    maxlength="100"
+            >
+                <span class="formErrorMessage">{notesMessage}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit"
+                                                name="Submit"
+                                                value="Update"
+            ></td>
+        </tr>
+    </table>
+</form>
