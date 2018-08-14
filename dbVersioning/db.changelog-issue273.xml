@@ -16,4 +16,18 @@
             <column name="lastContractSent" type="varchar(150)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue273-1533889498-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="standardtexttype" columnName="variables"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="standardtexttype">
+            <column name="variables" type="mediumtext"/>
+        </addColumn>
+        <sql>
+            insert into standardtexttype(sty_desc, variables) values ('Signable Contracts Email', "['contactFirstName',
+            'contactLastName']"
+        </sql>
+    </changeSet>
 </databaseChangeLog>
