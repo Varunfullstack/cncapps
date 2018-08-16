@@ -25,9 +25,19 @@
         <addColumn tableName="standardtexttype">
             <column name="variables" type="mediumtext"/>
         </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue273-1533889498-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="standardtexttype" columnName="variables"/>
+        </preConditions>
         <sql>
-            insert into standardtexttype(sty_desc, variables) values ('Signable Contracts Email', "['contactFirstName',
-            'contactLastName']"
+            insert into standardtexttype(sty_standarttexttypeno, sty_desc, variables) values (
+            4,
+            'Signable Contracts Email',
+            '["contactFirstName","contactLastName"]'
+            )
         </sql>
+        <rollback></rollback>
     </changeSet>
 </databaseChangeLog>

@@ -27,6 +27,24 @@
         </option>
         <!-- END toSignContactsBlock -->
     </select>
+    <label for="signableTemplate">
+        Template
+    </label>
+    <select name="signableTemplate"
+            id="signableTemplate"
+            onchange="changedSignableTemplate()"
+    >
+        <option selected
+                value=""
+        >-- Pick a Template --
+        </option>
+        <!-- BEGIN templateBlock -->
+        <option value="{templateID}">
+            {templateDesc}
+        </option>
+        <!-- END templateBlock -->
+    </select>
+
     <button type="button"
             id="sendSignable"
             disabled
@@ -36,6 +54,11 @@
 </div>
 <H2>{customerName}</H2>
 <script>
+
+    function changedSignableTemplate() {
+        checkSendSignable();
+    }
+
     $(function () {
 
         $('#selectAll').change(function () {
@@ -108,7 +131,7 @@
 
     function checkSendSignable() {
 
-        if (currentPDFPath && $('#signableContact').val()) {
+        if (currentPDFPath && $('#signableContact').val() && $('#signableTemplate').val()) {
             $('#sendSignable').prop('disabled', false);
         } else {
             $('#sendSignable').prop('disabled', true);
@@ -126,7 +149,8 @@
             var data = {
                 contactID: $('#signableContact').val(),
                 PDFPath: currentPDFPath,
-                customerID: {customerID}
+                customerID: {customerID},
+                signableTemplateID: $('#signableTemplate').val()
             };
 
             $.ajax({

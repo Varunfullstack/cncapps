@@ -6,6 +6,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Signable\ApiClient;
+use Signable\DocumentWithoutTemplate;
+use Signable\Envelopes;
+use Signable\Party;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJRenContract.inc.php');
@@ -21,6 +27,7 @@ require_once($cfg ['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg['path_func'] . '/Common.inc.php');
 require_once($cfg ['path_bu'] . '/BUSalesOrder.inc.php');
+require_once($cfg ['path_bu'] . '/BUStandardText.inc.php');
 
 class CTRenewalReport extends CTCNC
 {
@@ -103,7 +110,7 @@ class CTRenewalReport extends CTCNC
                         'status' => $this->sendPDFContract(
                             $_REQUEST['PDFPath'],
                             $_REQUEST['contactID'],
-                            $_REQUEST['signableMessage'],
+                            $_REQUEST['signableTemplateID'],
                             $_REQUEST['customerID']
                         )
                     ]
@@ -371,7 +378,7 @@ Many thanks.
 
     private function sendPDFContract($PDFPath,
                                      $contactID,
-                                     $message,
+                                     $templateID,
                                      $customerID
     )
     {
@@ -439,9 +446,28 @@ Many thanks.
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
-            $thisBody = $message;
+            $buStandardText = new BUStandardText($this);
+            $dsResults = new DataSet($this);
+            $buStandardText->getStandardTextByID(
+                $templateID,
+                $dsResults
+            );
 
-            $buMail->mime->setHTMLBody($thisBody);
+
+            $body = $dsResults->getValue("stt_text");
+
+            $body = str_replace(
+                "[%contactFirstName%]",
+                $firstName,
+                $body
+            );
+            $body = str_replace(
+                "[%contactLastName%]",
+                $lastName,
+                $body
+            );
+
+            $buMail->mime->setHTMLBody($body);
 
             $mime_params = array(
                 'text_encoding' => '7bit',
@@ -450,14 +476,14 @@ Many thanks.
                 'head_charset'  => 'UTF-8'
             );
 
-            $thisBody = $buMail->mime->get($mime_params);
+            $body = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 
             $buMail->send(
                 $email,
                 $hdrs,
-                $thisBody
+                $body
             );
 
             $dbeCustomer = new DBECustomer($this);
@@ -704,6 +730,32 @@ Many thanks.
                 $this->template->parse(
                     'toSignContacts',
                     'toSignContactsBlock',
+                    true
+                );
+            }
+
+            $BUStandardText = new BUStandardText($this);
+            $dsResults = new DataSet($this);
+            $BUStandardText->getStandardTextByTypeID(
+                BUStandardText::SignableContractsEmailType,
+                $dsResults
+            );
+            $this->template->set_block(
+                'RenewalReport',
+                'templateBlock',
+                'templates'
+            );
+
+            while ($dsResults->fetchNext()) {
+                $this->template->set_var(
+                    array(
+                        'templateID'   => $dsResults->getValue("stt_standardtextno"),
+                        'templateDesc' => $dsResults->getValue("stt_desc")
+                    )
+                );
+                $this->template->parse(
+                    'templates',
+                    'templateBlock',
                     true
                 );
             }
