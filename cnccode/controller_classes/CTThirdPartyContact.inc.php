@@ -95,7 +95,7 @@ class CTThirdPartyContact extends CTCNC
         );
 
 
-        $this->setPageTitle('ThirdPartyContacts');
+        $this->setPageTitle('Third Party Contacts');
 
         if ($dsSearchForm->getValue('customerID')) {
             $buCustomer = new BUCustomer ($this);

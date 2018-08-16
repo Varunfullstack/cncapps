@@ -2415,7 +2415,7 @@ class CTActivity extends CTCNC
             );
 
 
-        $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">ThirdPartyContacts</a>';
+        $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
 
         return $thirdPartyContactLink;
     }
