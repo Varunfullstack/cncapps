@@ -154,7 +154,7 @@ class CTThirdPartyContact extends CTCNC
 
         $this->setMethodName('displayList');
 
-        $this->setPageTitle('ThirdPartyContacts');
+        $this->setPageTitle('Third Party Contacts');
 
         $this->setTemplateFiles(
             array('ThirdPartyContactList' => 'ThirdPartyContactList.inc')
