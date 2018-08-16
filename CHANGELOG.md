@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 315 - Monitored SR formatting issues.
 ### Added
 - Issue 317 - Customer 3rd party contact information
+### Changed
+- Issue 304 - Enhance First Time Fix Reporting
 
 ## [v1.10.1] - 2018-08-03
 ### Fixed
