@@ -94,7 +94,7 @@ class DBECustomerItem extends DBCNCEntity
     const autoGenerateContractInvoice = "autoGenerateContractInvoice";
     const secondSiteReplicationPath = "secondSiteReplicationPath";
     const secondSiteReplicationExcludeFlag = "secondSiteReplicationExcludeFlag";
-
+    const directDebitFlag = "directDebitFlag";
 
     /**
      * calls constructor()
@@ -629,6 +629,13 @@ class DBECustomerItem extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             'custitem.secondSiteReplicationExcludeFlag'
+        );
+
+        $this->addColumn(
+            self::directDebitFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "custitem.directDebitFlag"
         );
 
         $this->setPK(0);
