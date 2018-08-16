@@ -23,7 +23,6 @@ class DBEContact extends DBCNCEntity
     const sendMailshotFlag = "sendMailshotFlag";
     const discontinuedFlag = "discontinuedFlag";
     const accountsFlag = "accountsFlag";
-    const mailshot1Flag = "mailshot1Flag";
     const mailshot2Flag = "mailshot2Flag";
     const mailshot3Flag = "mailshot3Flag";
     const mailshot4Flag = "mailshot4Flag";
@@ -152,12 +151,6 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             "con_accounts_flag"
-        );
-        $this->addColumn(
-            self::mailshot1Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag1"
         );
         $this->addColumn(
             self::mailshot2Flag,
@@ -420,7 +413,7 @@ class DBEContact extends DBCNCEntity
             " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
 
         if ($supportOnly) {
-            $sql .= " AND " .$this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
+            $sql .= " AND " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
         }
         $sql .=
             " ORDER BY " . $this->getDBColumnName(self::lastName);
@@ -504,13 +497,11 @@ class DBEContact extends DBCNCEntity
         $queryString .=
             " AND (
         con_mailshot = 'Y' OR
-        con_mailflag1 = 'Y' OR
         con_mailflag2 = 'Y' OR
         con_mailflag3 = 'Y' OR
         con_mailflag4 = 'Y' Or
         con_mailflag8 = 'Y' OR
         con_mailflag9 = 'Y' OR
-        con_mailflag10 = 'Y' or
         con_mailflag11 = 'Y'
         )
         ";
