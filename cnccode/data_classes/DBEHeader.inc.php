@@ -216,12 +216,6 @@ class DBEHeader extends DBEntity
             "hed_portal_24_hour_pin"
         );
         $this->addColumn(
-            self::mailshot1FlagDef,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg1_def"
-        );
-        $this->addColumn(
             self::mailshot2FlagDef,
             DA_YN,
             DA_NOT_NULL,
@@ -240,24 +234,6 @@ class DBEHeader extends DBEntity
             "hed_mailflg4_def"
         );
         $this->addColumn(
-            self::mailshot5FlagDef,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg5_def"
-        );
-        $this->addColumn(
-            self::mailshot6FlagDef,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg6_def"
-        );
-        $this->addColumn(
-            self::mailshot7FlagDef,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg7_def"
-        );
-        $this->addColumn(
             self::mailshot8FlagDef,
             DA_YN,
             DA_NOT_NULL,
@@ -270,22 +246,10 @@ class DBEHeader extends DBEntity
             "hed_mailflg9_def"
         );
         $this->addColumn(
-            self::mailshot10FlagDef,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg10_def"
-        );
-        $this->addColumn(
             self::mailshot11FlagDef,
             DA_YN,
             DA_NOT_NULL,
             "hed_mailflg11_def"
-        );
-        $this->addColumn(
-            self::mailshot1FlagDesc,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg1_desc"
         );
         $this->addColumn(
             self::mailshot2FlagDesc,
@@ -306,24 +270,6 @@ class DBEHeader extends DBEntity
             "hed_mailflg4_desc"
         );
         $this->addColumn(
-            self::mailshot5FlagDesc,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg5_desc"
-        );
-        $this->addColumn(
-            self::mailshot6FlagDesc,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg6_desc"
-        );
-        $this->addColumn(
-            self::mailshot7FlagDesc,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg7_desc"
-        );
-        $this->addColumn(
             self::mailshot8FlagDesc,
             DA_YN,
             DA_NOT_NULL,
@@ -334,12 +280,6 @@ class DBEHeader extends DBEntity
             DA_YN,
             DA_NOT_NULL,
             "hed_mailflg9_desc"
-        );
-        $this->addColumn(
-            self::mailshot10FlagDesc,
-            DA_YN,
-            DA_NOT_NULL,
-            "hed_mailflg10_desc"
         );
         $this->addColumn(
             self::mailshot11FlagDesc,
