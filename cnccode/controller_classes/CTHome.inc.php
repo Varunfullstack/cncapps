@@ -1329,7 +1329,7 @@ WHERE week( problem.`pro_fixed_date`, 7) = WEEK(CURRENT_DATE, 7)
           ON fixedActivity.caa_problemno = test.pro_problemno 
           AND fixedActivity.caa_callacttypeno = 57 
       WHERE test.pro_problemno = problem.`pro_problemno` 
-        AND test.pro_status = 'F' 
+        AND (test.pro_status = 'F' OR test.pro_status = 'C')
         AND remoteSupport.caa_consno = engineer.`cns_consno` 
         AND fixedActivity.caa_consno = engineer.`cns_consno` 
         AND TIME_TO_SEC(
@@ -1356,6 +1356,19 @@ FROM
   JOIN consultant engineer 
     ON initial.`caa_consno` = engineer.`cns_consno` 
 WHERE problem.`pro_custno` <> 282 
+  AND 
+  (SELECT 
+    COUNT(item.`itm_itemno`) 
+  FROM
+    custitem 
+    JOIN item 
+      ON cui_itemno = itm_itemno 
+  WHERE custitem.`cui_custno` = pro_custno 
+    AND itm_servercare_flag = 'Y' 
+    AND itm_desc LIKE '%ServiceDesk%' 
+    AND cui_expiry_date >= NOW() 
+    AND renewalStatus <> 'D' 
+    AND declinedFlag <> 'Y') > 0 
   AND EXTRACT( YEAR_MONTH FROM initial.caa_date)  = EXTRACT( YEAR_MONTH FROM CURRENT_DATE )
   AND engineer.`teamID` = 1";
 
@@ -1410,7 +1423,7 @@ WHERE problem.`pro_custno` <> 282
           ON fixedActivity.caa_problemno = test.pro_problemno 
           AND fixedActivity.caa_callacttypeno = 57 
       WHERE test.pro_problemno = problem.`pro_problemno` 
-        AND test.pro_status = 'F' 
+        AND (test.pro_status = 'F' OR test.pro_status = 'C')
         AND remoteSupport.caa_consno = engineer.`cns_consno` 
         AND fixedActivity.caa_consno = engineer.`cns_consno` 
         AND TIME_TO_SEC(
@@ -1437,6 +1450,19 @@ FROM
   JOIN consultant engineer 
     ON initial.`caa_consno` = engineer.`cns_consno` 
 WHERE problem.`pro_custno` <> 282 
+  AND 
+  (SELECT 
+    COUNT(item.`itm_itemno`) 
+  FROM
+    custitem 
+    JOIN item 
+      ON cui_itemno = itm_itemno 
+  WHERE custitem.`cui_custno` = pro_custno 
+    AND itm_servercare_flag = 'Y' 
+    AND itm_desc LIKE '%ServiceDesk%' 
+    AND cui_expiry_date >= NOW() 
+    AND renewalStatus <> 'D' 
+    AND declinedFlag <> 'Y') > 0 
   AND initial.caa_date = CURRENT_DATE 
   AND engineer.`teamID` = 1 
 GROUP BY engineer.`cns_consno`  order by engineer.firstName"
