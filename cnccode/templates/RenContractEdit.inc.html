@@ -3,34 +3,57 @@
         src="CommonJS.js"
 ></script>
 <script language='JavaScript'>
+
+    var $directDebit;
+
+    function beforeShowDay(date) {
+        return [
+            $directDebit[0].checked ? date.getDate() === 1 : true,
+            "",
+            null
+        ];
+    }
+
     $(function () {
         window.despatchDate = $('#despatchDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
 
         var invoiceInterval = $('#invoiceInterval');
+        var autoGenerateContractInvoice = $('#autoGenerateContractInvoice');
+        var installationDate = $('#installationDate');
 
-        var $directDebit = $('#directDebit');
+        $directDebit = $('#directDebit');
 
-        function forceInvoiceInterval() {
-
+        function processDirectDebitChecked() {
             invoiceInterval.val(1);
             invoiceInterval.attr('disabled', true);
+            autoGenerateContractInvoice[0].checked = true;
+            autoGenerateContractInvoice.attr('disabled', true);
         }
 
-        function unlockInvoiceInterval() {
+        function processDirectDebitUnchecked() {
             invoiceInterval.attr('disabled', false);
+            autoGenerateContractInvoice.attr('disabled', false);
         }
 
         if ($directDebit[0].checked) {
-            forceInvoiceInterval();
+            processDirectDebitChecked();
         }
 
 
         $directDebit.change(function () {
             if ($directDebit[0].checked) {
-                forceInvoiceInterval();
+                var installationDateValue = installationDate.val();
+
+                if (!installationDateValue || (moment(installationDateValue, "DD/MM/YYYY")).date() !== 1) {
+                    alert('The Installation Date must be the first of the month when paying by Direct Debit.');
+                    $directDebit[0].checked = false;
+                    return;
+                }
+
+                processDirectDebitChecked();
             } else {
-                unlockInvoiceInterval();
+                processDirectDebitUnchecked();
             }
         })
 
@@ -211,6 +234,11 @@
                     {readonly}
                     size="40"
                     maxlength="50"
+                    class="jqueryCalendar"
+                    data-jqueryCalendarBeforeShowDay="beforeShowDay"
+                    required
+                    readonly="readonly"
+                    id="installationDate"
             >
                 <span class="formErrorMessage">{installationDateMessage}</span></td>
         </tr>
@@ -378,6 +406,7 @@
                        value="Y"
                        {autoGenerateContractInvoiceChecked}
                        title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created"
+                       id="autoGenerateContractInvoice"
                 >
             </td>
         </tr>
