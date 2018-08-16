@@ -1,0 +1,112 @@
+<style>
+    .firstTimeFix thead td {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .firstTimeFixContainer {
+        float: right;
+    }
+
+    .totalRow td {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+</style>
+<script>
+    $(function () {
+        $.ajax({
+            url: '{fetchDataURL}',
+            method: 'GET',
+            type: 'GET',
+            dataType: 'json'
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                console.log(result);
+                var html = "";
+                result.engineers.map(function (engineerData) {
+                    html += "<tr>" +
+                        "<td>" + engineerData.name + "</td>" +
+                        "<td>" + engineerData.totalRaised + "</td>" +
+                        "<td>" + engineerData.attemptedFirstTimeFix + "</td>" +
+                        "<td>" + engineerData.firstTimeFix + "</td>" +
+                        "</tr>"
+                });
+
+                html += "<tr class='totalRow'>" +
+                    "<td>Total</td>" +
+                    "<td>" + result.phonedThroughRequests + "</td>" +
+                    "<td>" + result.firstTimeFixAttemptedPct + "%</td>" +
+                    "<td>" + result.firstTimeFixAchievedPct + "%</td>" +
+                    "</tr>";
+
+                html += '<tr class="totalRow">' +
+                    '<td>Monthly Total</td>' +
+                    '<td>' + result.monthlyPhonedThroughRequests + '</td>' +
+                    '<td>' + result.monthlyFirstTimeFixAttemptedPct + '%</td>' +
+                    '<td>' + result.monthlyFirstTimeFixAchievedPct + '%</td>' +
+                    '</tr>';
+
+                $('#firstTimeFiguresTable tbody').html(html);
+                $('#firstTimeFiguresTable').removeClass('invisible');
+                $('#firstTimeFixLoader').remove();
+            }
+        })
+    })
+
+</script>
+<div class="firstTimeFixContainer">
+    <h3>
+        HD First Time Fixes
+    </h3>
+    <div class="parentLoading">
+        <table class="firstTimeFix invisible"
+               id="firstTimeFiguresTable"
+        >
+            <thead>
+            <tr>
+                <td>
+                    Name
+                </td>
+                <td>
+                    Raised
+                </td>
+                <td>
+                    Attempted
+                </td>
+                <td>
+                    Achieved
+                </td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{name}</td>
+                <td>{totalRaised}</td>
+                <td>{attemptedFirstTimeFix}</td>
+                <td>{firstTimeFix}</td>
+            </tr>
+            <tr class="totalRow">
+                <td>Total</td>
+                <td>{phonedThroughRequests}</td>
+                <td>{firstTimeFixAttemptedPct}%</td>
+                <td>{firstTimeFixAchievedPct}%</td>
+            </tr>
+            <tr class="totalRow">
+                <td>Monthly Total</td>
+                <td>{monthlyPhonedThroughRequests}</td>
+                <td>{monthlyFirstTimeFixAttemptedPct}%</td>
+                <td>{monthlyFirstTimeFixAchievedPct}%</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="loading"
+             id="firstTimeFixLoader"
+        ></div>
+    </div>
+
+</div>

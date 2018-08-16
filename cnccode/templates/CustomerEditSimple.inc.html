@@ -24,7 +24,8 @@
 
 </style>
 <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"
+></script>
 <script type="text/JavaScript">
 
     $(function () {
@@ -425,16 +426,23 @@
            type="button"
            value="Show Inactive Sites"
            onClick="document.location='{showInactiveSitesURL}';"
-    >
-    <input {disabled}
+
+    ><input {disabled}
            name="displayInactiveContacts"
            type="button"
            value="Show Inactive Contacts"
            onClick="document.location='{showInactiveContactsURL}';"
+
     >
-    <BR/>
-    {renewalLink}<BR/>
-    {passwordLink}<BR/>
+    <BR>
+    {customerFolderLink}
+    <br>
+    {renewalLink}
+    <BR>
+    {passwordLink}
+    <BR>
+    {customerFolderLink}
+    <br>
 
     <div class="customerEditMain">
 
@@ -579,6 +587,39 @@
                             <!-- END leadStatusBlock -->
                         </select>
                     </td>
+                </tr>
+                <tr>
+                    <td class="content">Main Contact Gets Other's Emails</td>
+                    <td class="content">
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[customer][{customerID}][othersEmailMainFlag]"
+                               value="Y"
+                               {othersEmailMainFlagChecked}
+                               onchange="othersEmailMainFlagChanged()"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">Main Contact Gets Work-started</td>
+                    <td class="content">
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[customer][{customerID}][workStartedEmailMainFlag]"
+                               value="Y"
+                               {workStartedEmailMainFlagChecked}
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">Main Contact Gets Auto-close</td>
+                    <td class="content">
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[customer][{customerID}][autoCloseEmailMainFlag]"
+                               value="Y"
+                               {autoCloseEmailMainFlagChecked}
+                        ></td>
                 </tr>
                 <tr>
                     <td class="content">24 Hour Cover</td>

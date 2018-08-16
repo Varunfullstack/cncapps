@@ -2,13 +2,31 @@
 <HTML>
 <HEAD>
     <TITLE>{pageTitle}</TITLE>
-    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="/screen.css" rel="stylesheet" type="text/css">
-    <link href="/changeLog.css" rel="stylesheet" type="text/css">
+    <META http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"
+    >
+    <link href="/screen.css"
+          rel="stylesheet"
+          type="text/css"
+    >
+    <link href="/changeLog.css"
+          rel="stylesheet"
+          type="text/css"
+    >
     <script src="/moment/moment.min.js"></script>
     <script src=".javascript/jquery-3.3.1.min.js"></script>
     <script src=".javascript/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href=".javascript/jquery-ui-1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet"
+          href=".javascript/jquery-ui-1.12.1/jquery-ui.min.css"
+    >
+    <link rel="stylesheet"
+          href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
+            integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o="
+            crossorigin="anonymous"
+    ></script>
+    <script src=".javascript/uploader.js"></script>
     <script type="application/javascript">
         /*!
    * modernizr v3.5.0
@@ -406,11 +424,16 @@
 
         })(window, document);
     </script>
-    <link rel="stylesheet" href=".javascript/datetime-local-polyfill/datetime-local-polyfill.css">
-    <link rel="stylesheet" href=".javascript/date-polyfill/date-polyfill.css">
+    <link rel="stylesheet"
+          href=".javascript/datetime-local-polyfill/datetime-local-polyfill.css"
+    >
+    <link rel="stylesheet"
+          href=".javascript/date-polyfill/date-polyfill.css"
+    >
     <script src=".javascript/datetime-local-polyfill/datetime-local-polyfill.min.js"></script>
     <script src=".javascript/date-polyfill/date-polyfill.min.js"></script>
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src=".javascript/fromDateToDate.js"></script>
     <SCRIPT TYPE="text/javascript">
         function popup(mylink, windowname) {
             if (!window.focus) return true;
@@ -420,6 +443,17 @@
             else
                 href = mylink.href;
             window.open(href, windowname, 'width=400,height=400,scrollbars=yes, resizable=yes');
+        }
+
+        function getDate(element) {
+            var date;
+            try {
+                date = $.datepicker.parseDate(dateFormat, element.value);
+            } catch (error) {
+                date = null;
+            }
+
+            return date;
         }
 
         var modal;
@@ -493,14 +527,25 @@
     {javaScript}
 
 </HEAD>
-<BODY {bodyTagExtras} {environmentTag}>
-<TABLE width="100%" border="0">
+<BODY {bodyTagExtras}
+      {environmentTag}
+>
+<TABLE width="100%"
+       border="0"
+>
     <TR>
-        <TD width="100px" valign="top">
-            <TABLE width="100px" border="0" bgcolor="#e1e1f0">
+        <TD width="100px"
+            valign="top"
+        >
+            <TABLE width="100px"
+                   border="0"
+                   bgcolor="#e1e1f0"
+            >
                 <TR>
-                    <TD align="center"><A href="index.php"><IMG src="images/cncscreenlogo_small.gif" width="100"
-                                                                border="0"></A>
+                    <TD align="center"><A href="index.php"><IMG src="images/cncscreenlogo_small.gif"
+                                                                width="100"
+                                                                border="0"
+                    ></A>
                     </TD>
                 </TR>
                 <TR>
@@ -515,17 +560,21 @@
                 {screenAccounts}
                 {screenMaintenance}
                 <TR>
-                    <TD align="left" class='userName'>
+                    <TD align="left"
+                        class='userName'
+                    >
                         <HR/>
                     </TD>
                 </TR>
                 <tr>
-                    <td  align="left">
+                    <td align="left">
                         <A href="About.php">About</A>
                     </td>
                 </tr>
                 <TR>
-                    <TD align="left" class='userName'>{userName} <A href="index.php?action=logout">logout</A></TD>
+                    <TD align="left"
+                        class='userName'
+                    >{userName} <A href="index.php?action=logout">logout</A></TD>
                 </TR>
             </TABLE>
         </TD>

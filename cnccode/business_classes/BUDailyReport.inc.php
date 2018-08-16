@@ -30,14 +30,34 @@ class BUDailyReport extends Business
 
         if ($row) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
-            $template->set_file('page', 'ServiceFixedReportEmail.inc.html');
-            $template->set_block('page', 'requestBlock', 'requests');
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+            $template->set_file(
+                'page',
+                'ServiceFixedReportEmail.inc.html'
+            );
+            $template->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
             /* csv file template */
-            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
-            $csvTemplate->set_file('page', 'ServiceFixedReportEmail.inc.csv');
-            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+            $csvTemplate = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+            $csvTemplate->set_file(
+                'page',
+                'ServiceFixedReportEmail.inc.csv'
+            );
+            $csvTemplate->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
             $controller = new Controller(
                 '',
@@ -62,7 +82,11 @@ class BUDailyReport extends Business
                         )
                     );
 
-                $description = substr(common_stripEverything($row[3]), 0, 50);
+                $description = substr(
+                    common_stripEverything($row[3]),
+                    0,
+                    50
+                );
 
                 $template->setVar(
                     array(
@@ -79,7 +103,11 @@ class BUDailyReport extends Business
                     )
                 );
 
-                $template->parse('requests', 'requestBlock', true);
+                $template->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
 
                 $csvTemplate->setVar(
                     array(
@@ -95,15 +123,27 @@ class BUDailyReport extends Business
                     )
                 );
 
-                $csvTemplate->parse('requests', 'requestBlock', true);
+                $csvTemplate->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
 
             } while ($row = $fixedRequests->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $template->get_var('output');
 
-            $csvTemplate->parse('output', 'page', true);
+            $csvTemplate->parse(
+                'output',
+                'page',
+                true
+            );
 
             $csvFileString = $csvTemplate->get_var('output');
 
@@ -132,26 +172,52 @@ class BUDailyReport extends Business
      * @param bool $priorityFiveOnly
      * @param bool $onScreen
      */
-    function outstandingIncidents($daysAgo, $priorityFiveOnly = false, $onScreen = false)
+    function outstandingIncidents($daysAgo,
+                                  $priorityFiveOnly = false,
+                                  $onScreen = false
+    )
     {
 
         $this->setMethodName('outstandingIncidents');
 
-        $outstandingRequests = $this->getOustandingRequests($daysAgo, $priorityFiveOnly);
+        $outstandingRequests = $this->getOustandingRequests(
+            $daysAgo,
+            $priorityFiveOnly
+        );
 
         if ($row = $outstandingRequests->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'ServiceOutstandingReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'ServiceOutstandingReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'requestBlock', 'requests');
+            $template->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
-            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $csvTemplate = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $csvTemplate->set_file('page', 'ServiceOutstandingReportEmail.inc.csv');
+            $csvTemplate->set_file(
+                'page',
+                'ServiceOutstandingReportEmail.inc.csv'
+            );
 
-            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+            $csvTemplate->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
             $controller = new Controller(
                 '',
@@ -180,12 +246,17 @@ class BUDailyReport extends Business
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
                         'assignedTo'       => $row[2],
-                        'description'      => substr(common_stripEverything($row[3]), 0, 50),
+                        'description'      => substr(
+                            common_stripEverything($row[3]),
+                            0,
+                            50
+                        ),
                         'durationHours'    => $row[4],
                         'timeSpentHours'   => $row[5],
                         'lastUpdatedDate'  => $row[6],
                         'priority'         => $row[7],
                         'teamName'         => $row[8],
+                        'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
                         'urlRequest'       => $urlRequest
                     )
                 );
@@ -195,17 +266,34 @@ class BUDailyReport extends Business
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
                         'assignedTo'       => $row[2],
-                        'description'      => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'description'      => str_replace(
+                            ',',
+                            '',
+                            substr(
+                                common_stripEverything($row[3]),
+                                0,
+                                50
+                            )
+                        ),
                         'durationHours'    => $row[4],
                         'timeSpentHours'   => $row[5],
                         'lastUpdatedDate'  => $row[6],
                         'priority'         => $row[7],
                         'teamName'         => $row[8],
+                        'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
                     )
                 );
 
-                $template->parse('requests', 'requestBlock', true);
-                $csvTemplate->parse('requests', 'requestBlock', true);
+                $template->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
+                $csvTemplate->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
 
             } while ($row = $outstandingRequests->fetch_row());
 
@@ -215,10 +303,18 @@ class BUDailyReport extends Business
                 )
             );
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
             $body = $template->get_var('output');
 
-            $csvTemplate->parse('output', 'page', true);
+            $csvTemplate->parse(
+                'output',
+                'page',
+                true
+            );
             $csvFile = $csvTemplate->get_var('output');
 
             if (!$onScreen) {
@@ -238,7 +334,9 @@ class BUDailyReport extends Business
                 );
             } else {
                 ?>
-                <a href="data:text/csv;charset=utf-8;base64,<?= base64_encode($csvFile) ?>" download="outstanding.csv">
+                <a href="data:text/csv;charset=utf-8;base64,<?= base64_encode($csvFile) ?>"
+                   download="outstanding.csv"
+                >
                     Download CSV
                 </a>
 
@@ -260,11 +358,21 @@ class BUDailyReport extends Business
 
         if ($row = $activities->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'ServiceFocReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'ServiceFocReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'activityBlock', 'activities');
+            $template->set_block(
+                'page',
+                'activityBlock',
+                'activities'
+            );
 
             $controller = new Controller(
                 '',
@@ -302,7 +410,10 @@ class BUDailyReport extends Business
                         'serviceRequestID' => $row[1],
                         'activityID'       => $row[2],
                         'technician'       => $row[3],
-                        'hours'            => number_format($row[4], 2),
+                        'hours'            => number_format(
+                            $row[4],
+                            2
+                        ),
                         'contract'         => $row[5],
                         'category'         => $row[6],
                         'urlRequest'       => $urlRequest,
@@ -310,11 +421,19 @@ class BUDailyReport extends Business
                     )
                 );
 
-                $template->parse('activities', 'activityBlock', true);
+                $template->parse(
+                    'activities',
+                    'activityBlock',
+                    true
+                );
 
             } while ($row = $activities->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $template->get_var('output');
 
@@ -338,11 +457,21 @@ class BUDailyReport extends Business
 
         if ($row = $activities->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'ServicePrepayOverValueReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'ServicePrepayOverValueReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'activityBlock', 'activities');
+            $template->set_block(
+                'page',
+                'activityBlock',
+                'activities'
+            );
 
             $controller = new Controller(
                 '',
@@ -380,7 +509,10 @@ class BUDailyReport extends Business
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
                         'activityID'       => $row[2],
-                        'value'            => number_format($row[3], 2),
+                        'value'            => number_format(
+                            $row[3],
+                            2
+                        ),
                         'technician'       => $row[4],
                         'urlRequest'       => $urlRequest,
                         'urlActivity'      => $urlActivity,
@@ -388,11 +520,19 @@ class BUDailyReport extends Business
                     )
                 );
 
-                $template->parse('activities', 'activityBlock', true);
+                $template->parse(
+                    'activities',
+                    'activityBlock',
+                    true
+                );
 
             } while ($row = $activities->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $template->get_var('output');
 
@@ -451,7 +591,9 @@ class BUDailyReport extends Business
         return $this->db->query($sql);
     } // end function
 
-    function getOustandingRequests($daysAgo = 1, $priorityFiveOnly = false)
+    function getOustandingRequests($daysAgo = 1,
+                                   $priorityFiveOnly = false
+    )
     {
         $sql =
             "SELECT 
@@ -468,7 +610,9 @@ class BUDailyReport extends Business
         pro_total_activity_duration_hours AS `timeSpentHours`,
         last.caa_date as lastUpdatedDate,
         pro_priority as `priority`,
-        team.name AS teamName
+        team.name AS teamName,
+        pro_awaiting_customer_response_flag,
+        pro_status
       FROM
         problem 
         JOIN customer 
@@ -587,7 +731,12 @@ class BUDailyReport extends Business
         return $this->db->query($sql);
     }
 
-    function sendByEmailTo($toEmail, $subject, $body, $attachment = false, $senderEmail = CONFIG_SALES_EMAIL)
+    function sendByEmailTo($toEmail,
+                           $subject,
+                           $body,
+                           $attachment = false,
+                           $senderEmail = CONFIG_SALES_EMAIL
+    )
     {
 
         $buMail = new BUMail($this);
@@ -605,7 +754,12 @@ class BUDailyReport extends Business
         $buMail->mime->setHTMLBody($body);
 
         if ($attachment) {
-            $buMail->mime->addAttachment($attachment, 'text/plain', 'report.csv', false);
+            $buMail->mime->addAttachment(
+                $attachment,
+                'text/plain',
+                'report.csv',
+                false
+            );
         }
 
         $mime_params = array(
@@ -638,17 +792,37 @@ class BUDailyReport extends Business
 
         if ($row = $outstandingRequests->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'P5NoSalesReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'P5NoSalesReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'requestBlock', 'requests');
+            $template->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
-            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $csvTemplate = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $csvTemplate->set_file('page', 'P5NoSalesReportEmail.inc.csv');
+            $csvTemplate->set_file(
+                'page',
+                'P5NoSalesReportEmail.inc.csv'
+            );
 
-            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+            $csvTemplate->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
             $controller = new Controller(
                 '',
@@ -679,7 +853,11 @@ class BUDailyReport extends Business
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
                         'assignedTo'       => $row[2],
-                        'description'      => substr(common_stripEverything($row[3]), 0, 50),
+                        'description'      => substr(
+                            common_stripEverything($row[3]),
+                            0,
+                            50
+                        ),
                         'durationHours'    => $row[4],
                         'timeSpentHours'   => $row[5],
                         'lastUpdatedDate'  => $row[6],
@@ -695,7 +873,15 @@ class BUDailyReport extends Business
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
                         'assignedTo'       => $row[2],
-                        'description'      => str_replace(',', '', substr(common_stripEverything($row[3]), 0, 50)),
+                        'description'      => str_replace(
+                            ',',
+                            '',
+                            substr(
+                                common_stripEverything($row[3]),
+                                0,
+                                50
+                            )
+                        ),
                         'durationHours'    => $row[4],
                         'timeSpentHours'   => $row[5],
                         'lastUpdatedDate'  => $row[6],
@@ -704,15 +890,31 @@ class BUDailyReport extends Business
                     )
                 );
 
-                $template->parse('requests', 'requestBlock', true);
-                $csvTemplate->parse('requests', 'requestBlock', true);
+                $template->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
+                $csvTemplate->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
 
             } while ($row = $outstandingRequests->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
             $body = $template->get_var('output');
 
-            $csvTemplate->parse('output', 'page', true);
+            $csvTemplate->parse(
+                'output',
+                'page',
+                true
+            );
             $csvFile = $csvTemplate->get_var('output');
 
             $subject = $title;
@@ -760,17 +962,37 @@ class BUDailyReport extends Business
 
         if ($row = $outstandingRequests->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'P5WithSalesAndContractReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'P5WithSalesAndContractReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'requestBlock', 'requests');
+            $template->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
-            $csvTemplate = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $csvTemplate = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $csvTemplate->set_file('page', 'P5WithSalesAndContractReportEmail.inc.csv');
+            $csvTemplate->set_file(
+                'page',
+                'P5WithSalesAndContractReportEmail.inc.csv'
+            );
 
-            $csvTemplate->set_block('page', 'requestBlock', 'requests');
+            $csvTemplate->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
             $title = "P5 SRs with SO and not T&M";
 
@@ -800,7 +1022,11 @@ class BUDailyReport extends Business
                     array(
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'description'      => substr(common_stripEverything($row[2]), 0, 50),
+                        'description'      => substr(
+                            common_stripEverything($row[2]),
+                            0,
+                            50
+                        ),
                         'urlRequest'       => $urlRequest,
                         'title'            => $title
                     )
@@ -810,19 +1036,43 @@ class BUDailyReport extends Business
                     array(
                         'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'description'      => str_replace(',', '', substr(common_stripEverything($row[2]), 0, 50)),
+                        'description'      => str_replace(
+                            ',',
+                            '',
+                            substr(
+                                common_stripEverything($row[2]),
+                                0,
+                                50
+                            )
+                        ),
                     )
                 );
 
-                $template->parse('requests', 'requestBlock', true);
-                $csvTemplate->parse('requests', 'requestBlock', true);
+                $template->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
+                $csvTemplate->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
 
             } while ($row = $outstandingRequests->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
             $body = $template->get_var('output');
 
-            $csvTemplate->parse('output', 'page', true);
+            $csvTemplate->parse(
+                'output',
+                'page',
+                true
+            );
             $csvFile = $csvTemplate->get_var('output');
 
             $subject = $title;
@@ -885,13 +1135,26 @@ WHERE pro_priority = 5
 
         foreach ($contactsData as $contactID => $contactsDatum) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'DailySROpenReportEmail.html');
+            $template->set_file(
+                'page',
+                'DailySROpenReportEmail.html'
+            );
 
-            $template->set_var('contactName', $contactsDatum['name']);
+            $template->set_var(
+                'contactName',
+                $contactsDatum['name']
+            );
 
-            $template->set_block('page', 'openSRBlock', 'openSR');
+            $template->set_block(
+                'page',
+                'openSRBlock',
+                'openSR'
+            );
 
 
             foreach ($contactsDatum['serviceRequests'] as $SR) {
@@ -904,16 +1167,27 @@ WHERE pro_priority = 5
                         "srRaisedByName" => $SR['raisedBy'] . ($onScreen ? ('( ' . $contactsDatum['customerName'] . ' )') : ''),
                         "srRaisedOnDate" => (new \DateTime($SR['raisedOn']))->format('d-m-Y h:i'),
                         "srStatus"       => $SR['status'],
-                        "srDetails"      => $this->getFirstLinesDetails($SR['details'], 150),
+                        "srDetails"      => $this->getFirstLinesDetails(
+                            $SR['details'],
+                            150
+                        ),
                     )
                 );
 
 
-                $template->parse('openSR', 'openSRBlock', true);
+                $template->parse(
+                    'openSR',
+                    'openSRBlock',
+                    true
+                );
 
             }
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
             $body = $template->get_var('output');
 
             $subject = "Open Service Request Report - " . (new DateTime())->format('Y-m-d');
@@ -935,12 +1209,21 @@ WHERE pro_priority = 5
 
     }
 
-    private function getFirstLinesDetails($details, $maxCharacters)
+    private function getFirstLinesDetails($details,
+                                          $maxCharacters
+    )
     {
         $details = strip_tags($details);
-        $details = preg_replace("!\s+!", ' ', $details);
+        $details = preg_replace(
+            "!\s+!",
+            ' ',
+            $details
+        );
 
-        $lines = preg_split("/\./", $details);
+        $lines = preg_split(
+            "/\./",
+            $details
+        );
         $result = "";
         $counter = 0;
 
@@ -989,6 +1272,7 @@ WHERE pro_priority = 5
                 AND problem.`pro_status` <> 'F' 
                 and problem.`pro_hide_from_customer_flag` <> 'Y'
                 and problem.pro_priority >= 1 and problem.pro_priority <= 4
+                AND (contact.`con_mailflag10` = 'Y' OR  reporter.con_contno = contact.con_contno ) 
                  ORDER BY pro_date_raised";
         return $this->db->query($sql);
 

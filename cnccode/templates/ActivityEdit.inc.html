@@ -1,12 +1,47 @@
 <!-- Template: ActivityEdit.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
+<link rel="stylesheet"
+      href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"
+>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script language='JavaScript'>
     $(function () {
         window.alarmDate = $('#alarmDate').get(0);
+
+        var activityTypeSelector = $('select[name="callActivity[1][callActTypeID]"]');
+
+        if (activityTypeSelector.val() == 59) {
+            hideChangeRequestButtons();
+        }
+
+        activityTypeSelector.change(function () {
+            if (activityTypeSelector.val() == 59) {
+                hideChangeRequestButtons();
+            } else {
+                showChangeRequestButtons();
+            }
+        });
+
+
+        function hideChangeRequestButtons() {
+            $('input[name="Fixed"]').hide();
+            $('input[name="CustomerAction"]').hide();
+            $('input[name="Escalate"]').hide();
+            $('input[name="Update"]').hide();
+        }
+
+        function showChangeRequestButtons() {
+            $('input[name="Fixed"]').show();
+            $('input[name="CustomerAction"]').show();
+            $('input[name="Escalate"]').show();
+            $('input[name="Update"]').show();
+        }
+
     })
     var formChanged = false;
 
@@ -71,43 +106,127 @@
 <table width="100%">
     <tr>
         <td>{activityWizardHeader} {contractListPopupLink}</td>
-        <td align="right" id="autoUpdateLabel"></td>
+        <td align="right"
+            id="autoUpdateLabel"
+        ></td>
     </tr>
 </table>
 <P><span class="formErrorMessage">{problemStatusMessage}</span></P>
-<form method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off" enctype="multipart/form-data">
-    <input type="hidden" name="userWarned" value="{userWarned}">
+<form method="post"
+      action="{urlUpdateActivity}"
+      name="callActivity"
+      AUTOCOMPLETE="off"
+      enctype="multipart/form-data"
+>
+    <input type="hidden"
+           name="userWarned"
+           value="{userWarned}"
+    >
 
-    <input type="hidden" id="callActivityID" name="callActivity[1][callActivityID]" value="{callActivityID}">
-    <input type="hidden" name="callActivity[1][customerID]" value="{customerID}">
-    <input type="hidden" id="problemID" name="callActivity[1][problemID]" value="{problemID}">
-    <input type="hidden" name="callActivity[1][problemStatus]" value="{problemStatus}">
-    <input type="hidden" name="callActivity[1][status]" value="{status}">
-    <input type="hidden" name="callActivity[1][siteDesc]" value="{siteDesc}">
-    <input type="hidden" name="callActivity[1][date]" value="{date}">
-    <input type="hidden" name="callActivity[1][startTime]" value="{startTime}">
-    <input type="hidden" name="callActivity[1][endTime]" value="{endTime}">
+    <input type="hidden"
+           id="callActivityID"
+           name="callActivity[1][callActivityID]"
+           value="{callActivityID}"
+    >
+    <input type="hidden"
+           name="callActivity[1][customerID]"
+           value="{customerID}"
+    >
+    <input type="hidden"
+           id="problemID"
+           name="callActivity[1][problemID]"
+           value="{problemID}"
+    >
+    <input type="hidden"
+           name="callActivity[1][problemStatus]"
+           value="{problemStatus}"
+    >
+    <input type="hidden"
+           name="callActivity[1][status]"
+           value="{status}"
+    >
+    <input type="hidden"
+           name="callActivity[1][siteDesc]"
+           value="{siteDesc}"
+    >
+    <input type="hidden"
+           name="callActivity[1][date]"
+           value="{date}"
+    >
+    <input type="hidden"
+           name="callActivity[1][startTime]"
+           value="{startTime}"
+    >
+    <input type="hidden"
+           name="callActivity[1][endTime]"
+           value="{endTime}"
+    >
 
-    <input type="hidden" name="callActivity[1][onSiteFlag]" value="{onSiteFlag}">
-    <input type="hidden" name="callActivity[1][allocatedUserID]" value="{allocatedUserID}">
+    <input type="hidden"
+           name="callActivity[1][onSiteFlag]"
+           value="{onSiteFlag}"
+    >
+    <input type="hidden"
+           name="callActivity[1][allocatedUserID]"
+           value="{allocatedUserID}"
+    >
 
-    <input type="hidden" name="callActivity[1][rootCauseID]" value="{rootCauseID}">
+    <input type="hidden"
+           name="callActivity[1][rootCauseID]"
+           value="{rootCauseID}"
+    >
 
-    <input type="hidden" name="callActivity[1][customerName]" value="{customerName}">
-    <input type="hidden" name="callActivity[1][authorisedFlag]" value="{authorisedFlag}">
-    <input type="hidden" name="callActivity[1][priority]" value="{hiddenPriority}">
-    <input type="hidden" name="callActivity[1][contractCustomerItemID]" value="{hiddenContractCustomerItemID}">
-    <input type="hidden" name="callActivity[1][hideFromCustomerFlag]" value="{hideFromCustomerFlag}">
-    <input type="hidden" name="callActivity[1][callActTypeID]" value="{hiddenCallActTypeID}">
-    <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
-    <table class="singleBorder" width="1000" border="0">
+    <input type="hidden"
+           name="callActivity[1][customerName]"
+           value="{customerName}"
+    >
+    <input type="hidden"
+           name="callActivity[1][authorisedFlag]"
+           value="{authorisedFlag}"
+    >
+    <input type="hidden"
+           name="callActivity[1][priority]"
+           value="{hiddenPriority}"
+    >
+    <input type="hidden"
+           name="callActivity[1][contractCustomerItemID]"
+           value="{hiddenContractCustomerItemID}"
+    >
+    <input type="hidden"
+           name="callActivity[1][hideFromCustomerFlag]"
+           value="{hideFromCustomerFlag}"
+    >
+    <input type="hidden"
+           name="callActivity[1][callActTypeID]"
+           value="{hiddenCallActTypeID}"
+    >
+    <input type="hidden"
+           name="MAX_FILE_SIZE"
+           value="6291456"
+    >
+    <table class="singleBorder"
+           width="1000"
+           border="0"
+    >
         <tr>
             <td colspan="4">
                 <div align="left">
-                    <input type="submit" name="Fixed" value="Fixed"
-                           onClick="return confirm('Are you sure this SR is fixed?')">
-                    <input type="submit" name="CustomerAction" value="Customer Action">
-                    <input type="submit" name="CncAction" value="CNC Action">
+                    <input type="submit"
+                           name="Fixed"
+                           value="Fixed"
+                           id="fixedBtn"
+                           onClick="return confirm('Are you sure this SR is fixed?')"
+                    >
+                    <input type="submit"
+                           name="CustomerAction"
+                           value="Customer Action"
+                           id="customerActionBtn"
+                    >
+                    <input type="submit"
+                           name="CncAction"
+                           value="CNC Action"
+                           id="cncActionBtn"
+                    >
                     Future Action
                     <input
                             type="text"
@@ -118,10 +237,11 @@
                             placeholder="dd/mm/yyyy"
                             size="10"
                             maxlength="10"
-                            onchange="setFormChanged();"/>
-                    <a href="javascript:;" onclick="popUpCalendar(this, alarmDate, 'dd/mm/yyyy')"><img
-                            src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0"
-                            border="0" align="absmiddle"/></a><span class="formErrorMessage">{alarmDateMessage}</span>
+                            onchange="setFormChanged();"
+                            class="jqueryCalendar"
+                            autocomplete="off"
+                    />
+                    <span class="formErrorMessage">{alarmDateMessage}</span>
                     <input
                             type="text"
                             title="Time to re-activate this request"
@@ -131,16 +251,28 @@
                             size="5"
                             maxlength="5"
                             placeholder="HH:MM"
-                            onchange="setFormChanged();"/>
+                            onchange="setFormChanged();"
+                    />
                     <span class="formErrorMessage">{alarmTimeMessage}</span>
 
-                    <input type="submit" name="Escalate" value="Escalate"
-                           onClick="return (confirm('Are you sure you want to escalate this SR?') )">
+                    <input type="submit"
+                           name="Escalate"
+                           value="Escalate"
+                           onClick="return (confirm('Are you sure you want to escalate this SR?') )"
+                           id="escalateBtn"
+                    >
 
-                    <input type="submit" name="Update" value="Update">
+                    <input type="submit"
+                           name="Update"
+                           value="Update"
+                           id="updateBtn"
+                    >
 
-                    <input name="Cancel" type="button" value="Cancel"
-                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"/>
+                    <input name="Cancel"
+                           type="button"
+                           value="Cancel"
+                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"
+                    />
 
                 </div>
 
@@ -156,14 +288,18 @@
             <td class="promptText">Type</td>
             <td class="fieldText">
                 <select
-                        {INITIAL_DISABLED} {typeDisabled}
+                        {INITIAL_DISABLED}
+                        {typeDisabled}
                         onchange="setFormChanged();"
                         id="{contractID}"
                         name="callActivity[1][callActTypeID]"
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN activityTypeBlock -->
-                    <option {activityTypeSelected} value="{callActTypeID}">{activityTypeDesc}</option>
+                    <option {activityTypeSelected}
+                            value="{callActTypeID}"
+                    >{activityTypeDesc}
+                    </option>
                     <!-- END activityTypeBlock -->
                 </select>
                 <span class="formErrorMessage">{callActTypeIDMessage}</span>
@@ -183,19 +319,24 @@
                     value="{curValue}"
                     size="10"
                     maxlength="10"
-                    onchange="setFormChanged();"/>
+                    onchange="setFormChanged();"
+            />
                 <span class="formErrorMessage">{curValueMessage}</span>
             </td>
         </tr>
         <tr>
             <td class="promptText">Contact</td>
             <td class="mainHeadText">
-                <select name="callActivity[1][contactID]" required>
+                <select name="callActivity[1][contactID]"
+                        required
+                >
 
                     <option value="">Please Select</option>
                     <!-- BEGIN contactBlock -->
                     {optGroupOpen}
-                    <option {contactSelected} value="{contactID}">{startMainContactStyle} {contactName}
+                    <option {contactSelected}
+                            value="{contactID}"
+                    >{startMainContactStyle} {contactName}
                         {endMainContactStyle}
                     </option>
                     {optGroupClose}
@@ -203,7 +344,9 @@
                 </select>
                 {contactPhone}<span class="formErrorMessage">{contactIDMessage}</span>
             </td>
-            <td colspan="2" style="color: red;">
+            <td colspan="2"
+                style="color: red;"
+            >
                 <span id="hdRemainMinutes">HD:{hdRemainMinutes}</span>
                 <span id="esRemainMinutes">ES:{esRemainMinutes}</span>
                 <span id="imRemainMinutes">IM:{imRemainMinutes}</span>
@@ -218,7 +361,10 @@
                     {INITIAL_DISABLED}
                     size="10"
                     maxlength="10"
-                    onchange="setFormChanged();"/>
+                    onchange="setFormChanged();"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            />
                 {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
             </td>
         </tr>
@@ -228,10 +374,15 @@
         <tr>
             <td class="promptText">Site</td>
             <td class="fieldText">
-                <select name="callActivity[1][siteNo]" required>
+                <select name="callActivity[1][siteNo]"
+                        required
+                >
                     <option value="">Please Select</option>
                     <!-- BEGIN siteBlock -->
-                    <option {siteSelected} value="{siteNo}">{siteDesc}</option>
+                    <option {siteSelected}
+                            value="{siteNo}"
+                    >{siteDesc}
+                    </option>
                     <!-- END siteBlock -->
                 </select>
                 <span class="formErrorMessage">{siteNoMessage}</span>
@@ -249,7 +400,8 @@
                     maxlength="8"
                     placeholder="HH:MM"
                     onchange="setFormChanged();"
-                    id="startTime"/>
+                    id="startTime"
+            />
                 <span class="formErrorMessage">{startTimeMessage}</span>
                 to <input
                         {DISABLED}
@@ -278,13 +430,19 @@
             >
                 <option value="">Please Select</option>
                 <!-- BEGIN priorityBlock -->
-                <option {prioritySelected} value="{priority}">{priorityDesc}</option>
+                <option {prioritySelected}
+                        value="{priority}"
+                >{priorityDesc}
+                </option>
                 <!-- END priorityBlock -->
             </select>
             </td>
             <td colspan="2">
-                <input type="button" id="requestAdditionalTime" value="Request More Time"
-                       title="Request more time for this SR">
+                <input type="button"
+                       id="requestAdditionalTime"
+                       value="Request More Time"
+                       title="Request more time for this SR"
+                >
             </td>
             <td class="promptText">User</td>
             <td>
@@ -295,7 +453,10 @@
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN userBlock -->
-                    <option {userSelected} value="{userID}">{userName}</option>
+                    <option {userSelected}
+                            value="{userID}"
+                    >{userName}
+                    </option>
                     <!-- END userBlock -->
                 </select>
                 <span class="formErrorMessage">{userIDMessage}</span>
@@ -310,12 +471,21 @@
                         name="callActivity[1][contractCustomerItemID]"
                         type="text"
                 >
-                    <option value="99" {noContractSelected}>Please select</option>
-                    <option value="" {tandMSelected}>T &amp; M</option>
+                    <option value="99"
+                            {noContractSelected}
+                    >Please select
+                    </option>
+                    <option value=""
+                            {tandMSelected}
+                    >T &amp; M
+                    </option>
                     <!-- BEGIN contractBlock -->
                     {optGroupClose}
                     {optGroupOpen}
-                    <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
+                    <option {contractSelected}
+                            value="{contractCustomerItemID}"
+                    >{contractDescription}
+                    </option>
                     <!-- END contractBlock -->
                     </optgroup>
                 </select>
@@ -332,7 +502,10 @@
                 >
                     <option value="">Not known</option>
                     <!-- BEGIN rootCauseBlock -->
-                    <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+                    <option {rootCauseSelected}
+                            value="{rootCauseID}"
+                    >{rootCauseDescription}
+                    </option>
                     <!-- END rootCauseBlock -->
                 </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
             </td>
@@ -350,7 +523,8 @@
                         {DISABLED}
                         size="100"
                         maxlength="200"
-                        onchange="setFormChanged();"/>
+                        onchange="setFormChanged();"
+                />
                 <span class="formErrorMessage">{contactNotesMessage}</span>
             </td>
             <td></td>
@@ -367,7 +541,8 @@
                     {COMPLETE_DISABLED}
                     size="10"
                     maxlength="10"
-                    onchange="setFormChanged();"/>
+                    onchange="setFormChanged();"
+            />
                 {calendarLinkCompleteDate}<span class="formErrorMessage">{completeDateMessage}</span>
             </td>
         </tr>
@@ -383,7 +558,8 @@
                         {DISABLED}
                         size="100"
                         maxlength="200"
-                        onchange="setFormChanged();"/>
+                        onchange="setFormChanged();"
+                />
                 <span class="formErrorMessage">{techNotesMessage}</span>
             </td>
             <td></td>
@@ -394,21 +570,32 @@
                         {hideFromCustomerDisabled}
                         type="checkbox"
                         name="callActivity[1][hideFromCustomerFlag]"
-                        value="Y" {hideFromCustomerFlagChecked}
-                        title="Hide this SR from customer">
+                        value="Y"
+                        {hideFromCustomerFlagChecked}
+                        title="Hide this SR from customer"
+                >
             </td>
         </tr>
         <tr>
             <td colspan="6"><H2>{customerDetails}</H2></td>
         </tr>
         <tr>
-            <td colspan="6" class="notesAlert">{contactNotes}</td>
+            <td colspan="6"
+                class="notesAlert"
+            >{contactNotes}
+            </td>
         </tr>
         <tr>
-            <td colspan="6" class="notesAlert">{techNotes}</td>
+            <td colspan="6"
+                class="notesAlert"
+            >{techNotes}
+            </td>
         </tr>
     </table>
-    <table class="singleBorder" width="900" border="0">
+    <table class="singleBorder"
+           width="900"
+           border="0"
+    >
         <tr>
             <td colspan="4"><span class="formErrorMessage">{reasonMessage}</span></td>
         </tr>
@@ -416,7 +603,11 @@
             <td colspan="4">&nbsp;</td>
         </tr>
         <tr>
-            <td colspan="4" class="promptTextLeft" valign="top">Activity Notes</td>
+            <td colspan="4"
+                class="promptTextLeft"
+                valign="top"
+            >Activity Notes
+            </td>
         </tr>
         <tr>
             <td colspan="4"><textarea name="reason">{reason}</textarea>
@@ -432,63 +623,127 @@
         <tr>
             <td colspan="4">
                 <div align="left">
-                    <input type="submit" name="Fixed" value="Fixed"
-                           onClick="return confirm('Are you sure this SR is fixed?')">
-                    <input type="submit" name="CustomerAction" value="Customer Action">
-                    <input type="submit" name="CncAction" value="CNC Action">
+                    <input type="submit"
+                           name="Fixed"
+                           value="Fixed"
+                           onClick="return confirm('Are you sure this SR is fixed?')"
+                    >
+                    <input type="submit"
+                           name="CustomerAction"
+                           value="Customer Action"
+                    >
+                    <input type="submit"
+                           name="CncAction"
+                           value="CNC Action"
+                    >
 
-                    <input type="submit" name="Escalate" value="Escalate"
-                           onClick="return (confirm('Are you sure you want to escalate this SR?') )">
+                    <input type="submit"
+                           name="Escalate"
+                           value="Escalate"
+                           onClick="return (confirm('Are you sure you want to escalate this SR?') )"
+                    >
 
-                    <input type="submit" name="Update" value="Update">
+                    <input type="submit"
+                           name="Update"
+                           value="Update"
+                    >
 
-                    <input name="Cancel" type="button" value="Cancel"
-                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"/>
+                    <input name="Cancel"
+                           type="button"
+                           value="Cancel"
+                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"
+                    />
                 </div>
             </td>
         </tr>
     </table>
 </form>
-<table class="singleBorder" width="900" border="0">
+<table class="singleBorder"
+       width="900"
+       border="0"
+>
     <tr>
         <td class="listHead">Documents</td>
     </tr>
     <tr>
         <td>
-            <table class="singleBorder" width="100%">
+            <table class="singleBorder"
+                   width="100%"
+            >
                 <tr>
-                    <td width="29%" class="listHeadText">Description</td>
-                    <td width="28%" class="listHeadText">File</td>
-                    <td width="18%" class="listHeadText">Date</td>
-                    <td width="14%" class="listHeadText">User</td>
-                    <td width="14%" class="listHeadText">&nbsp;</td>
+                    <td width="29%"
+                        class="listHeadText"
+                    >Description
+                    </td>
+                    <td width="28%"
+                        class="listHeadText"
+                    >File
+                    </td>
+                    <td width="18%"
+                        class="listHeadText"
+                    >Date
+                    </td>
+                    <td width="14%"
+                        class="listHeadText"
+                    >User
+                    </td>
+                    <td width="14%"
+                        class="listHeadText"
+                    >&nbsp;
+                    </td>
                 </tr>
                 <!-- BEGIN documentBlock -->
-                <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
-                    <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
+                <tr valign="top"
+                    onMouseOver="this.bgColor='#ffffcc';"
+                    onMouseOut="this.bgColor='';"
+                >
+                    <td nowrap="nowrap"><A href="{urlViewFile}"
+                                           title="View attached document"
+                                           target="_blank"
+                    >{description}</A>
                     </td>
-                    <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
+                    <td nowrap="nowrap"><A href="{urlViewFile}"
+                                           title="View attached document"
+                                           target="_blank"
+                    >{filename}</A>
                     </td>
                     <td nowrap="nowrap">{createDate}</td>
                     <td nowrap="nowrap">{createUserName}</td>
-                    <td><A href="{urlDeleteFile}&isEdit=true" title="Delete attached document"
-                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                    <td><A href="{urlDeleteFile}&isEdit=true"
+                           title="Delete attached document"
+                           onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"
+                    >{txtDeleteFile}</A>
                     </td>
                 </tr>
                 <!-- END documentBlock -->
                 <tr>
                     <td class="promptTextLeft">Description</td>
                     <td colspan="4">
-                        <form action="{urlUploadFile}" method="post" enctype="multipart/form-data">
-                            <input name="uploadDescription" type="text" size="45" maxlength="50"
-                                   value="{uploadDescription}">
-                            <input type="hidden" name="edit" value="true">
+                        <form action="{urlUploadFile}"
+                              method="post"
+                              enctype="multipart/form-data"
+                        >
+                            <input name="uploadDescription"
+                                   type="text"
+                                   size="45"
+                                   maxlength="50"
+                                   value="{uploadDescription}"
+                            >
+                            <input type="hidden"
+                                   name="edit"
+                                   value="true"
+                            >
                             <input
                                     name="userfile"
                                     type="file"
                                     value="{userfile}"
+                                    class="dragUploader"
+                                    data-description="uploadDescription"
                             >
-                            <input type="submit" name="uploadFile" value="Upload">
+                            <input type="submit"
+                                   name="uploadFile"
+                                   value="Upload"
+                            >
                         </form>
                     </td>
                 </tr>
@@ -496,7 +751,9 @@
         </td>
     </tr>
 </table>
-<div id="dialog" title="Alert"><p></p></div>
+<div id="dialog"
+     title="Alert"
+><p></p></div>
 <script>
     var timeout;              // timer
 

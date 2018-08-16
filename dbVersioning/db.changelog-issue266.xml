@@ -1,0 +1,29 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue266-1531904958-0">
+        <tagDatabase tag="issue266"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue266-1531904958-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hed_sd_dashboard_engineers_in_sr_engineers_max_count"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="hed_sd_dashboard_engineers_in_sr_engineers_max_count" type="int(2)" value="3"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue266-1531904958-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hed_sd_dashboard_engineers_in_sr_in_past_hours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="hed_sd_dashboard_engineers_in_sr_in_past_hours" type="int(3)" value="24"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

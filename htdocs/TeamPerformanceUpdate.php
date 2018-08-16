@@ -1,9 +1,23 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_bu"]."/BUTeamPerformance.inc.php");
+require_once($cfg["path_bu"] . "/BUTeamPerformance.inc.php");
 
-$buTeamPerformance= new BUTeamPerformance( $this );
-$buTeamPerformance->update( date('Y'), date( 'm' ));
+$buTeamPerformance = new BUTeamPerformance($this);
+$buTeamPerformance->update(
+    date('Y'),
+    date('m')
+);
+$buTeamPerformance->update(
+    date(
+        'Y',
+        strtotime("-1 months")
+    ),
+    date(
+        'm',
+        strtotime("-1 months")
+    )
+)
+
 
 //Uncomment this to update previous months
 /*

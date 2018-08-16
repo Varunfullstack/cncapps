@@ -1,11 +1,5 @@
 <!-- Template: PurchaseOrderSearch.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-
 <script language='JavaScript'>
-    $(function () {
-        window.fromDate = $('#fromDate').get(0);
-        window.toDate = $('#toDate').get(0);
-    });
 
     function validateSupplierName() {
         if (document.getElementById("supplierName").value != "") {
@@ -22,6 +16,7 @@
             document.getElementById("supplierID").value = '';
         }
     }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
@@ -41,11 +36,13 @@
         }
         return;
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function createOrder() {
         if (
             (document.searchForm.supplierID.value != "") &&
@@ -57,10 +54,20 @@
         }
     }
 </script>
-<form name="searchForm" method="post" action="{submitURL}" AUTOCOMPLETE="off">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="post"
+      action="{submitURL}"
+      AUTOCOMPLETE="off"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100px" class="promptText">
+            <td width="100px"
+                class="promptText"
+            >
                 <div align="right">Supplier</div>
             </td>
             <td>
@@ -110,7 +117,10 @@
                 <select name="orderType">
                     <option value=""></option>
                     <!-- BEGIN orderTypeBlock -->
-                    <option {orderTypeSelected} value="{orderType}">{orderTypeDescription}</option>
+                    <option {orderTypeSelected}
+                            value="{orderType}"
+                    >{orderTypeDescription}
+                    </option>
                     <!-- END orderTypeBlock -->
                 </select></td>
         </tr>
@@ -152,10 +162,11 @@
                     value="{fromDate}"
                     size="10"
                     maxlength="10"
-                    onkeypress="javascript:submitOnReturn()">
-                <a href="javascript:;" onclick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" alt="to date" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"/></a> <font class="formErrorMessage">{fromDateMessage}</font></td>
+                    onkeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
+                <font class="formErrorMessage">{fromDateMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -168,10 +179,11 @@
                     value="{toDate}"
                     size="10"
                     maxlength="10"
-                    onkeypress="javascript:submitOnReturn()">
-                <a href="javascript:;" onclick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" alt="from date" width="24" height="22" hspace="0" vspace="0"
-                        border="0" align="absmiddle"/></a> <font class="formErrorMessage">{toDateMessage}</font></td>
+                    onkeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
+                <font class="formErrorMessage">{toDateMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -189,23 +201,60 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="button" name="Search" value="Search" onClick="submit();">
-                <input type="button" name="CreateOrder" value="New Order" onClick="createOrder();">
-                <input type="button" name="Clear" value="Clear" onClick="document.location='{clearURL}'"></td>
+                <input type="button"
+                       name="Search"
+                       value="Search"
+                       onClick="submit();"
+                >
+                <input type="button"
+                       name="CreateOrder"
+                       value="New Order"
+                       onClick="createOrder();"
+                >
+                <input type="button"
+                       name="Clear"
+                       value="Clear"
+                       onClick="document.location='{clearURL}'"
+                ></td>
         </tr>
     </table>
 </form>
-<table class="singleBorder" width="890px" border="0" cellspacing="1" cellpadding="1">
+<table class="singleBorder"
+       width="890px"
+       border="0"
+       cellspacing="1"
+       cellpadding="1"
+>
     <tr>
-        <td width="240px" class="listHeadText">Supplier</td>
-        <td width="50px" class="listHeadText">Order No</td>
-        <td width="70px" class="listHeadText">Status</td>
-        <td width="250px" class="listHeadText">Supplier Ref</td>
-        <td width="245px" class="listHeadText">Sold To</td>
-        <td width="50px" class="listHeadText">&nbsp;</td>
+        <td width="240px"
+            class="listHeadText"
+        >Supplier
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >Order No
+        </td>
+        <td width="70px"
+            class="listHeadText"
+        >Status
+        </td>
+        <td width="250px"
+            class="listHeadText"
+        >Supplier Ref
+        </td>
+        <td width="245px"
+            class="listHeadText"
+        >Sold To
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >&nbsp;
+        </td>
     </tr>
     <!-- BEGIN orderBlock -->
-    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+    <tr onMouseOver="this.bgColor='#FFFFCC';"
+        onMouseOut="this.bgColor='';"
+    >
         <td class="listItemText">{listSupplierName}</td>
         <td class="listItemText"><A HREF="{listOrderURL}">{listPorheadID}</A></td>
         <td class="listItemText">{listOrderType}</td>

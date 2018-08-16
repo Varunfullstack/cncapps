@@ -702,10 +702,6 @@ class BUCustomer extends Business
             'N'
         );
         $dsContact->setValue(
-            DBEContact::statementFlag,
-            'N'
-        );
-        $dsContact->setValue(
             DBEContact::mailshot2Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef)
         );

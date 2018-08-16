@@ -78,82 +78,297 @@ class DBEJCallActivity extends DBECallActivity
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn(self::itemID, DA_INTEGER, DA_ALLOW_NULL, "cat_itemno");
-        $this->addColumn(self::activityType, DA_STRING, DA_ALLOW_NULL, "cat_desc");
-        $this->addColumn(self::requireCheckFlag, DA_YN, DA_NOT_NULL, "cat_req_check_flag");
-        $this->addColumn(self::onSiteFlag, DA_YN, DA_NOT_NULL, "cat_on_site_flag");
-        $this->addColumn(self::allowExpensesFlag, DA_YN, DA_ALLOW_NULL, "cat_allow_exp_flag");
-        $this->addColumn(self::travelFlag, DA_YN, DA_ALLOW_NULL);
-        $this->addColumn(self::allowSCRFlag, DA_YN, DA_ALLOW_NULL);
-        $this->addColumn(self::userID, DA_ID, DA_ALLOW_NULL, "consultant.cns_consno");
-        $this->addColumn(self::userName,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "CONCAT(consultant.firstName,' ',consultant.lastName)");
-        $this->addColumn(self::userAccount, DA_STRING, DA_ALLOW_NULL, "consultant.cns_logname");
-        $this->addColumn(self::durationMinutes,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 60");
-        $this->addColumn(self::siteDesc, DA_STRING, DA_ALLOW_NULL, "CONCAT(add_add1,' ',add_add2,' ',add_town)");
-        $this->addColumn(self::customerID, DA_STRING, DA_ALLOW_NULL, "problem.pro_custno");
-        $this->addColumn(self::customerName, DA_STRING, DA_ALLOW_NULL, "cus_name");
-        $this->addColumn(self::contactFirstName, DA_STRING, DA_ALLOW_NULL, "con_first_name");
-        $this->addColumn(self::contactName, DA_STRING, DA_ALLOW_NULL, "CONCAT(con_first_name,' ',con_last_name)");
-        $this->addColumn(self::contactNotes, DA_STRING, DA_ALLOW_NULL, "con_notes");
-        $this->addColumn(self::techNotes, DA_STRING, DA_ALLOW_NULL, "cus_tech_notes");
-        $this->addColumn(self::contactEmail, DA_STRING, DA_ALLOW_NULL, "con_email");
-        $this->addColumn(self::workStartedEmailFlag, DA_YN, DA_ALLOW_NULL, "con_work_started_email_flag");
-        $this->addColumn(self::autoCloseEmailFlag, DA_YN, DA_ALLOW_NULL, "con_auto_close_email_flag");
-        $this->addColumn(self::dateEngineer,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "CONCAT(DATE_FORMAT(caa_date,'%e/%c/%y'), ' - ', consultant.firstName,' ',consultant.lastName)");
-        $this->addColumn(self::contractCustomerItemID, DA_ID, DA_ALLOW_NULL, "problem.pro_contract_cuino");
-        $this->addColumn(self::contractItemID, DA_ID, DA_ALLOW_NULL, "contractitem.itm_itemno");
-        $this->addColumn(self::contractResponseTime, DA_STRING, DA_ALLOW_NULL, "contractitem.contractResponseTime");
-        $this->addColumn(self::contractDescription,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "if (contractitem.itm_desc IS NULL, 'T&M', contractitem.itm_desc)");
-        $this->addColumn(self::activityTypeCost,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "activity_type_item.itm_sstk_price");                // per hour cost of this activity
-        $this->addColumn(self::curValueFlag, DA_YN, DA_ALLOW_NULL);        // is it a Value Type activity?
-        $this->addColumn(self::projectDescription,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "if (project.description IS NULL, 'None', project.description)");
-        $this->addColumn(self::completedName, DA_STRING, DA_ALLOW_NULL, "completed_user.cns_logname");
-        $this->addColumn(self::priority, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_priority");
-        $this->addColumn(self::problemHideFromCustomerFlag,
-                         DA_YN,
-                         DA_ALLOW_NULL,
-                         "problem.pro_hide_from_customer_flag");
-        $this->addColumn(self::problemStatus, DA_STRING, DA_ALLOW_NULL, "problem.pro_status");
-        $this->addColumn(self::requestAwaitingCustomerResponseFlag,
-                         DA_STRING,
-                         DA_ALLOW_NULL,
-                         "problem.pro_awaiting_customer_response_flag");
-        $this->addColumn(self::internalNotes, DA_MEMO, DA_ALLOW_NULL, "problem.pro_internal_notes");
-        $this->addColumn(self::completeDate, DA_DATE, DA_ALLOW_NULL, "problem.pro_complete_date");
-        $this->addColumn(self::alarmDate, DA_DATE, DA_ALLOW_NULL, "problem.pro_alarm_date");
-        $this->addColumn(self::alarmTime, DA_TIME, DA_ALLOW_NULL, "problem.pro_alarm_time");
-        $this->addColumn(self::rootCauseID, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_rootcauseno");
-        $this->addColumn(self::rootCauseDescription, DA_INTEGER, DA_ALLOW_NULL, "rootcause.rtc_desc");
-        $this->addColumn(self::projectID, DA_ID, DA_ALLOW_NULL, "problem.pro_projectno");
-        $this->addColumn(self::linkedSalesOrderID, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_linked_ordno");
-        $this->addColumn(self::totalActivityDurationHours,
-                         DA_FLOAT,
-                         DA_ALLOW_NULL,
-                         "problem.pro_total_activity_duration_hours");
-        $this->addColumn(self::criticalFlag, DA_YN, DA_ALLOW_NULL, "problem.pro_critical_flag");
-        $this->addColumn(self::hdLimitMinutes, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_hd_limit_minutes");
-        $this->addColumn(self::esLimitMinutes, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_es_limit_minutes");
-        $this->addColumn(self::imLimitMinutes, DA_INTEGER, DA_ALLOW_NULL, "problem.pro_im_limit_minutes");
-        $this->addColumn(self::allocatedUserID, DA_ID, DA_NOT_NULL, "problem.pro_consno");
-        $this->addColumn(self::queueNo, DA_INTEGER, DA_NOT_NULL, "problem.pro_queue_no");
+        $this->addColumn(
+            self::itemID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "cat_itemno"
+        );
+        $this->addColumn(
+            self::activityType,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cat_desc"
+        );
+        $this->addColumn(
+            self::requireCheckFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "cat_req_check_flag"
+        );
+        $this->addColumn(
+            self::onSiteFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "cat_on_site_flag"
+        );
+        $this->addColumn(
+            self::allowExpensesFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "cat_allow_exp_flag"
+        );
+        $this->addColumn(
+            self::travelFlag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::allowSCRFlag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::userID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "consultant.cns_consno"
+        );
+        $this->addColumn(
+            self::userName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(consultant.firstName,' ',consultant.lastName)"
+        );
+        $this->addColumn(
+            self::userAccount,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "consultant.cns_logname"
+        );
+        $this->addColumn(
+            self::durationMinutes,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "( TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime) ) / 60"
+        );
+        $this->addColumn(
+            self::siteDesc,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(add_add1,' ',add_add2,' ',add_town)"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "problem.pro_custno"
+        );
+        $this->addColumn(
+            self::customerName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            self::contactFirstName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_first_name"
+        );
+        $this->addColumn(
+            self::contactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(con_first_name,' ',con_last_name)"
+        );
+        $this->addColumn(
+            self::contactNotes,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_notes"
+        );
+        $this->addColumn(
+            self::techNotes,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cus_tech_notes"
+        );
+        $this->addColumn(
+            self::contactEmail,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_email"
+        );
+        $this->addColumn(
+            self::workStartedEmailFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "con_work_started_email_flag"
+        );
+        $this->addColumn(
+            self::autoCloseEmailFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "con_auto_close_email_flag"
+        );
+        $this->addColumn(
+            self::dateEngineer,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(DATE_FORMAT(caa_date,'%e/%c/%y'), ' - ', consultant.firstName,' ',consultant.lastName)"
+        );
+        $this->addColumn(
+            self::contractCustomerItemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "problem.pro_contract_cuino"
+        );
+        $this->addColumn(
+            self::contractItemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "contractitem.itm_itemno"
+        );
+        $this->addColumn(
+            self::contractResponseTime,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "contractitem.contractResponseTime"
+        );
+        $this->addColumn(
+            self::contractDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "if (contractitem.itm_desc IS NULL, 'T&M', contractitem.itm_desc)"
+        );
+        $this->addColumn(
+            self::activityTypeCost,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "activity_type_item.itm_sstk_price"
+        );                // per hour cost of this activity
+        $this->addColumn(
+            self::curValueFlag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );        // is it a Value Type activity?
+        $this->addColumn(
+            self::projectDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "if (project.description IS NULL, 'None', project.description)"
+        );
+        $this->addColumn(
+            self::completedName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "completed_user.cns_logname"
+        );
+        $this->addColumn(
+            self::priority,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "problem.pro_priority"
+        );
+        $this->addColumn(
+            self::problemHideFromCustomerFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "problem.pro_hide_from_customer_flag"
+        );
+        $this->addColumn(
+            self::problemStatus,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "problem.pro_status"
+        );
+        $this->addColumn(
+            self::requestAwaitingCustomerResponseFlag,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "problem.pro_awaiting_customer_response_flag"
+        );
+        $this->addColumn(
+            self::internalNotes,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            "problem.pro_internal_notes"
+        );
+        $this->addColumn(
+            self::completeDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "problem.pro_complete_date"
+        );
+        $this->addColumn(
+            self::alarmDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "problem.pro_alarm_date"
+        );
+        $this->addColumn(
+            self::alarmTime,
+            DA_TIME,
+            DA_ALLOW_NULL,
+            "problem.pro_alarm_time"
+        );
+        $this->addColumn(
+            self::rootCauseID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "problem.pro_rootcauseno"
+        );
+        $this->addColumn(
+            self::rootCauseDescription,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "rootcause.rtc_desc"
+        );
+        $this->addColumn(
+            self::projectID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "problem.pro_projectno"
+        );
+        $this->addColumn(
+            self::linkedSalesOrderID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "problem.pro_linked_ordno"
+        );
+        $this->addColumn(
+            self::totalActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "problem.pro_total_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::criticalFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "problem.pro_critical_flag"
+        );
+        $this->addColumn(
+            self::hdLimitMinutes,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "problem.pro_hd_limit_minutes"
+        );
+        $this->addColumn(
+            self::esLimitMinutes,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "problem.pro_es_limit_minutes"
+        );
+        $this->addColumn(
+            self::imLimitMinutes,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "problem.pro_im_limit_minutes"
+        );
+        $this->addColumn(
+            self::allocatedUserID,
+            DA_ID,
+            DA_NOT_NULL,
+            "problem.pro_consno"
+        );
+        $this->addColumn(
+            self::queueNo,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "problem.pro_queue_no"
+        );
 
         $this->setAddColumnsOff();
 
@@ -221,28 +436,36 @@ class DBEJCallActivity extends DBECallActivity
             $IDs .= "," . $val;
         endforeach;
 
-        $IDs = substr($IDs, 1); // trim comma
+        $IDs = substr(
+            $IDs,
+            1
+        ); // trim comma
 
-
-        $this->setQueryString(
-            "SELECT " .
+        $query = "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
             " WHERE caa_callactivityno IN  (" . $IDs . ") AND callactivity.caa_problemno <> 0" .
-            " ORDER BY caa_problemno, caa_consno"
-        );
+            " ORDER BY caa_problemno, caa_consno";
+        $this->setQueryString($query);
         return (parent::getRows());
     }
 
-    function getRowsByDateRange($startDate, $endDate)
+    function getRowsByDateRange($startDate,
+                                $endDate
+    )
     {
         $this->setQueryString(
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE caa_date >= '" . mysqli_real_escape_string($this->db->link_id(), $startDate) . "'" .
-            " AND caa_date <= '" . mysqli_real_escape_string($this->db->link_id(),
-                                                             $endDate) . "' AND callactivity.caa_problemno <> 0"
+            " WHERE caa_date >= '" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $startDate
+            ) . "'" .
+            " AND caa_date <= '" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $endDate
+            ) . "' AND callactivity.caa_problemno <> 0"
         );
 
         return (parent::getRows());
@@ -273,7 +496,8 @@ class DBEJCallActivity extends DBECallActivity
         $includeTravel = false,
         $includeOperationalTasks = true,
         $descendingDate = false,
-        $fromDate = false, // limits the number of activities returned
+        $fromDate = false,
+        // limits the number of activities returned
         $includeServerGuardUpdates = true
     )
     {
@@ -282,8 +506,10 @@ class DBEJCallActivity extends DBECallActivity
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE callactivity.caa_problemno = '" . mysqli_real_escape_string($this->db->link_id(),
-                                                                                $problemID) . "' AND callactivity.caa_problemno <> 0";
+            " WHERE callactivity.caa_problemno = '" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $problemID
+            ) . "' AND callactivity.caa_problemno <> 0";
 
         if (!$includeTravel) {           // isnull in case this is an incomplete activity with no call activity set yet
             $query .= " AND ( travelFlag <> 'Y' OR ISNULL(travelFlag) )";
@@ -311,7 +537,9 @@ class DBEJCallActivity extends DBECallActivity
         return (parent::getRows());
     }
 
-    function countRowsByCustomerSiteNo($customerID, $siteNo)
+    function countRowsByCustomerSiteNo($customerID,
+                                       $siteNo
+    )
     {
         $this->setQueryString(
             "SELECT COUNT(*) FROM " . $this->getTableName() .

@@ -268,6 +268,174 @@ class CTCustomerCRM extends CTCustomer
 
     } // end search
 
+    function initialProcesses()
+    {
+        $this->retrieveHTMLVars();
+        parent::initialProcesses();
+    }
+
+    function setContact(&$contactArray)
+    {
+        if (!is_array(
+            $contactArray
+        )) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
+            return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
+        }
+
+        while (list($key, $value) = each($contactArray)) {
+            $this->dsContact->setUpdateModeInsert();
+            $this->dsContact->setValue(
+                DBEContact::contactID,
+                $value['contactID']
+            );
+            $this->dsContact->setValue(
+                DBEContact::customerID,
+                $value['customerID']
+            );
+            $this->dsContact->setValue(
+                DBEContact::supplierID,
+                $value['supplierID']
+            );
+            $this->dsContact->setValue(
+                DBEContact::siteNo,
+                $value['siteNo']
+            );
+            $this->dsContact->setValue(
+                DBEContact::title,
+                $value['title']
+            );
+            $this->dsContact->setValue(
+                DBEContact::lastName,
+                $value['lastName']
+            );
+            if ($this->dsContact->getValue(DBEContact::lastName) == '') {
+                $this->setFormErrorOn();
+                $this->dsContact->setValue(
+                    'LastNameClass',
+                    CTCUSTOMER_CLS_FORM_ERROR
+                );
+            }
+            $this->dsContact->setValue(
+                DBEContact::firstName,
+                $value['firstName']
+            );
+            $this->dsContact->setValue(
+                DBEContact::email,
+                $value['email']
+            );
+            $this->dsContact->setValue(
+                DBEContact::phone,
+                $value['phone']
+            );
+            $this->dsContact->setValue(
+                DBEContact::notes,
+                $value['notes']
+            );
+            $this->dsContact->setValue(
+                DBEContact::mobilePhone,
+                $value['mobilePhone']
+            );
+            $this->dsContact->setValue(
+                DBEContact::position,
+                $value['position']
+            );
+            $this->dsContact->setValue(
+                DBEContact::fax,
+                $value['fax']
+            );
+            $this->dsContact->setValue(
+                DBEContact::portalPassword,
+                $value['portalPassword']
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::accountsFlag,
+                $this->getYN($value['accountsFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::discontinuedFlag,
+                $value['discontinuedFlag']
+            );
+            $this->dsContact->setValue(
+                DBEContact::sendMailshotFlag,
+                $this->getYN($value['sendMailshotFlag'])
+            );// Use getYN() because HTML POST does not send a FALSE value
+            $this->dsContact->setValue(
+                DBEContact::mailshot1Flag,
+                $this->getYN($value['mailshot1Flag'])
+            );// Use getYN() because HTML POST does not send a FALSE value
+            $this->dsContact->setValue(
+                DBEContact::mailshot2Flag,
+                $this->getYN($value['mailshot2Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot3Flag,
+                $this->getYN($value['mailshot3Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot4Flag,
+                $this->getYN($value['mailshot4Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot5Flag,
+                $this->getYN($value['mailshot5Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot6Flag,
+                $this->getYN($value['mailshot6Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot7Flag,
+                $this->getYN($value['mailshot7Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot8Flag,
+                $this->getYN($value['mailshot8Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot9Flag,
+                $this->getYN($value['mailshot9Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::mailshot10Flag,
+                $this->getYN($value['mailshot10Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::workStartedEmailFlag,
+                $this->getYN($value['workStartedEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::autoCloseEmailFlag,
+                $this->getYN($value['autoCloseEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::failedLoginCount,
+                $value['failedLoginCount']
+            );
+
+
+            if (
+                $value['email'] == '' &&
+                $value[CONFIG_HEADER_SUPPORT_CONTACT_FLAG] == 'Y'
+            ) {
+                $this->setFormErrorOn();
+                $this->formErrorMessage = 'NOT SAVED: Email address required for support contacts';
+            }
+            // Determine whether a new contact is to be added
+            if ($this->dsContact->getValue(DBEContact::contactID) == 0) {
+                if (
+                    ($this->dsContact->getValue(DBEContact::title) != '') |
+                    ($this->dsContact->getValue(DBEContact::firstName) != '') |
+                    ($this->dsContact->getValue(DBEContact::lastName) != '')
+                ) {
+                    $this->dsContact->post();
+                }
+            } else {
+                $this->dsContact->post();  // Existing contact
+            }
+        }
+    }
+
     function getData(&$dbSource,
                      &$dsDestination
     )

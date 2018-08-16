@@ -5,10 +5,88 @@ This project changes will be shown here.
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
 
+## [v1.10.1] - 2018-08-03
+### Fixed
+- Fixed issue with First Time Fixes totals
+
+## [v1.10.0] - 2018-08-03
+### Added
+- Issue 259 - Contact changes audit log
+- Issue 309 - 2S Replication Check Exclusion feature
+### Fixed
+- Issue 308 - Bugs from release 1.9
+### Changed
+- Issue 314 - Increase length of mail queue recipient database field
+- Issue 313 - Monthly Customer Profitability Report email group update
+- Issue 307 - Dashboard figures to load asynchronously, daily fixed & first time fixes
+
+## [v1.9.2] - 2018-07-27
+### Fixed
+- Fixed problem with XX engineers in XX hours query
+- jQuery DatePicker to show Monday as first day of the week
+- Fixed issue with conflicting jQuery versions
+### Added
+- Added Monthly First Time Fix figures
+- Added Weekly Fixed and Reopened figures
+- Create script to send emails from Labtech database
+
+## [v1.9.1] - 2018-07-26
+### Fixed
+- 2nd Site Backup out of date calculations
+- Fix and improve holiday time logging calculations
+- Fix problem with item description quote page
+
+## [v1.9.0] - 2018-07-25
+### Changed
+- Issue 285 - Change length limit to customer item 'Item Text' field
+- Issue 267 - Auto Service Completion for Starters & Leavers
+- Issue 277 - Move reports to Technical menu for SD Managers
+- Issue 272 - Contract Analysis Report error handling
+- Issue 270 - Technical Change Request to default to Awaiting CNC
+- Issue 278 - Consider a negative 2nd Site date check to be a failure
+- Issue 281 - Add headings for the contract page popup.
+- Issue 293 - Team Performance Calculations Update To Include Previous Month
+- Issue 291 - Technical Change Request formatting change
+- Issue 274 - Set system updated SRs to status Awaiting CNC
+- Issue 294 - User performance graph tweaks
+- Issue 284 - Investigate length of fields allowed in quotes
+- Issue 296 - Change Open SR Report so non main contacts only see their SRs
+- Issue 249 - 2nd Site Replication check process
+- Issue 302 - 7 Day report to include awaiting status 
+- Issue 298 - Single Fixed Explanation within a Service Request
+- Issue 232 - Improve Uploading Files to Service Request Activities
+### Fixed
+- Issue 275 - Permissions error for PortalDocument
+- Issue 271 - CustomerAnalysis Report error handling
+- Issue 279 - Contracts not populating on Search page
+- Issue 300 - Error adding passwords from Sales Password page
+- Issue 276 - Occasional formatting issues for Monitored SR emails 
+### Added
+- Issue 280 - Restore ability to create customer documentation folder
+- Issue 121 - CNC014 - Add ability to log a new SR directly into a team
+- Issue 297 - First Time Fix figures
+- Issue 269 - Live fixed SR target & total.
+- Issue 266 - Helpdesk Manager Dashboard View
+### Removed
+- Issue 282 - Remove DNS records from domain name
+- Issue 283 - Remove Documentation link from Quotation Page
+
+## [v1.8.5]
+### Fixed
+- Issue 299 - Show link to create customer folder if it doesn't exist
+
+## [v1.8.4] - 2018-07-04
+### Fixed
+- Issue 292 - Skip Sales Order on Activity.php shows debug information
+
+## [v1.8.3] - 2018-06-29
+### Fixed
+- Issue 290 - T&M processing error for multiple activity
+
 ## [v1.8.2] - 2018-06-28
 ### Fixed
 - Issue 289 - Fix issues 
-
+ 
 ## [v1.8.1] - 2018-06-26
 ### Fixed
 - Issue 287 - Fix problem with sales orders

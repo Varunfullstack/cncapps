@@ -1,0 +1,71 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue259-1532422717-0">
+        <tagDatabase tag="issue259"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue259-1532422717-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="contactAuditLog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="contactAuditLog">
+            <column name="action" type="CHAR(8)"/>
+            <column name="createdAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="userId" type="int(11)"/>
+            <column name="contactId" type="int(11)"/>
+            <column name="con_contno" type="int(11)"/>
+            <column name="con_siteno" remarks="Default Site FK (only if Customer)" type="SMALLINT"/>
+            <column name="con_custno" remarks="Customer PK (optional)" type="INT"/>
+            <column name="con_suppno" remarks="Supplier PK (optional)" type="INT"/>
+            <column name="con_title" remarks="Title" type="CHAR(10)"/>
+            <column name="con_position" remarks="Position" type="CHAR(50)"/>
+            <column defaultValue="" name="con_last_name" remarks="Last name" type="CHAR(35)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="con_first_name" remarks="First name" type="CHAR(25)"/>
+            <column name="con_email" remarks="Email address" type="CHAR(60)"/>
+            <column name="con_phone" remarks="Phone number" type="CHAR(25)"/>
+            <column name="con_mobile_phone" remarks="Mobile phone" type="CHAR(25)"/>
+            <column name="con_fax" remarks="Fax" type="CHAR(25)"/>
+            <column name="con_mailshot" remarks="Send Mailshots?" type="CHAR(1)"/>
+            <column defaultValue="" name="con_accounts_flag" remarks="Is member of Accounts?" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="con_discontinued" remarks="Is no longer active?" type="CHAR(1)"/>
+            <column name="con_mailflag1" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag2" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag3" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag4" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag5" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag6" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag7" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag8" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag9" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_mailflag10" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+            <column name="con_notes" remarks="Notes" type="CHAR(200)"/>
+            <column name="con_portal_password" remarks="Customer portal password" type="CHAR(10)"/>
+            <column name="con_failed_login_count" remarks="Failed portal log in count" type="INT"/>
+            <column defaultValue="Y" name="con_work_started_email_flag" remarks="Send Request Work Started email?"
+                    type="CHAR(1)"/>
+            <column defaultValue="Y" name="con_auto_close_email_flag" remarks="Send Request automatically closed email?"
+                    type="CHAR(1)"/>
+            <column name="con_mailflag11" remarks="Refer to header table for meaning" type="CHAR(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue259-1532422717-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_statement_flag"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_statement_flag"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_statement_flag" type="CHAR(1)" beforeColumn="con_discontinued" remarks="Should receive PrePay statements?"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

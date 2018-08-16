@@ -34,7 +34,7 @@ require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_dbe"]. "/DBEJPorhead.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
@@ -1175,16 +1175,19 @@ class BUActivity extends Business
           WHERE con_contno = " . $dsCallActivity->getValue(DBEJCallActivity::contactID);
 
             $oldNotes = $this->db->query($sql)->fetch_object()->con_notes;
-
             if (
                 $oldNotes != $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
             ) {
-                $sql =
-                    "UPDATE contact
-              SET con_notes = '" . $dsCallActivity->getValue(DBEJCallActivity::contactNotes) .
-                    "' WHERE con_contno = " . $dsCallActivity->getValue(DBEJCallActivity::contactID);
 
-                $this->db->query($sql);
+                $dbeContact = new DBEContact($this);
+
+                $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
+                
+                $dbeContact->setValue(
+                    DBEContact::notes,
+                    $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
+                );
+                $dbeContact->updateRow();
             }
         }
         if ($dsCallActivity->getValue(DBEJCallActivity::techNotes) && $dsCallActivity->getValue(
@@ -2426,7 +2429,7 @@ class BUActivity extends Business
   Send an alert email if number of activities per SR per day exceeds system max
   */
 
-    function updateAllHistoricUserLoggedHours()
+    function updateAllHistoricUserLoggedHours(DateTime $startDate = null)
     {
         $sql =
             "SELECT
@@ -2435,6 +2438,11 @@ class BUActivity extends Business
       FROM
         user_time_log";
 
+        if ($startDate) {
+            $sql .= " where loggedDate > '" . $startDate->format('Y-m-d') . "'";
+        }
+        $sql .= " and holiday = 0 ";
+        $sql .= " order by loggedDate asc, userID";
         $result = $this->db->query($sql);
         while ($record = $result->fetch_assoc()) {
             echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . "<BR/>";
@@ -3171,6 +3179,7 @@ class BUActivity extends Business
         $lastProblemID = false;
         $lastUserID = false;
         $lastDate = false;
+        $consultantName = '';
 
         while ($dbeJCallActivity->fetchNext()) {
 
@@ -3221,7 +3230,7 @@ class BUActivity extends Business
                         $ordheadID = $dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID);
                     }
                 }
-                $sequenceNo = 0;
+
                 if ($ordheadID) {
 
                     $buSalesOrder->getOrderByOrdheadID(
@@ -3366,7 +3375,6 @@ class BUActivity extends Business
 
             $lastProblemID = $problemID;
 
-            $consultantName = '';
             if ($lastUserID != $dbeJCallActivity->getValue(
                     DBEJCallActivity::userID
                 ) or $lastDate != $dbeJCallActivity->getValue(
@@ -3414,7 +3422,6 @@ class BUActivity extends Business
             );
 
             if ($normalHours > 0) {
-
                 $description = $consultantName . ' - Consultancy';
                 $sequenceNo++;
                 $dbeOrdline->setValue(
@@ -4940,9 +4947,15 @@ is currently a balance of ';
             DBEProblem::slaResponseHours,
             $slaResponseHours
         );
+
+        $queueNo = 1;
+        if (isset($_SESSION[$sessionKey]['queueNo'])) {
+            $queueNo = $_SESSION[$sessionKey]['queueNo'];
+        }
+
         $dbeProblem->setValue(
             DBEProblem::queueNo,
-            1
+            $queueNo
         ); // initial queue number
         $dbeProblem->setValue(
             DBEProblem::priority,
@@ -6957,7 +6970,9 @@ is currently a balance of ';
                             $details,
                             false,
                             true,
-                            USER_SYSTEM
+                            USER_SYSTEM,
+                            false,
+                            true
                         );
 
                         if ($record['attachment'] == 'Y') {
@@ -7602,6 +7617,7 @@ is currently a balance of ';
      * @param bool $setEndTimeToNow
      * @param $userID
      * @param bool $moveToUsersQueue
+     * @param bool $resetAwaitingCustomerResponse
      * @return string
      */
     function createFollowOnActivity(
@@ -7612,7 +7628,8 @@ is currently a balance of ';
         $ifUnallocatedSetToCurrentUser = true,
         $setEndTimeToNow = false,
         $userID,
-        $moveToUsersQueue = false
+        $moveToUsersQueue = false,
+        $resetAwaitingCustomerResponse = false
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
@@ -7638,10 +7655,7 @@ is currently a balance of ';
                 /*
         Prepopulate reason
         */
-                $reason =
-                    '<p>System:</p><p>Version:</p><p>Summary of problem:</p><p>Change requested:</p>';
-                $reason .=
-                    '<p>Method to test change is successful:</p><p>Reversion plan if unsuccessful:</p>';
+                $reason = "<table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
             }
         }
 
@@ -7740,6 +7754,11 @@ is currently a balance of ';
                 $dbeProblem->setValue(
                     DBEJProblem::reopenedFlag,
                     'Y'
+                );
+
+                $dbeProblem->setValue(
+                    DBEJProblem::reopenedDate,
+                    (new DateTime())->format('Y-m-d')
                 );
 
                 if ($dbeProblem->getValue(DBEJProblem::fixedUserID) != USER_SYSTEM) {
@@ -7854,11 +7873,27 @@ is currently a balance of ';
             DBEJCallActivity::serverGuard,
             $dbeCallActivity->getValue(DBEJCallActivity::serverGuard)
         );
+
+        if ($resetAwaitingCustomerResponse) {
+
+            $dbeProblem->setValue(
+                DBEJProblem::awaitingCustomerResponseFlag,
+                'N'
+            );
+            $dbeProblem->updateRow();
+
+            $dbeCallActivity->setValue(
+                DBECallActivity::awaitingCustomerResponseFlag,
+                'N'
+            );
+        }
+
         $dbeCallActivity->insertRow();
 
         $ret = $dbeCallActivity->getPKValue();
 
         $this->highActivityAlertCheck($dbeProblem->getValue(DBEJProblem::problemID));
+
 
         if ($passedReason) {
             $this->updatedByAnotherUser(
@@ -8089,6 +8124,7 @@ is currently a balance of ';
             $problemID
         );
 
+
         if (!$fixedUserID) {
             $fixedUserID = $this->loggedInUserID;
         }
@@ -8132,6 +8168,27 @@ is currently a balance of ';
         $dbeProblem->updateRow();
 
         $this->closeActivitiesWithEndTime($problemID);
+
+        $dbeJCallActivity = $this->getActivitiesByProblemID($problemID);
+
+        while ($dbeJCallActivity->fetchNext()) {
+            if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
+                $dbeCallActivity = new DBECallActivity($this);
+                $dbeCallActivity->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActivityID));
+                $dbeCallActivity->setValue(
+                    DBEJCallActivity::callActTypeID,
+                    11
+                );
+
+                $dbeCallActivity->setValue(
+                    DBEJCallActivity::reason,
+                    '<div>Fixed Explanation</div>' . $dbeJCallActivity->getValue(DBEJCallActivity::reason)
+                );
+
+                $dbeCallActivity->updateRow();
+            }
+        }
+
         $this->createFixedActivity(
             $problemID,
             $resolutionSummary
@@ -9931,23 +9988,32 @@ is currently a balance of ';
      *
      * Called by a timed process last thing at night to ensure all active users
      * have a log entry for each working day.
-     *
+     * @param string $date
      */
-    function createUserTimeLogsForMissingUsers()
+    function createUserTimeLogsForMissingUsers($date = null)
     {
-        $bankHolidays = common_getUkBankHolidays(date('Y'));
+        if (!$date) {
+            $date = new DateTime();
+        } else {
+            $date = new DateTime($date);
+        }
+
+        $bankHolidays = common_getUkBankHolidays($date->format('Y'));
 
         if (in_array(
-                date('Y-m-d'),
+                $date->format('Y-m-d'),
                 $bankHolidays
-            ) || date('N') > 5) {
+            ) || $date->format('N') > 5) {
             return; // ignore holidays
         }
 
 
         $this->dbeUser->getRows(true);
         while ($this->dbeUser->fetchNext()) {
-            $this->createUserTimeLogRecord($this->dbeUser->getValue(DBEUser::userID));
+            $this->createUserTimeLogRecord(
+                $this->dbeUser->getValue(DBEUser::userID),
+                $date
+            );
         }
 
     }
@@ -9960,11 +10026,17 @@ is currently a balance of ';
      * start time.
      *
      * @param mixed $userID
+     * @param DateTime|null $date
      */
-    function createUserTimeLogRecord($userID)
+    function createUserTimeLogRecord($userID,
+                                     DateTime $date = null
+    )
     {
         global $db;
 
+        if (!$date) {
+            $date = new DateTime();
+        }
         $db->query(
             "SELECT
         team.level as teamLevel,
@@ -9990,6 +10062,7 @@ is currently a balance of ';
 
         $loggedHours = $standardDayHours * ($targetPercentage / 100);
 
+        $dateFormatted = $date->format('Y-m-d');
         $sql =
             "INSERT IGNORE INTO user_time_log
         (
@@ -9998,16 +10071,18 @@ is currently a balance of ';
         `loggedDate`,
         `loggedHours`,
         `dayHours`,
-        `startedTime` 
+        `startedTime` ,
+        holiday
         ) 
       VALUES 
         (
           $userID,
           $teamLevel,
-          DATE( NOW() ),
+          '$dateFormatted',
           $loggedHours,
           $standardDayHours,
-          '00:00:00'
+          '00:00:00',
+          1
         )";
 
         $db->query($sql);
@@ -10353,6 +10428,22 @@ is currently a balance of ';
 
         $body = $template->get_var('output');
 
+        $body = preg_replace(
+            '/[\x00-\x1F\x7F-\xFF]/',
+            '',
+            $body
+        );
+        $body = preg_replace(
+            '/[\x00-\x1F\x7F]/',
+            '',
+            $body
+        );
+        $body = preg_replace(
+            '/[\x00-\x1F\x7F]/u',
+            '',
+            $body
+        );
+
         foreach ($monitoringPeople as $monitoringPerson) {
             $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
 
@@ -10365,6 +10456,7 @@ is currently a balance of ';
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
+
 
             $buMail->mime->setHTMLBody($body);
 
@@ -10448,6 +10540,66 @@ is currently a balance of ';
         $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime <> ''";
         $db->query($sql);
         return true;
+    }
+
+    public function getSDDashBoardData($problems,
+                                       $limit,
+                                       $order = 'shortestSLARemaining',
+                                       $isP5 = false
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getDashBoardRows(
+            $limit,
+            $order,
+            $isP5
+        );
+
+        $this->getData(
+            $dbeJProblem,
+            $problems
+        );
+    }
+
+    public function getActivityCount($problemID,
+                                     $ignoreOperation = true
+    )
+    {
+        $dbejCallActivity = new DBEJCallActivity($this);
+        $dbejCallActivity->getRowsByProblemID(
+            $problemID,
+            true,
+            !$ignoreOperation
+        );
+        $count = 0;
+        while ($thing = $dbejCallActivity->fetchNext()) {
+            $count++;
+        }
+        return $count;
+    }
+
+    public function getSDDashBoardEngineersInSRData($problems,
+                                                    $engineersMaxCount = 3,
+                                                    $pastHours = 24,
+                                                    $limit = 5,
+                                                    $isP5 = false
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getDashBoardEngineersInSRRows(
+            $engineersMaxCount,
+            $pastHours,
+            $limit,
+            $isP5
+        );
+
+        $this->getData(
+            $dbeJProblem,
+            $problems
+        );
+
     }
 
 

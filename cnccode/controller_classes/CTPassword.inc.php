@@ -159,7 +159,7 @@ class CTPassword extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'edit',
-                        'customerID' => $_REQUEST['customerID']
+                        'customerID' => $customerID
                     )
                 );
             $urlLoadFromCsv =
@@ -167,7 +167,7 @@ class CTPassword extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'loadFromCsv',
-                        'customerID' => $_REQUEST['customerID']
+                        'customerID' => $customerID
                     )
                 );
 
@@ -184,7 +184,7 @@ class CTPassword extends CTCNC
                     'urlAdd'         => $urlAdd,
                     'urlLoadFromCsv' => $urlLoadFromCsv,
                     'customerName'   => $dbeCustomer->getValue(DBECustomer::name),
-                    'customerID'     => $_REQUEST['customerID'],
+                    'customerID'     => $customerID,
                     'formError'      => $this->getFormErrorMessage()
                 )
             );

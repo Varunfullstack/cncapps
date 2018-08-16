@@ -1779,12 +1779,9 @@ ORDER BY cus_name ASC  ";
             $customLetterTemplates = false;
         }
 
-        if ($customerFolderPath = $this->buCustomer->customerFolderExists(
+        if (!$this->buCustomer->customerFolderExists(
             $this->dsCustomer->getValue(DBECustomer::customerID)
         )) {
-            $customerFolderLink =
-                '<a href="file:' . $customerFolderPath . '" target="_blank" title="Open Folder">Open Folder</a>';
-        } else {
             $urlCreateCustomerFolder =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
