@@ -420,11 +420,8 @@ class DBEContact extends DBCNCEntity
             " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
 
         if ($supportOnly) {
-            $sql .= " AND " . $this->getDBColumnName(
-                    self::mailshot5Flag
-                ) . " = 'Y'";        // only nominated support contacts
+            $sql .= " AND " .$this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
         }
-
         $sql .=
             " ORDER BY " . $this->getDBColumnName(self::lastName);
 
@@ -442,7 +439,6 @@ class DBEContact extends DBCNCEntity
     function getSupplierContactRowsByNameMatch($match)
     {
         $this->setMethodName("getSupplierContactRowsByNameMatch");
-        $ret = FALSE;
         if ($this->getValue(self::supplierID) == '') {
             $this->raiseError('supplierID not set');
         }
@@ -480,7 +476,6 @@ class DBEContact extends DBCNCEntity
     )
     {
         $this->setMethodName("getCustomerRowsByNameMatch");
-        $ret = FALSE;
         $this->setValue(
             self::customerID,
             $customerId
@@ -512,10 +507,7 @@ class DBEContact extends DBCNCEntity
         con_mailflag1 = 'Y' OR
         con_mailflag2 = 'Y' OR
         con_mailflag3 = 'Y' OR
-        con_mailflag4 = 'Y' OR
-        con_mailflag5 = 'Y' OR
-        con_mailflag6 = 'Y' OR
-        con_mailflag7 = 'Y' OR
+        con_mailflag4 = 'Y' Or
         con_mailflag8 = 'Y' OR
         con_mailflag9 = 'Y' OR
         con_mailflag10 = 'Y' or
@@ -572,7 +564,7 @@ class DBEContact extends DBCNCEntity
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_MAIN_CONTACT_FLAG) . " = 'Y'" .
+            " WHERE " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'" .
             " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
         $this->setQueryString($sql);
         return (parent::getRows());
@@ -582,8 +574,8 @@ class DBEContact extends DBCNCEntity
     {
         $sql = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_SUPPORT_CONTACT_FLAG) . " = 'Y'
-        AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+            " WHERE " . $this->getDBColumnName(self::supportLevel) .
+            " is no null AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
 
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;
@@ -632,7 +624,7 @@ class DBEContact extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y'" .
+            " WHERE " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'" .
             " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
 
         );
