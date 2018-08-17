@@ -95,6 +95,7 @@ class DBECustomerItem extends DBCNCEntity
     const secondSiteReplicationPath = "secondSiteReplicationPath";
     const secondSiteReplicationExcludeFlag = "secondSiteReplicationExcludeFlag";
     const directDebitFlag = "directDebitFlag";
+    const transactionType = "transactionType";
 
     /**
      * calls constructor()
@@ -636,6 +637,13 @@ class DBECustomerItem extends DBCNCEntity
             DA_YN,
             DA_ALLOW_NULL,
             "custitem.directDebitFlag"
+        );
+
+        $this->addColumn(
+            self::transactionType,
+            DA_STRING,
+            DA_NOT_NULL,
+            'custitem.transactionType'
         );
 
         $this->setPK(0);

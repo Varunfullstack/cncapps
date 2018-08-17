@@ -16,7 +16,7 @@
             <column name="directDebitFlag" type="char(1)" defaultValue="N"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue211-1534414967-1" author="pavwebdev">
+    <changeSet id="issue211-1534414967-2" author="pavwebdev">
         <preConditions>
             <not>
                 <columnExists tableName="custitem" columnName="transactionType"/>
