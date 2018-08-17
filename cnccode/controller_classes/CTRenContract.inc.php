@@ -590,6 +590,30 @@ class CTRenContract extends CTCNC
 
         $this->template->set_block(
             'RenContractEdit',
+            'TransactionTypesBlock',
+            'transactionTypesOptions'
+        );
+        $transactionTypes = [
+            "01",
+            "17",
+        ];
+        foreach ($transactionTypes as $transactionType) {
+            $this->template->set_var(
+                array(
+                    'transactionType' => $transactionType,
+                    'selected'        => $dsRenContract->getValue(
+                        DBECustomerItem::transactionType
+                    ) == $transactionType ? 'selected' : null,
+                )
+            );
+            $this->template->parse(
+                'transactionTypesOptions',
+                'TransactionTypesBlock',
+                true
+            );
+        }
+        $this->template->set_block(
+            'RenContractEdit',
             'coveredItemsBlock',
             'coveredItems'
         );

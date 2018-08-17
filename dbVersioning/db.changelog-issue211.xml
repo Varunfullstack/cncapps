@@ -26,4 +26,20 @@
             <column name="transactionType" type="char(2)" defaultValue="01"/>
         </addColumn>
     </changeSet>
+    <changeSet id="issue211-1534414967-3" author="pavwebdev">
+        <preConditions>
+            <columnExists tableName="custitem" columnName="transactionType"/>
+        </preConditions>
+        <sql>
+            update custitem set transactionType = '01'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue211-1534414967-4" author="pavwebdev">
+        <sql>
+            update custitem JOIN item ON itm_itemno = cui_itemno set autoGenerateContractInvoice = 'Y' where
+            renewalTypeID in (1,4,5)
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
