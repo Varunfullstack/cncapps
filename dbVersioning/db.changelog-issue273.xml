@@ -38,6 +38,8 @@
             '["contactFirstName","contactLastName"]'
             )
         </sql>
-        <rollback></rollback>
+        <rollback>
+            delete from standardtexttype where sty_standardtexttypeno = 4
+        </rollback>
     </changeSet>
 </databaseChangeLog>
