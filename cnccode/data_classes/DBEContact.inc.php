@@ -44,6 +44,7 @@ class DBEContact extends DBCNCEntity
     const supportLevelMain = 'main';
     const supportLevelSupport = 'support';
     const supportLevelSupportDelegate = 'delegate';
+    const supportLevelSupervisor = 'supervisor';
 
     /**
      * calls constructor()

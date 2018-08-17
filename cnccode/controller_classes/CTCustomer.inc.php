@@ -3177,6 +3177,7 @@ ORDER BY cus_name ASC  ";
         $supportLevels = [
             ["value" => null, "description" => "None"],
             ["value" => DBEContact::supportLevelMain, "description" => "Main"],
+            ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
             ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
             ["value" => DBEContact::supportLevelSupportDelegate, "description" => "Delegate"],
         ];

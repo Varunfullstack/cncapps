@@ -282,7 +282,7 @@
         <dropColumn tableName="headert" columnName="hed_mailflg5_desc"/>
         <rollback>
             <addColumn tableName="headert">
-                <column name="hed_mailflg5_desc" type="char(30)"/>
+                <column name="hed_mailflg5_desc" type="char(30)" value="Sup"/>
             </addColumn>
         </rollback>
     </changeSet>
@@ -304,7 +304,7 @@
         <dropColumn tableName="headert" columnName="hed_mailflg10_desc"/>
         <rollback>
             <addColumn tableName="headert">
-                <column name="hed_mailflg10_desc" type="char(30)"/>
+                <column name="hed_mailflg10_desc" type="char(30)" value="Main"/>
             </addColumn>
         </rollback>
     </changeSet>
