@@ -162,7 +162,8 @@ class CTRenewalReport extends CTCNC
 
         $mainPDF->Output(
             'F',
-            $fileName
+            $fileName,
+            true
         );
 
         $fileName = str_replace(
@@ -452,7 +453,6 @@ Many thanks.
                 $templateID,
                 $dsResults
             );
-
 
             $body = $dsResults->getValue("stt_text");
 
