@@ -306,7 +306,7 @@ class BURenHosting extends Business
         /*
          * Finalise last sales order and create an invoice
          */
-        if ($createdSalesOrder && !$renewalIDs) {
+        if ($createdSalesOrder && !$customerItemIDs) {
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
             $buSalesOrder->getOrderByOrdheadID($dsOrdhead->getValue('ordheadID'), $dsOrdhead, $dsOrdline);
@@ -317,7 +317,7 @@ class BURenHosting extends Business
         If created from list of IDs then there will only be one customer and order
         and the caller will want to redirect to sales order page.
         */
-        if ($renewalIDs) {
+        if ($customerItemIDs) {
             return $dsOrdhead->getValue('ordheadID');
         }
     }

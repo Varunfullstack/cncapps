@@ -195,13 +195,9 @@ class BURenDomain extends Business
         $buInvoice = new BUInvoice ($this);
 
         if ($renewalIDs) {
-
             $this->dbeJRenDomain->getRenewalsRowsByID($renewalIDs);
-
         } else {
-
             $this->dbeJRenDomain->getRenewalsDueRows();
-
         }
 
         $dbeRenDomainUpdate = new DBECustomerItem($this);

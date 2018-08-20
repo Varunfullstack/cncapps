@@ -107,7 +107,7 @@ class DBEJRenBroadband extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
      AND renewalTypeID = 1
-		 AND declinedFlag = 'N'
+		 AND declinedFlag = 'N' and directDebitFlag <> 'Y'
 		 ORDER BY cui_custno
 		 ";
 
