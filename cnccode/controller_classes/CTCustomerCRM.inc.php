@@ -1721,9 +1721,6 @@ class CTCustomerCRM extends CTCNC
                 'autoCloseEmailMainFlagChecked'   => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)
                 ),
-                'pcxFlagChecked'                  => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::pcxFlag)
-                ),
                 'createDate'                      => $this->dsCustomer->getValue(DBECustomer::createDate),
                 'mailshot1FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot1FlagDesc"),
                 'mailshot2FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
