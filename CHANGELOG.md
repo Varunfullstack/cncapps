@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 326 - Enhance Items Not Received Process
+
 ## [v1.10.2] - 2018-08-20
 ### Fixed
 - Issue 333 - Prepay Top Up value lost when saving customer
