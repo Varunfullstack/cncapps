@@ -7,7 +7,7 @@
         <tagDatabase tag="issue320"/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue320-1531213570-1">
-        <modifyDataType tableName="mail_queue" columnName="recipient" newDataType="text"/>
+        <modifyDataType tableName="mail_queue" columnName="recipient" newDataType="varchar(1000)"/>
         <rollback/>
     </changeSet>
 </databaseChangeLog>
