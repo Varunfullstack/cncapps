@@ -9,9 +9,10 @@
 
 require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
-require_once($cfg ['path_dbe'] . '/DBEUser.inc.php');
+require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
 require_once($cfg ['path_dbe'] . '/DBETeam.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
+
 
 define(
     'CTCNC_ACT_DISP_CUST_POPUP',
@@ -234,7 +235,13 @@ class CTCNC extends Controller
 
         $this->user = new BUUser($this);
 
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "",
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg,
+            "",
             "",
             "",
             ""

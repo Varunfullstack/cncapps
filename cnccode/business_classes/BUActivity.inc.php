@@ -1182,7 +1182,7 @@ class BUActivity extends Business
                 $dbeContact = new DBEContact($this);
 
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
-                
+
                 $dbeContact->setValue(
                     DBEContact::notes,
                     $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
@@ -2204,13 +2204,15 @@ class BUActivity extends Business
         $this->dbeUser->getRow($userID);
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
+        $status = $dsCallActivity->getValue(DBEJCallActivity::status);
         switch ($response) {
 
             case 'A':
                 $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
 
                 $subject = 'Change Request approved';
+
+                $status = 'C';
 
                 break;
 
@@ -2219,6 +2221,8 @@ class BUActivity extends Business
 
                 $subject = 'Change Request denied';
 
+                $status = 'C';
+
                 break;
 
             case 'I':
@@ -2226,9 +2230,16 @@ class BUActivity extends Business
 
                 $subject = 'More information/discussion required for change request';
 
+                $status = 'O';
                 break;
         }
 
+        $dsCallActivity->setValue(
+            DBEJCallActivity::status,
+            $status
+        );
+        $dsCallActivity->setUpdateModeUpdate();
+        $dsCallActivity->post();
         /*
     Append any comments
     */
@@ -7825,6 +7836,15 @@ is currently a balance of ';
                 'O'
             ); // Leave open
         }
+
+        if ($callActivityTypeID == CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID) {
+            //if this is a change request ..leave it open as in "pending change request"
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::status,
+                'O'
+            );
+        }
+
 
         $dbeCallActivity->setPKValue('');
 
