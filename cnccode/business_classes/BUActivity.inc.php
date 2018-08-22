@@ -2234,12 +2234,15 @@ class BUActivity extends Business
                 break;
         }
 
-        $dsCallActivity->setValue(
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
+        $dbeCallActivity->setUpdateModeUpdate();
+        $dbeCallActivity->setValue(
             DBEJCallActivity::status,
             $status
         );
-        $dsCallActivity->setUpdateModeUpdate();
-        $dsCallActivity->post();
+
+        $dbeCallActivity->post();
         /*
     Append any comments
     */
