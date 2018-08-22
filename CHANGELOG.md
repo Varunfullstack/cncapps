@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 327 - SQL crash searching for customer with apostrophe in the name
+
 ## [v1.10.2] - 2018-08-20
 ### Fixed
 - Issue 333 - Prepay Top Up value lost when saving customer

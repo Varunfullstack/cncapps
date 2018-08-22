@@ -450,25 +450,58 @@ class DBECustomer extends DBCNCEntity
 
         if ($address != '') {
             $queryString .=
-                " AND (add_town LIKE '%" . $address . "%'" .
-                " OR add_add1 LIKE '%" . $address . "%'" .
-                " OR add_add2 LIKE '%" . $address . "%'" .
-                " OR add_add3 LIKE '%" . $address . "%'" .
-                " OR add_postcode LIKE '" . $address . "%'" .
-                " OR add_county LIKE '%" . $address . "%')";
+                " AND (add_town LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $address
+                ) . "%'" .
+                " OR add_add1 LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $address
+                ) . "%'" .
+                " OR add_add2 LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $address
+                ) . "%'" .
+                " OR add_add3 LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $address
+                ) . "%'" .
+                " OR add_postcode LIKE '" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $address
+                ) . "%'" .
+                " OR add_county LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $address
+                ) . "%')";
         }
 
         if ($contact != '') {
             $queryString .=
-                " AND (con_first_name LIKE '%" . $contact . "%'" .
-                " OR con_last_name LIKE '%" . $contact . "%')";
+                " AND (con_first_name LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $contact
+                ) . "%'" .
+                " OR con_last_name LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $contact
+                ) . "%')";
         }
 
         if ($phoneNo != '') {
             $queryString .=
-                " AND (con_phone LIKE '%" . $phoneNo . "%'" .
-                " OR con_mobile_phone LIKE '%" . $phoneNo . "%'" .
-                " OR add_phone LIKE '%" . $phoneNo . "%')";
+                " AND (con_phone LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $phoneNo
+                ) . "%'" .
+                " OR con_mobile_phone LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $phoneNo
+                ) . "%'" .
+                " OR add_phone LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $phoneNo
+                ) . "%')";
         }
 
         if ($newCustomerFromDate != '') {
@@ -502,7 +535,10 @@ class DBECustomer extends DBCNCEntity
         }
 
         if ($name != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::name) . " LIKE '%" . $name . "%'";
+            $queryString .= " AND " . $this->getDBColumnName(self::name) . " LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $name
+                ) . "%'";
         }
 
         $queryString .= " GROUP BY " . $this->getDBColumnName(self::customerID) . " ORDER BY " . $this->getDBColumnName(
