@@ -148,9 +148,9 @@ if (!$outputToScreen) {
                 }
             }
             ?>
-            <TR>
+            <TR <?= $style ?>>
                 <TD>
-                    <A href="http://cncapps/PurchaseOrder.php?action=display&porheadID=<?php print $i[0] ?>" <?= $style ?>><?php print $i[0] ?></A>
+                    <A href="http://cncapps/PurchaseOrder.php?action=display&porheadID=<?php print $i[0] ?>" ><?php print $i[0] ?></A>
                 </TD>
                 <td>
                     <?= $i[1] ?>
