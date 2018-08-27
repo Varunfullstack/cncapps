@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 317 - Customer 3rd party contact information
 ### Changed
 - Issue 304 - Enhance First Time Fix Reporting
+- Issue 320 - Further Increase length of mail queue recipient database field
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed
