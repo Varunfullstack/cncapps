@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Fixed
 - Issue 315 - Monitored SR formatting issues.
+- Issue 328 - Spell checking within fields
 ### Added
 - Issue 317 - Customer 3rd party contact information
 ### Changed
