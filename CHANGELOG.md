@@ -9,6 +9,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 304 - Enhance First Time Fix Reporting
 - Issue 320 - Further Increase length of mail queue recipient database field
+- Issue 322 - Change Renewal Report Heading Expires to Invoiced Until
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed

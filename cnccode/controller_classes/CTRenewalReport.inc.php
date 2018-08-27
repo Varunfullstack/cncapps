@@ -109,21 +109,8 @@ class CTRenewalReport extends CTCNC
                     $this->setFormErrorOn();
 
                 } else {
-
                     $customerID = $this->dsSearchForm->getValue('customerID');
-
                     $report = $this->produceReport($customerID);
-
-                    $urlProducePdf =
-                        $this->buildLink(
-                            $_SERVER ['PHP_SELF'],
-                            array(
-                                'action'     => 'producePdfReport',
-                                'customerID' => $customerID
-                            )
-                        );
-
-                    $producePdfLink = '<a href="' . $urlProducePdf . '">Download PDF</a>';
                 }
 
             }
@@ -170,7 +157,6 @@ class CTRenewalReport extends CTCNC
                 'customerIDMessage' => $this->dsSearchForm->getMessage('customerID'),
                 'customerString'    => $customerString,
                 'urlCustomerPopup'  => $urlCustomerPopup,
-                'producePdfLink'    => $producePdfLink,
                 'urlSubmit'         => $urlSubmit,
                 'report'            => $report
             )
