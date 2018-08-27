@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 304 - Enhance First Time Fix Reporting
 - Issue 320 - Further Increase length of mail queue recipient database field
 - Issue 322 - Change Renewal Report Heading Expires to Invoiced Until
+- Issue 327 - SQL crash searching for customer with apostrophe in the name
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed
