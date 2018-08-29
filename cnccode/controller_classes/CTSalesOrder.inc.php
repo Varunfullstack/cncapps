@@ -1720,14 +1720,17 @@ class CTSalesOrder extends CTCNC
                             )
                         );
 
-                    $iconColor = 'yellow';
+                    $createItem = true;
+                    $iconColor = 'red';
                     if ($dsOrdline->getValue('renewalCustomerItemID')) {
                         $iconColor = 'green';
+                        $createItem = false;
                     }
 
+
                     $renewalIcon =
-                        '<A HREF="' . $urlEditRenewal . ' " target="_BLANK">
-                         <i class="fa fa-2x fa-step-forward" style="color: ' . $iconColor . '"></i>
+                        '<A HREF="' . $urlEditRenewal . '" target="_BLANK" onclick="checkCreation()"' . ($createItem ? ' class="createItem" ' : null) . '>' .
+                        '<i class="fa fa-2x fa-step-forward" style="color: ' . $iconColor . '"></i>
                          </A>';
                 } else {
                     $renewalIcon = '';
