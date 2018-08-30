@@ -209,7 +209,8 @@ define(
 class CTCNC extends Controller
 {
     var $userID;
-    var $dbeUser;
+    /** @var DBEUser */
+    public $dbeUser;
     var $dbeTeam;
     private $user;
 

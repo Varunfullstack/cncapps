@@ -62,6 +62,7 @@ class DBECustomer extends DBCNCEntity
     const decisionMakerBackground = 'decisionMakerBackground';
     const opportunityDeal = 'opportunityDeal';
     const rating = 'rating';
+    const lastContractSent = 'lastContractSent';
 
     /**
      * calls constructor()
@@ -399,6 +400,14 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "rating"
         );
+
+        $this->addColumn(
+            self::lastContractSent,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            "lastContractSent"
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

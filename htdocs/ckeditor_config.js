@@ -11,17 +11,17 @@ CKEDITOR.editorConfig = function (config) {
 
     config.toolbar = 'CNCToolbar';
 
-    config.toolbar_CNCToolbar =
-        [
-            ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike'],
-            ['NumberedList', 'BulletedList', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['Table'],
-            ['Styles', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor']
-        ];
-
-    CKEDITOR.config.width = '870';
-    CKEDITOR.config.resize_minWidth = '760';
-    CKEDITOR.config.spellChecker = 'ieSpell';
+  config.toolbar_CNCToolbar =
+  [
+   ['Source', '-', '-', 'Bold','Italic','Underline','Strike'],
+   ['NumberedList','BulletedList','-', 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+   ['Table'],
+   ['Styles','Format','Font','FontSize','TextColor','BGColor']
+  ];
+  
+  CKEDITOR.config.width = '870';
+  CKEDITOR.config.resize_minWidth = '760';
     CKEDITOR.config.disableNativeSpellChecker = false;
     CKEDITOR.config.removePlugins = 'liststyle,tabletools,scayt,menubutton,contextmenu';
+
 };
