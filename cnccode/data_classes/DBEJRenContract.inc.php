@@ -150,9 +150,9 @@ class DBEJRenContract extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     *
+     * @param bool $directDebit
      */
-    function getRenewalsDueRows()
+    function getRenewalsDueRows($directDebit = false)
     {
 
         $statement =
@@ -165,10 +165,15 @@ class DBEJRenContract extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
 		 AND declinedFlag = 'N'
-     AND renewalTypeID = 2 and directDebitFlag <> 'Y'";
+     AND renewalTypeID = 2";
+
+        if ($directDebit) {
+            $statement .= " and directDebitFlag == 'Y' ";
+        } else {
+            $statement .= " and directDebitFlag <> 'Y' ";
+        }
 
         $statement .= " ORDER BY cui_custno";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -192,7 +197,7 @@ class DBEJRenContract extends DBECustomerItem
                 '\',\'',
                 $ids
             ) . "')" .
-            " AND declinedFlag = 'N'
+            " AND declinedFlag = 'N' and directDebitFlag <> 'Y'
         AND renewalTypeID = 2";
         $statement .= " ORDER BY cui_custno";
 

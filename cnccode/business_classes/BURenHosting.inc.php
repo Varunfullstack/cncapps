@@ -16,6 +16,7 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 class BURenHosting extends Business
 {
     var $dbeRenHosting = "";
+    private $dbeJRenHosting;
 
     /**
      * Constructor
@@ -32,22 +33,35 @@ class BURenHosting extends Business
     function updateRenHosting(&$dsData)
     {
         $this->setMethodName('updateRenHosting');
-        $this->updateDataaccessObject($dsData, $this->dbeRenHosting);
+        $this->updateDataaccessObject(
+            $dsData,
+            $this->dbeRenHosting
+        );
 
         return TRUE;
     }
 
-    function getRenHostingByID($ID, &$dsResults)
+    function getRenHostingByID($ID,
+                               &$dsResults
+    )
     {
         $this->dbeJRenHosting->setPKValue($ID);
         $this->dbeJRenHosting->getRow();
-        return ($this->getData($this->dbeJRenHosting, $dsResults));
+        return ($this->getData(
+            $this->dbeJRenHosting,
+            $dsResults
+        ));
     }
 
-    function getAll(&$dsResults, $orderBy = false)
+    function getAll(&$dsResults,
+                    $orderBy = false
+    )
     {
         $this->dbeJRenHosting->getRows($orderBy);
-        return ($this->getData($this->dbeJRenHosting, $dsResults));
+        return ($this->getData(
+            $this->dbeJRenHosting,
+            $dsResults
+        ));
     }
 
     function deleteRenHosting($ID)
@@ -68,7 +82,10 @@ class BURenHosting extends Business
     {
         $dbeRenHosting = new DBERenHosting ($this);
         // validate no activities of this type
-        $dbeRenHosting->setValue('customerItemID', $ID);
+        $dbeRenHosting->setValue(
+            'customerItemID',
+            $ID
+        );
         if ($dbeRenHosting->countRowsByColumn('customerItemID') < 1) {
             return TRUE;
         } else {
@@ -96,12 +113,30 @@ class BURenHosting extends Business
 
         $dsCustomerItem->setUpdateModeInsert();
 
-        $dsCustomerItem->setValue('customerItemID', 0);
-        $dsCustomerItem->setValue('customerID', $customerID);
-        $dsCustomerItem->setValue('itemID', $itemID);
-        $dsCustomerItem->setValue('siteNo', $siteNo);
-        $dsCustomerItem->setValue('curUnitCost', $dbeItem->getValue('curUnitCost'));
-        $dsCustomerItem->setValue('curUnitSale', $dbeItem->getValue('curUnitSale'));
+        $dsCustomerItem->setValue(
+            'customerItemID',
+            0
+        );
+        $dsCustomerItem->setValue(
+            'customerID',
+            $customerID
+        );
+        $dsCustomerItem->setValue(
+            'itemID',
+            $itemID
+        );
+        $dsCustomerItem->setValue(
+            'siteNo',
+            $siteNo
+        );
+        $dsCustomerItem->setValue(
+            'curUnitCost',
+            $dbeItem->getValue('curUnitCost')
+        );
+        $dsCustomerItem->setValue(
+            'curUnitSale',
+            $dbeItem->getValue('curUnitSale')
+        );
 
         $dsCustomerItem->post();
 
@@ -114,27 +149,37 @@ class BURenHosting extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
+    /**
+     * @param string $toEmail
+     * @param bool $directDebit
+     */
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL,
+                                         $directDebit = false
+    )
     {
-        $this->dbeJRenHosting->getRenewalsDueRows();
+        $this->dbeJRenHosting->getRenewalsDueRows($directDebit);
 
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
             array(
-                'From' => $senderEmail,
-                'To' => $toEmail,
-                'Subject' => 'Hosting Renewals Due Today',
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => 'Hosting Renewals Due Today',
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
         <HTML>
         <BODY>
-        <TABLE border="1" bgcolor="#FFFFFF">
-            <tr bordercolor="#333333" bgcolor="#CCCCCC">
+        <TABLE border="1"
+               bgcolor="#FFFFFF"
+        >
+            <tr bordercolor="#333333"
+                bgcolor="#CCCCCC"
+            >
                 <td bordercolor="#000000">Customer</td>
                 <td>Service</td>
             </tr>
@@ -155,9 +200,9 @@ class BURenHosting extends Business
         $buMail->mime->setHTMLBody($message);
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 
@@ -172,21 +217,13 @@ class BURenHosting extends Business
 
     }
 
-    function createRenewalsSalesOrders($customerItemIDs = false)
+    function createRenewalsSalesOrders($directDebit = false)
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
 
-        if ($customerItemIDs) {
-
-            $this->dbeJRenHosting->getRenewalsRowsByID($customerItemIDs);
-
-        } else {
-
-            $this->dbeJRenHosting->getRenewalsDueRows();
-
-        }
+        $this->dbeJRenHosting->getRenewalsDueRows($directDebit);
 
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
 
@@ -194,8 +231,11 @@ class BURenHosting extends Business
 
         $dbeOrdline = new DBEOrdline ($this);
 
-        $previousCustomerID = 99999;
+        $dsOrdhead = new DataSet($this);
+        $dsOrdline = new DataSet($this);
 
+        $previousCustomerID = 99999;
+        $generateInvoice = false;
         while ($this->dbeJRenHosting->fetchNext()) {
 
             if ($dbeJCustomerItem->getRow($this->dbeJRenHosting->getValue('customerItemID'))) {
@@ -203,16 +243,45 @@ class BURenHosting extends Business
                  * Group many contracts for same customer under one sales order
                  */
                 if ($previousCustomerID != $dbeJCustomerItem->getValue('customerID')) {
+
+                    /*
+                   If generating invoices and an order has been started
+                   */
+                    if ($generateInvoice && $dsOrdhead) {
+
+                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+
+                        $buSalesOrder->getOrderByOrdheadID(
+                            $dsOrdhead->getValue('ordheadID'),
+                            $dsOrdhead,
+                            $dsOrdline
+                        );
+
+                        $buInvoice->createInvoiceFromOrder(
+                            $dsOrdhead,
+                            $dsOrdline
+                        );
+                    }
                     /*
                      *  create order header
                      */
                     $dbeCustomer->getRow($dbeJCustomerItem->getValue('customerID'));
-                    $this->getData($dbeCustomer, $dsCustomer);
+                    $this->getData(
+                        $dbeCustomer,
+                        $dsCustomer
+                    );
 
-                    $buSalesOrder->initialiseOrder($dsOrdhead, $dsOrdline, $dsCustomer);
+                    $buSalesOrder->initialiseOrder(
+                        $dsOrdhead,
+                        $dsOrdline,
+                        $dsCustomer
+                    );
 
                     $line = -1;  // initialise sales order line seq
                 }
+                $generateInvoice = $this->dbeJRenHosting->getValue(
+                        DBECustomerItem::autoGenerateContractInvoice
+                    ) === 'Y';
                 /**
                  * add notes as a comment line (if they exist)
                  */
@@ -220,20 +289,62 @@ class BURenHosting extends Business
 
                     $line++;
 
-                    $dbeOrdline->setValue('description', $this->dbeJRenHosting->getValue('notes'));
-                    $dbeOrdline->setValue('lineType', 'C');
-                    $dbeOrdline->setValue('renewalCustomerItemID', '');
-                    $dbeOrdline->setValue('ordheadID', $dsOrdhead->getValue('ordheadID'));
-                    $dbeOrdline->setValue('customerID', $dsOrdhead->getValue('customerID'));
-                    $dbeOrdline->setValue('itemID', 0);
-                    $dbeOrdline->setValue('supplierID', '');
-                    $dbeOrdline->setValue('sequenceNo', $line);
-                    $dbeOrdline->setValue('lineType', 'C');
-                    $dbeOrdline->setValue('qtyOrdered', 0); // default 1
-                    $dbeOrdline->setValue('qtyDespatched', 0);
-                    $dbeOrdline->setValue('qtyLastDespatched', 0);
-                    $dbeOrdline->setValue('curUnitSale', 0);
-                    $dbeOrdline->setValue('curUnitCost', 0);
+                    $dbeOrdline->setValue(
+                        'description',
+                        $this->dbeJRenHosting->getValue('notes')
+                    );
+                    $dbeOrdline->setValue(
+                        'lineType',
+                        'C'
+                    );
+                    $dbeOrdline->setValue(
+                        'renewalCustomerItemID',
+                        ''
+                    );
+                    $dbeOrdline->setValue(
+                        'ordheadID',
+                        $dsOrdhead->getValue('ordheadID')
+                    );
+                    $dbeOrdline->setValue(
+                        'customerID',
+                        $dsOrdhead->getValue('customerID')
+                    );
+                    $dbeOrdline->setValue(
+                        'itemID',
+                        0
+                    );
+                    $dbeOrdline->setValue(
+                        'supplierID',
+                        ''
+                    );
+                    $dbeOrdline->setValue(
+                        'sequenceNo',
+                        $line
+                    );
+                    $dbeOrdline->setValue(
+                        'lineType',
+                        'C'
+                    );
+                    $dbeOrdline->setValue(
+                        'qtyOrdered',
+                        0
+                    ); // default 1
+                    $dbeOrdline->setValue(
+                        'qtyDespatched',
+                        0
+                    );
+                    $dbeOrdline->setValue(
+                        'qtyLastDespatched',
+                        0
+                    );
+                    $dbeOrdline->setValue(
+                        'curUnitSale',
+                        0
+                    );
+                    $dbeOrdline->setValue(
+                        'curUnitCost',
+                        0
+                    );
 
                     $dbeOrdline->insertRow();
 
@@ -245,44 +356,135 @@ class BURenHosting extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
-                $buItem->getItemByID($dbeJCustomerItem->getValue('itemID'), $dsItem);
-                $dbeOrdline->setValue('stockcat', $dsItem->getValue('stockcat'));
+                $buItem->getItemByID(
+                    $dbeJCustomerItem->getValue('itemID'),
+                    $dsItem
+                );
+                $dbeOrdline->setValue(
+                    'stockcat',
+                    $dsItem->getValue('stockcat')
+                );
 
-                $dbeOrdline->setValue('renewalCustomerItemID', $this->dbeJRenHosting->getValue('customerItemID'));
-                $dbeOrdline->setValue('ordheadID', $dsOrdhead->getValue('ordheadID'));
-                $dbeOrdline->setValue('customerID', $dsOrdhead->getValue('customerID'));
-                $dbeOrdline->setValue('itemID', $dbeJCustomerItem->getValue('itemID'));
-                $dbeOrdline->setValue('description', $dbeJCustomerItem->getValue('itemDescription'));
-                $dbeOrdline->setValue('supplierID', CONFIG_SALES_STOCK_SUPPLIERID);
-                $dbeOrdline->setValue('sequenceNo', $line);
-                $dbeOrdline->setValue('lineType', 'I');
-                $dbeOrdline->setValue('qtyOrdered', 1); // default 1
-                $dbeOrdline->setValue('qtyDespatched', 0);
-                $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale',
-                                      ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost',
-                                      ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue(
+                    'renewalCustomerItemID',
+                    $this->dbeJRenHosting->getValue('customerItemID')
+                );
+                $dbeOrdline->setValue(
+                    'ordheadID',
+                    $dsOrdhead->getValue('ordheadID')
+                );
+                $dbeOrdline->setValue(
+                    'customerID',
+                    $dsOrdhead->getValue('customerID')
+                );
+                $dbeOrdline->setValue(
+                    'itemID',
+                    $dbeJCustomerItem->getValue('itemID')
+                );
+                $dbeOrdline->setValue(
+                    'description',
+                    $dbeJCustomerItem->getValue('itemDescription')
+                );
+                $dbeOrdline->setValue(
+                    'supplierID',
+                    CONFIG_SALES_STOCK_SUPPLIERID
+                );
+                $dbeOrdline->setValue(
+                    'sequenceNo',
+                    $line
+                );
+                $dbeOrdline->setValue(
+                    'lineType',
+                    'I'
+                );
+                $dbeOrdline->setValue(
+                    'qtyOrdered',
+                    1
+                ); // default 1
+                $dbeOrdline->setValue(
+                    'qtyDespatched',
+                    0
+                );
+                $dbeOrdline->setValue(
+                    'qtyLastDespatched',
+                    0
+                );
+                $dbeOrdline->setValue(
+                    'curUnitSale',
+                    ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue(
+                        'invoicePeriodMonths'
+                    )
+                );
+                $dbeOrdline->setValue(
+                    'curUnitCost',
+                    ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue(
+                        'invoicePeriodMonths'
+                    )
+                );
 
                 $dbeOrdline->insertRow();
 
                 // period comment line
                 $line++;
-                $description = $this->dbeJRenHosting->getValue('invoiceFromDate') . ' to ' . $this->dbeJRenHosting->getValue('invoiceToDate');
-                $dbeOrdline->setValue('lineType', 'C');
-                $dbeOrdline->setValue('renewalCustomerItemID', '');
-                $dbeOrdline->setValue('ordheadID', $dsOrdhead->getValue('ordheadID'));
-                $dbeOrdline->setValue('customerID', $dsOrdhead->getValue('customerID'));
-                $dbeOrdline->setValue('itemID', 0);
-                $dbeOrdline->setValue('description', $description);
-                $dbeOrdline->setValue('supplierID', '');
-                $dbeOrdline->setValue('sequenceNo', $line);
-                $dbeOrdline->setValue('lineType', 'C');
-                $dbeOrdline->setValue('qtyOrdered', 0); // default 1
-                $dbeOrdline->setValue('qtyDespatched', 0);
-                $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale', 0);
-                $dbeOrdline->setValue('curUnitCost', 0);
+                $description = $this->dbeJRenHosting->getValue(
+                        'invoiceFromDate'
+                    ) . ' to ' . $this->dbeJRenHosting->getValue('invoiceToDate');
+                $dbeOrdline->setValue(
+                    'lineType',
+                    'C'
+                );
+                $dbeOrdline->setValue(
+                    'renewalCustomerItemID',
+                    ''
+                );
+                $dbeOrdline->setValue(
+                    'ordheadID',
+                    $dsOrdhead->getValue('ordheadID')
+                );
+                $dbeOrdline->setValue(
+                    'customerID',
+                    $dsOrdhead->getValue('customerID')
+                );
+                $dbeOrdline->setValue(
+                    'itemID',
+                    0
+                );
+                $dbeOrdline->setValue(
+                    'description',
+                    $description
+                );
+                $dbeOrdline->setValue(
+                    'supplierID',
+                    ''
+                );
+                $dbeOrdline->setValue(
+                    'sequenceNo',
+                    $line
+                );
+                $dbeOrdline->setValue(
+                    'lineType',
+                    'C'
+                );
+                $dbeOrdline->setValue(
+                    'qtyOrdered',
+                    0
+                ); // default 1
+                $dbeOrdline->setValue(
+                    'qtyDespatched',
+                    0
+                );
+                $dbeOrdline->setValue(
+                    'qtyLastDespatched',
+                    0
+                );
+                $dbeOrdline->setValue(
+                    'curUnitSale',
+                    0
+                );
+                $dbeOrdline->setValue(
+                    'curUnitCost',
+                    0
+                );
 
                 $dbeOrdline->insertRow();
 
@@ -306,12 +508,19 @@ class BURenHosting extends Business
         /*
          * Finalise last sales order and create an invoice
          */
-        if ($createdSalesOrder && !$customerItemIDs) {
+        if ($generateInvoice) {
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
-            $buSalesOrder->getOrderByOrdheadID($dsOrdhead->getValue('ordheadID'), $dsOrdhead, $dsOrdline);
+            $buSalesOrder->getOrderByOrdheadID(
+                $dsOrdhead->getValue('ordheadID'),
+                $dsOrdhead,
+                $dsOrdline
+            );
 
-            $buInvoice->createInvoiceFromOrder($dsOrdhead, $dsOrdline);
+            $buInvoice->createInvoiceFromOrder(
+                $dsOrdhead,
+                $dsOrdline
+            );
         }
         /*
         If created from list of IDs then there will only be one customer and order
@@ -341,10 +550,15 @@ class BURenHosting extends Business
 
     }
 
-    function sendEmailTo($ID, $emailAddress)
+    function sendEmailTo($ID,
+                         $emailAddress
+    )
     {
         $dbeJRenHosting = new DBEJRenHosting($this);
-        $dbeJRenHosting->setValue('customerItemID', $ID);
+        $dbeJRenHosting->setValue(
+            'customerItemID',
+            $ID
+        );
         $dbeJRenHosting->getRow();
 
         $buMail = new BUMail($this);
@@ -354,10 +568,10 @@ class BURenHosting extends Business
 
         $hdrs =
             array(
-                'From' => $senderEmail,
-                'To' => $toEmail,
-                'Subject' => 'Hosting details',
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => 'Hosting details',
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -405,7 +619,10 @@ class BURenHosting extends Business
             </tr>
             <tr>
                 <td valign="top">Router IP Address</td>
-                <td><?php echo Controller::htmlDisplayText($dbeJRenHosting->getValue('routerIPAddress'), 1) ?></td>
+                <td><?php echo Controller::htmlDisplayText(
+                        $dbeJRenHosting->getValue('routerIPAddress'),
+                        1
+                    ) ?></td>
             </tr>
             <tr>
                 <td>User Name</td>
@@ -430,9 +647,9 @@ class BURenHosting extends Business
         $buMail->mime->setHTMLBody($message);
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
 

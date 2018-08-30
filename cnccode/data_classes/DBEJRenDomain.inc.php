@@ -195,7 +195,7 @@ class DBEJRenDomain extends DBECustomerItem
                 $ids
             ) . "')" .
             " AND declinedFlag = 'N'
-      AND renewalTypeID = 4
+      AND renewalTypeID = 4 and directDebitFlag <> 'Y'
      ORDER BY cui_custno";
 
         $this->setQueryString($statement);

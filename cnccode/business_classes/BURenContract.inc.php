@@ -134,9 +134,15 @@ class BURenContract extends Business
         return;
     }
 
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
+    /**
+     * @param string $toEmail
+     * @param bool $directDebit
+     */
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL,
+                                         $directDebit = false
+    )
     {
-        $this->dbeJRenContract->getRenewalsDueRows();
+        $this->dbeJRenContract->getRenewalsDueRows($directDebit);
 
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
@@ -192,25 +198,15 @@ class BURenContract extends Business
 
     }
 
-    function createRenewalsSalesOrders($customerItemIDs = false)
-    {
-        $this->createSalesOrders(
-            $customerItemIDs
-        );
-    }
-
-    function createSalesOrders($customerItemIDs = false)
+    function createRenewalsSalesOrders($directDebit = false)
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
         $buActivity = new BUActivity ($this);
 
-        if ($customerItemIDs) {
-            $this->dbeJRenContract->getRenewalsRowsByID($customerItemIDs);
-        } else {
-            $this->dbeJRenContract->getRenewalsDueRows();
-        }
+        $this->dbeJRenContract->getRenewalsDueRows($directDebit);
+
 
         $dsRenContract = new DSForm($this);
         $dsRenContract->replicate($this->dbeJRenContract);
@@ -221,9 +217,11 @@ class BURenContract extends Business
 
         $dbeOrdline = new DBEOrdline ($this);
 
+        $dsOrdhead = new DataSet($this);
+        $dsOrdline = new DataSet($this);
+
         $previousCustomerID = 99999;
 
-        $dsOrdhead = false;
         $generateInvoice = false;
         while ($dsRenContract->fetchNext()) {
             /* don't process prepay */
@@ -284,9 +282,7 @@ class BURenContract extends Business
 
                     $line = -1;    // initialise sales order line seq
                 }
-
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
-
                 /**
                  * add notes as a comment line (if they exist)
                  */
@@ -718,13 +714,6 @@ HEREDOC;
                 $dsOrdline
             );
         }
-
-        /* there will only be one order in this case */
-        if ($renewalIDs) {
-
-            return $dsOrdhead->getValue('ordheadID');
-        }
-
     }
 
 
