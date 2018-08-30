@@ -760,6 +760,13 @@ Many thanks.
                 );
             }
 
+            $checkbox = null;
+
+            if ($item['renewalTypeID'] != 3) {
+                $checkbox = '<input type="checkbox" id="' . $item['customerItemID'] . '">';
+            }
+
+
             $this->template->set_var(
                 array(
                     'linkURL'             => $item['linkURL'],
@@ -772,7 +779,8 @@ Many thanks.
                     'customerItemID'      => $item['customerItemID'],
                     'coveredItemsString'  => $coveredItemsString,
                     'itemClass'           => $itemClass,
-                    'customerID'          => $customerID
+                    'customerID'          => $customerID,
+                    'checkbox'            => $checkbox
                 )
             );
 

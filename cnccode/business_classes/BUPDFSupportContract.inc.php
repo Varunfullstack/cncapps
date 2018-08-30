@@ -603,7 +603,10 @@ class BUPDFSupportContract extends BaseObject
             switch ($this->_renewalTypeID) {
 
                 case(CONFIG_BROADBAND_RENEWAL_TYPE_ID):
-                    $annualPrice = $dsContract->getValue('salePricePerMonth') * 12;
+                    $annualPrice = number_format(
+                        $dsContract->getValue('salePricePerMonth') * 12,
+                        2
+                    );
                     break;
 
                 case(CONFIG_QUOTATION_RENEWAL_TYPE_ID):
