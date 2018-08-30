@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 322 - Change Renewal Report Heading Expires to Invoiced Until
 - Issue 327 - SQL crash searching for customer with apostrophe in the name
 - Issue 326 - Enhance Items Not Received Process
+- Issue 331 - Renewal item creation warning
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed
