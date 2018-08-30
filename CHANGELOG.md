@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 320 - Further Increase length of mail queue recipient database field
 - Issue 322 - Change Renewal Report Heading Expires to Invoiced Until
 - Issue 327 - SQL crash searching for customer with apostrophe in the name
+- Issue 326 - Enhance Items Not Received Process
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed
