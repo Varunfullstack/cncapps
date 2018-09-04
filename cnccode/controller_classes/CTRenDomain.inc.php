@@ -577,10 +577,7 @@ class CTRenDomain extends CTCNC
      */
     function createRenewalsSalesOrders()
     {
-
         $this->buRenDomain->createRenewalsSalesOrders();
-
-
     }
 
     function editArecord()

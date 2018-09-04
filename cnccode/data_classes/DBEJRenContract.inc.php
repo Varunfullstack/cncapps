@@ -151,8 +151,11 @@ class DBEJRenContract extends DBECustomerItem
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
      * @param bool $directDebit
+     * @param bool $ignorePrePayContracts
      */
-    function getRenewalsDueRows($directDebit = false)
+    function getRenewalsDueRows($directDebit = false,
+                                $ignorePrePayContracts = true
+    )
     {
 
         $statement =
@@ -168,14 +171,18 @@ class DBEJRenContract extends DBECustomerItem
      AND renewalTypeID = 2";
 
         if ($directDebit) {
-            $statement .= " and directDebitFlag == 'Y' ";
+            $statement .= " and directDebitFlag = 'Y' ";
         } else {
             $statement .= " and directDebitFlag <> 'Y' ";
         }
 
-        $statement .= " ORDER BY cui_custno";
+        if ($ignorePrePayContracts) {
+            $statement .= ' and itm_itemno <> 4111';
+        }
+
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
-        $ret = (parent::getRows());
+        parent::getRows();
     }
 
     /**

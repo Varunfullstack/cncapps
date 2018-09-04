@@ -763,6 +763,22 @@ class CTCustomer extends CTCNC
                 DBECustomer::gscTopUpAmount,
                 $this->getYN($value['pcxFlag'])
             );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::sortCode,
+                $value['sortCode']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::accountName,
+                $value['accountName']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::accountNumber,
+                $value['accountNumber']
+            );
+
             $this->dsCustomer->post();
         }
     }
@@ -1891,7 +1907,11 @@ ORDER BY cus_name ASC  ";
                 'slaP2'                           => $this->dsCustomer->getValue(DBECustomer::slaP2),
                 'slaP3'                           => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                           => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5)
+                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'sortCode'                        => $this->dsCustomer->getValue(DBECustomer::sortCode),
+                'accountName'                     => $this->dsCustomer->getValue(DBECustomer::accountName),
+                'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),
+
             )
         );
         if ((!$this->formError) & ($this->getAction(

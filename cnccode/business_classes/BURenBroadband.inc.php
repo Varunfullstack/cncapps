@@ -217,24 +217,28 @@ class BURenBroadband extends Business
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;
-
-        $createdSalesOrder = 0;
         $dsOrdhead = null;
-
+        $generateInvoice = false;
+        $generatedOrder = false;
         while ($this->dbeJRenBroadband->fetchNext()) {
-
-            $createdSalesOrder++;
-
+            $generatedOrder = false;
             if ($dbeJCustomerItem->getRow($this->dbeJRenBroadband->getValue('customerItemID'))) {
                 /*
                  * Group many renewals for same customer under one sales order
                  */
-                if ($previousCustomerID != $dbeJCustomerItem->getValue('customerID')) {
+                if (
+                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
+                    $this->dbeJRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
+                    (
+                        !$generateInvoice &&
+                        $this->dbeJRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
+                    ) ||
+                    $this->dbeJRenBroadband->getValue(DBECustomerItem::directDebitFlag) === 'Y'
+                ) {
                     /*
                      * Create an invoice from each sales order (unless this is the first iteration)
                      */
-                    if ($previousCustomerID != 99999) {
-
+                    if ($generateInvoice && $dsOrdhead) {
                         /*
                          * Finalise previous sales order and create an invoice
                          */
@@ -249,8 +253,8 @@ class BURenBroadband extends Business
                             $dsOrdhead,
                             $dsOrdline
                         );
-
                     }
+
 
                     /*
                      *  create new sales order header
@@ -260,16 +264,20 @@ class BURenBroadband extends Business
                         $dbeCustomer,
                         $dsCustomer
                     );
-
                     $buSalesOrder->InitialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
-                        $dsCustomer
+                        $dsCustomer,
+                        $this->dbeJRenBroadband->getValue(DBECustomerItem::directDebitFlag) === 'Y',
+                        $this->dbeJRenBroadband->getValue(DBECustomerItem::transactionType)
                     );
-
+                    $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
 
                 }
+                $generateInvoice = $this->dbeJRenBroadband->getValue(
+                        DBECustomerItem::autoGenerateContractInvoice
+                    ) === 'Y';
 
                 $line++;
 
@@ -488,6 +496,12 @@ class BURenBroadband extends Business
                     $this->dbeJRenBroadband->getValue('totalInvoiceMonths') +
                     $this->dbeJRenBroadband->getValue('invoicePeriodMonths')
                 );
+
+                $this->dbeRenBroadband->setValue(
+                    DBECustomerItem::transactionType,
+                    '17'
+                );
+
                 $this->dbeRenBroadband->updateRow();
 
                 $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
@@ -496,7 +510,7 @@ class BURenBroadband extends Business
         /*
          * Finalise last sales order and create an invoice
          */
-        if ($createdSalesOrder) {
+        if ($generateInvoice && $generatedOrder) {
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
             $buSalesOrder->getOrderByOrdheadID(

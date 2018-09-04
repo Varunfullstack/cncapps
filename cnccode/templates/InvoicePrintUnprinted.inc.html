@@ -1,51 +1,74 @@
 <!-- Template: InvoicePrintUnprinted.inc.html -->
-<form name="invoice" method="post" action="{urlSubmit}">
-<P>
-	Invoices and credit notes that have not been sent to customers yet. The date you enter will be used as the Invoice Date on all invoices.
-</P>
-<BR/>
-	<table class='singleBorder' width="500px" border="0" cellspacing="1" cellpadding="2">
-		<tr> 
-			<td class="tableHeader">&nbsp;</td>
-			<td class="tableHeader">Count</td>
-			<td class="tableHeader">Cost £</td>
-			<td class="tableHeader">Sale £</td>
-		</tr>
-		<tr> 
-			<td class="displayfield">Invoices</td>
-			<td class="displayfield">{invoiceCount}</td>
-			<td align="right">{invoiceCost}</td>
-			<td align="right">{invoiceSale}</td>
-		</tr>
-		<tr> 
-			<td class="displayfield">Credit Notes</td>
-			<td class="displayfield">{creditCount}</td>
-			<td align="right">{creditCost}</td>
-			<td align="right">{creditSale}</td>
-		</tr>
-	</table>
-	<br/>
-	<table width="400px" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td width="150px" class="promptText">Date (leave blank for today)</td>
-			<td class="field">
-				<input
-					type="text"
-					name="invoice[1][startDate]"
-					id="dateToUse"
-					value="{dateToUse}"
-					size="10"
-					maxlength="10"
-				>
-				<font class="formErrorMessage">{startDateMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-				<input type="submit" name="Print" value="Send" onClick="if(!confirm('Are you sure you want to send the invoices?')) return(false)">  <input type="submit" name="Trial" value="Trial">
-			</td>
-		</tr>
-	</table>
+<form name="invoice"
+      method="post"
+      action="{urlSubmit}"
+>
+    <P>
+        Invoices and credit notes that have not been sent to customers yet. The date you enter will be used as the
+        Invoice Date on all invoices.
+    </P>
+    <BR/>
+    <table class='singleBorder'
+           width="500px"
+           border="0"
+           cellspacing="1"
+           cellpadding="2"
+    >
+        <tr>
+            <td class="tableHeader">&nbsp;</td>
+            <td class="tableHeader">Count</td>
+            <td class="tableHeader">Cost £</td>
+            <td class="tableHeader">Sale £</td>
+        </tr>
+        <tr>
+            <td class="displayfield">Invoices</td>
+            <td class="displayfield">{invoiceCount}</td>
+            <td align="right">{invoiceCost}</td>
+            <td align="right">{invoiceSale}</td>
+        </tr>
+        <tr>
+            <td class="displayfield">Credit Notes</td>
+            <td class="displayfield">{creditCount}</td>
+            <td align="right">{creditCost}</td>
+            <td align="right">{creditSale}</td>
+        </tr>
+    </table>
+    <br/>
+    <table width="400px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="150px"
+                class="promptText"
+            >Date (leave blank for today)
+            </td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="invoice[1][startDate]"
+                        id="dateToUse"
+                        value="{dateToUse}"
+                        size="10"
+                        maxlength="10"
+                >
+                <font class="formErrorMessage">{startDateMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Print"
+                       value="Send"
+                       onClick="if(!confirm('Are you sure you want to send the invoices?')) return(false)"
+                > <input type="submit"
+                         name="Trial"
+                         value="Trial"
+            >
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: InvoicePrintUnprinted.inc.html -->

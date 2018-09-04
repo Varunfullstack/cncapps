@@ -207,7 +207,6 @@ class BURenContract extends Business
 
         $this->dbeJRenContract->getRenewalsDueRows($directDebit);
 
-
         $dsRenContract = new DSForm($this);
         $dsRenContract->replicate($this->dbeJRenContract);
 
@@ -217,18 +216,15 @@ class BURenContract extends Business
 
         $dbeOrdline = new DBEOrdline ($this);
 
-        $dsOrdhead = new DataSet($this);
+        $dsOrdhead = null;
         $dsOrdline = new DataSet($this);
 
         $previousCustomerID = 99999;
 
         $generateInvoice = false;
+        $generatedOrder = false;
         while ($dsRenContract->fetchNext()) {
-            /* don't process prepay */
-            if ($dsRenContract->getValue('itemID') == CONFIG_DEF_PREPAY_ITEMID) {
-                continue;
-            }
-
+            $generatedOrder = false;
             if ($dbeJCustomerItem->getRow($dsRenContract->getValue('customerItemID'))) {
                 /*
                  * Group many contracts for same customer under one sales order
@@ -245,7 +241,13 @@ class BURenContract extends Business
 
                 if (
                     $previousCustomerID != $dbeJCustomerItem->getValue('customerID') OR
-                    $isSslCertificate
+                    $isSslCertificate ||
+                    $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
+                    (
+                        !$generateInvoice &&
+                        $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
+                    ) ||
+                    $dsRenContract->getValue(DBECustomerItem::directDebitFlag) === 'Y'
                 ) {
                     /*
                     If generating invoices and an order has been started
@@ -277,9 +279,11 @@ class BURenContract extends Business
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
-                        $dsCustomer
+                        $dsCustomer,
+                        $dsRenContract->getValue(DBECustomerItem::directDebitFlag) === 'Y',
+                        $dsRenContract->getValue(DBECustomerItem::transactionType)
                     );
-
+                    $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
                 }
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
@@ -690,6 +694,12 @@ HEREDOC;
                     $dsRenContract->getValue('totalInvoiceMonths') +
                     $dsRenContract->getValue('invoicePeriodMonths')
                 );
+
+                $this->dbeRenContract->setValue(
+                    DBECustomerItem::transactionType,
+                    '17'
+                );
+
                 $this->dbeRenContract->updateRow();
 
                 $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
@@ -699,7 +709,7 @@ HEREDOC;
         /*
         Finish off last automatic invoice
         */
-        if ($generateInvoice && $dsOrdhead) {
+        if ($generateInvoice && $generatedOrder) {
 
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 

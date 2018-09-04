@@ -231,18 +231,28 @@ class BURenHosting extends Business
 
         $dbeOrdline = new DBEOrdline ($this);
 
-        $dsOrdhead = new DataSet($this);
+        $dsOrdhead = null;
         $dsOrdline = new DataSet($this);
 
         $previousCustomerID = 99999;
         $generateInvoice = false;
+        $generatedOrder = false;
         while ($this->dbeJRenHosting->fetchNext()) {
+            $generatedOrder = false;
 
             if ($dbeJCustomerItem->getRow($this->dbeJRenHosting->getValue('customerItemID'))) {
                 /*
                  * Group many contracts for same customer under one sales order
                  */
-                if ($previousCustomerID != $dbeJCustomerItem->getValue('customerID')) {
+                if (
+                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
+                    $this->dbeJRenHosting->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
+                    (
+                        !$generateInvoice &&
+                        $this->dbeJRenHosting->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
+                    ) ||
+                    $this->dbeJRenHosting->getValue(DBECustomerItem::directDebitFlag) === 'Y'
+                ) {
 
                     /*
                    If generating invoices and an order has been started
@@ -274,9 +284,11 @@ class BURenHosting extends Business
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
-                        $dsCustomer
+                        $dsCustomer,
+                        $this->dbeJRenHosting->getValue(DBECustomerItem::directDebitFlag) === 'Y',
+                        $this->dbeJRenHosting->getValue(DBECustomerItem::transactionType)
                     );
-
+                    $generatedOrder = true;
                     $line = -1;  // initialise sales order line seq
                 }
                 $generateInvoice = $this->dbeJRenHosting->getValue(
@@ -498,6 +510,12 @@ class BURenHosting extends Business
                     $this->dbeJRenHosting->getValue('totalInvoiceMonths') +
                     $this->dbeJRenHosting->getValue('invoicePeriodMonths')
                 );
+
+                $this->dbeRenHosting->setValue(
+                    DBECustomerItem::transactionType,
+                    '17'
+                );
+
                 $this->dbeRenHosting->updateRow();
 
                 $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
@@ -508,7 +526,7 @@ class BURenHosting extends Business
         /*
          * Finalise last sales order and create an invoice
          */
-        if ($generateInvoice) {
+        if ($generateInvoice && $generatedOrder) {
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
             $buSalesOrder->getOrderByOrdheadID(
@@ -521,13 +539,6 @@ class BURenHosting extends Business
                 $dsOrdhead,
                 $dsOrdline
             );
-        }
-        /*
-        If created from list of IDs then there will only be one customer and order
-        and the caller will want to redirect to sales order page.
-        */
-        if ($customerItemIDs) {
-            return $dsOrdhead->getValue('ordheadID');
         }
     }
 

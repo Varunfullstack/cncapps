@@ -18,15 +18,45 @@ class DBEJInvhead extends DBEInvhead
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
-        $this->addColumn("firstName", DA_STRING, DA_ALLOW_NULL, "con_first_name");
-        $this->addColumn("lastName", DA_STRING, DA_ALLOW_NULL, "con_last_name");
-        $this->addColumn("title", DA_STRING, DA_ALLOW_NULL, "con_title");
-        $this->addColumn("paymentTerms", DA_STRING, DA_ALLOW_NULL, "description");
+        $this->addColumn(
+            "customerName",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            "firstName",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_first_name"
+        );
+        $this->addColumn(
+            "lastName",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_last_name"
+        );
+        $this->addColumn(
+            "title",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "con_title"
+        );
+        $this->addColumn(
+            "paymentTerms",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "description"
+        );
         $this->setAddColumnsOff();
     }
 
-    function getPrintedRowsByRange($customerID, $startDate, $endDate, $startID, $endID)
+    function getPrintedRowsByRange($customerID,
+                                   $startDate,
+                                   $endDate,
+                                   $startID,
+                                   $endID
+    )
     {
         $this->setMethodName('getPrintedRowsByRange');
 
@@ -39,17 +69,26 @@ class DBEJInvhead extends DBEInvhead
 
         if ($startDate != '') {
             $queryString .=
-                ' AND ' . $this->getDBColumnName('datePrinted') . ' >= \'' . mysqli_real_escape_string($this->db->link_id(), $startDate) . '\'';
+                ' AND ' . $this->getDBColumnName('datePrinted') . ' >= \'' . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $startDate
+                ) . '\'';
         }
 
         if ($endDate != '') {
             $queryString .=
-                ' AND ' . $this->getDBColumnName('datePrinted') . ' <= \'' . mysqli_real_escape_string($this->db->link_id(), $endDate) . '\'';
+                ' AND ' . $this->getDBColumnName('datePrinted') . ' <= \'' . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $endDate
+                ) . '\'';
         }
 
         if ($customerID != '') {
             $queryString .=
-                ' AND ' . $this->getDBColumnName('customerID') . ' = \'' . mysqli_real_escape_string($this->db->link_id(), $customerID) . '\'';
+                ' AND ' . $this->getDBColumnName('customerID') . ' = \'' . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $customerID
+                ) . '\'';
         }
 
         if ($startID != '') {
@@ -70,7 +109,7 @@ class DBEJInvhead extends DBEInvhead
         return ($this->getRows());
     }
 
-    function getUnprintedRows()
+    function getUnprintedRows($directDebit = false)
     {
         $this->setMethodName('getUnprintedRows');
         $queryString =
@@ -79,6 +118,9 @@ class DBEJInvhead extends DBEInvhead
             ' LEFT JOIN contact ON inh_contno = con_contno' .
             ' JOIN paymentterms ON invhead.paymentTermsID = paymentterms.paymentTermsID ' .
             ' WHERE ' . $this->getDBColumnName('datePrinted') . ' = \'0000-00-00\'';
+
+        $queryString .= " and " . $this->getDBColumnName(self::directDebit) . " = " . ($directDebit ? 'true' : 'false');
+
         $queryString .= ' ORDER BY ' . $this->getDBColumnName('customerID');
         $this->setQueryString($queryString);
         return ($this->getRows());
@@ -117,11 +159,17 @@ class DBEJInvhead extends DBEInvhead
             if ($printedFlag == 'Y') {
                 if ($fromDate != '') {
                     $statement = $statement .
-                        " AND " . $this->getDBColumnName('datePrinted') . ">='" . mysqli_real_escape_string($this->db->link_id(), $fromDate) . "'";
+                        " AND " . $this->getDBColumnName('datePrinted') . ">='" . mysqli_real_escape_string(
+                            $this->db->link_id(),
+                            $fromDate
+                        ) . "'";
                 }
                 if ($toDate != '') {
                     $statement = $statement .
-                        " AND " . $this->getDBColumnName('datePrinted') . "<='" . mysqli_real_escape_string($this->db->link_id(), $toDate) . "'";
+                        " AND " . $this->getDBColumnName('datePrinted') . "<='" . mysqli_real_escape_string(
+                            $this->db->link_id(),
+                            $toDate
+                        ) . "'";
                 }
             } else {
                 $statement = $statement .

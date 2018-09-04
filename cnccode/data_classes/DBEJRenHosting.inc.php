@@ -167,12 +167,12 @@ class DBEJRenHosting extends DBECustomerItem
 		 AND declinedFlag = 'N' AND renewalTypeID = 5";
 
         if ($directDebit) {
-            $statement .= " and directDebitFlag == 'Y' ";
+            $statement .= " and directDebitFlag = 'Y' ";
         } else {
             $statement .= " and directDebitFlag <> 'Y' ";
         }
 
-        $statement .= " ORDER BY cui_custno";
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());

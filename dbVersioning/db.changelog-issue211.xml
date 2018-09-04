@@ -42,4 +42,74 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet id="issue211-1534414967-5" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="invhead" columnName="directDebit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="invhead">
+            <column name="directDebit" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-6" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="ordhead" columnName="directDebit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="directDebit" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-7" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="customer" columnName="sortCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="sortCode" type="varchar(8)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-8" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="customer" columnName="accountName"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="accountName" type="varchar(18)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-9" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="customer" columnName="accountNumber"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="accountNumber" type="varchar(8)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-10" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="ordhead" columnName="transactionType"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="transactionType" type="char(2)" defaultValue="01"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-11" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="invhead" columnName="accountNumber"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="invhead">
+            <column name="transactionType" type="char(2)" defaultValue="01"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

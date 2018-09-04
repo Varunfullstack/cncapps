@@ -697,6 +697,61 @@
                         </select>
                     </td>
                 </tr>
+                <script>
+                    $(function () {
+                        $('#sortCode').mask('00-00-00');
+                    })
+                </script>
+                <tr>
+                    <td class="content">Sort Code</td>
+                    <td class="content">
+                        <input
+                                {disabled}
+                                type="text"
+                                name="form[customer][{customerID}][sortCode]"
+                                id="sortCode"
+                                value="{sortCode}"
+                                size="8"
+                                maxlength="8"
+                                minlength="8"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">Account Name</td>
+                    <td class="content">
+                        <input
+                                {disabled}
+                                type="text"
+                                name="form[customer][{customerID}][accountName]"
+                                id="accountName"
+                                value="{accountName}"
+                                size="18"
+                                maxlength="18"
+                        >
+                    </td>
+                </tr>
+                <script>
+                    $(function () {
+                        $('#accountNumber').mask('00000000');
+                    })
+                </script>
+                <tr>
+                    <td class="content">Account Number</td>
+                    <td class="content">
+                        <input
+                                {disabled}
+                                type="text"
+                                name="form[customer][{customerID}][accountNumber]"
+                                id="accountNumber"
+                                value="{accountNumber}"
+                                size="8"
+                                maxlength="8"
+                                minlength="8"
+                        >
+                    </td>
+                </tr>
+
             </table>
 
         </div> <!-- customerEditMainLeftColumn -->

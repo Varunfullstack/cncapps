@@ -152,15 +152,13 @@ class DBEJRenBroadband extends DBECustomerItem
      AND renewalTypeID = 1
 		 AND declinedFlag = 'N'";
 
-
         if ($directDebit) {
-            $statement .= " and directDebitFlag == 'Y' ";
+            $statement .= " and directDebitFlag = 'Y' ";
         } else {
             $statement .= " and directDebitFlag <> 'Y' ";
         }
 
-        $statement .= " ORDER BY cui_custno";
-
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
