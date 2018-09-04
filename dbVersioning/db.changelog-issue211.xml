@@ -7,7 +7,7 @@
         <tagDatabase tag="issue211"/>
     </changeSet>
     <changeSet id="issue211-1534414967-1" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="custitem" columnName="directDebitFlag"/>
             </not>
@@ -17,7 +17,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-2" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="custitem" columnName="transactionType"/>
             </not>
@@ -27,7 +27,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-3" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="custitem" columnName="transactionType"/>
         </preConditions>
         <sql>
@@ -43,7 +43,7 @@
         <rollback/>
     </changeSet>
     <changeSet id="issue211-1534414967-5" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="invhead" columnName="directDebit"/>
             </not>
@@ -53,7 +53,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-6" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="ordhead" columnName="directDebit"/>
             </not>
@@ -63,7 +63,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-7" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="customer" columnName="sortCode"/>
             </not>
@@ -73,7 +73,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-8" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="customer" columnName="accountName"/>
             </not>
@@ -83,7 +83,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-9" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="customer" columnName="accountNumber"/>
             </not>
@@ -93,7 +93,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-10" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="ordhead" columnName="transactionType"/>
             </not>
@@ -103,7 +103,7 @@
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-11" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="invhead" columnName="accountNumber"/>
             </not>
