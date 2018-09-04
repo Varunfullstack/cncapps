@@ -1496,9 +1496,7 @@ class BUInvoice extends Business
             'trans.csv'
         );
         $data = $this->generateBankExport($bankData);
-        var_dump($data);
 
-        exit();
         $buMail->mime->addAttachment(
             $data,
             'Text/csv',
