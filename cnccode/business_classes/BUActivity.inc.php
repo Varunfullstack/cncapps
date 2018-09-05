@@ -1182,7 +1182,7 @@ class BUActivity extends Business
                 $dbeContact = new DBEContact($this);
 
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
-                
+
                 $dbeContact->setValue(
                     DBEContact::notes,
                     $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
@@ -9205,7 +9205,7 @@ is currently a balance of ';
 
         $bcc =
             $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
-            CONFIG_SALES_EMAIL;
+            CONFIG_SALES_EMAIL . ',' . "VisitConfirmation@cnc-ltd.co.uk";
 
         $recipients = $toEmail . ',' . $bcc . ',' . $cc;
 
