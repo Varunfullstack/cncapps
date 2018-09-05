@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Add total to Service Requests Open For More Than 7 Days on screen
+
 ## [v1.10.2] - 2018-08-20
 ### Fixed
 - Issue 333 - Prepay Top Up value lost when saving customer
