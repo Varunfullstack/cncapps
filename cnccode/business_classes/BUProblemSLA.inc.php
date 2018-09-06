@@ -382,7 +382,7 @@ class BUProblemSLA extends Business
 
                             $this->sendCompletionAlertEmail(
                                 $problemID,
-                                $this->dbeProblem->getValue('completeDate'),
+                                $this->dbeProblem->getValue(DBEProblem::completeDate),
                                 $dbeCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
                             );
 
@@ -661,6 +661,7 @@ class BUProblemSLA extends Business
      * Send Service Completion Alert Email
      *
      * @param mixed $problemID
+     * @param $completeDate
      */
     function sendCompletionAlertEmail($problemID,
                                       $completeDate
@@ -687,13 +688,6 @@ class BUProblemSLA extends Business
         */
         $copyEmailToMainContact = true;
 
-        if (
-            $dbeCustomer->getValue(DBECustomer::othersEmailMainFlag) == 'N' ||
-            $dbeCustomer->getValue(DBECustomer::autoCloseEmailMainFlag) == 'N'
-        ) {
-            $copyEmailToMainContact = false;
-        }
-
         /*
         do we send to first activity contact?
         */
@@ -714,22 +708,21 @@ class BUProblemSLA extends Business
         /*
         Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact or don't want to get them.
         */
-        if ($copyEmailToMainContact) {
-            if (
-                $workStartedEmailMain == 'Y' &&
-                $mainSupportEmailAddresses = $buCustomer->getMainSupportEmailAddresses(
-                    $dbeJCallActivity->getValue('customerID'),
-                    $toEmail
-                )) {
 
+        $dbeContact = new DBEContact($this
+                );
+
+        $dbeContact->getMainSupportRowsByCustomerID($dbeJProblem->getValue('customerID'));
+
+        while ($dbeContact->fetchNext()) {
+            if ($dbeContact->getValue(DBEContact::othersEmailFlag) == 'Y' &&
+                $dbeContact->getValue(DBEContact::othersAutoCloseEmailFlag)) {
                 if ($toEmail) {
-                    $toEmail .= ',';
+                    $toEmail .= ",";
                 }
 
-                $toEmail .= $mainSupportEmailAddresses;
-
+                $toEmail .= $dbeContact->getValue(DBEContact::Email);
             }
-
         }
 
         if (!$toEmail) {       // no recipients so no email

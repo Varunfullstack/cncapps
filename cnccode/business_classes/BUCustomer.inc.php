@@ -454,25 +454,62 @@ class BUCustomer extends Business
         }
         $dsContact->clearCurrentRow();
         $dsContact->setUpdateModeInsert();
-        $dsContact->setValue(DBEContact::contactID, 0);
-        $dsContact->setValue(DBEContact::customerID, $customerID);
-        $dsContact->setValue(DBEContact::firstName, 'First Name');
-        $dsContact->setValue(DBEContact::lastName, 'Last Name');
-        $dsContact->setValue(DBEContact::siteNo, $siteNo);
-        $dsContact->setValue(DBEContact::discontinuedFlag, 'N');
-        $dsContact->setValue(DBEContact::sendMailshotFlag, 'Y');
-        $dsContact->setValue(DBEContact::accountsFlag, 'N');
-        $dsContact->setValue(DBEContact::mailshot1Flag, $this->dsHeader->getValue(DBEHeader::mailshot1FlagDef));
-        $dsContact->setValue(DBEContact::mailshot2Flag, $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef));
-        $dsContact->setValue(DBEContact::mailshot3Flag, $this->dsHeader->getValue(DBEHeader::mailshot3FlagDef));
-        $dsContact->setValue(DBEContact::mailshot4Flag, $this->dsHeader->getValue(DBEHeader::mailshot4FlagDef));
-        $dsContact->setValue(DBEContact::mailshot5Flag, $this->dsHeader->getValue(DBEHeader::mailshot5FlagDef));
-        $dsContact->setValue(DBEContact::mailshot6Flag, $this->dsHeader->getValue(DBEHeader::mailshot6FlagDef));
-        $dsContact->setValue(DBEContact::mailshot7Flag, $this->dsHeader->getValue(DBEHeader::mailshot7FlagDef));
-        $dsContact->setValue(DBEContact::mailshot8Flag, $this->dsHeader->getValue(DBEHeader::mailshot8FlagDef));
-        $dsContact->setValue(DBEContact::mailshot9Flag, $this->dsHeader->getValue(DBEHeader::mailshot9FlagDef));
-        $dsContact->setValue(DBEContact::mailshot10Flag, $this->dsHeader->getValue(DBEHeader::mailshot10FlagDef));
-        $dsContact->setValue(DBEContact::mailshot11Flag, $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef));
+        $dsContact->setValue(
+            DBEContact::contactID,
+            0
+        );
+        $dsContact->setValue(
+            DBEContact::customerID,
+            $customerID
+        );
+        $dsContact->setValue(
+            DBEContact::firstName,
+            'First Name'
+        );
+        $dsContact->setValue(
+            DBEContact::lastName,
+            'Last Name'
+        );
+        $dsContact->setValue(
+            DBEContact::siteNo,
+            $siteNo
+        );
+        $dsContact->setValue(
+            DBEContact::discontinuedFlag,
+            'N'
+        );
+        $dsContact->setValue(
+            DBEContact::sendMailshotFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::accountsFlag,
+            'N'
+        );
+        $dsContact->setValue(
+            DBEContact::mailshot2Flag,
+            $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef)
+        );
+        $dsContact->setValue(
+            DBEContact::mailshot3Flag,
+            $this->dsHeader->getValue(DBEHeader::mailshot3FlagDef)
+        );
+        $dsContact->setValue(
+            DBEContact::mailshot4Flag,
+            $this->dsHeader->getValue(DBEHeader::mailshot4FlagDef)
+        );
+        $dsContact->setValue(
+            DBEContact::mailshot8Flag,
+            $this->dsHeader->getValue(DBEHeader::mailshot8FlagDef)
+        );
+        $dsContact->setValue(
+            DBEContact::mailshot9Flag,
+            $this->dsHeader->getValue(DBEHeader::mailshot9FlagDef)
+        );
+        $dsContact->setValue(
+            DBEContact::mailshot11Flag,
+            $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef)
+        );
         $dsContact->post();
         $this->updateModify($dsContact->getValue(DBEContact::customerID));
         return TRUE;

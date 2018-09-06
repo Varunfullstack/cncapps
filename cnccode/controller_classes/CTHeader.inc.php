@@ -121,171 +121,63 @@ class CTHeader extends CTCNC
                 'townMessage'                            => Controller::htmlDisplayText($dsHeader->getMessage('town')),
                 'county'                                 => Controller::htmlInputText($dsHeader->getValue('county')),
                 'postcode'                               => Controller::htmlInputText($dsHeader->getValue('postcode')),
-                'postcodeMessage'                        => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('postcode')
-                ),
+                'postcodeMessage'                        => Controller::htmlDisplayText($dsHeader->getMessage('postcode')),
                 'phone'                                  => Controller::htmlInputText($dsHeader->getValue('phone')),
                 'phoneMessage'                           => Controller::htmlDisplayText($dsHeader->getMessage('phone')),
                 'fax'                                    => Controller::htmlInputText($dsHeader->getValue('fax')),
                 'faxMessage'                             => Controller::htmlDisplayText($dsHeader->getMessage('fax')),
-                'goodsContact'                           => Controller::htmlInputText(
-                    $dsHeader->getValue('goodsContact')
-                ),
-                'goodsContactMessage'                    => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('goodsContact')
-                ),
-                'serviceDeskNotification24hBegin'        => Controller::htmlInputText(
-                    $dsHeader->getValue('serviceDeskNotification24hBegin')
-                ),
-                'serviceDeskNotification24hBeginMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('serviceDeskNotification24hBegin')
-                ),
-                'serviceDeskNotification24hEnd'          => Controller::htmlInputText(
-                    $dsHeader->getValue('serviceDeskNotification24hEnd')
-                ),
-                'serviceDeskNotification24hEndMessage'   => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('serviceDeskNotification24hEnd')
-                ),
-                'billingStartTime'                       => Controller::htmlInputText(
-                    $dsHeader->getValue('billingStartTime')
-                ),
-                'billingStartTimeMessage'                => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('billingStartTime')
-                ),
-                'billingEndTime'                         => Controller::htmlInputText(
-                    $dsHeader->getValue('billingEndTime')
-                ),
-                'billingEndTimeMessage'                  => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('billingEndTime')
-                ),
-                'projectStartTime'                       => Controller::htmlInputText(
-                    $dsHeader->getValue('projectStartTime')
-                ),
-                'projectStartTimeMessage'                => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('projectStartTime')
-                ),
-                'projectEndTime'                         => Controller::htmlInputText(
-                    $dsHeader->getValue('projectEndTime')
-                ),
-                'projectEndTimeMessage'                  => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('projectEndTime')
-                ),
-                'helpdeskStartTime'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('helpdeskStartTime')
-                ),
-                'helpdeskStartTimeMessage'               => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('helpdeskStartTime')
-                ),
-                'helpdeskEndTime'                        => Controller::htmlInputText(
-                    $dsHeader->getValue('helpdeskEndTime')
-                ),
-                'helpdeskEndTimeMessage'                 => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('helpdeskEndTime')
-                ),
-                'hourlyLabourCost'                       => Controller::htmlInputText(
-                    $dsHeader->getValue('hourlyLabourCost')
-                ),
-                'hourlyLabourCostMessage'                => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('hourlyLabourCost')
-                ),
-                'portalPin'                              => Controller::htmlInputText($dsHeader->getValue('portalPin')),
-                'portalPinMessage'                       => Controller::htmlInputText(
-                    $dsHeader->getMessage('portalPin')
-                ),
-                'portal24HourPin'                        => Controller::htmlInputText(
-                    $dsHeader->getValue('portal24HourPin')
-                ),
-                'portal24HourPinMessage'                 => Controller::htmlInputText(
-                    $dsHeader->getMessage('portal24HourPin')
-                ),
-                'gscItemID'                              => Controller::htmlInputText($dsHeader->getValue('gscItemID')),
-                'gscItemDescription'                     => Controller::htmlInputText(
-                    $dsHeader->getValue('gscItemDescription')
-                ),
-                'highActivityAlertCount'                 => Controller::htmlInputText(
-                    $dsHeader->getValue('highActivityAlertCount')
-                ),
+                'goodsContact'                           => Controller::htmlInputText($dsHeader->getValue('goodsContact')
+                ),'goodsContactMessage'                    => Controller::htmlDisplayText($dsHeader->getMessage('goodsContact')
+                ),'serviceDeskNotification24hBegin'        => Controller::htmlInputText($dsHeader->getValue('serviceDeskNotification24hBegin')
+                ),'serviceDeskNotification24hBeginMessage' => Controller::htmlDisplayText($dsHeader->getMessage('serviceDeskNotification24hBegin')),
+                'serviceDeskNotification24hEnd'          => Controller::htmlInputText($dsHeader->getValue('serviceDeskNotification24hEnd')
+                ),'serviceDeskNotification24hEndMessage'   => Controller::htmlDisplayText($dsHeader->getMessage('serviceDeskNotification24hEnd')
+                ),'billingStartTime'                       => Controller::htmlInputText($dsHeader->getValue('billingStartTime')),
+                'billingStartTimeMessage'                => Controller::htmlDisplayText($dsHeader->getMessage('billingStartTime')
+                ),'billingEndTime'                         => Controller::htmlInputText($dsHeader->getValue('billingEndTime')),
+                'billingEndTimeMessage'                  => Controller::htmlDisplayText($dsHeader->getMessage('billingEndTime')),
+                'projectStartTime'                       => Controller::htmlInputText($dsHeader->getValue('projectStartTime')
+                ),'projectStartTimeMessage'                => Controller::htmlDisplayText($dsHeader->getMessage('projectStartTime')
+                ),'projectEndTime'                         => Controller::htmlInputText($dsHeader->getValue('projectEndTime')),
+                'projectEndTimeMessage'                  => Controller::htmlDisplayText($dsHeader->getMessage('projectEndTime')
+                ),'helpdeskStartTime'                      => Controller::htmlInputText($dsHeader->getValue('helpdeskStartTime')),
+                'helpdeskStartTimeMessage'               => Controller::htmlDisplayText($dsHeader->getMessage('helpdeskStartTime')),
+                'helpdeskEndTime'                        => Controller::htmlInputText($dsHeader->getValue('helpdeskEndTime')
+                ),'helpdeskEndTimeMessage'                 => Controller::htmlDisplayText($dsHeader->getMessage('helpdeskEndTime')),
+                'hourlyLabourCost'                       => Controller::htmlInputText($dsHeader->getValue('hourlyLabourCost')),
+                'hourlyLabourCostMessage'                => Controller::htmlDisplayText($dsHeader->getMessage('hourlyLabourCost')
+                ),'portalPin'                              => Controller::htmlInputText($dsHeader->getValue('portalPin')),
+                'portalPinMessage'                       => Controller::htmlInputText($dsHeader->getMessage('portalPin')),
+                'portal24HourPin'                        => Controller::htmlInputText($dsHeader->getValue('portal24HourPin')),
+                'portal24HourPinMessage'                 => Controller::htmlInputText($dsHeader->getMessage('portal24HourPin')
+                ),'gscItemID'                              => Controller::htmlInputText($dsHeader->getValue('gscItemID')),
+                'gscItemDescription'                     => Controller::htmlInputText($dsHeader->getValue('gscItemDescription')),
+                'highActivityAlertCount'                 => Controller::htmlInputText($dsHeader->getValue('highActivityAlertCount')),
                 'highActivityAlertCountMessage'          => $dsHeader->getMessage('highActivityAlertCount'),
-                'mailshot1FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot1FlagDesc')
-                ),
-                'mailshot1FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot1FlagDef')),
-                'mailshot2FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot2FlagDesc')
-                ),
-                'mailshot2FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot2FlagDef')),
-                'mailshot3FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot3FlagDesc')
-                ),
-                'mailshot3FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot3FlagDef')),
-                'mailshot4FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot4FlagDesc')
-                ),
+                'mailshot2FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot2FlagDesc')
+                ),'mailshot2FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot2FlagDef')),
+                'mailshot3FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot3FlagDesc')
+                ),'mailshot3FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot3FlagDef')),
+                'mailshot4FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot4FlagDesc')),
                 'mailshot4FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot4FlagDef')),
-                'mailshot5FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot5FlagDesc')
-                ),
-                'mailshot5FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot5FlagDef')),
-                'mailshot6FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot6FlagDesc')
-                ),
-                'mailshot6FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot6FlagDef')),
-                'mailshot7FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot7FlagDesc')
-                ),
-                'mailshot7FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot7FlagDef')),
-                'mailshot8FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot8FlagDesc')
-                ),
+                'mailshot8FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot8FlagDesc')),
                 'mailshot8FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot8FlagDef')),
-                'mailshot9FlagDesc'                      => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot9FlagDesc')
-                ),
-                'mailshot9FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot9FlagDef')),
-                'mailshot10FlagDesc'                     => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot10FlagDesc')
-                ),
-                'mailshot10FlagDefChecked'               => $this->getChecked($dsHeader->getValue('mailshot10FlagDef')),
-                'mailshot11FlagDesc'                     => Controller::htmlInputText(
-                    $dsHeader->getValue('mailshot11FlagDesc')
-                ),
-                'mailshot11FlagDefChecked'               => $this->getChecked($dsHeader->getValue('mailshot11FlagDef')),
-                'priority1Desc'                          => Controller::htmlInputText(
-                    $dsHeader->getValue('priority1Desc')
-                ),
-                'priority1DescMessage'                   => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('priority1Desc')
-                ),
-                'priority2Desc'                          => Controller::htmlInputText(
-                    $dsHeader->getValue('priority2Desc')
-                ),
-                'priority2DescMessage'                   => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('priority2Desc')
-                ),
-                'priority3Desc'                          => Controller::htmlInputText(
-                    $dsHeader->getValue('priority3Desc')
-                ),
-                'priority3DescMessage'                   => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('priority3Desc')
-                ),
-                'priority4Desc'                          => Controller::htmlInputText(
-                    $dsHeader->getValue('priority4Desc')
-                ),
-                'priority4DescMessage'                   => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('priority4Desc')
-                ),
-                'priority5Desc'                          => Controller::htmlInputText(
-                    $dsHeader->getValue('priority5Desc')
-                ),
-                'priority5DescMessage'                   => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('priority5Desc')
-                ),
-                'allowedClientIpPattern'                 => Controller::htmlInputText(
-                    $dsHeader->getValue('allowedClientIpPattern')
-                ),
-                'allowedClientIpPatternMessage'          => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('allowedClientIpPattern')
-                ),
+                'mailshot9FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot9FlagDesc')
+                ),'mailshot9FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot9FlagDef')),
+                'mailshot11FlagDesc'                     => Controller::htmlInputText($dsHeader->getValue('mailshot11FlagDesc')
+                ),'mailshot11FlagDefChecked'               => $this->getChecked($dsHeader->getValue('mailshot11FlagDef')),
+                'priority1Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority1Desc')
+                ),'priority1DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority1Desc')),
+                'priority2Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority2Desc')),
+                'priority2DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority2Desc')
+                ),'priority3Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority3Desc')),
+                'priority3DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority3Desc')),
+                'priority4Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority4Desc')
+                ),'priority4DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority4Desc')),
+                'priority5Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority5Desc')),
+                'priority5DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority5Desc')
+                ),'allowedClientIpPattern'                 => Controller::htmlInputText($dsHeader->getValue('allowedClientIpPattern')),
+                'allowedClientIpPatternMessage'          => Controller::htmlDisplayText($dsHeader->getMessage('allowedClientIpPattern')),
 
                 'hdTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue('hdTeamLimitHours')),
 
@@ -432,8 +324,8 @@ class CTHeader extends CTCNC
                 DBEHeader::secondSiteReplicationAdditionalDelayAllowance . 'Message' => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::secondSiteReplicationAdditionalDelayAllowance)
                 ),
-                'urlItemPopup'                                                   => $urlItemPopup,
-                'urlUpdate'                                                      => $urlUpdate
+                'urlItemPopup' => $urlItemPopup,
+                'urlUpdate'    => $urlUpdate
             )
         );
 

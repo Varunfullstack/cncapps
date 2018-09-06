@@ -1,10 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+
 ## [v1.10.2] - 2018-08-20
 ### Fixed
-- Issue 333 - Prepay Top Up value lost when saving customer
 
+- Issue 333 - Prepay Top Up value lost when saving customer
 ## [v1.10.1] - 2018-08-03
 ### Fixed
 - Fixed issue with First Time Fixes totals

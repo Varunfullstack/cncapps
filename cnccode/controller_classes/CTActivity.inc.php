@@ -718,8 +718,11 @@ class CTActivity extends CTCNC
         }
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer
-            );$customerString = $dsCustomer->getValue(DBECustomer::name);
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue('customerID'),
+                $dsCustomer
+            );
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $this->template->set_var(
             array(
@@ -3359,7 +3362,10 @@ class CTActivity extends CTCNC
     {
         // Site selection
         $dbeSite = new DBESite($this);
-        $dbeSite->setValue(DBESite::customerID, $customerID);
+        $dbeSite->setValue(
+            DBESite::customerID,
+            $customerID
+        );
         $dbeSite->getRowsByCustomerID();
 
         $siteCount = 0;
@@ -3367,7 +3373,10 @@ class CTActivity extends CTCNC
             $siteCount++;
         }
 
-        $dbeSite->setValue(DBESite::customerID, $customerID);
+        $dbeSite->setValue(
+            DBESite::customerID,
+            $customerID
+        );
         $dbeSite->getRowsByCustomerID();
 
         $this->template->set_block(
@@ -3384,7 +3393,9 @@ class CTActivity extends CTCNC
                 $siteSelected = ($siteNo == $dbeSite->getValue(DBESite::siteNo)) ? CT_SELECTED : '';
             }
 
-            $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(DBESite::town) . ' ' . $dbeSite->getValue(DBESite::postcode);
+            $siteDesc = $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                    DBESite::town
+                ) . ' ' . $dbeSite->getValue(DBESite::postcode);
 
             $this->template->set_var(
                 array(
@@ -3410,7 +3421,7 @@ class CTActivity extends CTCNC
         $dbeContact = new DBEContact($this);
         $dbeSite = new DBESite($this);
 
-        $dbeContact->getRowsByCustomerID( $customerID);
+        $dbeContact->getRowsByCustomerID($customerID);
 
         $this->template->set_block(
             $templateName,
@@ -3430,13 +3441,22 @@ class CTActivity extends CTCNC
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupportDelegate) {
                 $startMainContactStyle = '-delegate';
                 $endMainContactStyle = '-delegate';
+            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
+                $startMainContactStyle = '-Supervisor';
+                $endMainContactStyle = '-Supervisor';
             } else {
                 $startMainContactStyle = '';
                 $endMainContactStyle = '';
             }
 
-            $dbeSite->setValue(DBESite::customerID, $dbeContact->getValue("customerID"));
-            $dbeSite->setValue(DBESite::siteNo, $dbeContact->getValue("siteNo"));
+            $dbeSite->setValue(
+                DBESite::customerID,
+                $dbeContact->getValue("customerID")
+            );
+            $dbeSite->setValue(
+                DBESite::siteNo,
+                $dbeContact->getValue("siteNo")
+            );
             $dbeSite->getRow();
 
             $name = $dbeContact->getValue("firstName") . ' ' . $dbeContact->getValue("lastName");
@@ -3461,7 +3481,9 @@ class CTActivity extends CTCNC
                     }
                 }
 
-                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(DBESite::town) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
+                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                        DBESite::town
+                    ) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
                 $optGroupClose = '';
             } else {
                 $optGroupOpen = '';
@@ -4491,8 +4513,10 @@ class CTActivity extends CTCNC
                 $buCustomer = new BUCustomer($this);
                 if (!$buCustomer->isASupportContact($dsCallActivity->getValue('contactID'))) {
                     $this->formError = true;
-                    $this->dsCallActivity->setMessage('contactID', 'Not a nominated support contact'
-                );
+                    $this->dsCallActivity->setMessage(
+                        'contactID',
+                        'Not a nominated support contact'
+                    );
                 }
             }
 
@@ -4787,8 +4811,14 @@ class CTActivity extends CTCNC
             $dbeCallActType->getValue('itemSalePrice') > 0
         ) {
             $dbeSite = new DBESite($this);
-            $dbeSite->setValue(DBESite::customerID, $this->dsCallActivity->getValue('customerID'));
-            $dbeSite->setValue(DBESite::siteNo, $this->dsCallActivity->getValue('siteNo'));
+            $dbeSite->setValue(
+                DBESite::customerID,
+                $this->dsCallActivity->getValue('customerID')
+            );
+            $dbeSite->setValue(
+                DBESite::siteNo,
+                $this->dsCallActivity->getValue('siteNo')
+            );
             $dbeSite->getRowByCustomerIDSiteNo();
             if (
                 $this->buActivity->travelActivityForCustomerEngineerTodayExists(

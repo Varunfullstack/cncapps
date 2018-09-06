@@ -239,6 +239,7 @@
             UPDATE contact SET supportLevel = IF(con_mailflag10 = 'Y', 'main', IF(con_mailflag5 = 'Y', 'support', NULL))
         </sql>
         <rollback>
+            update contact set con_mailflag10 = if(supportLevel = 'main', 'Y','N'), con_mailflag5 = if(supportLevel = 'support', 'Y', 'N')
         </rollback>
     </changeSet>
     <changeSet id="pavwebdev" author="issue215-1528799226-22">
@@ -281,7 +282,7 @@
         <dropColumn tableName="headert" columnName="hed_mailflg5_desc"/>
         <rollback>
             <addColumn tableName="headert">
-                <column name="hed_mailflg5_desc" type="char(30)"/>
+                <column name="hed_mailflg5_desc" type="char(30)" value="Sup"/>
             </addColumn>
         </rollback>
     </changeSet>
@@ -303,7 +304,7 @@
         <dropColumn tableName="headert" columnName="hed_mailflg10_desc"/>
         <rollback>
             <addColumn tableName="headert">
-                <column name="hed_mailflg10_desc" type="char(30)"/>
+                <column name="hed_mailflg10_desc" type="char(30)" value="Main"/>
             </addColumn>
         </rollback>
     </changeSet>
