@@ -12,6 +12,7 @@ require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerLeadStatus.php");
 require_once($cfg["path_dbe"] . "/DBELeadStatus.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once ($cfg['path_dbe'].'/DBEJContract.inc.php');
 define('BUCUSTOMER_NAME_STR_NT_PASD', 'No name string passed');
 
 class BUCustomer extends Business
