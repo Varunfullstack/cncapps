@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Added
 - Issue 317 - Customer 3rd party contact information
 - Issue 318 - Create Change Request Dashboard
+- Add total to Service Requests Open For More Than 7 Days on screen
 ### Changed
 - Issue 304 - Enhance First Time Fix Reporting
 - Issue 320 - Further Increase length of mail queue recipient database field

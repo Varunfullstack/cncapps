@@ -184,7 +184,7 @@ class BUDailyReport extends Business
             $daysAgo,
             $priorityFiveOnly
         );
-
+        $totalRequests = 0;
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (
@@ -294,12 +294,13 @@ class BUDailyReport extends Business
                     'requestBlock',
                     true
                 );
-
+                $totalRequests++;
             } while ($row = $outstandingRequests->fetch_row());
 
             $template->setVar(
                 array(
-                    'daysAgo' => $daysAgo
+                    'daysAgo'       => $daysAgo,
+                    'totalRequests' => $totalRequests
                 )
             );
 
