@@ -1185,6 +1185,19 @@ class BUCustomer extends Business
         return ($dbePortalCustomerDocument->insertRow());
     }
 
+    /**
+     * @param $customerId
+     * @return bool
+     */
+    public function hasPrepayContract($customerId)
+    {
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getPrePayContracts($customerId);
+
+        $array = $dbeJContract->getRowAsArray();
+
+        return !!count($array);
+    }
 
 }// End of class
 ?>
