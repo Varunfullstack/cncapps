@@ -418,7 +418,7 @@ class BUDailyReport extends Business
                         'contract'         => $row[5],
                         'category'         => $row[6],
                         'urlRequest'       => $urlRequest,
-                        'urlActivity'      => urlencode($urlActivity)
+                        'urlActivity'      => $urlActivity
                     )
                 );
 
