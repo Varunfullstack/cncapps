@@ -522,14 +522,13 @@ define(
     "PHPLIB_SESSIONS_DIR",
     BASE_DRIVE . "/sessions/"
 );
-var_dump(DB_NAME);
 $GLOBALS['db_options'] =
     array(
         'type'       => 'db',
         'dsn'        => 'mysqli://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST . '/' . DB_NAME,
         'mail_table' => 'mail_queue'
     );
-
+ 
 
 require BASE_DRIVE . '/vendor/autoload.php';
 // disable DOMPDF's internal autoloader if you are using Composer
