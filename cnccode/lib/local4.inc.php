@@ -113,6 +113,8 @@ class auSweetcode extends Auth
 
         $bind = @ldap_bind($ldap, $ldaprdn, $password);
 
+        var_dump('trying to connect to ldap');
+        exit;
         if ($bind) {
             $ret = true;
         } else {
