@@ -5979,7 +5979,13 @@ class CTActivity extends CTCNC
         );
 
         if ($dsCallActivity->getValue(DBECallActivity::status) !== 'O') {
-            echo 'This Sales Request has already been processed';
+
+            $this->template->setVar(
+                'CONTENTS',
+                'This Sales Request has already been processed',
+                true
+            );
+            $this->parsePage();
             exit;
         }
 
@@ -6018,10 +6024,9 @@ class CTActivity extends CTCNC
 
             $nextURL =
                 $this->buildLink(
-                    'CurrentActivityReport.php',
+                    'SalesRequestDashboard.php',
                     array()
                 );
-
             header('Location: ' . $nextURL);
             exit;
         }

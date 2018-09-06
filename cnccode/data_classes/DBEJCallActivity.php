@@ -554,4 +554,15 @@ class DBEJCallActivity extends DBECallActivity
             }
         }
     }
+
+    public function getPendingSalesRequestRows()
+    {
+        $query =
+            "SELECT " .
+            $this->getDBColumnNamesAsString() .
+            " FROM " . $this->fromString .
+            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 43";
+        $this->setQueryString($query);
+        return (parent::getRows());
+    }
 }

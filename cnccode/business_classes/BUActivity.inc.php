@@ -2199,9 +2199,11 @@ class BUActivity extends Business
             $dsCallActivity
         );
 
+
         $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
 
         $this->dbeUser->getRow($userID);
+
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
 
@@ -2222,6 +2224,7 @@ class BUActivity extends Business
                 break;
         }
 
+
         /*
     Append any comments
     */
@@ -2231,31 +2234,32 @@ class BUActivity extends Business
         if ($comments) {
             $reason .= '<div style="color: red"><p>Comments:</p>' . $comments . '</div>';
         }
+
         /*
     and the original request
     */
         $reason .= '<p></p>' . $dsCallActivity->getValue(DBEJCallActivity::reason);
 
 
-        $newCallActivityID = $this->createSalesRequestActivity(
+        $newCallActivity = $this->createSalesRequestActivity(
             $dsCallActivity->getValue(DBEJCallActivity::problemID),
             $reason
         );
 
-        $this->getActivityByID(
-            $newCallActivityID,
-            $dsCallActivity
-        );    // get activity just created
 
         $this->sendSalesRequestReplyEmail(
-            $dsCallActivity,
+            $newCallActivity,
             $subject,
             $requestingUserID
         );
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-        $dbeCallActivity->setValue(DBECallActivity::status, 'C');
+        $dbeCallActivity->setValue(
+            DBECallActivity::status,
+            'C'
+        );
+
         $dbeCallActivity->updateRow();
     }
 
@@ -2403,8 +2407,8 @@ class BUActivity extends Business
      * @param string|int $requestingUserID
      */
     private function sendSalesRequestReplyEmail($dbeCallActivity,
-                                                 $subject,
-                                                 $requestingUserID
+                                                $subject,
+                                                $requestingUserID
     )
     {
         $buMail = new BUMail($this);
@@ -2458,7 +2462,7 @@ class BUActivity extends Business
     */
         $this->dbeUser->getRow($requestingUserID);
 
-        $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN . ',' . $this->dbeUser->getValue(
+        $toEmail = 'salesRequestReply@' . CONFIG_PUBLIC_DOMAIN . ',' . $this->dbeUser->getValue(
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
 
