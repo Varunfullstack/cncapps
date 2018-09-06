@@ -17,6 +17,7 @@ This project changes will be shown here.
 - Issue 326 - Enhance Items Not Received Process
 - Issue 331 - Renewal item creation warning
 - Issue 273 - Allow for contracts & T&Cs to be manually sent to a customer.
+- Issue 335 - Improve visit confirmation email addressing
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed

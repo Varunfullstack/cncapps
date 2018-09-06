@@ -11,6 +11,51 @@ $buMail = new BUMail($thing);
 $thing = null;
 $buActivity = new BUActivity($thing);
 
+
+$buMail->mime->setHTMLBody("<div>this is a test</div>");
+
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset'  => 'UTF-8',
+    'html_charset'  => 'UTF-8',
+    'head_charset'  => 'UTF-8'
+);
+$body = $buMail->mime->get($mime_params);
+$senderEmail = CONFIG_SUPPORT_EMAIL;
+
+$toEmail = "guerreradelviento@gmail.com";
+
+$cc = "fizdalf@gmail.com";
+
+$bcc = "publixavi@gmail.com";
+
+$toEmail = implode(
+    ";",
+    [$toEmail, $cc, $bcc]
+);
+
+$hdrs = array(
+    'From'         => $senderEmail,
+    'To'           => $toEmail,
+    'Subject'      => 'Testeando',
+    'Date'         => date("r"),
+    'Content-Type' => 'text/html; charset=UTF-8',
+    'Cc'           => $cc,
+);
+$recipients = "xavi@pavilionweb.co.uk";
+$hdrs = $buMail->mime->headers($hdrs);
+
+$buMail->putInQueue(
+    $senderEmail,
+    $recipients,
+    $hdrs,
+    $body
+);
+var_dump($buMail->sendQueue());
+
+exit;
+
+
 $results = new DataSet($thing);
 $buActivity->getActivityByID(
     1640238,

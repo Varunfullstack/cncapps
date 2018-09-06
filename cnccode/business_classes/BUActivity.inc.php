@@ -9228,7 +9228,7 @@ is currently a balance of ';
 
         $bcc =
             $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
-            CONFIG_SALES_EMAIL;
+            CONFIG_SALES_EMAIL . ',' . "VisitConfirmation@cnc-ltd.co.uk";
 
         $recipients = $toEmail . ',' . $bcc . ',' . $cc;
 
