@@ -522,7 +522,7 @@ define(
     "PHPLIB_SESSIONS_DIR",
     BASE_DRIVE . "/sessions/"
 );
-
+var_dump(DB_NAME);
 $GLOBALS['db_options'] =
     array(
         'type'       => 'db',

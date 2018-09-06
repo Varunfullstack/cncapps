@@ -11,30 +11,102 @@
  *
  **/
 require_once($cfg["path_func"] . "/Common.inc.php");
-define('PHPLIB_CLASSNAME_DB', 'dbSweetcode');
-define('PHPLIB_CLASSNAME_SESSION_CONTAINER', 'CtSweetcode');
-define('PHPLIB_CLASSNAME_SESSION', 'seSweetcode');
-define('PHPLIB_CLASSNAME_USER', 'usSweetcode');
-define('PHPLIB_CLASSNAME_AUTH', 'auSweetcode');
-define('PHPLIB_CLASSNAME_PERM', 'pmSweetcode');
-define('PHPLIB_TABLE_SESSIONS', 'sessions');
-define('PHPLIB_TABLE_AUTH', 'consultant');
-define('PHPLIB_COLUMN_PERMS', 'cns_perms');
-define('PHPLIB_COLUMN_USERID', 'cns_consno');
-define('PHPLIB_COLUMN_USERNAME', 'cns_logname');
-define('PHPLIB_COLUMN_PASSWORD', 'cns_password');
-define('PHPLIB_PAGE_LOGIN', $cfg["path_templates"] . '/login.inc.html');
-define('PHPLIB_PAGE_PERM_INVALID', $cfg["path_templates"] . '/perminvalid.inc.html');
-define('PHPLIB_SESSION_VAR_INIT', APPLICATION_DIR . '/lib/sessioninit.inc.php');
-define('PHPLIB_MSG_BAD_LOGIN', 'Please check User Name and Password. If all are correct please contact Gary or Graham');
-define('PHPLIB_PERM_SALES', 'sales');
-define('PHPLIB_PERM_ACCOUNTS', 'accounts');
-define('PHPLIB_PERM_TECHNICAL', 'technical');
-define('PHPLIB_PERM_MAINTENANCE', 'maintenance');
-define('PHPLIB_PERM_REPORTS', 'reports');
-define('PHPLIB_PERM_SUPERVISOR', 'supervisor');
-define('PHPLIB_PERM_CUSTOMER', 'customer');
-define('PHPLIB_PERM_RENEWALS', 'renewals');
+define(
+    'PHPLIB_CLASSNAME_DB',
+    'dbSweetcode'
+);
+define(
+    'PHPLIB_CLASSNAME_SESSION_CONTAINER',
+    'CtSweetcode'
+);
+define(
+    'PHPLIB_CLASSNAME_SESSION',
+    'seSweetcode'
+);
+define(
+    'PHPLIB_CLASSNAME_USER',
+    'usSweetcode'
+);
+define(
+    'PHPLIB_CLASSNAME_AUTH',
+    'auSweetcode'
+);
+define(
+    'PHPLIB_CLASSNAME_PERM',
+    'pmSweetcode'
+);
+define(
+    'PHPLIB_TABLE_SESSIONS',
+    'sessions'
+);
+define(
+    'PHPLIB_TABLE_AUTH',
+    'consultant'
+);
+define(
+    'PHPLIB_COLUMN_PERMS',
+    'cns_perms'
+);
+define(
+    'PHPLIB_COLUMN_USERID',
+    'cns_consno'
+);
+define(
+    'PHPLIB_COLUMN_USERNAME',
+    'cns_logname'
+);
+define(
+    'PHPLIB_COLUMN_PASSWORD',
+    'cns_password'
+);
+define(
+    'PHPLIB_PAGE_LOGIN',
+    $cfg["path_templates"] . '/login.inc.html'
+);
+define(
+    'PHPLIB_PAGE_PERM_INVALID',
+    $cfg["path_templates"] . '/perminvalid.inc.html'
+);
+define(
+    'PHPLIB_SESSION_VAR_INIT',
+    APPLICATION_DIR . '/lib/sessioninit.inc.php'
+);
+define(
+    'PHPLIB_MSG_BAD_LOGIN',
+    'Please check User Name and Password. If all are correct please contact Gary or Graham'
+);
+define(
+    'PHPLIB_PERM_SALES',
+    'sales'
+);
+define(
+    'PHPLIB_PERM_ACCOUNTS',
+    'accounts'
+);
+define(
+    'PHPLIB_PERM_TECHNICAL',
+    'technical'
+);
+define(
+    'PHPLIB_PERM_MAINTENANCE',
+    'maintenance'
+);
+define(
+    'PHPLIB_PERM_REPORTS',
+    'reports'
+);
+define(
+    'PHPLIB_PERM_SUPERVISOR',
+    'supervisor'
+);
+define(
+    'PHPLIB_PERM_CUSTOMER',
+    'customer'
+);
+define(
+    'PHPLIB_PERM_RENEWALS',
+    'renewals'
+);
 
 /**
  * System needs to use a database class.
@@ -94,7 +166,9 @@ class auSweetcode extends Auth
         include(PHPLIB_PAGE_LOGIN);
     }
 
-    function authenticate_on_ldap($username, $password)
+    function authenticate_on_ldap($username,
+                                  $password
+    )
     {
         if (!$password) {
             return false;
@@ -108,13 +182,22 @@ class auSweetcode extends Auth
 
         $ldaprdn = $domain . "\\" . $username;
 
-        ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
-        ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+        ldap_set_option(
+            $ldap,
+            LDAP_OPT_PROTOCOL_VERSION,
+            3
+        );
+        ldap_set_option(
+            $ldap,
+            LDAP_OPT_REFERRALS,
+            0
+        );
 
-        $bind = @ldap_bind($ldap, $ldaprdn, $password);
-
-        var_dump('trying to connect to ldap');
-        exit;
+        $bind = ldap_bind(
+            $ldap,
+            $ldaprdn,
+            $password
+        );
         if ($bind) {
             $ret = true;
         } else {
@@ -139,7 +222,10 @@ class auSweetcode extends Auth
         */
         $allowedIpPattern = $this->get_allowed_ip_pattern();
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_LIVE &&
-            !preg_match('/' . $allowedIpPattern . '/', $_SERVER['REMOTE_ADDR'])
+            !preg_match(
+                '/' . $allowedIpPattern . '/',
+                $_SERVER['REMOTE_ADDR']
+            )
         ) {
             $GLOBALS['loginMessage'] = 'Login blocked: You are not on the CNC network';
             return false;
@@ -158,15 +244,18 @@ class auSweetcode extends Auth
             return false;
         }
 
-        $this->db->query(sprintf("select %s, %s " .
-            "        from %s " .
-            "       where %s = '%s' ",
-            PHPLIB_COLUMN_PERMS,
-            PHPLIB_COLUMN_USERID,
-            $this->database_table,
-            PHPLIB_COLUMN_USERNAME,
-            addslashes($_POST["username"])
-        ));
+        $this->db->query(
+            sprintf(
+                "select %s, %s " .
+                "        from %s " .
+                "       where %s = '%s' ",
+                PHPLIB_COLUMN_PERMS,
+                PHPLIB_COLUMN_USERID,
+                $this->database_table,
+                PHPLIB_COLUMN_USERNAME,
+                addslashes($_POST["username"])
+            )
+        );
 
         while ($this->db->next_record()) {
             if ($uid = $this->db->f(PHPLIB_COLUMN_USERID)) {
@@ -212,7 +301,10 @@ class auSweetcode extends Auth
     )
     {
         $file_name = SAGE_EXPORT_DIR . '/session_log/' . date('Ymd') . '.csv';
-        $handle = fopen($file_name, 'a+');
+        $handle = fopen(
+            $file_name,
+            'a+'
+        );
         fwrite(
             $handle,
             $ip . ',' .
@@ -237,7 +329,10 @@ class auSweetcode extends Auth
         Do not record if:
         */
         if (
-            in_array(date('Y-m-d'), $bankHolidays) OR // holiday
+            in_array(
+                date('Y-m-d'),
+                $bankHolidays
+            ) OR // holiday
             date('g') < 6 OR // before 6am
             date('g') > 18 OR // after 6pm
             date('N') > 5                                   // Sat or Sun
@@ -293,17 +388,19 @@ class pmSweetcode extends Perm
 {
     var $classname = PHPLIB_CLASSNAME_PERM;
     var $permissions = array(
-        PHPLIB_PERM_SALES => 1,
-        PHPLIB_PERM_ACCOUNTS => 2,
-        PHPLIB_PERM_TECHNICAL => 4,
+        PHPLIB_PERM_SALES       => 1,
+        PHPLIB_PERM_ACCOUNTS    => 2,
+        PHPLIB_PERM_TECHNICAL   => 4,
         PHPLIB_PERM_MAINTENANCE => 8,
-        PHPLIB_PERM_CUSTOMER => 16,
-        PHPLIB_PERM_REPORTS => 32,
-        PHPLIB_PERM_SUPERVISOR => 64,
-        PHPLIB_PERM_RENEWALS => 128
+        PHPLIB_PERM_CUSTOMER    => 16,
+        PHPLIB_PERM_REPORTS     => 32,
+        PHPLIB_PERM_SUPERVISOR  => 64,
+        PHPLIB_PERM_RENEWALS    => 128
     );
 
-    function perm_invalid($does_have, $must_have)
+    function perm_invalid($does_have,
+                          $must_have
+    )
     {
         global $perm, $auth, $sess;
         global $cfg;
