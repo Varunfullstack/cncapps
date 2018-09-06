@@ -1182,7 +1182,7 @@ class BUActivity extends Business
                 $dbeContact = new DBEContact($this);
 
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
-                
+
                 $dbeContact->setValue(
                     DBEContact::notes,
                     $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
@@ -2187,6 +2187,78 @@ class BUActivity extends Business
 
     }
 
+    public function salesRequestProcess($callActivityID,
+                                        $userID,
+                                        $response,
+                                        $comments
+    )
+    {
+        $dsCallActivity = new DataSet($this);
+        $this->getActivityByID(
+            $callActivityID,
+            $dsCallActivity
+        );
+
+        $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
+
+        $this->dbeUser->getRow($userID);
+
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
+
+        switch ($response) {
+
+            case 'A':
+                $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
+
+                $subject = 'Sales Request approved';
+
+                break;
+
+            case 'D':
+                $reason = '<p>The following change request has been denied by ' . $userName . '</p>';
+
+                $subject = 'Sales Request denied';
+
+                break;
+        }
+
+        /*
+    Append any comments
+    */
+        $subject .= ' for ' . $dsCallActivity->getValue(DBEJCallActivity::customerName) . ' by ' . $userName .
+            ' for SR ' . $dsCallActivity->getValue(DBEJCallActivity::problemID);
+
+        if ($comments) {
+            $reason .= '<div style="color: red"><p>Comments:</p>' . $comments . '</div>';
+        }
+        /*
+    and the original request
+    */
+        $reason .= '<p></p>' . $dsCallActivity->getValue(DBEJCallActivity::reason);
+
+
+        $newCallActivityID = $this->createSalesRequestActivity(
+            $dsCallActivity->getValue(DBEJCallActivity::problemID),
+            $reason
+        );
+
+        $this->getActivityByID(
+            $newCallActivityID,
+            $dsCallActivity
+        );    // get activity just created
+
+        $this->sendSalesRequestReplyEmail(
+            $dsCallActivity,
+            $subject,
+            $requestingUserID
+        );
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($callActivityID);
+        $dbeCallActivity->setValue(DBECallActivity::status, 'C');
+        $dbeCallActivity->updateRow();
+    }
+
     public function changeRequestProcess($callActivityID,
                                          $userID,
                                          $response,
@@ -2323,6 +2395,101 @@ class BUActivity extends Business
         $dbeNewActivity->insertRow();
 
         return $dbeNewActivity->getPKValue();
+    }
+
+    /**
+     * @param DataAccess $dbeCallActivity
+     * @param string $subject
+     * @param string|int $requestingUserID
+     */
+    private function sendSalesRequestReplyEmail($dbeCallActivity,
+                                                 $subject,
+                                                 $requestingUserID
+    )
+    {
+        $buMail = new BUMail($this);
+
+        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
+
+        $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+
+        $template->set_file(
+            'page',
+            'SalesRequestReplyEmail.inc.html'
+        );
+
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
+
+        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
+
+        $template->setVar(
+            array(
+                'problemID' => $problemID,
+
+                'userName' => $userName,
+
+                'subject' => $subject,
+
+                'urlLastActivity' => $urlLastActivity,
+
+                'requestReason' => $dbeCallActivity->getValue(DBEJCallActivity::reason)
+
+            )
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+        /*
+    Send reply to allocated user
+    */
+        $this->dbeUser->getRow($requestingUserID);
+
+        $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN . ',' . $this->dbeUser->getValue(
+                DBEUser::username
+            ) . '@' . CONFIG_PUBLIC_DOMAIN;
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
     }
 
     /**
@@ -10627,6 +10794,183 @@ is currently a balance of ';
             $problems
         );
 
+    }
+
+    /**
+     * @param $problemID
+     * @param $message
+     * @param $type
+     * @throws Exception
+     */
+    public function sendSalesRequest($problemID,
+                                     $message,
+                                     $type
+    )
+    {
+        // we have to create an open "sales activity"
+        $salesRequestActivity = $this->createSalesRequestActivity(
+            $problemID,
+            $message,
+            "O"
+        );
+
+        if ($type == "newStarter") {
+            $destEmail = "salesrequeststarter@cnc-ltd.co.uk";
+        } else if ($type == "otherRequest") {
+            $destEmail = "salesrequestother@cnc-ltd.co.uk";
+        } else {
+            throw new Exception('The type is not valid');
+        }
+
+        $this->sendSalesRequestEmail(
+            $salesRequestActivity,
+            $destEmail
+        );
+    }
+
+    private function sendSalesRequestEmail(DBEJCallActivity $salesRequestActivity,
+                                           $email
+    )
+    {
+        $buMail = new BUMail($this);
+        $problemID = $salesRequestActivity->getValue(DBEJCallActivity::problemID);
+        $dsInitialCallActivity = $this->getFirstActivityInProblem($problemID);
+        $lastActivity = $this->getLastActivityInProblem($problemID);
+        $this->dbeUser->getRow($this->loggedInUserID);
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+
+        $template->set_file(
+            'page',
+            'SalesRequestEmail.html'
+        );
+
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
+
+
+        $urlSalesRequestReview = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
+                DBEJCallActivity::callActivityID
+            ) . '&fromEmail=true';
+
+        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
+
+        $template->setVar(
+            array(
+                'problemID' => $problemID,
+
+                'userName' => $userName,
+
+                'urlSalesRequestControl' => $urlSalesRequestReview,
+
+                'urlLastActivity' => $urlLastActivity,
+
+                'requestReason' => $salesRequestActivity->getValue(DBEJCallActivity::reason)
+            )
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $toEmail = $email;
+
+        $subject = 'Sales Request submitted for ' . $dsInitialCallActivity->getValue(
+                DBEJCallActivity::customerName
+            ) . ' by ' . $userName . ' for SR' . $problemID;
+
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
+
+    /**
+     * @param $problemID
+     * @param $message
+     * @param string $status
+     * @return bool|DBEJCallActivity
+     */
+    private function createSalesRequestActivity($problemID,
+                                                $message,
+                                                $status = "C"
+    )
+    {
+        $lastActivity = $this->getLastActivityInProblem($problemID);
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
+        $dbeCallActivity->setPKValue('');
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(CONFIG_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $this->loggedInUserID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_SALES_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $message
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::serverGuard,
+            'N'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            $status
+        );              // Checked
+
+        $dbeCallActivity->insertRow();
+
+        return $this->getLastActivityInProblem($problemID);
     }
 
 

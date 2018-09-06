@@ -523,8 +523,32 @@
         </td>
     </tr>
 </table>
-<div id="salesRequestDialog" title="Sales Request">
-
+<div id="salesRequestDialog"
+     title="Sales Request"
+>
+    <label for="templateSelector"></label>
+    <select name="templateSelector"
+            id="templateSelector"
+            onchange="changeTemplate()"
+    >
+        <option value="">
+            Pick a template
+        </option>
+        <option value="newStarter">New Starter/ Office 365 License</option>
+        <option value="otherRequest">Other Request</option>
+    </select>
+    <br>
+    <br>
+    <textarea id="salesRequestText"
+              cols="30"
+              rows="10"
+    ></textarea>
+    <br>
+    <br>
+    <div>
+        <button onclick="sendSalesRequest()">Send</button>
+        <button onclick="cancelSalesRequest()">Cancel</button>
+    </div>
 </div>
 
 <div id="partsUsedDialog"
@@ -542,13 +566,29 @@
 </div>
 <script>
     $('#partsUsedDialog').dialog({autoOpen: false, width: 910});
+    $('#salesRequestDialog').dialog({autoOpen: false, width: 910});
     CKEDITOR.replace('partsUsedText', {
             customConfig: '/ckeditor_config.js'
         }
     );
 
-    function showDialog() {
+    CKEDITOR.replace('salesRequestText', {customConfig: '/ckeditor_config.js'});
+
+    function showPartsUsedDialog() {
         $('#partsUsedDialog').dialog('open');
+    }
+
+    function showSalesRequestDialog() {
+        $('#salesRequestDialog').dialog('open');
+    }
+
+    function changeTemplate() {
+        var html = "";
+        if (event.target.value) {
+            html = $('#' + event.target.value + 'Template').html()
+        }
+
+        CKEDITOR.instances.salesRequestText.setData(html);
     }
 
     function sendPartsUsedToSales() {
@@ -578,6 +618,35 @@
     function cancelPartsUsed() {
         $('#partsUsedDialog').dialog('close');
     }
+
+    function sendSalesRequest() {
+        var object = {
+            message: CKEDITOR.instances.salesRequestText.getData(),
+            type: $('#templateSelector').val()
+        };
+
+        $.ajax({
+            url: '{urlSalesRequest}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to send message';
+            } else {
+                cancelSalesRequest();
+                alert('Submitted OK');
+            }
+        }).catch(function () {
+            alert('Failed to send message');
+        });
+    }
+
+    function cancelSalesRequest() {
+        $('#salesRequestDialog').dialog('close');
+    }
+
 </script>
 <table>
     <tr>
@@ -585,13 +654,13 @@
             class="promptTextLeft"
             valign="top"
         >
-            <button onclick="showDialog()">Parts Used</button>
+            <button onclick="showPartsUsedDialog()">Parts Used</button>
         </td>
         <td colspan="4"
             class="promptTextLeft"
             valign="top"
         >
-            <button>Sales Request</button>
+            <button onclick="showSalesRequestDialog()">Sales Request</button>
         </td>
     </tr>
 </table>

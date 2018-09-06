@@ -475,6 +475,12 @@ class CTActivity extends CTCNC
                 echo json_encode($data);
 
                 break;
+            case 'sendSalesRequest':
+                echo json_encode($this->sendSalesRequest());
+                break;
+            case 'salesRequestReview':
+                $this->salesRequestReview();
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -1981,6 +1987,15 @@ class CTActivity extends CTCNC
                     'callActivityID' => $callActivityID,
                 )
             );
+        $urlSalesRequest =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => 'sendSalesRequest',
+                    'problemID' => $problemID,
+                )
+            );
+
         if ($dsCallActivity->getValue('contractCustomerItemID')) {
             $dbeContract = new DBEJContract($this);
             $dbeContract->getRowByContractID($dsCallActivity->getValue('contractCustomerItemID'));
@@ -2132,6 +2147,7 @@ class CTActivity extends CTCNC
                 'contactNotes'                       => $dsCallActivity->getValue('contactNotes'),
                 'techNotes'                          => $dsCallActivity->getValue('techNotes'),
                 'urlLinkedSalesOrder'                => $urlLinkedSalesOrder,
+                'urlSalesRequest'                    => $urlSalesRequest,
                 'disabled'                           => $disabled,
                 'contactPhone'                       => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue('contactID')
@@ -5951,6 +5967,109 @@ class CTActivity extends CTCNC
         );
     }
 
+    function salesRequestReview()
+    {
+        $this->setMethodName('salesRequestReview');
+
+        $callActivityID = $_REQUEST['callActivityID'];
+
+        $this->buActivity->getActivityByID(
+            $callActivityID,
+            $dsCallActivity
+        );
+
+        if ($dsCallActivity->getValue(DBECallActivity::status) !== 'O') {
+            echo 'This Sales Request has already been processed';
+            exit;
+        }
+
+        $problemID = $dsCallActivity->getValue('problemID');
+
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+
+        $this->setTemplateFiles(
+            array(
+                'ServiceSalesRequestReview' => 'ServiceSalesRequestReview.inc'
+            )
+        );
+
+        $this->setPageTitle("Review Sales Request");
+
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            switch ($_REQUEST['Submit']) {
+
+                case 'Approve':
+                    $option = 'A';
+                    break;
+
+                case 'Deny':
+                    $option = 'D';
+                    break;
+            }
+
+            $this->buActivity->salesRequestProcess(
+                $callActivityID,
+                $this->userID,
+                $option,
+                $_REQUEST['comments']
+            );
+
+            $nextURL =
+                $this->buildLink(
+                    'CurrentActivityReport.php',
+                    array()
+                );
+
+            header('Location: ' . $nextURL);
+            exit;
+        }
+
+        $urlProblemHistoryPopup =
+            $this->buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'problemHistoryPopup',
+                    'problemID' => $problemID,
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+
+
+        $submitURL =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
+                )
+            );
+
+        $this->template->set_var(
+            array(
+                'callActivityID' => $callActivityID,
+
+                'problemID' => $problemID,
+
+                'customerID' => $dbeFirstActivity->getValue('customerID'),
+
+                'customerName'           => $dbeFirstActivity->getValue('customerName'),
+                'requestDetails'         => $dsCallActivity->getValue('reason'),
+                'userName'               => $dsCallActivity->getValue('userName'),
+                'submitUrl'              => $submitURL,
+                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceSalesRequestReview',
+            true
+        );
+
+        $this->parsePage();
+    }
+
     function changeRequestReview()
     {
 
@@ -6274,6 +6393,27 @@ class CTActivity extends CTCNC
             $callActivityID,
             $message
         );
+        return ["status" => "ok"];
+    }
+
+    function sendSalesRequest()
+    {
+        $this->setMethodName('sendSalesRequest');
+
+        $message = $_REQUEST['message'];
+        $problemID = $_REQUEST['problemID'];
+        $type = $_REQUEST['type'];
+
+        try {
+
+            $this->buActivity->sendSalesRequest(
+                $problemID,
+                $message,
+                $type
+            );
+        } catch (\Exception $exception) {
+            return ["status" => "error", "message" => $exception->getMessage()];
+        }
         return ["status" => "ok"];
     }
 
