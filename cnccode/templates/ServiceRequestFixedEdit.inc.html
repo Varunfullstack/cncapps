@@ -3,7 +3,7 @@
 
 <script src="ckeditor/ckeditor.js"></script>
 
-<script src="ckfinder/ckfinder.js"></script>
+<!--<script src="ckfinder/ckfinder.js"></script>-->
 
 <script>
     var formChanged = false;
@@ -204,6 +204,64 @@
         </tr>
     </table>
 </form>
+<div id="dialog"
+     title="Parts Used"
+>
+    <textarea id="partsUsedText"
+              cols="30"
+              rows="10"
+    ></textarea>
+    <br>
+    <div>
+        <button type="button"
+                onclick="sendPartsUsedToSales()"
+        >Send
+        </button>
+        <button type="button"
+                onclick="cancelPartsUsed()"
+        >Cancel
+        </button>
+    </div>
+</div>
+<script>
+    $('#dialog').dialog({autoOpen: false, width: 910});
+    CKEDITOR.replace('partsUsedText', {
+            customConfig: '/ckeditor_config.js'
+        }
+    );
+
+    function showDialog() {
+        $('#dialog').dialog('open');
+    }
+
+    function sendPartsUsedToSales() {
+        var object = {
+            message: CKEDITOR.instances.partsUsedText.getData(),
+            callActivityID: {callActivityID}
+        };
+
+        $.ajax({
+            url: '{urlMessageToSales}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to send message';
+            } else {
+                $('#dialog').dialog('close');
+                alert('Submitted OK');
+            }
+        }).catch(function () {
+            alert('Failed to send message');
+        });
+    }
+
+    function cancelPartsUsed() {
+        $('#dialog').dialog('close');
+    }
+</script>
 <h3>Message to Sales</h3>
 <input type="hidden"
        name="callActivityID"
@@ -214,51 +272,18 @@
         <td colspan="4"
             class="promptTextLeft"
             valign="top"
-        >Parts Used / Message to Sales/
+        >
+            <button onclick="showDialog()">Parts Used</button>
+        </td>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >
+            <button>Sales Request</button>
         </td>
     </tr>
-    <tr>
-        <td colspan="4"><textarea name="message"
-                                  id="message"
-                                  cols="110"
-                                  rows="20"
-        ></textarea>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="4"><input type="button"
-                               name="messageToSales"
-                               id="messageToSales"
-                               value="Send"
-        ></td>
-    </tr>
+
 </table>
-</form>
-<script>
-
-    $(document).ready(function () {
-        /*
-        Create ajax submit function for message to sales
-        */
-        $('input#messageToSales').click(function () {
-
-            $.ajax({
-                url: 'Activity.php',
-                data: {
-                    action: "messageToSales",
-                    callActivityID: {callActivityID},
-                    message: $("TEXTAREA#message").val()
-                }
-            })
-                .done(function () {
-                    alert("Message sent to Sales");
-                    $("TEXTAREA#message").val("");
-
-                });
-        })
-    });
-
-</script>
 
 
 <!-- End Template: ServiceRequestFixedEdit.inc.html -->

@@ -387,7 +387,7 @@ class BUActivity extends Business
         $dbeProblem->setValue(
             DBEJProblem::internalNotes,
             $dbeProblem->getValue(DBEProblem::internalNotes) . '<BR/><BR/><STRONG>' .
-            'Request to Sales on ' . date('d/m/Y H:i') . ' from  ' .
+            'Parts Used on ' . date('d/m/Y H:i') . ' from  ' .
             $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName) .
             '</STRONG><BR/><BR/>' .
             $message

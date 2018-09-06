@@ -1,4 +1,7 @@
 <!-- Template: ActivityDisplay.inc.html -->
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
 />
@@ -520,36 +523,130 @@
         </td>
     </tr>
 </table>
-<form method="post"
-      action="{urlMessageToSales}"
-      name="messageToSales"
-      AUTOCOMPLETE="off"
+<div id="salesRequestDialog" title="Sales Request">
+
+</div>
+
+<div id="partsUsedDialog"
+     title="Parts Used"
 >
-    <input type="hidden"
-           name="callActivityID"
-           value="{callActivityID}"
-    />
+    <textarea id="partsUsedText"
+              cols="30"
+              rows="10"
+    ></textarea>
+    <br>
+    <div>
+        <button onclick="sendPartsUsedToSales()">Send</button>
+        <button onclick="cancelPartsUsed()">Cancel</button>
+    </div>
+</div>
+<script>
+    $('#partsUsedDialog').dialog({autoOpen: false, width: 910});
+    CKEDITOR.replace('partsUsedText', {
+            customConfig: '/ckeditor_config.js'
+        }
+    );
+
+    function showDialog() {
+        $('#partsUsedDialog').dialog('open');
+    }
+
+    function sendPartsUsedToSales() {
+        var object = {
+            message: CKEDITOR.instances.partsUsedText.getData(),
+            callActivityID: {callActivityID}
+        };
+
+        $.ajax({
+            url: '{urlMessageToSales}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to send message';
+            } else {
+                $('#dialog').dialog('close');
+                alert('Submitted OK');
+            }
+        }).catch(function () {
+            alert('Failed to send message');
+        });
+    }
+
+    function cancelPartsUsed() {
+        $('#partsUsedDialog').dialog('close');
+    }
+</script>
+<table>
+    <tr>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >
+            <button onclick="showDialog()">Parts Used</button>
+        </td>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >
+            <button>Sales Request</button>
+        </td>
+    </tr>
+</table>
+<script type="text/html"
+        id="newStarterTemplate"
+>
     <table>
+        <tbody>
         <tr>
-            <td colspan="4"
-                class="promptTextLeft"
-                valign="top"
-            >Parts Used / Message to Sales/
-            </td>
+            <td>License Required</td>
+            <td></td>
         </tr>
         <tr>
-            <td colspan="4"><textarea name="message"
-                                      cols="110"
-                                      rows="20"
-            ></textarea>
-            </td>
+            <td>Quantity</td>
+            <td></td>
         </tr>
         <tr>
-            <td colspan="4"><input type="submit"
-                                   name="Submit"
-                                   value="Send"
-            ></td>
+            <td>Approved By Customer?</td>
+            <td></td>
         </tr>
+        <tr>
+            <td>Time Needed (hours)</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Other Information</td>
+            <td></td>
+        </tr>
+        </tbody>
     </table>
-</form>
+</script>
+<script type="text/html"
+        id="otherRequestTemplate"
+>
+    <table>
+        <tbody>
+        <tr>
+            <td>Reason for request</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Software/hardware required</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Time Needed (hours)</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Other Information</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</script>
+
+
 <!-- End Template: ActvityDisplay.inc.html -->

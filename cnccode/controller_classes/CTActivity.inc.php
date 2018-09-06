@@ -404,7 +404,7 @@ class CTActivity extends CTCNC
                 $this->managerCommentPopup();
                 break;
             case 'messageToSales':
-                $this->messageToSales();
+                echo json_encode($this->messageToSales());
                 break;
             case 'toggleDoNextFlag':
                 $this->checkPermissions(PHPLIB_PERM_SUPERVISOR);
@@ -5636,6 +5636,14 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $urlMessageToSales =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'         => 'messageToSales',
+                    'callActivityID' => $_REQUEST['callActivityID'],
+                )
+            );
 
         $this->template->set_var(
             array(
@@ -5649,7 +5657,8 @@ class CTActivity extends CTCNC
                 'submitURL'                     => $submitURL,
                 'historyLink'                   => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'uploadErrors'                  => $errorFile,
-                'uploadURL'                     => $uploadURL
+                'uploadURL'                     => $uploadURL,
+                'urlMessageToSales'             => $urlMessageToSales
             )
         );
 
@@ -6265,9 +6274,7 @@ class CTActivity extends CTCNC
             $callActivityID,
             $message
         );
-
-        $this->redirectToDisplay($callActivityID);
-
+        return ["status" => "ok"];
     }
 
     function toggleDoNextFlag()
