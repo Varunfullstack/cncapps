@@ -358,7 +358,13 @@ class CTRenDomain extends CTCNC
                 'declinedFlag' => $dsRenDomain->getValue('declinedFlag'),
                 'disabled' => $disabled,
                 'readonly' => $readonly,
-                'internalNotes' => Controller::htmlTextArea($dsRenDomain->getValue('internalNotes'))
+                'internalNotes' => Controller::htmlTextArea($dsRenDomain->getValue('internalNotes')),
+                'calculatedExpiryDate'    => getExpiryDate(
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenDomain->getValue(DBECustomerItem::installationDate)
+                    )
+                )->format('d/m/Y'),
 
             )
         );

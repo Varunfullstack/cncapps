@@ -436,7 +436,13 @@ class CTRenBroadband extends CTCNC
                 'urlDisplayList' => $urlDisplayList,
                 'disabled' => $disabled,
                 'readonly' => $readonly,
-                'urlEmailTo' => $urlEmailTo
+                'urlEmailTo' => $urlEmailTo,
+                'calculatedExpiryDate'    => getExpiryDate(
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenBroadband->getValue(DBECustomerItem::installationDate)
+                    )
+                )->format('d/m/Y'),
             )
         );
 

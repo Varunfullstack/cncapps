@@ -303,16 +303,17 @@ class CTRenewalReport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'linkURL'             => $item['linkURL'],
-                    'notes'               => $item['notes'],
-                    'description'         => Controller::htmlDisplayText($item['description']),
-                    'itemTypeDescription' => Controller::htmlDisplayText($item['itemTypeDescription']),
-                    'expiryDate'          => Controller::htmlDisplayText($item['expiryDate']),
-                    'salePrice'           => $salePrice,
-                    'costPrice'           => $costPrice,
-                    'customerItemID'      => $item['customerItemID'],
-                    'coveredItemsString'  => $coveredItemsString,
-                    'itemClass'           => $itemClass
+                    'linkURL'              => $item['linkURL'],
+                    'notes'                => $item['notes'],
+                    'description'          => Controller::htmlDisplayText($item['description']),
+                    'itemTypeDescription'  => Controller::htmlDisplayText($item['itemTypeDescription']),
+                    'expiryDate'           => Controller::htmlDisplayText($item['expiryDate']),
+                    'salePrice'            => $salePrice,
+                    'costPrice'            => $costPrice,
+                    'customerItemID'       => $item['customerItemID'],
+                    'coveredItemsString'   => $coveredItemsString,
+                    'itemClass'            => $itemClass,
+                    'calculatedExpiryDate' => $item['calculatedExpiryDate'],
                 )
             );
 

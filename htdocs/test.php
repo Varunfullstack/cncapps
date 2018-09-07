@@ -6,6 +6,137 @@ require_once("config.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_func"] . "/Common.inc.php");
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+function getExpiryDate(DateTime $installDate,
+                       DateTime $today = null
+)
+{
+
+    if ($today == null) {
+        $today = new DateTime();
+    }
+
+    //get next expiry date
+
+    $expiryDay = (int)$installDate->format('d');
+    $expiryMonth = (int)$installDate->format('m');
+
+    // we need to check
+    $expiryYear = (int)$today->format('Y');
+
+    if ($expiryMonth < (int)$today->format('m') ||
+        $expiryMonth == (int)$today->format('m') &&
+        $expiryDay < (int)$today->format('d')) {
+        $expiryYear += 1;
+    }
+
+    $nextExpiryDate = DateTime::createFromFormat(
+        'Y-m-d',
+        "$expiryYear-$expiryMonth-$expiryDay"
+    );
+
+    $difference = (int)$nextExpiryDate->diff($today)->format('%m');
+
+    $expiryDate = clone $nextExpiryDate;
+    if ($difference < 3) {
+        $expiryDate->add(new DateInterval("P1Y"));
+    }
+    return [
+        $nextExpiryDate,
+        $today,
+        $expiryDate
+    ];
+
+}
+
+
+$array = [
+    ["01/02/2013", "02/08/2017", "01/02/2018", "01/02/2018",],
+    ["01/02/2013", "01/01/2018", "01/02/2018", "01/02/2019",],
+    ["01/02/2013", "01/02/2018", "01/02/2018", "01/02/2019",],
+    ["01/02/2013", "01/04/2018", "01/02/2019", "01/02/2019",],
+    ["01/02/2013", "01/06/2018", "01/02/2019", "01/02/2019",],
+    ["01/02/2013", "02/12/2018", "01/02/2019", "01/02/2020",],
+    ["01/01/2010", "02/10/2011", "01/01/2012", "01/01/2013",],
+    ["30/12/2010", "30/11/2011", "30/12/2011", "30/12/2012",],
+    ["01/01/2011", "01/10/2011", "01/01/2012", "01/01/2012",],
+    ["01/01/2011", "02/10/2011", "01/01/2012", "01/01/2013",],
+];
+
+foreach ($array
+
+         as $item) {
+    $result = getExpiryDate(
+        DateTime::createFromFormat(
+            'd/m/Y',
+            $item[0]
+        ),
+        DateTime::createFromFormat(
+            'd/m/Y',
+            $item[1]
+        )
+    );
+
+    /** @var DateTimeInterface $nextExpiryObtained */
+    $nextExpiryObtained = $result[0];
+    /** @var DateTimeInterface $today */
+    $today = $result[1];
+    /** @var DateTimeInterface $finalExpiryDate */
+    $finalExpiryDate = $result[2];
+    ?>
+    <br>
+    <br>
+    <div>
+        <div>Installation Date: <?= $item[0] ?></div>
+        <div>Today's date: <?= $item[1] ?></div>
+        <div>Next Expiry Expected <?= $item[2] ?></div>
+        <div>Next Expiry Obtained <?= $nextExpiryObtained->format('d/m/Y') ?></div>
+        <?php
+
+        if ($result[0]->format('d/m/Y') === $item[2]) {
+            ?>
+            <div style="color: green;">
+                Next Expiry Date Pass
+            </div>
+            <?php
+        } else {
+            ?>
+            <div style="color: red;">
+                Next Expiry Date Fail
+            </div>
+            <?php
+        }
+        ?>
+        <div>
+            Date diff <?= $nextExpiryObtained->diff($today)->format('%m') ?>
+        </div>
+        <div>
+            Final expiry date expected: <?= $item[3] ?>
+        </div>
+        <div>
+            Final expiry date obtained: <?= $finalExpiryDate->format('d/m/Y') ?>
+        </div>
+        <?php
+
+        if ($finalExpiryDate->format('d/m/Y') === $item[3]) {
+            ?>
+            <div style="color: green;">
+                Final Expiry Date Pass
+            </div>
+            <?php
+        } else {
+            ?>
+            <div style="color: red;">
+                Final Expiry Date Fail
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+    <?php
+}
+
+
+exit;
 
 $buMail = new BUMail($thing);
 $thing = null;
