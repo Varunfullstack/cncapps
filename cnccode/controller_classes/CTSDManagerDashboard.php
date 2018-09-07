@@ -45,6 +45,11 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     {
 
         $isP5 = isset($_REQUEST['showP5']);
+
+        $showHelpDesk = isset($_REQUEST['HD']);
+        $showEscalation = isset($_REQUEST['ES']);
+        $showImplementation = isset($_REQUEST['IM']);
+
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : ''));
 
         $this->setTemplateFiles(
@@ -58,7 +63,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $problems,
             $limit,
             'shortestSLARemaining',
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
         $this->renderQueue(
@@ -70,7 +78,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $problems,
             5,
             'oldestUpdatedSR',
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
         $this->renderQueue(
@@ -82,7 +93,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $problems,
             5,
             'longestOpenSR',
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
         $this->renderQueue(
@@ -94,7 +108,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $problems,
             5,
             'mostHoursLogged',
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
         $this->renderQueue(
@@ -114,7 +131,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $engineersMaxCount,
             $pastHours,
             5,
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
 
@@ -124,7 +144,19 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             "Activities By $engineersMaxCount or more engineers in $pastHours Hours"
         );
 
-        $this->renderOpenSRByCustomer();
+        $this->renderOpenSRByCustomer(
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
+        );
+
+        $this->template->setVar(
+            [
+                "helpDeskChecked"       => $showHelpDesk ? "checked" : null,
+                "escalationChecked"     => $showEscalation ? "checked" : null,
+                "implementationChecked" => $showImplementation ? "checked" : null,
+            ]
+        );
 
         $this->template->parse(
             'CONTENTS',
@@ -329,7 +361,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         );
     }
 
-    private function renderOpenSRByCustomer()
+    private function renderOpenSRByCustomer($showHelpDesk = true,
+                                            $showEscalation = true,
+                                            $showImplementation = true
+    )
     {
         $rowCount = 0;
 
@@ -342,9 +377,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         );
 
         global $db;
-        /** @var mysqli_result $result */
-        $result = $db->query(
-            'SELECT 
+
+        $query = 'SELECT 
               cus_custno,
               cus_name,
               (SELECT 
@@ -352,12 +386,27 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
               FROM
                 problem 
               WHERE problem.`pro_custno` = customer.`cus_custno` 
-                AND problem.`pro_status` IN ("I", "P")) openSRCount 
+                AND problem.`pro_status` IN ("I", "P")
+          ';
+
+        if (!$showHelpDesk) {
+            $query .= ' and pro_queue_no <> 1 ';
+        }
+
+        if (!$showEscalation) {
+            $query .= ' and pro_queue_no <> 2 ';
+        }
+
+        if (!$showImplementation) {
+            $query .= ' and pro_queue_no <> 3 ';
+        }
+
+        $query .= " ) openSRCount 
             FROM
-              customer WHERE cus_custno <> 282
-            ORDER BY openSRCount DESC 
-            LIMIT 10'
-        );
+              customer WHERE cus_custno <> 282 ORDER BY openSRCount DESC LIMIT 10";
+
+        /** @var mysqli_result $result */
+        $result = $db->query($query);
 
         while ($row = $result->fetch_assoc()) {
 
