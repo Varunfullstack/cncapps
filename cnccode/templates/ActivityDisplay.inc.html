@@ -546,7 +546,11 @@
     <br>
     <br>
     <div>
-        <button onclick="sendSalesRequest()">Send</button>
+        <button disabled
+                id="sendSalesRequestBtn"
+                onclick="sendSalesRequest()"
+        >Send
+        </button>
         <button onclick="cancelSalesRequest()">Cancel</button>
     </div>
 </div>
@@ -584,10 +588,12 @@
 
     function changeTemplate() {
         var html = "";
+        var sendSalesRequestBtn = document.getElementById("sendSalesRequestBtn");
+        sendSalesRequestBtn.setAttribute('disabled', true);
         if (event.target.value) {
+            sendSalesRequestBtn.removeAttribute('disabled');
             html = $('#' + event.target.value + 'Template').html()
         }
-
         CKEDITOR.instances.salesRequestText.setData(html);
     }
 
@@ -607,7 +613,7 @@
             if (result.status == 'error') {
                 throw 'Failed to send message';
             } else {
-                $('#dialog').dialog('close');
+                $('#partsUsedDialog').dialog('close');
                 alert('Submitted OK');
             }
         }).catch(function () {

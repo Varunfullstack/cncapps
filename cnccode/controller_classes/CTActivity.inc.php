@@ -5661,6 +5661,15 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $urlSalesRequest =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => 'sendSalesRequest',
+                    'problemID' => $dsCallActivity->getValue('problemID'),
+                )
+            );
+
         $this->template->set_var(
             array(
                 'callActivityID'                => $_REQUEST['callActivityID'],
@@ -5674,7 +5683,8 @@ class CTActivity extends CTCNC
                 'historyLink'                   => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'uploadErrors'                  => $errorFile,
                 'uploadURL'                     => $uploadURL,
-                'urlMessageToSales'             => $urlMessageToSales
+                'urlMessageToSales'             => $urlMessageToSales,
+                'urlSalesRequest'               => $urlSalesRequest
             )
         );
 

@@ -26,7 +26,10 @@ class CTSalesRequestDashboard extends CTCNC
             $cookieVars,
             $cfg
         );
-        if (!self::isSdManager()) {
+        $roles = [
+            "sales",
+        ];
+        if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }

@@ -256,6 +256,8 @@ class Mail_mime
      */
     public function setHTMLBody($data, $isfile = false)
     {
+        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
+        $data = $cssToInlineStyles->convert($data);
         return $this->setBody('htmlbody', $data, $isfile);
     }
 
