@@ -531,19 +531,21 @@
             <td></td>
 
             <td class="promptText">Complete On</td>
-            <td class="fieldText"><input
-                    type="text"
-                    title="Date when this request should be set to completed"
-                    name="callActivity[1][completeDate]"
-                    id="completeDate"
-                    value="{completeDate}"
-                    {DISABLED}
-                    {COMPLETE_DISABLED}
-                    size="10"
-                    maxlength="10"
-                    onchange="setFormChanged();"
-            />
-                {calendarLinkCompleteDate}<span class="formErrorMessage">{completeDateMessage}</span>
+            <td class="fieldText">
+                <input type="text"
+                       title="Date when this request should be set to completed"
+                       name="callActivity[1][completeDate]"
+                       id="completeDate"
+                       value="{completeDate}"
+                       {DISABLED}
+                       {COMPLETE_DISABLED}
+                       size="10"
+                       maxlength="10"
+                       onchange="setFormChanged();"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                />
+                <span class="formErrorMessage">{completeDateMessage}</span>
             </td>
         </tr>
         <tr>

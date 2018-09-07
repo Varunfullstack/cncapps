@@ -3806,17 +3806,11 @@ class CTActivity extends CTCNC
             if ($dsCallActivity->getValue('callActTypeID') != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
                 $setTimeNowLink = '<a href="javascript:;"  onclick="setServerTime(endTime);"><img src="images/clock.gif" alt="Clock" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" title="Set end time now" /></a>';
             }
-
-            $calendarLinkCompleteDate = '<a href="javascript:;" onclick="popUpCalendar(this, completeDate, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
-
         } else {
 
             $disabled = CTCNC_HTML_DISABLED;
 
             $calendarLinkDate = '';
-
-            $calendarLinkCompleteDate = '';
-
         }
         /*
       Only enable the complete date and autocomplete checkbox if Fixed
@@ -3825,7 +3819,6 @@ class CTActivity extends CTCNC
             $complete_disabled = '';
         } else {
             $complete_disabled = CTCNC_HTML_DISABLED;
-            $calendarLinkCompleteDate = '';
         }
 
         if ($this->canChangeSrPriority()) {
@@ -4091,8 +4084,6 @@ class CTActivity extends CTCNC
                 'setTimeNowLink'               => $setTimeNowLink,
                 'calendarLinkDate'             => $calendarLinkDate,
                 'completeDate'                 => Controller::dateYMDtoDMY($dsCallActivity->getValue('completeDate')),
-                'calendarLinkCompleteDate'
-                                               => $calendarLinkCompleteDate,
                 'contactIDMessage'             => Controller::htmlDisplayText($dsCallActivity->getMessage('contactID')),
                 'alarmDate'                    => Controller::dateYMDtoDMY($dsCallActivity->getValue('alarmDate')),
                 'alarmTime'                    => $dsCallActivity->getValue(
