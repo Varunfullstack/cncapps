@@ -10762,7 +10762,10 @@ is currently a balance of ';
     public function getSDDashBoardData($problems,
                                        $limit,
                                        $order = 'shortestSLARemaining',
-                                       $isP5 = false
+                                       $isP5 = false,
+                                       $showHelpDesk = true,
+                                       $showEscalation = true,
+                                       $showImplementation = true
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -10770,7 +10773,10 @@ is currently a balance of ';
         $dbeJProblem->getDashBoardRows(
             $limit,
             $order,
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
         $this->getData(
@@ -10800,7 +10806,10 @@ is currently a balance of ';
                                                     $engineersMaxCount = 3,
                                                     $pastHours = 24,
                                                     $limit = 5,
-                                                    $isP5 = false
+                                                    $isP5 = false,
+                                                    $showHelpDesk = true,
+                                                    $showEscalation = true,
+                                                    $showImplementation = true
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -10809,7 +10818,10 @@ is currently a balance of ';
             $engineersMaxCount,
             $pastHours,
             $limit,
-            $isP5
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
         );
 
         $this->getData(

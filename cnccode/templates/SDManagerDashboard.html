@@ -4,8 +4,60 @@
             console.log(this.value);
             window.location = this.value;
         })
+
+
     })
+
+    filters = {
+        helpDesk: 'HD',
+        escalation: 'ES',
+        implementation: 'IM'
+    };
+
+    function changeFilter() {
+
+        var isP5 = window.location.search.indexOf('showP5') > -1;
+
+        var urlString = window.location.origin + window.location.pathname;
+        var url = new URL(urlString);
+        if (isP5) {
+            url.searchParams.append('showP5', true)
+        }
+
+        Object.keys(filters).forEach(function (key) {
+            if (document.getElementById(key).checked) {
+                url.searchParams.append(filters[key], null);
+            }
+        });
+
+
+        window.location.href = url.toString();
+
+    }
+
 </script>
+<div id="filters">
+    <label for="helpDesk">HD</label>
+    <input type="checkbox"
+           {helpDeskChecked}
+           id="helpDesk"
+           onchange="changeFilter()"
+    >
+    <label for="escalation">ES</label>
+    <input type="checkbox"
+           {escalationChecked}
+           id="escalation"
+           onchange="changeFilter()"
+    >
+    <label for="implementation">IMT</label>
+    <input type="checkbox"
+           {implementationChecked}
+           id="implementation"
+           onchange="changeFilter()"
+    >
+
+</div>
+
 <table class="table-bordered oddRows"
        width="100%"
 >
