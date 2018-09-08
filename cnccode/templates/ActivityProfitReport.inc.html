@@ -1,6 +1,10 @@
 <!-- Template: ActivitySearch.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script language='JavaScript'>
     $(function () {
         window.fromDate = $('#fromDate').get(0);
@@ -8,9 +12,11 @@
     });
     var state = 'none'; // display status
     var savedCustomerString
+
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -25,11 +31,13 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
@@ -37,10 +45,19 @@
     }
 </script>
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="get" action="{urlSubmit}">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -74,16 +91,18 @@
             <td class="promptText">
                 <div align="right">from</div>
             </td>
-            <td><input
-                    type="text"
-                    name="searchForm[1][fromDate]"
-                    id="fromDate"
-                    value="{fromDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
+            <td>
+                <input
+                        type="text"
+                        name="searchForm[1][fromDate]"
+                        id="fromDate"
+                        value="{fromDate}"
+                        size="10"
+                        maxlength="10"
+                        onKeypress="javascript:submitOnReturn()"
+                        autocomplete="off"
+                        class="jQueryCalendar"
+                >
                 <font class="formErrorMessage">{fromDateMessage}</font></td>
         </tr>
         <tr>
@@ -98,18 +117,24 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif"
-                                                                                              width="24" height="22"
-                                                                                              hspace="0" vspace="0"
-                                                                                              border="0"
-                                                                                              align="absmiddle"></a>
+                    autocomplete="off"
+                    class="jQueryCalendar"
+            >
                 <font class="formErrorMessage">{toDateMessage}</font></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Search" onClick="submit();">
-                <input type="button" name="Clear" value="Clear" onClick="document.location='ActivityProfitReport.php'"/>
+                <input type="submit"
+                       name="Search"
+                       value="Search"
+                       onClick="submit();"
+                >
+                <input type="button"
+                       name="Clear"
+                       value="Clear"
+                       onClick="document.location='ActivityProfitReport.php'"
+                />
             </td>
         </tr>
     </table>
@@ -117,130 +142,303 @@
 
 </form>
 <p>&nbsp;</p>
-<table border="0" cellpadding="2" cellspacing="1" class="singleBorder">
+<table border="0"
+       cellpadding="2"
+       cellspacing="1"
+       class="singleBorder"
+>
     <tr valign="top">
-        <td nowrap="nowrap" class="listHeadText">
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="center">Customer</div>
         </td>
-        <td colspan="3" align="center" nowrap="nowrap" class="listHeadText">Service Desk</td>
-        <td colspan="3" align="center" nowrap="nowrap" class="listHeadText">Server Care</td>
-        <td colspan="2" align="center" nowrap="nowrap" class="listHeadText">Pre-pay</td>
-        <td colspan="2" nowrap="nowrap" class="listHeadText">T and M</td>
-        <td nowrap="nowrap" class="listHeadText">Total Hours</td>
-        <td nowrap="nowrap" class="listHeadText">CNC Cost(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">Profit</td>
-        <td nowrap="nowrap" class="listHeadText">&nbsp;</td>
+        <td colspan="3"
+            align="center"
+            nowrap="nowrap"
+            class="listHeadText"
+        >Service Desk
+        </td>
+        <td colspan="3"
+            align="center"
+            nowrap="nowrap"
+            class="listHeadText"
+        >Server Care
+        </td>
+        <td colspan="2"
+            align="center"
+            nowrap="nowrap"
+            class="listHeadText"
+        >Pre-pay
+        </td>
+        <td colspan="2"
+            nowrap="nowrap"
+            class="listHeadText"
+        >T and M
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Total Hours
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >CNC Cost(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Profit
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >&nbsp;
+        </td>
     </tr>
     <tr valign="top">
-        <td nowrap="nowrap" class="listHeadText">
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="center"></div>
         </td>
-        <td nowrap="nowrap" class="listHeadText">Total Hours</td>
-        <td nowrap="nowrap" class="listHeadText">Chargable(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">Paid(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">Total Hours</td>
-        <td nowrap="nowrap" class="listHeadText">Chargable(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">Paid(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">Total Hours</td>
-        <td nowrap="nowrap" class="listHeadText">Chargable(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">Total Hours</td>
-        <td nowrap="nowrap" class="listHeadText">Chargable(&pound;)</td>
-        <td nowrap="nowrap" class="listHeadText">&nbsp;</td>
-        <td nowrap="nowrap" class="listHeadText">&nbsp;</td>
-        <td align="right" nowrap="nowrap" class="listHeadText">Invoiced(&pound;)</td>
-        <td align="right" nowrap="nowrap" class="listHeadText">Service(&pound;)</td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Total Hours
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Chargable(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Paid(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Total Hours
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Chargable(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Paid(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Total Hours
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Chargable(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Total Hours
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Chargable(&pound;)
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+        <td align="right"
+            nowrap="nowrap"
+            class="listHeadText"
+        >Invoiced(&pound;)
+        </td>
+        <td align="right"
+            nowrap="nowrap"
+            class="listHeadText"
+        >Service(&pound;)
+        </td>
     </tr>
     <!-- BEGIN resultBlock -->
-    <tr valign="top" onmouseover="this.bgColor='#FFFFCC';" onmouseout="this.bgColor=''">
+    <tr valign="top"
+        onmouseover="this.bgColor='#FFFFCC';"
+        onmouseout="this.bgColor=''"
+    >
 
         <td nowrap="nowrap">{CustomerName}</td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{SDHours}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{SDCharge}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{SDProRata}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{SCHours}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{SCCharge}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{SCProRata}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{PPHours}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{PPCharge}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{TMHours}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{TMCharge}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{TotalHours}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right">{CncCost}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right"><A HREF="{urlDrillInvoices}">{SalesProfit}</A></div>
         </td>
-        <td align="top" nowrap="nowrap" class="listItemText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listItemText"
+        >
             <div align="right"><A HREF="{urlDrill}">{ServiceProfit}</A></div>
         </td>
     </tr>
     <!-- END resultBlock -->
     <tr valign="top">
 
-        <td nowrap="nowrap" class="listHeadText">Totals</td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Totals
+        </td>
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SDHoursTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SDChargeTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SDProRataTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SCHoursTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SCChargeTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SCProRataTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{PPHoursTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{PPChargeTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{TMHoursTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{TMChargeTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{TotalHoursTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{CncCostTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{SalesProfitTotal}</div>
         </td>
-        <td align="top" nowrap="nowrap" class="listHeadText">
+        <td align="top"
+            nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="right">{ServiceProfitTotal}</div>
         </td>
     </tr>
