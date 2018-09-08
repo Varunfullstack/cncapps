@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 317 - Customer 3rd party contact information
 - Issue 318 - Create Change Request Dashboard
 - Add total to Service Requests Open For More Than 7 Days on screen
+- Issue 319 - Implement Sales Request Approval Process
 ### Changed
 - Issue 304 - Enhance First Time Fix Reporting
 - Issue 320 - Further Increase length of mail queue recipient database field

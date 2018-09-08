@@ -103,8 +103,6 @@ $body = $template->get_var('output');
 $thing = null;
 $buMail = new BUMail($thing);
 
-$cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
-$body = $cssToInlineStyles->convert($body);
 $buMail->mime->setHTMLBody($body);
 $hdrs_array = array(
     'From'         => CONFIG_SUPPORT_EMAIL,
