@@ -317,6 +317,10 @@ class BURenContract extends Business
                         DBEOrdhead::custPORef,
                         $custPORef
                     );
+                    $dsOrdhead->setValue(
+                        DBEOrdhead::custPORef,
+                        $custPORef
+                    );
                     $ordHead->updateRow();
                 }
 
