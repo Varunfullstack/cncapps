@@ -766,7 +766,8 @@ Many thanks.
                     'coveredItemsString'  => $coveredItemsString,
                     'itemClass'           => $itemClass,
                     'customerID'          => $customerID,
-                    'checkbox'            => $checkbox
+                    'checkbox'            => $checkbox,
+                    'calculatedExpiryDate' => $item['calculatedExpiryDate'],
                 )
             );
 

@@ -181,10 +181,26 @@
                     type="text"
                     value="{installationDate}"
                     {readonly}
-                    size="40"
-                    maxlength="50"
+                    size="10"
+                    maxlength="10"
             >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">
+                Initial Contract Length (months)
+            </td>
+            <td class="fieldText">
+                <select {disabled}
+                        name="renContract[1][initialContractLength]"
+                >
+                    <!-- BEGIN initialContractLengthBlock -->
+                    <option {initialContractLengthSelected}
+                            value="{initialContractLength}"
+                    >{initialContractLengthDescription}
+                    </option>
+                    <!-- END initialContractLengthBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
@@ -209,6 +225,10 @@
                     maxlength="10"
             >
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Contract Expiry Date</td>
+            <td class="fieldText">{calculatedExpiryDate}</td>
         </tr>
         <tr>
             <td class="promptText">Next Invoice Period</td>
@@ -263,7 +283,7 @@
         </TR>
         {renContractPrePayFields}
         <TR>
-            <TD class="promptText">Contract Expiry</TD>
+            <TD class="promptText">Billing End Date</TD>
             <TD class="field"><input
                     type="text"
                     id="expiryDate"
@@ -282,8 +302,8 @@
             <td class="promptText">
                 <div align="right">Renewal Status</div>
             </td>
-            <td><select
-                    {disabled}
+            <td>
+                <select {disabled}
                     name="renContract[1][renewalStatus]"
             >
                 <option value=""></option>

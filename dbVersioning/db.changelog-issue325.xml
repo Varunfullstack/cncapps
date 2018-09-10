@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue325-1536569837-0">
+        <tagDatabase tag="issue325"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue325-1536569837-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custitem" columnName="initialContractLength"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custitem">
+            <column name="initialContractLength" type="tinyint" defaultValue="12"/>
+        </addColumn>
+        <sql>
+            update custitem set initialContractLength = 12
+        </sql>
+        <rollback>
+            <sql>
+                alter table custitem drop column initialContractLength
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
