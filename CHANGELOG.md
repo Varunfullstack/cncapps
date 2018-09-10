@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 315 - Monitored SR formatting issues.
 - Issue 328 - Spell checking within fields
 - Issue 337 - FOC activities email URL text error
+- Issue 340 - Hidden from customer flag showed as cleared under certain conditions.
 ### Added
 - Issue 317 - Customer 3rd party contact information
 - Issue 318 - Create Change Request Dashboard

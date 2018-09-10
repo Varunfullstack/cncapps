@@ -3981,7 +3981,14 @@ class CTActivity extends CTCNC
         );
         $renewalsLink = $this->getRenewalsLink($dsCallActivity->getValue('customerID'));
 
-        if ($dsCallActivity->getValue('problemHideFromCustomerFlag') == 'Y') {
+
+        $dbeProblem = new DBEProblem($this);
+
+        $dbeProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
+
+        if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y' || $dsCallActivity->getValue(
+                'problemHideFromCustomerFlag'
+            ) == 'Y') {
             $hideFromCustomerFlag = 'Y';
             $hideFromCustomerDisabled = CTCNC_HTML_DISABLED;
         } else {
