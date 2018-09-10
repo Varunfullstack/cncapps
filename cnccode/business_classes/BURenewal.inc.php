@@ -44,7 +44,9 @@ class BURenewal extends Business
      * @param string $page the controller page
      * @return object The appropriate renewal business object for this itemID
      */
-    function getRenewalBusinessObject($renewalTypeID, &$page)
+    function getRenewalBusinessObject($renewalTypeID,
+                                      &$page
+    )
     {
 
         $this->setMethodName('getRenewalBusinessObject');
@@ -93,12 +95,18 @@ class BURenewal extends Business
     function processRenewalEmailRequests()
     {
         $this->dbeCustomer->getRenewalRequests();
-        $this->getData($this->dbeCustomer, $dsCustomer);
+        $this->getData(
+            $this->dbeCustomer,
+            $dsCustomer
+        );
         while ($dsCustomer->fetchNext()) {
             $this->sendRenewalEmailToCustomer($dsCustomer);
 
             $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::customerID));
-            $this->dbeCustomer->setValue(DBECustomer::sendContractEmail, '');
+            $this->dbeCustomer->setValue(
+                DBECustomer::sendContractEmail,
+                ''
+            );
             $this->dbeCustomer->updateRow();
         }
     }
@@ -118,17 +126,26 @@ class BURenewal extends Business
 
 
         $hdrs = array(
-            'From' => $senderName . " <" . $senderEmail . ">",
-            'To' => $toEmail,
-            'Subject' => $subject,
+            'From'         => $senderName . " <" . $senderEmail . ">",
+            'To'           => $toEmail,
+            'Subject'      => $subject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
-        $template->set_file('page', 'RenewalScheduleEmail.inc.html');
+        $template = new Template (
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'RenewalScheduleEmail.inc.html'
+        );
 
         $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue(DBECustomer::customerID));
-        $this->getData($this->dbeJContract, $dsRenewal);
+        $this->getData(
+            $this->dbeJContract,
+            $dsRenewal
+        );
 
         $renewalCount = 0;
 
@@ -145,15 +162,22 @@ class BURenewal extends Business
         }
 
         if ($renewalCount > 0) {
-            $this->addCustomerAcceptedDocumentsToEmail($dsCustomer->getValue(DBECustomer::customerID), $buMail);
+            $this->addCustomerAcceptedDocumentsToEmail(
+                $dsCustomer->getValue(DBECustomer::customerID),
+                $buMail
+            );
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
             $buMail->mime->setHTMLBody($template->get_var('output'));
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
             $body = $buMail->mime->get($mime_params);
             $hdrs = $buMail->mime->headers($hdrs);
@@ -171,13 +195,26 @@ class BURenewal extends Business
     function getRenewalAsPdfString($customerItemID)
     {
         $buCustomerItem = new BUCustomerItem($this);
-        $buCustomerItem->getCustomerItemByID($customerItemID, $dsContract);
-        $buCustomerItem->getCustomerItemsByContractID($customerItemID, $dsCustomerItem);
+        $buCustomerItem->getCustomerItemByID(
+            $customerItemID,
+            $dsContract
+        );
+        $buCustomerItem->getCustomerItemsByContractID(
+            $customerItemID,
+            $dsCustomerItem
+        );
         $buSite = new BUSite($this);
         $buActivity = new BUActivity($this);
         $buCustomer = new BUCustomer($this);
-        $buCustomer->getCustomerByID($dsContract->getValue('customerID'), $dsCustomer);
-        $buSite->getSiteByID($dsContract->getValue('customerID'), $dsContract->getValue('siteNo'), $dsSite);
+        $buCustomer->getCustomerByID(
+            $dsContract->getValue('customerID'),
+            $dsCustomer
+        );
+        $buSite->getSiteByID(
+            $dsContract->getValue('customerID'),
+            $dsContract->getValue('siteNo'),
+            $dsSite
+        );
         $customerHasServiceDeskContract =
             $buCustomerItem->customerHasServiceDeskContract($dsContract->getValue('customerID'));
 
@@ -198,14 +235,20 @@ class BURenewal extends Business
     function processTandcEmailRequests()
     {
         $this->dbeCustomer->getTandcRequests();
-        $this->getData($this->dbeCustomer, $dsCustomer);
+        $this->getData(
+            $this->dbeCustomer,
+            $dsCustomer
+        );
 
         while ($dsCustomer->fetchNext()) {
 
             $this->sendTandcEmailToCustomer($dsCustomer);
 
             $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::customerID));
-            $this->dbeCustomer->setValue(DBECustomer::sendTandcEmail, '');
+            $this->dbeCustomer->setValue(
+                DBECustomer::sendTandcEmail,
+                ''
+            );
             $this->dbeCustomer->updateRow();
 
         }
@@ -227,24 +270,37 @@ class BURenewal extends Business
 
 
         $hdrs = array(
-            'From' => $senderName . " <" . $senderEmail . ">",
-            'To' => $toEmail,
-            'Subject' => $subject,
+            'From'         => $senderName . " <" . $senderEmail . ">",
+            'To'           => $toEmail,
+            'Subject'      => $subject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
-        $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
-        $template->set_file('page', 'TermsAndConditionsEmail.inc.html');
+        $template = new Template (
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'TermsAndConditionsEmail.inc.html'
+        );
 
-        $this->addCustomerAcceptedDocumentsToEmail($dsCustomer->getValue(DBECustomer::customerID), $buMail);
+        $this->addCustomerAcceptedDocumentsToEmail(
+            $dsCustomer->getValue(DBECustomer::customerID),
+            $buMail
+        );
 
-        $template->parse('output', 'page', true);
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
         $buMail->mime->setHTMLBody($template->get_var('output'));
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $buMail->mime->get($mime_params);
         $hdrs = $buMail->mime->headers($hdrs);
@@ -259,7 +315,9 @@ class BURenewal extends Business
 
     }
 
-    function addCustomerAcceptedDocumentsToEmail($customerID, &$buMail)
+    function addCustomerAcceptedDocumentsToEmail($customerID,
+                                                 &$buMail
+    )
     {
         global $db;
 
@@ -297,7 +355,10 @@ class BURenewal extends Business
      * @param Controller $controller
      * @return array
      */
-    function getRenewalsAndExternalItemsByCustomer($customerID, $displayAccountsInfo = true, $controller)
+    function getRenewalsAndExternalItemsByCustomer($customerID,
+                                                   $displayAccountsInfo = true,
+                                                   $controller
+    )
     {
         $returnArray = array();
 
@@ -316,7 +377,7 @@ class BURenewal extends Business
                     'RenContract.php',
                     array(
                         'action' => 'edit',
-                        'ID' => $dbeJRenContract->getValue('customerItemID')
+                        'ID'     => $dbeJRenContract->getValue('customerItemID')
                     )
                 );
 
@@ -332,6 +393,13 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenContract->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenContract->getValue('notes');
             $row['expiryDate'] = $dbeJRenContract->getValue('invoiceFromDate');
+            $row['calculatedExpiryDate'] = getExpiryDate(
+                DateTime::createFromFormat(
+                    'Y-m-d',
+                    $dbeJRenContract->getValue(DBECustomerItem::installationDate)
+                ),
+                $dbeJRenContract->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
             /*
             Build list of covered items
             */
@@ -371,7 +439,7 @@ class BURenewal extends Business
                     'RenDomain.php',
                     array(
                         'action' => 'edit',
-                        'ID' => $dbeJRenDomain->getValue('customerItemID')
+                        'ID'     => $dbeJRenDomain->getValue('customerItemID')
                     )
                 );
             if ($displayAccountsInfo) {
@@ -386,6 +454,13 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenDomain->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenDomain->getValue('notes');
             $row['expiryDate'] = $dbeJRenDomain->getValue('invoiceFromDate');
+            $row['calculatedExpiryDate'] = getExpiryDate(
+                DateTime::createFromFormat(
+                    'Y-m-d',
+                    $dbeJRenDomain->getValue(DBECustomerItem::installationDate)
+                ),
+                $dbeJRenDomain->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
 
             $returnArray[] = $row;
         }
@@ -404,7 +479,7 @@ class BURenewal extends Business
                     'RenBroadband.php',
                     array(
                         'action' => 'edit',
-                        'ID' => $dbeJRenBroadband->getValue('customerItemID')
+                        'ID'     => $dbeJRenBroadband->getValue('customerItemID')
                     )
                 );
 
@@ -421,6 +496,13 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenBroadband->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenBroadband->getValue('adslPhone');
             $row['expiryDate'] = $dbeJRenBroadband->getValue('invoiceFromDate');
+            $row['calculatedExpiryDate'] = getExpiryDate(
+                DateTime::createFromFormat(
+                    'Y-m-d',
+                    $dbeJRenBroadband->getValue(DBECustomerItem::installationDate)
+                ),
+                $dbeJRenBroadband->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
 
             $returnArray[] = $row;
         }
@@ -437,7 +519,7 @@ class BURenewal extends Business
                     'RenHosting.php',
                     array(
                         'action' => 'edit',
-                        'ID' => $dbeJRenHosting->getValue('customerItemID')
+                        'ID'     => $dbeJRenHosting->getValue('customerItemID')
                     )
                 );
 
@@ -454,7 +536,13 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenHosting->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenHosting->getValue('notes');
             $row['expiryDate'] = $dbeJRenHosting->getValue('invoiceFromDate');
-
+            $row['calculatedExpiryDate'] = getExpiryDate(
+                DateTime::createFromFormat(
+                    'Y-m-d',
+                    $dbeJRenHosting->getValue(DBECustomerItem::installationDate)
+                ),
+                $dbeJRenHosting->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
             $returnArray[] = $row;
 
         }// end hosting
@@ -472,7 +560,7 @@ class BURenewal extends Business
                     'RenQuotation.php',
                     array(
                         'action' => 'edit',
-                        'ID' => $dbeJRenQuotation->getValue('customerItemID')
+                        'ID'     => $dbeJRenQuotation->getValue('customerItemID')
                     )
                 );
 
@@ -489,13 +577,21 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenQuotation->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenQuotation->getValue('notes');
             $row['expiryDate'] = $dbeJRenQuotation->getValue('nextPeriodStartDate');
-
+            $row['calculatedExpiryDate'] = (
+            DateTime::createFromFormat(
+                'Y-m-d',
+                $dbeJRenQuotation->getValue(DBECustomerItem::startDate)
+            )
+            )->add(new DateInterval('P1Y'))->format('d/m/Y');
             $returnArray[] = $row;
 
         }
 
         $buExternalItem = new BUExternalItem($this);
-        $buExternalItem->getExternalItemsByCustomerID($customerID, $dsExternalItem);
+        $buExternalItem->getExternalItemsByCustomerID(
+            $customerID,
+            $dsExternalItem
+        );
 
         while ($dsExternalItem->fetchNext()) {
 
@@ -503,13 +599,16 @@ class BURenewal extends Business
                 $controller->buildLink(
                     'ExternalItem.php',
                     array(
-                        'action' => 'edit',
+                        'action'         => 'edit',
                         'externalItemID' => $dsExternalItem->getValue('externalItemID')
                     )
                 );
 
             if ($dsExternalItem->getValue('licenceRenewalDate') > 0) {
-                $row['expiryDate'] = strftime("%d/%m/%Y", strtotime($dsExternalItem->getValue('licenceRenewalDate')));
+                $row['expiryDate'] = strftime(
+                    "%d/%m/%Y",
+                    strtotime($dsExternalItem->getValue('licenceRenewalDate'))
+                );
             } else {
                 $row['expiryDate'] = '';
             }

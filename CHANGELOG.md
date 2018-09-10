@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
+### Added
+- Issue 325 - Calculate and display contract expiry date
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed

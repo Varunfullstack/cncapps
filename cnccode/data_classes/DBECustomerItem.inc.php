@@ -41,6 +41,7 @@ class DBECustomerItem extends DBCNCEntity
     const password = "password";
     const etaDate = "etaDate";
     const installationDate = "installationDate";
+    const initialContractLength = 'initialContractLength';
     const costPricePerMonth = "costPricePerMonth";
     const ispID = "ispID";
     const dualBroadbandFlag = "dualBroadbandFlag";
@@ -630,6 +631,13 @@ class DBECustomerItem extends DBCNCEntity
             DA_NOT_NULL,
             'custitem.secondSiteReplicationExcludeFlag'
         );
+        $this->addColumn(
+            self::initialContractLength,
+            DA_YN,
+            DA_NOT_NULL,
+            'custitem.initialContractLength'
+        );
+
 
         $this->setPK(0);
         $this->setAddColumnsOff();
