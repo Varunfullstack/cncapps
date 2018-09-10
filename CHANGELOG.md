@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 319 - Implement Sales Request Approval Process
 - Issue 339 - Team Lead Dashboard view filtering by teams
 - Issue 325 - Calculate and display contract expiry date
+- Issue 324 - Official Order Number for Contracts
 ### Changed
 - Issue 304 - Enhance First Time Fix Reporting
 - Issue 320 - Further Increase length of mail queue recipient database field
