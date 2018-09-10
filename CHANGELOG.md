@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 340 - Hidden from customer flag showed as cleared under certain conditions.
+
 ## [v1.10.2] - 2018-08-20
 ### Fixed
 - Issue 333 - Prepay Top Up value lost when saving customer
