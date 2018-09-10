@@ -23,6 +23,7 @@ This project changes will be shown here.
 - Issue 273 - Allow for contracts & T&Cs to be manually sent to a customer.
 - Issue 335 - Improve visit confirmation email addressing
 - Issue 338 - Change date picker on additional pages
+- Issue 268 - Customer Review Meeting formatting improvements
 
 ## [v1.10.2] - 2018-08-20
 ### Fixed
