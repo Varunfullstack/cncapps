@@ -94,6 +94,7 @@ class DBECustomerItem extends DBCNCEntity
     const autoGenerateContractInvoice = "autoGenerateContractInvoice";
     const secondSiteReplicationPath = "secondSiteReplicationPath";
     const secondSiteReplicationExcludeFlag = "secondSiteReplicationExcludeFlag";
+    const officialOrderNumber = "officialOrderNumber";
 
 
     /**
@@ -629,6 +630,13 @@ class DBECustomerItem extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             'custitem.secondSiteReplicationExcludeFlag'
+        );
+
+        $this->addColumn(
+            self::officialOrderNumber,
+            DA_TEXT,
+            DA_ALLOW_NULL,
+            'custitem.officialOrderNumber'
         );
 
         $this->setPK(0);

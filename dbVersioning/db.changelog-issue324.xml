@@ -16,4 +16,27 @@
             <column name="officialOrderNumber" type="varchar(50)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue324-1536574744-2">
+        <preConditions>
+            <indexExists tableName="ordhead" indexName="ixodh_6"/>
+        </preConditions>
+        <sql>
+            ALTER TABLE `ordhead`
+            DROP INDEX `ixodh_6`,
+            ADD FULLTEXT INDEX `ixodh_6` (`odh_ref_cust`);
+        </sql>
+        <rollback>
+            <sql>
+                ALTER TABLE `ordhead`
+                DROP INDEX `ixodh_6`,
+                ADD INDEX `ixodh_6` (`odh_ref_cust`);
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue324-1536574744-3">
+        <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="text"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="varchar(23)"/>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
