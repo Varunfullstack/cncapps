@@ -388,7 +388,8 @@ function common_stripEverything($description)
 }
 
 function getExpiryDate(DateTime $installDate,
-                       DateTime $today = null
+                       DateTime $today = null,
+                       $initialContractLength = 12
 )
 {
 
@@ -396,24 +397,32 @@ function getExpiryDate(DateTime $installDate,
         $today = new DateTime();
     }
 
-    //get next expiry date
+    $firstExpiryDate = clone $installDate;
 
-    $expiryDay = (int)$installDate->format('d');
-    $expiryMonth = (int)$installDate->format('m');
+    $firstExpiryDate->add(new DateInterval('P' . $initialContractLength . 'M'));
 
-    // we need to check
-    $expiryYear = (int)$today->format('Y');
+    if ($today <= $firstExpiryDate) {
+        $nextExpiryDate = clone $firstExpiryDate;
+    } else {
+        //get next expiry date
 
-    if ($expiryMonth < (int)$today->format('m') ||
-        $expiryMonth == (int)$today->format('m') &&
-        $expiryDay < (int)$today->format('d')) {
-        $expiryYear += 1;
+        $expiryDay = (int)$installDate->format('d');
+        $expiryMonth = (int)$installDate->format('m');
+
+        // we need to check
+        $expiryYear = (int)$today->format('Y');
+
+        if ($expiryMonth < (int)$today->format('m') ||
+            $expiryMonth == (int)$today->format('m') &&
+            $expiryDay < (int)$today->format('d')) {
+            $expiryYear += 1;
+        }
+
+        $nextExpiryDate = DateTime::createFromFormat(
+            'Y-m-d',
+            "$expiryYear-$expiryMonth-$expiryDay"
+        );
     }
-
-    $nextExpiryDate = DateTime::createFromFormat(
-        'Y-m-d',
-        "$expiryYear-$expiryMonth-$expiryDay"
-    );
 
     $difference = (int)$nextExpiryDate->diff($today)->format('%m');
 

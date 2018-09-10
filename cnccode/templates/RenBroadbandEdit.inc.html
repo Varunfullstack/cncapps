@@ -179,10 +179,13 @@
                     type="text"
                     value="{installationDate}"
                     {readonly}
-                    size="50"
-                    maxlength="50"
+                    size="10"
+                    maxlength="10"
             >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">Initial Contract Length (months)</td>
+            <td><input type="text"/></td>
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
@@ -209,7 +212,7 @@
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
         </tr>
         <tr>
-            <td class="promptText">Expiry Date</td>
+            <td class="promptText">Contract Expiry Date</td>
             <td class="fieldText">{calculatedExpiryDate}</td>
         </tr>
         <tr>
