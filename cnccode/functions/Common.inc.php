@@ -388,8 +388,8 @@ function common_stripEverything($description)
 }
 
 function getExpiryDate(DateTime $installDate,
-                       DateTime $today = null,
-                       $initialContractLength = 12
+                       $initialContractLength = 12,
+                       DateTime $today = null
 )
 {
 

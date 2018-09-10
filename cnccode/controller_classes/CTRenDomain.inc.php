@@ -14,13 +14,31 @@ require_once($cfg['path_dbe'] . '/DBEArecord.inc.php');
 
 class CTRenDomain extends CTCNC
 {
+    const InitialContractLengthValues = [
+        12,
+        24,
+        36,
+        48,
+        60
+    ];
     var $dsRenDomain = '';
     var $buRenDomain = '';
     var $buCustomerItem = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "renewals",
             "technical"
@@ -33,11 +51,31 @@ class CTRenDomain extends CTCNC
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenDomain = new DSForm($this);
         $this->dsRenDomain->copyColumnsFrom($this->buRenDomain->dbeRenDomain);
-        $this->dsRenDomain->addColumn('customerName', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenDomain->addColumn('siteName', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenDomain->addColumn('invoiceFromDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenDomain->addColumn('invoiceToDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenDomain->addColumn('itemDescription', DA_STRING, DA_ALLOW_NULL);
+        $this->dsRenDomain->addColumn(
+            'customerName',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenDomain->addColumn(
+            'siteName',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenDomain->addColumn(
+            'invoiceFromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenDomain->addColumn(
+            'invoiceToDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenDomain->addColumn(
+            'itemDescription',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
     }
 
     /**
@@ -88,10 +126,17 @@ class CTRenDomain extends CTCNC
             array('RenDomainList' => 'RenDomainList.inc')
         );
 
-        $this->buRenDomain->getAll($dsRenDomain, $_REQUEST['orderBy']);
+        $this->buRenDomain->getAll(
+            $dsRenDomain,
+            $_REQUEST['orderBy']
+        );
 
         if ($dsRenDomain->rowCount() > 0) {
-            $this->template->set_block('RenDomainList', 'rowBlock', 'rows');
+            $this->template->set_block(
+                'RenDomainList',
+                'rowBlock',
+                'rows'
+            );
             while ($dsRenDomain->fetchNext()) {
 
                 $customerItemID = $dsRenDomain->getValue('customerItemID');
@@ -101,7 +146,7 @@ class CTRenDomain extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
-                            'ID' => $customerItemID
+                            'ID'     => $customerItemID
                         )
                     );
                 $txtEdit = '[edit]';
@@ -110,7 +155,7 @@ class CTRenDomain extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'delete',
+                            'action'         => 'delete',
                             'customerItemID' => $customerItemID
                         )
                     );
@@ -126,20 +171,28 @@ class CTRenDomain extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsRenDomain->getValue('customerName'),
+                        'customerName'    => $dsRenDomain->getValue('customerName'),
                         'itemDescription' => $dsRenDomain->getValue('itemDescription'),
-                        'domain' => $dsRenDomain->getValue('notes'),
+                        'domain'          => $dsRenDomain->getValue('notes'),
                         'invoiceFromDate' => Controller::dateYMDtoDMY($dsRenDomain->getValue('invoiceFromDate')),
-                        'invoiceToDate' => Controller::dateYMDtoDMY($dsRenDomain->getValue('invoiceToDate')),
-                        'urlEdit' => $urlEdit,
-                        'urlList' => $urlList,
-                        'txtEdit' => $txtEdit
+                        'invoiceToDate'   => Controller::dateYMDtoDMY($dsRenDomain->getValue('invoiceToDate')),
+                        'urlEdit'         => $urlEdit,
+                        'urlList'         => $urlList,
+                        'txtEdit'         => $txtEdit
                     )
                 );
-                $this->template->parse('rows', 'rowBlock', true);
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
             }//while $dsRenDomain->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'RenDomainList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenDomainList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -170,7 +223,11 @@ class CTRenDomain extends CTCNC
 
             // create a new record first
 
-            $buSalesOrder->getOrderByOrdheadID($_REQUEST['ordheadID'], $dsOrdhead, $dsDontNeedOrdline);
+            $buSalesOrder->getOrderByOrdheadID(
+                $_REQUEST['ordheadID'],
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
 
             $ID = $this->buRenDomain->createNewRenewal(
                 $dsOrdhead->getValue('customerID'),
@@ -183,11 +240,20 @@ class CTRenDomain extends CTCNC
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
 
-            $dbeOrdline->setValue('ordheadID', $dsOrdline->getValue('ordheadID'));
-            $dbeOrdline->setValue('sequenceNo', $dsOrdline->getValue('sequenceNo'));
+            $dbeOrdline->setValue(
+                'ordheadID',
+                $dsOrdline->getValue('ordheadID')
+            );
+            $dbeOrdline->setValue(
+                'sequenceNo',
+                $dsOrdline->getValue('sequenceNo')
+            );
 
             $dbeOrdline->getRow();
-            $dbeOrdline->setValue('renewalCustomerItemID', $renewalCustomerItemID);
+            $dbeOrdline->setValue(
+                'renewalCustomerItemID',
+                $renewalCustomerItemID
+            );
 
             $dbeOrdline->updateRow();
 
@@ -198,7 +264,7 @@ class CTRenDomain extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
-                    'ID' => $renewalCustomerItemID
+                    'ID'     => $renewalCustomerItemID
                 )
             );
 
@@ -218,11 +284,17 @@ class CTRenDomain extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'edit') {
-                $this->buRenDomain->getRenDomainByID($_REQUEST['ID'], $dsRenDomain);
+                $this->buRenDomain->getRenDomainByID(
+                    $_REQUEST['ID'],
+                    $dsRenDomain
+                );
                 $customerItemID = $_REQUEST['ID'];
             } else {                                                                    // creating new
                 $dsRenDomain->initialise();
-                $dsRenDomain->setValue('customerItemID', '0');
+                $dsRenDomain->setValue(
+                    'customerItemID',
+                    '0'
+                );
                 $customerItemID = '0';
             }
         } else {                                                                        // form validation error
@@ -235,8 +307,8 @@ class CTRenDomain extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'update',
-                    'ordheadID' => $_REQUEST['ordheadID'],
+                    'action'         => 'update',
+                    'ordheadID'      => $_REQUEST['ordheadID'],
                     'customerItemID' => $customerItemID
                 )
             );
@@ -276,7 +348,9 @@ class CTRenDomain extends CTCNC
               type="text" value="' . $dsRenDomain->getValue('salePrice') . '"
               size="10"
               maxlength="10">
-                    <span class="formErrorMessage">' . Controller::htmlDisplayText($dsRenDomain->getMessage('salePrice')) . '</span> </td>
+                    <span class="formErrorMessage">' . Controller::htmlDisplayText(
+                    $dsRenDomain->getMessage('salePrice')
+                ) . '</span> </td>
         </tr>
         <tr>
             <td class="promptText">Cost Price/Annum</td>
@@ -286,7 +360,9 @@ class CTRenDomain extends CTCNC
               {readonly}
               size="10"
               maxlength="10" />
-                    <span class="formErrorMessage">' . Controller::htmlDisplayText($dsRenDomain->getMessage('costPrice')) . '</span> </td>
+                    <span class="formErrorMessage">' . Controller::htmlDisplayText(
+                    $dsRenDomain->getMessage('costPrice')
+                ) . '</span> </td>
         </tr>';
 
 
@@ -300,16 +376,16 @@ class CTRenDomain extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
-                    'action' => CTCNC_ACT_DISP_ITEM_POPUP,
+                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
                     'renewalTypeID' => CONFIG_DOMAIN_RENEWAL_TYPE_ID,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'htmlFmt'       => CT_HTML_FMT_POPUP
                 )
             );
         $urlItemEdit =
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
-                    'action' => CTCNC_ACT_ITEM_EDIT,
+                    'action'  => CTCNC_ACT_ITEM_EDIT,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -317,7 +393,7 @@ class CTRenDomain extends CTCNC
             $this->buildLink(
                 'CustomerItem.php',
                 array(
-                    'action' => 'printContract',
+                    'action'         => 'printContract',
                     'customerItemID' => $customerItemID
                 )
             );
@@ -328,59 +404,82 @@ class CTRenDomain extends CTCNC
             )
         );
 
+        $this->template->setBlock(
+            'RenDomainEdit',
+            'initialContractLengthBlock',
+            'initialContractLengths'
+        );
+
+        $this->parseInitialContractLength($dsRenDomain->getValue(DBECustomerItem::initialContractLength));
+
         $this->template->set_var(
             array(
-                'pricePerMonth' => $pricePerMonth,
-                'costPrice' => $dsRenDomain->getValue('costPrice'),
-                'salePrice' => $dsRenDomain->getValue('salePrice'),
-                'customerItemID' => $dsRenDomain->getValue('customerItemID'),
-                'customerName' => Controller::htmlDisplayText($dsRenDomain->getValue('customerName')),
-                'customerID' => Controller::htmlDisplayText($dsRenDomain->getValue('customerID')),
-                'siteName' => Controller::htmlDisplayText($dsRenDomain->getValue('siteName')),
-                'siteNo' => $dsRenDomain->getValue('siteNo'),
-                'itemDescription' => Controller::htmlDisplayText($dsRenDomain->getValue('itemDescription')),
-                'itemID' => Controller::htmlDisplayText($dsRenDomain->getValue('itemID')),
-                'invoiceFromDate' => $dsRenDomain->getValue('invoiceFromDate'),
-                'installationDate' => Controller::dateYMDtoDMY($dsRenDomain->getValue('installationDate')),
-                'invoiceToDate' => $dsRenDomain->getValue('invoiceToDate'),
-                'invoicePeriodMonths' => Controller::htmlInputText($dsRenDomain->getValue('invoicePeriodMonths')),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenDomain->getMessage('invoicePeriodMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenDomain->getValue('totalInvoiceMonths')),
-                'notes' => Controller::htmlInputText($dsRenDomain->getValue('notes')),
-                'notesMessage' => Controller::htmlDisplayText($dsRenDomain->getMessage('notes')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'urlItemEdit' => $urlItemEdit,
-                'urlItemPopup' => $urlItemPopup,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList,
-                'declined' => $declined,
-                'declinedFlag' => $dsRenDomain->getValue('declinedFlag'),
-                'disabled' => $disabled,
-                'readonly' => $readonly,
-                'internalNotes' => Controller::htmlTextArea($dsRenDomain->getValue('internalNotes')),
-                'calculatedExpiryDate'    => getExpiryDate(
+                'pricePerMonth'              => $pricePerMonth,
+                'costPrice'                  => $dsRenDomain->getValue('costPrice'),
+                'salePrice'                  => $dsRenDomain->getValue('salePrice'),
+                'customerItemID'             => $dsRenDomain->getValue('customerItemID'),
+                'customerName'               => Controller::htmlDisplayText($dsRenDomain->getValue('customerName')),
+                'customerID'                 => Controller::htmlDisplayText($dsRenDomain->getValue('customerID')),
+                'siteName'                   => Controller::htmlDisplayText($dsRenDomain->getValue('siteName')),
+                'siteNo'                     => $dsRenDomain->getValue('siteNo'),
+                'itemDescription'            => Controller::htmlDisplayText($dsRenDomain->getValue('itemDescription')),
+                'itemID'                     => Controller::htmlDisplayText($dsRenDomain->getValue('itemID')),
+                'invoiceFromDate'            => $dsRenDomain->getValue('invoiceFromDate'),
+                'installationDate'           => Controller::dateYMDtoDMY($dsRenDomain->getValue('installationDate')),
+                'invoiceToDate'              => $dsRenDomain->getValue('invoiceToDate'),
+                'invoicePeriodMonths'        => Controller::htmlInputText(
+                    $dsRenDomain->getValue('invoicePeriodMonths')
+                ),
+                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText(
+                    $dsRenDomain->getMessage('invoicePeriodMonths')
+                ),
+                'totalInvoiceMonths'         => Controller::htmlInputText($dsRenDomain->getValue('totalInvoiceMonths')),
+                'notes'                      => Controller::htmlInputText($dsRenDomain->getValue('notes')),
+                'notesMessage'               => Controller::htmlDisplayText($dsRenDomain->getMessage('notes')),
+                'urlUpdate'                  => $urlUpdate,
+                'urlDelete'                  => $urlDelete,
+                'urlItemEdit'                => $urlItemEdit,
+                'urlItemPopup'               => $urlItemPopup,
+                'txtDelete'                  => $txtDelete,
+                'urlDisplayList'             => $urlDisplayList,
+                'declined'                   => $declined,
+                'declinedFlag'               => $dsRenDomain->getValue('declinedFlag'),
+                'disabled'                   => $disabled,
+                'readonly'                   => $readonly,
+                'internalNotes'              => Controller::htmlTextArea($dsRenDomain->getValue('internalNotes')),
+                'calculatedExpiryDate'       => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
                         $dsRenDomain->getValue(DBECustomerItem::installationDate)
-                    )
+                    ),
+                    $dsRenDomain->getValue(DBECustomerItem::initialContractLength)
                 )->format('d/m/Y'),
 
             )
         );
 
         $dbeArecord = new DBEArecord($this);
-        $dbeArecord->setValue('customerItemID', $dsRenDomain->getValue('customerItemID'));
+        $dbeArecord->setValue(
+            'customerItemID',
+            $dsRenDomain->getValue('customerItemID')
+        );
 
-        $dbeArecord->getRowsByColumn('customerItemID', 'name');
+        $dbeArecord->getRowsByColumn(
+            'customerItemID',
+            'name'
+        );
 
-        $this->template->set_block('RenDomainEdit', 'arecordBlock', 'arecords');
+        $this->template->set_block(
+            'RenDomainEdit',
+            'arecordBlock',
+            'arecords'
+        );
 
         $urlAddArecord =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'createArecord',
+                    'action'         => 'createArecord',
                     'customerItemID' => $dsRenDomain->getValue('customerItemID')
                 )
             );
@@ -392,7 +491,7 @@ class CTRenDomain extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'editArecord',
+                        'action'    => 'editArecord',
                         'arecordID' => $dbeArecord->getPKValue()
                     )
                 );
@@ -401,26 +500,34 @@ class CTRenDomain extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'deleteArecord',
+                        'action'    => 'deleteArecord',
                         'arecordID' => $dbeArecord->getPKValue()
                     )
                 );
             $this->template->set_var(
                 array(
-                    'arecordID' => $dbeArecord->getValue('arecordID'),
-                    'arecordName' => $dbeArecord->getValue('name'),
+                    'arecordID'            => $dbeArecord->getValue('arecordID'),
+                    'arecordName'          => $dbeArecord->getValue('name'),
                     'arecordDestinationIp' => $dbeArecord->getValue('destinationIp'),
-                    'arecordFunction' => $dbeArecord->getValue('function'),
-                    'arecordType' => $dbeArecord->getValue('type'),
-                    'urlDeleteArecord' => $urlDeleteArecord,
-                    'urlEditArecord' => $urlEditArecord
+                    'arecordFunction'      => $dbeArecord->getValue('function'),
+                    'arecordType'          => $dbeArecord->getValue('type'),
+                    'urlDeleteArecord'     => $urlDeleteArecord,
+                    'urlEditArecord'       => $urlEditArecord
                 )
             );
-            $this->template->parse('arecords', 'arecordBlock', true);
+            $this->template->parse(
+                'arecords',
+                'arecordBlock',
+                true
+            );
         } // while
 
 
-        $this->template->parse('CONTENTS', 'RenDomainEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenDomainEdit',
+            true
+        );
         $this->parsePage();
     }// end function editActivity()
 
@@ -452,17 +559,18 @@ class CTRenDomain extends CTCNC
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID' => $_REQUEST['ordheadID']
+                        'ID'     => $_REQUEST['ordheadID']
                     )
                 );
 
         } else {
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
-                                 array(
-                                     'action' => 'edit',
-                                     'ID' => $this->dsRenDomain->getValue('customerItemID')
-                                 )
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'edit',
+                        'ID'     => $this->dsRenDomain->getValue('customerItemID')
+                    )
                 );
 
         }
@@ -501,7 +609,7 @@ class CTRenDomain extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
-                            'ID' => $dsArecord->getValue('customerItemID')
+                            'ID'     => $dsArecord->getValue('customerItemID')
                         )
                     );
 
@@ -510,10 +618,19 @@ class CTRenDomain extends CTCNC
             }
         } else {
             if ($_REQUEST['arecordID']) {                      // editing
-                $this->buRenDomain->getArecordById($_REQUEST['arecordID'], $dsArecord);
+                $this->buRenDomain->getArecordById(
+                    $_REQUEST['arecordID'],
+                    $dsArecord
+                );
             } else {                                               // create new record
-                $dsArecord->setValue('arecordID', 0);
-                $dsArecord->setValue('customerItemID', $_REQUEST['customerItemID']);
+                $dsArecord->setValue(
+                    'arecordID',
+                    0
+                );
+                $dsArecord->setValue(
+                    'customerItemID',
+                    $_REQUEST['customerItemID']
+                );
             }
         }
 
@@ -521,8 +638,8 @@ class CTRenDomain extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'editArecord',
-                    'ordheadID' => $arecordID,
+                    'action'         => 'editArecord',
+                    'ordheadID'      => $arecordID,
                     'customerItemID' => $customerItemID
                 )
             );
@@ -532,21 +649,25 @@ class CTRenDomain extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerItemID' => $dsArecord->getValue('customerItemID'),
-                'arecordID' => $dsArecord->getValue('arecordID'),
-                'type' => $dsArecord->getValue('type'),
-                'typeMessage' => $dsArecord->getMessage('type'),
-                'name' => $dsArecord->getValue('name'),
-                'nameMessage' => $dsArecord->getMessage('name'),
-                'function' => $dsArecord->getValue('function'),
-                'functionMessage' => $dsArecord->getMessage('function'),
-                'destinationIp' => $dsArecord->getValue('destinationIp'),
+                'customerItemID'       => $dsArecord->getValue('customerItemID'),
+                'arecordID'            => $dsArecord->getValue('arecordID'),
+                'type'                 => $dsArecord->getValue('type'),
+                'typeMessage'          => $dsArecord->getMessage('type'),
+                'name'                 => $dsArecord->getValue('name'),
+                'nameMessage'          => $dsArecord->getMessage('name'),
+                'function'             => $dsArecord->getValue('function'),
+                'functionMessage'      => $dsArecord->getMessage('function'),
+                'destinationIp'        => $dsArecord->getValue('destinationIp'),
                 'destinationIpMessage' => $dsArecord->getMessage('destinationIp'),
-                'urlUpdate' => $urlUpdate
+                'urlUpdate'            => $urlUpdate
             )
         );
 
-        $this->template->parse('CONTENTS', 'ArecordEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ArecordEdit',
+            true
+        );
         $this->parsePage();
     }
 
@@ -554,7 +675,10 @@ class CTRenDomain extends CTCNC
     {
         $this->setMethodName('deleteArecord');
 
-        if (!$this->buRenDomain->getArecordById($_REQUEST['arecordID'], $dsArecord)) {
+        if (!$this->buRenDomain->getArecordById(
+            $_REQUEST['arecordID'],
+            $dsArecord
+        )) {
             $this->raiseError('arecordID ' . $_REQUEST['arecordID'] . ' not found');
             exit;
         }
@@ -565,12 +689,31 @@ class CTRenDomain extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
-                    'ID' => $dsArecord->getValue('customerItemID')
+                    'ID'     => $dsArecord->getValue('customerItemID')
                 )
             );
 
         header('Location: ' . $urlNext);
         exit;
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
     }
 }// end of class
 ?>

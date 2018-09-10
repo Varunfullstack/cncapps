@@ -397,7 +397,8 @@ class BURenewal extends Business
                 DateTime::createFromFormat(
                     'Y-m-d',
                     $dbeJRenContract->getValue(DBECustomerItem::installationDate)
-                )
+                ),
+                $dbeJRenContract->getValue(DBECustomerItem::initialContractLength)
             )->format('d/m/Y');
             /*
             Build list of covered items
@@ -457,7 +458,8 @@ class BURenewal extends Business
                 DateTime::createFromFormat(
                     'Y-m-d',
                     $dbeJRenDomain->getValue(DBECustomerItem::installationDate)
-                )
+                ),
+                $dbeJRenDomain->getValue(DBECustomerItem::initialContractLength)
             )->format('d/m/Y');
 
             $returnArray[] = $row;
@@ -498,7 +500,8 @@ class BURenewal extends Business
                 DateTime::createFromFormat(
                     'Y-m-d',
                     $dbeJRenBroadband->getValue(DBECustomerItem::installationDate)
-                )
+                ),
+                $dbeJRenBroadband->getValue(DBECustomerItem::initialContractLength)
             )->format('d/m/Y');
 
             $returnArray[] = $row;
@@ -537,7 +540,8 @@ class BURenewal extends Business
                 DateTime::createFromFormat(
                     'Y-m-d',
                     $dbeJRenHosting->getValue(DBECustomerItem::installationDate)
-                )
+                ),
+                $dbeJRenHosting->getValue(DBECustomerItem::initialContractLength)
             )->format('d/m/Y');
             $returnArray[] = $row;
 

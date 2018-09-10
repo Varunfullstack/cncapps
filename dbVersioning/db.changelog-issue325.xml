@@ -18,5 +18,10 @@
         <sql>
             update custitem set initialContractLength = 12
         </sql>
+        <rollback>
+            <sql>
+                alter table custitem drop column initialContractLength
+            </sql>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

@@ -132,22 +132,39 @@
                     type="text"
                     value="{installationDate}"
                     {readonly}
-                    size="40"
-                    maxlength="50"
-            >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
-        </tr>
-        <tr>
-            <td class="promptText">Total Invoiced (months)</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][totalInvoiceMonths]"
-                    type="text"
-                    value="{totalInvoiceMonths}"
-                    {readonly}
                     size="10"
                     maxlength="10"
             >
-                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">
+                Initial Contract Length (months)
+            </td>
+            <td class="fieldText">
+                <select {disabled}
+                        name="renHosting[1][initialContractLength]"
+                >
+                    <!-- BEGIN initialContractLengthBlock -->
+                    <option {initialContractLengthSelected}
+                            value="{initialContractLength}"
+                    >{initialContractLengthDescription}
+                    </option>
+                    <!-- END initialContractLengthBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Total Invoiced (months)</td>
+            <td class="fieldText">
+                <input name="renHosting[1][totalInvoiceMonths]"
+                       type="text"
+                       value="{totalInvoiceMonths}"
+                       {readonly}
+                       size="10"
+                       maxlength="10"
+                >
+                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Invoice Interval (months)</td>

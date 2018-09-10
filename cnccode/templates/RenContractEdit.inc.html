@@ -181,10 +181,26 @@
                     type="text"
                     value="{installationDate}"
                     {readonly}
-                    size="40"
-                    maxlength="50"
+                    size="10"
+                    maxlength="10"
             >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">
+                Initial Contract Length (months)
+            </td>
+            <td class="fieldText">
+                <select {disabled}
+                        name="renContract[1][initialContractLength]"
+                >
+                    <!-- BEGIN initialContractLengthBlock -->
+                    <option {initialContractLengthSelected}
+                            value="{initialContractLength}"
+                    >{initialContractLengthDescription}
+                    </option>
+                    <!-- END initialContractLengthBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
@@ -302,18 +318,19 @@
             <td class="promptText">
                 <div align="right">Renewal Status</div>
             </td>
-            <td><select
-                    {disabled}
-                    name="renContract[1][renewalStatus]"
-            >
-                <option value=""></option>
-                <!-- BEGIN renewalStatusBlock -->
-                <option {renewalStatusSelected}
-                        value="{renewalStatus}"
-                >{renewalStatusDescription}
-                </option>
-                <!-- END renewalStatusBlock -->
-            </select></td>
+            <td>
+                <select {disabled}
+                        name="renContract[1][renewalStatus]"
+                >
+                    <option value=""></option>
+                    <!-- BEGIN renewalStatusBlock -->
+                    <option {renewalStatusSelected}
+                            value="{renewalStatus}"
+                    >{renewalStatusDescription}
+                    </option>
+                    <!-- END renewalStatusBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td valign="top"

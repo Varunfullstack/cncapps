@@ -139,15 +139,31 @@
         </tr>
         <tr>
             <td class="promptText">Start Date</td>
-            <td class="fieldText"><input
-                    name="renDomain[1][installationDate]"
-                    type="text"
-                    value="{installationDate}"
-                    {readonly}
-                    size="50"
-                    maxlength="50"
-            >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
+            <td class="fieldText">
+                <input name="renDomain[1][installationDate]"
+                       type="text"
+                       value="{installationDate}"
+                       {readonly}
+                       size="10"
+                       maxlength="10"
+                >
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">
+                Initial Contract Length (months)
+            </td>
+            <td class="fieldText">
+                <select {disabled}
+                        name="renDomain[1][initialContractLength]"
+                >
+                    <!-- BEGIN initialContractLengthBlock -->
+                    <option {initialContractLengthSelected}
+                            value="{initialContractLength}"
+                    >{initialContractLengthDescription}
+                    </option>
+                    <!-- END initialContractLengthBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
