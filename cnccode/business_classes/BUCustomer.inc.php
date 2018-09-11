@@ -953,12 +953,7 @@ class BUCustomer extends Business
             $this->raiseError('contactID not passed');
         }
         $this->dbeContact->getRow($contactID);
-        if ($this->dbeContact->getValue('mailshot5Flag') == 'Y') {
-            $ret = true;
-        } else {
-            $ret = false;
-        }
-        return $ret;
+        return !empty($this->dbeContact->getValue(DBEContact::supportLevel));
     }
 
     function setProspectFlagOff($customerID)

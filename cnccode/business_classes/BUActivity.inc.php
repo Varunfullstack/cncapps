@@ -1182,7 +1182,7 @@ class BUActivity extends Business
                 $dbeContact = new DBEContact($this);
 
                 $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
-                
+
                 $dbeContact->setValue(
                     DBEContact::notes,
                     $dsCallActivity->getValue(DBEJCallActivity::contactNotes)
@@ -1241,6 +1241,8 @@ class BUActivity extends Business
         }
 
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
+
+        $this->sendEmailToCustomer([]);
 
         /*
     Send emails UNLESS this is an escalation or change request activity type
@@ -8495,6 +8497,16 @@ is currently a balance of ';
         $parameters
     )
     {
+
+
+        // we send emails for
+
+        // Initial // Activiy Type 51
+        // Work Started // just when they start to work
+        // Work Updates // 4, 7, 8, 18, 11, priority changed
+        // Auto Close ////
+        // Fixed // send fixed email, REOPEN, Completed
+
         /*
     $problemID,
     $templateName,
@@ -8563,8 +8575,11 @@ is currently a balance of ';
 
         if ($parameters['templateName'] == 'WorkCommencedEmail' &&
             $mainSupportEmailAddresses =
-                $buCustomer->getMainSupportEmailAddresses($dbeLastActivity->getValue(DBEJCallActivity::customerID), $toEmail,
-                                                          DBEContact::OthersWorkStartedEmailFlag)
+                $buCustomer->getMainSupportEmailAddresses(
+                    $dbeLastActivity->getValue(DBEJCallActivity::customerID),
+                    $toEmail,
+                    DBEContact::othersWorkStartedEmailFlag
+                )
         ) {
             if ($toEmail) {
                 $toEmail .= ',';
@@ -10601,6 +10616,13 @@ is currently a balance of ';
         );
 
     }
+
+    private function sendSRUpdateEmails($getValue)
+    {
+        echo 'this will send an email';
+    }
+
+    private function sendClientFixedEmails() { }
 
 
 } // End of class

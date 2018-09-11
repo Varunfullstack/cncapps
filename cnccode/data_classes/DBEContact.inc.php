@@ -45,6 +45,7 @@ class DBEContact extends DBCNCEntity
     const supportLevelSupport = 'support';
     const supportLevelSupportDelegate = 'delegate';
     const supportLevelSupervisor = 'supervisor';
+    const initialLogging = 'initialLogging';
 
     /**
      * calls constructor()
@@ -239,7 +240,7 @@ class DBEContact extends DBCNCEntity
         );
         $this->addColumn(
             self::supportLevel,
-            DA_STRING,
+            DA_SUPPORT_LEVEL,
             DA_ALLOW_NULL,
             'supportLevel'
         );
@@ -250,6 +251,22 @@ class DBEContact extends DBCNCEntity
             DA_NOT_NULL,
             "hrUser"
         );
+
+//        $this->addColumn(
+//            self::initialLogging,
+//            DA_YN,
+//            DA_NOT_NULL
+//        );
+//
+//        $this->addColumn(
+//            self::othersInitialLogging,
+//            DA_YN,
+//            DA_NOT_NULL
+//        );
+//
+//        $this->addColumn(
+//            self::
+//        )
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -290,7 +307,7 @@ class DBEContact extends DBCNCEntity
 					con_mailflag4 = 'Y' OR
 					con_mailflag8 = 'Y' OR
 					con_mailflag9 = 'Y' OR
-					supportLevel is not null
+					(supportLevel is not null and supportLevel <> '') 
 					)
 					";
         }
@@ -301,8 +318,8 @@ class DBEContact extends DBCNCEntity
                 ) . " = " . self::supportLevelSupport;    // only nominated support contacts
         }
 
-
         $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
+
         $this->setQueryString($query);
 
         return (parent::getRows());

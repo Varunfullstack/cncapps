@@ -71,7 +71,14 @@ define(
 define(
     "DA_ARRAY",
     "array"
-);    // a PHP array of values
+);
+
+define(
+    'DA_SUPPORT_LEVEL',
+    'supportLevel'
+);
+
+// a PHP array of values
 // Update modes
 define(
     "DA_MODE_NONE",

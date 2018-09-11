@@ -79,7 +79,8 @@
             validatorFunction: function (value, $el, config, language, $form) {
                 var test = $('[data-type="' + $el.data().type + '"]');
                 var isValid = false;
-
+                var except = test.data().except;
+                var exceptCondition = eval(except);
                 test.each(function () {
                     var elm = $(this);
                     var isMe = elm.get(0) === $el.get(0);
@@ -93,8 +94,11 @@
                         elm.validate();
                     }
                 });
-                $el.data("toBeValidated", false);
 
+                $el.data("toBeValidated", false);
+                if(exceptCondition){
+                    return true;
+                }
                 return isValid;
             },
             errorMessage: '',
@@ -121,7 +125,14 @@
                         elm.validate();
                     }
                 });
+                var except = test.data().except;
+                var exceptCondition = eval(except);
                 $el.data("toBeValidated", false);
+
+                if(exceptCondition){
+                    return true;
+                }
+
                 return checkedCount === 1;
             },
             errorMessage: '',
@@ -134,7 +145,8 @@
                 var test = $('[data-type="' + $el.data().type + '"]');
 
                 var checkedCount = 0;
-
+                var except = test.data().except;
+                var exceptCondition = eval(except);
                 test.each(function () {
                     var elm = $(this);
                     var isMe = elm.get(0) === $el.get(0);
@@ -149,6 +161,10 @@
                     }
                 });
                 $el.data("toBeValidated", false);
+
+                if (exceptCondition) {
+                    return true;
+                }
                 return checkedCount > 0;
             }
         });
@@ -428,12 +444,12 @@
            onClick="document.location='{showInactiveSitesURL}';"
 
     ><input {disabled}
-           name="displayInactiveContacts"
-           type="button"
-           value="Show Inactive Contacts"
-           onClick="document.location='{showInactiveContactsURL}';"
+            name="displayInactiveContacts"
+            type="button"
+            value="Show Inactive Contacts"
+            onClick="document.location='{showInactiveContactsURL}';"
 
-    >
+>
     <BR>
     {customerFolderLink}
     <br>
@@ -488,6 +504,7 @@
                                type="checkbox"
                                name="form[customer][{customerID}][referredFlag]"
                                value="Y"
+                               id="referred"
                                {referredFlagChecked}
                         /></td>
                 </tr>
@@ -1568,6 +1585,7 @@
                                {accountsFlagChecked}
                                data-validation="atLeastOne"
                                data-type="accounts"
+                               data-except="$('#referred').prop('checked')"
                         />
                     </td>
                     <td>
@@ -1578,6 +1596,7 @@
                                {mailshot2FlagChecked}
                                data-validation="atLeastOne"
                                data-type="invoice"
+                               data-except="$('#referred').prop('checked')"
                         />
                     </td>
                     <td>
@@ -1597,6 +1616,7 @@
                                class="stmCheckBox"
                                data-validation="atLeastOneAtMostOne"
                                data-type="statement"
+                               data-except="$('#referred').prop('checked')"
                         />
                     </td>
                     <td>
@@ -1604,6 +1624,7 @@
                                 name="form[contact][{contactID}][supportLevel]"
                                 data-validation="atLeastOneMain"
                                 data-type="mainSelector"
+                                data-except="$('#referred').prop('checked')"
                         >
                             <!-- BEGIN supportLevelBlock -->
                             <option {supportLevelSelected}
@@ -1631,6 +1652,7 @@
                                {reviewUserFlagChecked}
                                data-validation="atLeastOne"
                                data-type="review"
+                               data-except="$('#referred').prop('checked')"
                         />
                     </td>
                     <td>
@@ -1641,6 +1663,7 @@
                                {mailshot8FlagChecked}
                                data-type="topUp"
                                {topUpValidation}
+                               data-except="$('#referred').prop('checked')"
                         />
                     </td>
                     <td>
@@ -1659,6 +1682,7 @@
                                {mailshot9FlagChecked}
                                data-validation="atLeastOne"
                                data-type="reports"
+                               data-except="$('#referred').prop('checked')"
                         />
                     </td>
                     <td>
