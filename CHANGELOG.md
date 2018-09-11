@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.11.0] - 2018-09-11
 ### Fixed
 - Issue 315 - Monitored SR formatting issues.
 - Issue 328 - Spell checking within fields
