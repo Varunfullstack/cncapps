@@ -2652,7 +2652,7 @@ class CTActivity extends CTCNC
             contact.con_phone,
             contact.con_notes,
             address.add_phone,
-            supportLevel
+            supportLevel,
             con_position,
             (
               SELECT
@@ -2695,18 +2695,8 @@ class CTActivity extends CTCNC
                     $query .= " AND con_contno = " . $_REQUEST['contactID'];
                 }
 
-                $query .= "
-          AND (
-            con_mailshot = 'Y' OR
-            con_mailflag2 = 'Y' OR
-            con_mailflag3 = 'Y' OR
-            con_mailflag4 = 'Y' OR 
-            con_mailflag8 = 'Y' OR
-            con_mailflag9 = 'Y' OR
-            supportLevel is not null          
-          )";
+                $query .= " AND  supportLevel is not null ";
                 $query .= " ORDER BY cus_name, con_last_name, con_first_name";
-
                 $result = mysqli_query(
                     $db,
                     $query
@@ -2760,65 +2750,65 @@ class CTActivity extends CTCNC
 
                 // only allow selection of support contacts
 
-                if ($row['supportLevel'] == 'support') {
 
-                    if ($row['openSrCount'] == 0) {
-                        $nextURL =
-                            $this->buildLink(
-                                $_SERVER['PHP_SELF'],
-                                array(
-                                    'action'     => 'editServiceRequestHeader',
-                                    'customerID' => $row['cus_custno'],
-                                    'contactID'  => $row['con_contno'],
-                                    'reason'     => $reason
-                                )
-                            );
-                    } else {
-                        $nextURL =
-                            $this->buildLink(
-                                $_SERVER['PHP_SELF'],
-                                array(
-                                    'action'     => 'displayOpenSrs',
-                                    'customerID' => $row['cus_custno'],
-                                    'contactID'  => $row['con_contno'],
-                                    'reason'     => $reason
-                                )
-                            );
-
-                    }
-
-                    // main suport contact?
-                    if ($row['supportLevel'] == 'main') {
-                        $linkClass = 'class="mainSupportContact"';
-                    } else {
-                        $linkClass = '';
-                    }
-
-                    $cus_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['cus_name'] . '</A>';
-                    $contact_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['con_first_name'] . ' ' . $row['con_last_name'] . '</A>';
-                    $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
-                    $contact_phone = $row['con_phone'];
-                    $contact_position = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['con_position'] . '</A>';
-                    $site_phone = $row['add_phone'];
-
+                if ($row['openSrCount'] == 0) {
+                    $nextURL =
+                        $this->buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'     => 'editServiceRequestHeader',
+                                'customerID' => $row['cus_custno'],
+                                'contactID'  => $row['con_contno'],
+                                'reason'     => $reason
+                            )
+                        );
                 } else {
-                    $cus_name = $row['cus_name'];
-                    $contact_name = $row['con_first_name'] . ' ' . $row['con_last_name'];
-                    $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
-                    $contact_phone = '';
-                    $contact_position = '';
-                    $site_phone = '';
+                    $nextURL =
+                        $this->buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'     => 'displayOpenSrs',
+                                'customerID' => $row['cus_custno'],
+                                'contactID'  => $row['con_contno'],
+                                'reason'     => $reason
+                            )
+                        );
+
                 }
+
+                // main suport contact?
+                if ($row['supportLevel'] == 'main') {
+                    $linkClass = 'class="mainSupportContact"';
+                } else {
+                    $linkClass = '';
+                }
+
+                $cus_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['cus_name'] . '</A>';
+                $contact_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['con_first_name'] . ' ' . $row['con_last_name'] . '</A>';
+                $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
+                $contact_phone = $row['con_phone'];
+                $contact_position = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['con_position'] . '</A>';
+                $site_phone = $row['add_phone'];
+
+
+//                    $cus_name = $row['cus_name'];
+//                    $contact_name = $row['con_first_name'] . ' ' . $row['con_last_name'];
+//                    $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
+//                    $contact_phone = '';
+//                    $contact_position = '';
+//                    $site_phone = '';
+
 
                 $this->template->set_var(
                     array(
-                        'cus_name'         => $cus_name,
-                        'contact_name'     => $contact_name,
-                        'contact_position' => $contact_position,
-                        'con_phone'        => $contact_phone,
-                        'add_phone'        => $site_phone,
-                        'site_name'        => $site_name,
-                        'contact_notes'    => $row['con_notes']
+                        'cus_name'             => $cus_name,
+                        'contact_name'         => $contact_name,
+                        'contact_position'     => $contact_position,
+                        'con_phone'            => $contact_phone,
+                        'add_phone'            => $site_phone,
+                        'site_name'            => $site_name,
+                        'contact_notes'        => $row['con_notes'],
+                        'contact_supportLevel' => $row['supportLevel']
                     )
                 );
                 $this->template->parse(

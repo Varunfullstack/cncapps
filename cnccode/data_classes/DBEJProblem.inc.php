@@ -328,6 +328,7 @@ class DBEJProblem extends DBEProblem
             $sql .= " AND pro_consno <> 0";
         }
 
+
         $this->setQueryString($sql);
 
         return (parent::getRows());
