@@ -428,7 +428,7 @@ class CTCustomer extends CTCNC
                 $this->getYN($value['workStartedEmailFlag'])
             );
             $this->dsContact->setValue(
-                DBEContact::autoCloseEmailFlag,
+                DBEContact::pendingClosureEmailFlag,
                 $this->getYN($value['autoCloseEmailFlag'])
             );
             $this->dsContact->setValue(
@@ -437,12 +437,7 @@ class CTCustomer extends CTCNC
             );
 
             $this->dsContact->setValue(
-                DBEContact::othersEmailFlag,
-                $this->getYN($value['othersEmailFlag'])
-            );
-
-            $this->dsContact->setValue(
-                DBEContact:: othersAutoCloseEmailFlag,
+                DBEContact:: othersPendingClosureEmailFlag,
                 $this->getYN($value['othersAutoCloseEmailFlag'])
             );
             $this->dsContact->setValue(
@@ -2566,14 +2561,11 @@ ORDER BY cus_name ASC  ";
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),
                     'autoCloseEmailFlagChecked'   => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
-                    ),
-                    'othersEmailFlagChecked'      => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersEmailFlag)
+                        $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
                     ),
 
                     'othersAutoCloseEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersAutoCloseEmailFlag)
+                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
                     ),
 
                     'othersWorkStartedEmailFlagChecked' => $this->getChecked(
@@ -3179,7 +3171,7 @@ ORDER BY cus_name ASC  ";
             ["value" => DBEContact::supportLevelMain, "description" => "Main"],
             ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
             ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
-            ["value" => DBEContact::supportLevelSupportDelegate, "description" => "Delegate"],
+            ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
         ];
         foreach ($supportLevels as $supportLevel) {
             $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : '';

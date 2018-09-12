@@ -3431,7 +3431,7 @@ class CTActivity extends CTCNC
             if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
                 $startMainContactStyle = '*';
                 $endMainContactStyle = '*';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupportDelegate) {
+            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
                 $startMainContactStyle = '-delegate';
                 $endMainContactStyle = '-delegate';
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {

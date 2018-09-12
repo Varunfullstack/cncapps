@@ -359,9 +359,7 @@ class BUProblemSLA extends Business
                     $hoursUntilComplete <= 0 &
                     $this->dbeProblem->getValue('totalActivityDurationHours') <= $this->srAutocompleteThresholdHours
                 ) {
-
                     $this->buActivity->setProblemToCompleted($problemID);
-
                 } else {
                     /*
                     if within 2 working days of complete date send an email up to maximum 2 emails.
@@ -376,19 +374,10 @@ class BUProblemSLA extends Business
                         );
                         $this->dbeProblem->updateRow();
 
-                        if (
-                            $this->dbeProblem->getValue('hideFromCustomerFlag') == 'N'
-                        ) {
-
-                            $this->sendCompletionAlertEmail(
-                                $problemID,
-                                $this->dbeProblem->getValue(DBEProblem::completeDate),
-                                $dbeCustomer->getValue(DBECustomer::workStartedEmailMainFlag)
-                            );
-
-
-                        } // end if hours until complete
-
+                        $this->buActivity->sendEmailToCustomer(
+                            $problemID,
+                            BUActivity::PendingClosureCustomerEmailCategory
+                        );
 
                     }// end if last activity = true
 
@@ -657,154 +646,6 @@ class BUProblemSLA extends Business
 
     }
 
-    /**
-     * Send Service Completion Alert Email
-     *
-     * @param mixed $problemID
-     * @param $completeDate
-     */
-    function sendCompletionAlertEmail($problemID,
-                                      $completeDate
-    )
-    {
-        $buMail = new BUMail($this);
-
-        $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRow($problemID);
-
-        $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID);
-
-        $dbeJLastCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
-
-        $activityRef = $problemID;
-
-        $dbeCustomer = new DBECustomer ($this);
-        $dbeCustomer->getRow($dbeJProblem->getValue('customerID'));
-        /*
-        do we copy in main contact?
-        */
-        $copyEmailToMainContact = true;
-
-        /*
-        do we send to first activity contact?
-        */
-        if (
-            $dbeJCallActivity->getValue('autoCloseEmailFlag') == 'N'
-        ) {
-            $sendEmailToFirstActivityContact = false;
-        } else {
-            $sendEmailToFirstActivityContact = true;
-        }
-
-
-        if ($sendEmailToFirstActivityContact) {
-            $toEmail = $dbeJCallActivity->getValue('contactEmail');
-            $toName = $dbeJCallActivity->getValue('contactName');
-        }
-
-        /*
-        Send the email to all the main support email addresses at the client but exclude them if they were the reporting contact or don't want to get them.
-        */
-
-        $dbeContact = new DBEContact($this
-                );
-
-        $dbeContact->getMainSupportRowsByCustomerID($dbeJProblem->getValue('customerID'));
-
-        while ($dbeContact->fetchNext()) {
-            if ($dbeContact->getValue(DBEContact::othersEmailFlag) == 'Y' &&
-                $dbeContact->getValue(DBEContact::othersAutoCloseEmailFlag)) {
-                if ($toEmail) {
-                    $toEmail .= ",";
-                }
-
-                $toEmail .= $dbeContact->getValue(DBEContact::Email);
-            }
-        }
-
-        if (!$toEmail) {       // no recipients so no email
-            return;
-        }
-
-        $fixedUserID = $dbeJProblem->getValue('fixedUserID');
-
-        $dbeFixedUser = new DBEUser($this);
-        $dbeFixedUser->getRow($fixedUserID);
-
-        $template = new Template (
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'ServiceCompletionAlertEmail.inc.html'
-        );
-
-        if ($dbeJProblem->getValue('rootCauseID')) {
-            $dbeRootCause = new DBERootCause($this);
-            $dbeRootCause->getRow($dbeJProblem->getValue('rootCauseID'));
-            $rootCause = $dbeRootCause->getValue('description');
-        } else {
-            $rootCause = 'Unknown';
-        }
-
-        $template->setVar(
-            array(
-                'contactFirstName'            => $dbeJCallActivity->getValue('contactFirstName'),
-                'activityRef'                 => $activityRef,
-                'reason'                      => $dbeJCallActivity->getValue('reason'),
-                'lastActivityReason'          => $dbeJLastCallActivity->getValue('reason'),
-                'rootCause'                   => $rootCause,
-                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
-                'completeDate'                => Controller::dateYMDtoDMY($completeDate),
-                'resolvedEngineerName'        => $dbeFixedUser->getValue('firstName') . ' ' . $dbeFixedUser->getValue(
-                        'lastName'
-                    )
-
-            )
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $dbeJCallActivity->getValue(
-                        'problemID'
-                    ) . ' - Pending Closure on ' . Controller::dateYMDtoDMY($completeDate),
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-    } // end sendServiceCompletedEmail
 
     /**
      * Calculate number of working hours for a problem

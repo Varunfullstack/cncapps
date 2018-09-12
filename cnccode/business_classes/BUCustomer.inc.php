@@ -1256,9 +1256,12 @@ class BUCustomer extends Business
     /**
      *    Delete sites and contacts
      * @param $customerID
+     * @param bool $includeSupervisors
      * @return array
      */
-    function getMainSupportContacts($customerID)
+    function getMainSupportContacts($customerID,
+                                    $includeSupervisors = false
+    )
     {
         $this->setMethodName('getMainSupportContacts');
 
@@ -1266,12 +1269,48 @@ class BUCustomer extends Business
             $this->raiseError('customerID not passed');
         }
 
-        $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
+        $this->dbeContact->getMainSupportRowsByCustomerID(
+            $customerID,
+            $includeSupervisors
+        );
         $contacts = [];
         while ($this->dbeContact->fetchNext()) {
             $contacts[] = [
-                "firstName" => $this->dbeContact->getValue('firstName'),
-                "lastName"  => $this->dbeContact->getValue('lastName')
+                DBEContact::contactID                     => $this->dbeContact->getValue(DBEContact::contactID),
+                DBEContact::firstName                     => $this->dbeContact->getValue(DBEContact::firstName),
+                DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
+                DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
+                DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
+                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
+                DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
             ];
         }
 

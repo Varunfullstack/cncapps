@@ -405,7 +405,7 @@ class CTCustomerCRM extends CTCustomer
                 $this->getYN($value['workStartedEmailFlag'])
             );
             $this->dsContact->setValue(
-                DBEContact::autoCloseEmailFlag,
+                DBEContact::pendingClosureEmailFlag,
                 $this->getYN($value['autoCloseEmailFlag'])
             );
             $this->dsContact->setValue(
@@ -1378,7 +1378,7 @@ class CTCustomerCRM extends CTCustomer
                 'mailshot4FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
                 'mailshot8FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
                 'mailshot9FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
-                'mailshot11FlagDesc'             => $this->buCustomer->dsHeader->getValue(
+                'mailshot11FlagDesc'  => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot11FlagDesc
                 ),
                 'submitURL'           => $submitURL,
@@ -2069,14 +2069,11 @@ class CTCustomerCRM extends CTCustomer
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),
                     'autoCloseEmailFlagChecked'   => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
-                    ),
-                    'othersEmailFlagChecked'      => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersEmailFlag)
+                        $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
                     ),
 
                     'othersAutoCloseEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersAutoCloseEmailFlag)
+                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
                     ),
 
                     'othersWorkStartedEmailFlagChecked' => $this->getChecked(
