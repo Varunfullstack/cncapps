@@ -37,9 +37,9 @@ class DBEContact extends DBCNCEntity
     const supportLevel = "supportLevel";
 
     const supportLevelMain = 'main';
+    const supportLevelSupervisor = 'supervisor';
     const supportLevelSupport = 'support';
     const supportLevelDelegate = 'delegate';
-    const supportLevelSupervisor = 'supervisor';
 
     const initialLoggingEmailFlag = 'initialLoggingEmailFlag';
     const workStartedEmailFlag = "workStartedEmailFlag";
