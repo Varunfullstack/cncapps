@@ -421,7 +421,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->printStringRJAt(BUPDFPOR_UNIT_PRICE_COL, 'Customer Ref');
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
-        $this->_buPDF->printStringAt(BUPDFPOR_COST_BOX_LEFT_EDGE, substr($this->_dsOrdhead->getValue('custPORef'), 0, 17));
+        $this->_buPDF->printStringAt(BUPDFPOR_COST_BOX_LEFT_EDGE, substr($this->_dsOrdhead->getValue('custPORef'), 0, 12));
         $this->_buPDF->CR();
         $this->_buPDF->box(BUPDFPOR_UNIT_PRICE_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
         $this->_buPDF->box(BUPDFPOR_COST_BOX_LEFT_EDGE, $this->_buPDF->getYPos(), BUPDFPOR_UNIT_PRICE_BOX_WIDTH, $this->_buPDF->getFontSize() / 2);
