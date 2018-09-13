@@ -96,7 +96,7 @@
                 });
 
                 $el.data("toBeValidated", false);
-                if(exceptCondition){
+                if (exceptCondition) {
                     return true;
                 }
                 return isValid;
@@ -129,7 +129,7 @@
                 var exceptCondition = eval(except);
                 $el.data("toBeValidated", false);
 
-                if(exceptCondition){
+                if (exceptCondition) {
                     return true;
                 }
 
@@ -604,39 +604,6 @@
                             <!-- END leadStatusBlock -->
                         </select>
                     </td>
-                </tr>
-                <tr>
-                    <td class="content">Main Contact Gets Other's Emails</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][othersEmailMainFlag]"
-                               value="Y"
-                               {othersEmailMainFlagChecked}
-                               onchange="othersEmailMainFlagChanged()"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Main Contact Gets Work-started</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][workStartedEmailMainFlag]"
-                               value="Y"
-                               {workStartedEmailMainFlagChecked}
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Main Contact Gets Auto-close</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][autoCloseEmailMainFlag]"
-                               value="Y"
-                               {autoCloseEmailMainFlagChecked}
-                        ></td>
                 </tr>
                 <tr>
                     <td class="content">24 Hour Cover</td>
@@ -1350,13 +1317,19 @@
                     <td class="headerLightgrey">Email</td>
                     <td class="headerLightgrey">Password</td>
                     <td class="headerLightgrey">Failed Logins</td>
-                    <td class="headerLightgrey">Letters</td>
                     <td class="headerLightgrey">Notes</td>
+                    <td class="headerLightgrey">Initial Logging?</td>
                     <td class="headerLightgrey">Work Started?</td>
-                    <td class="headerLightgrey">Auto-close?</td>
-                    <td class="headerLightgrey">Others</td>
-                    <td class="headerLightgrey">Others Work</td>
-                    <td class="headerLightgrey">Others Close</td>
+                    <td class="headerLightgrey">Work Updates?</td>
+                    <td class="headerLightgrey">Fixed?</td>
+                    <td class="headerLightgrey">Pending Closure?</td>
+                    <td class="headerLightgrey">Closure?</td>
+                    <td class="headerLightgrey">Others Initial Logging?</td>
+                    <td class="headerLightgrey">Others Work Started?</td>
+                    <td class="headerLightgrey">Others Work Updates?</td>
+                    <td class="headerLightgrey">Others Fixed?</td>
+                    <td class="headerLightgrey">Others Pending Closure?</td>
+                    <td class="headerLightgrey">Others Closure?</td>
                     <td class="headerLightgrey">Accounts</td>
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
@@ -1368,6 +1341,7 @@
                     <td class="headerLightgrey">{mailshot11FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">Mailshot</td>
+                    <td class="headerLightgrey">Letters</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -1509,25 +1483,23 @@
                                 maxlength="5"
                         >
                     </td>
-                    <td nowrap="nowrap">
-                        <select {disabled}
-                                name="letters_menu"
-                                onchange="MM_jumpMenu('_blank',this,0)"
-                        >
-                            <option>Send Letter</option>
-                            <option value="{clientFormURL}">Appointment</option>
-                            <!-- BEGIN customLetterBlock -->
-                            <option value="{customLetterURL}">{customLetterName}</option>
-                            <!-- END customLetterBlock -->
-                        </select>
+                    <td>
+                        <input
+                                {disabled}
+                                name="form[contact][{contactID}][notes]"
+                                size="5"
+                                maxlength="200"
+                                value="{notes}"
+                        />
                     </td>
-                    <td><input
-                            {disabled}
-                            name="form[contact][{contactID}][notes]"
-                            size="5"
-                            maxlength="200"
-                            value="{notes}"
-                    />
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][initialLoggingEmailFlag]"
+                               value="Y"
+                               {initialLoggingEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
                     </td>
                     <td>
                         <input {disabled}
@@ -1541,17 +1513,45 @@
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][autoCloseEmailFlag]"
+                               name="form[contact][{contactID}][workUpdatesEmailFlag]"
                                value="Y"
-                               {autoCloseEmailFlagChecked}
+                               {workUpdatesEmailFlagChecked}
+                               class="checkboxAlign"
                         >
                     </td>
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][othersEmailFlag]"
+                               name="form[contact][{contactID}][fixedEmailFlag]"
                                value="Y"
-                               {othersEmailFlagChecked}
+                               {fixedEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][pendingClosureEmailFlag]"
+                               value="Y"
+                               {pendingClosureEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][closureEmailFlag]"
+                               value="Y"
+                               {closureEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersInitialLoggingEmailFlag]"
+                               value="Y"
+                               {othersInitialLoggingEmailFlagChecked}
                                hidden
                                class="onlyMain"
                         >
@@ -1569,14 +1569,43 @@
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][othersAutoCloseEmailFlag]"
+                               name="form[contact][{contactID}][othersWorkUpdatesEmailFlag]"
                                value="Y"
-                               {othersAutoCloseEmailFlagChecked}
+                               {othersWorkUpdatesEmailFlagChecked}
                                hidden
                                class="onlyMain"
                         >
                     </td>
-
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersFixedEmailFlag]"
+                               value="Y"
+                               {othersFixedEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersPendingClosureEmailFlag]"
+                               value="Y"
+                               {othersPendingClosureEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersClosureEmailFlag]"
+                               value="Y"
+                               {othersClosureEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
                     <td>
                         <input {disabled}
                                type="checkbox"
@@ -1692,6 +1721,18 @@
                                value="Y"
                                {sendMailshotFlagChecked}
                         />
+                    </td>
+                    <td nowrap="nowrap">
+                        <select {disabled}
+                                name="letters_menu"
+                                onchange="MM_jumpMenu('_blank',this,0)"
+                        >
+                            <option>Send Letter</option>
+                            <option value="{clientFormURL}">Appointment</option>
+                            <!-- BEGIN customLetterBlock -->
+                            <option value="{customLetterURL}">{customLetterName}</option>
+                            <!-- END customLetterBlock -->
+                        </select>
                     </td>
                 </tr>
 

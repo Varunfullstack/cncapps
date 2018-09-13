@@ -343,7 +343,21 @@ class DBEContact extends DBCNCEntity
 					con_mailflag4 = 'Y' OR
 					con_mailflag8 = 'Y' OR
 					con_mailflag9 = 'Y' OR
-					(supportLevel is not null and supportLevel <> '') 
+					con_mailflag11 = 'Y' or
+					(supportLevel is not null and supportLevel <> '')  or
+					hrUser = 'Y' or
+                    initialLoggingEmailFlag = 'Y' or
+                    workStartedEmailFlag = 'Y' or
+                    workUpdatesEmailFlag = 'Y' or
+                    fixedEmailFlag = 'Y' or
+                    pendingClosureEmailFlag = 'Y' or
+                    closureEmailFlag = 'Y' or
+                    othersInitialLoggingEmailFlag = 'Y' or
+                    othersWorkStartedEmailFlag = 'Y' or
+                    othersWorkUpdatesEmailFlag = 'Y' or
+                    othersFixedEmailFlag = 'Y' or
+                    othersPendingClosureEmailFlag = 'Y' or
+                    othersClosureEmailFlag = 'Y' 
 					)
 					";
         }

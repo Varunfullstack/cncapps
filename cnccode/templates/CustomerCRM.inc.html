@@ -731,11 +731,18 @@
                     <td class="headerLightgrey">Failed Logins</td>
                     <td class="headerLightgrey">Letters</td>
                     <td class="headerLightgrey">Notes</td>
+                    <td class="headerLightgrey">Initial Logging?</td>
                     <td class="headerLightgrey">Work Started?</td>
-                    <td class="headerLightgrey">Auto-close?</td>
-                    <td class="headerLightgrey">Others</td>
-                    <td class="headerLightgrey">Others Work</td>
-                    <td class="headerLightgrey">Others Close</td>
+                    <td class="headerLightgrey">Work Updates?</td>
+                    <td class="headerLightgrey">Fixed?</td>
+                    <td class="headerLightgrey">Pending Closure?</td>
+                    <td class="headerLightgrey">Closure?</td>
+                    <td class="headerLightgrey">Others Initial Logging?</td>
+                    <td class="headerLightgrey">Others Work Started?</td>
+                    <td class="headerLightgrey">Others Work Updates?</td>
+                    <td class="headerLightgrey">Others Fixed?</td>
+                    <td class="headerLightgrey">Others Pending Closure?</td>
+                    <td class="headerLightgrey">Others Closure?</td>
                     <td class="headerLightgrey">Accounts</td>
                     <td class="headerLightgrey">{mailshot2FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot3FlagDesc}</td>
@@ -911,6 +918,15 @@
                     <td>
                         <input {disabled}
                                type="checkbox"
+                               name="form[contact][{contactID}][initialLoggingEmailFlag]"
+                               value="Y"
+                               {initialLoggingEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
                                name="form[contact][{contactID}][workStartedEmailFlag]"
                                value="Y"
                                {workStartedEmailFlagChecked}
@@ -920,17 +936,45 @@
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][autoCloseEmailFlag]"
+                               name="form[contact][{contactID}][workUpdatesEmailFlag]"
                                value="Y"
-                               {autoCloseEmailFlagChecked}
+                               {workUpdatesEmailFlagChecked}
+                               class="checkboxAlign"
                         >
                     </td>
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][othersEmailFlag]"
+                               name="form[contact][{contactID}][fixedEmailFlag]"
                                value="Y"
-                               {othersEmailFlagChecked}
+                               {fixedEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][pendingClosureEmailFlag]"
+                               value="Y"
+                               {pendingClosureEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][closureEmailFlag]"
+                               value="Y"
+                               {closureEmailFlagChecked}
+                               class="checkboxAlign"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersInitialLoggingEmailFlag]"
+                               value="Y"
+                               {othersInitialLoggingEmailFlagChecked}
                                hidden
                                class="onlyMain"
                         >
@@ -948,14 +992,43 @@
                     <td>
                         <input {disabled}
                                type="checkbox"
-                               name="form[contact][{contactID}][othersAutoCloseEmailFlag]"
+                               name="form[contact][{contactID}][othersWorkUpdatesEmailFlag]"
                                value="Y"
-                               {othersAutoCloseEmailFlagChecked}
+                               {othersWorkUpdatesEmailFlagChecked}
                                hidden
                                class="onlyMain"
                         >
                     </td>
-
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersFixedEmailFlag]"
+                               value="Y"
+                               {othersFixedEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersPendingClosureEmailFlag]"
+                               value="Y"
+                               {othersPendingClosureEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][othersClosureEmailFlag]"
+                               value="Y"
+                               {othersClosureEmailFlagChecked}
+                               hidden
+                               class="onlyMain"
+                        >
+                    </td>
                     <td>
                         <input {disabled}
                                type="checkbox"

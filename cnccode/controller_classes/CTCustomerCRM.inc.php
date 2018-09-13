@@ -361,10 +361,6 @@ class CTCustomerCRM extends CTCustomer
                 $this->getYN($value['sendMailshotFlag'])
             );// Use getYN() because HTML POST does not send a FALSE value
             $this->dsContact->setValue(
-                DBEContact::mailshot1Flag,
-                $this->getYN($value['mailshot1Flag'])
-            );// Use getYN() because HTML POST does not send a FALSE value
-            $this->dsContact->setValue(
                 DBEContact::mailshot2Flag,
                 $this->getYN($value['mailshot2Flag'])
             );
@@ -377,18 +373,6 @@ class CTCustomerCRM extends CTCustomer
                 $this->getYN($value['mailshot4Flag'])
             );
             $this->dsContact->setValue(
-                DBEContact::mailshot5Flag,
-                $this->getYN($value['mailshot5Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot6Flag,
-                $this->getYN($value['mailshot6Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot7Flag,
-                $this->getYN($value['mailshot7Flag'])
-            );
-            $this->dsContact->setValue(
                 DBEContact::mailshot8Flag,
                 $this->getYN($value['mailshot8Flag'])
             );
@@ -397,16 +381,69 @@ class CTCustomerCRM extends CTCustomer
                 $this->getYN($value['mailshot9Flag'])
             );
             $this->dsContact->setValue(
-                DBEContact::mailshot10Flag,
-                $this->getYN($value['mailshot10Flag'])
+                DBEContact::mailshot11Flag,
+                $this->getYN($value['mailshot11Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::reviewUser,
+                $this->getYN($value['reviewUser'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::hrUser,
+                $this->getYN($value['hrUser'])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::supportLevel,
+                $value['supportLevel']
+            );
+            $this->dsContact->setValue(
+                DBEContact::initialLoggingEmailFlag,
+                $this->getYN($value['initialLoggingEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::workStartedEmailFlag,
                 $this->getYN($value['workStartedEmailFlag'])
             );
             $this->dsContact->setValue(
+                DBEContact::workUpdatesEmailFlag,
+                $this->getYN($value['workUpdatesEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::fixedEmailFlag,
+                $this->getYN($value['fixedEmailFlag'])
+            );
+            $this->dsContact->setValue(
                 DBEContact::pendingClosureEmailFlag,
-                $this->getYN($value['autoCloseEmailFlag'])
+                $this->getYN($value['pendingClosureEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::closureEmailFlag,
+                $this->getYN($value['closureEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersInitialLoggingEmailFlag,
+                $this->getYN($value['othersInitialLoggingEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersWorkStartedEmailFlag,
+                $this->getYN($value['othersWorkStartedEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersWorkUpdatesEmailFlag,
+                $this->getYN($value['othersWorkUpdatesEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersFixedEmailFlag,
+                $this->getYN($value['othersFixedEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersPendingClosureEmailFlag,
+                $this->getYN($value['othersPendingClosureEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersClosureEmailFlag,
+                $this->getYN($value['othersClosureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
@@ -2008,89 +2045,110 @@ class CTCustomerCRM extends CTCustomer
 
             $this->template->set_var(
                 array(
-                    'contactID'                   => $this->dsContact->getValue(DBEContact::contactID),
-                    'siteNo'                      => $this->dsContact->getValue(DBEContact::siteNo),
-                    'customerID'                  => $this->dsContact->getValue(DBEContact::customerID),
-                    'supplierID'                  => $this->dsContact->getValue(DBEContact::supplierID),
-                    'title'                       => $this->dsContact->getValue(DBEContact::title),
-                    'titleClass'                  => $this->dsContact->getValue('TitleClass'),
-                    'firstName'                   => $this->dsContact->getValue(DBEContact::firstName),
-                    'lastName'                    => $this->dsContact->getValue(DBEContact::lastName),
-                    'firstNameClass'              => $this->dsContact->getValue('FirstNameClass'),
-                    'lastNameClass'               => $this->dsContact->getValue('LastNameClass'),
-                    'phone'                       => $this->dsContact->getValue(DBEContact::phone),
-                    'mobilePhone'                 => $this->dsContact->getValue(DBEContact::mobilePhone),
-                    'position'                    => $this->dsContact->getValue(DBEContact::position),
-                    'fax'                         => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPassword'              => $this->dsContact->getValue(DBEContact::portalPassword),
-                    'failedLoginCount'            => $this->dsContact->getValue(DBEContact::failedLoginCount),
-                    'email'                       => $this->dsContact->getValue(DBEContact::email),
-                    'emailClass'                  => $this->dsContact->getValue("EmailClass"),
-                    'notes'                       => $this->dsContact->getValue(DBEContact::notes),
-                    'discontinuedFlag'            => $this->dsContact->getValue(DBEContact::discontinuedFlag),
-                    'invoiceContactFlagChecked'   => ($this->dsContact->getValue(
+                    'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
+                    'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
+                    'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
+                    'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
+                    'title'                                => $this->dsContact->getValue(DBEContact::title),
+                    'titleClass'                           => $this->dsContact->getValue('TitleClass'),
+                    'firstName'                            => $this->dsContact->getValue(DBEContact::firstName),
+                    'lastName'                             => $this->dsContact->getValue(DBEContact::lastName),
+                    'firstNameClass'                       => $this->dsContact->getValue('FirstNameClass'),
+                    'lastNameClass'                        => $this->dsContact->getValue('LastNameClass'),
+                    'phone'                                => $this->dsContact->getValue(DBEContact::phone),
+                    'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
+                    'position'                             => $this->dsContact->getValue(DBEContact::position),
+                    'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
+                    'portalPassword'                       => $this->dsContact->getValue(DBEContact::portalPassword),
+                    'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
+                    'email'                                => $this->dsContact->getValue(DBEContact::email),
+                    'emailClass'                           => $this->dsContact->getValue("EmailClass"),
+                    'notes'                                => $this->dsContact->getValue(DBEContact::notes),
+                    'discontinuedFlag'                     => $this->dsContact->getValue(DBEContact::discontinuedFlag),
+                    'invoiceContactFlagChecked'            => ($this->dsContact->getValue(
                             DBEContact::contactID
                         ) == $this->dsSite->getValue(
                             DBESite::invoiceContactID
                         )) ? CT_CHECKED : '',
-                    'deliverContactFlagChecked'   => ($this->dsContact->getValue(
+                    'deliverContactFlagChecked'            => ($this->dsContact->getValue(
                             DBEContact::contactID
                         ) == $this->dsSite->getValue(
                             DBESite::deliverContactID
                         )) ? CT_CHECKED : '',
-                    'sendMailshotFlagChecked'     => $this->getChecked(
+                    'sendMailshotFlagChecked'              => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::sendMailshotFlag)
                     ),
-                    'accountsFlagChecked'         => $this->getChecked(
+                    'accountsFlagChecked'                  => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::accountsFlag)
                     ),
-                    'mailshot2FlagChecked'        => $this->getChecked(
+                    'mailshot2FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot2Flag)
                     ),
-                    'mailshot3FlagChecked'        => $this->getChecked(
+                    'mailshot3FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot3Flag)
                     ),
-                    'mailshot4FlagChecked'        => $this->getChecked(
+                    'mailshot4FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot4Flag)
                     ),
-                    'mailshot8FlagChecked'        => $this->getChecked(
+                    'mailshot8FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot8Flag)
                     ),
-                    'mailshot9FlagChecked'        => $this->getChecked(
+                    'mailshot9FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot9Flag)
                     ),
-                    'mailshot11FlagChecked'       => $this->getChecked(
+                    'mailshot11FlagChecked'                => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot11Flag)
                     ),
-                    'reviewUserFlagChecked'       => $this->getChecked(
+                    'reviewUserFlagChecked'                => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::reviewUser)
                     ),
-                    'workStartedEmailFlagChecked' => $this->getChecked(
+                    'initialLoggingEmailFlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
+                    ),
+                    'workStartedEmailFlagChecked'          => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),
-                    'autoCloseEmailFlagChecked'   => $this->getChecked(
+                    'workUpdatesEmailFlagChecked'          => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
+                    ),
+                    'fixedEmailFlagChecked'                => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::fixedEmailFlag)
+                    ),
+                    'pendingClosureEmailFlagChecked'       => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
                     ),
-
-                    'othersAutoCloseEmailFlagChecked' => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
+                    'closureEmailFlagChecked'              => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::closureEmailFlag)
                     ),
-
-                    'othersWorkStartedEmailFlagChecked' => $this->getChecked(
+                    'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
+                    ),
+                    'othersWorkStartedEmailFlagChecked'    => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
                     ),
-
-                    'hrUserFlagChecked' => $this->getChecked(
+                    'othersWorkUpdatesEmailFlagChecked'    => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersWorkUpdatesEmailFlag)
+                    ),
+                    'othersFixedEmailFlagChecked'          => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersFixedEmailFlag)
+                    ),
+                    'othersPendingClosureEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
+                    ),
+                    'othersClosureEmailFlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersClosureEmailFlag)
+                    ),
+                    'hrUserFlagChecked'                    => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::hrUser)
                     ),
-                    'topUpValidation'   => $this->buCustomer->hasPrepayContract(
+                    'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
                         DBEContact::customerID
                     ) ? 'data-validation="atLeastOne"' : '',
-                    'clientFormURL'     => $clientFormURL,
-                    'dearJohnURL'       => $dearJohnURL,
-                    'dmLetterURL'       => $dmLetterURL,
-                    'customLetter1URL'  => $customLetter1URL,
-                    'deleteContactLink' => $deleteContactLink
+                    'clientFormURL'                        => $clientFormURL,
+                    'dearJohnURL'                          => $dearJohnURL,
+                    'dmLetterURL'                          => $dmLetterURL,
+                    'customLetter1URL'                     => $customLetter1URL,
+                    'deleteContactLink'                    => $deleteContactLink
                 )
             );
 
