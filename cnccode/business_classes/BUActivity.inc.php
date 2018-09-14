@@ -890,7 +890,44 @@ class BUActivity extends Business
                 DBEJProblem::userID,
                 $dbeProblem->getValue(DBEJProblem::fixedUserID)
             ); // reallocate
+
+
+            $dbeUser = new DBEJUser($this);
+            $dbeUser->getRow($dbeProblem->getValue(DBEJProblem::fixedUserID));
+
+            $teamID = $dbeUser->getValue(DBEJUser::teamID);
+
+            switch ($teamID) {
+                case 1:
+
+                    if ($dbeProblem->getValue(DBEProblem::hdLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::hdLimitMinutes,
+                            5
+                        );
+                    }
+
+                    break;
+                case 2:
+                    if ($dbeProblem->getValue(DBEProblem::esLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::esLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+                case 4:
+                    if ($dbeProblem->getValue(DBEProblem::imLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::imLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+            }
+
         }
+
 
         $dbeProblem->updateRow();
 
