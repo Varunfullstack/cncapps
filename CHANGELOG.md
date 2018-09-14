@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.11.0] - 2018-09-11
 ### Fixed
 - Issue 315 - Monitored SR formatting issues.
 - Issue 328 - Spell checking within fields
@@ -10,7 +10,7 @@ This project changes will be shown here.
 ### Added
 - Issue 317 - Customer 3rd party contact information
 - Issue 318 - Create Change Request Dashboard
-- Add total to Service Requests Open For More Than 7 Days on screen
+- Issue 334 - Add total to Service Requests Open For More Than 7 Days on screen
 - Issue 319 - Implement Sales Request Approval Process
 - Issue 339 - Team Lead Dashboard view filtering by teams
 - Issue 325 - Calculate and display contract expiry date

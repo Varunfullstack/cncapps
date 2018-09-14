@@ -27,9 +27,9 @@ class BUDailyReport extends Business
 
         $fixedRequests = $this->getFixedRequests($daysAgo);
         $row = $fixedRequests->fetch_row();
-
+        $requests = 0;
         if ($row) {
-
+            $requests = 1;
             $template = new Template (
                 EMAIL_TEMPLATE_DIR,
                 "remove"
@@ -128,8 +128,14 @@ class BUDailyReport extends Business
                     'requestBlock',
                     true
                 );
-
+                $requests++;
             } while ($row = $fixedRequests->fetch_row());
+
+            $template->setVar(
+                [
+                    'totalRequests' => $requests
+                ]
+            );
 
             $template->parse(
                 'output',

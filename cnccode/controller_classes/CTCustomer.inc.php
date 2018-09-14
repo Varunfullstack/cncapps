@@ -1871,6 +1871,16 @@ ORDER BY cus_name ASC  ";
 
         $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
 
+        $thirdPartyLinkURL = $this->buildLink(
+            'ThirdPartyContact.php',
+            [
+                'action'     => 'list',
+                'customerID' => $this->getCustomerID()
+            ]
+        );
+
+        $thirdPartyLink = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
+
         $showInactiveContactsURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -1988,6 +1998,7 @@ ORDER BY cus_name ASC  ";
                 'submitURL'                       => $submitURL,
                 'renewalLink'                     => $renewalLink,
                 'passwordLink'                    => $passwordLink,
+                'thirdPartyContactsLink'          => $thirdPartyLink,
                 'deleteCustomerURL'               => $deleteCustomerURL,
                 'deleteCustomerText'              => $deleteCustomerText,
                 'cancelURL'                       => $cancelURL,

@@ -157,6 +157,24 @@ if (!function_exists('str_split')) {
     }
 }
 
+function getPhoneLink($phone)
+{
+    return '<a href="tel:' . str_replace(
+            ' ',
+            '',
+            $phone
+        ) . '">' . $phone . '</a>';
+}
+
+function getMailToLink($email)
+{
+    return '<a href="mailto:' . str_replace(
+            ' ',
+            '',
+            $email
+        ) . '">' . $email . '</a>';
+}
+
 function common_convertDecimalToHHMM($decimalTime)
 {
 

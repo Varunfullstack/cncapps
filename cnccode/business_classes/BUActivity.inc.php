@@ -890,7 +890,44 @@ class BUActivity extends Business
                 DBEJProblem::userID,
                 $dbeProblem->getValue(DBEJProblem::fixedUserID)
             ); // reallocate
+
+
+            $dbeUser = new DBEJUser($this);
+            $dbeUser->getRow($dbeProblem->getValue(DBEJProblem::fixedUserID));
+
+            $teamID = $dbeUser->getValue(DBEJUser::teamID);
+
+            switch ($teamID) {
+                case 1:
+
+                    if ($dbeProblem->getValue(DBEProblem::hdLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::hdLimitMinutes,
+                            5
+                        );
+                    }
+
+                    break;
+                case 2:
+                    if ($dbeProblem->getValue(DBEProblem::esLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::esLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+                case 4:
+                    if ($dbeProblem->getValue(DBEProblem::imLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::imLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+            }
+
         }
+
 
         $dbeProblem->updateRow();
 
@@ -2200,6 +2237,8 @@ class BUActivity extends Business
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
         $approval = false;
+        $problem = new DBEProblem($this);
+        $problem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
         switch ($response) {
 
             case 'A':
@@ -2207,6 +2246,18 @@ class BUActivity extends Business
 
                 $subject = 'Sales Request approved';
                 $approval = true;
+
+                $problem->setValue(
+                    DBEProblem::userID,
+                    0
+                );
+
+                $problem->setValue(
+                    DBEProblem::queueNo,
+                    4
+                );
+
+
                 break;
 
             case 'D':
@@ -2214,10 +2265,24 @@ class BUActivity extends Business
 
                 $subject = 'Sales Request denied';
 
+                $problem->setValue(
+                    DBEProblem::userID,
+                    $requestingUserID
+                );
+
                 break;
         }
 
+        $problem->setValue(
+            DBEProblem::alarmDate,
+            "0000-00-00"
+        );
+        $problem->setValue(
+            DBEProblem::alarmTime,
+            null
+        );
 
+        $problem->updateRow();
         /*
     Append any comments
     */
@@ -10852,6 +10917,24 @@ is currently a balance of ';
         if ($type == "newStarter") {
             $destEmail = "salesrequeststarter@cnc-ltd.co.uk";
         } else if ($type == "otherRequest") {
+            $problem = new DBEProblem($this);
+            $problem->getRow($problemID);
+
+            $alarmDate = (new DateTime())->add(new DateInterval('P1D'));
+
+            $problem->setValue(
+                DBEProblem::userID,
+                0
+            );
+            $problem->setValue(
+                DBEProblem::alarmDate,
+                $alarmDate->format('Y-m-d')
+            );
+            $problem->setValue(
+                DBEProblem::alarmTime,
+                $alarmDate->format('h:i')
+            );
+            $problem->updateRow();
             $destEmail = "salesrequestother@cnc-ltd.co.uk";
         } else {
             throw new Exception('The type is not valid');

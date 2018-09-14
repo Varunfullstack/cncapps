@@ -144,7 +144,7 @@ class DBEPorhead extends DBEntity
         $this->addColumn(
             self::requiredBY,
             DA_DATE,
-            DA_NOT_NULL,
+            DA_ALLOW_NULL,
             "poh_required_by"
         );
         $this->setPK(0);

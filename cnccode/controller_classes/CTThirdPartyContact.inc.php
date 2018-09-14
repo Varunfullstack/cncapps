@@ -255,8 +255,12 @@ class CTThirdPartyContact extends CTCNC
                         'customerID'          => $dsThirdPartyContact->getValue(DBEThirdPartyContact::customerID),
                         'software'            => $dsThirdPartyContact->getValue(DBEThirdPartyContact::software),
                         'vendor'              => $dsThirdPartyContact->getValue(DBEThirdPartyContact::vendor),
-                        'phone'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::phone),
-                        'email'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::email),
+                        'phoneLink'           => getPhoneLink(
+                            $dsThirdPartyContact->getValue(DBEThirdPartyContact::phone)
+                        ),
+                        'emailLink'           => getMailToLink(
+                            $dsThirdPartyContact->getValue(DBEThirdPartyContact::email)
+                        ),
                         'notes'               => $notes,
                         'urlEdit'             => $urlEdit,
                         'urlDelete'           => $urlDelete
