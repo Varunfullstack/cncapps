@@ -18,9 +18,20 @@ class CTRenQuotation extends CTCNC
     var $buRenQuotation = '';
     var $buCustomerItem = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "renewals",
             "technical"
@@ -33,16 +44,56 @@ class CTRenQuotation extends CTCNC
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenQuotation = new DSForm($this);
         $this->dsRenQuotation->copyColumnsFrom($this->buRenQuotation->dbeRenQuotation);
-        $this->dsRenQuotation->addColumn('invoiceFromDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('invoiceToDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('itemID', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('customerName', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('nextPeriodStartDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('nextPeriodEndDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('itemDescription', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('siteName', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('costPrice', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenQuotation->addColumn('salePrice', DA_STRING, DA_ALLOW_NULL);
+        $this->dsRenQuotation->addColumn(
+            'invoiceFromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'invoiceToDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'itemID',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'customerName',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'nextPeriodStartDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'nextPeriodEndDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'itemDescription',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'siteName',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'costPrice',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenQuotation->addColumn(
+            'salePrice',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
     }
 
     /**
@@ -88,10 +139,17 @@ class CTRenQuotation extends CTCNC
             array('RenQuotationList' => 'RenQuotationList.inc')
         );
 
-        $this->buRenQuotation->getAll($dsRenQuotation, $_REQUEST['orderBy']);
+        $this->buRenQuotation->getAll(
+            $dsRenQuotation,
+            $_REQUEST['orderBy']
+        );
 
         if ($dsRenQuotation->rowCount() > 0) {
-            $this->template->set_block('RenQuotationList', 'rowBlock', 'rows');
+            $this->template->set_block(
+                'RenQuotationList',
+                'rowBlock',
+                'rows'
+            );
 
             while ($dsRenQuotation->fetchNext()) {
 
@@ -102,7 +160,7 @@ class CTRenQuotation extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
-                            'ID' => $customerItemID
+                            'ID'     => $customerItemID
                         )
                     );
                 $txtEdit = '[edit]';
@@ -111,7 +169,7 @@ class CTRenQuotation extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'delete',
+                            'action'         => 'delete',
                             'customerItemID' => $customerItemID
                         )
                     );
@@ -136,22 +194,36 @@ class CTRenQuotation extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsRenQuotation->getValue('customerName'),
-                        'itemDescription' => $dsRenQuotation->getValue('itemDescription'),
-                        'type' => $dsRenQuotation->getValue('type'),
-                        'startDate' => Controller::dateYMDtoDMY($dsRenQuotation->getValue('startDate')),
-                        'nextPeriodStartDate' => Controller::dateYMDtoDMY($dsRenQuotation->getValue('nextPeriodStartDate')),
-                        'nextPeriodEndDate' => Controller::dateYMDtoDMY($dsRenQuotation->getValue('nextPeriodEndDate')),
-                        'urlEdit' => $urlEdit,
-                        'urlList' => $urlList,
+                        'customerName'                => $dsRenQuotation->getValue('customerName'),
+                        'itemDescription'             => $dsRenQuotation->getValue('itemDescription'),
+                        'type'                        => $dsRenQuotation->getValue('type'),
+                        'startDate'                   => Controller::dateYMDtoDMY(
+                            $dsRenQuotation->getValue('startDate')
+                        ),
+                        'nextPeriodStartDate'         => Controller::dateYMDtoDMY(
+                            $dsRenQuotation->getValue('nextPeriodStartDate')
+                        ),
+                        'nextPeriodEndDate'           => Controller::dateYMDtoDMY(
+                            $dsRenQuotation->getValue('nextPeriodEndDate')
+                        ),
+                        'urlEdit'                     => $urlEdit,
+                        'urlList'                     => $urlList,
                         'urlCreateRenewalsQuotations' => $urlCreateRenewalsQuotations,
-                        'txtEdit' => $txtEdit
+                        'txtEdit'                     => $txtEdit
                     )
                 );
-                $this->template->parse('rows', 'rowBlock', true);
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
             }//while $dsRenQuotation->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'RenQuotationList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenQuotationList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -181,13 +253,18 @@ class CTRenQuotation extends CTCNC
 
             // create a new record first
 
-            $buSalesOrder->getOrderByOrdheadID($_REQUEST['ordheadID'], $dsOrdhead, $dsDontNeedOrdline);
+            $buSalesOrder->getOrderByOrdheadID(
+                $_REQUEST['ordheadID'],
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
 
             $ID = $this->buRenQuotation->createNewRenewal(
                 $dsOrdhead->getValue('customerID'),
                 $dsOrdhead->getValue('delSiteNo'),
                 $dsOrdline->getValue('itemID'),
-                $renewalCustomerItemID,                // returned by function
+                $renewalCustomerItemID,
+                // returned by function
                 $dsOrdline->getValue('curUnitSale'),
                 $dsOrdline->getValue('curUnitCost'),
                 $dsOrdline->getValue('qtyOrdered')
@@ -197,11 +274,20 @@ class CTRenQuotation extends CTCNC
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
 
-            $dbeOrdline->setValue('ordheadID', $dsOrdline->getValue('ordheadID'));
-            $dbeOrdline->setValue('sequenceNo', $dsOrdline->getValue('sequenceNo'));
+            $dbeOrdline->setValue(
+                'ordheadID',
+                $dsOrdline->getValue('ordheadID')
+            );
+            $dbeOrdline->setValue(
+                'sequenceNo',
+                $dsOrdline->getValue('sequenceNo')
+            );
 
             $dbeOrdline->getRow();
-            $dbeOrdline->setValue('renewalCustomerItemID', $renewalCustomerItemID);
+            $dbeOrdline->setValue(
+                'renewalCustomerItemID',
+                $renewalCustomerItemID
+            );
 
             $dbeOrdline->updateRow();
 
@@ -212,7 +298,7 @@ class CTRenQuotation extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
-                    'ID' => $renewalCustomerItemID
+                    'ID'     => $renewalCustomerItemID
                 )
             );
 
@@ -231,11 +317,17 @@ class CTRenQuotation extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'edit') {
-                $this->buRenQuotation->getRenQuotationByID($_REQUEST['ID'], $dsRenQuotation);
+                $this->buRenQuotation->getRenQuotationByID(
+                    $_REQUEST['ID'],
+                    $dsRenQuotation
+                );
                 $customerItemID = $_REQUEST['ID'];
             } else {                                                                    // creating new
                 $dsRenQuotation->initialise();
-                $dsRenQuotation->setValue('customerItemID', '0');
+                $dsRenQuotation->setValue(
+                    'customerItemID',
+                    '0'
+                );
                 $customerItemID = '0';
             }
         } else {                                                                        // form validation error
@@ -248,8 +340,8 @@ class CTRenQuotation extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'update',
-                    'ordheadID' => $_REQUEST['ordheadID'],
+                    'action'         => 'update',
+                    'ordheadID'      => $_REQUEST['ordheadID'],
                     'customerItemID' => $customerItemID
                 )
             );
@@ -283,16 +375,16 @@ class CTRenQuotation extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
-                    'action' => CTCNC_ACT_DISP_ITEM_POPUP,
+                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
                     'renewalTypeID' => CONFIG_QUOTATION_RENEWAL_TYPE_ID,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'htmlFmt'       => CT_HTML_FMT_POPUP
                 )
             );
         $urlItemEdit =
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
-                    'action' => CTCNC_ACT_ITEM_EDIT,
+                    'action'  => CTCNC_ACT_ITEM_EDIT,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -300,52 +392,73 @@ class CTRenQuotation extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerID' => Controller::htmlDisplayText($dsRenQuotation->getValue('customerID')),
-                'siteName' => Controller::htmlDisplayText($dsRenQuotation->getValue('siteName')),
-                'siteNo' => $dsRenQuotation->getValue('siteNo'),
-                'itemID' => Controller::htmlDisplayText($dsRenQuotation->getValue('itemID')),
-                'customerItemID' => $dsRenQuotation->getValue('customerItemID'),
-                'customerName' => Controller::htmlDisplayText($dsRenQuotation->getValue('customerName')),
-                'itemDescription' => Controller::htmlDisplayText($dsRenQuotation->getValue('itemDescription')),
-                'startDate' => Controller::dateYMDtoDMY($dsRenQuotation->getValue('startDate')),
-                'dateGenerated' => Controller::dateYMDtoDMY($dsRenQuotation->getValue('dateGenerated')),
+                'customerID'           => Controller::htmlDisplayText($dsRenQuotation->getValue('customerID')),
+                'siteName'             => Controller::htmlDisplayText($dsRenQuotation->getValue('siteName')),
+                'siteNo'               => $dsRenQuotation->getValue('siteNo'),
+                'itemID'               => Controller::htmlDisplayText($dsRenQuotation->getValue('itemID')),
+                'customerItemID'       => $dsRenQuotation->getValue('customerItemID'),
+                'customerName'         => Controller::htmlDisplayText($dsRenQuotation->getValue('customerName')),
+                'itemDescription'      => Controller::htmlDisplayText($dsRenQuotation->getValue('itemDescription')),
+                'startDate'            => Controller::dateYMDtoDMY($dsRenQuotation->getValue('startDate')),
+                'calculatedExpiryDate' =>
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenQuotation->getValue('startDate')
+                    )->add(
+                        new DateInterval('P1Y')
+                    )->format('d/m/Y'),
+                'dateGenerated'        => Controller::dateYMDtoDMY($dsRenQuotation->getValue('dateGenerated')),
                 'dateGeneratedMessage' => $dsRenQuotation->getMessage('dateGenerated'),
-                'grantNumber' => Controller::htmlDisplayText($dsRenQuotation->getValue('grantNumber')),
-                'serialNo' => Controller::htmlDisplayText($dsRenQuotation->getValue('serialNo')),
-                'qty' => Controller::htmlDisplayText($dsRenQuotation->getValue('qty')),
-                'declinedFlagChecked' => Controller::htmlChecked($dsRenQuotation->getValue('declinedFlag')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlItemEdit' => $urlItemEdit,
-                'urlItemPopup' => $urlItemPopup,
-                'urlDisplayList' => $urlDisplayList,
-                'disabled' => $disabled,
-                'internalNotes' => Controller::htmlTextArea($dsRenQuotation->getValue('internalNotes')),
-                'readonly' => $readonly
+                'grantNumber'          => Controller::htmlDisplayText($dsRenQuotation->getValue('grantNumber')),
+                'serialNo'             => Controller::htmlDisplayText($dsRenQuotation->getValue('serialNo')),
+                'qty'                  => Controller::htmlDisplayText($dsRenQuotation->getValue('qty')),
+                'declinedFlagChecked'  => Controller::htmlChecked($dsRenQuotation->getValue('declinedFlag')),
+                'urlUpdate'            => $urlUpdate,
+                'urlDelete'            => $urlDelete,
+                'txtDelete'            => $txtDelete,
+                'urlItemEdit'          => $urlItemEdit,
+                'urlItemPopup'         => $urlItemPopup,
+                'urlDisplayList'       => $urlDisplayList,
+                'disabled'             => $disabled,
+                'internalNotes'        => Controller::htmlTextArea($dsRenQuotation->getValue('internalNotes')),
+                'readonly'             => $readonly
             )
         );
         $dbeRenQuotationType = new DBERenQuotationType($this);
 
         $dbeRenQuotationType->getRows();
 
-        $this->template->set_block('RenQuotationEdit', 'typeBlock', 'types');
+        $this->template->set_block(
+            'RenQuotationEdit',
+            'typeBlock',
+            'types'
+        );
 
         while ($dbeRenQuotationType->fetchNext()) {
 
-            $typeSelected = ($dsRenQuotation->getValue('renQuotationTypeID') == $dbeRenQuotationType->getValue('renQuotationTypeID')) ? CT_SELECTED : '';
+            $typeSelected = ($dsRenQuotation->getValue('renQuotationTypeID') == $dbeRenQuotationType->getValue(
+                    'renQuotationTypeID'
+                )) ? CT_SELECTED : '';
 
             $this->template->set_var(
                 array(
-                    'typeSelected' => $typeSelected,
+                    'typeSelected'       => $typeSelected,
                     'renQuotationTypeID' => $dbeRenQuotationType->getPKValue(),
-                    'typeDescription' => $dbeRenQuotationType->getValue('description')
+                    'typeDescription'    => $dbeRenQuotationType->getValue('description')
                 )
             );
-            $this->template->parse('types', 'typeBlock', true);
+            $this->template->parse(
+                'types',
+                'typeBlock',
+                true
+            );
         }
 
-        $this->template->parse('CONTENTS', 'RenQuotationEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenQuotationEdit',
+            true
+        );
 
         $this->parsePage();
 
@@ -382,17 +495,18 @@ class CTRenQuotation extends CTCNC
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID' => $_REQUEST['ordheadID']
+                        'ID'     => $_REQUEST['ordheadID']
                     )
                 );
 
         } else {
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
-                                 array(
-                                     'action' => 'edit',
-                                     'ID' => $this->dsRenQuotation->getValue('customerItemID')
-                                 )
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'edit',
+                        'ID'     => $this->dsRenQuotation->getValue('customerItemID')
+                    )
                 );
 
         }

@@ -1,36 +1,70 @@
 <!-- Template: ActvitySalesRequest.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script type="application/javascript">
     $(function () {
         window.alarmDate = $('#alarmDate').get(0);
 
     });
 </script>
-<form name="action_date" action="{urlNext}" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="input[1][callActivityID]" value="{callActivityID}"/>
+<form name="action_date"
+      action="{urlNext}"
+      method="post"
+      enctype="multipart/form-data"
+>
+    <input type="hidden"
+           name="input[1][callActivityID]"
+           value="{callActivityID}"
+    />
     <table border="0">
         <TR>
-            <td colspan="2" valign="top" class="content">Message to Sales (if required)</td>
+            <td colspan="2"
+                valign="top"
+                class="content"
+            >Message to Sales (if required)
+            </td>
         </tr>
         <tr>
-            <td colspan="2" class="fieldText">
+            <td colspan="2"
+                class="fieldText"
+            >
 				<textarea
                         name="input[1][emailBody]"
                         id="emailBody"
-                        cols="130" rows="20">{emailBody}</textarea>
+                        cols="130"
+                        rows="20"
+                >{emailBody}</textarea>
             </td>
         </TR>
         <TR>
-            <td class="content" colspan="2" valign="top" align="left">
-                <input type="radio" name="input[1][serviceStatus]" value="ESCALATION" checked="{escalationChecked}">Escalation<br>
+            <td class="content"
+                colspan="2"
+                valign="top"
+                align="left"
+            >
+                <input type="radio"
+                       name="input[1][serviceStatus]"
+                       value="ESCALATION"
+                       checked="{escalationChecked}"
+                >Escalation<br>
             </td>
         </TR>
         <TR>
-            <td class="content" valign="top" align="left">
-                <input type="radio" name="input[1][serviceStatus]" value="WAITING_FOR_CUSTOMER"
-                       checked="{waitingForCustomerChecked}">Waiting for further action by customer<br>
-                <input type="radio" name="input[1][serviceStatus]" value="WAITING_FOR_CNC"
-                       checked="{waitingForCncChecked}">Further CNC Work Required<br>
+            <td class="content"
+                valign="top"
+                align="left"
+            >
+                <input type="radio"
+                       name="input[1][serviceStatus]"
+                       value="WAITING_FOR_CUSTOMER"
+                       checked="{waitingForCustomerChecked}"
+                >Waiting for further action by customer<br>
+                <input type="radio"
+                       name="input[1][serviceStatus]"
+                       value="WAITING_FOR_CNC"
+                       checked="{waitingForCncChecked}"
+                >Further CNC Work Required<br>
                 <span class="message">{serviceStatusMessage}</span>
             </td>
             <td class="content">on
@@ -42,10 +76,10 @@
                         {DISABLED}
                         size="10"
                         maxlength="10"
+                        autocomplete="off"
+                        class="jQueryCalendar"
                 />
-                <a href="javascript:;" onclick="popUpCalendar(this, alarmDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"/></a> at
+                at
                 <input
                         type="text"
                         {DISABLED}
@@ -53,7 +87,8 @@
                         value="{alarmTime}"
                         size="5"
                         maxlength="5"
-                        onchange="setFormChanged();"/>
+                        onchange="setFormChanged();"
+                />
                 <span class="formErrorMessage">{alarmDateMessage}</span>
                 <span class="formErrorMessage">{alarmTimeMessage}</span>
             </td>
@@ -61,7 +96,10 @@
 
         <TR>
             <td class="fieldText">
-                <input type="submit" name="Submit" value="Finished"/>
+                <input type="submit"
+                       name="Submit"
+                       value="Finished"
+                />
             </td>
         </TR>
     </table>

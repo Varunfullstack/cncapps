@@ -145,7 +145,7 @@ class BUMail extends Business
 
         $this->db->query($sql);
 
-        $this->mailQueue->sendMailsInQueue(
+        return $this->mailQueue->sendMailsInQueue(
             self::MAIL_QUEUE_SEND_LIMIT,
             0,
             self::MAIL_QUEUE_TRY_LIMIT,

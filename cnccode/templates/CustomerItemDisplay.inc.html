@@ -1,11 +1,7 @@
 <!-- Template: InvoiceDisplay.inc.html -->
 <script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
-<script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 
 <script language='JavaScript'>
 
@@ -282,21 +278,12 @@
                         title="Validation is suspended until this date. Leave blank if active"
                         {secondsiteReadonly}
                         {readonly}
-
                         value="{secondsiteValidationSuspendUntilDate}"
                         size="10"
                         maxlength="10"
-                ><a href="javascript:;"
-                    onClick="if ('{readonly}' != 'readonly' ) popUpCalendar(this, secondsiteValidationSuspendUntilDate, 'dd/mm/yyyy')"
-            ><img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            ></a>
+                        autocomplete="off"
+                        class="jQueryCalendar"
+                >
                 <font class="formErrorMessage">{secondsiteValidationSuspendUntilDateMessage}</font>
                 {suspendedByText}
             </td>
@@ -406,26 +393,19 @@
         </TR>
         <TR>
             <TD class="promptText">SO Date</TD>
-            <TD class="field"><input
-                    {readonly}
-                    type="text"
-                    id="sOrderDate"
-                    name="customerItem[1][sOrderDate]"
-                    value="{sOrderDate}"
-                    size="10"
-                    maxlength="10"
-            > <a href="javascript:;"
-                 onClick="popUpCalendar(this, sOrderDate, 'dd/mm/yyyy')"
-            ><img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            ></a>
-                <font class="formErrorMessage">{sOrderDateMessage}</font></TD>
+            <TD class="field">
+                <input {readonly}
+                       type="text"
+                       id="sOrderDate"
+                       name="customerItem[1][sOrderDate]"
+                       value="{sOrderDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                >
+                <font class="formErrorMessage">{sOrderDateMessage}</font>
+            </TD>
         </TR>
         <TR>
             <TD class="promptText">Purchase Order</TD>

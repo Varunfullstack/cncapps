@@ -190,37 +190,6 @@ class CTCustomerCRM extends CTCNC
         $this->dsCustomer->copyColumnsFrom($this->buCustomer->dbeCustomer);
     }
 
-
-//    /**
-//     * Route to function based upon action passed
-//     */
-//    function defaultAction()
-//    {
-//        switch ($_REQUEST['action']) {
-//            case 'edit':
-//                $this->edit();
-//                break;
-//            case 'delete':
-//                $this->delete();
-//                break;
-//            case 'generate':
-//                $this->generate();
-//                break;
-//            case 'loadFromCsv':
-//                $this->loadFromCsv();
-//                break;
-//
-//            case 'list':
-//                $this->displayList();
-//                break;
-//
-//            case 'search':
-//            default:
-//                $this->search();
-//                break;
-//        }
-//    }
-//
     function search()
     {
 
@@ -348,7 +317,7 @@ class CTCustomerCRM extends CTCNC
         $customerLeadID = $_POST['customerLeadID'];
         // in the post we should find the id of the status we are searching for
         /** @var DBEContact $results */
-        $results = $this->buCustomer->getMainContactsByLeadStatus($customerLeadID);
+        $results = $this->buCustomer->getContactsByLeadStatus($customerLeadID);
         $data = [];
 
         $customers = [];
@@ -793,10 +762,15 @@ class CTCustomerCRM extends CTCNC
                 'd/m/Y',
                 $value[DBECustomer::reviewDate]
             );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewDate,
-                $reviewDate->format(DATE_ISO8601)
-            );
+
+            if ($reviewDate) {
+                $this->dsCustomer->setValue(
+                    DBECustomer::reviewDate,
+                    $reviewDate->format(DATE_ISO8601)
+                );
+
+            }
+
 
             $this->dsCustomer->setValue(
                 DBECustomer::reviewTime,
@@ -2143,13 +2117,13 @@ class CTCustomerCRM extends CTCNC
             $this->buCustomer->getSitesByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsSite,
-                $_REQUEST['showInactiveSites']
+                true
             );
 
             $this->buCustomer->getContactsByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsContact,
-                $_REQUEST['showInactiveContacts']
+                true
             );
 
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {

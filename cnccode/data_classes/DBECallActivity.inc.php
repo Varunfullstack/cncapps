@@ -103,6 +103,13 @@ class DBECallActivity extends DBEntity
             DA_ALLOW_NULL,
             "caa_endtime"
         );
+        /**
+         * Status can be one of
+         * A => Authorized
+         * C => Checked
+         * O => Open
+         * F => ?
+         */
         $this->addColumn(
             self::status,
             DA_STRING,
