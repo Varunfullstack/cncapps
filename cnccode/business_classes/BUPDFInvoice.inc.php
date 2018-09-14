@@ -682,7 +682,7 @@ class BUPDFInvoice extends BaseObject
             substr(
                 $this->_dsInvhead->getValue('custPORef'),
                 0,
-                12
+                15
             )
         );
         $this->_buPDF->CR();
