@@ -9479,6 +9479,10 @@ is currently a balance of ';
             $hdrs['Cc'] = $cc;
         }
 
+        if ($bcc) {
+            $hdrs['Bcc'] = $bcc;
+        }
+
         $hdrs = $buMail->mime->headers($hdrs);
 
         $buMail->putInQueue(
