@@ -2247,17 +2247,6 @@ class BUActivity extends Business
                 $subject = 'Sales Request approved';
                 $approval = true;
 
-                $problem->setValue(
-                    DBEProblem::userID,
-                    0
-                );
-
-                $problem->setValue(
-                    DBEProblem::queueNo,
-                    4
-                );
-
-
                 break;
 
             case 'D':
@@ -8567,7 +8556,16 @@ is currently a balance of ';
         $dbeCallActivity->insertRow();
     }
 
-    function getLastActivityInProblem($problemID)
+    /**
+     * @param $problemID
+     * @param null $activityType
+     * @param null $activityStatus
+     * @return bool|DBEJCallActivity
+     */
+    function getLastActivityInProblem($problemID,
+                                      $activityType = null,
+                                      $activityStatus = null
+    )
     {
 
         $dbeCallActivity = new DBEJCallActivity($this);
@@ -8576,7 +8574,11 @@ is currently a balance of ';
             $problemID,
             false,
             true,
-            true
+            true,
+            false,
+            true,
+            $activityType,
+            $activityStatus
         ); // 3rd param= descending date
 
         if ($dbeCallActivity->fetchNext()) {
@@ -11092,7 +11094,7 @@ is currently a balance of ';
 
         $dbeCallActivity->insertRow();
 
-        return $this->getLastActivityInProblem($problemID);
+        return $this->getLastActivityInProblem($problemID, CONFIG_SALES_ACTIVITY_TYPE_ID, $status);
     }
 
 

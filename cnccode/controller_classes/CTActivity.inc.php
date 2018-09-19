@@ -6035,13 +6035,13 @@ class CTActivity extends CTCNC
 
         $this->setPageTitle("Review Sales Request");
 
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             switch ($_REQUEST['Submit']) {
 
                 case 'Approve':
                     $option = 'A';
+
                     break;
 
                 case 'Deny':
