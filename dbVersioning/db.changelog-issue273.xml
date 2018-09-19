@@ -1,0 +1,45 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue273-1533889498-0">
+        <tagDatabase tag="issue273"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue273-1533889498-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="lastContractSent"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="lastContractSent" type="varchar(150)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue273-1533889498-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="standardtexttype" columnName="variables"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="standardtexttype">
+            <column name="variables" type="mediumtext"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue273-1533889498-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="standardtexttype" columnName="variables"/>
+        </preConditions>
+        <sql>
+            insert into standardtexttype(sty_standardtexttypeno, sty_desc, variables) values (
+            4,
+            'Signable Contracts Email',
+            '["contactFirstName","contactLastName"]'
+            )
+        </sql>
+        <rollback>
+            delete from standardtexttype where sty_standardtexttypeno = 4
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

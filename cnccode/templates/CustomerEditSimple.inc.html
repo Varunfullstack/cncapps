@@ -353,7 +353,46 @@
         );
     }
 
+
     function checkMailShotOptions() {
+
+        var x = document.getElementsByClassName('stmCheckBox');
+        var count = 0;
+        var i = 0;
+        do {
+            if (x[i].checked) {
+                count++;
+            }
+
+            i++;
+        } while (count < 2 && i < x.length);
+
+        if (count > 1) {
+            alert('There cannot be more than one "stm" option selected');
+            return false;
+        }
+
+        if (!count) {
+            alert('There needs to be at least one "stm" option selected');
+            return false;
+        }
+
+        x = document.getElementsByClassName('invCheckBox');
+        count = 0;
+        i = 0;
+        do {
+            if (x[i].checked) {
+                count++;
+            }
+
+            i++;
+        } while (count < 1 && i < x.length);
+
+        if (!count) {
+            alert('There needs to be at least one "inv" option selected');
+            return false;
+        }
+
         return true;
     }
 
@@ -467,6 +506,8 @@
     <BR>
     {customerFolderLink}
     <br>
+    {thirdPartyContactsLink}
+    <br>
 
     <div class="customerEditMain">
 
@@ -534,21 +575,10 @@
                                 value="{specialAttentionEndDate}"
                                 size="10"
                                 maxlength="10"
+                                autocomplete="off"
+                                class="jQueryCalendar"
                         >
-                        <a
-                                href="javascript:;"
-                                onClick="popUpCalendar(this, specialAttentionEndDate, 'dd/mm/yyyy')"
-                        >
-                            <img
-                                    src="images/calendar.gif"
-                                    width="24"
-                                    height="22"
-                                    hspace="0"
-                                    vspace="0"
-                                    border="0"
-                                    align="absmiddle"
-                            >
-                        </a><span class="formErrorMessage">{specialAttentionEndDateMessage}</span>
+                        <span class="formErrorMessage">{specialAttentionEndDateMessage}</span>
                     </td>
                 </tr>
                 <tr>
@@ -562,21 +592,10 @@
                                 value="{lastReviewMeetingDate}"
                                 size="10"
                                 maxlength="10"
+                                autocomplete="off"
+                                class="jQueryCalendar"
                         >
-                        <a
-                                href="javascript:;"
-                                onClick="popUpCalendar(this, lastReviewMeetingDate, 'dd/mm/yyyy')"
-                        >
-                            <img
-                                    src="images/calendar.gif"
-                                    width="24"
-                                    height="22"
-                                    hspace="0"
-                                    vspace="0"
-                                    border="0"
-                                    align="absmiddle"
-                            >
-                        </a>Frequency
+                        Frequency
                         <select {disabled}
                                 name="form[customer][{customerID}][reviewMeetingFrequencyMonths]"
                         >
@@ -843,20 +862,9 @@
                         value="{reviewDate}"
                         size="10"
                         maxlength="10"
+                        autocomplete="off"
+                        class="jQueryCalendar"
                 >
-                <a
-                        href="javascript:;"
-                        onClick="popUpCalendar(this, reviewDate, 'dd/mm/yyyy')"
-                >
-                    <img
-                            src="images/calendar.gif"
-                            width="24"
-                            height="22"
-                            hspace="0"
-                            vspace="0"
-                            border="0"
-                            align="absmiddle"
-                    > </a>
                 Time
                 <input
                         {disabled}
@@ -982,7 +990,9 @@
         >{customerNoteDetails}
         </textarea>
             </div>
-
+            <div>
+                {lastContractSent}
+            </div>
         </div> <!-- customerEditMainRightColumn -->
 
     </div> <!-- customerEditMain -->

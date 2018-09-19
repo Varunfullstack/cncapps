@@ -576,7 +576,10 @@ class DBEJProblem extends DBEProblem
 
     public function getDashBoardRows($limit = 10,
                                      $orderBy = 'shortestSLARemaining',
-                                     $isP5 = false
+                                     $isP5 = false,
+                                     $showHelpDesk = true,
+                                     $showEscalation = true,
+                                     $showImplementation = true
     )
     {
         $sql =
@@ -603,6 +606,17 @@ class DBEJProblem extends DBEProblem
                 self::status
             ) . ' in ("I","P") ';
 
+        if (!$showHelpDesk) {
+            $sql .= ' and pro_queue_no <> 1 ';
+        }
+
+        if (!$showEscalation) {
+            $sql .= ' and pro_queue_no <> 2 ';
+        }
+
+        if (!$showImplementation) {
+            $sql .= ' and pro_queue_no <> 3 ';
+        }
 
         if ($isP5) {
             $sql .= 'and ' . $this->getDBColumnName(
@@ -653,7 +667,10 @@ class DBEJProblem extends DBEProblem
     public function getDashBoardEngineersInSRRows($engineersMaxCount = 3,
                                                   $pastHours = 24,
                                                   $limit = 5,
-                                                  $isP5 = false
+                                                  $isP5 = false,
+                                                  $showHelpDesk = true,
+                                                  $showEscalation = true,
+                                                  $showImplementation = true
     )
     {
         $sql =
@@ -679,6 +696,19 @@ class DBEJProblem extends DBEProblem
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
                 self::status
             ) . " in ('I','P') ";
+
+        if (!$showHelpDesk) {
+            $sql .= ' and pro_queue_no <> 1 ';
+        }
+
+        if (!$showEscalation) {
+            $sql .= ' and pro_queue_no <> 2 ';
+        }
+
+        if (!$showImplementation) {
+            $sql .= ' and pro_queue_no <> 3 ';
+        }
+
 
         if ($isP5) {
             $sql .= ' and ' . $this->getDBColumnName(

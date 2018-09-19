@@ -388,9 +388,9 @@ class BUCustomer extends Business
      * @param null $leadStatusID
      * @return DBEContact
      */
-    function getMainContactsByLeadStatus($leadStatusID = null)
+    function getContactsByLeadStatus($leadStatusID = null)
     {
-        return $this->dbeContact->getMainContactsByLeadStatus($leadStatusID);
+        return $this->dbeContact->getContactsByLeadStatus($leadStatusID);
     }
 
     /**
@@ -822,43 +822,6 @@ class BUCustomer extends Business
             DBECustomer::customerTypeID,
             0
         );
-        $dsCustomer->setValue(
-            DBECustomer::customerID,
-            0
-        );
-        $dsCustomer->setValue(
-            DBECustomer::name,
-            'New Customer'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::mailshotFlag,
-            'Y'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::referredFlag,
-            'N'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::prospectFlag,
-            'Y'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::createDate,
-            date('Y-m-d')
-        );
-        $dsCustomer->setValue(
-            DBECustomer::invoiceSiteNo,
-            0
-        );
-        $dsCustomer->setValue(
-            DBECustomer::deliverSiteNo,
-            0
-        );
-        $dsCustomer->setValue(
-            DBECustomer::customerTypeID,
-            0
-        );
-
         $dsCustomer->setValue(
             DBECustomer::pcxFlag,
             'N'

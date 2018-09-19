@@ -27,9 +27,9 @@ class BUDailyReport extends Business
 
         $fixedRequests = $this->getFixedRequests($daysAgo);
         $row = $fixedRequests->fetch_row();
-
+        $requests = 0;
         if ($row) {
-
+            $requests = 1;
             $template = new Template (
                 EMAIL_TEMPLATE_DIR,
                 "remove"
@@ -128,8 +128,14 @@ class BUDailyReport extends Business
                     'requestBlock',
                     true
                 );
-
+                $requests++;
             } while ($row = $fixedRequests->fetch_row());
+
+            $template->setVar(
+                [
+                    'totalRequests' => $requests
+                ]
+            );
 
             $template->parse(
                 'output',
@@ -184,7 +190,7 @@ class BUDailyReport extends Business
             $daysAgo,
             $priorityFiveOnly
         );
-
+        $totalRequests = 0;
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (
@@ -294,12 +300,13 @@ class BUDailyReport extends Business
                     'requestBlock',
                     true
                 );
-
+                $totalRequests++;
             } while ($row = $outstandingRequests->fetch_row());
 
             $template->setVar(
                 array(
-                    'daysAgo' => $daysAgo
+                    'daysAgo'       => $daysAgo,
+                    'totalRequests' => $totalRequests
                 )
             );
 
@@ -417,7 +424,7 @@ class BUDailyReport extends Business
                         'contract'         => $row[5],
                         'category'         => $row[6],
                         'urlRequest'       => $urlRequest,
-                        'urlActivity'      => urlencode($urlActivity)
+                        'urlActivity'      => $urlActivity
                     )
                 );
 

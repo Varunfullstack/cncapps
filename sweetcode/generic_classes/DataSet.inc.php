@@ -499,7 +499,6 @@ class DataSet extends DataAccess
                                             'd/m/Y',
                                             $value
                                         );
-
                                         if (!$date) {
                                             $this->setValue(
                                                 $fieldName,

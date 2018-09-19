@@ -404,7 +404,7 @@ class CTActivity extends CTCNC
                 $this->managerCommentPopup();
                 break;
             case 'messageToSales':
-                $this->messageToSales();
+                echo json_encode($this->messageToSales());
                 break;
             case 'toggleDoNextFlag':
                 $this->checkPermissions(PHPLIB_PERM_SUPERVISOR);
@@ -474,6 +474,12 @@ class CTActivity extends CTCNC
                 }
                 echo json_encode($data);
 
+                break;
+            case 'sendSalesRequest':
+                echo json_encode($this->sendSalesRequest());
+                break;
+            case 'salesRequestReview':
+                $this->salesRequestReview();
                 break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
@@ -1980,6 +1986,15 @@ class CTActivity extends CTCNC
                     'callActivityID' => $callActivityID,
                 )
             );
+        $urlSalesRequest =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => 'sendSalesRequest',
+                    'problemID' => $problemID,
+                )
+            );
+
         if ($dsCallActivity->getValue('contractCustomerItemID')) {
             $dbeContract = new DBEJContract($this);
             $dbeContract->getRowByContractID($dsCallActivity->getValue('contractCustomerItemID'));
@@ -2122,6 +2137,9 @@ class CTActivity extends CTCNC
                 ),
                 'passwordLink'                       => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
                 'generatePasswordLink'               => $this->getGeneratePasswordLink(),
+                'thirdPartyContactLink'              => $this->getThirdPartyContactLink(
+                    $dsCallActivity->getValue('customerID')
+                ),
                 'contractListPopupLink'              => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
                 ),
@@ -2131,6 +2149,7 @@ class CTActivity extends CTCNC
                 'contactNotes'                       => $dsCallActivity->getValue('contactNotes'),
                 'techNotes'                          => $dsCallActivity->getValue('techNotes'),
                 'urlLinkedSalesOrder'                => $urlLinkedSalesOrder,
+                'urlSalesRequest'                    => $urlSalesRequest,
                 'disabled'                           => $disabled,
                 'contactPhone'                       => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue('contactID')
@@ -2397,6 +2416,23 @@ class CTActivity extends CTCNC
         $passwordLink = '| <a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Passwords</a>';
 
         return $passwordLink;
+    }
+
+    function getThirdPartyContactLink($customerID)
+    {
+        $thirdPartyContactLinkURL =
+            $this->buildLink(
+                'ThirdPartyContact.php',
+                array(
+                    'action'     => 'list',
+                    'customerID' => $customerID
+                )
+            );
+
+
+        $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
+
+        return $thirdPartyContactLink;
     }
 
     function getGeneratePasswordLink()
@@ -3323,6 +3359,9 @@ class CTActivity extends CTCNC
                     $_SESSION[$this->sessionKey]['hideFromCustomerFlag']
                 ),
                 'passwordLink'                => $this->getPasswordLink($_SESSION[$this->sessionKey]['customerID']),
+                'thirdPartyContactLink'       => $this->getThirdPartyContactLink(
+                    $_SESSION[$this->sessionKey]['customerID']
+                ),
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,
                 'submitURL'                   => $submitURL,
@@ -3797,17 +3836,11 @@ class CTActivity extends CTCNC
             if ($dsCallActivity->getValue('callActTypeID') != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
                 $setTimeNowLink = '<a href="javascript:;"  onclick="setServerTime(endTime);"><img src="images/clock.gif" alt="Clock" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" title="Set end time now" /></a>';
             }
-
-            $calendarLinkCompleteDate = '<a href="javascript:;" onclick="popUpCalendar(this, completeDate, \'dd/mm/yyyy\')"><img src="images/calendar.gif" alt="Calendar" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" /></a>';
-
         } else {
 
             $disabled = CTCNC_HTML_DISABLED;
 
             $calendarLinkDate = '';
-
-            $calendarLinkCompleteDate = '';
-
         }
         /*
       Only enable the complete date and autocomplete checkbox if Fixed
@@ -3816,7 +3849,6 @@ class CTActivity extends CTCNC
             $complete_disabled = '';
         } else {
             $complete_disabled = CTCNC_HTML_DISABLED;
-            $calendarLinkCompleteDate = '';
         }
 
         if ($this->canChangeSrPriority()) {
@@ -3940,7 +3972,14 @@ class CTActivity extends CTCNC
         );
         $renewalsLink = $this->getRenewalsLink($dsCallActivity->getValue('customerID'));
 
-        if ($dsCallActivity->getValue('problemHideFromCustomerFlag') == 'Y') {
+
+        $dbeProblem = new DBEProblem($this);
+
+        $dbeProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
+
+        if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y' || $dsCallActivity->getValue(
+                'problemHideFromCustomerFlag'
+            ) == 'Y') {
             $hideFromCustomerFlag = 'Y';
             $hideFromCustomerDisabled = CTCNC_HTML_DISABLED;
         } else {
@@ -4060,6 +4099,9 @@ class CTActivity extends CTCNC
                 'currentDocumentsLink'         => $currentDocumentsLink,
                 'renewalsLink'                 => $renewalsLink,
                 'passwordLink'                 => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
+                'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
+                    $dsCallActivity->getValue('customerID')
+                ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
                     $dsCallActivity->getValue('linkedSalesOrderID')
@@ -4082,8 +4124,6 @@ class CTActivity extends CTCNC
                 'setTimeNowLink'               => $setTimeNowLink,
                 'calendarLinkDate'             => $calendarLinkDate,
                 'completeDate'                 => Controller::dateYMDtoDMY($dsCallActivity->getValue('completeDate')),
-                'calendarLinkCompleteDate'
-                                               => $calendarLinkCompleteDate,
                 'contactIDMessage'             => Controller::htmlDisplayText($dsCallActivity->getMessage('contactID')),
                 'alarmDate'                    => Controller::dateYMDtoDMY($dsCallActivity->getValue('alarmDate')),
                 'alarmTime'                    => $dsCallActivity->getValue(
@@ -5628,6 +5668,23 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $urlMessageToSales =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'         => 'messageToSales',
+                    'callActivityID' => $_REQUEST['callActivityID'],
+                )
+            );
+
+        $urlSalesRequest =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => 'sendSalesRequest',
+                    'problemID' => $dsCallActivity->getValue('problemID'),
+                )
+            );
 
         $this->template->set_var(
             array(
@@ -5641,7 +5698,9 @@ class CTActivity extends CTCNC
                 'submitURL'                     => $submitURL,
                 'historyLink'                   => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
                 'uploadErrors'                  => $errorFile,
-                'uploadURL'                     => $uploadURL
+                'uploadURL'                     => $uploadURL,
+                'urlMessageToSales'             => $urlMessageToSales,
+                'urlSalesRequest'               => $urlSalesRequest
             )
         );
 
@@ -5932,6 +5991,114 @@ class CTActivity extends CTCNC
             $_REQUEST['reason'],
             $_REQUEST['callActivityID']
         );
+    }
+
+    function salesRequestReview()
+    {
+        $this->setMethodName('salesRequestReview');
+
+        $callActivityID = $_REQUEST['callActivityID'];
+
+        $this->buActivity->getActivityByID(
+            $callActivityID,
+            $dsCallActivity
+        );
+
+        if ($dsCallActivity->getValue(DBECallActivity::status) !== 'O') {
+
+            $this->template->setVar(
+                'CONTENTS',
+                'This Sales Request has already been processed',
+                true
+            );
+            $this->parsePage();
+            exit;
+        }
+
+        $problemID = $dsCallActivity->getValue('problemID');
+
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+
+        $this->setTemplateFiles(
+            array(
+                'ServiceSalesRequestReview' => 'ServiceSalesRequestReview.inc'
+            )
+        );
+
+        $this->setPageTitle("Review Sales Request");
+
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            switch ($_REQUEST['Submit']) {
+
+                case 'Approve':
+                    $option = 'A';
+                    break;
+
+                case 'Deny':
+                    $option = 'D';
+                    break;
+            }
+
+            $this->buActivity->salesRequestProcess(
+                $callActivityID,
+                $this->userID,
+                $option,
+                $_REQUEST['comments']
+            );
+
+            $nextURL =
+                $this->buildLink(
+                    'SalesRequestDashboard.php',
+                    array()
+                );
+            header('Location: ' . $nextURL);
+            exit;
+        }
+
+        $urlProblemHistoryPopup =
+            $this->buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'problemHistoryPopup',
+                    'problemID' => $problemID,
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+
+
+        $submitURL =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
+                )
+            );
+
+        $this->template->set_var(
+            array(
+                'callActivityID' => $callActivityID,
+
+                'problemID' => $problemID,
+
+                'customerID' => $dbeFirstActivity->getValue('customerID'),
+
+                'customerName'           => $dbeFirstActivity->getValue('customerName'),
+                'requestDetails'         => $dsCallActivity->getValue('reason'),
+                'userName'               => $dsCallActivity->getValue('userName'),
+                'submitUrl'              => $submitURL,
+                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceSalesRequestReview',
+            true
+        );
+
+        $this->parsePage();
     }
 
     function changeRequestReview()
@@ -6257,9 +6424,28 @@ class CTActivity extends CTCNC
             $callActivityID,
             $message
         );
+        return ["status" => "ok"];
+    }
 
-        $this->redirectToDisplay($callActivityID);
+    function sendSalesRequest()
+    {
+        $this->setMethodName('sendSalesRequest');
 
+        $message = $_REQUEST['message'];
+        $problemID = $_REQUEST['problemID'];
+        $type = $_REQUEST['type'];
+
+        try {
+
+            $this->buActivity->sendSalesRequest(
+                $problemID,
+                $message,
+                $type
+            );
+        } catch (\Exception $exception) {
+            return ["status" => "error", "message" => $exception->getMessage()];
+        }
+        return ["status" => "ok"];
     }
 
     function toggleDoNextFlag()
