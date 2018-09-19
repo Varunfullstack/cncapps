@@ -61,10 +61,6 @@ define(
     'MAIN_CONFIG_SERVER_TYPE_REPLICATED',
     'replicated'
 ); // replicated server
-define(
-    'MAIN_CONFIG_SERVER_TYPE_WEBSITE',
-    'website'
-);
 
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
@@ -83,9 +79,6 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cnctest:86':
             $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
-            break;
-        case 'cncweb:88':
-            $server_type = MAIN_CONFIG_SERVER_TYPE_WEBSITE;
 
     }
 
@@ -374,94 +367,6 @@ switch ($server_type) {
             );
         break;
 
-    case MAIN_CONFIG_SERVER_TYPE_WEBSITE:
-
-        define(
-            "DB_NAME",
-            "cncweb"
-        );
-        define(
-            "BASE_DRIVE",
-            dirname(__DIR__)
-        );
-        define(
-            "SCR_DIR",
-            "\\\\cncltd\\cnc\\Company\\scr\\dev"
-        );
-        define(
-            "CUSTOMER_DIR_FROM_BROWSER",
-            "//cncltd/cnc/customer/dev"
-        );
-        define(
-            "CUSTOMER_DIR",
-            "\\\\cncltd\\cnc\\Customer\\dev"
-        );
-        define(
-            'CONFIG_CATCHALL_EMAIL',
-            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
-        );
-//            error_reporting(E_ALL & ~E_STRICT)
-        error_reporting(E_ALL & ~E_WARNING);
-        ini_set(
-            'display_errors',
-            'on'
-        );
-
-        $GLOBALS['mail_options'] =
-            array(
-                'driver' => 'smtp',
-                'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
-                'port'   => 25,
-                'auth'   => false
-            );
-
-        define(
-            'CONFIG_TEST_EMAIL',
-            CONFIG_CATCHALL_EMAIL
-        );
-        define(
-            'CONFIG_SALES_EMAIL',
-            'sales@' . CONFIG_PUBLIC_DOMAIN
-        );
-        define(
-            'CONFIG_SALES_MANAGER_EMAIL',
-            CONFIG_CATCHALL_EMAIL
-        );
-        define(
-            'CONFIG_SUPPORT_EMAIL',
-            'support@cnc-ltd.co.uk'
-        );
-        define(
-            'CONFIG_CUSTOMER_SERVICE_EMAIL',
-            ' customerservice@' . CONFIG_PUBLIC_DOMAIN
-        );
-        define(
-            'CONFIG_SUPPORT_MANAGER_EMAIL',
-            CONFIG_CATCHALL_EMAIL
-        );
-        define(
-            'CONFIG_SUPPORT_ADMINISTRATOR_EMAIL',
-            CONFIG_CATCHALL_EMAIL
-        );
-        define(
-            'CONFIG_HELP_DESK_EMAIL',
-            'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN
-        );
-        define(
-            'CONFIG_PREPAY_EMAIL',
-            CONFIG_CATCHALL_EMAIL
-        );
-
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
-        break;
-
 } // end switch
 
 define(
@@ -472,11 +377,19 @@ define(
     'CONFIG_LDAP_DOMAIN',
     'cncltd'
 );
-
+define(
+    'PDF_TEMP_DIR',
+    BASE_DRIVE . "/htdocs/pdfTemp"
+);
+define(
+    'PDF_RESOURCE_DIR',
+    BASE_DRIVE . '/htdocs/PDF-resources'
+);
 define(
     "APPLICATION_DIR",
     BASE_DRIVE . "/cnccode"
 );
+
 define(
     "SWEETCODE_DIR",
     BASE_DRIVE . "/sweetcode"
@@ -522,13 +435,14 @@ define(
     "PHPLIB_SESSIONS_DIR",
     BASE_DRIVE . "/sessions/"
 );
+
 $GLOBALS['db_options'] =
     array(
         'type'       => 'db',
         'dsn'        => 'mysqli://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST . '/' . DB_NAME,
         'mail_table' => 'mail_queue'
     );
- 
+
 
 require BASE_DRIVE . '/vendor/autoload.php';
 // disable DOMPDF's internal autoloader if you are using Composer
@@ -781,11 +695,14 @@ define(
 define(
     'CONFIG_FIXED_ACTIVITY_TYPE_ID',
     57
-);
-define(
+
+);define(
     'CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID',
     60
 );
+define(
+    'CONFIG_SALES_ACTIVITY_TYPE_ID',
+    43);
 define(
     'CONFIG_SERVER_HEALTH_CHECK_ACTIVITY_TYPE_ID',
     12
@@ -793,20 +710,20 @@ define(
 define(
     'CONFIG_SERVER_HEALTH_CHECK_CHECKLIST_ACTIVITY_TYPE_ID',
     48
-);
-define(
+
+);define(
     'CONFIG_SERVER_HEALTH_CHECK_OFF_SITE_ACTIVITY_TYPE_ID',
     12
-);
-define(
+
+);define(
     'CONFIG_SERVER_HEALTH_CHECK_ON_SITE_ACTIVITY_TYPE_ID',
     50
-);
-define(
+
+);define(
     'CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID',
     55
-);
-define(
+
+);define(
     'CONFIG_2NDSITE_BACKUP_ACTIVITY_TYPE_ID',
     49
 );
@@ -908,10 +825,7 @@ define(
     'mailshot8Flag'
 );    // GSC statement contact flag column
 
-define(
-    'CONFIG_HEADER_INVOICE_CONTACT',
-    'mailshot2Flag'
-);     // Customer contact to send invoices to
+define('CONFIG_HEADER_INVOICE_CONTACT', 'mailshot2Flag');     // Customer contact to send invoices to
 
 define(
     'CONFIG_HEADER_DAILY_OPEN_SR_REPORT',

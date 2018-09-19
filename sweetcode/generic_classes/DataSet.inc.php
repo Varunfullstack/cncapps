@@ -18,6 +18,10 @@ define(
     'Must be a number'
 );
 define(
+    'SUPPORT_LEVEL_MSG_INCORRECT_VALUE',
+    'The value is not acceptable'
+);
+define(
     'DATASET_MSG_BAD_DATE_FORMAT',
     'Please use DD/MM/YYYY'
 );
@@ -495,7 +499,6 @@ class DataSet extends DataAccess
                                             'd/m/Y',
                                             $value
                                         );
-
                                         if (!$date) {
                                             $this->setValue(
                                                 $fieldName,
@@ -548,6 +551,30 @@ class DataSet extends DataAccess
                                     );
                                     break;
                                 default:
+                                    $this->setValue(
+                                        $fieldName,
+                                        $value
+                                    );
+                                    break;
+                                case DA_SUPPORT_LEVEL:
+                                    $value = trim($value);
+
+                                    if (!empty($value)) {
+                                        $validOptions = ['main', 'supervisor', 'support', 'delegate'];
+                                        if (!in_array(
+                                            $value,
+                                            $validOptions
+                                        )) {
+                                            $this->setMessage(
+                                                $fieldName,
+                                                SUPPORT_LEVEL_MSG_INCORRECT_VALUE
+                                            );
+                                            $ret = FALSE;
+                                        }
+                                    } else {
+                                        $value = null;
+                                    }
+
                                     $this->setValue(
                                         $fieldName,
                                         $value

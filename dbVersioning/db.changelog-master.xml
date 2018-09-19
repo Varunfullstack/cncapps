@@ -21,7 +21,6 @@
     <include file="db.changelog-issue195.xml"/>
     <include file="db.changelog-1.9.0.xml"/>
     <include file="db.changelog-1.10.0.xml"/>
+    <include file="db.changelog-1.11.0.xml"/>
     <include file="db.changelog-issue215.xml"/>
-    <include file="db.changelog-website.xml"/>
-    <include file="db.changelog-issue325.xml"/>
 </databaseChangeLog>

@@ -1,6 +1,10 @@
 <!-- Template: ActivitySearch.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script src="jquery/jquery-1.6.min.js"></script>
 <script type="application/javascript">
     $(function () {
@@ -10,22 +14,33 @@
     });
 </script>
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="POST" action="{urlSubmit}">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="POST"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">from</div>
             </td>
-            <td><input
-                    type="text"
-                    name="searchForm[1][fromDate]"
-                    id="fromDate"
-                    value="{fromDate}"
-                    size="10"
-                    maxlength="10"
-            > <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-                <font class="formErrorMessage">{fromDateMessage}</font></td>
+            <td>
+                <input type="text"
+                       name="searchForm[1][fromDate]"
+                       id="fromDate"
+                       value="{fromDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                >
+                <font class="formErrorMessage">{fromDateMessage}</font>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
@@ -39,33 +54,50 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif"
-                                                                                              width="24" height="22"
-                                                                                              hspace="0" vspace="0"
-                                                                                              border="0"
-                                                                                              align="absmiddle"></a>
-                <font class="formErrorMessage">{toDateMessage}</font></td>
+                    autocomplete="off"
+                    class="jQueryCalendar"
+            >
+                <font class="formErrorMessage">{toDateMessage}</font>
+            </td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Search">
+                <input type="submit"
+                       name="Search"
+                       value="Search"
+                >
             </td>
         </tr>
     </table>
 </form>
 <p>A list of customers that have had service call activity within the selected date range.</p>
-<table border="0" cellpadding="2" cellspacing="1" class="singleBorder">
+<table border="0"
+       cellpadding="2"
+       cellspacing="1"
+       class="singleBorder"
+>
     <tr valign="top">
-        <td nowrap="nowrap" class="listHeadText">
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >
             <div align="center">Customer</div>
         </td>
-        <td nowrap="nowrap" class="listHeadText">Requests</td>
-        <td nowrap="nowrap" class="listHeadText">On Site</td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >Requests
+        </td>
+        <td nowrap="nowrap"
+            class="listHeadText"
+        >On Site
+        </td>
     </tr>
 
     <!-- BEGIN resultBlock -->
-    <tr valign="top" onmouseover="this.bgColor='#FFFFCC';" onmouseout="this.bgColor=''">
+    <tr valign="top"
+        onmouseover="this.bgColor='#FFFFCC';"
+        onmouseout="this.bgColor=''"
+    >
 
         <td nowrap="nowrap">{CustomerName}</td>
         <td nowrap="nowrap">{Activities}</td>

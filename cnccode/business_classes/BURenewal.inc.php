@@ -393,6 +393,7 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenContract->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenContract->getValue('notes');
             $row['expiryDate'] = $dbeJRenContract->getValue('invoiceFromDate');
+            $row['renewalTypeID'] = 2;
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -454,6 +455,7 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenDomain->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenDomain->getValue('notes');
             $row['expiryDate'] = $dbeJRenDomain->getValue('invoiceFromDate');
+            $row['renewalTypeID'] = 4;
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -496,6 +498,7 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenBroadband->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenBroadband->getValue('adslPhone');
             $row['expiryDate'] = $dbeJRenBroadband->getValue('invoiceFromDate');
+            $row['renewalTypeID'] = 1;
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -536,6 +539,8 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenHosting->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenHosting->getValue('notes');
             $row['expiryDate'] = $dbeJRenHosting->getValue('invoiceFromDate');
+            $row['renewalTypeID'] = 5;
+
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -577,6 +582,8 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenQuotation->getValue('itemTypeDescription');
             $row['notes'] = $dbeJRenQuotation->getValue('notes');
             $row['expiryDate'] = $dbeJRenQuotation->getValue('nextPeriodStartDate');
+            $row['renewalTypeID'] = 3;
+
             $row['calculatedExpiryDate'] = (
             DateTime::createFromFormat(
                 'Y-m-d',
@@ -617,6 +624,7 @@ class BURenewal extends Business
             $row['customerItemID'] = null;
             $row['itemTypeDescription'] = $dsExternalItem->getValue('itemTypeDescription');
             $row['notes'] = $dsExternalItem->getValue('notes');
+            $row['renewalTypeID'] = 0;
 
             $returnArray[] = $row;
 

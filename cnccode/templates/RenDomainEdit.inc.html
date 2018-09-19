@@ -132,7 +132,7 @@
                     type="text"
                     value="{notes}"
                     title="Will appear as a comment line on the generated sales order before the item line"
-                    size="45"
+                    size="50"
                     maxlength="45"
             >
                 <span class="formErrorMessage">{notesMessage}</span></td>
@@ -146,9 +146,10 @@
                        {readonly}
                        size="10"
                        maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
                 >
-                <span class="formErrorMessage">{installationDateMessage}</span>
-            </td>
+                <span class="formErrorMessage">{installationDateMessage}</span></td>
             <td class="promptText">
                 Initial Contract Length (months)
             </td>

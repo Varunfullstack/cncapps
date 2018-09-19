@@ -9,6 +9,8 @@ require_once($cfg["path_dbe"] . "/DBEStandardText.inc.php");
 
 class BUStandardText extends Business
 {
+    const SignableContractsEmailType = 4;
+
     public $dbeStandardText;
 
     /**
@@ -25,27 +27,49 @@ class BUStandardText extends Business
     function updateStandardText(&$dsData)
     {
         $this->setMethodName('updateStandardText');
-        $this->updateDataaccessObject($dsData, $this->dbeStandardText);
+        $this->updateDataaccessObject(
+            $dsData,
+            $this->dbeStandardText
+        );
         return TRUE;
     }
 
-    function getStandardTextByID($ID, &$dsResults)
+    function getStandardTextByID($ID,
+                                 &$dsResults
+    )
     {
         $this->dbeStandardText->setPKValue($ID);
         $this->dbeStandardText->getRow();
-        return ($this->getData($this->dbeStandardText, $dsResults));
+        return ($this->getData(
+            $this->dbeStandardText,
+            $dsResults
+        ));
     }
 
     function getAllTypes(&$dsResults)
     {
         $this->dbeStandardText->getRows();
-        return ($this->getData($this->dbeStandardText, $dsResults));
+        return ($this->getData(
+            $this->dbeStandardText,
+            $dsResults
+        ));
     }
 
     function deleteStandardText($ID)
     {
         $this->setMethodName('deleteStandardText');
         return $this->dbeStandardText->deleteRow($ID);
+    }
+
+    public function getStandardTextByTypeID(int $standardTextTypeID,
+                                            &$dsResults
+    )
+    {
+        $this->dbeStandardText->getRowsByTypeID($standardTextTypeID);
+        return ($this->getData(
+            $this->dbeStandardText,
+            $dsResults
+        ));
     }
 }// End of class
 ?>

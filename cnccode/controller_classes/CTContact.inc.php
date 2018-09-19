@@ -324,7 +324,7 @@ class CTContact extends CTCNC
                     $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                 ),
                 'autoCloseEmailFlagChecked'         => Controller::htmlChecked(
-                    $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
+                    $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
                 ),
                 'accountsFlagChecked'               => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::accountsFlag)
@@ -335,59 +335,56 @@ class CTContact extends CTCNC
                 'discontinuedFlagChecked'           => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::discontinuedFlag)
                 ),
-                'othersEmailFlagChecked'            => Controller::htmlChecked(
-                    $this->dsContact->getValue(DBEContact::othersEmailFlag)
-                ),
                 'othersWorkStartedEmailFlagChecked' => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
                 ),
                 'othersAutoCloseEmailFlagChecked'   => Controller::htmlChecked(
-                    $this->dsContact->getValue(DBEContact::othersAutoCloseEmailFlag)
+                    $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
                 ),
-                'hrUserFlagChecked'   => Controller::htmlChecked(
+                'hrUserFlagChecked'                 => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::hrUser)
                 ),
-                 'reviewUserFlagChecked'   => Controller::htmlChecked(
+                'reviewUserFlagChecked'             => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::reviewUser)
                 ),
 
-                'mailshot2FlagDesc'                 => Controller::htmlDisplayText(
+                'mailshot2FlagDesc'     => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot2FlagDesc)
                 ),
-                'mailshot3FlagDesc'                 => Controller::htmlDisplayText(
+                'mailshot3FlagDesc'     => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot3FlagDesc)
                 ),
-                'mailshot4FlagDesc'                 => Controller::htmlDisplayText(
+                'mailshot4FlagDesc'     => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot4FlagDesc)
                 ),
-                'mailshot8FlagDesc'                 => Controller::htmlDisplayText(
+                'mailshot8FlagDesc'     => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot8FlagDesc)
                 ),
-                'mailshot9FlagDesc'                 => Controller::htmlDisplayText(
+                'mailshot9FlagDesc'     => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot9FlagDesc)
                 ),
-                'mailshot11FlagDesc'                => Controller::htmlDisplayText(
+                'mailshot11FlagDesc'    => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot11FlagDesc)
                 ),
-                'mailshot2FlagChecked'              => Controller::htmlChecked(
+                'mailshot2FlagChecked'  => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot2Flag)
                 ),
-                'mailshot3FlagChecked'              => Controller::htmlChecked(
+                'mailshot3FlagChecked'  => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot3Flag)
                 ),
-                'mailshot4FlagChecked'              => Controller::htmlChecked(
+                'mailshot4FlagChecked'  => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot4Flag)
                 ),
-                'mailshot8FlagChecked'              => Controller::htmlChecked(
+                'mailshot8FlagChecked'  => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot8Flag)
                 ),
-                'mailshot9FlagChecked'              => Controller::htmlChecked(
+                'mailshot9FlagChecked'  => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot9Flag)
                 ),
-                'mailshot11FlagChecked'             => Controller::htmlChecked(
+                'mailshot11FlagChecked' => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::mailshot11Flag)
                 ),
-                'urlSubmit'                         => $urlSubmit,
+                'urlSubmit'             => $urlSubmit,
                 //				'urlCancel' => $urlCancel
             )
         );

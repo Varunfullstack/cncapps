@@ -12,148 +12,14 @@ require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJOrdhead.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJSite.php');
-require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_ct'] . '/CTCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-// Parameters
-define(
-    'CTCUSTOMER_VAL_NONE_SELECTED',
-    -1
-);
-// Actions
-define(
-    'CTCUSTOMER_ACT_DISP_SEARCH',
-    'dispSearch'
-);
-define(
-    'CTCUSTOMER_ACT_SEARCH',
-    'search'
-);
-define(
-    'CTCUSTOMER_ACT_DISP_LIST',
-    'dispList'
-);
-define(
-    'CTCUSTOMER_ACT_UPDATE',
-    'update'
-);
-define(
-    'CTCUSTOMER_ACT_DELETECUSTOMER',
-    'deleteCustomer'
-);
-define(
-    'CTCUSTOMER_ACT_ADDCONTACT',
-    'addContact'
-);
-define(
-    'CTCUSTOMER_ACT_DELETECONTACT',
-    'deleteContact'
-);
-define(
-    'CTCUSTOMER_ACT_ADDSITE',
-    'addSite'
-);
-define(
-    'CTCUSTOMER_ACT_DELETESITE',
-    'deleteSite'
-);
-define(
-    'CTCUSTOMER_ACT_ADDCUSTOMER',
-    'addCustomer'
-);
-define(
-    'CTCUSTOMER_ACT_DISP_SUCCESS',
-    'dispSuccess'
-);
-define(
-    'CTCUSTOMER_ACT_DISP_CUST_POPUP',
-    'dispCustPopup'
-);
-// Messages
-define(
-    'CTCUSTOMER_MSG_CUSTTRING_REQ',
-    'Please enter search parameters'
-);
-define(
-    'CTCUSTOMER_MSG_NONE_FND',
-    'No customers found'
-);
-define(
-    'CTCUSTOMER_MSG_CUS_NOT_FND',
-    'Customer not found'
-);
-define(
-    'CTCUSTOMER_CLS_FORM_ERROR',
-    'formError'
-);
-define(
-    'CTCUSTOMER_CLS_TABLE_EDIT_HEADER',
-    'tableEditHeader'
-);
-define(
-    'CTCUSTOMER_CLS_FORM_ERROR_UC',
-    'formErrorUC'
-);                // upper case
-define(
-    'CTCUSTOMER_CLS_TABLE_EDIT_HEADER_UC',
-    'tableEditHeaderUC'
-);
-// Form text
-define(
-    'CTCUSTOMER_TXT_ADD_SITE',
-    'Add site'
-);
-define(
-    'CTCUSTOMER_TXT_ADD_CONTACT',
-    'Add contact'
-);
 
 
-class CTCustomerCRM extends CTCNC
+class CTCustomerCRM extends CTCustomer
 {
 
     const CTCUSTOMER_ACT_SEARCH_LEAD = 'searchLead';
-    var $customerID = '';
-    var $customerString = '';                      // Used when searching for an entity by string
-    var $contactString = '';                      // Used when searching for an entity by string
-    var $phoneString = '';                      // Used when searching for an entity by string
-    var $newCustomerFromDate = '';                      // Used when searching for an entity by string
-    var $newCustomerToDate = '';                      // Used when searching for an entity by string
-    var $droppedCustomerFromDate = '';                      // Used when searching for an entity by string
-    var $droppedCustomerToDate = '';                      // Used when searching for an entity by string
-    var $address = '';                                // Used when searching for customer
-
-    /**
-     * @var BUCustomer $buCustomer
-     *
-     */
-    var $buCustomer;
-    var $customerStringMessage = '';
-    /**
-     * @var DBECustomer
-     */
-    var $dsCustomer;
-    var $dsContact = '';
-    var $dsSite = '';
-    var $siteNo = '';
-    var $contactID = '';
-    var $dsHeader = '';
-
-    var $orderTypeArray = array(
-        "I" => "Initial",
-        "Q" => "Quotation",
-        "P" => "Part Despatched",
-        "C" => "Completed",
-        "B" => "Both Initial & Part Despatched",
-        "R" => "Renewal Quote: Quick Quote Not Sent",
-        "S" => "Renewal Quote: Awaiting Client Reply"
-    );
-
-    var $meetingFrequency = array(
-        "1"  => "Monthly",
-        "3"  => "Quarterly",
-        "6"  => "Six-monthly",
-        "12" => "Annually"
-    );
 
     function __construct($requestMethod,
                          $postVars,
@@ -169,103 +35,8 @@ class CTCustomerCRM extends CTCNC
             $cookieVars,
             $cfg
         );
-        $this->buCustomer = new BUCustomer($this);
-        $this->dsContact = new DataSet($this);
-        $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
-        $this->dsContact->addColumn(
-            'FirstNameClass',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsContact->addColumn(
-            'LastNameClass',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsSite = new DataSet($this);
-        $this->dsSite->setIgnoreNULLOn();
-        $this->dsSite->copyColumnsFrom($this->buCustomer->dbeSite);
-        $this->dsSite->addColumn(
-            'Add1Class',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsSite->addColumn(
-            'TownClass',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsSite->addColumn(
-            'PostcodeClass',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsCustomer = new DataSet($this);
-        $this->dsCustomer->setIgnoreNULLOn();
-        $this->dsCustomer->copyColumnsFrom($this->buCustomer->dbeCustomer);
-        $this->dsCustomer->addColumn(
-            'NameClass',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsCustomer->addColumn(
-            'InvoiceSiteMessage',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsCustomer->addColumn(
-            'DeliverSiteMessage',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsCustomer->addColumn(
-            'SectorMessage',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsCustomer->addColumn(
-            'specialAttentionEndDateMessage',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsCustomer->addColumn(
-            'lastReviewMeetingDateMessage',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
     }
 
-
-//    /**
-//     * Route to function based upon action passed
-//     */
-//    function defaultAction()
-//    {
-//        switch ($_REQUEST['action']) {
-//            case 'edit':
-//                $this->edit();
-//                break;
-//            case 'delete':
-//                $this->delete();
-//                break;
-//            case 'generate':
-//                $this->generate();
-//                break;
-//            case 'loadFromCsv':
-//                $this->loadFromCsv();
-//                break;
-//
-//            case 'list':
-//                $this->displayList();
-//                break;
-//
-//            case 'search':
-//            default:
-//                $this->search();
-//                break;
-//        }
-//    }
-//
     function search()
     {
 
@@ -393,7 +164,7 @@ class CTCustomerCRM extends CTCNC
         $customerLeadID = $_POST['customerLeadID'];
         // in the post we should find the id of the status we are searching for
         /** @var DBEContact $results */
-        $results = $this->buCustomer->getMainContactsByLeadStatus($customerLeadID);
+        $results = $this->buCustomer->getContactsByLeadStatus($customerLeadID);
         $data = [];
 
         $customers = [];
@@ -579,12 +350,69 @@ class CTCustomerCRM extends CTCNC
                 $this->getYN($value['mailshot9Flag'])
             );
             $this->dsContact->setValue(
+                DBEContact::mailshot11Flag,
+                $this->getYN($value['mailshot11Flag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::reviewUser,
+                $this->getYN($value['reviewUser'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::hrUser,
+                $this->getYN($value['hrUser'])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::supportLevel,
+                $value['supportLevel']
+            );
+            $this->dsContact->setValue(
+                DBEContact::initialLoggingEmailFlag,
+                $this->getYN($value['initialLoggingEmailFlag'])
+            );
+            $this->dsContact->setValue(
                 DBEContact::workStartedEmailFlag,
                 $this->getYN($value['workStartedEmailFlag'])
             );
             $this->dsContact->setValue(
-                DBEContact::autoCloseEmailFlag,
-                $this->getYN($value['autoCloseEmailFlag'])
+                DBEContact::workUpdatesEmailFlag,
+                $this->getYN($value['workUpdatesEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::fixedEmailFlag,
+                $this->getYN($value['fixedEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::pendingClosureEmailFlag,
+                $this->getYN($value['pendingClosureEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::closureEmailFlag,
+                $this->getYN($value['closureEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersInitialLoggingEmailFlag,
+                $this->getYN($value['othersInitialLoggingEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersWorkStartedEmailFlag,
+                $this->getYN($value['othersWorkStartedEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersWorkUpdatesEmailFlag,
+                $this->getYN($value['othersWorkUpdatesEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersFixedEmailFlag,
+                $this->getYN($value['othersFixedEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersPendingClosureEmailFlag,
+                $this->getYN($value['othersPendingClosureEmailFlag'])
+            );
+            $this->dsContact->setValue(
+                DBEContact::othersClosureEmailFlag,
+                $this->getYN($value['othersClosureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
@@ -593,10 +421,11 @@ class CTCustomerCRM extends CTCNC
 
 
             if (
-                $value['email'] == ''
+                $value['email'] == '' &&
+                $value[CONFIG_HEADER_SUPPORT_CONTACT_FLAG] == 'Y'
             ) {
                 $this->setFormErrorOn();
-                $this->formErrorMessage = 'NOT SAVED: Email address required';
+                $this->formErrorMessage = 'NOT SAVED: Email address required for support contacts';
             }
             // Determine whether a new contact is to be added
             if ($this->dsContact->getValue(DBEContact::contactID) == 0) {
@@ -669,13 +498,10 @@ class CTCustomerCRM extends CTCNC
                 DBESite::add1,
                 $value['add1']
             );
-            if ($this->dsSite->getValue(DBESite::add1) == '') {
-//                $this->setFormErrorOn();
-                $this->dsSite->setValue(
-                    'Add1Class',
-                    CTCUSTOMER_CLS_FORM_ERROR
-                );
-            }
+//            if ($this->dsSite->getValue(DBESite::Add1) == '') {
+//
+////                $this->dsSite->setValue(DBESite::Add1Class, CTCUSTOMER_CLS_FORM_ERROR);
+//            }
             $this->dsSite->setValue(
                 DBESite::add2,
                 $value['add2']
@@ -688,13 +514,10 @@ class CTCustomerCRM extends CTCNC
                 DBESite::town,
                 strtoupper($value['town'])
             );
-            if ($this->dsSite->getValue(DBESite::town) == '') {
-//                $this->setFormErrorOn();
-                $this->dsSite->setValue(
-                    'TownClass',
-                    CTCUSTOMER_CLS_FORM_ERROR_UC
-                );
-            }
+//            if ($this->dsSite->getValue(DBESite::Town) == '') {
+//
+////                $this->dsSite->setValue(DBESite::TownClass, CTCUSTOMER_CLS_FORM_ERROR_UC);
+//            }
             $this->dsSite->setValue(
                 DBESite::county,
                 $value['county']
@@ -703,17 +526,15 @@ class CTCustomerCRM extends CTCNC
                 DBESite::postcode,
                 strtoupper($value['postcode'])
             );
-            if ($this->dsSite->getValue(DBESite::postcode) == '') {
-//                $this->setFormErrorOn();
-                $this->dsSite->setValue(
-                    'PostcodeClass',
-                    CTCUSTOMER_CLS_FORM_ERROR_UC
-                );
-            }
+//            if ($this->dsSite->getValue(DBESite::Postcode) == '') {
+//
+////                $this->dsSite->setValue(DBESite::PostcodeClass, CTCUSTOMER_CLS_FORM_ERROR_UC);
+//            }
             $this->dsSite->setValue(
                 DBESite::phone,
                 $value['sitePhone']
             );
+
             $this->dsSite->post();
         }
     }
@@ -769,9 +590,6 @@ class CTCustomerCRM extends CTCNC
                 $value['customerID'],
                 $this->dsCustomer
             );
-            echo $this->dsCustomer->getValue(DBECustomer::name);
-//            $this->dsCustomer->getRow($value['customerID']);
-//            $this->getData($this->, $this->dsSite);
             $this->dsCustomer->setUpdateModeInsert();
             $this->dsCustomer->setValue(
                 DBECustomer::mailshotFlag,
@@ -825,10 +643,20 @@ class CTCustomerCRM extends CTCNC
                 'd/m/Y',
                 $value[DBECustomer::reviewDate]
             );
+
+            if ($reviewDate) {
+                $reviewDateValue = null;
+            if ($reviewDate) {
+                $reviewDateValue = $reviewDate->format(DATE_ISO8601);
+            }
+
             $this->dsCustomer->setValue(
-                DBECustomer::reviewDate,
-                $reviewDate->format(DATE_ISO8601)
-            );
+                    DBECustomer::reviewDate,
+                    $reviewDateValue
+                );
+
+            }
+
 
             $this->dsCustomer->setValue(
                 DBECustomer::reviewTime,
@@ -842,52 +670,6 @@ class CTCustomerCRM extends CTCNC
                 DBECustomer::reviewAction,
                 $value[DBECustomer::reviewAction]
             );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::customerLeadStatusID,
-                $value['customerLeadStatusID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::dateMeetingConfirmed,
-                $value['dateMeetingConfirmedDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::meetingDateTime,
-                $value['meetingDateTime']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::inviteSent,
-                $this->getTrueFalse($value[DBECustomer::inviteSent])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reportProcessed,
-                $this->getTrueFalse($value[DBECustomer::reportProcessed])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reportSent,
-                $this->getTrueFalse($value[DBECustomer::reportSent])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::crmComments,
-                $value[DBECustomer::crmComments]
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::companyBackground,
-                $value[DBECustomer::companyBackground]
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::decisionMakerBackground,
-                $value[DBECustomer::decisionMakerBackground]
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::opportunityDeal,
-                $value[DBECustomer::opportunityDeal]
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::rating,
-                $value[DBECustomer::rating]
-            );
-
             $this->dsCustomer->post();
         }
     }
@@ -1343,207 +1125,6 @@ class CTCustomerCRM extends CTCNC
     }
 
     /**
-     * Displays list of customers with Special Attention flag set
-     *
-     */
-    function displaySpecialAttentionCustomers()
-    {
-        $this->setMethodName('displaySpecialAttentionCustomers');
-
-        $this->setPageTitle("Special Attention Customers");
-
-
-        if ($this->buCustomer->getSpecialAttentionCustomers($dsCustomer)) {
-
-
-            $this->setTemplateFiles(
-                'CustomerSpecialAttention',
-                'CustomerSpecialAttention.inc'
-            );
-
-            $this->template->set_block(
-                'CustomerSpecialAttention',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    $this->buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $this->template->set_var(
-                    array(
-                        'customerName'            => $dsCustomer->getValue(DBECustomer::name),
-                        'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
-                        'linkURL'                 => $linkURL
-                    )
-                );
-
-                $this->template->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $this->template->parse(
-                'CONTENTS',
-                'CustomerSpecialAttention',
-                true
-            );
-
-        } else {
-
-            $this->setTemplateFiles(
-                'SimpleMessage',
-                'SimpleMessage.inc'
-            );
-
-            $this->template->set_var(array('message' => 'There are no special attention customers'));
-
-            $this->template->parse(
-                'CONTENTS',
-                'SimpleMessage',
-                true
-            );
-        }
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    /**
-     * Display the initial form that prompts the employee for details
-     * @access private
-     */
-    function displaySearchForm()
-    {
-        $this->setMethodName('displaySearchForm');
-        $this->setTemplateFiles(
-            'CustomerSearch',
-            'CustomerSearch.inc'
-        );
-// Parameters
-        $this->setPageTitle("Customer");
-        $submitURL = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => CTCUSTOMER_ACT_SEARCH)
-        );
-        $createURL = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => CTCUSTOMER_ACT_ADDCUSTOMER)
-        );
-        $customerPopupURL =
-            $this->buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $this->template->set_var(
-            array(
-                'contactString'           => $this->getContactString(),
-                'phoneString'             => $this->getPhoneString(),
-                'customerString'          => $this->getCustomerString(),
-                'address'                 => $this->getAddress(),
-                'customerStringMessage'   => $this->getCustomerStringMessage(),
-                'newCustomerFromDate'     => $this->getNewCustomerFromDate(),
-                'newCustomerToDate'       => $this->getNewCustomerToDate(),
-                'droppedCustomerFromDate' => $this->getDroppedCustomerFromDate(),
-                'droppedCustomerToDate'   => $this->getDroppedCustomerToDate(),
-                'submitURL'               => $submitURL,
-                'createURL'               => $createURL,
-                'customerPopupURL'        => $customerPopupURL,
-            )
-        );
-        if (is_object($this->dsCustomer)) {
-            $this->template->set_block(
-                'CustomerSearch',
-                'customerBlock',
-                'customers'
-            );
-            while ($this->dsCustomer->fetchNext()) {
-                $customerURL =
-                    $this->buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => CTCNC_ACT_DISP_EDIT,
-                            'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'customerName' => $this->dsCustomer->getValue(DBECustomer::name),
-                        'customerURL'  => $customerURL
-                    )
-                );
-                $this->template->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-            }
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'CustomerSearch',
-            true
-        );
-        $this->parsePage();
-    }
-
-//    /**
-//     * Search for customers usng customerString
-//     * @access private
-//     */
-//    function search()
-//    {
-//        $this->setMethodName('search');
-//        // Parameter validation
-//        if (!$this->buCustomer->getCustomersByNameMatch(
-//            $this->getContactString(),
-//            $this->getPhoneString(),
-//            $this->getCustomerString(),
-//            $this->getAddress(),
-//            $this->convertDateYMD($this->getNewCustomerFromDate()),
-//            $this->convertDateYMD($this->getNewCustomerToDate()),
-//            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
-//            $this->convertDateYMD($this->getDroppedCustomerToDate()),
-//            $this->dsCustomer)
-//        ) {
-//            $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
-//        }
-//        if (($this->formError) || ($this->dsCustomer->rowCount() > 1)) {
-//            $this->displaySearchForm();
-//        } else {
-//            // reload with this customer
-//            $nextURL =
-//                $this->buildLink(
-//                    $_SERVER['PHP_SELF'],
-//                    array(
-//                        'action' => CTCNC_ACT_DISP_EDIT,
-//                        'customerID' => $this->dsCustomer->getValue(DBECustomer::CustomerID)
-//                    )
-//                );
-//            header('Location: ' . $nextURL);
-//            exit;
-//
-//        }
-//    }
-
-    /**
      * Form for editing customer details
      * @access private
      */
@@ -1620,9 +1201,18 @@ class CTCustomerCRM extends CTCNC
                 )
             );
         if (!$this->formError) {              // Not displaying form error page so get customer record
-//            $this->dsCustomer->setValue(DBECustomer::NameClass, CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
-//            $this->dsCustomer->setValue(DBECustomer::InvoiceSiteMessage, CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
-//            $this->dsCustomer->setValue(DBECustomer::DeliverSiteMessage, CTCUSTOMER_CLS_TABLE_EDIT_HEADER);
+            $this->dsCustomer->setValue(
+                'NameClass',
+                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
+            );
+            $this->dsCustomer->setValue(
+                'InvoiceSiteMessage',
+                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
+            );
+            $this->dsCustomer->setValue(
+                'DeliverSiteMessage',
+                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
+            );
         }
 
         $this->setPageTitle("Customer - " . $this->dsCustomer->getValue(DBECustomer::name));
@@ -1737,47 +1327,71 @@ class CTCustomerCRM extends CTCNC
                 'urlContactPopup'                    => $urlContactPopup,
                 'bodyTagExtras'                      => $bodyTagExtras,
                 /* hidden */
-                'reviewMeetingEmailSentFlag' => $this->dsCustomer->getValue(DBECustomer::reviewMeetingEmailSentFlag),
-                'customerNotePopupLink' => $this->getCustomerNotePopupLink($this->getCustomerID()),
-                'showInactiveContactsURL' => $showInactiveContactsURL,
-                'showInactiveSitesURL' => $showInactiveSitesURL,
-                'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID),
-                'customerName' => $this->dsCustomer->getValue(DBECustomer::name),
-                'reviewCount' => $this->buCustomer->getReviewCount(),
-                'customerFolderLink' => $customerFolderLink,
-                //'customerNameClass' => $this->dsCustomer->getValue(DBECustomer::NameClass),
-                //'SectorMessage' => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
-                'regNo' => $this->dsCustomer->getValue(DBECustomer::regNo),
-                'mailshotFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::mailshotFlag)),
-                'referredFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::referredFlag)),
-                'specialAttentionFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)),
-                'specialAttentionEndDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)),
-                //'specialAttentionEndDateMessage' => $this->dsCustomer->getValue(DBECustomer::SpecialAttentionEndDateMessage),
-                'lastReviewMeetingDate' => Controller::dateYMDtoDMY($this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)),
-                'dateMeetingConfirmedDate' => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
-                'meetingDateTime' => Controller::dateToISO($this->dsCustomer->getValue(DBECustomer::meetingDateTime)),
-                DBECustomer::inviteSent => $this->getChecked($this->dsCustomer->getValue(DBECustomer::inviteSent)),
-                DBECustomer::reportProcessed => $this->getChecked($this->dsCustomer->getValue(DBECustomer::reportProcessed)),
-                DBECustomer::reportSent => $this->getChecked($this->dsCustomer->getValue(DBECustomer::reportSent)),
-                DBECustomer::crmComments => $this->dsCustomer->getValue(DBECustomer::crmComments),
-                DBECustomer::companyBackground => $this->dsCustomer->getValue(DBECustomer::companyBackground),
-                DBECustomer::decisionMakerBackground => $this->dsCustomer->getValue(DBECustomer::decisionMakerBackground),
-                DBECustomer::opportunityDeal => $this->dsCustomer->getValue(DBECustomer::opportunityDeal),
-                DBECustomer::rating => $this->dsCustomer->getValue(DBECustomer::rating),
+                'reviewMeetingEmailSentFlag'         => $this->dsCustomer->getValue(
+                    DBECustomer::reviewMeetingEmailSentFlag
+                ),
+                'customerNotePopupLink'              => $this->getCustomerNotePopupLink($this->getCustomerID()),
+                'showInactiveContactsURL'            => $showInactiveContactsURL,
+                'showInactiveSitesURL'               => $showInactiveSitesURL,
+                'customerID'                         => $this->dsCustomer->getValue(DBECustomer::customerID),
+                'customerName'                       => $this->dsCustomer->getValue(DBECustomer::name),
+                'reviewCount'                        => $this->buCustomer->getReviewCount(),
+                'customerFolderLink'                 => $customerFolderLink,
+                //                'customerNameClass'                  => $this->dsCustomer->getValue(DBECustomer::NameClass),
+                //                'SectorMessage'                      => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
+                'regNo'                              => $this->dsCustomer->getValue(DBECustomer::regNo),
+                'mailshotFlagChecked'                => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
+                ),
+                'referredFlagChecked'                => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::referredFlag)
+                ),
+                'specialAttentionFlagChecked'        => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
+                ),
+                'specialAttentionEndDate'            => Controller::dateYMDtoDMY(
+                    $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
+                ),
+                //                'specialAttentionEndDateMessage'     => $this->dsCustomer->getValue(DBECustomer::SpecialAttentionEndDateMessage),
+                'lastReviewMeetingDate'              => Controller::dateYMDtoDMY(
+                    $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
+                ),
+                'dateMeetingConfirmedDate'           => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
+                'meetingDateTime'                    => Controller::dateToISO(
+                    $this->dsCustomer->getValue(DBECustomer::meetingDateTime)
+                ),
+                DBECustomer::inviteSent              => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::inviteSent)
+                ),
+                DBECustomer::reportProcessed         => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::reportProcessed)
+                ),
+                DBECustomer::reportSent              => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::reportSent)
+                ),
+                DBECustomer::crmComments             => $this->dsCustomer->getValue(DBECustomer::crmComments),
+                DBECustomer::companyBackground       => $this->dsCustomer->getValue(DBECustomer::companyBackground),
+                DBECustomer::decisionMakerBackground => $this->dsCustomer->getValue(
+                    DBECustomer::decisionMakerBackground
+                ),
+                DBECustomer::opportunityDeal         => $this->dsCustomer->getValue(DBECustomer::opportunityDeal),
+                DBECustomer::rating                  => $this->dsCustomer->getValue(DBECustomer::rating),
 
-                'prospectFlagChecked' => $this->getChecked($this->dsCustomer->getValue(DBECustomer::prospectFlag)
+                'prospectFlagChecked' => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::prospectFlag)
+                ),
+                'pcxFlagChecked'                  => $this->getChecked(
+                    $this->dsCustomer->getValue(DBECustomer::pcxFlag)
                 ),
                 'createDate'                      => $this->dsCustomer->getValue(DBECustomer::createDate),
-                'mailshot1FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot1FlagDesc"),
                 'mailshot2FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
                 'mailshot3FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot3FlagDesc"),
                 'mailshot4FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
-                'mailshot5FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot5FlagDesc"),
-                'mailshot6FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot6FlagDesc"),
-                'mailshot7FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot7FlagDesc"),
                 'mailshot8FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
                 'mailshot9FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
-                'mailshot10FlagDesc'              => $this->buCustomer->dsHeader->getValue("mailshot10FlagDesc"),
+                'mailshot11FlagDesc'  => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot11FlagDesc
+                ),
                 'submitURL'                       => $submitURL,
                 'renewalLink'                     => $renewalLink,
                 'passwordLink'                    => $passwordLink,
@@ -1787,30 +1401,30 @@ class CTCustomerCRM extends CTCNC
                 'disabled'                        => $this->hasPermissions(
                     PHPLIB_PERM_SALES
                 ) ? '' : CTCNC_HTML_DISABLED,
-                'gscTopUpAmount'                  => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
-                'noOfServers'                     => $this->dsCustomer->getValue(DBECustomer::noOfServers),
-                'noOfSites'                       => $this->dsCustomer->getValue(DBECustomer::noOfSites),
-                'modifyDate'                      => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                      => Controller::dateYMDtoDMY(
+                'gscTopUpAmount'      => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
+                'noOfServers'         => $this->dsCustomer->getValue(DBECustomer::noOfServers),
+                'noOfSites'           => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'modifyDate'          => $this->dsCustomer->getValue(DBECustomer::modifyDate),
+                'reviewDate'          => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewDate)
                 ),
-                'reviewTime'                      => Controller::dateYMDtoDMY(
+                'reviewTime'          => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewTime)
                 ),
-                'becameCustomerDate'              => Controller::dateYMDtoDMY(
+                'becameCustomerDate'  => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
                 ),
-                'droppedCustomerDate'             => Controller::dateYMDtoDMY(
+                'droppedCustomerDate' => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
                 ),
-                'reviewAction'                    => $this->dsCustomer->getValue(DBECustomer::reviewAction),
-                'comments'                        => $this->dsCustomer->getValue(DBECustomer::comments),
-                'techNotes'                       => $this->dsCustomer->getValue(DBECustomer::techNotes),
-                'slaP1'                           => $this->dsCustomer->getValue(DBECustomer::slaP1),
-                'slaP2'                           => $this->dsCustomer->getValue(DBECustomer::slaP2),
-                'slaP3'                           => $this->dsCustomer->getValue(DBECustomer::slaP3),
-                'slaP4'                           => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'reviewAction'        => $this->dsCustomer->getValue(DBECustomer::reviewAction),
+                'comments'            => $this->dsCustomer->getValue(DBECustomer::comments),
+                'techNotes'           => $this->dsCustomer->getValue(DBECustomer::techNotes),
+                'slaP1'               => $this->dsCustomer->getValue(DBECustomer::slaP1),
+                'slaP2'               => $this->dsCustomer->getValue(DBECustomer::slaP2),
+                'slaP3'               => $this->dsCustomer->getValue(DBECustomer::slaP3),
+                'slaP4'               => $this->dsCustomer->getValue(DBECustomer::slaP4),
+                'slaP5'               => $this->dsCustomer->getValue(DBECustomer::slaP5),
 
                 'add1' => $site->getValue(DBESite::add1),
                 'add2' => $site->getValue(DBESite::add2),
@@ -1830,7 +1444,7 @@ class CTCustomerCRM extends CTCNC
                 'deliveryContactID' => $site->getValue(DBESite::deliverContactID),
                 'invoiceContactID'  => $site->getValue(DBESite::deliverContactID),
                 'nonUKFlag'         => $site->getValue(DBESite::nonUKFlag),
-                ' deleteSiteText'   => null,
+                'deleteSiteText'    => null,
                 'deleteSiteURL'     => null
             )
         );
@@ -2180,6 +1794,12 @@ class CTCustomerCRM extends CTCNC
 
         $this->template->set_block(
             'CustomerEdit',
+            'supportLevelBlock',
+            'selectSupportLevel'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'contactBlock',
             'contacts'
         );      // have to declare innermost block first
@@ -2189,13 +1809,13 @@ class CTCustomerCRM extends CTCNC
             $this->buCustomer->getSitesByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsSite,
-                $_REQUEST['showInactiveSites']
+                true
             );
 
             $this->buCustomer->getContactsByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsContact,
-                $_REQUEST['showInactiveContacts']
+                true
             );
 
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {
@@ -2349,6 +1969,12 @@ class CTCustomerCRM extends CTCNC
                 ''
             );
 
+            $this->template->set_block(
+                'CustomerEdit',
+                'selectSupportLevel',
+                ''
+            );
+
             if ($this->dsContact->getValue(DBEContact::contactID) == 0) { // New contact so no delete link
                 $deleteContactURL = '';
                 $deleteContactLink = '';
@@ -2393,68 +2019,120 @@ class CTCustomerCRM extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'contactID'                   => $this->dsContact->getValue(DBEContact::contactID),
-                    'siteNo'                      => $this->dsContact->getValue(DBEContact::siteNo),
-                    'customerID'                  => $this->dsContact->getValue(DBEContact::customerID),
-                    'supplierID'                  => $this->dsContact->getValue(DBEContact::supplierID),
-                    'title'                       => $this->dsContact->getValue(DBEContact::title),
-                    'firstName'                   => $this->dsContact->getValue(DBEContact::firstName),
-                    'lastName'                    => $this->dsContact->getValue(DBEContact::lastName),
-                    'firstNameClass'              => $this->dsContact->getValue('FirstNameClass'),
-                    'lastNameClass'               => $this->dsContact->getValue('LastNameClass'),
-                    'phone'                       => $this->dsContact->getValue(DBEContact::phone),
-                    'mobilePhone'                 => $this->dsContact->getValue(DBEContact::mobilePhone),
-                    'position'                    => $this->dsContact->getValue(DBEContact::position),
-                    'fax'                         => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPassword'              => $this->dsContact->getValue(DBEContact::portalPassword),
-                    'failedLoginCount'            => $this->dsContact->getValue(DBEContact::failedLoginCount),
-                    'email'                       => $this->dsContact->getValue(DBEContact::email),
-                    'notes'                       => $this->dsContact->getValue(DBEContact::notes),
-                    'discontinuedFlag'            => $this->dsContact->getValue(DBEContact::discontinuedFlag),
-                    'invoiceContactFlagChecked'   => ($this->dsContact->getValue(
+                    'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
+                    'siteNo'                               => $this->dsContact->getValue(DBEContact::siteNo),
+                    'customerID'                           => $this->dsContact->getValue(DBEContact::customerID),
+                    'supplierID'                           => $this->dsContact->getValue(DBEContact::supplierID),
+                    'title'                                => $this->dsContact->getValue(DBEContact::title),
+                    'titleClass'                           => $this->dsContact->getValue('TitleClass'),
+                    'firstName'                            => $this->dsContact->getValue(DBEContact::firstName),
+                    'lastName'                             => $this->dsContact->getValue(DBEContact::lastName),
+                    'firstNameClass'                       => $this->dsContact->getValue('FirstNameClass'),
+                    'lastNameClass'                        => $this->dsContact->getValue('LastNameClass'),
+                    'phone'                                => $this->dsContact->getValue(DBEContact::phone),
+                    'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
+                    'position'                             => $this->dsContact->getValue(DBEContact::position),
+                    'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
+                    'portalPassword'                       => $this->dsContact->getValue(DBEContact::portalPassword),
+                    'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
+                    'email'                                => $this->dsContact->getValue(DBEContact::email),
+                    'emailClass'                           => $this->dsContact->getValue("EmailClass"),
+                    'notes'                                => $this->dsContact->getValue(DBEContact::notes),
+                    'discontinuedFlag'                     => $this->dsContact->getValue(DBEContact::discontinuedFlag),
+                    'invoiceContactFlagChecked'            => ($this->dsContact->getValue(
                             DBEContact::contactID
-                        ) == $this->dsSite->getValue(DBESite::invoiceContactID)) ? CT_CHECKED : '',
-                    'deliverContactFlagChecked'   => ($this->dsContact->getValue(
+                        ) == $this->dsSite->getValue(
+                            DBESite::invoiceContactID
+                        )) ? CT_CHECKED : '',
+                    'deliverContactFlagChecked'            => ($this->dsContact->getValue(
                             DBEContact::contactID
-                        ) == $this->dsSite->getValue(DBESite::deliverContactID)) ? CT_CHECKED : '',
-                    'sendMailshotFlagChecked'     => $this->getChecked(
+                        ) == $this->dsSite->getValue(
+                            DBESite::deliverContactID
+                        )) ? CT_CHECKED : '',
+                    'sendMailshotFlagChecked'              => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::sendMailshotFlag)
                     ),
-                    'accountsFlagChecked'         => $this->getChecked(
+                    'accountsFlagChecked'                  => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::accountsFlag)
                     ),
-                    'mailshot2FlagChecked'        => $this->getChecked(
+                    'mailshot2FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot2Flag)
                     ),
-                    'mailshot3FlagChecked'        => $this->getChecked(
+                    'mailshot3FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot3Flag)
                     ),
-                    'mailshot4FlagChecked'        => $this->getChecked(
+                    'mailshot4FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot4Flag)
                     ),
-                    'mailshot8FlagChecked'        => $this->getChecked(
+                    'mailshot8FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot8Flag)
                     ),
-                    'mailshot9FlagChecked'        => $this->getChecked(
+                    'mailshot9FlagChecked'                 => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::mailshot9Flag)
                     ),
-                    'workStartedEmailFlagChecked' => $this->getChecked(
+                    'mailshot11FlagChecked'                => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::mailshot11Flag)
+                    ),
+                    'reviewUserFlagChecked'                => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::reviewUser)
+                    ),
+                    'initialLoggingEmailFlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::initialLoggingEmailFlag)
+                    ),
+                    'workStartedEmailFlagChecked'          => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::workStartedEmailFlag)
                     ),
-                    'autoCloseEmailFlagChecked'   => $this->getChecked(
-                        $this->dsContact->getValue(DBEContact::autoCloseEmailFlag)
+                    'workUpdatesEmailFlagChecked'          => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::workUpdatesEmailFlag)
                     ),
-                    'clientFormURL'               => $clientFormURL,
-                    'dearJohnURL'                 => $dearJohnURL,
-                    'dmLetterURL'                 => $dmLetterURL,
-                    'customLetter1URL'            => $customLetter1URL,
-                    'deleteContactLink'           => $deleteContactLink
+                    'fixedEmailFlagChecked'                => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::fixedEmailFlag)
+                    ),
+                    'pendingClosureEmailFlagChecked'       => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::pendingClosureEmailFlag)
+                    ),
+                    'closureEmailFlagChecked'              => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::closureEmailFlag)
+                    ),
+                    'othersInitialLoggingEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersInitialLoggingEmailFlag)
+                    ),
+                    'othersWorkStartedEmailFlagChecked'    => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersWorkStartedEmailFlag)
+                    ),
+                    'othersWorkUpdatesEmailFlagChecked'    => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersWorkUpdatesEmailFlag)
+                    ),
+                    'othersFixedEmailFlagChecked'          => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersFixedEmailFlag)
+                    ),
+                    'othersPendingClosureEmailFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersPendingClosureEmailFlag)
+                    ),
+                    'othersClosureEmailFlagChecked'        => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::othersClosureEmailFlag)
+                    ),
+                    'hrUserFlagChecked'                    => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::hrUser)
+                    ),
+                    'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
+                        DBEContact::customerID
+                    ) ? 'data-validation="atLeastOne"' : '',
+                    'clientFormURL'                        => $clientFormURL,
+                    'dearJohnURL'                          => $dearJohnURL,
+                    'dmLetterURL'                          => $dmLetterURL,
+                    'customLetter1URL'                     => $customLetter1URL,
+                    'deleteContactLink'                    => $deleteContactLink
                 )
             );
 
             $this->siteDropdown(
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
+            );
+
+            $this->supportLevelDropDown(
+                $this->dsContact->getValue(DBEContact::supportLevel)
             );
 
             /*
@@ -2569,43 +2247,6 @@ class CTCustomerCRM extends CTCNC
         $this->parsePage();
     }
 
-    /**
-     * Delete customer and associated sites/contacts
-     * @access private
-     */
-    function deleteCustomer()
-    {
-        $this->setMethodName('deleteCustomer');
-        if ($this->getCustomerID() == '') {
-            $this->displayFatalError('CustomerID not passed');
-        }
-        if ($this->buCustomer->canDeleteCustomer(
-            $this->getCustomerID(),
-            $this->userID
-        )) {
-            $this->buCustomer->deleteCustomer($this->getCustomerID());
-
-            $nextURL =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMER_ACT_DISP_SEARCH
-                    )
-                );
-        } else {
-            $this->setFormErrorMessage('Cannot delete this customer - dependencies exist');
-            $this->setAction(CTCNC_ACT_DISP_EDIT);
-            $this->buCustomer->getCustomerByID(
-                $this->getCustomerID(),
-                $this->dsCustomer
-            );
-            $this->displayEditForm();
-            exit;
-        }
-
-        header('Location: ' . $nextURL);
-        exit;
-    }
 
     /**
      * Delete sites and associated contacts
@@ -2714,7 +2355,6 @@ class CTCustomerCRM extends CTCNC
             $this->buCustomer->updateSite($this->dsSite);
             if (isset($this->postVars["form"]["contact"])) {
                 $this->buCustomer->updateContact($this->dsContact);
-
             }
 
             $this->setAction(CTCUSTOMER_ACT_DISP_SUCCESS);

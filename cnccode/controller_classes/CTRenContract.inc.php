@@ -476,16 +476,16 @@ class CTRenContract extends CTCNC
                 'notes'                   => Controller::htmlInputText($dsRenContract->getValue('notes')),
                 'notesMessage'            => Controller::htmlDisplayText($dsRenContract->getMessage('notes')),
                 'hostingCompany'          => Controller::htmlInputText($dsRenContract->getValue('hostingCompany')),
-                'hostingCompanyMessage'   => Controller::htmlDisplayText($dsRenContract->getMessage('hostingCompany')),
-                'password'                => Controller::htmlInputText($dsRenContract->getValue('password')),
+                'hostingCompanyMessage'   => Controller::htmlDisplayText($dsRenContract->getMessage('hostingCompany')
+                ),'password'                => Controller::htmlInputText($dsRenContract->getValue('password')),
                 'passwordMessage'         => Controller::htmlDisplayText($dsRenContract->getMessage('password')),
                 'osPlatform'              => Controller::htmlInputText($dsRenContract->getValue('osPlatform')),
                 'osPlatformMessage'       => Controller::htmlDisplayText($dsRenContract->getMessage('osPlatform')),
                 'domainNames'             => Controller::htmlInputText($dsRenContract->getValue('domainNames')),
                 'domainNamesMessage'      => Controller::htmlDisplayText($dsRenContract->getMessage('domainNames')),
                 'controlPanelUrl'         => Controller::htmlInputText($dsRenContract->getValue('controlPanelUrl')),
-                'controlPanelUrlMessage'  => Controller::htmlDisplayText($dsRenContract->getMessage('controlPanelUrl')),
-                'ftpAddress'              => Controller::htmlInputText($dsRenContract->getValue('ftpAddress')),
+                'controlPanelUrlMessage'  => Controller::htmlDisplayText($dsRenContract->getMessage('controlPanelUrl')
+                ),'ftpAddress'              => Controller::htmlInputText($dsRenContract->getValue('ftpAddress')),
                 'ftpAddressMessage'       => Controller::htmlDisplayText($dsRenContract->getMessage('ftpAddress')),
                 'ftpUsername'             => Controller::htmlInputText($dsRenContract->getValue('ftpUsername')),
                 'ftpUsernameMessage'      => Controller::htmlDisplayText($dsRenContract->getMessage('ftpUsername')),
@@ -495,6 +495,8 @@ class CTRenContract extends CTCNC
                 'websiteDeveloperMessage' => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('websiteDeveloper')
                 ),
+                'officialOrderNumber'        => Controller::htmlInputText(
+                    $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)),
                 'urlUpdate'               => $urlUpdate,
                 'urlDelete'               => $urlDelete,
                 'txtDelete'               => $txtDelete,

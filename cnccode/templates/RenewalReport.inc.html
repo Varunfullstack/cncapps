@@ -1,5 +1,175 @@
 <!-- Template: RenewalReport.inc.html -->
+<div style="float: right">
+    <h2>Send Contracts to be signed</h2>
+    <button type="button"
+            onclick="previewPDF()"
+    >Preview
+    </button>
+    <input type="hidden"
+           name="PDFPath"
+           id="PDFPath"
+    >
+
+    <label for="signableContact">
+        Signee Contact
+    </label>
+    <select name="signableContact"
+            id="signableContact"
+            onchange="changedSignableContact()"
+    >
+        <option selected
+                value=""
+        >-- Pick a Contact --
+        </option>
+        <!-- BEGIN toSignContactsBlock -->
+        <option value="{toSignContactID}">
+            {toSignContactName}
+        </option>
+        <!-- END toSignContactsBlock -->
+    </select>
+    <label for="signableTemplate">
+        Template
+    </label>
+    <select name="signableTemplate"
+            id="signableTemplate"
+            onchange="changedSignableTemplate()"
+    >
+        <option selected
+                value=""
+        >-- Pick a Template --
+        </option>
+        <!-- BEGIN templateBlock -->
+        <option value="{templateID}">
+            {templateDesc}
+        </option>
+        <!-- END templateBlock -->
+    </select>
+
+    <button type="button"
+            id="sendSignable"
+            disabled
+            onclick="sendDocument()"
+    >Send
+    </button>
+</div>
 <H2>{customerName}</H2>
+<script>
+
+    function changedSignableTemplate() {
+        checkSendSignable();
+    }
+
+    $(function () {
+
+        $('#selectAll').change(function () {
+            if ($(this).prop('checked')) {
+                $('#renewalTable tbody input[type=checkbox]').prop('checked', true);
+            } else {
+                $('#renewalTable tbody input[type=checkbox]').prop('checked', false);
+            }
+            $(this).prop('indeterminate', false);
+            currentPDFPath = null;
+            checkSendSignable(false);
+        })
+        $('#renewalTable tbody input[type=checkbox]').change(function () {
+            var allCheckBoxes = 0;
+            var checkedCheckBoxes = 0;
+            $('#renewalTable tbody input[type=checkbox]').each(function () {
+                allCheckBoxes++;
+                if ($(this).prop('checked')) {
+                    checkedCheckBoxes++;
+                }
+            })
+            if (checkedCheckBoxes === allCheckBoxes) {
+                $('#selectAll').prop('checked', true);
+            } else {
+                $('#selectAll').prop('checked', false);
+            }
+
+            if (checkedCheckBoxes > 0 && checkedCheckBoxes < allCheckBoxes) {
+                $('#selectAll').prop('indeterminate', true)
+            } else {
+                $('#selectAll').prop('indeterminate', false)
+            }
+            currentPDFPath = null;
+
+            checkSendSignable(false);
+        })
+    })
+    var currentPDFPath = null;
+
+    function previewPDF() {
+
+        var contractsIds = [];
+        $('#renewalTable tbody input[type=checkbox]').each(function () {
+            if ($(this).prop('checked')) {
+                contractsIds.push($(this).attr('id'));
+            }
+        });
+
+
+        if (!contractsIds.length) {
+            return;
+        }
+        var data = {
+            customerID: {customerID},
+            contractsIDs: contractsIds
+        };
+        $.ajax({
+            url: '?action=previewPDF',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: data
+        }).then(function (result) {
+            currentPDFPath = result.PDFPath;
+            window.open(result.PDFPath);
+            var signableContact = $('#signableContact').val();
+            checkSendSignable(signableContact);
+        });
+    }
+
+    function checkSendSignable() {
+
+        if (currentPDFPath && $('#signableContact').val() && $('#signableTemplate').val()) {
+            $('#sendSignable').prop('disabled', false);
+        } else {
+            $('#sendSignable').prop('disabled', true);
+        }
+    }
+
+    function changedSignableContact() {
+        checkSendSignable();
+    }
+
+    function sendDocument() {
+
+        if (confirm("Are you sure you want to send these contract documents?")) {
+
+            var data = {
+                contactID: $('#signableContact').val(),
+                PDFPath: currentPDFPath,
+                customerID: {customerID},
+                signableTemplateID: $('#signableTemplate').val()
+            };
+
+            $.ajax({
+                url: '?action=sendPDF',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: data
+            }).then(function (result) {
+                if (result.status) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to send envelope');
+                }
+            });
+        }
+    }
+
+</script>
 <form name="domain"
       action="{urlCreateQuote}"
       method="post"
@@ -9,26 +179,39 @@
            cellpadding="2"
            cellspacing="1"
            width="100%"
+           id="renewalTable"
     >
+        <thead>
         <tr>
-            <td colspan="3">&nbsp;</td>
-            <td>Expires</td>
-            <td>Contract Expiry Date</td>
-            <td>Quantity</td>
-            <td>Cost(&pound;)</td>
-            <td>Sale(&pound;)</td>
-            <td width="2%">&nbsp;</td>
+            <th>
+                <input type="checkbox"
+                       id="selectAll"
+                >
+            </th>
+            <th colspan="2">&nbsp;</th>
+            <th>Invoiced Until</th>
+            <th>Contract Expiry Date</th>
+            <th>Cost(&pound;)</th>
+            <th>Sale(&pound;)</th>
+            <th width="2%">&nbsp;</th>
         </tr>
+
+        </thead>
+        <tbody>
+
+
         <!-- BEGIN itemBlock -->
         {itemTypeHeader}
         <tr class="{itemClass}">
-            <td colspan="2"
-                class="content"
-            ><A HREF="{linkURL}">{description}</a></td>
+            <td style="vertical-align: baseline">
+                {checkbox}
+            </td>
+            <td class="content">
+                <A HREF="{linkURL}" target="_blank">{description}</a>
+            </td>
             <td class="content">{notes}{coveredItemsString}</td>
             <td class="content">{expiryDate}</td>
             <td class="content">{calculatedExpiryDate}</td>
-            <td class="contentRightAlign">1</td>
             <td class="contentRightAlign">{costPrice}</td>
             <td class="contentRightAlign">{salePrice}</td>
         </tr>
@@ -54,6 +237,7 @@
             <td class="contentRightAlign">{totalSalePrice}</td>
             <td>&nbsp;</td>
         </tr>
+        </tbody>
     </table>
 </form>
 <!-- End Template: RenContractList.inc.html -->

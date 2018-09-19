@@ -138,9 +138,75 @@ foreach ($array
 
 exit;
 
+
+/**
+ * This code will benchmark your server to determine how high of a cost you can
+ * afford. You want to set the highest cost that you can without slowing down
+ * you server too much. 8-10 is a good baseline, and more is good if your servers
+ * are fast enough. The code below aims for ≤ 50 milliseconds stretching time,
+ * which is a good baseline for systems handling interactive logins.
+ */
+$timeTarget = 0.05; // 50 milliseconds
+
+$cost = 8;
+do {
+    $cost++;
+    $start = microtime(true);
+    password_hash("test", PASSWORD_BCRYPT, ["cost" => $cost]);
+    $end = microtime(true);
+} while (($end - $start) < $timeTarget);
+
+echo "Appropriate Cost Found: " . $cost;
+exit;
+
 $buMail = new BUMail($thing);
 $thing = null;
 $buActivity = new BUActivity($thing);
+
+
+$buMail->mime->setHTMLBody("<div>this is a test</div>");
+
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset'  => 'UTF-8',
+    'html_charset'  => 'UTF-8',
+    'head_charset'  => 'UTF-8'
+);
+$body = $buMail->mime->get($mime_params);
+$senderEmail = CONFIG_SUPPORT_EMAIL;
+
+$toEmail = "guerreradelviento@gmail.com";
+
+$cc = "fizdalf@gmail.com";
+
+$bcc = "publixavi@gmail.com";
+
+$toEmail = implode(
+    ";",
+    [$toEmail, $cc, $bcc]
+);
+
+$hdrs = array(
+    'From'         => $senderEmail,
+    'To'           => $toEmail,
+    'Subject'      => 'Testeando',
+    'Date'         => date("r"),
+    'Content-Type' => 'text/html; charset=UTF-8',
+    'Cc'           => $cc,
+);
+$recipients = "xavi@pavilionweb.co.uk";
+$hdrs = $buMail->mime->headers($hdrs);
+
+$buMail->putInQueue(
+    $senderEmail,
+    $recipients,
+    $hdrs,
+    $body
+);
+var_dump($buMail->sendQueue());
+
+exit;
+
 
 $results = new DataSet($thing);
 $buActivity->getActivityByID(
