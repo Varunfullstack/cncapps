@@ -6012,7 +6012,7 @@ class CTActivity extends CTCNC
             $dsCallActivity
         );
 
-        if ($dsCallActivity->getValue(DBECallActivity::status) !== 'O') {
+        if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
 
             $this->template->setVar(
                 'CONTENTS',

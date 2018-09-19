@@ -2304,7 +2304,7 @@ class BUActivity extends Business
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
         $dbeCallActivity->setValue(
-            DBECallActivity::status,
+            DBECallActivity::salesRequestStatus,
             'C'
         );
 
@@ -11047,7 +11047,7 @@ is currently a balance of ';
      * @param $problemID
      * @param $message
      * @param string $status
-     * @return bool|DBEJCallActivity
+     * @return DBECallActivity
      */
     private function createSalesRequestActivity($problemID,
                                                 $message,
@@ -11089,12 +11089,19 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::salesRequestStatus,
             $status
-        );              // Checked
+        );
 
         $dbeCallActivity->insertRow();
 
-        return $this->getLastActivityInProblem($problemID, CONFIG_SALES_ACTIVITY_TYPE_ID, $status);
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($dbeCallActivity->getPKValue());
+
+        return $dbejCallactivity;
     }
 
 

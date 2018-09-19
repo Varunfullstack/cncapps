@@ -574,7 +574,7 @@ class DBEJCallActivity extends DBECallActivity
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 43";
+            " WHERE callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43";
         $this->setQueryString($query);
         return (parent::getRows());
     }
