@@ -643,4 +643,13 @@
             <column name="othersClosureEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
+    <changeSet id="issue215-1528799226-55" author="pavwebdev">
+        <modifyDataType tableName="contact" columnName="con_portal_password" newDataType="char(60)"/>
+        <modifyDataType tableName="contactAuditLog" columnName="con_portal_password" newDataType="char(60)"/>
+        <sql>
+            update contact set con_portal_password = null;
+            update contactAuditLog set con_portal_password = null
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

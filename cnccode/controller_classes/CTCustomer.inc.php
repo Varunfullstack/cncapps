@@ -190,6 +190,13 @@ class CTCustomer extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
+
+        $this->dsContact->addColumn(
+            'hasPassword',
+            DA_BOOLEAN,
+            DA_NOT_NULL
+        );
+
         $this->dsSite = new DataSet($this);
         $this->dsSite->setIgnoreNULLOn();
         $this->dsSite->copyColumnsFrom($this->buCustomer->dbeSite);
@@ -376,10 +383,17 @@ class CTCustomer extends CTCNC
                 DBEContact::fax,
                 $value['fax']
             );
-            $this->dsContact->setValue(
-                DBEContact::portalPassword,
-                $value['portalPassword']
-            );
+
+            if (!empty($value['newPassword'])) {
+                $this->dsContact->setValue(
+                    DBEContact::portalPassword,
+                    password_hash(
+                        $value['newPassword'],
+                        PASSWORD_DEFAULT
+                    )
+                );
+            }
+
             $this->dsContact->setValue(
                 DBEContact::accountsFlag,
                 $this->getYN($value['accountsFlag'])
@@ -2528,6 +2542,12 @@ ORDER BY cus_name ASC  ";
                     );
             }
 
+            var_dump(
+                $this->dsContact->getValue(
+                    DBEContact::portalPassword
+                )
+            );
+
             $this->template->set_var(
                 array(
                     'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
@@ -2544,7 +2564,9 @@ ORDER BY cus_name ASC  ";
                     'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
                     'position'                             => $this->dsContact->getValue(DBEContact::position),
                     'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPassword'                       => $this->dsContact->getValue(DBEContact::portalPassword),
+                    'portalPasswordButton'                 => $this->dsContact->getValue(
+                        DBEContact::portalPassword
+                    ) ? '<i class="fa fa-lock"></i> Change Password' : 'Set Password',
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue("EmailClass"),

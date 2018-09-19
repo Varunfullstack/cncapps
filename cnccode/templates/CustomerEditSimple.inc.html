@@ -23,10 +23,18 @@
     .redText
 
 </style>
-<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"
 ></script>
 <script type="text/JavaScript">
+
+    function askNewPassword() {
+        var password = prompt('Please set a secure password');
+
+        if(password){
+            $(event.target).parent().
+        }
+
+    }
 
     $(function () {
 
@@ -1466,13 +1474,9 @@
                         >
                     </td>
                     <td>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][portalPassword]"
-                                value="{portalPassword}"
-                                size="4"
-                                maxlength="10"
-                        >
+                        <button onclick="askNewPassword()">
+                            {portalPasswordButton}
+                        </button>
                     </td>
                     <td>
                         <input
