@@ -6,7 +6,7 @@
     <changeSet author="pavwebdev" id="hotfix1.11.1-1531213570-0">
         <tagDatabase tag="Hotfix-1.11.1"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue326-1531213570-1">
+    <changeSet author="pavwebdev" id="hotfix1.11.1-1531213570-1">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="callactivity" columnName="salesRequestStatus"/>
@@ -16,12 +16,14 @@
             <column name="salesRequestStatus" type="char(1)" defaultValue="C"/>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue326-1531213570-1">
+    <changeSet author="pavwebdev" id="hotfix1.11.1-1531213570-2">
         <preConditions onFail="MARK_RAN">
-                <columnExists tableName="callactivity" columnName="salesRequestStatus"/>
+            <columnExists tableName="callactivity" columnName="salesRequestStatus"/>
         </preConditions>
         <sql>
             update callactivity set salesRequestStatus = caa_status where caa_callacttypeno = 43
         </sql>
+        <rollback/>
     </changeSet>
+
 </databaseChangeLog>
