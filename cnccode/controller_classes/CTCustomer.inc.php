@@ -797,12 +797,10 @@ class CTCustomer extends CTCNC
                 DBECustomer::createDate,
                 $value['createDate']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::gscTopUpAmount,
                 $value['gscTopUpAmount']
             );
-
             $this->dsCustomer->setValue(
                 DBECustomer::becameCustomerDate,
                 $this->convertDateYMD($value['becameCustomerDate'])
@@ -885,6 +883,10 @@ class CTCustomer extends CTCNC
             $this->dsCustomer->setValue(
                 DBECustomer::slaP5,
                 $value['slaP5']
+            );
+            $this->dsCustomer->setValue(
+                DBECustomer::gscTopUpAmount,
+                $this->getYN($value['pcxFlag'])
             );
             $this->dsCustomer->post();
         }

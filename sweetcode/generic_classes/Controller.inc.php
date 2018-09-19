@@ -21,7 +21,10 @@ use Syonix\ChangelogViewer\Factory\ViewerFactory;
 function stripslashes_deep($value)
 {
     $value = is_array($value) ?
-        array_map('stripslashes_deep', $value) :
+        array_map(
+            'stripslashes_deep',
+            $value
+        ) :
         stripslashes($value);
 
     return $value;
@@ -29,37 +32,103 @@ function stripslashes_deep($value)
 
 // Session level constants
 
-define("CT_LEVEL_NONE", 0);
-define("CT_LEVEL_SESS", 1);
-define("CT_LEVEL_PERM", 2);
+define(
+    "CT_LEVEL_NONE",
+    0
+);
+define(
+    "CT_LEVEL_SESS",
+    1
+);
+define(
+    "CT_LEVEL_PERM",
+    2
+);
 
 // Action constants
-define("CT_ACTION_INSERT", "insert");
-define("CT_ACTION_DELETE", "delete");
-define("CT_ACTION_UPDATE", "update");
-define("CT_ACTION_DISPLAY_EDIT", "displayEditForm");
-define("CT_ACTION_DISPLAY_ADD", "displayAddForm");
-define("CT_ACTION_DISPLAY_DELETE", "displayDeleteForm");
+define(
+    "CT_ACTION_INSERT",
+    "insert"
+);
+define(
+    "CT_ACTION_DELETE",
+    "delete"
+);
+define(
+    "CT_ACTION_UPDATE",
+    "update"
+);
+define(
+    "CT_ACTION_DISPLAY_EDIT",
+    "displayEditForm"
+);
+define(
+    "CT_ACTION_DISPLAY_ADD",
+    "displayAddForm"
+);
+define(
+    "CT_ACTION_DISPLAY_DELETE",
+    "displayDeleteForm"
+);
 
 // HTTP request method constants
-define("CT_METHOD_POST", "POST");
-define("CT_METHOD_GET", "GET");
+define(
+    "CT_METHOD_POST",
+    "POST"
+);
+define(
+    "CT_METHOD_GET",
+    "GET"
+);
 
 // Type of document to to client (extend this as necessary)
-define('CT_DOC_TYPE_HTML', 'html');
-define('CT_DOC_TYPE_XML', 'xml');
+define(
+    'CT_DOC_TYPE_HTML',
+    'html'
+);
+define(
+    'CT_DOC_TYPE_XML',
+    'xml'
+);
 
 // HTML display format
-define("CT_HTML_FMT_SCREEN", 'screen');                // HTML Document to be formatted for screen output
-define("CT_HTML_FMT_POPUP", 'popup');                // HTML Document to be formatted for popup window
-define("CT_HTML_FMT_PRINTER", 'printer');            // HTML Document to be formatted for printer output
-define("CT_HTML_FMT_PDF", 'pdf');        // HTML Document to be formatted for PDF file output
-define('CT_HTML_READONLY', 'readonly'); // HTML for setting text fields readonly
+define(
+    "CT_HTML_FMT_SCREEN",
+    'screen'
+);                // HTML Document to be formatted for screen output
+define(
+    "CT_HTML_FMT_POPUP",
+    'popup'
+);                // HTML Document to be formatted for popup window
+define(
+    "CT_HTML_FMT_PRINTER",
+    'printer'
+);            // HTML Document to be formatted for printer output
+define(
+    "CT_HTML_FMT_PDF",
+    'pdf'
+);        // HTML Document to be formatted for PDF file output
+define(
+    'CT_HTML_READONLY',
+    'readonly'
+); // HTML for setting text fields readonly
 // Other
-define("CT_FORM_ERROR_MESSAGE", "Please complete the fields highlighted in red");
-define("CT_SELECTED", "selected");
-define("CT_CHECKED", "checked");
-define("POUND_CHAR", chr(163));
+define(
+    "CT_FORM_ERROR_MESSAGE",
+    "Please complete the fields highlighted in red"
+);
+define(
+    "CT_SELECTED",
+    "selected"
+);
+define(
+    "CT_CHECKED",
+    "checked"
+);
+define(
+    "POUND_CHAR",
+    chr(163)
+);
 
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 
@@ -154,7 +223,9 @@ class Controller extends BaseObject
         if (($format == CT_HTML_FMT_SCREEN) | ($format == CT_HTML_FMT_PRINTER) | ($format == CT_HTML_FMT_POPUP | ($format == CT_HTML_FMT_PDF))) {
             $this->htmlFmt = $format;
         } else {
-            $this->displayFatalError('Format must be ' . CT_HTML_FMT_SCREEN . ' or ' . CT_HTML_FMT_PRINTER . ' or ' . CT_HTML_FMT_POPUP);
+            $this->displayFatalError(
+                'Format must be ' . CT_HTML_FMT_SCREEN . ' or ' . CT_HTML_FMT_PRINTER . ' or ' . CT_HTML_FMT_POPUP
+            );
         }
     }
 
@@ -212,7 +283,10 @@ class Controller extends BaseObject
      */
     function createTemplate()
     {
-        $this->template = new Template($this->cfg["path_templates"], "remove");
+        $this->template = new Template(
+            $this->cfg["path_templates"],
+            "remove"
+        );
         return TRUE;
     }
 
@@ -458,7 +532,9 @@ class Controller extends BaseObject
      *
      * @access private
      */
-    function setTemplateFiles($handle, $fileName = "")
+    function setTemplateFiles($handle,
+                              $fileName = ""
+    )
     {
 
         // We always include the page or report template
@@ -496,25 +572,52 @@ class Controller extends BaseObject
      */
     function parsePage()
     {
-        $this->template->set_var("STYLESHEET", $this->cfg["stylesheet"]);
-        $this->template->set_var("pageTitle", $this->getPageTitle());
+        $this->template->set_var(
+            "STYLESHEET",
+            $this->cfg["stylesheet"]
+        );
+        $this->template->set_var(
+            "pageTitle",
+            $this->getPageTitle()
+        );
 
 
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
-            $this->template->set_var("environmentTag", 'bgcolor="#FAE8EF"');
+            $this->template->set_var(
+                "environmentTag",
+                'bgcolor="#FAE8EF"'
+            );
         }
         if ($GLOBALS['server_type'] == MAIN_CONFIG_SERVER_TYPE_TEST) {
-            $this->template->set_var("environmentTag", 'bgcolor=#f1f9d1');
+            $this->template->set_var(
+                "environmentTag",
+                'bgcolor=#f1f9d1'
+            );
+        }
+        if ($GLOBALS['server_type'] == MAIN_CONFIG_SERVER_TYPE_WEBSITE) {
+            $this->template->set_var(
+                "environmentTag",
+                'bgcolor=#f0f9ff'
+            );
         }
 
         if ($this->getFormError()) {
             if ($this->getFormErrorMessage() != '') {
-                $this->template->set_var("formErrorMessage", $this->getFormErrorMessage());
+                $this->template->set_var(
+                    "formErrorMessage",
+                    $this->getFormErrorMessage()
+                );
             } else {
-                $this->template->set_var("formErrorMessage", CT_FORM_ERROR_MESSAGE);
+                $this->template->set_var(
+                    "formErrorMessage",
+                    CT_FORM_ERROR_MESSAGE
+                );
             }
         }
-        $this->template->parse("CONTENTS", "page");
+        $this->template->parse(
+            "CONTENTS",
+            "page"
+        );
         if (SHOW_TIMINGS) {
             $timeOfDay = gettimeofday();
             $endTime = $timeOfDay["sec"] + ($timeOfDay["usec"] / 1000000);
@@ -579,7 +682,10 @@ class Controller extends BaseObject
         };
         // This idiot guard prevents the URL page rom being cached by the browser
         if ((defined('CONFIG_IDIOT_GUARD_ON')) && CONFIG_IDIOT_GUARD_ON) {
-            $urlString = $this->addParametersToLink($urlString, array("ig" => time()));
+            $urlString = $this->addParametersToLink(
+                $urlString,
+                array("ig" => time())
+            );
         }
         return $urlString;
     }
@@ -589,7 +695,9 @@ class Controller extends BaseObject
      *
      * @access private
      */
-    function addParametersToLink($url, $parameters)
+    function addParametersToLink($url,
+                                 $parameters
+    )
     {
         if ($url == "") {
             $this->displayFatalError("Blank url");
@@ -599,7 +707,10 @@ class Controller extends BaseObject
 
         // Do we have at least one parameter already?
 
-        if (stristr($urlString, "?") == FALSE) {
+        if (stristr(
+                $urlString,
+                "?"
+            ) == FALSE) {
             $first = TRUE;
         } else {
             $first = FALSE;
@@ -648,7 +759,10 @@ class Controller extends BaseObject
     function generateCallTrace()
     {
         $e = new Exception();
-        $trace = explode("\n", $e->getTraceAsString());
+        $trace = explode(
+            "\n",
+            $e->getTraceAsString()
+        );
         // reverse array to make steps line up chronologically
         $trace = array_reverse($trace);
         array_shift($trace); // remove {main}
@@ -657,12 +771,19 @@ class Controller extends BaseObject
         $result = array();
 
         for ($i = 0; $i < $length; $i++) {
-            $result[] = ($i + 1) . ')' . substr($trace[$i],
-                                                strpos($trace[$i],
-                                                       ' ')); // replace '#someNum' with '$i)', set the right ordering
+            $result[] = ($i + 1) . ')' . substr(
+                    $trace[$i],
+                    strpos(
+                        $trace[$i],
+                        ' '
+                    )
+                ); // replace '#someNum' with '$i)', set the right ordering
         }
 
-        return "\t" . implode("\n\t", $result);
+        return "\t" . implode(
+                "\n\t",
+                $result
+            );
     }
 
 
@@ -685,7 +806,11 @@ class Controller extends BaseObject
                 "arguments"    => $_SERVER['argv']
             )
         );
-        $this->template->parse("CONTENTS", "FatalError", true);
+        $this->template->parse(
+            "CONTENTS",
+            "FatalError",
+            true
+        );
         $this->parsePage();
         exit;
     }
@@ -696,7 +821,10 @@ class Controller extends BaseObject
      */
     function checkEmailFormat($emailAddress)
     {
-        return !!filter_var($emailAddress, FILTER_VALIDATE_EMAIL);
+        return !!filter_var(
+            $emailAddress,
+            FILTER_VALIDATE_EMAIL
+        );
     }
 
     /**
@@ -735,7 +863,10 @@ class Controller extends BaseObject
     {
         $this->setMethodName("getHTMLPostVar");
         $methodName = "set" . ucwords($variableName);
-        if (!method_exists($this, $methodName)) {
+        if (!method_exists(
+            $this,
+            $methodName
+        )) {
             //$this->displayFatalError("Method ".$methodName."() does not exist");
         } else {
             $command =
@@ -756,7 +887,10 @@ class Controller extends BaseObject
     {
         $this->setMethodName("getHTMLGetVar");
         $methodName = "set" . ucwords($variableName);
-        if (!method_exists($this, $methodName)) {
+        if (!method_exists(
+            $this,
+            $methodName
+        )) {
 //			$this->displayFatalError("Method ".$methodName."() does not exist");
         } else {
             $command =
@@ -773,7 +907,9 @@ class Controller extends BaseObject
      * @access private
      * @param String $variableName The variable to retrieve/set
      */
-    function setNumericVar($variableName, $value)
+    function setNumericVar($variableName,
+                           $value
+    )
     {
         if (!is_numeric($value) & ($value != '')) {
             $this->displayFatalError('Non-numeric value passed to numeric variable ' . $variableName);
@@ -782,7 +918,9 @@ class Controller extends BaseObject
         }
     }
 
-    public static function formatForHTML($string, $html_encode = true)
+    public static function formatForHTML($string,
+                                         $html_encode = true
+    )
     {
         /*
                 $string = str_replace("\011", ' &nbsp;&nbsp;&nbsp;', str_replace('  ', ' &nbsp;', $string));
@@ -792,7 +930,11 @@ class Controller extends BaseObject
             $string = htmlentities($string);
         }
 
-        $string = preg_replace("/((\015\012)|(\015)|(\012))/", '<br />', $string);
+        $string = preg_replace(
+            "/((\015\012)|(\015)|(\012))/",
+            '<br />',
+            $string
+        );
 
         return $string;
     }
@@ -820,11 +962,20 @@ class Controller extends BaseObject
     /**
      * Prepare string for display on HTML page
      */
-    public static function htmlDisplayText($text, $format = 0)
+    public static function htmlDisplayText($text,
+                                           $format = 0
+    )
     {
         $text = stripslashes($text);
-        $text = htmlspecialchars($text, ENT_QUOTES);
-        $text = str_replace("\r\n", "\n", $text);
+        $text = htmlspecialchars(
+            $text,
+            ENT_QUOTES
+        );
+        $text = str_replace(
+            "\r\n",
+            "\n",
+            $text
+        );
         switch ($format):
             case 1: //
                 // convert \r\n to <br>
@@ -845,7 +996,10 @@ class Controller extends BaseObject
     {
 //		$text = addslashes($text);// replaced because it resulted in e.g. Karim O\'Ahmed
 //		$text = str_replace('"','\"', $text);	// this one only escapes "
-        $text = htmlspecialchars($text, ENT_QUOTES);
+        $text = htmlspecialchars(
+            $text,
+            ENT_QUOTES
+        );
         return trim($text);
     }
 
@@ -861,14 +1015,23 @@ class Controller extends BaseObject
      * format number for display in HTML cell
      * Default 2dps
      */
-    public static function formatNumber($unformattedNumber, $dps = 2, $thousandsSep = ',', $blankZeros = true)
+    public static function formatNumber($unformattedNumber,
+                                        $dps = 2,
+                                        $thousandsSep = ',',
+                                        $blankZeros = true
+    )
     {
 
         if ($unformattedNumber == 0 && $blankZeros) {
             return '&nbsp;';
         } else {
 
-            return number_format($unformattedNumber, $dps, '.', $thousandsSep);
+            return number_format(
+                $unformattedNumber,
+                $dps,
+                '.',
+                $thousandsSep
+            );
         }
     }
 
@@ -876,13 +1039,22 @@ class Controller extends BaseObject
      * format GBP currency value for display
      * Default 2dps
      */
-    public static function formatNumberCur($unformattedNumber, $dps = 2, $thousandsSep = ',', $blankZeros = true)
+    public static function formatNumberCur($unformattedNumber,
+                                           $dps = 2,
+                                           $thousandsSep = ',',
+                                           $blankZeros = true
+    )
     {
 
         if ($unformattedNumber == 0 && $blankZeros) {
             return '';
         } else {
-            return POUND_CHAR . number_format($unformattedNumber, $dps, '.', $thousandsSep);
+            return POUND_CHAR . number_format(
+                    $unformattedNumber,
+                    $dps,
+                    '.',
+                    $thousandsSep
+                );
         }
     }
 
@@ -894,12 +1066,18 @@ class Controller extends BaseObject
      * @param string $separator
      * @return string
      */
-    public static function dateYMDtoDMY($dateYMD, $separator = '/')
+    public static function dateYMDtoDMY($dateYMD,
+                                        $separator = '/'
+    )
     {
         if (($dateYMD == '') OR ($dateYMD == '0000-00-00')) {
             return '';
         } else {
-            if (preg_match_all("/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $dateYMD, $regs)) {
+            if (preg_match_all(
+                "/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",
+                $dateYMD,
+                $regs
+            )) {
                 $day = $regs[3][0];
                 $month = $regs[2][0];
                 $year = $regs[1][0];
