@@ -1694,88 +1694,13 @@ ORDER BY cus_name ASC  ";
         } else {
             $_SESSION['save_page'] = false;
         }
-        $submitURL =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMER_ACT_UPDATE
-                )
-            );
-
-
-        $dbeJRenContract = new DBEJRenContract($this);
-        $dbeJRenContract->getRowsByCustomerID($this->getCustomerID());
-        // broadband
-        $dbeJRenBroadband = new DBEJRenBroadband($this);
-        $dbeJRenBroadband->getRowsByCustomerID($this->getCustomerID());
-// Hosting
-        $dbeJRenHosting = new DBEJRenHosting($this);
-        $dbeJRenHosting->getRowsByCustomerID($this->getCustomerID());
-
-        $contracts = array_merge(
-            [],
-            $this->extractValidContracts($dbeJRenContract),
-            $this->extractValidContracts($dbeJRenBroadband),
-            $this->extractValidContracts($dbeJRenHosting)
+        $submitURL = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTCUSTOMER_ACT_UPDATE
+            )
         );
 
-
-        usort(
-            $contracts,
-            function ($a,
-                      $b
-            ) {
-                if (strcmp(
-                        $a['itemTypeDescription'],
-                        $b['itemTypeDescription']
-                    ) === 0) {
-                    return strcmp(
-                        $a['itemDescription'],
-                        $b['itemDescription']
-                    );
-                }
-                return strcmp(
-                    $a['itemTypeDescription'],
-                    $b['itemTypeDescription']
-                );
-            }
-        );
-        $this->template->set_block(
-            'CustomerEdit',
-            'toSignContractsBlock',
-            'toSignContracts'
-        );
-        $lastContractType = null;
-        foreach ($contracts as $contact) {
-
-            if ($contact['itemTypeDescription'] != $lastContractType) {
-                if ($lastContractType) {
-                    $optGroupClose = '</optgroup>';
-                } else {
-                    $optGroupClose = '';
-                }
-
-                $optGroupOpen = '<optgroup label="' . $contact['itemTypeDescription'] . '">';
-            } else {
-                $optGroupOpen = '';
-                $optGroupClose = '';
-            }
-            $lastContractType = $contact['itemTypeDescription'];
-
-            $this->template->set_var(
-                array(
-                    'toSignContractID'   => $contact['customerItemID'],
-                    'toSignContractName' => $contact['itemDescription'],
-                    'optGroupOpen'       => $optGroupOpen,
-                    'optGroupClose'      => $optGroupClose
-                )
-            );
-            $this->template->parse(
-                'toSignContracts',
-                'toSignContractsBlock',
-                true
-            );
-        }
 
         if ($_SESSION['save_page']) {
             $cancelURL = $_SESSION['save_page'];
