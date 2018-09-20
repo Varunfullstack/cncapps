@@ -652,4 +652,52 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet id="issue215-1528799226-56" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="contact" columnName="pendingLeaverFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
+        </addColumn>
+        <sql>
+            update contact set pendingLeaverFlag = 'N'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="pendingLeaverFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue215-1528799226-57" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="contact" columnName="pendingLeaverDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingLeaverDate" type="date"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue215-1528799226-58" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingLeaverFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-59" author="pavwebdev">
+        <preConditions>
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingLeaverDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingLeaverDate" type="date"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

@@ -55,6 +55,9 @@ class DBEContact extends DBCNCEntity
     const othersPendingClosureEmailFlag = "othersPendingClosureEmailFlag";
     const othersClosureEmailFlag = 'othersClosureEmailFlag';
 
+    const pendingLeaverFlag = 'pendingLeaverFlag';
+    const pendingLeaverDate = 'pendingLeaverDate';
+
     /**
      * calls constructor()
      * @access public
@@ -303,6 +306,16 @@ class DBEContact extends DBCNCEntity
             DA_NOT_NULL
         );
 
+        $this->addColumn(
+            self::pendingLeaverFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::pendingLeaverDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -780,7 +793,12 @@ class DBEContact extends DBCNCEntity
         }
 
         $updated = parent::updateRow();
-        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        if ($GLOBALS['auth']) {
+            $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        } else {
+            $currentLoggedInUserID = USER_SYSTEM;
+        }
 
 
         if ($updated && $hasChanged) {
@@ -820,6 +838,20 @@ class DBEContact extends DBCNCEntity
         $db->query($query);
 
         return parent::deleteRow($pkValue);
+    }
+
+    public function getTodayLeavers()
+    {
+        $sqlQuery =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " left join customer on con_custno = cus_custno 
+             WHERE " .
+            $this->getDBColumnName(self::pendingLeaverFlag) . " = 'Y' and " .
+            $this->getDBColumnName(self::pendingLeaverDate) . " = curdate() ";
+        $this->setQueryString($sqlQuery);
+        $this->getRows();
+        return $this;
     }
 }
 

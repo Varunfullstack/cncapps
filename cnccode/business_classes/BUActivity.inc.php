@@ -6523,6 +6523,20 @@ is currently a balance of ';
         );
     }
 
+    function getOpenProblemByContactID($contactID,
+                                       &$dsResults
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getOpenRowsByContactID($contactID);
+
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+    }
+
     /**
      * Get problems by status
      *

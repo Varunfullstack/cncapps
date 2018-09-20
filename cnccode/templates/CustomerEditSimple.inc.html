@@ -4,6 +4,7 @@
 ></script>
 <style>
 
+
     table.content tbody td {
         background-color: #F4f4f2;
         text-align: left;
@@ -12,34 +13,212 @@
         white-space: nowrap;
     }
 
+    table.content tbody td.center {
+        text-align: center;
+    }
+
     .contactError input {
         border-color: red;
+    }
+
+    .lockedIcon::before {
+        font-family: "FontAwesome";
+        content: '\f023';
+        color: green;
+    }
+
+    .unlockedIcon::before {
+        font-family: "FontAwesome";
+        content: '\f13e';
+        color: red;
     }
 
     td.has-error {
         background-color: red !important;
     }
 
-    .redText
+    fieldset label {
+        height: 20px;
+        width: 140px;
+        margin-left: 10px;
+        text-align: right;
+        clear: both;
+        float: left;
+        margin-right: 15px;
+        margin-top: 10px;
+    }
+
+    fieldset input {
+        height: 20px;
+        width: 200px;
+        border: 1px solid #000;
+        margin-top: 10px;
+        float: left;
+    }
+
+    fieldset .comment {
+        float: left;
+        margin-top: 10px;
+    }
+
+    .redText td input, .redText td textarea, .redText td select, .redText td button {
+        color: red !important;
+    }
 
 </style>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"
 ></script>
+<div id="newPasswordDialog"
+     title="New Password"
+>
+    <fieldset id="register">
+        <label>Password </label>
+        <input type="password"
+               id="password"
+        >
+        <span class="comment"
+              id="passwordComment"
+        ></span>
+        <label>Repeat Password </label>
+        <input type="password"
+               id="repeatPassword"
+        >
+        <span class="comment"
+              id="repeatPasswordComment"
+        ></span>
+    </fieldset>
+    <br>
+    <div>
+        <button onclick="saveNewPassword()"
+                disabled
+                id="savePasswordButton"
+        >Save
+        </button>
+        <button onclick="cancelNewPassword()">Cancel</button>
+    </div>
+</div>
 <script type="text/JavaScript">
+    var currentContactId = null;
+    var currentPasswordButton = null;
 
-    function askNewPassword() {
-        var password = prompt('Please set a secure password');
-
-        if (password) {
-            debugger;
-            var data = $(event.target).data();
-            data.contactId;
-
-        }
-
+    function resetPasswordFields() {
+        $('#password').val(null);
+        $('#repeatPassword').val(null);
     }
 
+    function cancelNewPassword() {
+        $('#newPasswordDialog').dialog('close');
+    }
+
+    function saveNewPassword() {
+        var object = {
+            password: $('#password').val(),
+            contactID: currentContactId
+        };
+
+        $.ajax({
+            url: '?action=saveContactPassword',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to save password';
+            } else {
+                alert('Submitted OK');
+                if ($(currentPasswordButton).hasClass('unlockedIcon')) {
+                    $(currentPasswordButton).removeClass('unlockedIcon').addClass('lockedIcon');
+                }
+            }
+        }).catch(function (error) {
+            alert('Failed to save password');
+            resetPasswordFields();
+        }).then(function () {
+            $('#newPasswordDialog').dialog('close');
+        });
+    }
+
+    $('#newPasswordDialog').dialog({
+        autoOpen: false, width: 500, close: function () {
+            resetPasswordFields();
+        }
+    });
+
+
+    function askNewPassword() {
+        var data = $(event.target).data();
+        currentContactId = data.contactId;
+        currentPasswordButton = event.target;
+        $('#newPasswordDialog').dialog('open');
+    }
+
+    var validPassword = false;
+    var validRepeatPassword = false;
+
     $(function () {
+
+
+        $('#password').keyup(function () {
+            $('#passwordComment').html(checkStrength($('#password').val()));
+            checkSavePassword();
+        });
+
+        $('#repeatPassword').keyup(function () {
+            $('#repeatPasswordComment').html(checkPasswordEqual($('#password').val(), $('#repeatPassword').val()));
+            checkSavePassword();
+        });
+
+        function checkSavePassword() {
+            if (validPassword && validRepeatPassword) {
+                $('#savePasswordButton').prop("disabled", false);
+            } else {
+                $('#savePasswordButton').prop("disabled", true);
+            }
+        }
+
+        function checkPasswordEqual(password, repeatPassword) {
+            validRepeatPassword = false;
+            if (!password || !repeatPassword) {
+                return null;
+            }
+
+            if (password != repeatPassword) {
+                return 'Not Equal';
+            }
+            validRepeatPassword = true;
+            return null;
+        }
+
+        function checkStrength(password) {
+            validPassword = false;
+            if (!password) {
+                return false;
+            }
+
+            var strength = 0;
+            if (password.length < 6) {
+                return 'Too short'
+            }
+
+            if (password.match(/([a-z])/)) strength += 1;
+            if (password.match(/([A-Z])/)) strength += 1;
+            if (password.match(/([0-9])/)) strength += 1;
+            if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
+// Calculated strength value, we can return messages
+// If value is less than 2
+            if (strength < 3) {
+                $('#result').removeClass();
+                $('#result').addClass('weak');
+                return 'Weak'
+            } else if (strength >= 3) {
+                $('#result').removeClass();
+                $('#result').addClass('good');
+                validPassword = true;
+                return null
+            }
+        }
+
 
         var config = {
             modules: 'security',
@@ -404,11 +583,6 @@
     })
     //-->
 </script>
-<style>
-    .redText td input, .redText td textarea, .redText td select, .redText td button {
-        color: red !important;
-    }
-</style>
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
 />
@@ -1363,6 +1537,9 @@
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">Mailshot</td>
                     <td class="headerLightgrey">Letters</td>
+                    <td class="headerLightgrey">Pending Leaver</td>
+                    <td class="headerLightgrey">Pending Leaver Date</td>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -1486,12 +1663,12 @@
                                 data-validation-url="/validateUniqueEmail.php"
                         >
                     </td>
-                    <td>
+                    <td class="center">
                         <button onclick="askNewPassword()"
                                 data-contact-id="{contactID}"
                                 type="button"
+                                class="{portalPasswordButtonClass}"
                         >
-                            {portalPasswordButton}
                         </button>
                     </td>
                     <td>
@@ -1753,6 +1930,23 @@
                             <option value="{customLetterURL}">{customLetterName}</option>
                             <!-- END customLetterBlock -->
                         </select>
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][pendingLeaverFlag]"
+                               value="Y"
+                               {pendingLeaverFlagChecked}
+                        />
+                    </td>
+                    <td>
+                        <input {disabled}
+                               type="text"
+                               name="form[contact][{contactID}][pendingLeaverDate]"
+                               value="{pendingLeaverDate}"
+                               class="jQueryCalendar"
+                               autocomplete="off"
+                        />
                     </td>
                 </tr>
 

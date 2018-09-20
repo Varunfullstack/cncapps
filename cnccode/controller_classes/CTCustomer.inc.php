@@ -277,6 +277,18 @@ class CTCustomer extends CTCNC
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
         foreach ($contactArray as $key => $value) {
+
+            if ($value['contactID']) {
+
+                $dbeContact = new DBEContact($this);
+                $dbeContact->getRow($value['contactID']);
+
+                $this->dsContact->setValue(
+                    DBEContact::portalPassword,
+                    $dbeContact->getValue(DBEContact::portalPassword)
+                );
+            }
+
             $this->dsContact->setUpdateModeInsert();
             $this->dsContact->setValue(
                 DBEContact::contactID,
@@ -397,16 +409,6 @@ class CTCustomer extends CTCNC
                 $value['fax']
             );
 
-            if (!empty($value['newPassword'])) {
-                $this->dsContact->setValue(
-                    DBEContact::portalPassword,
-                    password_hash(
-                        $value['newPassword'],
-                        PASSWORD_DEFAULT
-                    )
-                );
-            }
-
             $this->dsContact->setValue(
                 DBEContact::accountsFlag,
                 $this->getYN($value['accountsFlag'])
@@ -515,6 +517,16 @@ class CTCustomer extends CTCNC
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
                 $value['failedLoginCount']
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::pendingLeaverFlag,
+                $this->getYN($value[DBEContact::pendingLeaverFlag])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::pendingLeaverDate,
+                common_convertDateDMYToYMD($value[DBEContact::pendingLeaverDate])
             );
 
             if (
@@ -1112,6 +1124,19 @@ class CTCustomer extends CTCNC
                 break;
             case 'csvContractAndNumbersReport':
                 $this->csvContractAndNumbersReport();
+                break;
+            case 'saveContactPassword':
+                $response = [];
+                try {
+                    $this->saveContactPassword();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"] = $exception->getMessage();
+                }
+
+                echo json_encode($response);
                 break;
             default:
                 $this->displaySearchForm();
@@ -2684,12 +2709,6 @@ ORDER BY cus_name ASC  ";
                     );
             }
 
-            var_dump(
-                $this->dsContact->getValue(
-                    DBEContact::portalPassword
-                )
-            );
-
             $this->template->set_var(
                 array(
                     'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
@@ -2706,9 +2725,15 @@ ORDER BY cus_name ASC  ";
                     'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
                     'position'                             => $this->dsContact->getValue(DBEContact::position),
                     'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPasswordButton'                 => $this->dsContact->getValue(
+                    'portalPasswordButtonClass'            => $this->dsContact->getValue(
                         DBEContact::portalPassword
-                    ) ? '<i class="fa fa-lock"></i> Change Password' : 'Set Password',
+                    ) ? 'lockedIcon' : 'unlockedIcon',
+                    'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
+                            DBEContact::pendingLeaverFlag
+                        ) == 'Y') ? CT_CHECKED : '',
+                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
+                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
+                    ),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue("EmailClass"),
@@ -3404,6 +3429,35 @@ ORDER BY cus_name ASC  ";
                 true
             );
         }
+    }
+
+    protected function saveContactPassword()
+    {
+        $contactID = $_REQUEST['contactID'];
+        $password = $_REQUEST['password'];
+
+        if (!$contactID || !$password) {
+            throw new Exception("Contact ID and Password required");
+        }
+
+        checkContactPassword($password);
+
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($contactID);
+
+        $dbeContact->setValue(
+            DBEContact::portalPassword,
+            password_hash(
+                $password,
+                PASSWORD_DEFAULT
+            )
+        );
+        $dbeContact->updateRow();
+
+        return true;
+
     } // end function documents
 }// end of class
 ?>

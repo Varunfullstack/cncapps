@@ -243,204 +243,204 @@ class CTCustomerCRM extends CTCustomer
         parent::initialProcesses();
     }
 
-    function setContact(&$contactArray)
-    {
-        if (!is_array(
-            $contactArray
-        )) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
-            return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
-        }
-
-        while (list($key, $value) = each($contactArray)) {
-            $this->dsContact->setUpdateModeInsert();
-            $this->dsContact->setValue(
-                DBEContact::contactID,
-                $value['contactID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::customerID,
-                $value['customerID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::supplierID,
-                $value['supplierID']
-            );
-            $this->dsContact->setValue(
-                DBEContact::siteNo,
-                $value['siteNo']
-            );
-            $this->dsContact->setValue(
-                DBEContact::title,
-                $value['title']
-            );
-            $this->dsContact->setValue(
-                DBEContact::lastName,
-                $value['lastName']
-            );
-            if ($this->dsContact->getValue(DBEContact::lastName) == '') {
-                $this->setFormErrorOn();
-                $this->dsContact->setValue(
-                    'LastNameClass',
-                    CTCUSTOMER_CLS_FORM_ERROR
-                );
-            }
-            $this->dsContact->setValue(
-                DBEContact::firstName,
-                $value['firstName']
-            );
-            $this->dsContact->setValue(
-                DBEContact::email,
-                $value['email']
-            );
-            $this->dsContact->setValue(
-                DBEContact::phone,
-                $value['phone']
-            );
-            $this->dsContact->setValue(
-                DBEContact::notes,
-                $value['notes']
-            );
-            $this->dsContact->setValue(
-                DBEContact::mobilePhone,
-                $value['mobilePhone']
-            );
-            $this->dsContact->setValue(
-                DBEContact::position,
-                $value['position']
-            );
-            $this->dsContact->setValue(
-                DBEContact::fax,
-                $value['fax']
-            );
-            $this->dsContact->setValue(
-                DBEContact::portalPassword,
-                $value['portalPassword']
-            );
-
-            $this->dsContact->setValue(
-                DBEContact::accountsFlag,
-                $this->getYN($value['accountsFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::discontinuedFlag,
-                $value['discontinuedFlag']
-            );
-            $this->dsContact->setValue(
-                DBEContact::sendMailshotFlag,
-                $this->getYN($value['sendMailshotFlag'])
-            );// Use getYN() because HTML POST does not send a FALSE value
-            $this->dsContact->setValue(
-                DBEContact::mailshot2Flag,
-                $this->getYN($value['mailshot2Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot3Flag,
-                $this->getYN($value['mailshot3Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot4Flag,
-                $this->getYN($value['mailshot4Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot8Flag,
-                $this->getYN($value['mailshot8Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot9Flag,
-                $this->getYN($value['mailshot9Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::mailshot11Flag,
-                $this->getYN($value['mailshot11Flag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::reviewUser,
-                $this->getYN($value['reviewUser'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::hrUser,
-                $this->getYN($value['hrUser'])
-            );
-
-            $this->dsContact->setValue(
-                DBEContact::supportLevel,
-                $value['supportLevel']
-            );
-            $this->dsContact->setValue(
-                DBEContact::initialLoggingEmailFlag,
-                $this->getYN($value['initialLoggingEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::workStartedEmailFlag,
-                $this->getYN($value['workStartedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::workUpdatesEmailFlag,
-                $this->getYN($value['workUpdatesEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::fixedEmailFlag,
-                $this->getYN($value['fixedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::pendingClosureEmailFlag,
-                $this->getYN($value['pendingClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::closureEmailFlag,
-                $this->getYN($value['closureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersInitialLoggingEmailFlag,
-                $this->getYN($value['othersInitialLoggingEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersWorkStartedEmailFlag,
-                $this->getYN($value['othersWorkStartedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersWorkUpdatesEmailFlag,
-                $this->getYN($value['othersWorkUpdatesEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersFixedEmailFlag,
-                $this->getYN($value['othersFixedEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersPendingClosureEmailFlag,
-                $this->getYN($value['othersPendingClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::othersClosureEmailFlag,
-                $this->getYN($value['othersClosureEmailFlag'])
-            );
-            $this->dsContact->setValue(
-                DBEContact::failedLoginCount,
-                $value['failedLoginCount']
-            );
-
-
-            if (
-                $value['email'] == '' &&
-                $value[CONFIG_HEADER_SUPPORT_CONTACT_FLAG] == 'Y'
-            ) {
-                $this->setFormErrorOn();
-                $this->formErrorMessage = 'NOT SAVED: Email address required for support contacts';
-            }
-            // Determine whether a new contact is to be added
-            if ($this->dsContact->getValue(DBEContact::contactID) == 0) {
-                if (
-                    ($this->dsContact->getValue(DBEContact::title) != '') |
-                    ($this->dsContact->getValue(DBEContact::firstName) != '') |
-                    ($this->dsContact->getValue(DBEContact::lastName) != '')
-                ) {
-                    $this->dsContact->post();
-                }
-            } else {
-                $this->dsContact->post();  // Existing contact
-            }
-        }
-    }
+//    function setContact(&$contactArray)
+//    {
+//        if (!is_array(
+//            $contactArray
+//        )) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
+//            return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
+//        }
+//
+//        while (list($key, $value) = each($contactArray)) {
+//            $this->dsContact->setUpdateModeInsert();
+//            $this->dsContact->setValue(
+//                DBEContact::contactID,
+//                $value['contactID']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::customerID,
+//                $value['customerID']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::supplierID,
+//                $value['supplierID']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::siteNo,
+//                $value['siteNo']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::title,
+//                $value['title']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::lastName,
+//                $value['lastName']
+//            );
+//            if ($this->dsContact->getValue(DBEContact::lastName) == '') {
+//                $this->setFormErrorOn();
+//                $this->dsContact->setValue(
+//                    'LastNameClass',
+//                    CTCUSTOMER_CLS_FORM_ERROR
+//                );
+//            }
+//            $this->dsContact->setValue(
+//                DBEContact::firstName,
+//                $value['firstName']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::email,
+//                $value['email']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::phone,
+//                $value['phone']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::notes,
+//                $value['notes']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::mobilePhone,
+//                $value['mobilePhone']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::position,
+//                $value['position']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::fax,
+//                $value['fax']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::portalPassword,
+//                $value['portalPassword']
+//            );
+//
+//            $this->dsContact->setValue(
+//                DBEContact::accountsFlag,
+//                $this->getYN($value['accountsFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::discontinuedFlag,
+//                $value['discontinuedFlag']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::sendMailshotFlag,
+//                $this->getYN($value['sendMailshotFlag'])
+//            );// Use getYN() because HTML POST does not send a FALSE value
+//            $this->dsContact->setValue(
+//                DBEContact::mailshot2Flag,
+//                $this->getYN($value['mailshot2Flag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::mailshot3Flag,
+//                $this->getYN($value['mailshot3Flag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::mailshot4Flag,
+//                $this->getYN($value['mailshot4Flag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::mailshot8Flag,
+//                $this->getYN($value['mailshot8Flag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::mailshot9Flag,
+//                $this->getYN($value['mailshot9Flag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::mailshot11Flag,
+//                $this->getYN($value['mailshot11Flag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::reviewUser,
+//                $this->getYN($value['reviewUser'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::hrUser,
+//                $this->getYN($value['hrUser'])
+//            );
+//
+//            $this->dsContact->setValue(
+//                DBEContact::supportLevel,
+//                $value['supportLevel']
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::initialLoggingEmailFlag,
+//                $this->getYN($value['initialLoggingEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::workStartedEmailFlag,
+//                $this->getYN($value['workStartedEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::workUpdatesEmailFlag,
+//                $this->getYN($value['workUpdatesEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::fixedEmailFlag,
+//                $this->getYN($value['fixedEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::pendingClosureEmailFlag,
+//                $this->getYN($value['pendingClosureEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::closureEmailFlag,
+//                $this->getYN($value['closureEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::othersInitialLoggingEmailFlag,
+//                $this->getYN($value['othersInitialLoggingEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::othersWorkStartedEmailFlag,
+//                $this->getYN($value['othersWorkStartedEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::othersWorkUpdatesEmailFlag,
+//                $this->getYN($value['othersWorkUpdatesEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::othersFixedEmailFlag,
+//                $this->getYN($value['othersFixedEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::othersPendingClosureEmailFlag,
+//                $this->getYN($value['othersPendingClosureEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::othersClosureEmailFlag,
+//                $this->getYN($value['othersClosureEmailFlag'])
+//            );
+//            $this->dsContact->setValue(
+//                DBEContact::failedLoginCount,
+//                $value['failedLoginCount']
+//            );
+//
+//
+//            if (
+//                $value['email'] == '' &&
+//                $value[CONFIG_HEADER_SUPPORT_CONTACT_FLAG] == 'Y'
+//            ) {
+//                $this->setFormErrorOn();
+//                $this->formErrorMessage = 'NOT SAVED: Email address required for support contacts';
+//            }
+//            // Determine whether a new contact is to be added
+//            if ($this->dsContact->getValue(DBEContact::contactID) == 0) {
+//                if (
+//                    ($this->dsContact->getValue(DBEContact::title) != '') |
+//                    ($this->dsContact->getValue(DBEContact::firstName) != '') |
+//                    ($this->dsContact->getValue(DBEContact::lastName) != '')
+//                ) {
+//                    $this->dsContact->post();
+//                }
+//            } else {
+//                $this->dsContact->post();  // Existing contact
+//            }
+//        }
+//    }
 
     function getData(&$dbSource,
                      &$dsDestination
@@ -890,6 +890,19 @@ class CTCustomerCRM extends CTCustomer
                 break;
             case 'displaySpecialAttentionCustomers':
                 $this->displaySpecialAttentionCustomers();
+                break;
+            case 'saveContactPassword':
+                $response = [];
+                try {
+                    $this->saveContactPassword();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"] = $exception->getMessage();
+                }
+
+                echo json_encode($response);
                 break;
             default:
 //                $this->displaySearchForm();
@@ -2033,7 +2046,15 @@ class CTCustomerCRM extends CTCustomer
                     'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
                     'position'                             => $this->dsContact->getValue(DBEContact::position),
                     'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPassword'                       => $this->dsContact->getValue(DBEContact::portalPassword),
+                    'portalPasswordButtonClass'            => $this->dsContact->getValue(
+                        DBEContact::portalPassword
+                    ) ? 'lockedIcon' : 'unlockedIcon',
+                    'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
+                            DBEContact::pendingLeaverFlag
+                        ) == 'Y') ? CT_CHECKED : '',
+                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
+                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
+                    ),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue("EmailClass"),
