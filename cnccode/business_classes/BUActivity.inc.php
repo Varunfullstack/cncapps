@@ -9463,8 +9463,7 @@ is currently a balance of ';
         );
         $body = $buMail->mime->get($mime_params);
 
-        $bcc =
-            $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
+        $bcc = $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
             CONFIG_SALES_EMAIL . ',' . "VisitConfirmation@cnc-ltd.co.uk";
 
         $recipients = $toEmail . ',' . $bcc . ',' . $cc;
@@ -9479,10 +9478,6 @@ is currently a balance of ';
 
         if ($cc) {
             $hdrs['Cc'] = $cc;
-        }
-
-        if ($bcc) {
-            $hdrs['Bcc'] = $bcc;
         }
 
         $hdrs = $buMail->mime->headers($hdrs);

@@ -113,8 +113,6 @@ class BUMail extends Business
 
         }
 
-        $headers['To'] = $toEmail;
-
         if (!$userID && isset($GLOBALS ['auth'])) {
             $userID = ( string )$GLOBALS ['auth']->is_authenticated();
         } else {
