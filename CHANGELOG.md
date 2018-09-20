@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.11.1] - 2018-09-17
+### Fixed
+- Fix issue with Visit Confirmation emails.
+
 ## [v1.11.0] - 2018-09-11
 ### Fixed
 - Issue 315 - Monitored SR formatting issues.

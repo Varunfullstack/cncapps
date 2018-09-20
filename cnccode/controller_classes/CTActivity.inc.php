@@ -2452,7 +2452,7 @@ class CTActivity extends CTCNC
         onClick = "window.open(
           \'' . $generatePasswordLinkURL . '\',
           \'reason\',
-          \'scrollbars=yes,resizable=yes,height=50,width=80,copyhistory=no, menubar=0\')" >Generate Password</a>';
+          \'scrollbars=yes,resizable=yes,height=50,width=80,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
     }
@@ -6012,7 +6012,7 @@ class CTActivity extends CTCNC
             $dsCallActivity
         );
 
-        if ($dsCallActivity->getValue(DBECallActivity::status) !== 'O') {
+        if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
 
             $this->template->setVar(
                 'CONTENTS',
@@ -6035,13 +6035,13 @@ class CTActivity extends CTCNC
 
         $this->setPageTitle("Review Sales Request");
 
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             switch ($_REQUEST['Submit']) {
 
                 case 'Approve':
                     $option = 'A';
+
                     break;
 
                 case 'Deny':

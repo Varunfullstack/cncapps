@@ -2247,17 +2247,6 @@ class BUActivity extends Business
                 $subject = 'Sales Request approved';
                 $approval = true;
 
-                $problem->setValue(
-                    DBEProblem::userID,
-                    0
-                );
-
-                $problem->setValue(
-                    DBEProblem::queueNo,
-                    4
-                );
-
-
                 break;
 
             case 'D':
@@ -2315,7 +2304,7 @@ class BUActivity extends Business
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
         $dbeCallActivity->setValue(
-            DBECallActivity::status,
+            DBECallActivity::salesRequestStatus,
             'C'
         );
 
@@ -8567,7 +8556,16 @@ is currently a balance of ';
         $dbeCallActivity->insertRow();
     }
 
-    function getLastActivityInProblem($problemID)
+    /**
+     * @param $problemID
+     * @param null $activityType
+     * @param null $activityStatus
+     * @return bool|DBEJCallActivity
+     */
+    function getLastActivityInProblem($problemID,
+                                      $activityType = null,
+                                      $activityStatus = null
+    )
     {
 
         $dbeCallActivity = new DBEJCallActivity($this);
@@ -8576,7 +8574,11 @@ is currently a balance of ';
             $problemID,
             false,
             true,
-            true
+            true,
+            false,
+            true,
+            $activityType,
+            $activityStatus
         ); // 3rd param= descending date
 
         if ($dbeCallActivity->fetchNext()) {
@@ -9477,6 +9479,10 @@ is currently a balance of ';
 
         if ($cc) {
             $hdrs['Cc'] = $cc;
+        }
+
+        if ($bcc) {
+            $hdrs['Bcc'] = $bcc;
         }
 
         $hdrs = $buMail->mime->headers($hdrs);
@@ -11041,7 +11047,7 @@ is currently a balance of ';
      * @param $problemID
      * @param $message
      * @param string $status
-     * @return bool|DBEJCallActivity
+     * @return DBECallActivity
      */
     private function createSalesRequestActivity($problemID,
                                                 $message,
@@ -11083,12 +11089,19 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::salesRequestStatus,
             $status
-        );              // Checked
+        );
 
         $dbeCallActivity->insertRow();
 
-        return $this->getLastActivityInProblem($problemID);
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($dbeCallActivity->getPKValue());
+
+        return $dbejCallactivity;
     }
 
 
