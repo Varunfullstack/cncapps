@@ -30,8 +30,11 @@
     function askNewPassword() {
         var password = prompt('Please set a secure password');
 
-        if(password){
-            $(event.target).parent().
+        if (password) {
+            debugger;
+            var data = $(event.target).data();
+            data.contactId;
+
         }
 
     }
@@ -1484,7 +1487,10 @@
                         >
                     </td>
                     <td>
-                        <button onclick="askNewPassword()">
+                        <button onclick="askNewPassword()"
+                                data-contact-id="{contactID}"
+                                type="button"
+                        >
                             {portalPasswordButton}
                         </button>
                     </td>
