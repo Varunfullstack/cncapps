@@ -1,4 +1,208 @@
 <!-- Template: ContactEdit.inc.html -->
+<style>
+    .lockedIcon::before {
+        font-family: "FontAwesome";
+        content: '\f023';
+        color: green;
+    }
+
+    .unlockedIcon::before {
+        font-family: "FontAwesome";
+        content: '\f13e';
+        color: red;
+    }
+
+    fieldset label {
+        height: 20px;
+        width: 140px;
+        margin-left: 10px;
+        text-align: right;
+        clear: both;
+        float: left;
+        margin-right: 15px;
+        margin-top: 10px;
+    }
+
+    fieldset input {
+        height: 20px;
+        width: 200px;
+        border: 1px solid #000;
+        margin-top: 10px;
+        float: left;
+    }
+
+    fieldset .comment {
+        float: left;
+        margin-top: 10px;
+    }
+
+</style>
+<div id="newPasswordDialog"
+     title="New Password"
+>
+    <fieldset id="register">
+        <label>Password </label>
+        <input type="password"
+               id="password"
+        >
+        <span class="comment"
+              id="passwordComment"
+        ></span>
+        <label>Repeat Password </label>
+        <input type="password"
+               id="repeatPassword"
+        >
+        <span class="comment"
+              id="repeatPasswordComment"
+        ></span>
+    </fieldset>
+    <br>
+    <div>
+        <button onclick="saveNewPassword()"
+                disabled
+                id="savePasswordButton"
+        >Save
+        </button>
+        <button onclick="cancelNewPassword()">Cancel</button>
+    </div>
+</div>
+<script>
+    var currentContactId = null;
+    var currentPasswordButton = null;
+
+    function resetPasswordFields() {
+        $('#password').val(null);
+        $('#repeatPassword').val(null);
+    }
+
+    function cancelNewPassword() {
+        $('#newPasswordDialog').dialog('close');
+    }
+
+    function saveNewPassword() {
+        var object = {
+            password: $('#password').val(),
+            contactID: currentContactId
+        };
+
+        $.ajax({
+            url: '?action=saveContactPassword',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to save password';
+            } else {
+                alert('Submitted OK');
+                if ($(currentPasswordButton).hasClass('unlockedIcon')) {
+                    $(currentPasswordButton).removeClass('unlockedIcon').addClass('lockedIcon');
+                }
+            }
+        }).catch(function (error) {
+            alert('Failed to save password');
+            resetPasswordFields();
+        }).then(function () {
+            $('#newPasswordDialog').dialog('close');
+        });
+    }
+
+    $('#newPasswordDialog').dialog({
+        autoOpen: false, width: 500, close: function () {
+            resetPasswordFields();
+        }
+    });
+
+
+    function askNewPassword() {
+        var data = $(event.target).data();
+        currentContactId = data.contactId;
+        currentPasswordButton = event.target;
+        $('#newPasswordDialog').dialog('open');
+    }
+
+    var validPassword = false;
+    var validRepeatPassword = false;
+
+    $(function () {
+
+
+        $('#password').keyup(function () {
+            $('#passwordComment').html(checkStrength($('#password').val()));
+            checkSavePassword();
+        });
+
+        $('#repeatPassword').keyup(function () {
+            $('#repeatPasswordComment').html(checkPasswordEqual($('#password').val(), $('#repeatPassword').val()));
+            checkSavePassword();
+        });
+
+        function checkSavePassword() {
+            if (validPassword && validRepeatPassword) {
+                $('#savePasswordButton').prop("disabled", false);
+            } else {
+                $('#savePasswordButton').prop("disabled", true);
+            }
+        }
+
+        function checkPasswordEqual(password, repeatPassword) {
+            validRepeatPassword = false;
+            if (!password || !repeatPassword) {
+                return null;
+            }
+
+            if (password != repeatPassword) {
+                return 'Not Equal';
+            }
+            validRepeatPassword = true;
+            return null;
+        }
+
+        function checkStrength(password) {
+            validPassword = false;
+            if (!password) {
+                return false;
+            }
+
+            var strength = 0;
+            if (password.length < 6) {
+                return 'Too short'
+            }
+
+            if (password.match(/([a-z])/)) strength += 1;
+            if (password.match(/([A-Z])/)) strength += 1;
+            if (password.match(/([0-9])/)) strength += 1;
+            if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
+// Calculated strength value, we can return messages
+// If value is less than 2
+            if (strength < 3) {
+                $('#result').removeClass();
+                $('#result').addClass('weak');
+                return 'Weak'
+            } else if (strength >= 3) {
+                $('#result').removeClass();
+                $('#result').addClass('good');
+                validPassword = true;
+                return null
+            }
+        }
+        var assignClass = function () {
+            var elem = $(this);
+            if (elem[0].value === 'main') {
+                // we want to show the
+                $('.onlyMain').show();
+            } else {
+                $('.onlyMain').hide();
+            }
+        };
+
+        $('body').on('change', '[data-type="mainSelector"]', assignClass);
+
+        $('[data-type="mainSelector"]').each(assignClass);
+    });
+</script>
+
 <form name="contactForm"
       method="post"
       action="{urlSubmit}"
@@ -101,15 +305,12 @@
         <tr>
             <td class="promptText">Portal Password</td>
             <td class="field">
-                <input
-                        type="text"
-                        name="contact[1][portalPassword]"
-                        id="portalPassword"
-                        value="{portalPassword}"
-                        size="10"
-                        maxlength="10"
+                <button onclick="askNewPassword()"
+                        data-contact-id="{contactID}"
+                        type="button"
+                        class="{portalPasswordButtonClass}"
                 >
-                <font class="formErrorMessage">{portalPasswordMessage}</font>
+                </button>
             </td>
         </tr>
         <tr>
@@ -118,7 +319,7 @@
                 <input
                         type="text"
                         name="contact[1][failedLoginCount]"
-                        id="notes"
+                        id="failedLoginCount"
                         value="{failedLoginCount}"
                         size="2"
                         maxlength="3"
@@ -169,52 +370,152 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Work Started Emails?</td>
+            <td class="promptText">Work Started Email</td>
             <td class="field">
-                <input type="checkbox"
+
+                <input {disabled}
+                       type="checkbox"
                        name="contact[1][workStartedEmailFlag]"
                        value="Y"
                        {workStartedEmailFlagChecked}
+                       class="checkboxAlign"
                 >
+
             </td>
         </tr>
         <tr>
-            <td class="promptText">Auto-close Emails?</td>
+            <td class="promptText">Work Updates Email</td>
             <td class="field">
-                <input type="checkbox"
-                       name="contact[1][autoCloseEmailFlag]"
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][workUpdatesEmailFlag]"
                        value="Y"
-                       {autoCloseEmailFlagChecked}
+                       {workUpdatesEmailFlagChecked}
+                       class="checkboxAlign"
                 >
             </td>
         </tr>
         <tr>
-            <td class="promptText">Others Emails?</td>
+            <td class="promptText">Fixed Email</td>
             <td class="field">
-                <input type="checkbox"
-                       name="contact[1][othersEmailMainFlag]"
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][fixedEmailFlag]"
                        value="Y"
-                       {othersEmailFlagChecked}
+                       {fixedEmailFlagChecked}
+                       class="checkboxAlign"
                 >
             </td>
         </tr>
         <tr>
-            <td class="promptText">Others Work Started Emails?</td>
+            <td class="promptText">Pending Closure Email</td>
             <td class="field">
-                <input type="checkbox"
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][pendingClosureEmailFlag]"
+                       value="Y"
+                       {pendingClosureEmailFlagChecked}
+                       class="checkboxAlign"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Closure Email</td>
+            <td class="field">
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][closureEmailFlag]"
+                       value="Y"
+                       {closureEmailFlagChecked}
+                       class="checkboxAlign"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Initial Logging Email</td>
+            <td class="field">
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][othersInitialLoggingEmailFlag]"
+                       value="Y"
+                       {othersInitialLoggingEmailFlagChecked}
+                       hidden
+                       class="onlyMain"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Work Started Email</td>
+            <td class="field">
+
+                <input {disabled}
+                       type="checkbox"
                        name="contact[1][othersWorkStartedEmailFlag]"
                        value="Y"
                        {othersWorkStartedEmailFlagChecked}
+                       hidden
+                       class="onlyMain"
                 >
             </td>
         </tr>
         <tr>
-            <td class="promptText">Others Auto-close Emails?</td>
+            <td class="promptText">Others Work Updates Email</td>
             <td class="field">
-                <input type="checkbox"
-                       name="contact[1][othersAutoCloseEmailFlag]"
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][othersWorkUpdatesEmailFlag]"
                        value="Y"
-                       {othersAutoCloseEmailFlagChecked}
+                       {othersWorkUpdatesEmailFlagChecked}
+                       hidden
+                       class="onlyMain"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Fixed Email</td>
+            <td class="field">
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][othersFixedEmailFlag]"
+                       value="Y"
+                       {othersFixedEmailFlagChecked}
+                       hidden
+                       class="onlyMain"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Pending Closure Email</td>
+            <td class="field">
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][othersPendingClosureEmailFlag]"
+                       value="Y"
+                       {othersPendingClosureEmailFlagChecked}
+                       hidden
+                       class="onlyMain"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Others Closure Email</td>
+            <td class="field">
+
+                <input {disabled}
+                       type="checkbox"
+                       name="contact[1][othersClosureEmailFlag]"
+                       value="Y"
+                       {othersClosureEmailFlagChecked}
+                       hidden
+                       class="onlyMain"
                 >
             </td>
         </tr>
@@ -279,6 +580,25 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Support Level</td>
+            <td class="field">
+                <select
+                        name="contact[1][supportLevel]"
+                        data-validation="atLeastOneMain"
+                        data-type="mainSelector"
+                        data-except="$('#referred').prop('checked')"
+                >
+                    <!-- BEGIN supportLevelBlock -->
+                    <option {supportLevelSelected}
+                            value="{supportLevelValue}"
+                    >
+                        {supportLevelDescription}
+                    </option>
+                    <!-- END supportLevelBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">HR user</td>
             <td class="field">
                 <input type="checkbox"
@@ -328,6 +648,29 @@
                 >
             </td>
         </tr>
+        <tr>
+            <td class="promptText">Pending Leaver</td>
+            <td class="field">
+                <input {disabled}
+                       type="checkbox"
+                       name="form[contact][{contactID}][pendingLeaverFlag]"
+                       value="Y"
+                       {pendingLeaverFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Pending Leaver Date</td>
+            <td class="field">
+                <input {disabled}
+                       type="text"
+                       name="form[contact][{contactID}][pendingLeaverDate]"
+                       value="{pendingLeaverDate}"
+                       class="jQueryCalendar"
+                       autocomplete="off"
+                />
+        </tr>
+        </td>
         <tr>
             <td>&nbsp;</td>
             <td align="left">
