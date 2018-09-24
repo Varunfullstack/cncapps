@@ -2032,6 +2032,17 @@ class CTActivity extends CTCNC
             $hiddenText = '';
         }
 
+        if ((int)$dbeJProblem->getValue(DBEProblem::authorisedBy)) {
+            $dbeContact = new DBEContact($this);
+
+            $dbeContact->getRow($dbeJProblem->getValue(DBEProblem::authorisedBy));
+
+            $authorisedByName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                    DBEContact::lastName
+                );
+        }
+
+
         $this->template->set_var(
             array(
                 'hiddenText'               => $hiddenText,
@@ -2153,7 +2164,9 @@ class CTActivity extends CTCNC
                 'disabled'                           => $disabled,
                 'contactPhone'                       => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue('contactID')
-                )
+                ),
+                'authorisedByHide'                   => $authorisedByName ? '' : "hidden",
+                'authorisedByName'                   => $authorisedByName
 
             )
         );
