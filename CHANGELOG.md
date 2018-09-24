@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
+### Added
+- Issue 347 - Customer Review Management documents
 
 ## [v1.11.0] - 2018-09-11
 ### Fixed
