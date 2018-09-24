@@ -341,8 +341,9 @@ class DBEContact extends DBCNCEntity
         $query =
             "SELECT " . $this->getDBColumnNamesAsString() .
             ", case when supportLevel = 'main' then 0
-              when supportLevel = 'support' then 1
-              else 2
+              when supportLevel = 'supervisor' then 1
+              when supportLevel = 'support' then 2
+              else 3
               end as orderSupport " .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
@@ -378,9 +379,10 @@ class DBEContact extends DBCNCEntity
         if ($supportOnly) {
             $query .= " AND " . $this->getDBColumnName(
                     self::supportLevel
-                ) . " = " . self::supportLevelSupport;    // only nominated support contacts
+                ) . " is not null and " . $this->getDBColumnName(
+                    self::supportLevel
+                ) . ' <> ""';
         }
-
         $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
 
         $this->setQueryString($query);

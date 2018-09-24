@@ -5279,6 +5279,12 @@ is currently a balance of ';
             DBEProblem::rootCauseID,
             $_SESSION [$sessionKey] ['rootCauseID']
         );
+
+        $dbeProblem->setValue(
+            DBEProblem::authorisedBy,
+            $_SESSION[$sessionKey]['authorisedBy']
+        );
+
         $dbeProblem->setValue(
             DBEProblem::status,
             'I'

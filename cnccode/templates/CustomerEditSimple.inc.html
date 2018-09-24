@@ -79,8 +79,13 @@
 
     .fixed_header tbody {
         overflow-y: scroll;
-        height: 200px;
+        height: 851px;
+        direction: rtl;
         /*width: 100%;*/
+    }
+
+    .fixed_header tbody tr{
+        direction: ltr;
     }
 
     .fixed_header tbody td {
@@ -888,7 +893,7 @@
 
         $.formUtils.addValidator({
             name: 'emailOrEmpty',
-            validatorFunction: function (email) {
+            validatorFunction: function (email, $el) {
 
                 if (email === '') {
                     return true;
@@ -908,11 +913,32 @@
                         }
                     }
 
-                    return $.formUtils.validators.validate_domain.validatorFunction(emailParts[1]) &&
+                    if (!$.formUtils.validators.validate_domain.validatorFunction(emailParts[1]) &&
                         localPart.indexOf('.') !== 0 &&
                         localPart.substring(localPart.length - 1, localPart.length) !== '.' &&
                         localPart.indexOf('..') === -1 &&
-                        !(/[^\w\+\.\-\#\-\_\~\!\$\&\'\(\)\*\+\,\;\=\:]/.test(localPart));
+                        !(/[^\w\+\.\-\#\-\_\~\!\$\&\'\(\)\*\+\,\;\=\:]/.test(localPart))
+                    ) {
+                        return false;
+                    }
+
+
+                    ///we need to check that no other email is set to the same
+                    var test = $('input[data-validation*="emailOrEmpty"]');
+                    var isDuplicate = false;
+
+                    test.each(function () {
+                        var elm = $(this);
+                        var isMe = elm.get(0) === $el.get(0);
+
+                        if (!isMe && elm.val().toLowerCase() === email.toLowerCase()) {
+                            isDuplicate = true;
+                            elm.addClass('error');
+                            elm.parent().addClass('has-error');
+                        }
+                    });
+
+                    return !isDuplicate;
                 }
 
                 return false;

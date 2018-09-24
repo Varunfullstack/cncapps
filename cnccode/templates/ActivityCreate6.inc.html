@@ -6,7 +6,22 @@
 <script language='JavaScript'
         src='popcalendar/popcalendar.js'
 ></script>
+<script>
+    $(function () {
+        checkauthorisedBy();
+    })
 
+    function checkauthorisedBy() {
+        if ($('#contactID').find(':selected').text().indexOf('- Delegate') > -1) {
+            $("#authorisedRow").show();
+            $("#authorisedByContactID").attr('required', true);
+        } else {
+            $("#authorisedRow").hide();
+            $("#authorisedByContactID").attr('required', false);
+        }
+    }
+
+</script>
 <P id="autoUpdateLabel"></P>
 <form name="detailsForm"
       method="post"
@@ -43,12 +58,12 @@
                        id="AddToHDQueue"
                        value="HD Q"
                 >
-                 <input name="escQ"
+                <input name="escQ"
                        type="submit"
                        id="AddToESCQueue"
                        value="ESC Q"
                 >
-                 <input name="imtQ"
+                <input name="imtQ"
                        type="submit"
                        id="AddToIMTQueue"
                        value="IMT Q"
@@ -69,22 +84,47 @@
         <tr>
             <td colspan="4">&nbsp;</td>
         </tr>
+        <tr id="authorisedRow"
+        >
+            <td class="promptText"
+            >
+                Authorised By
+            </td>
+            <td class="mainHeadText">
+                <select
+                        name="authorisedBy"
+                        id="authorisedBy"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN contactOnlyMainAndSupervisorsBlock -->
+                    {optGroupOpen}
+                    <option {contactSelected}
+                            value="{contactID}"
+                    >{contactName} {startMainContactStyle}
+                    </option>
+                    {optGroupClose}
+                    <!-- END contactOnlyMainAndSupervisorsBlock -->
+                </select>
+            </td>
+        </tr>
         <tr class="content">
             <td class="promptText">Contact</td>
-            <td class="mainHeadText"><select
-                    name="contactID"
-                    id="contactID"
-            >
-                <option value="">Please Select</option>
-                <!-- BEGIN contactBlock -->
-                {optGroupOpen}
-                <option {contactSelected}
-                        value="{contactID}"
-                >{contactName} {startMainContactStyle}
-                </option>
-                {optGroupClose}
-                <!-- END contactBlock -->
-            </select>
+            <td class="mainHeadText">
+                <select
+                        name="contactID"
+                        id="contactID"
+                        onchange="checkauthorisedBy()"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN contactBlock -->
+                    {optGroupOpen}
+                    <option {contactSelected}
+                            value="{contactID}"
+                    >{contactName} {startMainContactStyle}
+                    </option>
+                    {optGroupClose}
+                    <!-- END contactBlock -->
+                </select>
                 <a href="tel:{contactPhone}">{contactPhone}</a><span class="formErrorMessage">{contactIDMessage}</span>
             </td>
 
@@ -189,7 +229,6 @@
                 <textarea name="reason">{reason}</textarea>
                 <script type="text/javascript">
                     reason = CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
-                    reason.addCss('body { font-size: 10pt; }');
                 </script>
             </td>
         </tr>
@@ -211,7 +250,6 @@
                             customConfig: '/ckeditor_config.js'
                         }
                     );
-                    internalNotes.addCss('body { font-size: 10pt; }');
                 </script>
             </td>
         </tr>

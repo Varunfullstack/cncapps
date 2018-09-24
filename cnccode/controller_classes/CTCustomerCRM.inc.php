@@ -646,11 +646,11 @@ class CTCustomerCRM extends CTCustomer
 
             if ($reviewDate) {
                 $reviewDateValue = null;
-            if ($reviewDate) {
-                $reviewDateValue = $reviewDate->format(DATE_ISO8601);
-            }
+                if ($reviewDate) {
+                    $reviewDateValue = $reviewDate->format(DATE_ISO8601);
+                }
 
-            $this->dsCustomer->setValue(
+                $this->dsCustomer->setValue(
                     DBECustomer::reviewDate,
                     $reviewDateValue
                 );
@@ -895,6 +895,19 @@ class CTCustomerCRM extends CTCustomer
                 $response = [];
                 try {
                     $this->saveContactPassword();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"] = $exception->getMessage();
+                }
+
+                echo json_encode($response);
+                break;
+            case 'archiveContact':
+                $response = [];
+                try {
+                    $this->clearContact();
                     $response["status"] = "ok";
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -1295,24 +1308,6 @@ class CTCustomerCRM extends CTCustomer
 
         $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
 
-        $showInactiveContactsURL =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'               => 'dispEdit',
-                    'customerID'           => $this->getCustomerID(),
-                    'showInactiveContacts' => '1'
-                )
-            );
-        $showInactiveSitesURL =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'            => 'dispEdit',
-                    'customerID'        => $this->getCustomerID(),
-                    'showInactiveSites' => '1'
-                )
-            );
         $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
 
         $urlContactPopup =
@@ -1344,8 +1339,6 @@ class CTCustomerCRM extends CTCustomer
                     DBECustomer::reviewMeetingEmailSentFlag
                 ),
                 'customerNotePopupLink'              => $this->getCustomerNotePopupLink($this->getCustomerID()),
-                'showInactiveContactsURL'            => $showInactiveContactsURL,
-                'showInactiveSitesURL'               => $showInactiveSitesURL,
                 'customerID'                         => $this->dsCustomer->getValue(DBECustomer::customerID),
                 'customerName'                       => $this->dsCustomer->getValue(DBECustomer::name),
                 'reviewCount'                        => $this->buCustomer->getReviewCount(),
@@ -1393,25 +1386,25 @@ class CTCustomerCRM extends CTCustomer
                 'prospectFlagChecked' => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::prospectFlag)
                 ),
-                'pcxFlagChecked'                  => $this->getChecked(
+                'pcxFlagChecked'      => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
                 ),
-                'createDate'                      => $this->dsCustomer->getValue(DBECustomer::createDate),
-                'mailshot2FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
-                'mailshot3FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot3FlagDesc"),
-                'mailshot4FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
-                'mailshot8FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
-                'mailshot9FlagDesc'               => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
+                'createDate'          => $this->dsCustomer->getValue(DBECustomer::createDate),
+                'mailshot2FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot2FlagDesc"),
+                'mailshot3FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot3FlagDesc"),
+                'mailshot4FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot4FlagDesc"),
+                'mailshot8FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot8FlagDesc"),
+                'mailshot9FlagDesc'   => $this->buCustomer->dsHeader->getValue("mailshot9FlagDesc"),
                 'mailshot11FlagDesc'  => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot11FlagDesc
                 ),
-                'submitURL'                       => $submitURL,
-                'renewalLink'                     => $renewalLink,
-                'passwordLink'                    => $passwordLink,
-                'deleteCustomerURL'               => $deleteCustomerURL,
-                'deleteCustomerText'              => $deleteCustomerText,
-                'cancelURL'                       => $cancelURL,
-                'disabled'                        => $this->hasPermissions(
+                'submitURL'           => $submitURL,
+                'renewalLink'         => $renewalLink,
+                'passwordLink'        => $passwordLink,
+                'deleteCustomerURL'   => $deleteCustomerURL,
+                'deleteCustomerText'  => $deleteCustomerText,
+                'cancelURL'           => $cancelURL,
+                'disabled'            => $this->hasPermissions(
                     PHPLIB_PERM_SALES
                 ) ? '' : CTCNC_HTML_DISABLED,
                 'gscTopUpAmount'      => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
@@ -1828,7 +1821,7 @@ class CTCustomerCRM extends CTCustomer
             $this->buCustomer->getContactsByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsContact,
-                true
+                false
             );
 
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {
@@ -2152,8 +2145,11 @@ class CTCustomerCRM extends CTCustomer
                 $this->dsContact->getValue(DBEContact::siteNo)
             );
 
-            $this->supportLevelDropDown(
-                $this->dsContact->getValue(DBEContact::supportLevel)
+            $buContact = new BUContact($this);
+
+            $buContact->supportLevelDropDown(
+                $this->dsContact->getValue(DBEContact::supportLevel),
+                $this->template
             );
 
             /*
