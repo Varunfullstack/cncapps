@@ -316,7 +316,7 @@ class BUCustomer extends Business
     }
 
     function duplicatedEmail($email,
-                             $contactID
+                             $contactID = null
     )
     {
         if ($email === '') {

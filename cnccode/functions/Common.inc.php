@@ -452,6 +452,46 @@ function getExpiryDate(DateTime $installDate,
     return $expiryDate;
 }
 
+function checkContactPassword($password)
+{
+    if (strlen($password) < 8) {
+        throw new Exception('Minimum 8 characters');
+    }
+
+    $strength = 0;
+    if (preg_match(
+        '/([a-z])/',
+        $password
+    )) {
+        $strength++;
+    }
+    if (preg_match(
+        '/([A-Z])/',
+        $password
+    )) {
+        $strength++;
+    }
+    if (preg_match(
+        '/([0-9])/',
+        $password
+    )) {
+        $strength++;
+    }
+    if (preg_match(
+        '/([!,%,&,@,#,$,^,*,?,_,~])/',
+        $password
+    )) {
+        $strength++;
+    }
+
+
+    if ($strength < 3) {
+        throw new Exception('Password is too weak');
+    }
+
+    return true;
+}
+
 function common_getUKBankHolidays($year)
 {
     $utFirstJan = strtotime('1st jan ' . $year);

@@ -277,6 +277,18 @@ class CTCustomer extends CTCNC
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
         foreach ($contactArray as $key => $value) {
+
+            if ($value['contactID']) {
+
+                $dbeContact = new DBEContact($this);
+                $dbeContact->getRow($value['contactID']);
+
+                $this->dsContact->setValue(
+                    DBEContact::portalPassword,
+                    $dbeContact->getValue(DBEContact::portalPassword)
+                );
+            }
+
             $this->dsContact->setUpdateModeInsert();
             $this->dsContact->setValue(
                 DBEContact::contactID,
@@ -397,16 +409,6 @@ class CTCustomer extends CTCNC
                 $value['fax']
             );
 
-            if (!empty($value['newPassword'])) {
-                $this->dsContact->setValue(
-                    DBEContact::portalPassword,
-                    password_hash(
-                        $value['newPassword'],
-                        PASSWORD_DEFAULT
-                    )
-                );
-            }
-
             $this->dsContact->setValue(
                 DBEContact::accountsFlag,
                 $this->getYN($value['accountsFlag'])
@@ -517,12 +519,15 @@ class CTCustomer extends CTCNC
                 $value['failedLoginCount']
             );
 
-            if (
-                $value['email'] == ''
-            ) {
-                $this->setFormErrorOn();
-                $this->formErrorMessage = 'NOT SAVED: Email address required';
-            }
+            $this->dsContact->setValue(
+                DBEContact::pendingLeaverFlag,
+                $this->getYN($value[DBEContact::pendingLeaverFlag])
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::pendingLeaverDate,
+                common_convertDateDMYToYMD($value[DBEContact::pendingLeaverDate])
+            );
 
             // Determine whether a new contact is to be added
             if ($this->dsContact->getValue(DBEContact::contactID) == 0) {
@@ -1112,6 +1117,32 @@ class CTCustomer extends CTCNC
                 break;
             case 'csvContractAndNumbersReport':
                 $this->csvContractAndNumbersReport();
+                break;
+            case 'saveContactPassword':
+                $response = [];
+                try {
+                    $this->saveContactPassword();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"] = $exception->getMessage();
+                }
+
+                echo json_encode($response);
+                break;
+            case 'archiveContact':
+                $response = [];
+                try {
+                    $this->clearContact();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"] = $exception->getMessage();
+                }
+
+                echo json_encode($response);
                 break;
             default:
                 $this->displaySearchForm();
@@ -1945,7 +1976,7 @@ ORDER BY cus_name ASC  ";
                 }
             }
         } else {
-            $customLetterTemplates = false;
+            $customLetterTemplates = [];
         }
 
         if (!$this->buCustomer->customerFolderExists(
@@ -2122,9 +2153,11 @@ ORDER BY cus_name ASC  ";
                 'slaP2'                          => $this->dsCustomer->getValue(DBECustomer::slaP2),
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5)
+                'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'isShowingInactive'              => $_REQUEST['showInactiveContacts'] ? 'true' : 'false'
             )
         );
+
         if ((!$this->formError) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_ADDCUSTOMER)) {                                                      // Only get from DB if not displaying form error(s)
             $this->template->set_var(
@@ -2600,14 +2633,32 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_block(
             'CustomerEdit',
+            'templateCustomLetterBlock',
+            'templateCustomLetters'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'selectSiteBlock',
             'selectSites'
         );
 
         $this->template->set_block(
             'CustomerEdit',
+            'templateSelectSiteBlock',
+            'templateSelectSites'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'supportLevelBlock',
             'selectSupportLevel'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'templateSupportLevelBlock',
+            'templateSelectSupportLevel'
         );
 
         $this->template->set_block(
@@ -2619,6 +2670,77 @@ ORDER BY cus_name ASC  ";
 
         $this->dsContact->initialise();
         $this->dsContact->sortAscending(DBEContact::lastName);
+        $this->template->set_block(
+            'CustomerEdit',
+            'templateSelectSites',
+            ''
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'templateSelectSupportLevel',
+            ''
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'templateCustomLetters',
+            ''
+        );
+
+
+        $this->siteDropdown(
+            $this->dsCustomer->getValue(DBECustomer::customerID),
+            null,
+            'templateSelectSites',
+            'templateSelectSiteBlock'
+        );
+
+
+        $buContact = new BUContact($this);
+        $buContact->supportLevelDropDown(
+            null,
+            $this->template,
+            'supportLevelSelected',
+            'supportLevelValue',
+            'supportLevelDescription',
+            'templateSelectSupportLevel',
+            'templateSupportLevelBlock'
+        );
+
+
+        /*
+        Display all the custom letters
+        */
+        foreach ($customLetterTemplates as $index => $filename) {
+
+            $customLetterURL =
+                $this->buildLink(
+                    'LetterForm.php',
+                    array(
+                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                        'letterTemplate' => $filename
+                    )
+                );
+
+
+            $this->template->set_var(
+
+                array(
+                    'customLetterURL'  => $customLetterURL,
+                    'customLetterName' => $filename
+
+                )
+            );
+
+            $this->template->parse(
+                'templateCustomLetters',
+                'templateCustomLetterBlock',
+                true
+            );
+
+        } // end foreach
+
 
         while ($this->dsContact->fetchNext()) {
 
@@ -2684,12 +2806,6 @@ ORDER BY cus_name ASC  ";
                     );
             }
 
-            var_dump(
-                $this->dsContact->getValue(
-                    DBEContact::portalPassword
-                )
-            );
-
             $this->template->set_var(
                 array(
                     'contactID'                            => $this->dsContact->getValue(DBEContact::contactID),
@@ -2706,9 +2822,15 @@ ORDER BY cus_name ASC  ";
                     'mobilePhone'                          => $this->dsContact->getValue(DBEContact::mobilePhone),
                     'position'                             => $this->dsContact->getValue(DBEContact::position),
                     'fax'                                  => $this->dsContact->getValue(DBEContact::fax),
-                    'portalPasswordButton'                 => $this->dsContact->getValue(
+                    'portalPasswordButtonClass'            => $this->dsContact->getValue(
                         DBEContact::portalPassword
-                    ) ? '<i class="fa fa-lock"></i> Change Password' : 'Set Password',
+                    ) ? 'lockedIcon' : 'unlockedIcon',
+                    'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
+                            DBEContact::pendingLeaverFlag
+                        ) == 'Y') ? CT_CHECKED : '',
+                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
+                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
+                    ),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue("EmailClass"),
@@ -2806,9 +2928,10 @@ ORDER BY cus_name ASC  ";
                 $this->dsContact->getValue(DBEContact::siteNo)
             );
 
-
-            $this->supportLevelDropDown(
-                $this->dsContact->getValue(DBEContact::supportLevel)
+            $buContact = new BUContact($this);
+            $buContact->supportLevelDropDown(
+                $this->dsContact->getValue(DBEContact::supportLevel),
+                $this->template
             );
 
 
@@ -3208,7 +3331,7 @@ ORDER BY cus_name ASC  ";
     function siteDropdown(
         $customerID,
         $siteNo,
-        $templateName = 'CustomerEdit',
+        $templateName = "selectSites",
         $blockName = 'selectSiteBlock'
     )
     {
@@ -3233,7 +3356,7 @@ ORDER BY cus_name ASC  ";
                 )
             );
             $this->template->parse(
-                'selectSites',
+                $templateName,
                 $blockName,
                 true
             );
@@ -3378,32 +3501,160 @@ ORDER BY cus_name ASC  ";
 
     }
 
-    protected function supportLevelDropDown($supportLevelValue)
-    {
-        // Site selection
-        $supportLevels = [
-            ["value" => null, "description" => "None"],
-            ["value" => DBEContact::supportLevelMain, "description" => "Main"],
-            ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
-            ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
-            ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
-        ];
-        foreach ($supportLevels as $supportLevel) {
-            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : '';
 
-            $this->template->set_var(
-                array(
-                    'supportLevelSelected'    => $supportLevelSelected,
-                    'supportLevelValue'       => $supportLevel['value'],
-                    'supportLevelDescription' => $supportLevel['description']
-                )
-            );
-            $this->template->parse(
-                'selectSupportLevel',
-                'supportLevelBlock',
-                true
-            );
+    protected function saveContactPassword()
+    {
+        $contactID = $_REQUEST['contactID'];
+        $password = $_REQUEST['password'];
+
+        if (!$contactID || !$password) {
+            throw new Exception("Contact ID and Password required");
         }
+
+        checkContactPassword($password);
+
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($contactID);
+
+        $dbeContact->setValue(
+            DBEContact::portalPassword,
+            password_hash(
+                $password,
+                PASSWORD_DEFAULT
+            )
+        );
+        $dbeContact->updateRow();
+
+        return true;
+
+    }
+
+    protected function clearContact()
+    {
+        $contactID = $_REQUEST['contactID'];
+        if (!$contactID) {
+            throw new Exception("Contact ID required");
+        }
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($contactID);
+
+        $dbeContact->setValue(
+            DBEContact::email,
+            null
+        );
+        $dbeContact->setValue(
+            DBEContact::email,
+            null
+        );
+        $dbeContact->setValue(
+            DBEContact::supportLevel,
+            null
+        );
+        $dbeContact->setValue(
+            DBEContact::reviewUser,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::hrUser,
+            "N"
+        );
+
+        $dbeContact->setValue(
+            DBEContact::sendMailshotFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::discontinuedFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::accountsFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::mailshot2Flag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::mailshot3Flag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::mailshot4Flag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::mailshot8Flag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::mailshot9Flag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::mailshot11Flag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::initialLoggingEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::workStartedEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::workUpdatesEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::fixedEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::pendingClosureEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::closureEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::othersInitialLoggingEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::othersWorkStartedEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::othersWorkUpdatesEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::othersFixedEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::othersPendingClosureEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::othersClosureEmailFlag,
+            "N"
+        );
+        $dbeContact->setValue(
+            DBEContact::pendingLeaverFlag,
+            "N"
+        );
+
+        $dbeContact->updateRow();
+
+        return true;
     } // end function documents
 }// end of class
 ?>

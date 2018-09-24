@@ -220,7 +220,7 @@
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue215-1528799226-15">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="cus_others_email_main_flag"/>
         </preConditions>
         <dropColumn tableName="customer" columnName="cus_others_email_main_flag"/>
@@ -231,7 +231,7 @@
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue215-1528799226-16">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="cus_work_started_email_main_flag"/>
         </preConditions>
         <dropColumn tableName="customer" columnName="cus_work_started_email_main_flag"/>
@@ -352,7 +352,7 @@
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue215-1528799226-27">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contact" columnName="reviewUser"/>
             </not>
@@ -651,5 +651,62 @@
             update contactAuditLog set con_portal_password = null
         </sql>
         <rollback/>
+    </changeSet>
+    <changeSet id="issue215-1528799226-56" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingLeaverFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
+        </addColumn>
+        <sql>
+            update contact set pendingLeaverFlag = 'N'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="pendingLeaverFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue215-1528799226-57" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingLeaverDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingLeaverDate" type="date"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue215-1528799226-58" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingLeaverFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-59" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingLeaverDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingLeaverDate" type="date"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-60" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="authorisedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="authorisedBy" type="int(11)" />
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

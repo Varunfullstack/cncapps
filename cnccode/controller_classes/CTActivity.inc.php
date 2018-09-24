@@ -1309,7 +1309,10 @@ class CTActivity extends CTCNC
         $this->setMethodName('displayActivity');
         $this->setPageTitle('Activity');
 
-        $this->buActivity->getActivityByID($_REQUEST['callActivityID'], $dsCallActivity);
+        $this->buActivity->getActivityByID(
+            $_REQUEST['callActivityID'],
+            $dsCallActivity
+        );
         $callActivityID = $dsCallActivity->getValue('callActivityID');
 
         $problemID = $dsCallActivity->getValue('problemID');
@@ -2029,6 +2032,17 @@ class CTActivity extends CTCNC
             $hiddenText = '';
         }
 
+        if ((int)$dbeJProblem->getValue(DBEProblem::authorisedBy)) {
+            $dbeContact = new DBEContact($this);
+
+            $dbeContact->getRow($dbeJProblem->getValue(DBEProblem::authorisedBy));
+
+            $authorisedByName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                    DBEContact::lastName
+                );
+        }
+
+
         $this->template->set_var(
             array(
                 'hiddenText'               => $hiddenText,
@@ -2150,7 +2164,9 @@ class CTActivity extends CTCNC
                 'disabled'                           => $disabled,
                 'contactPhone'                       => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue('contactID')
-                )
+                ),
+                'authorisedByHide'                   => $authorisedByName ? '' : "hidden",
+                'authorisedByName'                   => $authorisedByName
 
             )
         );
@@ -2702,7 +2718,7 @@ class CTActivity extends CTCNC
             JOIN contact ON con_custno = cus_custno
             JOIN address ON add_custno = cus_custno AND add_siteno = con_siteno
           
-          WHERE 1=1";
+          WHERE supportLevel is not null and supportLevel <> '' ";
 
                 if ($_REQUEST['customerString']) {
                     $query .= " AND ( cus_name LIKE '%" . $_REQUEST['customerString'] . "%' OR customer.cus_custno = '" . $_REQUEST['customerString'] . "')";
@@ -3141,6 +3157,7 @@ class CTActivity extends CTCNC
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $_SESSION[$this->sessionKey]['reason'] = $_REQUEST['reason'];
+            $_SESSION[$this->sessionKey]['authorisedBy'] = $_REQUEST['authorisedBy'];
 
             if ($_REQUEST['hideFromCustomerFlag']) {
                 $_SESSION[$this->sessionKey]['hideFromCustomerFlag'] = $_REQUEST['hideFromCustomerFlag'];
@@ -3290,6 +3307,12 @@ class CTActivity extends CTCNC
             $_SESSION[$this->sessionKey]['siteNo'],
             'ActivityCreate6',
             'siteBlock'
+        );
+
+        $this->onlyMainAndSupervisorsDropdown(
+            'ActivityCreate6',
+            $_SESSION[$this->sessionKey]['customerID'],
+            $_SESSION[$this->sessionKey]['contactID']
         );
 
         $this->contactDropdown(
@@ -3450,7 +3473,11 @@ class CTActivity extends CTCNC
         $dbeContact = new DBEContact($this);
         $dbeSite = new DBESite($this);
 
-        $dbeContact->getRowsByCustomerID($customerID);
+        $dbeContact->getRowsByCustomerID(
+            $customerID,
+            false,
+            true
+        );
 
         $this->template->set_block(
             $templateName,
@@ -3468,11 +3495,11 @@ class CTActivity extends CTCNC
                 $startMainContactStyle = '*';
                 $endMainContactStyle = '*';
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
-                $startMainContactStyle = '-delegate';
-                $endMainContactStyle = '-delegate';
+                $startMainContactStyle = '- Delegate';
+                $endMainContactStyle = '- Delegate';
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
-                $startMainContactStyle = '-Supervisor';
-                $endMainContactStyle = '-Supervisor';
+                $startMainContactStyle = '- Supervisor';
+                $endMainContactStyle = '- Supervisor';
             } else {
                 $startMainContactStyle = '';
                 $endMainContactStyle = '';
@@ -4047,6 +4074,17 @@ class CTActivity extends CTCNC
                 )
             );
 
+        if ((int)$dbeProblem->getValue(DBEProblem::authorisedBy)) {
+            $dbeContact = new DBEContact($this);
+
+            $dbeContact->getRow($dbeProblem->getValue(DBEProblem::authorisedBy));
+
+            $authorisedByName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                    DBEContact::lastName
+                );
+        }
+
+
         $this->template->set_var(
             array(
                 'level'                        => $level,
@@ -4145,7 +4183,9 @@ class CTActivity extends CTCNC
                 'esUsedMinutes'             => $esUsedMinutes,
                 'imAssignedMinutes'         => $imAssignedMinutes,
                 'imUsedMinutes'             => $imUsedMinutes,
-                'userWarned'                => $this->userWarned
+                'userWarned'                => $this->userWarned,
+                'authoriseHide'             => $authorisedByName ? '' : 'hidden',
+                'authorisedByName'          => $authorisedByName
             )
         );
 
@@ -6767,6 +6807,102 @@ class CTActivity extends CTCNC
         );
 
         $this->redirectToDisplay($_REQUEST['callActivityID']);
+    }
+
+    private function onlyMainAndSupervisorsDropdown($templateName,
+                                                    $customerID,
+                                                    $contactID
+    )
+    {
+        $dbeContact = new DBEContact($this);
+        $dbeSite = new DBESite($this);
+
+        $dbeContact->getRowsByCustomerID(
+            $customerID,
+            false,
+            true
+        );
+
+        $this->template->set_block(
+            $templateName,
+            'contactOnlyMainAndSupervisorsBlock',
+            'contactsOnlyMainAndSupervisor'
+        );
+
+        $lastSiteNo = '';
+        while ($dbeContact->fetchNext()) {
+            $contactSelected = ($contactID == $dbeContact->getValue("contactID")) ? CT_SELECTED : '';
+
+            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
+                $startMainContactStyle = '*';
+                $endMainContactStyle = '*';
+            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
+                $startMainContactStyle = '- Supervisor';
+                $endMainContactStyle = '- Supervisor';
+            } else {
+                continue;
+            }
+
+            $dbeSite->setValue(
+                DBESite::customerID,
+                $dbeContact->getValue("customerID")
+            );
+            $dbeSite->setValue(
+                DBESite::siteNo,
+                $dbeContact->getValue("siteNo")
+            );
+            $dbeSite->getRow();
+
+            $name = $dbeContact->getValue("firstName") . ' ' . $dbeContact->getValue("lastName");
+
+            if ($dbeContact->getValue("position")) {
+                $name .= ' (' . $dbeContact->getValue("position") . ')';
+            }
+
+            /*
+        Option group site
+        */
+
+            if ($dbeContact->getValue('siteNo') != $lastSiteNo) {
+
+                if ($dbeContact->getValue('siteNo') != '') {
+
+                    if ($lastSiteNo !== '') {
+                        $optGroupClose = '</optgroup>';
+                    } else {
+                        $optGroupClose = '';
+
+                    }
+                }
+
+                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                        DBESite::town
+                    ) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
+                $optGroupClose = '';
+            } else {
+                $optGroupOpen = '';
+                $optGroupClose = '';
+            }
+
+            $lastSiteNo = $dbeContact->getValue('siteNo');
+
+            $this->template->set_var(
+                array(
+                    'contactSelected'       => $contactSelected,
+                    'contactID'             => $dbeContact->getValue("contactID"),
+                    'contactName'           => $name,
+                    'startMainContactStyle' => $startMainContactStyle,
+                    'endMainContactStyle'   => $endMainContactStyle,
+                    'optGroupOpen'          => $optGroupOpen,
+                    'optGroupClose'         => $optGroupClose
+                )
+            );
+            $this->template->parse(
+                'contactsOnlyMainAndSupervisor',
+                'contactOnlyMainAndSupervisorsBlock',
+                true
+            );
+        }
     }
 }
 

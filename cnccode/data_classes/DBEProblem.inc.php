@@ -56,6 +56,7 @@ class DBEProblem extends DBEntity
     const managementReviewReason = "managementReviewReason";
     const startedUserID = "startedUserID";
     const reopenedDate = "reopenedDate";
+    const authorisedBy = "authorisedBy";
 
     /**
      * calls constructor()
@@ -366,6 +367,13 @@ class DBEProblem extends DBEntity
             DA_ALLOW_NULL,
             "pro_started_consno"
         );
+
+        $this->addColumn(
+            self::authorisedBy,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {

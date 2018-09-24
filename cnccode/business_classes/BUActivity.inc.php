@@ -1758,167 +1758,6 @@ class BUActivity extends Business
         return $enteredEndTime;
     }
 
-    private function sendMonitoringEmails($callActivityID)
-    {
-        $buMail = new BUMail($this);
-
-        $dbeJCallActivity = new DBEJCallActivity($this);
-        $dbeJCallActivity->getRow($callActivityID);
-
-        $validActivityTypeIDs = [
-            4,
-            7,
-            8,
-            11,
-            18,
-            57,
-            55,
-            59,
-        ];
-
-        if (!in_array(
-            $dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID),
-            $validActivityTypeIDs
-        )) {
-            return;
-        }
-
-        $monitoringPeople = $this->getPeopleMonitoringProblem($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
-
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-//        $senderName = 'CNC Support Department';
-
-        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
-                DBEJCallActivity::customerName
-            );
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'MonitoringEmail.inc.html'
-        );
-
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
-            );
-
-        $durationHours = common_convertHHMMToDecimal(
-                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
-            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
-
-        $awaitingCustomerResponse = null;
-
-        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
-            $awaitingCustomerResponse = 'Awaiting Customer';
-        } else {
-            $awaitingCustomerResponse = 'Awaiting CNC';
-        }
-
-
-        $template->setVar(
-            array(
-                'activityRef'                 => $activityRef,
-                'activityDate'                => $dbeJCallActivity->getValue(DBEJCallActivity::date),
-                'activityStartTime'           => $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
-                'activityEndTime'             => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
-                'activityTypeName'            => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
-                'urlActivity'                 => $urlActivity,
-                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
-                'durationHours'               => round(
-                    $durationHours,
-                    2
-                ),
-                'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
-                    DBEJCallActivity::problemStatus
-                )],
-                'awaitingCustomerResponse'    => $awaitingCustomerResponse,
-                'customerName'                => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
-                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
-            )
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $body = preg_replace(
-            '/[\x00-\x1F\x7F-\xFF]/',
-            '',
-            $body
-        );
-        $body = preg_replace(
-            '/[\x00-\x1F\x7F]/',
-            '',
-            $body
-        );
-        $body = preg_replace(
-            '/[\x00-\x1F\x7F]/u',
-            '',
-            $body
-        );
-
-        foreach ($monitoringPeople as $monitoringPerson) {
-            $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
-
-            $hdrs = array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => 'Monitored SR ' . $dbeJCallActivity->getValue(
-                        DBEJCallActivity::problemID
-                    ) . ' For ' . $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body,
-                true
-            );
-        }
-
-
-    }
-
-    private function getPeopleMonitoringProblem($problemID)
-    {
-        global $db;
-
-        $sql = "SELECT * FROM problem_monitoring left join consultant on problem_monitoring.cons_no = consultant.cns_consno WHERE problemId = $problemID";
-
-
-        $db->query($sql);
-        $data = [];
-        while ($db->next_record()) {
-            $data[] = $db->Record;
-        }
-        return $data;
-    }
-
     function highActivityAlertCheck($problemID)
     {
 
@@ -5440,6 +5279,12 @@ is currently a balance of ';
             DBEProblem::rootCauseID,
             $_SESSION [$sessionKey] ['rootCauseID']
         );
+
+        $dbeProblem->setValue(
+            DBEProblem::authorisedBy,
+            $_SESSION[$sessionKey]['authorisedBy']
+        );
+
         $dbeProblem->setValue(
             DBEProblem::status,
             'I'
@@ -6681,6 +6526,20 @@ is currently a balance of ';
             $toEmail,
             $hdrs,
             $body
+        );
+    }
+
+    function getOpenProblemByContactID($contactID,
+                                       &$dsResults
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getOpenRowsByContactID($contactID);
+
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
         );
     }
 
@@ -10066,63 +9925,6 @@ is currently a balance of ';
             $text
         );
 
-    }
-
-    public function getHDTeamUsedTime($problemID,
-                                      $excludedActivityID = null
-    )
-    {
-        return $this->getUsedTimeForProblemAndTeam(
-            $problemID,
-            1,
-            $excludedActivityID
-        );
-    }
-
-    public function getUsedTimeForProblemAndTeam($problemID,
-                                                 $teamID,
-                                                 $excludedActivityID = null
-    )
-    {
-        global $db;
-
-        $sql =
-            "SELECT sum(time_to_sec(timediff(caa_endtime, caa_starttime)) / 60) AS amountOfTime
-            FROM
-              `problem`
-              LEFT JOIN callactivity ON callactivity.`caa_problemno` = problem.`pro_problemno`
-              LEFT JOIN consultant ON caa_consno = cns_consno
-            WHERE  pro_problemno = $problemID AND teamID = $teamID AND caa_starttime AND caa_endtime and caa_callacttypeno in (4, 8, 11, 18)";
-
-        if ($excludedActivityID) {
-            $sql .= " and caa_callactivityno <> $excludedActivityID";
-        }
-
-        $db->query($sql);
-        $db->next_record();
-        return empty($db->Record['amountOfTime']) ? 0 : $db->Record['amountOfTime'];
-    }
-
-    public function getESTeamUsedTime($problemID,
-                                      $excludedActivityID = null
-    )
-    {
-        return $this->getUsedTimeForProblemAndTeam(
-            $problemID,
-            2,
-            $excludedActivityID
-        );
-    }
-
-    public function getIMTeamUsedTime($problemID,
-                                      $excludedActivityID = null
-    )
-    {
-        return $this->getUsedTimeForProblemAndTeam(
-            $problemID,
-            4,
-            $excludedActivityID
-        );
     }
 
     function getUserPerformanceWeekToDate($userID)

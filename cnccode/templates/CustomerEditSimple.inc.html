@@ -4,6 +4,7 @@
 ></script>
 <style>
 
+
     table.content tbody td {
         background-color: #F4f4f2;
         text-align: left;
@@ -12,44 +13,887 @@
         white-space: nowrap;
     }
 
+    table.content thead td {
+        padding: 5px;
+    }
+
+    table.content tbody td.center {
+        text-align: center;
+    }
+
     .contactError input {
         border-color: red;
     }
 
-    td.has-error {
+    .lockedIcon::before {
+        font-family: "FontAwesome";
+        content: '\f023';
+        color: green;
+    }
+
+    .unlockedIcon::before {
+        font-family: "FontAwesome";
+        content: '\f13e';
+        color: red;
+    }
+
+    div.has-error {
         background-color: red !important;
     }
 
-    .redText
+    fieldset label {
+        height: 20px;
+        width: 140px;
+        margin-left: 10px;
+        text-align: right;
+        clear: both;
+        float: left;
+        margin-right: 15px;
+        margin-top: 10px;
+    }
+
+    fieldset input {
+        height: 20px;
+        width: 200px;
+        border: 1px solid #000;
+        margin-top: 10px;
+        float: left;
+    }
+
+    fieldset .comment {
+        float: left;
+        margin-top: 10px;
+    }
+
+    .redText td input, .redText td textarea, .redText td select, .redText td button {
+        color: red !important;
+    }
+
+    table.fixed_header {
+        table-layout: fixed;
+    }
+
+    .fixed_header tbody, thead {
+        display: block;
+    }
+
+    .fixed_header tbody {
+        overflow-y: scroll;
+        height: 851px;
+        direction: rtl;
+        /*width: 100%;*/
+    }
+
+    .fixed_header tbody tr{
+        direction: ltr;
+    }
+
+    .fixed_header tbody td {
+        overflow: hidden;
+    }
+
+    .fixed_header td, th {
+        word-wrap: break-word;
+    }
+
+    .fixed_header thead tr, .fixed_header tbody tr {
+        display: block;
+    }
+
+    .highlight {
+        background-color: lightgreen;
+    }
+
+    .fixed_header thead {
+        margin-right: 12px;
+    }
+
+    .contactClear {
+        width: 26px;
+    }
+
+    .contactSite {
+        width: 40px;
+    }
+
+    .contactTitle {
+        width: 52px;
+    }
+
+    .contactFirstName {
+        width: 100px;
+    }
+
+    .contactLast {
+        width: 100px;
+    }
+
+    .contactPosition {
+        width: 100px;
+    }
+
+    .contactPhone {
+        width: 100px;
+    }
+
+    .contactMobile {
+        width: 100px;
+    }
+
+    .contactEmail {
+        width: 190px;
+    }
+
+    .contactPassword {
+        width: 60px;
+    }
+
+    .contactFailedLogins {
+        width: 50px;
+    }
+
+    .contactNotes {
+        width: 80px;
+    }
+
+    .contactInitialLogging {
+        width: 50px;
+    }
+
+    .contactWorkStarted {
+        width: 50px;
+    }
+
+    .contactWorkUpdates {
+        width: 50px;
+    }
+
+    .contactFixed {
+        width: 50px;
+    }
+
+    .contactPendingClosure {
+        width: 50px;
+    }
+
+    .contactClosure {
+        width: 50px;
+    }
+
+    .contactOthersInitialLogging {
+        width: 50px;
+    }
+
+    .contactOthersWorkStarted {
+        width: 50px;
+    }
+
+    .contactOthersWorkUpdates {
+        width: 50px;
+    }
+
+    .contactOthersFixed {
+        width: 50px;
+    }
+
+    .contactOthersPendingClosure {
+        width: 50px;
+    }
+
+    .contactOthersClosure {
+        width: 50px;
+    }
+
+    .contactAccounts {
+        width: 50px;
+    }
+
+    .contactMailshot2Flag {
+        width: 50px;
+    }
+
+    .contactMailshot3Flag {
+        width: 50px;
+    }
+
+    .contactMailshot4Flag {
+        width: 50px;
+    }
+
+    .contactSupportLevel {
+        width: 90px;
+    }
+
+    .contactHR {
+        width: 50px;
+    }
+
+    .contactReview {
+        width: 50px;
+    }
+
+    .contactMailshot8Flag {
+        width: 50px;
+    }
+
+    .contactMailshot11Flag {
+        width: 50px;
+    }
+
+    .contactMailshot9Flag {
+        width: 50px;
+    }
+
+    .contactMailshot {
+        width: 50px;
+    }
+
+    .contactLetters {
+        width: 290px;
+    }
+
+    .contactPendingLeaver {
+        width: 50px;
+    }
+
+    .contactPendingLeaverDate {
+        width: 160px;
+    }
 
 </style>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"
 ></script>
+<div id="newPasswordDialog"
+     title="New Password"
+>
+    <fieldset id="register">
+        <label>Password </label>
+        <input type="password"
+               id="password"
+        >
+        <span class="comment"
+              id="passwordComment"
+        ></span>
+        <label>Repeat Password </label>
+        <input type="password"
+               id="repeatPassword"
+        >
+        <span class="comment"
+              id="repeatPasswordComment"
+        ></span>
+    </fieldset>
+    <br>
+    <div>
+        <button onclick="saveNewPassword()"
+                disabled
+                id="savePasswordButton"
+        >Save
+        </button>
+        <button onclick="cancelNewPassword()">Cancel</button>
+    </div>
+</div>
+
+<script id="contact-row"
+        type="text/template"
+>
+    <tr>
+        <td>
+            <input type="hidden"
+                   name="form[contact][0][contactID]"
+                   value="0"
+            >
+            <input type="hidden"
+                   name="form[contact][0][customerID]"
+                   value="{customerID}"
+            >
+            <input type="hidden"
+                   name="form[contact][0][supplierID]"
+                   value="0"
+            >
+            <input type="hidden"
+                   name="form[contact][0][fax]"
+                   value=""
+            >
+            <input type="hidden"
+                   name="form[contact][0][discontinuedFlag]"
+                   value="N"
+            >
+            <div class="contactClear">
+            </div>
+        </td>
+        <td>
+            <div class="contactSite">
+                <select name="form[contact][0][siteNo]"
+                        data-validation="required"
+                >
+                    <!-- BEGIN templateSelectSiteBlock -->
+                    <option value="{selectSiteNo}"
+                    >{selectSiteDesc}
+                    </option>
+                    <!-- END templateSelectSiteBlock -->
+                </select>
+            </div>
+        </td>
+        <td>
+            <div class="contactTitle">
+
+                <input name="form[contact][0][title]"
+                       size="2"
+                       maxlength="10"
+                       value=""
+                       required
+                       data-validation="required"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactFirstName">
+
+                <input name="form[contact][0][firstName]"
+                       size="10"
+                       maxlength="50"
+                       value=""
+                       required
+                       data-validation="required"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactLast">
+
+                <input name="form[contact][0][lastName]"
+                       size="10"
+                       maxlength="50"
+                       value=""
+                       required
+                       data-validation="required"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactPosition">
+                <input name="form[contact][0][position]"
+                       value=""
+                       size="10"
+                       maxlength="20"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactPhone">
+
+                <input name="form[contact][0][phone]"
+                       value=""
+                       size="10"
+                       maxlength="30"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactMobile">
+                <input name="form[contact][0][mobilePhone]"
+                       value=""
+                       size="10"
+                       maxlength="30"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactEmail">
+                <input type="email"
+                       name="form[contact][0][email]"
+                       value=""
+                       size="25"
+                       maxlength="50"
+                       data-validation="emailOrEmpty server"
+                       data-validation-url="/validateUniqueEmail.php"
+                >
+            </div>
+        </td>
+        <td class="center ">
+            <div class="contactPassword">
+            </div>
+        </td>
+        <td>
+            <div class="contactFailedLogins">
+                <input name="form[contact][0][failedLoginCount]"
+                       value=""
+                       size="2"
+                       maxlength="5"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactNotes">
+                <input
+                        name="form[contact][0][notes]"
+                        size="5"
+                        maxlength="200"
+                        value=""
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactInitialLogging">
+
+                <input type="checkbox"
+                       name="form[contact][0][initialLoggingEmailFlag]"
+                       value="Y"
+                       class="checkboxAlign"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactWorkStarted">
+
+                <input type="checkbox"
+                       name="form[contact][0][workStartedEmailFlag]"
+                       value="Y"
+                       class="checkboxAlign"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactWorkUpdates">
+
+                <input type="checkbox"
+                       name="form[contact][0][workUpdatesEmailFlag]"
+                       value="Y"
+                       class="checkboxAlign"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactFixed">
+
+                <input type="checkbox"
+                       name="form[contact][0][fixedEmailFlag]"
+                       value="Y"
+                       class="checkboxAlign"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactPendingClosure">
+
+                <input type="checkbox"
+                       name="form[contact][0][pendingClosureEmailFlag]"
+                       value="Y"
+                       class="checkboxAlign"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactClosure">
+
+                <input type="checkbox"
+                       name="form[contact][0][closureEmailFlag]"
+                       value="Y"
+                       class="checkboxAlign"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactOthersInitialLogging">
+
+                <input type="checkbox"
+                       name="form[contact][0][othersInitialLoggingEmailFlag]"
+                       value="Y"
+                       disabled
+                       class="onlyMain"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactOthersWorkStarted">
+                <input type="checkbox"
+                       name="form[contact][0][othersWorkStartedEmailFlag]"
+                       value="Y"
+                       disabled
+                       class="onlyMain"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactOthersWorkUpdates">
+                <input type="checkbox"
+                       name="form[contact][0][othersWorkUpdatesEmailFlag]"
+                       value="Y"
+                       disabled
+                       class="onlyMain"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactOthersFixed">
+                <input type="checkbox"
+                       name="form[contact][0][othersFixedEmailFlag]"
+                       value="Y"
+                       disabled
+                       class="onlyMain"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactOthersPendingClosure">
+                <input type="checkbox"
+                       name="form[contact][0][othersPendingClosureEmailFlag]"
+                       value="Y"
+                       disabled
+                       class="onlyMain"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactOthersClosure">
+                <input type="checkbox"
+                       name="form[contact][0][othersClosureEmailFlag]"
+                       value="Y"
+                       disabled
+                       class="onlyMain"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="contactAccounts">
+
+                <input type="checkbox"
+                       name="form[contact][0][accountsFlag]"
+                       value="Y"
+                       data-validation="atLeastOne"
+                       data-type="accounts"
+                       data-except="$('#referred').prop('checked')"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot2Flag">
+                <input type="checkbox"
+                       name="form[contact][0][mailshot2Flag]"
+                       value="Y"
+                       data-validation="atLeastOne"
+                       data-type="invoice"
+                       data-except="$('#referred').prop('checked')"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot3Flag">
+                <input type="checkbox"
+                       name="form[contact][0][mailshot3Flag]"
+                       value="Y"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot4Flag">
+                <input type="checkbox"
+                       name="form[contact][0][mailshot4Flag]"
+                       value="Y"
+                       class="stmCheckBox"
+                       data-validation="atLeastOneAtMostOne"
+                       data-type="statement"
+                       data-except="$('#referred').prop('checked')"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactSupportLevel">
+                <select name="form[contact][0][supportLevel]"
+                        data-validation="atLeastOneMain"
+                        data-type="mainSelector"
+                        data-except="$('#referred').prop('checked')"
+                >
+                    <!-- BEGIN templateSupportLevelBlock -->
+                    <option value="{supportLevelValue}"
+                    >
+                        {supportLevelDescription}
+                    </option>
+                    <!-- END templateSupportLevelBlock -->
+                </select>
+            </div>
+        </td>
+        <td>
+            <div class="contactHR">
+                <input type="checkbox"
+                       name="form[contact][0][hrUser]"
+                       value="Y"
+                />
+            </div>
+        </td>
+
+        <td>
+            <div class="contactReview">
+                <input type="checkbox"
+                       name="form[contact][0][reviewUser]"
+                       value="Y"
+                       data-validation="atLeastOne"
+                       data-type="review"
+                       data-except="$('#referred').prop('checked')"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot8Flag">
+                <input type="checkbox"
+                       name="form[contact][0][mailshot8Flag]"
+                       value="Y"
+                       data-type="topUp"
+                       {topUpValidation}
+                       data-except="$('#referred').prop('checked')"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot11Flag">
+                <input type="checkbox"
+                       name="form[contact][0][mailshot11Flag]"
+                       value="Y"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot9Flag">
+                <input type="checkbox"
+                       name="form[contact][0][mailshot9Flag]"
+                       value="Y"
+                       data-validation="atLeastOne"
+                       data-type="reports"
+                       data-except="$('#referred').prop('checked')"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactMailshot">
+                <input type="checkbox"
+                       name="form[contact][0][sendMailshotFlag]"
+                       value="Y"
+                />
+            </div>
+        </td>
+        <td nowrap="nowrap">
+            <div class="contactLetters">
+                <select name="letters_menu"
+                        onchange="MM_jumpMenu('_blank',this,0)"
+                >
+                    <option>Send Letter</option>
+                    <option value="{clientFormURL}">Appointment</option>
+                    <!-- BEGIN templateCustomLetterBlock -->
+                    <option value="{customLetterURL}">{customLetterName}</option>
+                    <!-- END templateCustomLetterBlock -->
+                </select>
+            </div>
+        </td>
+        <td>
+            <div class="contactPendingLeaver">
+                <input type="checkbox"
+                       name="form[contact][0][pendingLeaverFlag]"
+                       value="Y"
+                />
+            </div>
+        </td>
+        <td>
+            <div class="contactPendingLeaverDate">
+                <input type="text"
+                       name="form[contact][0][pendingLeaverDate]"
+                       value="{pendingLeaverDate}"
+                       class="jQueryCalendar"
+                       autocomplete="off"
+                />
+            </div>
+        </td>
+    </tr>
+</script>
 <script type="text/JavaScript">
 
-    function askNewPassword() {
-        var password = prompt('Please set a secure password');
+    var isShowingInactive = {isShowingInactive};
 
-        if(password){
-            $(event.target).parent().
-        }
+    function clearRow(contactID) {
+        var row = $(event.target).closest('tr');
+
+        var object = {
+            contactID: contactID
+        };
+        $.ajax({
+            url: '?action=archiveContact',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to clear contact';
+            } else {
+                if (isShowingInactive) {
+                    row.find('input[type="checkbox"]').attr('checked', false);
+                    row.find('input[type="email"]').val(null);
+                    row.find('select[data-type="mainSelector"]').val("").change();
+                } else {
+                    row.remove();
+                }
+
+            }
+        }).catch(function (error) {
+            alert('Failed to save password');
+        });
 
     }
 
+    function addContact(siteNo) {
+        this.source = document.getElementById("contact-row").innerHTML;
+        var context = {
+            name: "a",
+            id: 1,
+            userID: 2
+        };
+        var html = Mustache.to_html(this.source, context);
+        $(html)
+            .find('select[name="form[contact][0][siteNo]"] option[value=' + siteNo + ']')
+            .attr('selected', true)
+            .end()
+            .prependTo('#contactsTable tbody');
+    }
+
+    var currentContactId = null;
+    var currentPasswordButton = null;
+
+    function resetPasswordFields() {
+        $('#password').val(null);
+        $('#repeatPassword').val(null);
+    }
+
+    function cancelNewPassword() {
+        $('#newPasswordDialog').dialog('close');
+    }
+
+    function saveNewPassword() {
+        var object = {
+            password: $('#password').val(),
+            contactID: currentContactId
+        };
+
+        $.ajax({
+            url: '?action=saveContactPassword',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to save password';
+            } else {
+                alert('Submitted OK');
+                if ($(currentPasswordButton).hasClass('unlockedIcon')) {
+                    $(currentPasswordButton).removeClass('unlockedIcon').addClass('lockedIcon');
+                }
+            }
+        }).catch(function (error) {
+            alert('Failed to save password');
+            resetPasswordFields();
+        }).then(function () {
+            $('#newPasswordDialog').dialog('close');
+        });
+    }
+
+    $('#newPasswordDialog').dialog({
+        autoOpen: false, width: 500, close: function () {
+            resetPasswordFields();
+        }
+    });
+
+
+    function askNewPassword() {
+        var data = $(event.target).data();
+        currentContactId = data.contactId;
+        currentPasswordButton = event.target;
+        $('#newPasswordDialog').dialog('open');
+    }
+
+    var validPassword = false;
+    var validRepeatPassword = false;
+
     $(function () {
+
+        $("#contactsTable tbody tr").click(function () {
+            var selected = $(this).hasClass("highlight");
+            $("#contactsTable tbody tr").removeClass("highlight");
+            if (!selected)
+                $(this).addClass("highlight");
+        });
+
+        $('#password').keyup(function () {
+            $('#passwordComment').html(checkStrength($('#password').val()));
+            checkSavePassword();
+        });
+
+        $('#repeatPassword').keyup(function () {
+            $('#repeatPasswordComment').html(checkPasswordEqual($('#password').val(), $('#repeatPassword').val()));
+            checkSavePassword();
+        });
+
+        function checkSavePassword() {
+            if (validPassword && validRepeatPassword) {
+                $('#savePasswordButton').prop("disabled", false);
+            } else {
+                $('#savePasswordButton').prop("disabled", true);
+            }
+        }
+
+        function checkPasswordEqual(password, repeatPassword) {
+            validRepeatPassword = false;
+            if (!password || !repeatPassword) {
+                return null;
+            }
+
+            if (password != repeatPassword) {
+                return 'Not Equal';
+            }
+            validRepeatPassword = true;
+            return null;
+        }
+
+        function checkStrength(password) {
+            validPassword = false;
+            if (!password) {
+                return false;
+            }
+
+            var strength = 0;
+            if (password.length < 6) {
+                return 'Too short'
+            }
+
+            if (password.match(/([a-z])/)) strength += 1;
+            if (password.match(/([A-Z])/)) strength += 1;
+            if (password.match(/([0-9])/)) strength += 1;
+            if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
+// Calculated strength value, we can return messages
+// If value is less than 2
+            if (strength < 3) {
+                $('#result').removeClass();
+                $('#result').addClass('weak');
+                return 'Weak'
+            } else if (strength >= 3) {
+                $('#result').removeClass();
+                $('#result').addClass('good');
+                validPassword = true;
+                return null
+            }
+        }
+
 
         var config = {
             modules: 'security',
             inlineErrorMessageCallback: function (error, element) {
 
             },
-            scrollToTopOnError: false
+            scrollToTopOnError: true
         };
         $.validate(config);
 
         $.formUtils.addValidator({
             name: 'emailOrEmpty',
-            validatorFunction: function (email) {
+            validatorFunction: function (email, $el) {
 
                 if (email === '') {
                     return true;
@@ -69,11 +913,32 @@
                         }
                     }
 
-                    return $.formUtils.validators.validate_domain.validatorFunction(emailParts[1]) &&
+                    if (!$.formUtils.validators.validate_domain.validatorFunction(emailParts[1]) &&
                         localPart.indexOf('.') !== 0 &&
                         localPart.substring(localPart.length - 1, localPart.length) !== '.' &&
                         localPart.indexOf('..') === -1 &&
-                        !(/[^\w\+\.\-\#\-\_\~\!\$\&\'\(\)\*\+\,\;\=\:]/.test(localPart));
+                        !(/[^\w\+\.\-\#\-\_\~\!\$\&\'\(\)\*\+\,\;\=\:]/.test(localPart))
+                    ) {
+                        return false;
+                    }
+
+
+                    ///we need to check that no other email is set to the same
+                    var test = $('input[data-validation*="emailOrEmpty"]');
+                    var isDuplicate = false;
+
+                    test.each(function () {
+                        var elm = $(this);
+                        var isMe = elm.get(0) === $el.get(0);
+
+                        if (!isMe && elm.val().toLowerCase() === email.toLowerCase()) {
+                            isDuplicate = true;
+                            elm.addClass('error');
+                            elm.parent().addClass('has-error');
+                        }
+                    });
+
+                    return !isDuplicate;
                 }
 
                 return false;
@@ -188,10 +1053,10 @@
 
             if (elem[0].value === 'main') {
                 // we want to show the
-                tr.find('.onlyMain').show();
+                tr.find('.onlyMain').prop('disabled', false);
                 tr.addClass('redText');
             } else {
-                tr.find('.onlyMain').hide();
+                tr.find('.onlyMain').prop('disabled', true);
                 tr.removeClass('redText');
             }
         };
@@ -356,42 +1221,42 @@
 
     function checkMailShotOptions() {
 
-        var x = document.getElementsByClassName('stmCheckBox');
-        var count = 0;
-        var i = 0;
-        do {
-            if (x[i].checked) {
-                count++;
-            }
-
-            i++;
-        } while (count < 2 && i < x.length);
-
-        if (count > 1) {
-            alert('There cannot be more than one "stm" option selected');
-            return false;
-        }
-
-        if (!count) {
-            alert('There needs to be at least one "stm" option selected');
-            return false;
-        }
-
-        x = document.getElementsByClassName('invCheckBox');
-        count = 0;
-        i = 0;
-        do {
-            if (x[i].checked) {
-                count++;
-            }
-
-            i++;
-        } while (count < 1 && i < x.length);
-
-        if (!count) {
-            alert('There needs to be at least one "inv" option selected');
-            return false;
-        }
+        // var x = document.getElementsByClassName('stmCheckBox');
+        // var count = 0;
+        // var i = 0;
+        // do {
+        //     if (x[i].checked) {
+        //         count++;
+        //     }
+        //
+        //     i++;
+        // } while (count < 2 && i < x.length);
+        //
+        // if (count > 1) {
+        //     alert('There cannot be more than one "stm" option selected');
+        //     return false;
+        // }
+        //
+        // if (!count) {
+        //     alert('There needs to be at least one "stm" option selected');
+        //     return false;
+        // }
+        //
+        // x = document.getElementsByClassName('invCheckBox');
+        // count = 0;
+        // i = 0;
+        // do {
+        //     if (x[i].checked) {
+        //         count++;
+        //     }
+        //
+        //     i++;
+        // } while (count < 1 && i < x.length);
+        //
+        // if (!count) {
+        //     alert('There needs to be at least one "inv" option selected');
+        //     return false;
+        // }
 
         return true;
     }
@@ -401,11 +1266,6 @@
     })
     //-->
 </script>
-<style>
-    .redText td input, .redText td textarea, .redText td select, .redText td button {
-        color: red !important;
-    }
-</style>
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
 />
@@ -490,13 +1350,13 @@
            value="Show Inactive Sites"
            onClick="document.location='{showInactiveSitesURL}';"
 
-    ><input {disabled}
-            name="displayInactiveContacts"
-            type="button"
-            value="Show Inactive Contacts"
-            onClick="document.location='{showInactiveContactsURL}';"
-
->
+    >
+    <input {disabled}
+           name="displayInactiveContacts"
+           type="button"
+           value="Show Inactive Contacts"
+           onClick="document.location='{showInactiveContactsURL}';"
+    >
     <BR>
     {customerFolderLink}
     <br>
@@ -1298,9 +2158,11 @@
                         <td colspan="2"
                             class="content"
                         >
-                            <a href="#"
-                               onclick="contactPopup(0, 'addContact', {customerID}, {siteNo} )"
-                            >{addContactText}</a>
+                            <button type="button"
+                                    onclick="addContact({siteNo})"
+                            >
+                                Add Contact
+                            </button>
                         </td>
                     </tr>
 
@@ -1315,51 +2177,203 @@
         <div class="contacts"
              id="contactsTable"
         >
-            <table class="content"
+            <table class="content fixed_header"
                    border="0"
                    cellpadding="2"
                    cellspacing="1"
-                   width="100%"
             >
                 <thead>
                 <tr>
-                    <td class="headerLightgrey">&nbsp;</td>
-                    <td class="headerLightgrey">&nbsp;</td>
-                    <td class="headerLightgrey">Site</td>
-                    <td class="headerLightgrey">Title</td>
-                    <td class="headerLightgrey">First</td>
-                    <td class="headerLightgrey">Last</td>
-                    <td class="headerLightgrey">Position</td>
-                    <td class="headerLightgrey">Phone</td>
-                    <td class="headerLightgrey">Mobile</td>
-                    <td class="headerLightgrey">Email</td>
-                    <td class="headerLightgrey">Password</td>
-                    <td class="headerLightgrey">Failed Logins</td>
-                    <td class="headerLightgrey">Notes</td>
-                    <td class="headerLightgrey">Initial Logging?</td>
-                    <td class="headerLightgrey">Work Started?</td>
-                    <td class="headerLightgrey">Work Updates?</td>
-                    <td class="headerLightgrey">Fixed?</td>
-                    <td class="headerLightgrey">Pending Closure?</td>
-                    <td class="headerLightgrey">Closure?</td>
-                    <td class="headerLightgrey">Others Initial Logging?</td>
-                    <td class="headerLightgrey">Others Work Started?</td>
-                    <td class="headerLightgrey">Others Work Updates?</td>
-                    <td class="headerLightgrey">Others Fixed?</td>
-                    <td class="headerLightgrey">Others Pending Closure?</td>
-                    <td class="headerLightgrey">Others Closure?</td>
-                    <td class="headerLightgrey">Accounts</td>
-                    <td class="headerLightgrey">{mailshot2FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot3FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot4FlagDesc}</td>
-                    <td class="headerLightgrey">Support Level</td>
-                    <td class="headerLightgrey">HR</td>
-                    <td class="headerLightgrey">Review</td>
-                    <td class="headerLightgrey">{mailshot8FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot11FlagDesc}</td>
-                    <td class="headerLightgrey">{mailshot9FlagDesc}</td>
-                    <td class="headerLightgrey">Mailshot</td>
-                    <td class="headerLightgrey">Letters</td>
+                    <td class="headerLightgrey">
+                        <div class="contactClear">
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactSite">
+                            Site
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactTitle">
+                            Title
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactFirstName">
+                            First
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactLast">
+                            Last
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPosition">
+                            Position
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPhone">
+                            Phone
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMobile">
+                            Mobile
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactEmail">
+                            Email
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPassword">
+                            Password
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactFailedLogins">
+                            Failed Logins
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactNotes">
+                            Notes
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactInitialLogging">
+                            Initial Logging?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactWorkStarted">
+                            Work Started?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactWorkUpdates">
+                            Work Updates?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactFixed">
+                            Fixed?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPendingClosure">
+                            Pending Closure?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactClosure">
+                            Closure?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactOthersInitialLogging">
+                            Others Initial Logging?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactOthersWorkStarted">
+                            Others Work Started?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactOthersWorkUpdates">
+                            Others Work Updates?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactOthersFixed">
+                            Others Fixed?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactOthersPendingClosure">
+                            Others Pending Closure?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactOthersClosure">
+                            Others Closure?
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactAccounts">
+                            Accounts
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot2Flag">
+                            {mailshot2FlagDesc}
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot3Flag">
+                            {mailshot3FlagDesc}
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot4Flag">
+                            {mailshot4FlagDesc}
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactSupportLevel">
+                            Support Level
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactHR">
+                            HR
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactReview">
+                            Review
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot8Flag">
+                            {mailshot8FlagDesc}
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot11Flag">
+                            {mailshot11FlagDesc}
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot9Flag">
+                            {mailshot9FlagDesc}
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactMailshot">
+                            Mailshot
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactLetters">
+                            Letters
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPendingLeaver">
+                            Pending Leaver
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPendingLeaverDate">
+                            Pending Leaver Date
+                        </div>
+                    </td>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -1392,361 +2406,485 @@
 
                 <tr>
                     <td>
-                        <A href="#"
-                           onclick="javascript:contactPopup({contactID}, 'editContact', '{customerID}','{siteNo}' )"
-                        >edit</a>
-                    </td>
-                    <td>{deleteContactLink}</td>
-                    <td>
-                        <select
-                                name="form[contact][{contactID}][siteNo]"
-                                data-validation="required"
-                        >
-                            <!-- BEGIN selectSiteBlock -->
-                            <option {siteSelected}
-                                    value="{selectSiteNo}"
-                            >{selectSiteDesc}
-                            </option>
-                            <!-- END selectSiteBlock -->
-                        </select>
-                    </td>
-                    <td class="{titleClass}">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][title]"
-                                size="2"
-                                maxlength="10"
-                                value="{title}"
-                                required
-                                data-validation="required"
-                        >
-                    </td>
-                    <td class='{firstNameClass}'>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][firstName]"
-                                size="10"
-                                maxlength="50"
-                                value="{firstName}"
-                                required
-                                data-validation="required"
-                        >
-                    </td>
-                    <td class='{lastNameClass}'>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][lastName]"
-                                size="10"
-                                maxlength="50"
-                                value="{lastName}"
-                                required
-                                data-validation="required"
-                        >
-                    </td>
-                    <td>
-                        <input
-                                name="form[contact][{contactID}][position]"
-                                id="form[contact][{contactID}][position]"
-                                value="{position}"
-                                size="10"
-                                maxlength="20"
-                                {disabled}
-                        />
-                    </td>
-                    <td>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][phone]"
-                                value="{phone}"
-                                size="10"
-                                maxlength="30"
-                        >
-                    </td>
-                    <td>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][mobilePhone]"
-                                value="{mobilePhone}"
-                                size="10"
-                                maxlength="30"
-                        >
-                    </td>
-                    <td class='{emailClass}'>
-                        <input
-                                {disabled}
-                                type="email"
-                                name="form[contact][{contactID}][email]"
-                                value="{email}"
-                                size="25"
-                                maxlength="50"
-                                data-validation="emailOrEmpty server"
-                                data-validation-url="/validateUniqueEmail.php"
-                        >
-                    </td>
-                    <td>
-                        <button onclick="askNewPassword()">
-                            {portalPasswordButton}
-                        </button>
-                    </td>
-                    <td>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][failedLoginCount]"
-                                value="{failedLoginCount}"
-                                size="2"
-                                maxlength="5"
-                        >
-                    </td>
-                    <td>
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][notes]"
-                                size="5"
-                                maxlength="200"
-                                value="{notes}"
-                        />
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][initialLoggingEmailFlag]"
-                               value="Y"
-                               {initialLoggingEmailFlagChecked}
-                               class="checkboxAlign"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][workStartedEmailFlag]"
-                               value="Y"
-                               {workStartedEmailFlagChecked}
-                               class="checkboxAlign"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][workUpdatesEmailFlag]"
-                               value="Y"
-                               {workUpdatesEmailFlagChecked}
-                               class="checkboxAlign"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][fixedEmailFlag]"
-                               value="Y"
-                               {fixedEmailFlagChecked}
-                               class="checkboxAlign"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][pendingClosureEmailFlag]"
-                               value="Y"
-                               {pendingClosureEmailFlagChecked}
-                               class="checkboxAlign"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][closureEmailFlag]"
-                               value="Y"
-                               {closureEmailFlagChecked}
-                               class="checkboxAlign"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][othersInitialLoggingEmailFlag]"
-                               value="Y"
-                               {othersInitialLoggingEmailFlagChecked}
-                               hidden
-                               class="onlyMain"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][othersWorkStartedEmailFlag]"
-                               value="Y"
-                               {othersWorkStartedEmailFlagChecked}
-                               hidden
-                               class="onlyMain"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][othersWorkUpdatesEmailFlag]"
-                               value="Y"
-                               {othersWorkUpdatesEmailFlagChecked}
-                               hidden
-                               class="onlyMain"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][othersFixedEmailFlag]"
-                               value="Y"
-                               {othersFixedEmailFlagChecked}
-                               hidden
-                               class="onlyMain"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][othersPendingClosureEmailFlag]"
-                               value="Y"
-                               {othersPendingClosureEmailFlagChecked}
-                               hidden
-                               class="onlyMain"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][othersClosureEmailFlag]"
-                               value="Y"
-                               {othersClosureEmailFlagChecked}
-                               hidden
-                               class="onlyMain"
-                        >
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][accountsFlag]"
-                               value="Y"
-                               {accountsFlagChecked}
-                               data-validation="atLeastOne"
-                               data-type="accounts"
-                               data-except="$('#referred').prop('checked')"
-                        />
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot2Flag]"
-                               value="Y"
-                               {mailshot2FlagChecked}
-                               data-validation="atLeastOne"
-                               data-type="invoice"
-                               data-except="$('#referred').prop('checked')"
-                        />
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot3Flag]"
-                               value="Y"
-                               {mailshot3FlagChecked}
-                        />
-                    </td>
-                    <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot4Flag]"
-                               value="Y"
-                               {mailshot4FlagChecked}
-                               class="stmCheckBox"
-                               data-validation="atLeastOneAtMostOne"
-                               data-type="statement"
-                               data-except="$('#referred').prop('checked')"
-                        />
-                    </td>
-                    <td>
-                        <select
-                                name="form[contact][{contactID}][supportLevel]"
-                                data-validation="atLeastOneMain"
-                                data-type="mainSelector"
-                                data-except="$('#referred').prop('checked')"
-                        >
-                            <!-- BEGIN supportLevelBlock -->
-                            <option {supportLevelSelected}
-                                    value="{supportLevelValue}"
+                        <div class="contactClear">
+                            <button type="button"
+                                    onclick="clearRow({contactID})"
                             >
-                                {supportLevelDescription}
-                            </option>
-                            <!-- END supportLevelBlock -->
-                        </select>
+                                <i class="fa fa-trash-o"></i>
+                            </button>
+                        </div>
                     </td>
                     <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][hrUser]"
-                               value="Y"
-                               {hrUserFlagChecked}
-                        />
+                        <div class="contactSite">
+
+                            <select name="form[contact][{contactID}][siteNo]"
+                                    data-validation="required"
+                            >
+                                <!-- BEGIN selectSiteBlock -->
+                                <option {siteSelected}
+                                        value="{selectSiteNo}"
+                                >{selectSiteDesc}
+                                </option>
+                                <!-- END selectSiteBlock -->
+                            </select>
+                        </div>
+                    </td>
+                    <td class="{titleClass} ">
+                        <div class="contactTitle">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][title]"
+                                   size="2"
+                                   maxlength="10"
+                                   value="{title}"
+                                   required
+                                   data-validation="required"
+                            >
+                        </div>
+                    </td>
+                    <td class='{firstNameClass} '>
+                        <div class="contactFirstName">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][firstName]"
+                                   size="10"
+                                   maxlength="50"
+                                   value="{firstName}"
+                                   required
+                                   data-validation="required"
+                            >
+                        </div>
+                    </td>
+                    <td class='{lastNameClass} '>
+                        <div class="contactLast">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][lastName]"
+                                   size="10"
+                                   maxlength="50"
+                                   value="{lastName}"
+                                   required
+                                   data-validation="required"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPosition">
+
+                            <input name="form[contact][{contactID}][position]"
+                                   id="form[contact][{contactID}][position]"
+                                   value="{position}"
+                                   size="10"
+                                   maxlength="20"
+                                   {disabled}
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPhone">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][phone]"
+                                   value="{phone}"
+                                   size="10"
+                                   maxlength="30"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactMobile">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][mobilePhone]"
+                                   value="{mobilePhone}"
+                                   size="10"
+                                   maxlength="30"
+                            >
+                        </div>
+                    </td>
+                    <td class='{emailClass} '>
+                        <div class="contactEmail">
+
+                            <input {disabled}
+                                   type="email"
+                                   name="form[contact][{contactID}][email]"
+                                   value="{email}"
+                                   size="25"
+                                   maxlength="50"
+                                   data-validation="emailOrEmpty server"
+                                   data-validation-url="/validateUniqueEmail.php"
+                            >
+                        </div>
+                    </td>
+                    <td class="center ">
+                        <div class="contactPassword">
+
+                            <button onclick="askNewPassword()"
+                                    data-contact-id="{contactID}"
+                                    type="button"
+                                    class="{portalPasswordButtonClass}"
+                            >
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactFailedLogins">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][failedLoginCount]"
+                                   value="{failedLoginCount}"
+                                   size="2"
+                                   maxlength="5"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactNotes">
+
+                            <input {disabled}
+                                   name="form[contact][{contactID}][notes]"
+                                   size="5"
+                                   maxlength="200"
+                                   value="{notes}"
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactInitialLogging">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][initialLoggingEmailFlag]"
+                                   value="Y"
+                                   {initialLoggingEmailFlagChecked}
+                                   class="checkboxAlign"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactWorkStarted">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][workStartedEmailFlag]"
+                                   value="Y"
+                                   {workStartedEmailFlagChecked}
+                                   class="checkboxAlign"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactWorkUpdates">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][workUpdatesEmailFlag]"
+                                   value="Y"
+                                   {workUpdatesEmailFlagChecked}
+                                   class="checkboxAlign"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactFixed">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][fixedEmailFlag]"
+                                   value="Y"
+                                   {fixedEmailFlagChecked}
+                                   class="checkboxAlign"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPendingClosure">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][pendingClosureEmailFlag]"
+                                   value="Y"
+                                   {pendingClosureEmailFlagChecked}
+                                   class="checkboxAlign"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactClosure">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][closureEmailFlag]"
+                                   value="Y"
+                                   {closureEmailFlagChecked}
+                                   class="checkboxAlign"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactOthersInitialLogging">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][othersInitialLoggingEmailFlag]"
+                                   value="Y"
+                                   {othersInitialLoggingEmailFlagChecked}
+                                   disabled
+                                   class="onlyMain"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactOthersWorkStarted">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][othersWorkStartedEmailFlag]"
+                                   value="Y"
+                                   {othersWorkStartedEmailFlagChecked}
+                                   disabled
+                                   class="onlyMain"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactOthersWorkUpdates">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][othersWorkUpdatesEmailFlag]"
+                                   value="Y"
+                                   {othersWorkUpdatesEmailFlagChecked}
+                                   disabled
+                                   class="onlyMain"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactOthersFixed">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][othersFixedEmailFlag]"
+                                   value="Y"
+                                   {othersFixedEmailFlagChecked}
+                                   disabled
+                                   class="onlyMain"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactOthersPendingClosure">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][othersPendingClosureEmailFlag]"
+                                   value="Y"
+                                   {othersPendingClosureEmailFlagChecked}
+                                   disabled
+                                   class="onlyMain"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactOthersClosure">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][othersClosureEmailFlag]"
+                                   value="Y"
+                                   {othersClosureEmailFlagChecked}
+                                   disabled
+                                   class="onlyMain"
+                            >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactAccounts">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][accountsFlag]"
+                                   value="Y"
+                                   {accountsFlagChecked}
+                                   data-validation="atLeastOne"
+                                   data-type="accounts"
+                                   data-except="$('#referred').prop('checked')"
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactMailshot2Flag">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][mailshot2Flag]"
+                                   value="Y"
+                                   {mailshot2FlagChecked}
+                                   data-validation="atLeastOne"
+                                   data-type="invoice"
+                                   data-except="$('#referred').prop('checked')"
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactMailshot3Flag">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][mailshot3Flag]"
+                                   value="Y"
+                                   {mailshot3FlagChecked}
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactMailshot4Flag">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][mailshot4Flag]"
+                                   value="Y"
+                                   {mailshot4FlagChecked}
+                                   class="stmCheckBox"
+                                   data-validation="atLeastOneAtMostOne"
+                                   data-type="statement"
+                                   data-except="$('#referred').prop('checked')"
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactSupportLevel">
+
+                            <select name="form[contact][{contactID}][supportLevel]"
+                                    data-validation="atLeastOneMain"
+                                    data-type="mainSelector"
+                                    data-except="$('#referred').prop('checked')"
+                            >
+                                <!-- BEGIN supportLevelBlock -->
+                                <option {supportLevelSelected}
+                                        data-test="{supportLevelSelected}"
+                                        value="{supportLevelValue}"
+                                >
+                                    {supportLevelDescription}
+                                </option>
+                                <!-- END supportLevelBlock -->
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactHR">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][hrUser]"
+                                   value="Y"
+                                   {hrUserFlagChecked}
+                            />
+                        </div>
                     </td>
 
                     <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][reviewUser]"
-                               value="Y"
-                               {reviewUserFlagChecked}
-                               data-validation="atLeastOne"
-                               data-type="review"
-                               data-except="$('#referred').prop('checked')"
-                        />
+                        <div class="contactReview">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][reviewUser]"
+                                   value="Y"
+                                   {reviewUserFlagChecked}
+                                   data-validation="atLeastOne"
+                                   data-type="review"
+                                   data-except="$('#referred').prop('checked')"
+                            />
+                        </div>
                     </td>
                     <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot8Flag]"
-                               value="Y"
-                               {mailshot8FlagChecked}
-                               data-type="topUp"
-                               {topUpValidation}
-                               data-except="$('#referred').prop('checked')"
-                        />
+                        <div class="contactMailshot8Flag">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][mailshot8Flag]"
+                                   value="Y"
+                                   {mailshot8FlagChecked}
+                                   data-type="topUp"
+                                   {topUpValidation}
+                                   data-except="$('#referred').prop('checked')"
+                            />
+                        </div>
                     </td>
                     <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot11Flag]"
-                               value="Y"
-                               {mailshot11FlagChecked}
-                        />
+                        <div class="contactMailshot11Flag">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][mailshot11Flag]"
+                                   value="Y"
+                                   {mailshot11FlagChecked}
+                            />
+                        </div>
                     </td>
                     <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][mailshot9Flag]"
-                               value="Y"
-                               {mailshot9FlagChecked}
-                               data-validation="atLeastOne"
-                               data-type="reports"
-                               data-except="$('#referred').prop('checked')"
-                        />
+                        <div class="contactMailshot9Flag">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][mailshot9Flag]"
+                                   value="Y"
+                                   {mailshot9FlagChecked}
+                                   data-validation="atLeastOne"
+                                   data-type="reports"
+                                   data-except="$('#referred').prop('checked')"
+                            />
+                        </div>
                     </td>
                     <td>
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][sendMailshotFlag]"
-                               value="Y"
-                               {sendMailshotFlagChecked}
-                        />
+                        <div class="contactMailshot">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][sendMailshotFlag]"
+                                   value="Y"
+                                   {sendMailshotFlagChecked}
+                            />
+                        </div>
                     </td>
                     <td nowrap="nowrap">
-                        <select {disabled}
-                                name="letters_menu"
-                                onchange="MM_jumpMenu('_blank',this,0)"
-                        >
-                            <option>Send Letter</option>
-                            <option value="{clientFormURL}">Appointment</option>
-                            <!-- BEGIN customLetterBlock -->
-                            <option value="{customLetterURL}">{customLetterName}</option>
-                            <!-- END customLetterBlock -->
-                        </select>
+                        <div class="contactLetters">
+
+                            <select {disabled}
+                                    name="letters_menu"
+                                    onchange="MM_jumpMenu('_blank',this,0)"
+                            >
+                                <option>Send Letter</option>
+                                <option value="{clientFormURL}">Appointment</option>
+                                <!-- BEGIN customLetterBlock -->
+                                <option value="{customLetterURL}">{customLetterName}</option>
+                                <!-- END customLetterBlock -->
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPendingLeaver">
+
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][pendingLeaverFlag]"
+                                   value="Y"
+                                   {pendingLeaverFlagChecked}
+                            />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPendingLeaverDate">
+
+                            <input {disabled}
+                                   type="text"
+                                   name="form[contact][{contactID}][pendingLeaverDate]"
+                                   value="{pendingLeaverDate}"
+                                   class="jQueryCalendar"
+                                   autocomplete="off"
+                            />
+                        </div>
                     </td>
                 </tr>
 
@@ -1770,29 +2908,29 @@
 <div class="orders">
     <h3>Orders</h3>
     <table class="singleBorder"
-           width="500px"
+           width="500"
            border="0"
            cellspacing="1"
            cellpadding="1"
     >
         <tr>
-            <td width="50px"
+            <td width="50"
                 class="listHeadText"
             >Order No
             </td>
-            <td width="100px"
+            <td width="100"
                 class="listHeadText"
             >Type
             </td>
-            <td width="50px"
+            <td width="50"
                 class="listHeadText"
             >Date
             </td>
-            <td width="250px"
+            <td width="250"
                 class="listHeadText"
             >Cust PO Ref
             </td>
-            <td width="50px"
+            <td width="50"
                 class="listHeadText"
             >Contract
             </td>

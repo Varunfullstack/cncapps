@@ -283,7 +283,16 @@
         <tr>
             <td class="promptText">ID</td>
             <td class="mainHeadText">{customerID}_{callActivityID}</td>
-            <td></td>
+            <td
+                    class="promptText"
+            >
+                <span {authoriseHide}>Authorised By</span>
+            </td>
+            <td class="mainHeadText"
+            > <span {authoriseHide}>
+                {authorisedByName}
+            </span>
+            </td>
             <td></td>
             <td class="promptText">Type</td>
             <td class="fieldText">
@@ -308,7 +317,10 @@
         </tr>
         <tr>
             <td class="promptText">Customer</td>
-            <td class="mainHeadText">{customerName}</td>
+            <td class="mainHeadText"
+                colspan="2"
+            >{customerName}
+            </td>
             <td></td>
             <td></td>
             <td class="promptText">Value</td>
@@ -326,7 +338,9 @@
         </tr>
         <tr>
             <td class="promptText">Contact</td>
-            <td class="mainHeadText">
+            <td class="mainHeadText"
+                colspan="2"
+            >
                 <select name="callActivity[1][contactID]"
                         required
                 >
@@ -373,7 +387,9 @@
         </tr>
         <tr>
             <td class="promptText">Site</td>
-            <td class="fieldText">
+            <td class="fieldText"
+                colspan="2"
+            >
                 <select name="callActivity[1][siteNo]"
                         required
                 >
@@ -421,21 +437,21 @@
 
         <tr>
             <td class="promptText">Priority</td>
-            <td><select
-                    {DISABLED}
-                    {PRIORITY_DISABLED}
-                    id="priority"
-                    name="callActivity[1][priority]"
-                    required
-            >
-                <option value="">Please Select</option>
-                <!-- BEGIN priorityBlock -->
-                <option {prioritySelected}
-                        value="{priority}"
-                >{priorityDesc}
-                </option>
-                <!-- END priorityBlock -->
-            </select>
+            <td colspan="2">
+                <select {DISABLED}
+                        {PRIORITY_DISABLED}
+                        id="priority"
+                        name="callActivity[1][priority]"
+                        required
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN priorityBlock -->
+                    <option {prioritySelected}
+                            value="{priority}"
+                    >{priorityDesc}
+                    </option>
+                    <!-- END priorityBlock -->
+                </select>
             </td>
             <td colspan="2">
                 <input type="button"
@@ -465,7 +481,9 @@
 
         <tr>
             <td class="promptText">Contract</td>
-            <td class="mainHeadText">
+            <td class="mainHeadText"
+                colspan="2"
+            >
                 <select
                         {CONTRACT_DISABLED}
                         name="callActivity[1][contractCustomerItemID]"
@@ -513,7 +531,9 @@
 
         <tr>
             <td class="promptText">Contact Notes</td>
-            <td class="contactNotes">
+            <td class="contactNotes"
+                colspan="2"
+            >
                 <input
                         type="text"
                         title="Contact Notes"
@@ -550,7 +570,9 @@
         </tr>
         <tr>
             <td class="promptText">Customer Notes</td>
-            <td class="contactNotes">
+            <td class="contactNotes"
+                colspan="2"
+            >
                 <input
                         type="text"
                         title="Customer Notes"

@@ -39,7 +39,7 @@ function processEmail()
     $result = $db->preparedQuery($query, $parameters);
     $data = $result->fetch_assoc();
     if ($data['count'] > 0) {
-        return ["valid" => false];
+        return ["valid" => false, "query" => $query, "parameters" => $parameters, $data];
     }
 
     return ["valid" => true];
