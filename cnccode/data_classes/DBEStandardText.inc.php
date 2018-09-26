@@ -9,6 +9,13 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEStandardText extends DBEntity
 {
+
+    const stt_standardtextno = "stt_standardtextno";
+    const stt_sort_order = "stt_sort_order";
+    const stt_desc = "stt_desc";
+    const stt_text = "stt_text";
+    const stt_standardtexttypeno = "stt_standardtexttypeno";
+
     /**
      * calls constructor()
      * @access public

@@ -17,7 +17,7 @@ class DBECustomerReviewMeetingDocument extends DBEntity
     const uploadedBy = "uploadedBy";
     const uploadedAt = "uploadedAt";
     const fileName = "fileName";
-    const mimeType = "mimeType";
+    const fileMIMEType = "fileMIMEType";
 
     /**
      * calls constructor()
@@ -58,7 +58,7 @@ class DBECustomerReviewMeetingDocument extends DBEntity
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            self::mimeType,
+            self::fileMIMEType,
             DA_STRING,
             DA_NOT_NULL
         );
@@ -75,5 +75,17 @@ class DBECustomerReviewMeetingDocument extends DBEntity
 
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    public function getRowsByCustomerID($customerID)
+    {
+        $this->setValue(
+            self::customerID,
+            $customerID
+        );
+        $this->getRowsByColumn(
+            self::customerID,
+            self::meetingDate
+        );
     }
 }

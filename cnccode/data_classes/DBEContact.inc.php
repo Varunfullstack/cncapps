@@ -855,6 +855,21 @@ class DBEContact extends DBCNCEntity
         $this->getRows();
         return $this;
     }
+
+    public function getReviewContactsByCustomerID($customerID)
+    {
+        $sqlQuery =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::reviewUser) . " = 'Y' and "
+            . $this->getDBColumnName(self::customerID) . " = " . $customerID;
+
+
+        $this->setQueryString($sqlQuery);
+
+        $this->getRows();
+        return $this;
+    }
 }
 
 ?>

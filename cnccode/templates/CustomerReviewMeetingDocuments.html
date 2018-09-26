@@ -1,0 +1,397 @@
+<style>
+    table th {
+        font-weight: bold;
+    }
+
+    .spacerRow {
+        height: 13px;
+    }
+</style>
+<script>
+    function sendReviewMeetingEmails() {
+        //retrieve the ids
+        const formData = new FormData();
+        const el = $('#currentMeetingTable tbody td')[0];
+        formData.append("meetingDate", el.innerText);
+
+        if (!formData.get('meetingDate')) {
+            return;
+        }
+        const standardTextId = $('#standardText').val();
+        const customerID = $('#customerID').val();
+        formData.append("standardTextID", standardTextId);
+        formData.append("customerID", customerID);
+
+
+        fetch(
+            "{sendReviewEmails}", {
+                method: "POST",
+                body: formData
+            }
+        ).then(
+            response => {
+                if (response.ok) {
+                    alert('Emails sent');
+                } else {
+                    throw "Failed to send";
+                }
+            }
+        )
+            .catch(
+                error => {
+                    alert('Failed to send');
+                }
+            )
+
+
+    }
+
+    function checkSendReviewMeetingEmails() {
+        if ($('#standardText').val()) {
+            $('#sendReviewMeetingEmailsBtn').attr('disabled', false);
+        } else {
+            $('#sendReviewMeetingEmailsBtn').attr('disabled', true);
+        }
+    }
+
+    function checkUploadFilesBtn() {
+        const files = document.querySelector('[type=file]').files;
+        const reviewMeetingDate = $('#reviewMeetingDate').val();
+
+        const isValidDate = moment(reviewMeetingDate, "DD/MM/YYYY", true).isValid();
+
+        if (files.length && isValidDate) {
+            $('#uploadFilesBtn').attr('disabled', false);
+        } else {
+            $('#uploadFilesBtn').attr('disabled', true);
+        }
+    }
+
+    function uploadFiles() {
+        const url = '{uploadFilesURL}';
+        const formData = new FormData();
+        const customerID = $('#customerID').val();
+        const files = document.querySelector('[type=file]').files;
+        const reviewMeetingDate = $('#reviewMeetingDate').val();
+
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            formData.append('files[]', file);
+        }
+
+        formData.append('customerID', customerID);
+        formData.append('reviewMeetingDate', reviewMeetingDate);
+
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            fetchTableData(customerID);
+        });
+    }
+
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function deleteDocument(documentID) {
+        const formData = new FormData();
+        formData.append('documentID', documentID);
+
+        fetch("{deleteDocumentURL}", {method: 'POST', body: formData})
+            .then(response => {
+                fetchTableData($('#customerID').val());
+            })
+    }
+
+    function fetchReviewContactsData(customerID) {
+        const formData = new FormData();
+        formData.append('customerID', customerID);
+        fetch("{fetchReviewContactsDataURL}", {method: 'POST', body: formData})
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return null;
+                }
+            })
+            .then(jsonResponse => {
+                $('#reviewMeetingUsers tbody').html();
+                jsonResponse.data.forEach(contact => {
+                    $('#reviewMeetingUsers tbody').append(
+                        "<tr>" +
+                        "<td>" + contact.firstName + "</td>" +
+                        "<td>" + contact.lastName + "</td>" +
+                        "</tr>"
+                    )
+                })
+            })
+    }
+
+    function fetchTableData(customerID) {
+        var object = {
+            customerID: customerID
+        };
+        $.ajax({
+            url: '{fetchDataUrl}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                if (result.length) {
+                    result.reverse();
+
+                    $('#currentMeetingSection').show();
+                    $('#previousMeetingSection').show();
+
+                    $('#currentMeetingTable tbody').html("");
+                    $('#previousMeetingsTable tbody').html("");
+
+
+                    result.forEach((item, idx) => {
+                            if (!idx) {
+                                // this is the first item which dictates the current
+                                $('#currentMeetingTable tbody').append(
+                                    "<tr data-document-id='" + item.documentID + "'>" +
+                                    "<td>" + item.reviewMeetingDate + "</td>" +
+                                    "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
+                                    "<td>" + item.uploadedBy + "</td>" +
+                                    "<td>" + item.uploadedAt + "</td>" +
+                                    "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fa fa-trash-o'></i></button>" + "</td>" +
+                                    "</tr>"
+                                );
+                                return;
+                            }
+
+                            if (item.reviewMeetingDate === result[0].reviewMeetingDate) {
+                                $('#currentMeetingTable tbody').append(
+                                    "<tr  data-document-id='" + item.documentID + "'>" +
+                                    "<td>" + item.reviewMeetingDate + "</td>" +
+                                    "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
+                                    "<td>" + item.uploadedBy + "</td>" +
+                                    "<td>" + item.uploadedAt + "</td>" +
+                                    "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fa fa-trash-o'></i></button>" + "</td>" +
+                                    "</tr>"
+                                );
+                                return;
+                            }
+
+                            if (result[idx - 1].reviewMeetingDate != item.reviewMeetingDate && result[idx - 1].reviewMeetingDate != result[0].reviewMeetingDate) {
+                                $('#previousMeetingsTable tbody').append(
+                                    "<tr class='spacerRow'>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "<td></td>" +
+                                    "</tr>"
+                                );
+
+                            }
+
+                            $('#previousMeetingsTable tbody').append(
+                                "<tr id='" + item.documentID + "'>" +
+                                "<td>" + item.reviewMeetingDate + "</td>" +
+                                "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
+                                "<td>" + item.uploadedBy + "</td>" +
+                                "<td>" + item.uploadedAt + "</td>" +
+                                "</tr>"
+                            );
+
+                        }
+                    )
+
+                }
+            }
+        }).catch(function () {
+
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
+    }
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                var newWindow = window.open('{urlCustomerPopup}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0');
+                newWindow.doNotSubmit = true;
+                newWindow.onbeforeunload = function (ev) {
+                    console.log('test');
+                    var customerID = $('#customerID').val();
+
+                    if (customerID) {
+                        $('#uploadSection').show();
+                        fetchTableData(customerID);
+                        fetchReviewContactsData(customerID);
+                    }
+                }
+            }
+        }
+        else {
+            $('#uploadSection').hide();
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+</script>
+<table>
+    <tbody>
+    <tr>
+        <td class="promptText">Customer</td>
+        <td>
+            <input type="hidden"
+                   name="activity[1][customerID]"
+                   id="customerID"
+                   value="{customerID}"
+            >
+            <input type="text"
+                   id="customerString"
+                   name="customerString"
+                   value="{customerString}"
+                   onFocus="javascript:saveCustomerString()"
+                   onBlur="javascript:validateCustomerString()"
+                   onKeypress="javascript:validateCustomerStringOnReturn()"
+                   size="50"
+                   maxlength="50"
+            >
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<table id="uploadSection"
+       hidden
+>
+    <tbody>
+    <tr>
+        <td class="promptText">Review Meeting Date</td>
+        <td>
+            <input type="text"
+                   id="reviewMeetingDate"
+                   class="jQueryCalendar"
+                   autocomplete="off"
+                   onchange="checkUploadFilesBtn()"
+            >
+        </td>
+    </tr>
+    <tr>
+        <td class="promptText">Files</td>
+        <td>
+            <input type="file"
+                   multiple
+                   onchange="checkUploadFilesBtn()"
+            >
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+
+            <button type="button"
+                    onclick="uploadFiles()"
+                    disabled
+                    id="uploadFilesBtn"
+            >
+                Upload Files
+            </button>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+<br>
+
+<div id="currentMeetingSection"
+     hidden
+>
+    <h1>Review Meeting Users</h1>
+    <table id="reviewMeetingUsers">
+        <tbody>
+
+        </tbody>
+    </table>
+    <h1>Current Meeting</h1>
+    <div>
+        <select id="standardText"
+                onchange="checkSendReviewMeetingEmails()"
+        >
+            <!-- BEGIN standardTextBlock -->
+            <option value="{standardTextID}">{standardTextDescription}</option>
+            <!-- END standardTextBlock -->
+        </select>
+        <button disabled
+                onclick="sendReviewMeetingEmails()"
+                id="sendReviewMeetingEmailsBtn"
+        >Send
+        </button>
+    </div>
+
+
+    <table id="currentMeetingTable">
+        <thead>
+        <tr>
+            <th>
+                Meeting Date
+            </th>
+            <th>
+                File Name
+            </th>
+            <th>
+                Uploaded By
+            </th>
+            <th>
+                Uploaded At
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+<br>
+<br>
+<div id="previousMeetingSection"
+     hidden
+>
+    <h1>Previous Meeting</h1>
+    <table id="previousMeetingsTable"
+    >
+        <thead>
+        <tr>
+            <th>
+                Meeting Date
+            </th>
+            <th>
+                File Name
+            </th>
+            <th>
+                Uploaded By
+            </th>
+            <th>
+                Uploaded At
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>

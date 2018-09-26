@@ -121,6 +121,7 @@ define(
 
 class CTCustomer extends CTCNC
 {
+    const GET_CUSTOMER_REVIEW_CONTACTS = "getCustomerReviewContacts";
     var $customerID = '';
     var $customerString = '';                      // Used when searching for an entity by string
     var $contactString = '';                      // Used when searching for an entity by string
@@ -1135,6 +1136,19 @@ class CTCustomer extends CTCNC
                 $response = [];
                 try {
                     $this->clearContact();
+                    $response["status"] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response["status"] = "error";
+                    $response["error"] = $exception->getMessage();
+                }
+
+                echo json_encode($response);
+                break;
+            case self::GET_CUSTOMER_REVIEW_CONTACTS:
+                $response = [];
+                try {
+                    $response['data'] = $this->getCustomerReviewContacts();
                     $response["status"] = "ok";
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -3655,6 +3669,27 @@ ORDER BY cus_name ASC  ";
         $dbeContact->updateRow();
 
         return true;
+    }
+
+    private function getCustomerReviewContacts()
+    {
+        if (!isset($_REQUEST['customerID'])) {
+            throw new Exception('Customer ID is missing');
+        }
+
+        $customerID = $_REQUEST['customerID'];
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getReviewContactsByCustomerID($customerID);
+
+        $contacts = [];
+        while ($dbeContact->fetchNext()) {
+            $contacts[] = [
+                "firstName" => $dbeContact->getValue(DBEContact::firstName),
+                "lastName"  => $dbeContact->getValue(DBEContact::lastName)
+            ];
+        }
+
+        return $contacts;
     } // end function documents
 }// end of class
 ?>
