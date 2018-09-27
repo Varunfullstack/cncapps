@@ -11,20 +11,46 @@ require_once($cfg['path_bu'] . '/BUStandardText.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStandardTextType.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 // Actions
-define('CTSTANDARDTEXT_ACT_DISPLAY_LIST', 'standardTextList');
-define('CTSTANDARDTEXT_ACT_CREATE', 'createStandardText');
-define('CTSTANDARDTEXT_ACT_EDIT', 'editStandardText');
-define('CTSTANDARDTEXT_ACT_DELETE', 'deleteStandardText');
-define('CTSTANDARDTEXT_ACT_UPDATE', 'updateStandardText');
+define(
+    'CTSTANDARDTEXT_ACT_DISPLAY_LIST',
+    'standardTextList'
+);
+define(
+    'CTSTANDARDTEXT_ACT_CREATE',
+    'createStandardText'
+);
+define(
+    'CTSTANDARDTEXT_ACT_EDIT',
+    'editStandardText'
+);
+define(
+    'CTSTANDARDTEXT_ACT_DELETE',
+    'deleteStandardText'
+);
+define(
+    'CTSTANDARDTEXT_ACT_UPDATE',
+    'updateStandardText'
+);
 
 class CTSTANDARDTEXT extends CTCNC
 {
     var $dsStandardText = '';
     var $buStandardText = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $this->buStandardText = new BUStandardText($this);
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom($this->buStandardText->dbeStandardText);
@@ -83,7 +109,11 @@ class CTSTANDARDTEXT extends CTCNC
         $dbeStandardTextType = new DBEStandardTextType($this);
 
         if ($dsStandardText->rowCount() > 0) {
-            $this->template->set_block('StandardTextList', 'standardTextBlock', 'standardTexts');
+            $this->template->set_block(
+                'StandardTextList',
+                'standardTextBlock',
+                'standardTexts'
+            );
             while ($dsStandardText->fetchNext()) {
 
                 $dbeStandardTextType->getRow($dsStandardText->getValue('stt_standardtexttypeno'));
@@ -94,7 +124,7 @@ class CTSTANDARDTEXT extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTSTANDARDTEXT_ACT_EDIT,
+                            'action'             => CTSTANDARDTEXT_ACT_EDIT,
                             'stt_standardtextno' => $stt_standardtextno
                         )
                     );
@@ -104,7 +134,7 @@ class CTSTANDARDTEXT extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTSTANDARDTEXT_ACT_DELETE,
+                            'action'             => CTSTANDARDTEXT_ACT_DELETE,
                             'stt_standardtextno' => $stt_standardtextno
                         )
                     );
@@ -113,18 +143,28 @@ class CTSTANDARDTEXT extends CTCNC
                 $this->template->set_var(
                     array(
                         'stt_standardtextno' => $stt_standardtextno,
-                        'stt_desc' => Controller::htmlDisplayText($dsStandardText->getValue('stt_desc')),
-                        'type' => Controller::htmlDisplayText($dbeStandardTextType->getValue('description')),
-                        'urlEdit' => $urlEdit,
-                        'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit,
-                        'txtDelete' => $txtDelete
+                        'stt_desc'           => Controller::htmlDisplayText($dsStandardText->getValue('stt_desc')),
+                        'type'               => Controller::htmlDisplayText(
+                            $dbeStandardTextType->getValue('description')
+                        ),
+                        'urlEdit'            => $urlEdit,
+                        'urlDelete'          => $urlDelete,
+                        'txtEdit'            => $txtEdit,
+                        'txtDelete'          => $txtDelete,
                     )
                 );
-                $this->template->parse('standardTexts', 'standardTextBlock', true);
+                $this->template->parse(
+                    'standardTexts',
+                    'standardTextBlock',
+                    true
+                );
             }//while $dsStandardText->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'StandardTextList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'StandardTextList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -139,11 +179,17 @@ class CTSTANDARDTEXT extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == CTSTANDARDTEXT_ACT_EDIT) {
-                $this->buStandardText->getStandardTextByID($_REQUEST['stt_standardtextno'], $dsStandardText);
+                $this->buStandardText->getStandardTextByID(
+                    $_REQUEST['stt_standardtextno'],
+                    $dsStandardText
+                );
                 $stt_standardtextno = $_REQUEST['stt_standardtextno'];
             } else {                                                                    // creating new
                 $dsStandardText->initialise();
-                $dsStandardText->setValue('stt_standardtextno', '0');
+                $dsStandardText->setValue(
+                    'stt_standardtextno',
+                    '0'
+                );
                 $stt_standardtextno = '0';
             }
         } else {                                                                        // form validation error
@@ -156,7 +202,7 @@ class CTSTANDARDTEXT extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => CTSTANDARDTEXT_ACT_DELETE,
+                        'action'             => CTSTANDARDTEXT_ACT_DELETE,
                         'stt_standardtextno' => $stt_standardtextno
                     )
                 );
@@ -169,7 +215,7 @@ class CTSTANDARDTEXT extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTSTANDARDTEXT_ACT_UPDATE,
+                    'action'             => CTSTANDARDTEXT_ACT_UPDATE,
                     'stt_standardtextno' => $stt_standardtextno
                 )
             );
@@ -186,23 +232,27 @@ class CTSTANDARDTEXT extends CTCNC
         );
         $this->template->set_var(
             array(
-                'stt_standardtextno' => $stt_standardtextno,
-                'stt_sort_order' => Controller::htmlInputText($dsStandardText->getValue('stt_sort_order')),
+                'stt_standardtextno'    => $stt_standardtextno,
+                'stt_sort_order'        => Controller::htmlInputText($dsStandardText->getValue('stt_sort_order')),
                 'stt_sort_orderMessage' => Controller::htmlDisplayText($dsStandardText->getMessage('stt_sort_order')),
-                'stt_desc' => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
-                'stt_descMessage' => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
-                'stt_text' => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
-                'stt_textMessage' => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'stt_desc'              => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
+                'stt_descMessage'       => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
+                'stt_text'              => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
+                'stt_textMessage'       => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
+                'urlUpdate'             => $urlUpdate,
+                'urlDelete'             => $urlDelete,
+                'txtDelete'             => $txtDelete,
+                'urlDisplayList'        => $urlDisplayList
             )
         );
 
         /* type selector */
         // activity status selector
-        $this->template->set_block('StandardTextEdit', 'typeBlock', 'types'); // ss avoids naming confict!
+        $this->template->set_block(
+            'StandardTextEdit',
+            'typeBlock',
+            'types'
+        ); // ss avoids naming confict!
         if ($this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
             $statusArray = &$this->statusArrayCustomer;
         } else {
@@ -214,19 +264,29 @@ class CTSTANDARDTEXT extends CTCNC
         $dbeStandardTextType->getRows('description');
 
         while ($dbeStandardTextType->fetchNext()) {
-            $selected = ($dsStandardText->getValue('stt_standardtexttypeno') == $dbeStandardTextType->getPKValue()) ? CT_SELECTED : '';
+            $selected = ($dsStandardText->getValue('stt_standardtexttypeno') == $dbeStandardTextType->getPKValue(
+                )) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
-                    'typeSelected' => $selected,
+                    'typeSelected'           => $selected,
                     'stt_standardtexttypeno' => $dbeStandardTextType->getValue('standardTextTypeID'),
-                    'typeDescription' => $dbeStandardTextType->getValue('description')
+                    'typeDescription'        => $dbeStandardTextType->getValue('description'),
+                    'variables'              => $dbeStandardTextType->getValue(DBEStandardTextType::variables)
                 )
             );
-            $this->template->parse('types', 'typeBlock', true);
+            $this->template->parse(
+                'types',
+                'typeBlock',
+                true
+            );
         }
 
 
-        $this->template->parse('CONTENTS', 'StandardTextEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'StandardTextEdit',
+            true
+        );
         $this->parsePage();
     }// end function editFurther Action()
 
@@ -254,10 +314,11 @@ class CTSTANDARDTEXT extends CTCNC
         $this->buStandardText->updateStandardText($this->dsStandardText);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
                 array(
                     'stt_standardtextno' => $this->dsStandardText->getValue('stt_standardtextno'),
-                    'action' => CTCNC_ACT_VIEW
+                    'action'             => CTCNC_ACT_VIEW
                 )
             );
         header('Location: ' . $urlNext);

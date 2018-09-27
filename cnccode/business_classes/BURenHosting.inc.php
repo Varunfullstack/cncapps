@@ -10,7 +10,7 @@ require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_bu"] . "/BUItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenHosting.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenHosting.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenHosting extends Business
@@ -114,13 +114,11 @@ class BURenHosting extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenHosting->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -128,7 +126,8 @@ class BURenHosting extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Hosting Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -154,8 +153,13 @@ class BURenHosting extends Business
         ob_end_clean();
 
         $buMail->mime->setHTMLBody($message);
-
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -207,16 +211,6 @@ class BURenHosting extends Business
 
                     $buSalesOrder->initialiseOrder($dsOrdhead, $dsOrdline, $dsCustomer);
 
-                    /*
-                     * if this is a Server Care contract and the expiry date is less 2 months away
-                     * then generate health-check activities
-                     */
-                    /*
-                     * @TODO find out whether service desk renewals need notifications
-                              if ( $this->dbeJRenHosting->getValue('itemID') == CONFIG_SERVICEDESK_ITEM_ID  ){
-                                $this->emailSalesOrderNotification( $dsCustomer->getValue('name'), $dsOrdhead->getValue ( 'ordheadID' ) );
-                              }
-                    */
                     $line = -1;  // initialise sales order line seq
                 }
                 /**
@@ -265,8 +259,10 @@ class BURenHosting extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 0);
                 $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale', ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 
@@ -361,7 +357,8 @@ class BURenHosting extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Hosting details',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -431,8 +428,13 @@ class BURenHosting extends Business
         ob_end_clean();
 
         $buMail->mime->setHTMLBody($message);
-
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

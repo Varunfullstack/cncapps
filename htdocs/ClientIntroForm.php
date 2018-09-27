@@ -1,7 +1,7 @@
 <?php
 require_once("config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 GLOBAL $cfg;
 page_open(
 	array(
@@ -19,41 +19,41 @@ $buCustomer = new BUCustomer($this);
 $buCustomer->getContactByID($_REQUEST['contactID'], $dsContact);
 $dsContact->fetchNext();
 
-$buCustomer->getCustomerByID($dsContact->getValue('customerID'), $dsCustomer);
+$buCustomer->getCustomerByID($dsContact->getValue(DBEContact::customerID), $dsCustomer);
 $dsCustomer->fetchNext();
 
-$name = $dsContact->getValue('title') . ' ' . $dsContact->getValue('lastName');
+$name = $dsContact->getValue(DBEContact::title) . ' ' . $dsContact->getValue(DBEContact::lastName);
 $letterBody = file_get_contents('letter_templates/new_client_introduction.txt');
-$firstName = $dsContact->getValue('firstName');
-$addressee = $dsContact->getValue('title').' '.$firstName[0].' '.$dsContact->getValue('lastName');
+$firstName = $dsContact->getValue(DBEContact::firstName);
+$addressee = $dsContact->getValue(DBEContact::title).' '.$firstName[0].' '.$dsContact->getValue(DBEContact::lastName);
 
-$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue('customerID'), $dsContact->getValue('siteNo'), $dsSite);
+$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue(DBEContact::customerID), $dsContact->getValue(DBEContact::siteNo), $dsSite);
 
 $address =
 	$addressee . "\r\n" .
-	$dsCustomer->getValue('name') . "\r\n" .
-	$dsSite->getValue('add1') . "\r\n";
+	$dsCustomer->getValue(DBECustomer::name) . "\r\n" .
+	$dsSite->getValue(DBESite::add1) . "\r\n";
 
-if ($dsSite->getValue('add2') != ''){
-	$address .= $dsSite->getValue('add2') . "\r\n";
+if ($dsSite->getValue(DBESite::add2) != ''){
+	$address .= $dsSite->getValue(DBESite::add2) . "\r\n";
 }
-if ($dsSite->getValue('add3') != ''){
-	$address .= $dsSite->getValue('add3') . "\r\n";
+if ($dsSite->getValue(DBESite::add3) != ''){
+	$address .= $dsSite->getValue(DBESite::add3) . "\r\n";
 }
-$address .= $dsSite->getValue('town') . "\r\n";
-if ($dsSite->getValue('county') != ''){
-	$address .= $dsSite->getValue('county') . "\r\n";
+$address .= $dsSite->getValue(DBESite::town) . "\r\n";
+if ($dsSite->getValue(DBESite::county) != ''){
+	$address .= $dsSite->getValue(DBESite::county) . "\r\n";
 }
-$address .= $dsSite->getValue('postcode') . "\r\n";
+$address .= $dsSite->getValue(DBESite::postcode) . "\r\n";
 ?>
 <html>
 <head>
 <title>Client Introduction Letter</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="screen.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<h1>Client Introduction Letter to <?php echo $dsContact->getValue('firstName').' '.$dsContact->getValue('lastName') ?></h1>
+<h1>Client Introduction Letter to <?php echo $dsContact->getValue(DBEContact::firstName).' '.$dsContact->getValue(DBEContact::lastName) ?></h1>
 <h2><?php echo stripslashes($_REQUEST['contactName'])?></h2>
 <form name="introductionLetter" method="post" action="ClientIntroGenerate.php">
 	<input type="hidden" name="contactID" value="<?php echo $_REQUEST['contactID']?>">

@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUMISReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTMISReport extends CTCNC
@@ -20,6 +20,13 @@ class CTMISReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buMISReport = new BUMISReport ($this);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsResults = new DataSet ($this);
@@ -76,7 +83,10 @@ class CTMISReport extends CTCNC
 
         $this->setTemplateFiles(array('MISReport' => 'MISReport.inc'));
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                                                   'htmlFmt' => CT_HTML_FMT_POPUP
+                                             ));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -89,7 +99,7 @@ class CTMISReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         if ($this->results) {
@@ -102,13 +112,13 @@ class CTMISReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'months' => $dsSearchForm->getValue('months'),
-                'monthsMessage' => $dsSearchForm->getMessage('months'),
+                'formError'        => $this->formError,
+                'customerID'       => $dsSearchForm->getValue('customerID'),
+                'customerString'   => $customerString,
+                'months'           => $dsSearchForm->getValue('months'),
+                'monthsMessage'    => $dsSearchForm->getMessage('months'),
                 'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit,
+                'urlSubmit'        => $urlSubmit,
             )
         );
 

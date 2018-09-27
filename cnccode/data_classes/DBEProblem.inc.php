@@ -7,6 +7,56 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEProblem extends DBEntity
 {
+    const problemID = "problemID";
+    const customerID = "customerID";
+    const priority = "priority";
+    const userID = "userID";
+    const status = "status";
+    const dateRaised = "dateRaised";
+    const fixedUserID = "fixedUserID";
+    const fixedDate = "fixedDate";
+    const respondedHours = "respondedHours";
+    const workingHours = "workingHours";
+    const sentSlaAlertFlag = "sentSlaAlertFlag";
+    const internalNotes = "internalNotes";
+    const completionAlertCount = "completionAlertCount";
+    const completeDate = "completeDate";
+    const hideFromCustomerFlag = "hideFromCustomerFlag";
+    const alarmDate = "alarmDate";
+    const alarmTime = "alarmTime";
+    const totalActivityDurationHours = "totalActivityDurationHours";
+    const totalTravelActivityDurationHours = "totalTravelActivityDurationHours";
+    const chargeableActivityDurationHours = "chargeableActivityDurationHours";
+    const slaResponseHours = "slaResponseHours";
+    const escalatedFlag = "escalatedFlag";
+    const escalatedUserID = "escalatedUserID";
+    const reopenedFlag = "reopenedFlag";
+    const contractCustomerItemID = "contractCustomerItemID";
+    const contactID = "contactID";
+    const technicianWeighting = "technicianWeighting";
+    const rejectedUserID = "rejectedUserID";
+    const doNextFlag = "doNextFlag";
+    const rootCauseID = "rootCauseID";
+    const workingHoursAlertSentFlag = "workingHoursAlertSentFlag";
+    const awaitingCustomerResponseFlag = "awaitingCustomerResponseFlag";
+    const workingHoursCalculatedToTime = "workingHoursCalculatedToTime";
+    const monitorAgentName = "monitorAgentName";
+    const monitorName = "monitorName";
+    const projectID = "projectID";
+    const linkedSalesOrderID = "linkedSalesOrderID";
+    const criticalFlag = "criticalFlag";
+    const queueNo = "queueNo";
+    const hdLimitMinutes = "hdLimitHours";
+    const esLimitMinutes = "esLimitHours";
+    const imLimitMinutes = "imLimitHours";
+    const hdTimeAlertFlag = "hdTimeAlertFlag";
+    const esTimeAlertFlag = "esTimeAlertFlag";
+    const imTimeAlertFlag = "imTimeAlertFlag";
+    const hdPauseCount = "hdPauseCount";
+    const managementReviewReason = "managementReviewReason";
+    const startedUserID = "startedUserID";
+    const reopenedDate = "reopenedDate";
+
     /**
      * calls constructor()
      * @access public
@@ -16,64 +66,306 @@ class DBEProblem extends DBEntity
      * @internal param $void
      * @see constructor()
      */
-    function __construct(&$owner, $pkID = false)
+    function __construct(&$owner,
+                         $pkID = false
+    )
     {
         parent::__construct($owner);
         $this->setTableName("problem");
-        $this->addColumn("problemID", DA_ID, DA_NOT_NULL, "pro_problemno");
-        $this->addColumn("customerID", DA_INTEGER, DA_ALLOW_NULL, "pro_custno");
-        $this->addColumn("priority", DA_INTEGER, DA_ALLOW_NULL, "pro_priority");
-        $this->addColumn("userID", DA_INTEGER, DA_ALLOW_NULL, "pro_consno");
-        $this->addColumn("status", DA_STRING, DA_ALLOW_NULL, "pro_status");
-        $this->addColumn("dateRaised", DA_INTEGER, DA_ALLOW_NULL, "pro_date_raised");
-        $this->addColumn("fixedUserID", DA_INTEGER, DA_ALLOW_NULL, "pro_fixed_consno");
-        $this->addColumn("fixedDate", DA_DATE, DA_ALLOW_NULL, "pro_fixed_date");
-        $this->addColumn("respondedHours", DA_FLOAT, DA_ALLOW_NULL, "pro_responded_hours");
-        $this->addColumn("workingHours", DA_FLOAT, DA_ALLOW_NULL, "pro_working_hours");
-        $this->addColumn("sentSlaAlertFlag", DA_YN, DA_ALLOW_NULL, "pro_sent_sla_alert_flag");
-        $this->addColumn("internalNotes", DA_MEMO, DA_ALLOW_NULL, "pro_internal_notes");
-        $this->addColumn("completionAlertCount", DA_INTEGER, DA_ALLOW_NULL, "pro_completion_alert_count");
-        $this->addColumn("completionAlertCount", DA_INTEGER, DA_ALLOW_NULL, "pro_completion_alert_count");
-        $this->addColumn("completeDate", DA_DATE, DA_ALLOW_NULL, "pro_complete_date");
-        $this->addColumn("hideFromCustomerFlag", DA_STRING, DA_ALLOW_NULL, "pro_hide_from_customer_flag");
-        $this->addColumn("alarmDate", DA_DATE, DA_ALLOW_NULL, "pro_alarm_date");
-        $this->addColumn("alarmTime", DA_TIME, DA_ALLOW_NULL, "pro_alarm_time");
-        $this->addColumn("totalActivityDurationHours", DA_FLOAT, DA_ALLOW_NULL, "pro_total_activity_duration_hours");
-
-        $this->addColumn("totalTravelActivityDurationHours", DA_FLOAT, DA_ALLOW_NULL, "pro_total_travel_activity_duration_hours");
-
-        $this->addColumn("chargableActivityDurationHours", DA_FLOAT, DA_ALLOW_NULL, "pro_chargeable_activity_duration_hours");
-        $this->addColumn("slaResponseHours", DA_FLOAT, DA_ALLOW_NULL, "pro_sla_response_hours");
-        $this->addColumn("escalatedFlag", DA_YN, DA_ALLOW_NULL, "pro_escalated_flag");
-        $this->addColumn("escalatedUserID", DA_INTEGER, DA_ALLOW_NULL, "pro_escalated_consno");
-        $this->addColumn("reopenedFlag", DA_YN, DA_ALLOW_NULL, "pro_reopened_flag");
-        $this->addColumn("contractCustomerItemID", DA_INTEGER, DA_ALLOW_NULL, "pro_contract_cuino");
-
-        $this->addColumn("contactID", DA_INTEGER, DA_ALLOW_NULL, "pro_contno");
-
-        $this->addColumn("technicianWeighting", DA_INTEGER, DA_ALLOW_NULL, "pro_technician_weighting");
-
-        $this->addColumn("rejectedUserID", DA_INTEGER, DA_ALLOW_NULL, "pro_rejected_consno");
-        $this->addColumn("doNextFlag", DA_YN, DA_ALLOW_NULL, "pro_do_next_flag");
-        $this->addColumn("rootCauseID", DA_INTEGER, DA_ALLOW_NULL, "pro_rootcauseno");
-        $this->addColumn("workingHoursAlertSentFlag", DA_YN, DA_ALLOW_NULL, "pro_working_hours_alert_sent_flag");
-        $this->addColumn("awaitingCustomerResponseFlag", DA_YN, DA_ALLOW_NULL, "pro_awaiting_customer_response_flag");
-        $this->addColumn("workingHoursCalculatedToTime", DA_YN, DA_ALLOW_NULL, "pro_working_hours_calculated_to_time");
-        $this->addColumn("monitorAgentName", DA_STRING, DA_ALLOW_NULL, "pro_monitor_agent_name");
-        $this->addColumn("monitorName", DA_STRING, DA_ALLOW_NULL, "pro_monitor_name");
-        $this->addColumn("projectID", DA_INTEGER, DA_ALLOW_NULL, "pro_projectno");
-        $this->addColumn("linkedSalesOrderID", DA_INTEGER, DA_ALLOW_NULL, "pro_linked_ordno");
-        $this->addColumn("criticalFlag", DA_YN, DA_ALLOW_NULL, "pro_critical_flag");
-        $this->addColumn("queueNo", DA_INTEGER, DA_ALLOW_NULL, "pro_queue_no");
-        $this->addColumn("hdRemainHours", DA_FLOAT, DA_NOT_NULL, "pro_hd_remain_hours"); // Helpdesk team remaining hours
-        $this->addColumn("esRemainHours", DA_FLOAT, DA_NOT_NULL, "pro_es_remain_hours");
-        $this->addColumn("imRemainHours", DA_FLOAT, DA_NOT_NULL, "pro_im_remain_hours");
-        $this->addColumn("hdTimeAlertFlag", DA_YN, DA_ALLOW_NULL, "pro_hd_time_alert_flag");
-        $this->addColumn("esTimeAlertFlag", DA_YN, DA_ALLOW_NULL, "pro_es_time_alert_flag");
-        $this->addColumn("imTimeAlertFlag", DA_YN, DA_ALLOW_NULL, "pro_im_time_alert_flag");
-        $this->addColumn("hdPauseCount", DA_INTEGER, DA_ALLOW_NULL, "pro_hd_pause_count");
-        $this->addColumn("managementReviewReason", DA_MEMO, DA_ALLOW_NULL, "pro_management_review_reason");
-        $this->addColumn("startedUserID", DA_INTEGER, DA_ALLOW_NULL, "pro_started_consno");
+        $this->addColumn(
+            self::problemID,
+            DA_ID,
+            DA_NOT_NULL,
+            "pro_problemno"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_custno"
+        );
+        $this->addColumn(
+            self::priority,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_priority"
+        );
+        $this->addColumn(
+            self::userID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_consno"
+        );
+        $this->addColumn(
+            self::status,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_status"
+        );
+        $this->addColumn(
+            self::dateRaised,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_date_raised"
+        );
+        $this->addColumn(
+            self::fixedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_fixed_consno"
+        );
+        $this->addColumn(
+            self::fixedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pro_fixed_date"
+        );
+        $this->addColumn(
+            self::respondedHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_responded_hours"
+        );
+        $this->addColumn(
+            self::workingHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_working_hours"
+        );
+        $this->addColumn(
+            self::sentSlaAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_sent_sla_alert_flag"
+        );
+        $this->addColumn(
+            self::internalNotes,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            "pro_internal_notes"
+        );
+        $this->addColumn(
+            self::completionAlertCount,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_completion_alert_count"
+        );
+        $this->addColumn(
+            self::completeDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pro_complete_date"
+        );
+        $this->addColumn(
+            self::hideFromCustomerFlag,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_hide_from_customer_flag"
+        );
+        $this->addColumn(
+            self::alarmDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pro_alarm_date"
+        );
+        $this->addColumn(
+            self::alarmTime,
+            DA_TIME,
+            DA_ALLOW_NULL,
+            "pro_alarm_time"
+        );
+        $this->addColumn(
+            self::totalActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_total_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::totalTravelActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_total_travel_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::chargeableActivityDurationHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_chargeable_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::slaResponseHours,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pro_sla_response_hours"
+        );
+        $this->addColumn(
+            self::escalatedFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_escalated_flag"
+        );
+        $this->addColumn(
+            self::escalatedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_escalated_consno"
+        );
+        $this->addColumn(
+            self::reopenedFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_reopened_flag"
+        );
+        $this->addColumn(
+            self::reopenedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            'pro_reopened_date'
+        );
+        $this->addColumn(
+            self::contractCustomerItemID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_contract_cuino"
+        );
+        $this->addColumn(
+            self::contactID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_contno"
+        );
+        $this->addColumn(
+            self::technicianWeighting,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_technician_weighting"
+        );
+        $this->addColumn(
+            self::rejectedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_rejected_consno"
+        );
+        $this->addColumn(
+            self::doNextFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_do_next_flag"
+        );
+        $this->addColumn(
+            self::rootCauseID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_rootcauseno"
+        );
+        $this->addColumn(
+            self::workingHoursAlertSentFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_working_hours_alert_sent_flag"
+        );
+        $this->addColumn(
+            self::awaitingCustomerResponseFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_awaiting_customer_response_flag"
+        );
+        $this->addColumn(
+            self::workingHoursCalculatedToTime,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_working_hours_calculated_to_time"
+        );
+        $this->addColumn(
+            self::monitorAgentName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_monitor_agent_name"
+        );
+        $this->addColumn(
+            self::monitorName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pro_monitor_name"
+        );
+        $this->addColumn(
+            self::projectID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_projectno"
+        );
+        $this->addColumn(
+            self::linkedSalesOrderID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_linked_ordno"
+        );
+        $this->addColumn(
+            self::criticalFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_critical_flag"
+        );
+        $this->addColumn(
+            self::queueNo,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_queue_no"
+        );
+        $this->addColumn(
+            self::hdLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pro_hd_limit_minutes"
+        ); // Helpdesk team remaining hours
+        $this->addColumn(
+            self::esLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pro_es_limit_minutes"
+        );
+        $this->addColumn(
+            self::imLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pro_im_limit_minutes"
+        );
+        $this->addColumn(
+            self::hdTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_hd_time_alert_flag"
+        );
+        $this->addColumn(
+            self::esTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_es_time_alert_flag"
+        );
+        $this->addColumn(
+            self::imTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "pro_im_time_alert_flag"
+        );
+        $this->addColumn(
+            self::hdPauseCount,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_hd_pause_count"
+        );
+        $this->addColumn(
+            self::managementReviewReason,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            "pro_management_review_reason"
+        );
+        $this->addColumn(
+            self::startedUserID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_started_consno"
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
         if ($pkID) {
@@ -81,15 +373,20 @@ class DBEProblem extends DBEntity
         }
     }
 
-    public function getManagementReviews($customerID, $startYearMonth, $endYearMonth)
+    public function getManagementReviews($customerID,
+                                         DateTimeInterface $startDate,
+                                         DateTimeInterface $endDate
+    )
     {
+
         $this->setQueryString(
 
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName('customerID') . ' = ' . $customerID .
-            " AND " . $this->getDBColumnName('completeDate') . " BETWEEN '" . $startYearMonth . "-01' AND '" . $endYearMonth . "-31'
-      AND " . $this->getDBColumnName('managementReviewReason') . "<> ''"
+            " AND " . $this->getDBColumnName('completeDate') . " BETWEEN '" .
+            $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "' AND " .
+            $this->getDBColumnName('managementReviewReason') . "<> ''"
         );
 
         return parent::getRows();

@@ -6,7 +6,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
-require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
+require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 define('BUCONTACT_MATCH_STR_NT_PASD', 'No match string passed');
 
 class BUContact extends Business
@@ -114,16 +114,15 @@ class BUContact extends Business
             }
         }
         if (!$ret) {
-            $this->dbeContact->setValue('customerID', $customerID);
-            $this->dbeContact->setValue('siteNo', $siteNo);
+
             if ($matchString{0} == '?') {  // get all contacts for customer/site
                 if ($siteNo != '') {
-                    $this->dbeContact->getRowsByCustomerIDSiteNo();
+                    $this->dbeContact->getRowsByCustomerIDSiteNo($customerID, $siteNo);
                 } else {
-                    $this->dbeContact->getRowsByCustomerID(false);
+                    $this->dbeContact->getRowsByCustomerID($customerID);
                 }
             } else {                                                // try to match
-                $this->dbeContact->getCustomerRowsByNameMatch($matchString);
+                $this->dbeContact->getCustomerRowsByNameMatch($customerID, $matchString);
             }
             $ret = ($this->getData($this->dbeContact, $dsResults));
             $dsResults->columnSort('lastName', 'firstName');
@@ -133,10 +132,8 @@ class BUContact extends Business
 
     /**
      * Get contact row by customerID
-     * @parameter integer $customerID
-     * @parameter DataSet &$dsResults results
-     * @return bool : Success
-     * @access public
+     * @param $customerID
+     * @param DataSet $dsResults
      */
     function getGSCContactByCustomerID($customerID, &$dsResults)
     {
@@ -196,6 +193,7 @@ class BUContact extends Business
         $dsResults->setValue('mailshot8Flag', $dsHeader->getValue('mailshot8FlagDef'));
         $dsResults->setValue('mailshot9Flag', $dsHeader->getValue('mailshot9FlagDef'));
         $dsResults->setValue('mailshot10Flag', $dsHeader->getValue('mailshot10FlagDef'));
+        $dsResults->setValue('mailshot11Flag', $dsHeader->getValue('mailshot11FlagDef'));
         $dsResults->post();
         return TRUE;
     }

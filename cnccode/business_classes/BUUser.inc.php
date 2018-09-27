@@ -27,7 +27,10 @@ class BUUser extends Business
     function updateUser(&$dsData)
     {
         $this->setMethodName('updateUser');
-        $this->updateDataaccessObject($dsData, $this->dbeUser);
+        $this->updateDataaccessObject(
+            $dsData,
+            $this->dbeUser
+        );
         return TRUE;
     }
 
@@ -42,7 +45,10 @@ class BUUser extends Business
         $this->setMethodName('getAllUsers');
         $dbeUser = new DBEUser($this);
         $dbeUser->getRows();
-        return ($this->getData($dbeUser, $dsResults));
+        return ($this->getData(
+            $dbeUser,
+            $dsResults
+        ));
     }
 
     /**
@@ -52,11 +58,17 @@ class BUUser extends Business
      * @return bool : Success
      * @access public
      */
-    function getUserByID($userID, &$dsResults)
+    function getUserByID($userID,
+                         &$dsResults
+    )
     {
         $this->setMethodName('getUserByID');
         $dbeUser = new DBEUser($this);
-        return ($this->getDatasetByPK($userID, $dbeUser, $dsResults));
+        return ($this->getDatasetByPK(
+            $userID,
+            $dbeUser,
+            $dsResults
+        ));
     }
 
     /**
@@ -78,17 +90,6 @@ class BUUser extends Business
      */
     function canDeleteUser($ID)
     {
-        /*
-                $dbeExpense = new DBEExpense($this);
-                // validate no activities of this type
-                $dbeExpense->setValue('expenseTypeID', $ID);
-                if ( $dbeExpense->countRowsByColumn('expenseTypeID') < 1 ){
-                    return TRUE;
-                }
-                else{
-                    return FALSE;
-                }
-        */
         return FALSE;
     }
 
@@ -106,7 +107,10 @@ class BUUser extends Business
     Create a record on user_time_log which indicates the user has not
     logged any time today
     */
-    function setUserAbsent($userID, $startDate, $days)
+    function setUserAbsent($userID,
+                           $startDate,
+                           $days
+    )
     {
         global $db;
 
@@ -142,32 +146,49 @@ class BUUser extends Business
 
         while ($loggedDayCount < $days) {
 
-            $dayCount++;
-
             $uDateToTry = strtotime($startDate . ' +' . $dayCount . ' day'); //UNIX
 
-            $dayOfWeek = date('N', $uDateToTry);
+            $dayOfWeek = date(
+                'N',
+                $uDateToTry
+            );
 
-            $dateToTry = date('Y-m-d', $uDateToTry);
+            $dateToTry = date(
+                'Y-m-d',
+                $uDateToTry
+            );
 
             // Exclude bank holidays and weekends
 
-            if (!in_array($dateToTry, $bankHolidays) & $dayOfWeek < 6) {
+            if (!in_array(
+                    $dateToTry,
+                    $bankHolidays
+                ) & $dayOfWeek < 6) {
 
                 $loggedDayCount++;
 
-                $this->logAbsentDate($userID, $teamLevel, $standardDayHours, $dateToTry);
+                $this->logAbsentDate(
+                    $userID,
+                    $teamLevel,
+                    $standardDayHours,
+                    $dateToTry
+                );
             }
+            $dayCount++;
         }
 
     }
 
-    function logAbsentDate($userID, $teamLevel, $standardDayHours, $date)
+    function logAbsentDate($userID,
+                           $teamLevel,
+                           $standardDayHours,
+                           $date
+    )
     {
         global $db;
 
         $sql =
-            "INSERT IGNORE INTO user_time_log
+            "replace INTO user_time_log
         (
         `userID`,
         `teamLevel`,
@@ -208,10 +229,154 @@ class BUUser extends Business
         return $db->Record[0];
     }
 
+    function teamMembersPerformanceData($teamLevel,
+                                        $days,
+                                        $hideExcluded = true
+    )
+    {
+        global $db;
+        $query = "SELECT 
+                      userID,
+                      user_time_log.loggedDate AS loggedDate,
+                      loggedHours,
+                      CONCAT(
+                        consultant.`firstName`,
+                        ' ',
+                        LEFT(consultant.`lastName`, 1)
+                      ) AS userLabel 
+                    FROM
+                      user_time_log 
+                      INNER JOIN 
+                        (SELECT DISTINCT 
+                          loggedDate 
+                        FROM
+                          user_time_log 
+                        ORDER BY loggedDate DESC 
+                        LIMIT 10) AS limited 
+                        ON user_time_log.`loggedDate` = limited.loggedDate 
+                      LEFT JOIN `consultant` 
+                        ON userID = consultant.`cns_consno` 
+                    WHERE teamLevel = $teamLevel 
+                      ";
+
+        if ($hideExcluded) {
+            $query .= ' and consultant.excludeFromStatsFlag <> "Y"';
+        }
+
+        $query .= " ORDER BY userID,
+                      user_time_log.loggedDate ASC";
+
+        $db->query($query);
+
+        $rows = [];
+        while ($db->next_record(1)) {
+            $rows[] = $db->Record;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param $engineerID
+     * @param DateTimeInterface $startDate
+     * @param DateTimeInterface $endDate
+     * @return array
+     */
+    function getEngineerDetailedData($engineerID,
+                                     DateTimeInterface $startDate,
+                                     DateTimeInterface $endDate
+    )
+    {
+        global $db;
+
+        $query = "
+        SELECT 
+  getLoggedTimeAvg (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    20
+  ) AS monthAvg,
+  getLoggedTimeTotal (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    20
+  ) AS monthTotal,
+  getToLogHours (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    20
+  ) AS monthToLog,
+  getLoggedTimeAvg (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    5
+  ) AS fiveDaysAvg,
+  getLoggedTimeTotal (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    5
+  ) AS fiveDaysTotal,
+  getToLogHours (
+    user_time_log.`userID`,
+    user_time_log.`loggedDate`,
+    5
+  ) AS fiveDaysToLog,
+  loggedDate,
+  user_time_log.`loggedHours`,
+  userID,
+  CASE
+    team.`level`
+    WHEN 1 
+    THEN 
+    (SELECT 
+      hed_hd_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    WHEN 2 
+    THEN 
+    (SELECT 
+      hed_es_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    WHEN 3 
+    THEN 
+    (SELECT 
+      hed_im_team_target_log_percentage 
+    FROM
+      headert 
+    LIMIT 1) 
+    ELSE 0 
+  END AS target 
+FROM
+  user_time_log 
+  LEFT JOIN consultant 
+    ON cns_consno = userID 
+  LEFT JOIN team 
+    ON `consultant`.`teamID` = team.`teamID`
+WHERE userID = $engineerID 
+  AND loggedDate >= '" . $startDate->format('Y-m-d') . "' 
+  AND loggedDate <= '" . $endDate->format('Y-m-d') . "' 
+ORDER BY user_time_log.`loggedDate` DESC 
+        ";
+
+        $db->query($query);
+
+        $rows = [];
+        while ($db->next_record(1)) {
+            $rows[] = $db->Record;
+        }
+
+        return $rows;
+    }
+
     /*
     Activity logging performance for past number of days by user
     */
-    function getUserPerformanceByUser($userID, $days = 8)
+    function getUserPerformanceByUser($userID,
+                                      $days = 8
+    )
     {
         global $db;
 
@@ -260,24 +425,20 @@ class BUUser extends Business
     function getUsersByTeamLevel($teamLevel)
     {
         global $db;
-
-        $db->query(
-            "SELECT 
+        $quey = "SELECT 
         c.cns_consno,
-        CONCAT( SUBSTR(c.firstName, 1, 1), SUBSTR(c.`lastName`,1, 1) ) AS initials
-        
+        CONCAT( SUBSTR(c.firstName, 1, 1), SUBSTR(c.`lastName`,1, 1) ) AS initials,
+        concat(c.firstName, ' ', c.lastName) as userName
       FROM
         consultant c
         JOIN team t ON c.teamID = t.teamID
-
       WHERE
         t.level = $teamLevel
         AND c.`activeFlag` = 'Y'
-
+        and c.excludeFromStatsFlag <> 'Y'
       ORDER BY
-        firstName, lastName"
-        );
-
+        firstName, lastName";
+        $db->query($quey);
         $ret = array();
 
         while ($db->next_record()) {

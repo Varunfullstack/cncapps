@@ -3,7 +3,7 @@
 
 <script src="ckeditor/ckeditor.js"></script>
 
-<script src="ckfinder/ckfinder.js"></script>
+<!--<script src="ckfinder/ckfinder.js"></script>-->
 
 <script>
     var formChanged = false;
@@ -28,18 +28,36 @@
 
 <table width="100%">
     <tr>
-        <td>{activityWizardHeader} {contractListPopupLink} {historyLink}</td>
-        <td align="right" id="autoUpdateLabel"></td>
+        <td>{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {historyLink}</td>
+        <td align="right"
+            id="autoUpdateLabel"
+        ></td>
     </tr>
 </table>
-<FORM method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off">
-    <input type="hidden" name="problemID" value="{problemID}">
-    <input type="hidden" name="customerID" value="{customerID}">
+<FORM method="post"
+      action="{urlUpdateActivity}"
+      name="callActivity"
+      AUTOCOMPLETE="off"
+>
+    <input type="hidden"
+           name="problemID"
+           value="{problemID}"
+    >
+    <input type="hidden"
+           name="customerID"
+           value="{customerID}"
+    >
 
-    <table class="singleBorder" width="900" border="0">
+    <table class="singleBorder"
+           width="900"
+           border="0"
+    >
         <tr>
             <td class="promptText">ID</td>
-            <td colspan="3" class="mainHeadText">{customerID}_{callActivityID}</td>
+            <td colspan="3"
+                class="mainHeadText"
+            >{customerID}_{callActivityID}
+            </td>
         </tr>
         <tr>
             <td class="promptText">Customer</td>
@@ -54,7 +72,10 @@
                 >
                     <option value="">Not known</option>
                     <!-- BEGIN rootCauseBlock -->
-                    <option {rootCauseSelected} value="{rootCauseID}">{rootCauseDescription}</option>
+                    <option {rootCauseSelected}
+                            value="{rootCauseID}"
+                    >{rootCauseDescription}
+                    </option>
                     <!-- END rootCauseBlock -->
                 </select><span class="formErrorMessage">{rootCauseIDMessage}</span>
             </td>
@@ -81,50 +102,98 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="submit" name="Submit" value="Save">
+                <input type="submit"
+                       name="Submit"
+                       value="Save"
+                >
             </td>
         </tr>
     </table>
 </FORM>
-<form method="post" action="{uploadURL}" name="uploadFile" AUTOCOMPLETE="off" enctype="multipart/form-data">
-    <table class="singleBorder" width="900" border="0">
+<form method="post"
+      action="{uploadURL}"
+      name="uploadFile"
+      AUTOCOMPLETE="off"
+      enctype="multipart/form-data"
+>
+    <table class="singleBorder"
+           width="900"
+           border="0"
+    >
         <tr>
             <td class="listHead">Documents</td>
         </tr>
         <tr>
             <td>
-                <table class="singleBorder" width="100%">
+                <table class="singleBorder"
+                       width="100%"
+                >
                     <tr>
-                        <td width="29%" class="listHeadText">Description</td>
-                        <td width="28%" class="listHeadText">File</td>
-                        <td width="18%" class="listHeadText">Date</td>
-                        <td width="14%" class="listHeadText">User</td>
-                        <td width="14%" class="listHeadText">&nbsp;</td>
+                        <td width="29%"
+                            class="listHeadText"
+                        >Description
+                        </td>
+                        <td width="28%"
+                            class="listHeadText"
+                        >File
+                        </td>
+                        <td width="18%"
+                            class="listHeadText"
+                        >Date
+                        </td>
+                        <td width="14%"
+                            class="listHeadText"
+                        >User
+                        </td>
+                        <td width="14%"
+                            class="listHeadText"
+                        >&nbsp;
+                        </td>
                     </tr>
                     <!-- BEGIN documentBlock -->
-                    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
-                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{description}</A>
+                    <tr valign="top"
+                        onMouseOver="this.bgColor='#ffffcc';"
+                        onMouseOut="this.bgColor='';"
+                    >
+                        <td nowrap="nowrap"><A href="{urlViewFile}"
+                                               title="View attached document"
+                                               target="_blank"
+                        >{description}</A>
                         </td>
-                        <td nowrap="nowrap"><A href="{urlViewFile}" title="View attached document" target="_blank">{filename}</A>
+                        <td nowrap="nowrap"><A href="{urlViewFile}"
+                                               title="View attached document"
+                                               target="_blank"
+                        >{filename}</A>
                         </td>
                         <td nowrap="nowrap">{createDate}</td>
                         <td nowrap="nowrap">{createUserName}</td>
-                        <td><A href="{urlDeleteFile}&isGather=true" title="Delete attached document"
-                               onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)">{txtDeleteFile}</A>
+                        <td><A href="{urlDeleteFile}&isGather=true"
+                               title="Delete attached document"
+                               onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"
+                        >{txtDeleteFile}</A>
                         </td>
                     </tr>
                     <!-- END documentBlock -->
                     <tr>
                         <td class="promptTextLeft">Description</td>
                         <td colspan="4">
-                            <input name="uploadDescription" type="text" size="45" maxlength="50"
-                                   value="{uploadDescription}">
+                            <input name="uploadDescription"
+                                   type="text"
+                                   size="45"
+                                   maxlength="50"
+                                   value="{uploadDescription}"
+                            >
                             <input
                                     name="userfile"
                                     type="file"
                                     value="{userfile}"
+                                    class="dragUploader"
+                                    data-description="uploadDescription"
                             >
-                            <input type="submit" name="gatherFixed" value="Upload">
+                            <input type="submit"
+                                   name="gatherFixed"
+                                   value="Upload"
+                            >
                             <span class="promptTextLeft">
                             {uploadErrors}
                             </span>
@@ -135,45 +204,205 @@
         </tr>
     </table>
 </form>
-<h3>Message to Sales</h3>
-<input type="hidden" name="callActivityID" value="{callActivityID}"/>
+
+<div id="salesRequestDialog"
+     title="Sales Request"
+>
+    <label for="templateSelector"></label>
+    <select name="templateSelector"
+            id="templateSelector"
+            onchange="changeTemplate()"
+    >
+        <option value="">
+            Pick a template
+        </option>
+        <option value="newStarter">New Starter/ Office 365 License</option>
+        <option value="otherRequest">Other Request</option>
+    </select>
+    <br>
+    <br>
+    <textarea id="salesRequestText"
+              cols="30"
+              rows="10"
+    ></textarea>
+    <br>
+    <br>
+    <div>
+        <button disabled
+                id="sendSalesRequestBtn"
+                onclick="sendSalesRequest()"
+        >Send
+        </button>
+        <button onclick="cancelSalesRequest()">Cancel</button>
+    </div>
+</div>
+
+<div id="partsUsedDialog"
+     title="Parts Used"
+>
+    <textarea id="partsUsedText"
+              cols="30"
+              rows="10"
+    ></textarea>
+    <br>
+    <div>
+        <button onclick="sendPartsUsedToSales()">Send</button>
+        <button onclick="cancelPartsUsed()">Cancel</button>
+    </div>
+</div>
+<script>
+    $('#partsUsedDialog').dialog({autoOpen: false, width: 910});
+    $('#salesRequestDialog').dialog({autoOpen: false, width: 910});
+    CKEDITOR.replace('partsUsedText', {
+            customConfig: '/ckeditor_config.js'
+        }
+    );
+
+    CKEDITOR.replace('salesRequestText', {customConfig: '/ckeditor_config.js'});
+
+    function showPartsUsedDialog() {
+        $('#partsUsedDialog').dialog('open');
+    }
+
+    function showSalesRequestDialog() {
+        $('#salesRequestDialog').dialog('open');
+    }
+
+    function changeTemplate() {
+        var html = "";
+        var sendSalesRequestBtn = document.getElementById("sendSalesRequestBtn");
+        sendSalesRequestBtn.setAttribute('disabled', true);
+        if (event.target.value) {
+            sendSalesRequestBtn.removeAttribute('disabled');
+            html = $('#' + event.target.value + 'Template').html()
+        }
+        CKEDITOR.instances.salesRequestText.setData(html);
+    }
+
+    function sendPartsUsedToSales() {
+        var object = {
+            message: CKEDITOR.instances.partsUsedText.getData(),
+            callActivityID: {callActivityID}
+        };
+
+        $.ajax({
+            url: '{urlMessageToSales}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to send message';
+            } else {
+                $('#partsUsedDialog').dialog('close');
+                alert('Submitted OK');
+            }
+        }).catch(function () {
+            alert('Failed to send message');
+        });
+    }
+
+    function cancelPartsUsed() {
+        $('#partsUsedDialog').dialog('close');
+    }
+
+    function sendSalesRequest() {
+        var object = {
+            message: CKEDITOR.instances.salesRequestText.getData(),
+            type: $('#templateSelector').val()
+        };
+
+        $.ajax({
+            url: '{urlSalesRequest}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to send message';
+            } else {
+                cancelSalesRequest();
+                alert('Submitted OK');
+            }
+        }).catch(function () {
+            alert('Failed to send message');
+        });
+    }
+
+    function cancelSalesRequest() {
+        $('#salesRequestDialog').dialog('close');
+    }
+
+</script>
 <table>
     <tr>
-        <td colspan="4" class="promptTextLeft" valign="top">Parts Used / Message to Sales/</td>
-    </tr>
-    <tr>
-        <td colspan="4"><textarea name="message" id="message" cols="110" rows="20"></textarea>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >
+            <button onclick="showPartsUsedDialog()">Parts Used</button>
+        </td>
+        <td colspan="4"
+            class="promptTextLeft"
+            valign="top"
+        >
+            <button onclick="showSalesRequestDialog()">Sales Request</button>
         </td>
     </tr>
-    <tr>
-        <td colspan="4"><input type="button" name="messageToSales" id="messageToSales" value="Send"></td>
-    </tr>
 </table>
-</form>
-<script>
-
-    $(document).ready(function () {
-        /*
-        Create ajax submit function for message to sales
-        */
-        $('input#messageToSales').click(function () {
-
-            $.ajax({
-                url: 'Activity.php',
-                data: {
-                    action: "messageToSales",
-                    callActivityID: {callActivityID},
-                    message: $("TEXTAREA#message").val()
-                }
-            })
-                .done(function () {
-                    alert("Message sent to Sales");
-                    $("TEXTAREA#message").val("");
-
-                });
-        })
-    });
-
+<script type="text/html"
+        id="newStarterTemplate"
+>
+    <table>
+        <tbody>
+        <tr>
+            <td>License Required</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Quantity</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Approved By Customer?</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Installation Time Needed (hours)</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Other Information</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</script>
+<script type="text/html"
+        id="otherRequestTemplate"
+>
+    <table>
+        <tbody>
+        <tr>
+            <td>Reason for request</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Software/hardware required</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Time Needed (hours)</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Other Information</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
 </script>
 
 

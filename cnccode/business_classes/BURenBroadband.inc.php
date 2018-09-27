@@ -10,7 +10,7 @@ require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_bu"] . "/BUItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenBroadband.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenBroadband.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenBroadband extends Business
@@ -108,13 +108,12 @@ class BURenBroadband extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenBroadband->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
 
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -122,7 +121,8 @@ class BURenBroadband extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Broadband Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -149,7 +149,13 @@ class BURenBroadband extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -207,7 +213,9 @@ class BURenBroadband extends Business
                              */
                             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
-                            $buSalesOrder->getOrderByOrdheadID($dsOrdhead->getValue('ordheadID'), $dsOrdhead, $dsOrdline);
+                            $buSalesOrder->getOrderByOrdheadID($dsOrdhead->getValue('ordheadID'),
+                                                               $dsOrdhead,
+                                                               $dsOrdline);
                             $buInvoice->createInvoiceFromOrder($dsOrdhead, $dsOrdline);
                         }
                     }
@@ -272,8 +280,10 @@ class BURenBroadband extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 1);
                 $dbeOrdline->setValue('qtyLastDespatched', 1);
-                $dbeOrdline->setValue('curUnitSale', $this->dbeJRenBroadband->getValue('salePricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', $this->dbeJRenBroadband->getValue('costPricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      $this->dbeJRenBroadband->getValue('salePricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      $this->dbeJRenBroadband->getValue('costPricePerMonth') * $this->dbeJRenBroadband->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 
@@ -365,7 +375,8 @@ class BURenBroadband extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Broadband details',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -436,7 +447,13 @@ class BURenBroadband extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

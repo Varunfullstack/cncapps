@@ -1,43 +1,76 @@
 <!-- Template: PortalDocumentEdit.inc.html -->
-<TABLE border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD class="navigateLink" valign="top"><a href="{urlDisplayHeader}">Back to header</a></TD>
-		<TD class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
+<TABLE border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD class="navigateLink"
+            valign="top"
+        ><a href="{urlDisplayHeader}">Back to header</a></TD>
+        <TD class="navigateLink"
+            valign="top"
+        ><a href="{urlDelete}">{txtDelete}</a></TD>
+    </TR>
 </table>
-<FORM  method="post" action="{urlUpdate}" name="portalDocument" AUTOCOMPLETE="OFF" enctype="multipart/form-data">
-  <input type="hidden" name="MAX_FILE_SIZE" value="6291456">
-	<table border="0">
-		<input
-			type="hidden"
-			name="portalDocument[1][portalDocumentID]"
-			value="{portalDocumentID}"
-		>
-		<tr> 
-			<td class="promptText">Description</td>
-			<td class="fieldText"> <input
-					name="portalDocument[1][description]"
-					type="text" value="{description}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
-		</tr>
-    <tr> 
-      <td class="promptText">Main Contact Only?</td>
-      <td class="fieldText"><input name="portalDocument[1][mainContactOnlyFlag]" type="checkbox" value="Y" {mainContactOnlyFlagChecked}><span class="formErrorMessage">{mainContactOnlyFlagMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">Requires Acceptance?</td>
-      <td class="fieldText"><input name="portalDocument[1][requiresAcceptanceFlag]" type="checkbox" value="Y" {requiresAcceptanceFlagChecked}><span class="formErrorMessage">{requiresAcceptanceFlagMessage}</span> </td>
-    </tr>
-    <tr> 
-      <td class="promptText">File</td>
-      <td class="fieldText"><input name="userfile" type="file"  value="{userfile}" size="30"> <span class="formErrorMessage">{userfileMessage}</span> </td>
-    </tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+<FORM method="post"
+      action="{urlUpdate}"
+      name="portalDocument"
+      AUTOCOMPLETE="OFF"
+      enctype="multipart/form-data"
+>
+    <input type="hidden"
+           name="MAX_FILE_SIZE"
+           value="6291456"
+    >
+    <table border="0">
+        <input
+                type="hidden"
+                name="portalDocument[1][portalDocumentID]"
+                value="{portalDocumentID}"
+        >
+        <tr>
+            <td class="promptText">Description</td>
+            <td class="fieldText"><input
+                    name="portalDocument[1][description]"
+                    type="text"
+                    value="{description}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{descriptionMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Main Contact Only?</td>
+            <td class="fieldText"><input name="portalDocument[1][mainContactOnlyFlag]"
+                                         type="checkbox"
+                                         value="Y"
+                                         {mainContactOnlyFlagChecked}
+            ><span class="formErrorMessage">{mainContactOnlyFlagMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Requires Acceptance?</td>
+            <td class="fieldText"><input name="portalDocument[1][requiresAcceptanceFlag]"
+                                         type="checkbox"
+                                         value="Y"
+                                         {requiresAcceptanceFlagChecked}
+            ><span class="formErrorMessage">{requiresAcceptanceFlagMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">File</td>
+            <td class="fieldText"><input name="userfile"
+                                         type="file"
+                                         value="{userfile}"
+                                         size="30"
+                                         class="dragUploader"
+                                         data-description="portalDocument[1][description]"
+            > <span class="formErrorMessage">{userfileMessage}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit"
+                                                name="Submit"
+                                                value="Update"
+            ></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: PortalDocumentEdit.inc.html -->

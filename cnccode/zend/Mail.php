@@ -77,7 +77,7 @@ class Zend_Mail extends Zend_Mime_Message
      * Mail character set
      * @var string
      */
-    protected $_charset = 'iso-8859-1';
+    protected $_charset = 'utf-8';
 
     /**
      * Mail headers

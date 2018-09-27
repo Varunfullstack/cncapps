@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerAnalysisReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerAnalysisReport extends CTCNC
@@ -17,6 +17,13 @@ class CTCustomerAnalysisReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerAnalysisReport = new BUCustomerAnalysisReport ($this);
     }
 
@@ -110,15 +117,16 @@ class CTCustomerAnalysisReport extends CTCNC
 
                     $this->template->set_block('CustomerAnalysisReport', 'contractsBlock', 'contracts');
 
-                        $reportUrl =
-                            $this->buildLink(
-                                'CustomerAnalysisReport.php',
-                                array(
-                                    'searchForm[1][customerID]' => $_REQUEST ['searchForm'][1]['customerID'],
-                                    'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
-                                    'searchForm[1][endYearMonth]' => $_REQUEST ['searchForm'][1]['endYearMonth'],
-                                )
-                            );foreach ($results as $contractName => $row) {
+                    $reportUrl =
+                        $this->buildLink(
+                            'CustomerAnalysisReport.php',
+                            array(
+                                'searchForm[1][customerID]' => $_REQUEST ['searchForm'][1]['customerID'],
+                                'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
+                                'searchForm[1][endYearMonth]' => $_REQUEST ['searchForm'][1]['endYearMonth'],
+                            )
+                        );
+                    foreach ($results as $contractName => $row) {
 
                         if ($row['profit'] <= 0) {
                             $profitAlertClass = 'profitAlert';
@@ -169,7 +177,8 @@ class CTCustomerAnalysisReport extends CTCNC
                             'totalCost' => number_format($totalCost, 2),
                             'totalLabour' => number_format($totalLabour, 2),
                             'totalProfit' => number_format($totalSales - $totalCost - $totalLabour, 2),
-                            'totalProfitPercent' => number_format($totalSales > 0 ? 100 - (($totalCost + $totalLabour) / $totalSales) * 100 : 0, 2),
+                            'totalProfitPercent' => number_format($totalSales > 0 ? 100 - (($totalCost + $totalLabour) / $totalSales) * 100 : 0,
+                                                                  2),
                             'totalLabourHours' => number_format($totalLabourHours, 2),
                         )
                     );
@@ -178,8 +187,10 @@ class CTCustomerAnalysisReport extends CTCNC
                             'grandTotalSales' => number_format($grandTotalSales, 2),
                             'grandTotalCost' => number_format($grandTotalCost, 2),
                             'grandTotalLabour' => number_format($grandTotalLabour, 2),
-                            'grandTotalProfit' => number_format($grandTotalSales - $grandTotalCost - $grandTotalLabour, 2),
-                            'grandTotalProfitPercent' => number_format($grandTotalSales > 0 ? 100 - (($grandTotalCost + $grandTotalLabour) / $grandTotalSales) * 100 : 0, 2),
+                            'grandTotalProfit' => number_format($grandTotalSales - $grandTotalCost - $grandTotalLabour,
+                                                                2),
+                            'grandTotalProfitPercent' => number_format($grandTotalSales > 0 ? 100 - (($grandTotalCost + $grandTotalLabour) / $grandTotalSales) * 100 : 0,
+                                                                       2),
                             'grandTotalLabourHours' => number_format($grandTotalLabourHours, 2),
                         )
                     );
@@ -190,7 +201,8 @@ class CTCustomerAnalysisReport extends CTCNC
 
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -199,7 +211,7 @@ class CTCustomerAnalysisReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
@@ -217,87 +229,5 @@ class CTCustomerAnalysisReport extends CTCNC
         $this->template->parse('CONTENTS', 'CustomerAnalysisReport', true);
         $this->parsePage();
     }
-    /**
-     * Display search form
-     * @access private
-     */
-    /*
-     function displaySearchForm() {
-     $this->setMethodName ( 'displaySearchForm' );
-
-
-     $this->buCustomerAnalysisReport->initialiseSearchForm ( $dsSearchForm );
-
-     if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
-
-       if (! $dsSearchForm->populateFromArray ( $_REQUEST ['searchForm'] )) {
-
-         $this->setFormErrorOn ();
-
-       }
-
-     }
-
-         $this->setTemplateFiles ( array ('CustomerAnalysisReport' => 'CustomerAnalysisReport.inc' ) );
-
-         $urlCustomerPopup = $this->buildLink ( CTCNC_PAGE_CUSTOMER, array ('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP ) );
-
-         $urlSubmit = $this->buildLink ( $_SERVER ['PHP_SELF'], array ('action' => CTCNC_ACT_SEARCH ) );
-
-         $this->setPageTitle ( 'CustomerAnalysis Report' );
-
-         if ($dsSearchForm->rowCount () == 0) {
-             $this->buCustomerAnalysisReport->initialiseSearchForm ( $dsSearchForm );
-         }
-
-         if ($dsSearchForm->getValue ( 'customerID' ) != 0) {
-             $buCustomer = new BUCustomer ( $this );
-             $buCustomer->getCustomerByID ( $dsSearchForm->getValue ( 'customerID' ), $dsCustomer );
-             $customerString = $dsCustomer->getValue ( 'name' );
-         }
-
-     if ( $this->results ){
-
-       if( $_REQUEST[ ] == 'Screen Report' ){
-
-
-       }else{
-
-         Header('Content-type: text/plain');
-         Header('Content-Disposition: attachment; filename=CustomerAnalysisReport.csv');
-
-         echo "Category,Sales(GBP),Cost(GBP),Labour(GBP),Labour(hours)\r\n";
-
-         foreach ( $this->results as $contractName => $row ){
-
-           echo "\"" . $contractName . "\",";
-           foreach ( $row as $value ){
-             echo $value . ",";
-           }
-           echo "\r\n";
-         }
-         exit;
-       }
-     }
-
-         $this->template->set_var (
-       array (
-         'formError'       => $this->formError,
-         'customerID'      => $dsSearchForm->getValue ( 'customerID' ),
-         'customerString'  => $customerString,
-         'startYearMonth'  => $dsSearchForm->getValue('startYearMonth'),
-         'startYearMonthMessage'   => $dsSearchForm->getMessage('startYearMonth'),
-         'endYearMonth'    => $dsSearchForm->getValue('endYearMonth'),
-         'endYearMonthMessage'   => $dsSearchForm->getMessage('endYearMonth'),
-         'urlCustomerPopup'=> $urlCustomerPopup,
-         'urlSubmit'       => $urlSubmit,
-         )
-       );
-
-         $this->template->parse ( 'CONTENTS', 'CustomerAnalysisReport', true );
-         $this->parsePage ();
-     } // end function displaySearchForm
- */
-
 } // end of class
 ?>

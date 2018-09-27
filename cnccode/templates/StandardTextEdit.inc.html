@@ -1,65 +1,149 @@
-<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
-<!-- Template: FurtherActionEdit.inc.html -->
-<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
-</table>
-<FORM  method="post" action="{urlUpdate}" name="standardText" AUTOCOMPLETE="OFF">
-	<table border="0">
-		<input
-			type="hidden"
-			name="standardText[1][stt_standardtextno]"
-			value="{stt_standardtextno}"
-		>
-		<tr> 
-			<td class="promptText">Sort Order (integer)</td>
-			<td class="fieldText"> <input
-					name="standardText[1][stt_sort_order]"
-					type="text" value="{stt_sort_order}"
-					size="4"
-					maxlength="3"
-				> <span class="formErrorMessage">{stt_sort_orderMessage}</span> </td>
-		</tr>
-        <tr> 
-      <td class="promptText">Type</td>
-      <td class="fieldText"><select name="standardText[1][stt_standardtexttypeno]">
-          <option value="">Please select</option>
-          <!-- BEGIN typeBlock -->
-          <option {typeSelected} value="{stt_standardtexttypeno}">{typeDescription}</option>
-          <!-- END typeBlock -->
-        </select>
-    <tr> 
-      <td class="promptText">Description</td>
-      <td class="fieldText"> <input
-          name="standardText[1][stt_desc]"
-          type="text" value="{stt_desc}"
-          size="50"
-          maxlength="50"
-        > <span class="formErrorMessage">{descriptionMessage}</span> </td>
-    </tr>
-		<tr> 
-			<td valign="top" class="promptText">Content</td>
-			<td class="fieldText">
-				<textarea
-					name="standardText[1][stt_text]"
-          id="stt_text"
-          cols="100"
-          rows="10"
-				>{stt_text}</textarea>
-        <script  type="text/javascript">
-          reason = CKEDITOR.replace( 'standardText[1][stt_text]', { customConfig : '/ckeditor_config.js' } );
-          reason.addCss( 'body { font-size: 10pt; }' );
-          reason.addCss( 'P { margin-top: 10px; margin-bottom: 10px; }' );
-        </script>
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
+<style>
+    {
+        display: inline !important
+    }
+    .cke_combo__tokens .cke_combo_text {
+        width: 70px;
+    }
+</style>
+<script>
+    var config = {
+        contentsCss: '/screen.css',
+        toolbarStartupExpanded: false,
+        disableNativeSpellChecker: false,
+        toolbar_CNCToolbar:
+            [
+                {name: 'line1', items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike']},
+                ['NumberedList', 'BulletedList', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+                ['Table'],
+                ['Styles', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor'],
+                {name: 'tokens', items: ['tokens']}
+            ],
+        toolbar: 'CNCToolbar',
+        extraPlugins: 'tokens,font',
+        fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt'
+    };
+    var editor = null;
 
-				<span class="formErrorMessage">{stt_textMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+
+    CKEDITOR.config.width = '870';
+    CKEDITOR.config.resize_minWidth = '760';
+
+    $(function () {
+        editor = CKEDITOR.replace('standardTextEditor', config);
+    });
+
+    function checkTags() {
+        var selectedOptions = $('#typeSelector').find(":selected");
+        var customConfig = Object.assign({}, config);
+        if (selectedOptions.length) {
+            var option = selectedOptions[0];
+            var tags = option.getAttribute('data-tags');
+
+            if (tags) {
+                tags = JSON.parse(tags);
+                customConfig.tags = tags;
+            }
+        }
+        recreateEditor(customConfig);
+    }
+
+    function recreateEditor(config) {
+        CKEDITOR.instances.standardTextEditor.destroy();
+        CKEDITOR.replace('standardTextEditor', config);
+    }
+
+</script>
+<!-- Template: FurtherActionEdit.inc.html -->
+<TABLE width="200px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDisplayList}">Back to list</a></TD>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDelete}">{txtDelete}</a></TD>
+    </TR>
+</table>
+<FORM method="post"
+      action="{urlUpdate}"
+      name="standardText"
+      AUTOCOMPLETE="OFF"
+>
+    <table border="0">
+        <input
+                type="hidden"
+                name="standardText[1][stt_standardtextno]"
+                value="{stt_standardtextno}"
+        >
+        <tr>
+            <td class="promptText">Sort Order (integer)</td>
+            <td class="fieldText">
+                <input
+                        name="standardText[1][stt_sort_order]"
+                        type="text"
+                        value="{stt_sort_order}"
+                        size="4"
+                        maxlength="3"
+                > <span class="formErrorMessage">{stt_sort_orderMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Type</td>
+            <td class="fieldText">
+                <select name="standardText[1][stt_standardtexttypeno]"
+                        onchange="checkTags()"
+                        id="typeSelector"
+                >
+                    <option value="">Please select</option>
+                    <!-- BEGIN typeBlock -->
+                    <option {typeSelected}
+                            value="{stt_standardtexttypeno}"
+                            data-tags='{variables}'
+                    >{typeDescription}
+                    </option>
+                    <!-- END typeBlock -->
+                </select>
+        <tr>
+            <td class="promptText">Description</td>
+            <td class="fieldText">
+                <input
+                        name="standardText[1][stt_desc]"
+                        type="text"
+                        value="{stt_desc}"
+                        size="50"
+                        maxlength="50"
+                > <span class="formErrorMessage">{descriptionMessage}</span></td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Content
+            </td>
+            <td class="fieldText">
+				<textarea
+                        name="standardText[1][stt_text]"
+                        id="standardTextEditor"
+                        cols="100"
+                        rows="10"
+                >{stt_text}</textarea>
+                <span class="formErrorMessage">{stt_textMessage}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit"
+                                                name="Submit"
+                                                value="Update"
+            ></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: FurtherActionEdit.inc.html -->

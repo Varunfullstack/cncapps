@@ -9,13 +9,20 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenHosting.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 
 class CTRenHosting extends CTCNC
 {
+    const InitialContractLengthValues = [
+        12,
+        24,
+        36,
+        48,
+        60
+    ];
     var $dsRenHosting = '';
     var $buRenHosting = '';
     var $buCustomerItem = '';
@@ -27,21 +34,72 @@ class CTRenHosting extends CTCNC
         "A" => "Awaiting Paperwork"
     );
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
+        $roles = [
+            "renewals",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buRenHosting = new BURenHosting($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenHosting = new DSForm($this);
         $this->dsRenHosting->copyColumnsFrom($this->buRenHosting->dbeRenHosting);
-        $this->dsRenHosting->addColumn('customerName', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('invoiceFromDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('invoiceToDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('itemID', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('itemDescription', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('siteName', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('costPrice', DA_STRING, DA_ALLOW_NULL);
-        $this->dsRenHosting->addColumn('salePrice', DA_STRING, DA_ALLOW_NULL);
+        $this->dsRenHosting->addColumn(
+            'customerName',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'invoiceFromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'invoiceToDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'itemID',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'itemDescription',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'siteName',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'costPrice',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsRenHosting->addColumn(
+            'salePrice',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
     }
 
     /**
@@ -85,10 +143,17 @@ class CTRenHosting extends CTCNC
             array('RenHostingList' => 'RenHostingList.inc')
         );
 
-        $this->buRenHosting->getAll($dsRenHosting, $_REQUEST['orderBy']);
+        $this->buRenHosting->getAll(
+            $dsRenHosting,
+            $_REQUEST['orderBy']
+        );
 
         if ($dsRenHosting->rowCount() > 0) {
-            $this->template->set_block('RenHostingList', 'rowBlock', 'rows');
+            $this->template->set_block(
+                'RenHostingList',
+                'rowBlock',
+                'rows'
+            );
             while ($dsRenHosting->fetchNext()) {
 
                 $customerItemID = $dsRenHosting->getValue('customerItemID');
@@ -98,7 +163,7 @@ class CTRenHosting extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
-                            'ID' => $customerItemID
+                            'ID'     => $customerItemID
                         )
                     );
                 $txtEdit = '[edit]';
@@ -107,7 +172,7 @@ class CTRenHosting extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'delete',
+                            'action'         => 'delete',
                             'customerItemID' => $customerItemID
                         )
                     );
@@ -123,19 +188,27 @@ class CTRenHosting extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName' => $dsRenHosting->getValue('customerName'),
+                        'customerName'    => $dsRenHosting->getValue('customerName'),
                         'itemDescription' => $dsRenHosting->getValue('itemDescription'),
-                        'invoiceFromDate' => $this->dateYMDtoDMY($dsRenHosting->getValue('invoiceFromDate')),
-                        'invoiceToDate' => $this->dateYMDtoDMY($dsRenHosting->getValue('invoiceToDate')),
-                        'urlEdit' => $urlEdit,
-                        'urlList' => $urlList,
-                        'txtEdit' => $txtEdit
+                        'invoiceFromDate' => Controller::dateYMDtoDMY($dsRenHosting->getValue('invoiceFromDate')),
+                        'invoiceToDate'   => Controller::dateYMDtoDMY($dsRenHosting->getValue('invoiceToDate')),
+                        'urlEdit'         => $urlEdit,
+                        'urlList'         => $urlList,
+                        'txtEdit'         => $txtEdit
                     )
                 );
-                $this->template->parse('rows', 'rowBlock', true);
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
             }//while $dsRenHosting->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'RenHostingList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenHostingList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -163,7 +236,11 @@ class CTRenHosting extends CTCNC
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
             // create a new record first
-            $buSalesOrder->getOrderByOrdheadID($_REQUEST['ordheadID'], $dsOrdhead, $dsDontNeedOrdline);
+            $buSalesOrder->getOrderByOrdheadID(
+                $_REQUEST['ordheadID'],
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
 
             $this->buRenHosting->createNewRenewal(
                 $dsOrdhead->getValue('customerID'),
@@ -176,11 +253,20 @@ class CTRenHosting extends CTCNC
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
 
-            $dbeOrdline->setValue('ordheadID', $dsOrdline->getValue('ordheadID'));
-            $dbeOrdline->setValue('sequenceNo', $dsOrdline->getValue('sequenceNo'));
+            $dbeOrdline->setValue(
+                'ordheadID',
+                $dsOrdline->getValue('ordheadID')
+            );
+            $dbeOrdline->setValue(
+                'sequenceNo',
+                $dsOrdline->getValue('sequenceNo')
+            );
 
             $dbeOrdline->getRow();
-            $dbeOrdline->setValue('renewalCustomerItemID', $renewalCustomerItemID);
+            $dbeOrdline->setValue(
+                'renewalCustomerItemID',
+                $renewalCustomerItemID
+            );
 
             $dbeOrdline->updateRow();
 
@@ -191,7 +277,7 @@ class CTRenHosting extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
-                    'ID' => $renewalCustomerItemID
+                    'ID'     => $renewalCustomerItemID
                 )
             );
 
@@ -211,11 +297,17 @@ class CTRenHosting extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'edit') {
-                $this->buRenHosting->getRenHostingByID($_REQUEST['ID'], $dsRenHosting);
+                $this->buRenHosting->getRenHostingByID(
+                    $_REQUEST['ID'],
+                    $dsRenHosting
+                );
                 $customerItemID = $_REQUEST['ID'];
             } else {                                                                    // creating new
                 $dsRenHosting->initialise();
-                $dsRenHosting->setValue('customerItemID', '0');
+                $dsRenHosting->setValue(
+                    'customerItemID',
+                    '0'
+                );
                 $customerItemID = '0';
             }
         } else {                                                                        // form validation error
@@ -228,8 +320,8 @@ class CTRenHosting extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'update',
-                    'ordheadID' => $_REQUEST['ordheadID'],
+                    'action'         => 'update',
+                    'ordheadID'      => $_REQUEST['ordheadID'],
                     'customerItemID' => $customerItemID
                 )
             );
@@ -265,7 +357,9 @@ class CTRenHosting extends CTCNC
               type="text" value="' . Controller::htmlInputText($dsRenHosting->getValue('curUnitSale')) . '"
               size="10"
               maxlength="10">
-                    <span class="formErrorMessage">' . Controller::htmlDisplayText($dsRenHosting->getMessage('curUnitSale')) . '</span> </td>
+                    <span class="formErrorMessage">' . Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('curUnitSale')
+                ) . '</span> </td>
         </tr>
         <tr>
             <td class="promptText">Cost Price/Annum</td>
@@ -275,7 +369,9 @@ class CTRenHosting extends CTCNC
               {readonly}
               size="10"
               maxlength="10" />
-                    <span class="formErrorMessage">' . Controller::htmlDisplayText($dsRenHosting->getMessage('curUnitCost')) . '</span> </td>
+                    <span class="formErrorMessage">' . Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('curUnitCost')
+                ) . '</span> </td>
         </tr>';
 
             $declined =
@@ -293,7 +389,7 @@ class CTRenHosting extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'prices' => $prices,
+                    'prices'   => $prices,
                     'declined' => $declined
                 )
             );
@@ -302,16 +398,16 @@ class CTRenHosting extends CTCNC
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
-                    'action' => CTCNC_ACT_DISP_ITEM_POPUP,
+                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
                     'renewalTypeID' => CONFIG_HOSTING_RENEWAL_TYPE_ID,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'htmlFmt'       => CT_HTML_FMT_POPUP
                 )
             );
         $urlItemEdit =
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
-                    'action' => CTCNC_ACT_ITEM_EDIT,
+                    'action'  => CTCNC_ACT_ITEM_EDIT,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -320,7 +416,7 @@ class CTRenHosting extends CTCNC
             $this->buildLink(
                 'CustomerItem.php',
                 array(
-                    'action' => 'printContract',
+                    'action'         => 'printContract',
                     'customerItemID' => $customerItemID
                 )
             );
@@ -333,56 +429,91 @@ class CTRenHosting extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerItemID' => $dsRenHosting->getValue('customerItemID'),
-                'customerName' => Controller::htmlDisplayText($dsRenHosting->getValue('customerName')),
-                'customerID' => Controller::htmlDisplayText($dsRenHosting->getValue('customerID')),
-                'users' => Controller::htmlDisplayText($dsRenHosting->getValue('users')),
-                'siteName' => Controller::htmlDisplayText($dsRenHosting->getValue('siteName')),
-                'siteNo' => $dsRenHosting->getValue('siteNo'),
-                'itemID' => Controller::htmlDisplayText($dsRenHosting->getValue('itemID')),
-                'itemDescription' => Controller::htmlDisplayText($dsRenHosting->getValue('itemDescription')),
-                'invoiceFromDate' => $dsRenHosting->getValue('invoiceFromDate'),
-                'installationDate' => $this->dateYMDtoDMY($dsRenHosting->getValue('installationDate')),
-                'invoiceToDate' => $dsRenHosting->getValue('invoiceToDate'),
-                'invoicePeriodMonths' => Controller::htmlInputText($dsRenHosting->getValue('invoicePeriodMonths')),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('invoicePeriodMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenHosting->getValue('totalInvoiceMonths')),
-                'totalInvoiceMonths' => Controller::htmlInputText($dsRenHosting->getValue('totalInvoiceMonths')),
-                'notes' => Controller::htmlInputText($dsRenHosting->getValue('notes')),
-                'notesMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('notes')),
-                'hostingCompany' => Controller::htmlInputText($dsRenHosting->getValue('hostingCompany')),
-                'hostingCompanyMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('hostingCompany')),
-                'hostingUserName' => Controller::htmlInputText($dsRenHosting->getValue('hostingUserName')),
-                'hostingUserNameMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('hostingUserName')),
-                'password' => Controller::htmlInputText($dsRenHosting->getValue('password')),
-                'passwordMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('password')),
-                'osPlatform' => Controller::htmlInputText($dsRenHosting->getValue('osPlatform')),
-                'osPlatformMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('osPlatform')),
-                'controlPanelUrl' => Controller::htmlInputText($dsRenHosting->getValue('controlPanelUrl')),
-                'controlPanelUrlMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('controlPanelUrl')),
-                'ftpAddress' => Controller::htmlInputText($dsRenHosting->getValue('ftpAddress')),
-                'ftpAddressMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('ftpAddress')),
-                'ftpUsername' => Controller::htmlInputText($dsRenHosting->getValue('ftpUsername')),
-                'ftpUsernameMessage' => Controller::htmlDisplayText($dsRenHosting->getMessage('ftpUsername')),
-                'curUnitSale' => $dsRenHosting->getValue('curUnitSale'),
-                'curUnitCost' => $dsRenHosting->getValue('curUnitCost'),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlItemEdit' => $urlItemEdit,
-                'urlItemPopup' => $urlItemPopup,
-                'urlDisplayList' => $urlDisplayList,
-                'disabled' => $disabled,
-                'readonly' => $readonly,
-                'customerItemNotes' => Controller::htmlTextArea($dsRenHosting->getValue('customerItemNotes')),
-                'internalNotes' => Controller::htmlTextArea($dsRenHosting->getValue('internalNotes'))
+                'customerItemID'             => $dsRenHosting->getValue('customerItemID'),
+                'customerName'               => Controller::htmlDisplayText($dsRenHosting->getValue('customerName')),
+                'customerID'                 => Controller::htmlDisplayText($dsRenHosting->getValue('customerID')),
+                'users'                      => Controller::htmlDisplayText($dsRenHosting->getValue('users')),
+                'siteName'                   => Controller::htmlDisplayText($dsRenHosting->getValue('siteName')),
+                'siteNo'                     => $dsRenHosting->getValue('siteNo'),
+                'itemID'                     => Controller::htmlDisplayText($dsRenHosting->getValue('itemID')),
+                'itemDescription'            => Controller::htmlDisplayText($dsRenHosting->getValue('itemDescription')),
+                'invoiceFromDate'            => $dsRenHosting->getValue('invoiceFromDate'),
+                'installationDate'           => Controller::dateYMDtoDMY($dsRenHosting->getValue('installationDate')),
+                'invoiceToDate'              => $dsRenHosting->getValue('invoiceToDate'),
+                'invoicePeriodMonths'        => Controller::htmlInputText(
+                    $dsRenHosting->getValue('invoicePeriodMonths')
+                ),
+                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('invoicePeriodMonths')
+                ),
+                'totalInvoiceMonths'         => Controller::htmlInputText(
+                    $dsRenHosting->getValue('totalInvoiceMonths')
+                ),
+                'notes'                      => Controller::htmlInputText($dsRenHosting->getValue('notes')),
+                'notesMessage'               => Controller::htmlDisplayText($dsRenHosting->getMessage('notes')),
+                'hostingCompany'             => Controller::htmlInputText($dsRenHosting->getValue('hostingCompany')),
+                'hostingCompanyMessage'      => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('hostingCompany')
+                ),
+                'hostingUserName'            => Controller::htmlInputText($dsRenHosting->getValue('hostingUserName')),
+                'hostingUserNameMessage'     => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('hostingUserName')
+                ),
+                'password'                   => Controller::htmlInputText($dsRenHosting->getValue('password')),
+                'passwordMessage'            => Controller::htmlDisplayText($dsRenHosting->getMessage('password')),
+                'osPlatform'                 => Controller::htmlInputText($dsRenHosting->getValue('osPlatform')),
+                'osPlatformMessage'          => Controller::htmlDisplayText($dsRenHosting->getMessage('osPlatform')),
+                'controlPanelUrl'            => Controller::htmlInputText($dsRenHosting->getValue('controlPanelUrl')),
+                'controlPanelUrlMessage'     => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('controlPanelUrl')
+                ),
+                'ftpAddress'                 => Controller::htmlInputText($dsRenHosting->getValue('ftpAddress')),
+                'ftpAddressMessage'          => Controller::htmlDisplayText($dsRenHosting->getMessage('ftpAddress')),
+                'ftpUsername'                => Controller::htmlInputText($dsRenHosting->getValue('ftpUsername')),
+                'ftpUsernameMessage'         => Controller::htmlDisplayText($dsRenHosting->getMessage('ftpUsername')),
+                'curUnitSale'                => $dsRenHosting->getValue('curUnitSale'),
+                'curUnitCost'                => $dsRenHosting->getValue('curUnitCost'),
+                'urlUpdate'                  => $urlUpdate,
+                'urlDelete'                  => $urlDelete,
+                'txtDelete'                  => $txtDelete,
+                'urlItemEdit'                => $urlItemEdit,
+                'urlItemPopup'               => $urlItemPopup,
+                'urlDisplayList'             => $urlDisplayList,
+                'disabled'                   => $disabled,
+                'readonly'                   => $readonly,
+                'customerItemNotes'          => Controller::htmlTextArea($dsRenHosting->getValue('customerItemNotes')),
+                'internalNotes'              => Controller::htmlTextArea($dsRenHosting->getValue('internalNotes')),
+                'calculatedExpiryDate'       => getExpiryDate(
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenHosting->getValue(DBECustomerItem::installationDate)
+                    ),
+                    $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
+                )->format('d/m/Y'),
             )
         );
 
-        $this->template->set_block('RenHostingEdit', 'renewalStatusBlock', 'renewalStatuss');
+
+        $this->template->setBlock(
+            'RenHostingEdit',
+            'initialContractLengthBlock',
+            'initialContractLengths'
+        );
+
+        $this->parseInitialContractLength($dsRenHosting->getValue(DBECustomerItem::initialContractLength));
+
+        $this->template->set_block(
+            'RenHostingEdit',
+            'renewalStatusBlock',
+            'renewalStatuss'
+        );
         $this->parseRenewalSelector($dsRenHosting->getValue('renewalStatus'));
 
-        $this->template->parse('CONTENTS', 'RenHostingEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'RenHostingEdit',
+            true
+        );
 
         $this->parsePage();
 
@@ -416,16 +547,17 @@ class CTRenHosting extends CTCNC
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID' => $_REQUEST['ordheadID']
+                        'ID'     => $_REQUEST['ordheadID']
                     )
                 );
 
         } else {
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
-                        'ID' => $this->dsRenHosting->getValue('customerItemID')
+                        'ID'     => $this->dsRenHosting->getValue('customerItemID')
                     )
                 );
 
@@ -457,12 +589,35 @@ class CTRenHosting extends CTCNC
             $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
-                    'renewalStatusSelected' => $renewalStatusSelected,
-                    'renewalStatus' => $key,
+                    'renewalStatusSelected'    => $renewalStatusSelected,
+                    'renewalStatus'            => $key,
                     'renewalStatusDescription' => $value
                 )
             );
-            $this->template->parse('renewalStatuss', 'renewalStatusBlock', true);
+            $this->template->parse(
+                'renewalStatuss',
+                'renewalStatusBlock',
+                true
+            );
+        }
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
         }
     }
 

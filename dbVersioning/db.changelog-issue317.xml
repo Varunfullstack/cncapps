@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue317-1533897009-0">
+        <tagDatabase tag="issue317"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue317-1533897009-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="third_party_contact"/>
+            </not>
+        </preConditions>
+        <createTable tableName="third_party_contact">
+            <column name="ThirdPartyContactID" type="INT UNSIGNED" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="customerID" type="INT UNSIGNED"/>
+            <column name="software" type="MEDIUMTEXT"/>
+            <column name="vendor" type="MEDIUMTEXT"/>
+            <column name="phone" type="MEDIUMTEXT"/>
+            <column name="email" type="MEDIUMTEXT"/>
+            <column name="notes" type="MEDIUMTEXT"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

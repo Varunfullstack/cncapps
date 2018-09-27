@@ -62,7 +62,7 @@ class BUServiceRequestReport extends Business
           concat(con_first_name, ' ', con_last_name) AS `Contact`,
           pro_priority AS `Priority`,
           rootcause.rtc_desc AS `RootCause`,
-          CONCAT('Ref-', pro_problemno) AS `CallReference`,
+          pro_problemno AS `CallReference`,
           pro_total_activity_duration_hours AS `TotalHours`,
           pro_responded_hours AS `ResponseHours`,
           pro_sla_response_hours AS `MinContractResponseHours`,

@@ -1,0 +1,126 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue167-1519296160-0">
+        <tagDatabase tag="issue167"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_team_max_pause_count"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_hd_team_max_pause_count"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_hd_team_max_pause_count" type="int"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue167-1519296160-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_team_pause_seconds"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_hd_team_pause_seconds"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_hd_team_pause_seconds" type="int"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue167-1519296160-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_hd_remain_hours"/>
+        </preConditions>
+        <renameColumn tableName="problem" oldColumnName="pro_hd_remain_hours" newColumnName="pro_hd_limit_minutes"
+                      columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_es_remain_hours"/>
+        </preConditions>
+        <renameColumn tableName="problem" oldColumnName="pro_es_remain_hours" newColumnName="pro_es_limit_minutes"
+                      columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_im_remain_hours"/>
+        </preConditions>
+        <renameColumn tableName="problem" oldColumnName="pro_im_remain_hours" newColumnName="pro_im_limit_minutes"
+                      columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_team_limit_hours"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_hd_team_limit_hours"
+                      newColumnName="hed_hd_team_limit_minutes" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_es_team_limit_hours"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_es_team_limit_hours"
+                      newColumnName="hed_es_team_limit_minutes" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_im_team_limit_hours"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_im_team_limit_hours"
+                      newColumnName="hed_im_team_limit_minutes" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="time_granted" columnName="hours"/>
+        </preConditions>
+        <sql>
+            update time_granted set hours = hours * 60
+        </sql>
+        <renameColumn tableName="time_granted" oldColumnName="hours"
+                      newColumnName="minutes" columnDataType="int"/>
+        <rollback>
+            <renameColumn tableName="time_granted" newColumnName="hours"
+                          oldColumnName="minutes" columnDataType="decimal(10,2)"/>
+            <sql>
+                update time_granted set hours = hours / 60
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue167-1519296160-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hed_im_team_minutes_in_a_day"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="hed_im_team_minutes_in_a_day" type="int"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue167-1519296160-11" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_im_team_minutes_in_a_day"/>
+        </preConditions>
+        <update tableName="headert">
+            <column name="hed_im_team_minutes_in_a_day" value="480"/>
+        </update>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue167-1519296160-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="time_granted"/>
+        </preConditions>
+        <dropTable tableName="time_granted"/>
+        <rollback>
+            <createTable tableName="time_granted">
+                <column name="timeGrantedID" type="int(11) unsigned">
+                    <constraints primaryKey="true" nullable="false"/>
+                </column>
+                <column name="minutes" type="int(11)"/>
+                <column name="userID" type="int(11) unsigned"/>
+                <column name="grantedDate" type="date"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

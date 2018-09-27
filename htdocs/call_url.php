@@ -18,11 +18,32 @@ if (!isset($argv[0])) {
     die('This script may only be called from the os command line');
 }
 
+$dat = getrusage();
+define('PHP_TUSAGE', microtime(true));
+define('PHP_RUSAGE', $dat["ru_utime.tv_sec"] * 1e6 + $dat["ru_utime.tv_usec"]);
+
+function getCpuUsage()
+{
+    $dat = getrusage();
+    $dat["ru_utime.tv_usec"] = ($dat["ru_utime.tv_sec"] * 1e6 + $dat["ru_utime.tv_usec"]) - PHP_RUSAGE;
+    $time = (microtime(true) - PHP_TUSAGE) * 1000000;
+
+    // cpu per request
+    if ($time > 0) {
+        $cpu = sprintf("%01.2f", ($dat["ru_utime.tv_usec"] / $time) * 100);
+    } else {
+        $cpu = '0.00';
+    }
+
+    return $cpu;
+}
+
+set_time_limit(0);
 date_default_timezone_set('Europe/London');
 
 $ch = curl_init($argv[1]);                                        // create handle using passed URL
 
-curl_setopt($ch, CURLOPT_TIMEOUT, 20);                // 20 second timeout
+curl_setopt($ch, CURLOPT_TIMEOUT, 1000);                // 20 second timeout
 
 $start_time = date('Y-m-d H:i:s');
 
@@ -54,6 +75,8 @@ if ($error != "") {
 }
 
 curl_close($ch);                                                                // free handle
+
+
 /*
 $handle = fopen( 'E:\\htdocs\\service_desk_monitor_log.htm', 'a');
 fwrite( $handle, '<PRE>' . print_r( $result, true ) . '</PRE>');
@@ -65,4 +88,25 @@ if ($result['curl_error']) {
 if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
+
+//we are going to use this to add to the monitoring db
+$dsn = 'mysql:host=localhost;dbname=cncappsdev';
+$DB_USER = "webuser";
+$DB_PASSWORD = "CnC1988";
+$options = [
+    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+];
+$db = new PDO($dsn, $DB_USER, $DB_PASSWORD, $options);
+
+$statement = $db->prepare('INSERT INTO taskLog(description, startedAt, finishedAt, maxCpuUsage, maxMemoryUsage) VALUES( :description, :startedAt, :finishedAt, :maxCpuUsage, :maxMemoryUsage ) ');
+
+$statement->bindValue(':description', $argv[1]);
+$statement->bindValue(':startedAt', $start_time);
+$statement->bindValue(':finishedAt', $end_time);
+$statement->bindValue(':maxCpuUsage', getCpuUsage());
+$statement->bindValue(':maxMemoryUsage', memory_get_peak_usage(true));
+
+$statement->execute();
+
+
 ?>

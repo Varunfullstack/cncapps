@@ -1,19 +1,19 @@
 <!-- Template: FurtherActionList.inc.html -->
-<A href="{urlCreate}">[create new]</A> 
+<A href="{urlCreate}">[create new]</A>
 <table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td class="listHeadText">Description</td>
-    <td class="listHeadText">Type</td>
-	</tr>
-	<!-- BEGIN standardTextBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{stt_desc}</div></td>
-    <td class="orderLineItem"><DIV align="left">{type}</div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit">{txtEdit}</a> 
-				<A href="{urlDelete}"  title="Delete this type" onClick="if(!confirm('Are you sure you want to remove this?')) return(false)">{txtDelete}</A> 
-			</DIV></td>
-	</tr>
-	<!-- END standardTextBlock -->
+    <tr>
+        <td class="listHeadText">Description</td>
+        <td class="listHeadText">Type</td>
+    </tr>
+    <!-- BEGIN standardTextBlock -->
+    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
+        <td class="orderLineItem"><DIV align="left">{stt_desc}</div></td>
+        <td class="orderLineItem"><DIV align="left">{type}</div></td>
+        <td class="orderLineItem"><DIV align="left"></div>
+            <DIV align="left"> <A href="{urlEdit}" title="Edit">{txtEdit}</a>
+                <A href="{urlDelete}"  title="Delete this type" onClick="if(!confirm('Are you sure you want to remove this?')) return(false)">{txtDelete}</A>
+            </DIV></td>
+    </tr>
+    <!-- END standardTextBlock -->
 </table>
 <!-- End Template: FurtherActionList.inc.html -->

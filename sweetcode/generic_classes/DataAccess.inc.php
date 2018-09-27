@@ -7,51 +7,170 @@
  */
 require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 
-define("DA_NOT_NULL", 0);
-define("DA_ALLOW_NULL", 1);
+define(
+    "DA_NOT_NULL",
+    0
+);
+define(
+    "DA_ALLOW_NULL",
+    1
+);
 // Column type constants
-define("DA_STRING", "string");
-define("DA_INTEGER", "int");
-define("DA_MEMO", "memo");
-define("DA_FLOAT", "float");
-define("DA_BLOB", "blob");
-define("DA_ID", "id");
-define("DA_YN", "yn");
-define("DA_DATETIME", "datetime");
-define("DA_DATE", "date");
-define("DA_TIME", "time");
-define("DA_BOOLEAN", "bool");
-define("DA_ARRAY", "array");    // a PHP array of values
+define(
+    "DA_STRING",
+    "string"
+);
+define(
+    "DA_TEXT",
+    "string"
+);
+define(
+    "DA_INTEGER",
+    "int"
+);
+define(
+    "DA_MEMO",
+    "memo"
+);
+define(
+    "DA_FLOAT",
+    "float"
+);
+define(
+    "DA_BLOB",
+    "blob"
+);
+define(
+    "DA_ID",
+    "id"
+);
+define(
+    "DA_YN",
+    "yn"
+);
+define(
+    "DA_YN_FLAG",
+    'yn'
+);
+define(
+    "DA_DATETIME",
+    "datetime"
+);
+define(
+    "DA_DATE",
+    "date"
+);
+define(
+    "DA_TIME",
+    "time"
+);
+define(
+    "DA_BOOLEAN",
+    "bool"
+);
+define(
+    "DA_ARRAY",
+    "array"
+);    // a PHP array of values
 // Update modes
-define("DA_MODE_NONE", 0);
-define("DA_MODE_INSERT", 1);
-define("DA_MODE_UPDATE", 2);
-define("DA_MODE_DELETE", 3);
+define(
+    "DA_MODE_NONE",
+    0
+);
+define(
+    "DA_MODE_INSERT",
+    1
+);
+define(
+    "DA_MODE_UPDATE",
+    2
+);
+define(
+    "DA_MODE_DELETE",
+    3
+);
 
-define("DA_PK_NOT_SET", -1);        // Primary key not set
-define("DA_OUT_OF_RANGE", -1);        // Column out of range
-define("DA_COLUMN_NOT_ADDED", -1);
+define(
+    "DA_PK_NOT_SET",
+    -1
+);        // Primary key not set
+define(
+    "DA_OUT_OF_RANGE",
+    -1
+);        // Column out of range
+define(
+    "DA_COLUMN_NOT_ADDED",
+    -1
+);
 
-define("DA_QUOTE_SINGLE", "'");
-define("DA_QUOTE_DOUBLE", "\"");
+define(
+    "DA_QUOTE_SINGLE",
+    "'"
+);
+define(
+    "DA_QUOTE_DOUBLE",
+    "\""
+);
 // Classnames - are returned as lower-case by PHP
-define("DA_CLASSNAME_DBENTITY", "dbentity");
-define("DA_CLASSNAME_DATASET", "dataset");
-define("DA_CLASSNAME_DATAACCESS", "dataaccess");
+define(
+    "DA_CLASSNAME_DBENTITY",
+    "dbentity"
+);
+define(
+    "DA_CLASSNAME_DATASET",
+    "dataset"
+);
+define(
+    "DA_CLASSNAME_DATAACCESS",
+    "dataaccess"
+);
 
-define("DA_AFTER_COLUMNS_CREATED", 0);    // Available callback methods
-define("DA_BEFORE_POST", 1);
-define("DA_AFTER_POST", 2);
+define(
+    "DA_AFTER_COLUMNS_CREATED",
+    0
+);    // Available callback methods
+define(
+    "DA_BEFORE_POST",
+    1
+);
+define(
+    "DA_AFTER_POST",
+    2
+);
 // Other
-define("DA_NAME", "name");
-define("DA_TYPE", "type");
-define("DA_NULL", "null");
-define("DA_NOT_SET", -1);
-define("DA_DATE_NOT_SET", "0000-00-00 00:00:00");
-define("DA_COLUMN_SEPARATOR", ",");
-define("DA_SERIAL_LIMIT", 1000);                // Attempt to tune the columnExists sort method
+define(
+    "DA_NAME",
+    "name"
+);
+define(
+    "DA_TYPE",
+    "type"
+);
+define(
+    "DA_NULL",
+    "null"
+);
+define(
+    "DA_NOT_SET",
+    -1
+);
+define(
+    "DA_DATE_NOT_SET",
+    "0000-00-00 00:00:00"
+);
+define(
+    "DA_COLUMN_SEPARATOR",
+    ","
+);
+define(
+    "DA_SERIAL_LIMIT",
+    1000
+);                // Attempt to tune the columnExists sort method
 // messages
-define("DA_MSG_COLUMN_DOES_NOT_EXIST", 'Column does not exist');                // Attempt to tune the columnExists sort method
+define(
+    "DA_MSG_COLUMN_DOES_NOT_EXIST",
+    'Column does not exist'
+);                // Attempt to tune the columnExists sort method
 class DataAccess extends BaseObject
 {
 
@@ -84,6 +203,7 @@ class DataAccess extends BaseObject
     var $newRowValue = 0;                    // This value in a primary key column indicates to INSERT a new row into a Data Access object
     var $failOutOfRange = TRUE;
     var $_colCount = 0;
+    protected $colValidation = [];
 
     function __construct(&$owner)
     {
@@ -147,16 +267,21 @@ class DataAccess extends BaseObject
      */
     function replicate(&$data)
     {
-
         $this->setMethodName("replicate");
         $ret = FALSE;
         $this->_colCount = $this->colCount();
-        if (!is_subclass_of($data, DA_CLASSNAME_DATAACCESS))
+        if (!is_subclass_of(
+            $data,
+            DA_CLASSNAME_DATAACCESS
+        ))
             $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
         // For safty's sake, at the moment we do not allow replicate to delete all rows from Tdobase
         // objects.
         if (
-            is_subclass_of($this, DA_CLASSNAME_DATASET) or
+            is_subclass_of(
+                $this,
+                DA_CLASSNAME_DATASET
+            ) or
             ($this->getClassname() == DA_CLASSNAME_DATASET)
         ) {
             if ($this->getClearRowsBeforeReplicate()) {
@@ -164,7 +289,10 @@ class DataAccess extends BaseObject
             }
         }
         if (        // Only relevant to reset row pointer on tdataset classes
-            is_subclass_of($data, DA_CLASSNAME_DATASET) or
+            is_subclass_of(
+                $data,
+                DA_CLASSNAME_DATASET
+            ) or
             ($data->getClassname() == DA_CLASSNAME_DATASET)
         ) {
             $data->initialise();
@@ -191,7 +319,10 @@ class DataAccess extends BaseObject
             }
         }
         if ($this->afterColumnsCreatedMethod != "") {
-            $this->callback(DA_AFTER_COLUMNS_CREATED, $data);
+            $this->callback(
+                DA_AFTER_COLUMNS_CREATED,
+                $data
+            );
         }
         /*
         Copy data rows(update or insert)
@@ -228,13 +359,19 @@ class DataAccess extends BaseObject
             Note: The callback may be used in order to set postRow to FALSE thus skipping post()
             */
             if ($this->beforePostMethod != "") {
-                $this->callback(DA_BEFORE_POST, $data);
+                $this->callback(
+                    DA_BEFORE_POST,
+                    $data
+                );
             }
             // Replaced use of composeRow because ot was far too slow with it's column name lookups
             // Using the new $crossRef array to resolve column numbers accross dataaccess objects
             if ($this->postRow) {
                 for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
-                    $this->setValueNoCheckByColumnNumber($crossRef[$ixCol], $data->getValueNoCheckByColumnNumber($ixCol));
+                    $this->setValueNoCheckByColumnNumber(
+                        $crossRef[$ixCol],
+                        $data->getValueNoCheckByColumnNumber($ixCol)
+                    );
                 }
                 $this->post();
                 $ret = TRUE;
@@ -244,7 +381,10 @@ class DataAccess extends BaseObject
             exists and doesn't already have a value.
             */
             if (
-                (!is_subclass_of($data, DA_CLASSNAME_DBENTITY)) &
+                (!is_subclass_of(
+                    $data,
+                    DA_CLASSNAME_DBENTITY
+                )) &
                 ($this->getUpdateMode() == DA_MODE_INSERT) &
                 ($data->getPKName() != "") &&
                 ($data->getPKValue() == $this->getNewRowValue())
@@ -255,12 +395,18 @@ class DataAccess extends BaseObject
             }
             if ($this->afterPostMethod != "") {
 //				$ret=($this->callback(DA_AFTER_POST, $data));
-                $this->callback(DA_AFTER_POST, $data);
+                $this->callback(
+                    DA_AFTER_POST,
+                    $data
+                );
             }
             $data->fetchNext();
         }
         if (
-            is_subclass_of($this, DA_CLASSNAME_DATASET) or
+            is_subclass_of(
+                $this,
+                DA_CLASSNAME_DATASET
+            ) or
             ($this->getClassname() == DA_CLASSNAME_DATASET)
         ) {
             $this->initialise();                // So the dataset is ready to use
@@ -289,14 +435,20 @@ class DataAccess extends BaseObject
      * @param string $methodname Name of the method on the callback object
      * @return  bool
      */
-    function setCallbackMethod($methodType, &$object, $methodName)
+    function setCallbackMethod($methodType,
+                               &$object,
+                               $methodName
+    )
     {
         $this->setMethodName("setCallbackMethod");
         if (!is_object($object))
             $this->raiseError("No callback object passed");
         if ($methodName == "")
             $this->raiseError("No method passed");
-        if (!method_exists($object, $methodName))
+        if (!method_exists(
+            $object,
+            $methodName
+        ))
             $this->raiseError("Method " . $methodName . "() does not exist on the callback object");
 
         switch ($methodType) {
@@ -352,7 +504,9 @@ class DataAccess extends BaseObject
      * @param DataAccess &$data Reference of source dataaccess object to be passed back
      * @return  bool
      */
-    function callback($methodType, &$data)
+    function callback($methodType,
+                      &$data
+    )
     {
         $ret = TRUE;
         switch ($methodType) {
@@ -402,7 +556,9 @@ class DataAccess extends BaseObject
      * @param string $value Value to search for
      * @return bool Found: TRUE or FALSE
      */
-    function search($ixColumn, $value)
+    function search($ixColumn,
+                    $value
+    )
     {
         $ret = FALSE;
         $ixColumnNumber = $this->columnExists($ixColumn);
@@ -473,7 +629,10 @@ class DataAccess extends BaseObject
      */
     function setPKValue($value)
     {
-        return ($this->setValue($this->getPKName(), $value));
+        return ($this->setValue(
+            $this->getPKName(),
+            $value
+        ));
     }
 
     /**
@@ -659,11 +818,21 @@ class DataAccess extends BaseObject
                 $name = func_get_arg(0);
                 $type = func_get_arg(1);
                 $null = func_get_arg(2);
+                $validationFunction = null;
+                if ($numArgs > 3) {
+                    $validationFunction = func_get_arg(3);
+                }
                 // add a column name only once
                 $ixColumn = $this->columnExists($name);
                 if ($ixColumn == DA_OUT_OF_RANGE) {
                     $ixColumn = $this->_colCount;    // Add to end
-                    $this->setNameAndType($ixColumn, $name, $type, $null);
+                    $this->setNameAndType(
+                        $ixColumn,
+                        $name,
+                        $type,
+                        $null,
+                        $validationFunction
+                    );
                 }
                 $ret = $ixColumn;        // found column
             }
@@ -697,10 +866,18 @@ class DataAccess extends BaseObject
      * @access public
      * @return integer New column number
      */
-    function addColumnNoCheck($name, $type, $null)
+    function addColumnNoCheck($name,
+                              $type,
+                              $null
+    )
     {
         $ixColumn = $this->_colCount;    // Add to end
-        $this->setNameAndType($ixColumn, $name, $type, $null);
+        $this->setNameAndType(
+            $ixColumn,
+            $name,
+            $type,
+            $null
+        );
 //		if ($this->_colCount > DA_SERIAL_LIMIT){ //Use xref for binary search?s
 //			$this->setXRef();
 //		}
@@ -710,18 +887,37 @@ class DataAccess extends BaseObject
     /**
      * Set-up columns on the object
      * @access private
-     * @param integer ixColumn Column number
+     * @param $ixColumn
      * @param string $name Column name
      * @param integer $type Column type See DA_ constants for values
      * @param integer $null Nulls allowed: DA_ALLOW_NULL DA_NOT_NULL
+     * @param $validationFunction
      * @return bool Success
      */
-    function setNameAndType($ixColumn, $name, $type, $null)
+    function setNameAndType($ixColumn,
+                            $name,
+                            $type,
+                            $null,
+                            $validationFunction = null
+    )
     {
         // Note: Must call setName first to create column
-        $this->setName($ixColumn, $name);
-        $this->setType($ixColumn, $type);
-        $this->setNull($ixColumn, $null);
+        $this->setName(
+            $ixColumn,
+            $name
+        );
+        $this->setType(
+            $ixColumn,
+            $type
+        );
+        $this->setNull(
+            $ixColumn,
+            $null
+        );
+        $this->setValidationFunction(
+            $ixColumn,
+            $validationFunction
+        );
         return TRUE;
     }
 
@@ -749,7 +945,9 @@ class DataAccess extends BaseObject
      * @param string Column name
      * return boolean Success
      */
-    function setName($ixColumn, $name)
+    function setName($ixColumn,
+                     $name
+    )
     {
         $this->colName[$ixColumn] = $name;
         $this->colNameInverse[$name] = $ixColumn;
@@ -792,7 +990,9 @@ class DataAccess extends BaseObject
      * @param integer $type Column type. See constants for list.
      * @return boolean Success
      */
-    function setType($ixPassedColumn, $type)
+    function setType($ixPassedColumn,
+                     $type
+    )
     {
         $ret = FALSE;
         $ixColumn = $this->columnExists($ixPassedColumn);
@@ -831,7 +1031,9 @@ class DataAccess extends BaseObject
      * @param integer $nullFlag DA_ALLOW_NULL DA_NOT_NULL
      * @return boolean Success
      */
-    function setNull($ixColumn, $nullflag)
+    function setNull($ixColumn,
+                     $nullflag
+    )
     {
         $ret = FALSE;
         $ixColumn = $this->columnExists($ixColumn);
@@ -853,7 +1055,10 @@ class DataAccess extends BaseObject
      */
     function setAllowEmpty($ixColumn)
     {
-        return ($this->setNull($ixColumn, DA_ALLOW_NULL));
+        return ($this->setNull(
+            $ixColumn,
+            DA_ALLOW_NULL
+        ));
     }
 
     /**
@@ -865,7 +1070,10 @@ class DataAccess extends BaseObject
      */
     function setNotAllowEmpty($ixColumn)
     {
-        return ($this->setNull($ixColumn, DA_NOT_NULL));
+        return ($this->setNull(
+            $ixColumn,
+            DA_NOT_NULL
+        ));
     }
 
     /**
@@ -978,7 +1186,7 @@ class DataAccess extends BaseObject
      * Get column value by name or column number
      * @access public
      * @param string $ixColumn
-     * @return variant Column value
+     * @return string|int|float|bool Column value
      */
     function getValue($ixPassedColumn)
     {
@@ -1040,7 +1248,9 @@ class DataAccess extends BaseObject
      * @param string $value Value
      * @return boolean Success
      */
-    function setValue($ixPassedColumn, $value)
+    function setValue($ixPassedColumn,
+                      $value
+    )
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
@@ -1050,7 +1260,9 @@ class DataAccess extends BaseObject
                 ($this->getPK() != $ixColumn) &
                 (!$this->getIgnoreNULL())
             ) {
-                $this->raiseError("Could not set column value because " . $ixPassedColumn . " does not accept NULL values.");
+                $this->raiseError(
+                    "Could not set column value because " . $ixPassedColumn . " does not accept NULL values."
+                );
                 return FALSE;
             } else {
                 $this->row[$ixColumn] = $value;
@@ -1073,7 +1285,9 @@ class DataAccess extends BaseObject
      * @param string $value Value
      * @return boolean Success
      */
-    function setValueNoCheckByColumnNumber($ixPassedColumn, $value)
+    function setValueNoCheckByColumnNumber($ixPassedColumn,
+                                           $value
+    )
     {
         $this->row[$ixPassedColumn] = $value;
     }
@@ -1192,11 +1406,17 @@ class DataAccess extends BaseObject
     function copyColumnsFrom(&$data)
     {
         $this->setMethodName("copyColumnsFrom");
-        if (!is_subclass_of($data, DA_CLASSNAME_DATAACCESS)) {
+        if (!is_subclass_of(
+            $data,
+            DA_CLASSNAME_DATAACCESS
+        )) {
             $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
         }
         for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
-            $this->copyColumn($data, $ixCol);
+            $this->copyColumn(
+                $data,
+                $ixCol
+            );
         }
         return TRUE;
     }
@@ -1207,7 +1427,9 @@ class DataAccess extends BaseObject
      * @access Public
      * @param integer $ixCol Column on source dataset to be added to this one
      */
-    function copyColumn(&$data, $ixCol)
+    function copyColumn(&$data,
+                        $ixCol
+    )
     {
         $ixThisColumn = $this->columnExists($data->getName($ixCol));
         if (($ixThisColumn == -1) & ($this->allowAddColumns)) {
@@ -1244,11 +1466,38 @@ class DataAccess extends BaseObject
     {
 
         $value = $this->getValue($ixCol);
-        $value = str_replace(',', '', $value);
-        $value = str_replace("\r\n", " ", $value);            // remove carrage returns
-        $value = str_replace("\"", "", $value);                // and double quotes
+        $value = str_replace(
+            ',',
+            '',
+            $value
+        );
+        $value = str_replace(
+            "\r\n",
+            " ",
+            $value
+        );            // remove carrage returns
+        $value = str_replace(
+            "\"",
+            "",
+            $value
+        );                // and double quotes
 
         return $value;
+    }
+
+    private function setValidationFunction($ixColumn,
+                                           $validationFunction
+    )
+    {
+        $ret = FALSE;
+        $ixColumn = $this->columnExists($ixColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            $this->colValidation[$ixColumn] = $validationFunction;
+            $ret = TRUE;
+        } else {
+            $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
+        }
+        return $ret;
     }
 
 }

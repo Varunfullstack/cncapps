@@ -68,30 +68,32 @@
         </tr>
         <tr>
             <td width="100" class="promptText">
-                <div align="right">Start Year/Month</div>
+                <div align="right">Start Month/Year</div>
             </td>
             <td>
                 <input
                         type="text"
                         name="searchForm[1][startYearMonth]"
                         value="{startYearMonth}"
-                        placeholder="YYYY-MM"
+                        placeholder="MM/YYYY"
                         size="10"
                         maxlength="7"
+                        required
                 > <font class="formErrorMessage"> {startYearMonthMesage} </font></td>
         </tr>
         <tr>
             <td width="100" class="promptText">
-                <div align="right">End Year/Month</div>
+                <div align="right">End Month/Year</div>
             </td>
             <td>
                 <input
                         type="text"
                         name="searchForm[1][endYearMonth]"
                         value="{endYearMonth}"
-                        placeholder="YYYY-MM"
+                        placeholder="MM/YYYY"
                         size="10"
                         maxlength="7"
+                        required
                 > <font class="formErrorMessage"> {endYearMonthMessage} </font></td>
         </tr>
         <tr>
@@ -101,8 +103,8 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Screen Report" onClick="submit();">
-                <input type="submit" name="Search" value="Generate CSV" onClick="submit();">
+                <input type="submit" name="Search" value="Screen Report">
+                <input type="submit" name="Search" value="Generate CSV">
                 <input type="reset" name="Clear" value="Clear"></td>
         </tr>
     </table>

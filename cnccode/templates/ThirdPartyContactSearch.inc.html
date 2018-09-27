@@ -1,0 +1,57 @@
+<!-- Template: ThirdPartyContactSearch.inc.html -->
+<script language='JavaScript' src="CommonJS.js"></script>
+<script type="text/javascript">
+
+
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{urlCustomerPopup}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.searchForm.customerID.value = "";
+        }
+    }
+</script>
+<H2>{customerName}</H2>
+
+<form name="search" id="search" method="post" action="{urlSubmit}">
+    <input type="hidden" name="action" value="search">
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td width="100" class="promptText">
+                <div align="right">Customer</div>
+            </td>
+            <td>
+                <input
+                        type="hidden"
+                        name="searchForm[1][customerID]"
+                        id="customerID"
+                        value="{customerID}"
+                        onchange="document.search.submit()"
+                > <input
+                    type="text" id="customerString" name="customerString"
+                    value="{customerString}" onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    maxlength="50"> <font class="formErrorMessage">
+                {customerStringMessage} </font></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" name="submit" value="search"></td>
+
+    </table>
+
+</form>
+<!-- End Template: ThirdPartyContactSearch.inc.html -->

@@ -1,18 +1,20 @@
 <!-- Template: FatalError.inc.html -->
 <H2>
-	Unfortunately, your request cannot be completed. The problem message follows:
+    Unfortunately, your request cannot be completed. The problem message follows:
 </H2>
 <TABLE>
-	<TR>
-		<TD VALIGN=top>
-			{errorMessage} in {className}-;gt{methodName}
-		</TD>
-	</TR>
-	<TR>
+    <TR>
+        <TD VALIGN=top>
+            {errorMessage} in {className}-;gt{methodName}
+        </TD>
+    </TR>
+    <TR>
 </TABLE>
-<H2>
-Please email this page to support@SweetCode.co.uk
-</H2>
-<H3><A HREF="javascript:history.go(-1)">Return to previous page</A></H3>
-<HR/>
+<div>
+    {trace}
+</div>
+<H3>
+    <A HREF="javascript:history.go(-1)">Return to previous page</A>
+</H3>
+
 <!-- End template: FatalError.inc.html -->

@@ -22,6 +22,14 @@ class CTSystemBuild extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+
+        $roles = [
+            "technical",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buSalesOrder = new BUSalesOrder($this);
     }
 

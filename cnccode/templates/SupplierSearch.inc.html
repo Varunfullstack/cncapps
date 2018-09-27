@@ -1,32 +1,66 @@
 <!-- Template: SupplierSearch.inc.html -->
-<form name="form" method="post" action="{submitURL}" AUTOCOMPLETE = "off">
-  <table width="100%" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td valign="top" width="50px" class="promptText">Name</td>
-			<td class="field"> <input
-					name="supplierString"
-					type="text"
-					value="{supplierString}" size="35" maxlength="35"
-				>
-			</td>
-		</tr>
-		<tr> 
-			<td valign="top" class="promptText">Address</td>
-			<td class="field"> <input name="address" type="text" id="address" value="{address}" size="35" maxlength="35"> 
-			</td>
-		</tr>
-		<tr>
-			<td valign="top">&nbsp;</td>
-			<td><input type="submit" name="Go" value="Search"> <input name="Button" type="button" value="New" onClick="document.location='{createURL}';"> 
-				<font class="formErrorMessage">{supplierStringMessage}</font></td>
-		</tr>
-	</table>
+<script language='JavaScript'>
+    function validateSupplierName() {
+        if (document.getElementById("supplierName").value != "") {
+            window.open(
+                '{urlSupplierPopup}&supplierName=' +
+                escape(document.getElementById("supplierName").value) +
+                '&parentIDField=supplierID' +
+                '&parentDescField=supplierName',
+                'items',
+                'scrollbars=yes,resizable=no,width=450,height=400,copyhistory=no, menubar=0'
+            )
+        }
+        else {
+            document.getElementById("supplierID").value = '';
+        }
+    }
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+
+    function createOrder() {
+        if (document.searchForm.supplierID.value != "") {
+            document.location = '{urlCreateOrder}&supplierID=' + escape(document.searchForm.supplierID.value)
+        }
+    }
+</script>
+<form name="form" method="post" action="{submitURL}" AUTOCOMPLETE="off">
+    <table width="100%" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+            <td valign="top" width="50px" class="promptText">Name</td>
+            <td class="field">
+                <input type="hidden" id="supplierID">
+                <input
+                        name="supplierString"
+                        type="text"
+                        value="{supplierString}" size="35" maxlength="35"
+                        onChange="javascript:validateSupplierName()"
+                        id="supplierName"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" class="promptText">Address</td>
+            <td class="field"><input name="address" type="text" id="address" value="{address}" size="35" maxlength="35">
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">&nbsp;</td>
+            <td><input type="submit" name="Go" value="Search"> <input name="Button" type="button" value="New"
+                                                                      onClick="document.location='{createURL}';">
+                <font class="formErrorMessage">{supplierStringMessage}</font></td>
+        </tr>
+    </table>
 </form>
 <table width="100%" border="0" cellspacing="0" cellpadding="1">
-	<!-- BEGIN supplierBlock -->
-	<tr> 
-		<td><A HREF="{supplierURL}">{supplierName}</A></td>
-	</tr>
-	<!-- END supplierBlock -->
+    <!-- BEGIN supplierBlock -->
+    <tr>
+        <td><A HREF="{supplierURL}">{supplierName}</A></td>
+    </tr>
+    <!-- END supplierBlock -->
 </table>
 <!-- End Template: SupplierSearch.inc.html -->

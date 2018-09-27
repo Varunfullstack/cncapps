@@ -182,7 +182,7 @@ class BUPDFSalesQuote extends Business
                             $buPDF->setFontSize(10);
                             $buPDF->setFont();
                         }
-                    } // if ($dsOrdline->getValue('itemID') != '')
+                    }
                 } else {
                     $buPDF->printStringAt(40, $dsOrdline->getValue('description')); // comment line
                 }
@@ -349,7 +349,7 @@ class BUPDFSalesQuote extends Business
                     $total = ($dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered'));
                     if ($dsOrdline->getValue('itemID') != 0) {            // some item lines in old system did not have a related item record
                         $buItem->getItemByID($dsOrdline->getValue('itemID'), $dsItem);
-                    } // if ($dsOrdline->getValue('itemID') != '')
+                    }
                 } else {
                     $buPDF->printStringAt(40, $dsOrdline->getValue('description')); // comment line
                 }
@@ -488,14 +488,21 @@ class BUPDFSalesQuote extends Business
             'From' => $senderName . '<' . $senderEmail . '>',
             'To' => $toEmail,
             'Subject' => $subject,
-            'Date' => date("r")
+            'Date' => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $buMail->mime->setHTMLBody($message);
 
         $buMail->mime->addAttachment($quoteFile, 'application/pdf');
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

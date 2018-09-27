@@ -8,7 +8,7 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUQuotationConversionReport.inc.php');
-require_once($cfg['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 require_once("Mail.php");
@@ -23,6 +23,13 @@ class CTQuotationConversionReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buQuotationConversionReport = new BUQuotationConversionReport($this);
         $this->dsSearchForm = new DSForm($this);
         $this->buQuotationConversionReport->initialiseSearchForm($this->dsSearchForm);
@@ -75,7 +82,7 @@ class CTQuotationConversionReport extends CTCNC
         $urlCustomerPopup = $this->buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
@@ -94,21 +101,21 @@ class CTQuotationConversionReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
+                'formError'         => $this->formError,
+                'customerID'        => $dsSearchForm->getValue('customerID'),
                 'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
-                'customerString' => $customerString,
-                'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $dsSearchForm->getMessage('toDate'),
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit
+                'customerString'    => $customerString,
+                'fromDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
+                'fromDateMessage'   => $dsSearchForm->getMessage('fromDate'),
+                'toDate'            => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
+                'toDateMessage'     => $dsSearchForm->getMessage('toDate'),
+                'urlCustomerPopup'  => $urlCustomerPopup,
+                'urlSubmit'         => $urlSubmit
             )
         );
 
@@ -129,10 +136,10 @@ class CTQuotationConversionReport extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'month' => $row['month'],
-                        'year' => $row['year'],
-                        'quoteCount' => $row['quoteCount'],
-                        'conversionCount' => $row['conversionCount'],
+                        'month'                => $row['month'],
+                        'year'                 => $row['year'],
+                        'quoteCount'           => $row['quoteCount'],
+                        'conversionCount'      => $row['conversionCount'],
                         'conversionPercentage' => number_format($percentage, 2)
                     )
 

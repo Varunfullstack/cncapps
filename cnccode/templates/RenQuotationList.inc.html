@@ -1,34 +1,69 @@
 <!-- Template: RenQuotationList.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<form name="regenerate" method="post" action="{urlCreateRenewalsQuotations}">
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<form name="regenerate"
+      method="post"
+      action="{urlCreateRenewalsQuotations}"
+>
 
-<table class="singleBorder" width="600" border="0" cellspacing="1" cellpadding="2">
-  <tr> 
-    <td colspan="4">&nbsp;</td>
-    <td colspan="3"><input name="Generate" type="submit" value="Generate Quotations" /></td>
-  </tr>
-	<tr> 
-		<td width="300" class="listHeadText"><a href="{urlList}&orderBy=cus_name">Customer</a></td>
-		<td width="200" class="listHeadText"><a href="{urlList}&orderBy=itm_desc">Item</a></td>
-		<td width="50" class="listHeadText">Type</td>
-		<td width="50" class="listHeadText"><a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a></td>
-    <td width="50" class="listHeadText"><a href="{urlList}&orderBy=nextPeriodEndDateYMD">To</a></td>
-		<td width="50" class="listHeadText">&nbsp;</td>
-    <td width="50" class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN rowBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{customerName}</div></td>
-		<td class="orderLineItem"><DIV align="left">{itemDescription}</div></td>
-		<td class="orderLineItem"><DIV align="left">{type}</div></td>
-		<td class="orderLineItem"><DIV align="left">{startDate}</div></td>
-    <td class="orderLineItem"><DIV align="left">{nextPeriodStartDate}</div></td>
-    <td class="orderLineItem"><DIV align="left"><input type="checkbox" id="resend" name="customerItemIDs[{ID}]" value="{customerItemID}" ></div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit renewal details">{txtEdit}</a> 
-			</DIV></td>
-	</tr>
-	<!-- END rowBlock -->
-</table>
+    <table class="singleBorder"
+           width="600"
+           border="0"
+           cellspacing="1"
+           cellpadding="2"
+    >
+        <tr>
+            <td width="300"
+                class="listHeadText"
+            ><a href="{urlList}&orderBy=cus_name">Customer</a></td>
+            <td width="200"
+                class="listHeadText"
+            ><a href="{urlList}&orderBy=itm_desc">Item</a></td>
+            <td width="50"
+                class="listHeadText"
+            >Type
+            </td>
+            <td width="50"
+                class="listHeadText"
+            ><a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a></td>
+            <td width="50"
+                class="listHeadText"
+            ><a href="{urlList}&orderBy=nextPeriodEndDateYMD">To</a></td>
+            <td width="50"
+                class="listHeadText"
+            >&nbsp;
+            </td>
+        </tr>
+        <!-- BEGIN rowBlock -->
+        <tr valign="top"
+            onMouseOver="this.bgColor='#ffffcc';"
+            onMouseOut="this.bgColor='';"
+        >
+            <td class="orderLineItem">
+                <DIV align="left">{customerName}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left">{itemDescription}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left">{type}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left">{startDate}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left">{nextPeriodStartDate}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left"></div>
+                <DIV align="left"><A href="{urlEdit}"
+                                     title="Edit renewal details"
+                >{txtEdit}</a>
+                </DIV>
+            </td>
+        </tr>
+        <!-- END rowBlock -->
+    </table>
 </form>
 <!-- End Template: RenQuotationList.inc.html -->

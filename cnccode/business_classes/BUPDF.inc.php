@@ -5,13 +5,29 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
+//require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
+require_once(PDF_DIR . '/fpdf_protection.php');
 
-define('FPDF_FONTPATH', PDF_DIR . '/font/');    // Used by fpdf class
-define('BUPDF_A4_WIDTH', 595);
-define('BUPDF_A4_LENGTH', 842);
-define('BUPDF_FONT_TIMES_NEW_ROMAN', 'Times New Roman');
-define('BUPDF_FONT_ARIAL', 'Arial');
+define(
+    'FPDF_FONTPATH',
+    PDF_DIR . '/font/'
+);    // Used by fpdf class
+define(
+    'BUPDF_A4_WIDTH',
+    595
+);
+define(
+    'BUPDF_A4_LENGTH',
+    842
+);
+define(
+    'BUPDF_FONT_TIMES_NEW_ROMAN',
+    'Times New Roman'
+);
+define(
+    'BUPDF_FONT_ARIAL',
+    'Arial'
+);
 
 class BUPDF extends BaseObject
 {
@@ -27,7 +43,15 @@ class BUPDF extends BaseObject
     var $fontSize = '';
     var $filename = '';
 
-    function __construct(&$owner, $filename, $author, $title, $creator, $subject, $paperSize)
+    function __construct(&$owner,
+                         $filename,
+                         $author,
+                         $title,
+                         $creator,
+                         $subject,
+                         $paperSize,
+                         $encrypted = true
+    )
     {
         BaseObject::__construct($owner);
 
@@ -61,19 +85,38 @@ class BUPDF extends BaseObject
             return FALSE;
         }
 //		$this->pdf = pdf_new();
-        $this->pdf = new FPDF();
-
+        $this->pdf = new FPDF_Protection();
+        if ($encrypted) {
+            $this->pdf->SetProtection(
+                ['print'],
+                '',
+                '[V.^DW_uA^2~vER$'
+            );
+        }
 //        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
 //        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
 //        $this->open();
-        $this->setInfo("Author", $author);
-        $this->setInfo("Title", $title);
-        $this->setInfo("Creator", $creator);
-        $this->setInfo("Subject", $subject);
+        $this->setInfo(
+            "Author",
+            $author
+        );
+        $this->setInfo(
+            "Title",
+            $title
+        );
+        $this->setInfo(
+            "Creator",
+            $creator
+        );
+        $this->setInfo(
+            "Subject",
+            $subject
+        );
         $this->setFontFamily(BUPDF_FONT_ARIAL);
         $this->setFontSize(10);
         $this->setPaperSize($paperSize);
+
     }
 
 
@@ -120,7 +163,11 @@ class BUPDF extends BaseObject
     function setFont()
     {
         $this->setMethodName('setFont');
-        $this->pdf->SetFont($this->getFontFamily(), $this->getFontStyle(), $this->getFontSize());
+        $this->pdf->SetFont(
+            $this->getFontFamily(),
+            $this->getFontStyle(),
+            $this->getFontSize()
+        );
         return TRUE;
     }
 
@@ -130,7 +177,9 @@ class BUPDF extends BaseObject
         return TRUE;
     }
 
-    function setInfo($element, $value)
+    function setInfo($element,
+                     $value
+    )
     {
         $this->setMethodName('setInfo');
         switch ($element) {
@@ -255,13 +304,17 @@ class BUPDF extends BaseObject
         if ($this->detectUTF8($string)) {
             $string = utf8_decode($string);
         }
-        $this->pdf->Write(($this->getFontSize() / 2), $string); // Fix bug where auto line break adds blank line
+        $this->pdf->Write(
+            ($this->getFontSize() / 2),
+            $string
+        ); // Fix bug where auto line break adds blank line
         return TRUE;
     }
 
     function detectUTF8($string)
     {
-        return preg_match('%(?:
+        return preg_match(
+            '%(?:
         [\xC2-\xDF][\x80-\xBF]        # non-overlong 2-byte
         |\xE0[\xA0-\xBF][\x80-\xBF]               # excluding overlongs
         |[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}      # straight 3-byte
@@ -269,10 +322,14 @@ class BUPDF extends BaseObject
         |\xF0[\x90-\xBF][\x80-\xBF]{2}    # planes 1-3
         |[\xF1-\xF3][\x80-\xBF]{3}                  # planes 4-15
         |\xF4[\x80-\x8F][\x80-\xBF]{2}    # plane 16
-        )+%xs', $string);
+        )+%xs',
+            $string
+        );
     }
 
-    function printStringAt($position, $string)
+    function printStringAt($position,
+                           $string
+    )
     {
         $this->moveXTo($position);
         $this->printString($string);
@@ -280,7 +337,9 @@ class BUPDF extends BaseObject
     }
 
     // Right Justified
-    function printStringRJAt($position, $string)
+    function printStringRJAt($position,
+                             $string
+    )
     {
         $textWidth = $this->pdf->GetStringWidth($string);
         $this->moveXTo($position - $textWidth);
@@ -294,10 +353,18 @@ class BUPDF extends BaseObject
 
     function close()
     {
-        $this->pdf->Output('F', $this->getFilename(), true);
+        $this->pdf->Output(
+            'F',
+            $this->getFilename(),
+            true
+        );
     }
 
-    function placeImageAt($filename, $imageType, $position, $width = 0)
+    function placeImageAt($filename,
+                          $imageType,
+                          $position,
+                          $width = 0
+    )
     {
         $this->setMethodName('placeImageAt');
         if ($filename == '') {
@@ -306,12 +373,26 @@ class BUPDF extends BaseObject
         if ($imageType == '') {
             $this->raiseError('No imageType passed');
         }
-        $this->pdf->Image($filename, $position, $this->pdf->GetY(), $width);
+        $this->pdf->Image(
+            $filename,
+            $position,
+            $this->pdf->GetY(),
+            $width
+        );
     }
 
-    function box($x, $y, $width, $height)
+    function box($x,
+                 $y,
+                 $width,
+                 $height
+    )
     {
-        $this->pdf->Rect($x, $y, $width, $height);
+        $this->pdf->Rect(
+            $x,
+            $y,
+            $width,
+            $height
+        );
     }
 }// End of class
 ?>

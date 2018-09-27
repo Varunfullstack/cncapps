@@ -1,1 +1,0 @@
-UPDATE custitem SET itemNotes = '';

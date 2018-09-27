@@ -9,7 +9,7 @@ require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenQuotation.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenQuotation.inc.php");
 require_once($cfg ["path_dbe"] . "/DBERenQuotationType.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
@@ -105,13 +105,11 @@ class BURenQuotation extends Business
         return;
     }
 
-    function emailRenewalsQuotationsDue()
+    function emailRenewalsQuotationsDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenQuotation->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -119,7 +117,8 @@ class BURenQuotation extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Quotation Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -146,7 +145,13 @@ class BURenQuotation extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -159,13 +164,11 @@ class BURenQuotation extends Business
 
     }
 
-    function emailRecentlyGeneratedQuotes()
+    function emailRecentlyGeneratedQuotes($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenQuotation->getRecentQuotesRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -173,7 +176,8 @@ class BURenQuotation extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Quotation Renewals Generated in Past 2 Weeks',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -200,7 +204,14 @@ class BURenQuotation extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 

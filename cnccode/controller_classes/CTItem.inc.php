@@ -38,6 +38,14 @@ class CTItem extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "technical"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buItem = new BUItem($this);
         $this->dsItem = new DSForm($this);    // new specialised dataset with form message support
         $this->dsItem->copyColumnsFrom($this->buItem->dbeItem);
@@ -119,6 +127,7 @@ class CTItem extends CTCNC
             exit;
         }
         $this->buItem->getItemsByNameMatch($_REQUEST['itemDescription'], $dsItem, $renewalTypeID);
+
         $this->template->set_var(
             array(
                 'parentIDField' => $_SESSION['itemParentIDField'],
@@ -271,7 +280,6 @@ class CTItem extends CTCNC
         );
         $this->parseItemTypeSelector($this->dsItem->getValue('itemTypeID'));
         $this->parseRenewalTypeSelector($this->dsItem->getValue('renewalTypeID'));
-        //$this->parseManufacturerSelector($this->dsItem->getValue('manufacturerID'));
         $this->parseWarrantySelector($this->dsItem->getValue('warrantyID'));
         $this->template->parse('CONTENTS', 'ItemEdit', true);
         $this->parsePage();

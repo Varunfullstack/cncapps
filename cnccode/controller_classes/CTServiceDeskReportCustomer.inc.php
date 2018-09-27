@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
@@ -21,6 +21,13 @@ class CTServiceDeskReportCustomer extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buServiceDeskReport = new BUServiceDeskReport($this);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
@@ -69,12 +76,19 @@ class CTServiceDeskReportCustomer extends CTCNC
                     'From' => $senderEmail,
                     'To' => $toEmail,
                     'Subject' => 'Service Desk Report ' . $this->buServiceDeskReport->getPeriod() . ' - ' . $this->buServiceDeskReport->getCustomerName(),
-                    'Date' => date("r")
+                    'Date' => date("r"),
+                    'Content-Type' => 'text/html; charset=UTF-8'
                 );
 
                 $buMail->mime->setHTMLBody($report);
 
-                $body = $buMail->mime->get();
+                $mime_params = array(
+                    'text_encoding' => '7bit',
+                    'text_charset' => 'UTF-8',
+                    'html_charset' => 'UTF-8',
+                    'head_charset' => 'UTF-8'
+                );
+                $body = $buMail->mime->get($mime_params);
 
                 $hdrs = $buMail->mime->headers($hdrs);
 
@@ -117,9 +131,10 @@ class CTServiceDeskReportCustomer extends CTCNC
         if ($this->dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $this->template->set_var(
             array(

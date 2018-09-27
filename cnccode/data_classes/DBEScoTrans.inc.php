@@ -7,6 +7,9 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEScoTrans extends DBEntity
 {
+    const scoTransID = "ScoTransID";
+    const statement = "Statement";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +21,16 @@ class DBEScoTrans extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("ScoTrans");
-        $this->addColumn("ScoTransID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("Statement", DA_STRING, DA_NOT_NULL);
+        $this->addColumn(
+            self::scoTransID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::statement,
+            DA_STRING,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

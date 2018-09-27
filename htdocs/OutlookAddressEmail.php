@@ -11,6 +11,7 @@ require_once("config.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
+
 define('EMAIL_FROM_USER', 'sales@cnc-ltd.co.uk');
 define('EMAIL_SUBJECT', 'Outlook address file');
 define('FORMAT_MYSQL_UK_DATE', '%e/%c/%Y');
@@ -167,11 +168,18 @@ $buMail->mime->setHTMLBody($html);
 
 $buMail->mime->addAttachment($csv_attachment, 'text/csv', 'addresses.csv', false);
 
-$body = $buMail->mime->get();
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset' => 'UTF-8',
+    'html_charset' => 'UTF-8',
+    'head_charset' => 'UTF-8'
+);
+$body = $buMail->mime->get($mime_params);
 
 $hdrs = array(
     'From' => CONFIG_SALES_EMAIL,
-    'Subject' => 'Outlook Address File'
+    'Subject' => 'Outlook Address File',
+    'Content-Type' => 'text/html; charset=UTF-8'
 );
 
 $hdrs = $buMail->mime->headers($hdrs);

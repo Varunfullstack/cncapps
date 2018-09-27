@@ -160,7 +160,7 @@ class DB_Sql
         $this->Row = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
-        if (!$result) {
+        if ($this->Errno) {
             debug_print_backtrace();
             $this->halt("Invalid SQL: " . $queryString);
         }
@@ -207,13 +207,13 @@ class DB_Sql
     }
 
     /* public: walk result set */
-    function next_record()
+    function next_record($fetchMode = MYSQLI_BOTH)
     {
         if (!$this->Query_ID) {
             $this->halt("next_record called with no query pending.");
             return 0;
         }
-        $this->Record = @mysqli_fetch_array($this->Query_ID);
+        $this->Record = @mysqli_fetch_array($this->Query_ID, $fetchMode);
         $this->Row += 1;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
@@ -518,8 +518,8 @@ class DB_Sql
     {
         printf("</td></tr></table><b>Database error:</b> %s<br>\n", $msg);
         printf("<b>MySQL Error</b>: %s (%s)<br>\n",
-            $this->Errno,
-            $this->Error);
+               $this->Errno,
+               $this->Error);
     }
 
 }

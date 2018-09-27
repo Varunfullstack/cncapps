@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue152-1517227191-0">
+        <tagDatabase tag="issue152"/>
+    </changeSet>
+    <changeSet id="issue152-1517227191-1" author="pavwebdev">
+        <modifyDataType columnName="hdTeamActualFixHours" tableName="team_performance" newDataType="DECIMAL(12,2)"/>
+        <rollback>
+            <modifyDataType columnName="hdTeamActualFixHours" newDataType="int(3)" tableName="team_performance"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue152-1517227191-2" author="pavwebdev">
+        <modifyDataType columnName="esTeamActualFixHours" tableName="team_performance" newDataType="DECIMAL(12,2)"/>
+        <rollback>
+            <modifyDataType columnName="esTeamActualFixHours" newDataType="int(3)" tableName="team_performance"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue152-1517227191-3" author="pavwebdev">
+        <modifyDataType columnName="imTeamActualFixHours" tableName="team_performance" newDataType="DECIMAL(12,2)"/>
+        <rollback>
+            <modifyDataType columnName="imTeamActualFixHours" newDataType="int(3)" tableName="team_performance"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

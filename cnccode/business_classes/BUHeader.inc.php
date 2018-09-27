@@ -7,6 +7,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJHeader.php");
 
 class BUHeader extends Business
 {
@@ -26,8 +27,7 @@ class BUHeader extends Business
 
     /**
      * Get customer rows whose names match the search string or, if the string is numeric, try to select by customerID
-     * @parameter String $nameSearchString String to match against or numeric customerID
-     * @parameter DataSet &$dsResults results
+     * @param DataSet $dsResults
      * @return bool : One or more rows
      * @access public
      */

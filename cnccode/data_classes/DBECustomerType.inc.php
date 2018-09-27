@@ -7,6 +7,10 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECustomerType extends DBEntity
 {
+
+    const customerTypeID = "customerTypeID";
+    const description = "description";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +22,18 @@ class DBECustomerType extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("custype");
-        $this->addColumn("customerTypeID", DA_ID, DA_NOT_NULL, "cty_ctypeno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "cty_desc");
+        $this->addColumn(
+            self::customerTypeID,
+            DA_ID,
+            DA_NOT_NULL,
+            "cty_ctypeno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cty_desc"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

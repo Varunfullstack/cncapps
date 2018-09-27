@@ -24,6 +24,14 @@ class CTPortalCustomerDocument extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            'sales'
+        ];
+
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPortalCustomerDocument = new BUPortalCustomerDocument($this);
         $this->dsPortalCustomerDocument = new DSForm($this);
         $this->dsPortalCustomerDocument->copyColumnsFrom($this->buPortalCustomerDocument->dbePortalCustomerDocument);
@@ -62,7 +70,8 @@ class CTPortalCustomerDocument extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
-                $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'], $dsPortalCustomerDocument);
+                $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'],
+                                                                 $dsPortalCustomerDocument);
                 $portalCustomerDocumentID = $_REQUEST['portalCustomerDocumentID'];
             } else {                                                                    // creating new
                 $dsPortalCustomerDocument->initialise();
@@ -143,28 +152,50 @@ class CTPortalCustomerDocument extends CTCNC
         );
 
         header('Content-type: ' . $dsPortalCustomerDocument->getValue('fileMimeType'));
-        header('Content-Disposition: attachment; filename="' . $dsPortalCustomerDocument->getValue('filename') . '"');
+        header('Content-Disposition: inline; filename="' . $dsPortalCustomerDocument->getValue('filename') . '"');
         print $dsPortalCustomerDocument->getValue('file');
 
         exit;
+    }
+
+    private function return_bytes($val)
+    {
+        $val = trim($val);
+
+        $last = strtolower($val[strlen($val) - 1]);
+        $val = substr($val, 0, -1); // necessary since PHP 7.1; otherwise optional
+
+        switch ($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
     }
 
     function update()
     {
         $this->setMethodName('update');
 
-        $dsPortalCustomerDocument = &$this->dsPortalCustomerDocument;
         $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray($_REQUEST['portalCustomerDocument']));
         /*
         Need a file when creating new
         */
+
         if ($_FILES['userfile']['name'] == '' && $this->dsPortalCustomerDocument->getValue('portalCustomerDocumentID') == '') {
             $this->setFormErrorMessage('Please enter a file path');
         } else {
             /* uploading a file */
 
             if ($_FILES['userfile']['name'] != '' && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-                $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
+                $this->setFormErrorMessage('Document not loaded - is it bigger than ' .
+                                           $this->return_bytes(ini_get('upload_max_filesize')) / 1024 / 1024 . '
+                                            MBytes ?');
             }
 
         }
@@ -202,7 +233,8 @@ class CTPortalCustomerDocument extends CTCNC
     {
         $this->setMethodName('delete');
 
-        $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'], $dsPortalCustomerDocument);
+        $this->buPortalCustomerDocument->getDocumentByID($_REQUEST['portalCustomerDocumentID'],
+                                                         $dsPortalCustomerDocument);
 
         if (!$this->buPortalCustomerDocument->deleteDocument($_REQUEST['portalCustomerDocumentID'])) {
             $this->displayFatalError('Cannot delete this document');

@@ -46,6 +46,13 @@ class CTDespatch extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            'sales'
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->dsOrdhead = new Dataset($this);
         $this->dsDespatch = new DSForm($this);
     }
@@ -115,10 +122,10 @@ class CTDespatch extends CTCNC
             $this->dsOrdhead->fetchNext();
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_DESPATCH,
-                        'ordheadID' => $this->dsOrdhead->getValue('ordheadID')
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_DESPATCH,
+                                     'ordheadID' => $this->dsOrdhead->getValue('ordheadID')
+                                 )
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -184,7 +191,7 @@ class CTDespatch extends CTCNC
         if ($_REQUEST['customerID'] != '') {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID($_REQUEST['customerID'], $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $this->template->set_var(
             array(
@@ -365,8 +372,14 @@ class CTDespatch extends CTCNC
                         array(
                             'stockcat' => $dsOrdline->getValue("stockcat"),
                             'qtyOrdered' => number_format($dsOrdline->getValue("qtyOrdered"), 2, '.', ''),
-                            'qtyOutstanding' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"), 2, '.', ''),
-                            'qtyOutstandingHide' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"), 2, '.', ''),
+                            'qtyOutstanding' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"),
+                                                              2,
+                                                              '.',
+                                                              ''),
+                            'qtyOutstandingHide' => number_format($dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"),
+                                                                  2,
+                                                                  '.',
+                                                                  ''),
                             'qtyToDespatch' => 0,
                             'renewalLink' => $renewalLink,
                             'orderLineClass' => CTDESPATCH_CLS_ORDER_LINE_ITEM
@@ -456,13 +469,16 @@ class CTDespatch extends CTCNC
             $this->displayDespatch();
             exit;
         } else {
-            $deliveryNoteFile = $buDespatch->despatch($_REQUEST['ordheadID'], $_REQUEST['deliveryMethodID'], $dsDespatch, $_REQUEST['onlyCreateDespatchNote']);
+            $deliveryNoteFile = $buDespatch->despatch($_REQUEST['ordheadID'],
+                                                      $_REQUEST['deliveryMethodID'],
+                                                      $dsDespatch,
+                                                      $_REQUEST['onlyCreateDespatchNote']);
             $urlNext =
                 $this->buildLink($_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCNC_ACT_DISPLAY_DESPATCH,
-                        'ordheadID' => $_REQUEST['ordheadID']
-                    )
+                                 array(
+                                     'action' => CTCNC_ACT_DISPLAY_DESPATCH,
+                                     'ordheadID' => $_REQUEST['ordheadID']
+                                 )
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -494,94 +510,5 @@ class CTDespatch extends CTCNC
         readfile($pdfFile);
         exit();
     }
-    /**
-     * Loop through the despatches that are renewal lines and for each one, display the edit form
-     * for that renewal type.
-     *
-     * Create a renewal record for any new renwal
-     *    CustomerItem
-     *  Relevant type of renewal record. e.g. renBroadband
-     *
-     *
-     * set renewalsPromptedDate on the customer item
-     */
-    /*
-    function inputRenewals()
-    {
-        // get next line for this sales order that have renewals that have not been prompted for today
-        $buDespatch = new BUDespatch($this);
-        $buSalesOrder = new BUSalesOrder($this);
-
-
-        $buDespatch->getRenewalRowByOrdheadID( $_REQUEST['ordheadID'], $dsDespatched );
-        $buSalesOrder->getOrderByOrdheadID( $_REQUEST['ordheadID'], $dsOrdhead, $dsOrdline );
-        /*
-         * If the renewal row does not exist then create it now
-         */
-//		$renewalCustomerItemID = $dsDespatched->getValue('renewalCustomerItemID');
-//		$renewalTypeID = $dsOrdline->getValue('renewalTypeID');
-
-    /*
-     * Create an instance of the correct renewal business object
-     */
-    /*
-            switch( $renewalTypeID ){
-
-                case CONFIG_BROADBAND_RENEWAL_TYPE_ID:
-                default:
-                    $buRenewal 	= new BURenBroadband( $this );
-                    $page 		= 'renBroadband';
-
-            }
-            if (!$renewalCustomerItemID ){
-
-                $ID = $buRenewal->createNewRenewal(
-                    $dsOrdhead->getValue('customerID'),
-                    0,
-                    $dsDespatched->getValue('itemID'),
-                    $renewalCustomerItemID				// returned by function
-                );
-
-                $newRenewal = true;
-            }
-            else{
-
-                $ID = $buRenewal->getRenewalIDByCustomerItemID( $renewalCustomerItemID );
-
-                $newRenewal = false;
-            }
-
-            // this date prevents the renewal appearing again today during despatch process.
-            $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue('ordheadID',  $dsDespatched->getValue('ordheadID') );
-            $dbeOrdline->setValue('sequenceNo', $dsDespatched->getValue('sequenceNo') );
-
-            $dbeOrdline->getRow();
-            $dbeOrdline->setValue('renewalPromptedDate', date(CONFIG_MYSQL_DATE) );
-
-            if ( $newRenewal ){
-
-                // update the order line with the renewal customerItemID
-                $dbeOrdline->setValue('renewalCustomerItemID', $renewalCustomerItemID );
-            }
-
-            $dbeOrdline->updateRow();
-
-            $urlNext =
-                $this->buildLink(
-                    $page,
-                    array(
-                        'ordheadID'	=> $dsDespatched->getValue('ordheadID'),
-                        'action'	=> 	'edit',
-                        'ID' 		=> 	$ID
-                    )
-                );
-
-            header('Location: ' . $urlNext);
-            exit;
-
-        }
-    */
 }// end of class
 ?>

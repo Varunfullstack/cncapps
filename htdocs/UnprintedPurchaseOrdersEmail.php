@@ -28,10 +28,20 @@ $headers .= "Content-Type: text/html";
 /*
 Unprinted purchase orders email to Gary
 */
-$query =
-    'SELECT poh_porno' .
-    ' FROM porhead' .
-    ' WHERE poh_ord_consno = 0';            // not ordered
+$query = "SELECT 
+  porhead.`poh_porno`,
+  customer.cus_name,
+  supplier.`sup_name`
+FROM
+  porhead 
+  LEFT JOIN ordhead 
+    ON porhead.`poh_ordno` = ordhead.`odh_ordno` 
+  LEFT JOIN customer 
+    ON ordhead.`odh_custno` = customer.`cus_custno` 
+    LEFT JOIN supplier 
+    ON supplier.`sup_suppno` = porhead.`poh_suppno`
+WHERE poh_ord_consno = 0 ";
+
 
 $result = $db1->query($query);
 
@@ -41,14 +51,22 @@ if (!OUTPUT_TO_SCREEN) {
 
 ?>
     <P>
-        The following purchase orders are unprinted:
+        The following purchase orders are have not been ordered:
     </P>
     <TABLE>
-        <TR>
-            <TD>
+        <thead>
+        <tr>
+            <th>
                 Purchase order
-            </TD>
-        </TR>
+            </th>
+            <th>
+                Customer
+            </th>
+            <th>
+                Supplier
+            </th>
+        </tr>
+        </thead>
         <?php
         while ($i = $result->fetch_row()) {
             ?>
@@ -56,6 +74,12 @@ if (!OUTPUT_TO_SCREEN) {
                 <TD>
                     <A href="http://cncapps/PurchaseOrder.php?action=display&porheadID=<?php print $i[0] ?>"><?php print $i[0] ?></A>
                 </TD>
+                <td>
+                    <?= $i[1] ?>
+                </td>
+                <td>
+                    <?= $i[2] ?>
+                </td>
             </TR>
             <?php
         }
@@ -76,12 +100,19 @@ if (!OUTPUT_TO_SCREEN) {
         'From' => CONFIG_SALES_EMAIL,
         'To' => $toEmail,
         'Subject' => 'Unprinted Purchase Orders',
-        'Date' => date("r")
+        'Date' => date("r"),
+        'Content-Type' => 'text/html; charset=UTF-8'
     );
 
     $buMail->mime->setHTMLBody($body);
 
-    $body = $buMail->mime->get();
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset' => 'UTF-8',
+        'html_charset' => 'UTF-8',
+        'head_charset' => 'UTF-8'
+    );
+    $body = $buMail->mime->get($mime_params);
 
     $hdrs = $buMail->mime->headers($hdrs);
 

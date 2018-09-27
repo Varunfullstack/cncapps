@@ -8,11 +8,13 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
-require_once($cfg["path_bu"] . "/BUCustomerNew.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
-require_once($cfg["path_dbe"] . "/DBEContactNew.inc.php");
+require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
+
+use Dompdf\Dompdf;
 
 class BUCustomerReviewMeeting extends Business
 {
@@ -67,7 +69,7 @@ class BUCustomerReviewMeeting extends Business
 
             $template->setVar(
                 array(
-                    'urlCustomer' => $urlCustomer,
+                    'urlCustomer'     => $urlCustomer,
                     'lastMeetingDate' => $customer['lastMeetingDate'],
                     'nextMeetingDate' => $customer['nextMeetingDate']
                 )
@@ -96,10 +98,10 @@ class BUCustomerReviewMeeting extends Business
 
                 $template->setVar(
                     array(
-                        'firstName' => $row['firstName'],
-                        'lastName' => $row['lastName'],
-                        'ddiPhone' => $row['ddiPhone'],
-                        'mobilePhone' => $row['mobilePhone'],
+                        'firstName'    => $row['firstName'],
+                        'lastName'     => $row['lastName'],
+                        'ddiPhone'     => $row['ddiPhone'],
+                        'mobilePhone'  => $row['mobilePhone'],
                         'emailAddress' => $row['emailAddress']
                     )
                 );
@@ -131,14 +133,14 @@ class BUCustomerReviewMeeting extends Business
 
                 $template->set_var(
                     array(
-                        'add1' => $dsSite->getValue('add1'),
-                        'add2' => $dsSite->getValue('add2'),
-                        'add3' => $dsSite->getValue('add3'),
-                        'town' => $dsSite->getValue('town'),
-                        'county' => $dsSite->getValue('county'),
-                        'postcode' => $dsSite->getValue('postcode'),
+                        'add1'         => $dsSite->getValue(DBESite::add1),
+                        'add2'         => $dsSite->getValue(DBESite::add2),
+                        'add3'         => $dsSite->getValue(DBESite::add3),
+                        'town'         => $dsSite->getValue(DBESite::town),
+                        'county'       => $dsSite->getValue(DBESite::county),
+                        'postcode'     => $dsSite->getValue(DBESite::postcode),
                         'contactPhone' => $phone,
-                        'contactName' => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
+                        'contactName'  => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
                     )
                 );
 
@@ -147,8 +149,8 @@ class BUCustomerReviewMeeting extends Business
             $template->set_var(
                 array(
                     'dateYYYYMMDD' => $nextMeetingDateYmd,
-                    'nowYYYYMMDD' => date('Ymd'),
-                    'nowHHMMSS' => date('His'),
+                    'nowYYYYMMDD'  => date('Ymd'),
+                    'nowHHMMSS'    => date('His'),
                     'customerName' => $customer['customerName']
                 )
             );
@@ -163,16 +165,24 @@ class BUCustomerReviewMeeting extends Business
             $subject = 'Review meeting with ' . $customer['customerName'] . ' due by ' . $customer['nextMeetingDate'];
 
             $hdrs = array(
-                'From' => $senderEmail,
-                'Subject' => $subject,
-                'Date' => date("r")
+                'From'         => $senderEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($body);
 
             $buMail->mime->addAttachment($icsFile, 'text/calendar', 'meeting.ics', false);
 
-            $body = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $body = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 
@@ -200,12 +210,22 @@ class BUCustomerReviewMeeting extends Business
 
     } // end function
 
+
     public function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
+
+        $checkMonthYear = function ($value) {
+            if (!$value) {
+                return false;
+            }
+
+            return !!DateTime::createFromFormat('m/Y', $value);
+        };
+
         $dsData->addColumn('customerID', DA_STRING, DA_NOT_NULL);
-        $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL);
-        $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL, $checkMonthYear);
+        $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL, $checkMonthYear);
         $dsData->addColumn('meetingDate', DA_DATE, DA_NOT_NULL);
     }
 
@@ -232,49 +252,58 @@ class BUCustomerReviewMeeting extends Business
 
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-        /*
-            require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+        require_once BASE_DRIVE . '/vendor/autoload.php';
 
-            $dompdf = new DOMPDF();
-            $dompdf->set_paper( 'A4', 'portrait' );
+        $fileId = uniqid();
+        $tempFilePath = 'c:\\Temp\\' . $fileId . '.html';
 
-            $dompdf->set_option( 'enable_remote', true);
+        file_put_contents($tempFilePath, $htmlPage);
 
-            $dompdf->set_base_path( BASE_DRIVE . '/htdocs' );   // so we can get the images and css
+        $meetingDate = new \DateTime($meetingDate);
 
-            $dompdf->load_html( $htmlPage );
+        $meetingDateDmy = $meetingDate->format('d-m-Y');
+        $path = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy;
+        $filePath = $path . '.pdf';
 
-            $dompdf->render();
-          */
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+        $descriptors = array(
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'a'),
+        );
 
-        /*
-            $dompdf->add_info('Title',  'Agenda ' . $meetingDateDmy );
+        $command = "c: && cd \"C:\\Program Files\\wkhtmltopdf\\bin\" && wkhtmltopdf $tempFilePath \"$filePath\"";
+        $process = proc_open($command, $descriptors, $pipes);
 
-            $dompdf->add_info('Author', 'CNC Ltd' );
+        if (is_resource($process)) {
+            $_stdOut = stream_get_contents($pipes[1]);
+            $_stdErr = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $_exitCode = proc_close($process);
 
-            $dompdf->add_info('Subject', 'Renewal Report' );
-
-            $pdfString = $dompdf->output();
-
-            $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.pdf';
-        */
-
-        $filePath = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy . '.htm';
-
-        $handle = fopen($filePath, 'w');
-
-//    fwrite( $handle, $pdfString );
-        fwrite($handle, $htmlPage);
-
+            if ($_exitCode !== 0) {
+                $_error = $_stdErr ? $_stdErr : "Failed without error message: $command";
+            }
+        }
+        if ($_error) {
+            unlink($tempFilePath);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
      * Create a PDF file of customer profit figures and save to documentation
      * folder
-     *
+     * @param $customerID
+     * @param $startDate
+     * @param $endDate
+     * @param $meetingDate
      */
-    public function generateSalesPdf($customerID, $startYearMonth, $endYearMonth, $meetingDate)
+    public function generateSalesPdf($customerID,
+                                     DateTimeInterface $startDate,
+                                     DateTimeInterface $endDate,
+                                     $meetingDate)
     {
         $buCustomer = new BUCustomer($this);
 
@@ -293,8 +322,8 @@ class BUCustomerReviewMeeting extends Business
         $this->initialiseSearchForm($dsSearchForm);
 
         $dsSearchForm->setValue('customerID', $customerID);
-        $dsSearchForm->setValue('startYearMonth', $startYearMonth);
-        $dsSearchForm->setValue('endYearMonth', $endYearMonth);
+        $dsSearchForm->setValue('startYearMonth', $startDate->format('m/Y'));
+        $dsSearchForm->setValue('endYearMonth', $endDate->format('m/Y'));
 
         $results = $buCustomerAnalysisReport->getResults($dsSearchForm);
 
@@ -315,13 +344,13 @@ class BUCustomerReviewMeeting extends Business
 
             $template->set_var(
                 array(
-                    'contract' => $contractName,
-                    'sales' => number_format($row['sales'], 2),
-                    'cost' => number_format($row['cost'], 2),
-                    'labour' => number_format($row['labourCost'], 2),
-                    'profit' => number_format($row['profit'], 2),
-                    'profitPercent' => $row['profitPercent'],
-                    'labourHours' => $row['labourHours'],
+                    'contract'         => $contractName,
+                    'sales'            => number_format($row['sales'], 2),
+                    'cost'             => number_format($row['cost'], 2),
+                    'labour'           => number_format($row['labourCost'], 2),
+                    'profit'           => number_format($row['profit'], 2),
+                    'profitPercent'    => $row['profitPercent'],
+                    'labourHours'      => $row['labourHours'],
                     'profitAlertClass' => $profitAlertClass
                 )
             );
@@ -334,16 +363,16 @@ class BUCustomerReviewMeeting extends Business
         }
         $template->set_var(
             array(
-                'customerName' => $dsCustomer->getValue('name'),
-                'startYearMonth' => $startYearMonth,
-                'meetingDate' => $meetingDate,
-                'endYearMonth' => $endYearMonth,
-                'totalSales' => number_format($totalSales, 2),
-                'totalCost' => number_format($totalCost, 2),
-                'totalLabour' => number_format($totalLabour, 2),
-                'totalProfit' => number_format($totalSales - $totalCost - $totalLabour, 2),
+                'customerName'       => $dsCustomer->getValue(DBECustomer::name),
+                'startYearMonth'     => $startDate->format('Y-m'),
+                'meetingDate'        => $meetingDate,
+                'endYearMonth'       => $endDate->format('Y-m'),
+                'totalSales'         => number_format($totalSales, 2),
+                'totalCost'          => number_format($totalCost, 2),
+                'totalLabour'        => number_format($totalLabour, 2),
+                'totalProfit'        => number_format($totalSales - $totalCost - $totalLabour, 2),
                 'totalProfitPercent' => number_format(100 - (($totalCost + $totalLabour) / $totalSales) * 100, 2),
-                'totalLabourHours' => number_format($totalLabourHours, 2),
+                'totalLabourHours'   => number_format($totalLabourHours, 2),
             )
         );
         /*
@@ -420,15 +449,15 @@ class BUCustomerReviewMeeting extends Business
 
             $template->set_var(
                 array(
-                    'notes' => $item['notes'],
-                    'description' => Controller::htmlDisplayText($item['description']),
+                    'notes'               => $item['notes'],
+                    'description'         => Controller::htmlDisplayText($item['description']),
                     'itemTypeDescription' => Controller::htmlDisplayText($item['itemTypeDescription']),
-                    'expiryDate' => Controller::htmlDisplayText($item['expiryDate']),
-                    'salePrice' => $salePrice,
-                    'costPrice' => $costPrice,
-                    'customerItemID' => $item['customerItemID'],
-                    'coveredItemsString' => $coveredItemsString,
-                    'itemClass' => $itemClass
+                    'expiryDate'          => Controller::htmlDisplayText($item['expiryDate']),
+                    'salePrice'           => $salePrice,
+                    'costPrice'           => $costPrice,
+                    'customerItemID'      => $item['customerItemID'],
+                    'coveredItemsString'  => $coveredItemsString,
+                    'itemClass'           => $itemClass
                 )
             );
 
@@ -452,20 +481,25 @@ class BUCustomerReviewMeeting extends Business
 
         @mkdir($reviewMeetingFolderPath, '0777', true);  // ensure folder exists
 
-        require_once BASE_DRIVE . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
+        require_once BASE_DRIVE . '/vendor/autoload.php';
 
-        $dompdf = new DOMPDF();
-        $dompdf->set_paper('A4', 'portrait');
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($options);
 
-        $dompdf->set_option('enable_remote', true);
+        $dompdf->setPaper('A4', 'portrait');
 
-        $dompdf->set_base_path(BASE_DRIVE . '/htdocs');   // so we can get the images and css
+        $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
-        $dompdf->load_html($htmlPage);
+        $htmlPage = mb_convert_encoding($htmlPage, 'HTML-ENTITIES', 'UTF-8');
+
+        $dompdf->loadHtml($htmlPage);
 
         $dompdf->render();
 
-        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate, 0, 4);
+        $meetingDateDmy = substr($meetingDate, 8, 2) . '-' . substr($meetingDate, 5, 2) . '-' . substr($meetingDate,
+                                                                                                       0,
+                                                                                                       4);
 
         $dompdf->add_info('Title', 'Renewal Report ' . $meetingDateDmy);
 
@@ -475,12 +509,34 @@ class BUCustomerReviewMeeting extends Business
 
         $pdfString = $dompdf->output();
 
+        $meetingDate = new \DateTime($meetingDate);
+
+        $meetingDateDmy = $meetingDate->format('d-m-Y');
+
         $filePath = $reviewMeetingFolderPath . '/Renewal Report ' . $meetingDateDmy . '.pdf';
 
         $handle = fopen($filePath, 'w');
 
         fwrite($handle, $pdfString);
 
+        $this->pdfEncrypt($filePath, $filePath, 'RenewalOwner2018', 'CNCShoreham2018');
+    }
+
+    function pdfEncrypt($origFile, $destFile, $owner_password = null, $user_password = null, $permissions = ['print'])
+    {
+        $pdf = new \setasign\FpdiProtection\FpdiProtection();
+        $pagecount = $pdf->setSourceFile($origFile);
+        // copy all pages from the old unprotected pdf in the new one
+        for ($loop = 1; $loop <= $pagecount; $loop++) {
+            $tplidx = $pdf->importPage($loop);
+            $pdf->addPage();
+            $dim = $pdf->useTemplate($tplidx);
+            //var_dump($dim);exit;
+        }
+        // Allow for array('print', 'modify', 'copy', 'annot-forms');
+        $pdf->SetProtection($permissions, $user_password, $owner_password);
+        $pdf->Output($destFile, 'F'); // F write, D download
+        return $destFile;
     }
 }
 

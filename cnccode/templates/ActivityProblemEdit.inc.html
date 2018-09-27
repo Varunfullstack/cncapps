@@ -1,12 +1,19 @@
 <!-- Template: ActivityProblemEdit.inc.html -->
 {activityWizardHeader}
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language="JavaScript" src="ckeditor/ckeditor.js"></script>
-<script language="Javascript" src="ckfinder/ckfinder.js"></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<script language="JavaScript"
+        src="ckeditor/ckeditor.js"
+></script>
+<script language="Javascript"
+        src="ckfinder/ckfinder.js"
+></script>
 <script language="Javascript">
     $(function () {
         window.date = $('#date').get(0);
     });
+
     /**
      * Inserts multiple fields.
      *
@@ -32,9 +39,19 @@
         }
     }
 </script>
-<form name="form" method="post" action="{submitURL}">
-    <input type="hidden" name="callActivityID" id="callActivityID" value="{callActivityID}"/>
-    <table border="0" cellspacing="0" cellpadding="1">
+<form name="form"
+      method="post"
+      action="{submitURL}"
+>
+    <input type="hidden"
+           name="callActivityID"
+           id="callActivityID"
+           value="{callActivityID}"
+    />
+    <table border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr class="singleBorder">
             <td class="promptText">Priority</td>
             <td class="fieldText">
@@ -44,7 +61,10 @@
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN priorityBlock -->
-                    <option {prioritySelected} value="{priority}">{priorityDesc}</option>
+                    <option {prioritySelected}
+                            value="{priority}"
+                    >{priorityDesc}
+                    </option>
                     <!-- END priorityBlock -->
                 </select>
                 <span class="formErrorMessage">{priorityMessage}</span>
@@ -59,13 +79,12 @@
                     value="{date}"
                     size="10"
                     maxlength="10"
-                    onchange="setFormChanged();"/>
-                <a href="javascript:;" onclick="popUpCalendar(this, date, 'dd/mm/yyyy')"><img src="images/calendar.gif"
-                                                                                              alt="Calendar" width="24"
-                                                                                              height="22" hspace="0"
-                                                                                              vspace="0" border="0"
-                                                                                              align="absmiddle"/></a>
-                <span class="formErrorMessage">{dateMessage}</span></td>
+                    onchange="setFormChanged();"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            />
+                <span class="formErrorMessage">{dateMessage}</span>
+            </td>
         </tr>
         <tr class="singleBorder">
             <td class="promptText">Time</td>
@@ -88,7 +107,10 @@
                 >
                     <option value="0">Unallocated</option>
                     <!-- BEGIN userBlock -->
-                    <option {userSelected} value="{userID}">{userName}</option>
+                    <option {userSelected}
+                            value="{userID}"
+                    >{userName}
+                    </option>
                     <!-- END userBlock -->
                 </select>
                 <span class="formErrorMessage">{userNameMessage}</span>
@@ -102,22 +124,39 @@
                 <div id="phraseinsertlabel">
                     <label>Standard Text </label>
                 </div>
-                <select id="tablefields" name="dummy" size="5" multiple="multiple"
-                        ondblclick="insertValueQuery( this, reason )">
-                    <option value="Server Guard reporting backup failure." title="">Server Guard reporting backup
+                <select id="tablefields"
+                        name="dummy"
+                        size="5"
+                        multiple="multiple"
+                        ondblclick="insertValueQuery( this, reason )"
+                >
+                    <option value="Server Guard reporting backup failure."
+                            title=""
+                    >Server Guard reporting backup
                         failure.
                     </option>
-                    <option value="Anti Virus out of date." title="">Anti Virus out of date.</option>
-                    <option value="Cannot access e-mail at the moment." title="">Cannot access e-mail at the moment.
+                    <option value="Anti Virus out of date."
+                            title=""
+                    >Anti Virus out of date.
                     </option>
-                    <option value="No Internet connection at the moment." title="">No Internet connection at the
+                    <option value="Cannot access e-mail at the moment."
+                            title=""
+                    >Cannot access e-mail at the moment.
+                    </option>
+                    <option value="No Internet connection at the moment."
+                            title=""
+                    >No Internet connection at the
                         moment.
                     </option>
 
                 </select>
                 <div id="phraseinsertbuttoncontainer">
-                    <input type="button" name="insert" value="Insert" onclick="insertValueQuery( dummy, 'reason' )"
-                           title="Insert"/>
+                    <input type="button"
+                           name="insert"
+                           value="Insert"
+                           onclick="insertValueQuery( dummy, 'reason' )"
+                           title="Insert"
+                    />
                 </div>
             </td>
         </tr>
@@ -126,7 +165,10 @@
         </tr>
         <tr>
             <td>
-                <textarea rows="10" cols="10" name="reason">{reason}</textarea>
+                <textarea rows="10"
+                          cols="10"
+                          name="reason"
+                >{reason}</textarea>
                 <script type="text/javascript">
                     reason = CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
                     reason.addCss('body { font-size: 10pt; }');
@@ -141,7 +183,10 @@
         </tr>
         <tr>
             <td>
-                <textarea rows="10" cols="10" name="internalNotes">{internalNotes}</textarea>
+                <textarea rows="10"
+                          cols="10"
+                          name="internalNotes"
+                >{internalNotes}</textarea>
                 <script type="text/javascript">
                     internalNotes = CKEDITOR.replace('internalNotes',
                         {
@@ -155,10 +200,17 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" valign="top">&nbsp;</td>
+            <td colspan="3"
+                valign="top"
+            >&nbsp;
+            </td>
         </tr>
         <tr>
-            <td><input name="Next" type="submit" id="Next" value="Update"></td>
+            <td><input name="Next"
+                       type="submit"
+                       id="Next"
+                       value="Update"
+            ></td>
         </tr>
     </table>
 </form>

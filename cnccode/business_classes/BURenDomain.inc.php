@@ -9,7 +9,7 @@ require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg ["path_dbe"] . "/DBERenDomain.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEJRenDomain.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEArecord.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
@@ -125,13 +125,11 @@ class BURenDomain extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue()
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenDomain->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
-
-        $toEmail = CONFIG_SALES_MANAGER_EMAIL;
         $senderEmail = CONFIG_SALES_EMAIL;
 
         $hdrs =
@@ -139,7 +137,8 @@ class BURenDomain extends Business
                 'From' => $senderEmail,
                 'To' => $toEmail,
                 'Subject' => 'Domain Renewals Due Today',
-                'Date' => date("r")
+                'Date' => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
         ob_start(); ?>
@@ -170,7 +169,13 @@ class BURenDomain extends Business
 
         $buMail->mime->setHTMLBody($message);
 
-        $body = $buMail->mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
 
         $hdrs = $buMail->mime->headers($hdrs);
 
@@ -270,8 +275,10 @@ class BURenDomain extends Business
                 $dbeOrdline->setValue('qtyOrdered', 1); // default 1
                 $dbeOrdline->setValue('qtyDespatched', 0);
                 $dbeOrdline->setValue('qtyLastDespatched', 0);
-                $dbeOrdline->setValue('curUnitSale', ($dsItem->getValue('curUnitSale') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
-                $dbeOrdline->setValue('curUnitCost', ($dsItem->getValue('curUnitCost') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitSale',
+                                      ($dsItem->getValue('curUnitSale') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
+                $dbeOrdline->setValue('curUnitCost',
+                                      ($dsItem->getValue('curUnitCost') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths'));
 
                 $dbeOrdline->insertRow();
 
@@ -301,8 +308,8 @@ class BURenDomain extends Business
                 $dbeRenDomainUpdate->setValue('customerItemID', $this->dbeJRenDomain->getPKValue());
                 $dbeRenDomainUpdate->getRow();
                 $dbeRenDomainUpdate->setValue('totalInvoiceMonths',
-                    $this->dbeJRenDomain->getValue('totalInvoiceMonths') +
-                    $this->dbeJRenDomain->getValue('invoicePeriodMonths')
+                                              $this->dbeJRenDomain->getValue('totalInvoiceMonths') +
+                                              $this->dbeJRenDomain->getValue('invoicePeriodMonths')
                 );
                 $dbeRenDomainUpdate->updateRow();
 

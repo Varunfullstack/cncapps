@@ -1,0 +1,174 @@
+<!-- Template: HomeDetailCharts.inc.html -->
+<script type="text/javascript"
+        src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script type="text/javascript">
+    dateFormat = 'dd/mm/yy';
+
+
+    $(function () {
+        var startDatePicker = $('#startDatePicker');
+        var endDatePicker = $('#endDatePicker');
+        startDatePicker.datepicker({
+                dateFormat: 'dd/mm/yy',
+                defaultDate: moment('{startDate}').toDate(),
+                changeMonth: true,
+                changeYear: true
+            }
+        ).on("change", function () {
+            endDatePicker.datepicker("option", "minDate", getDate(this));
+            drawChart();
+        });
+        startDatePicker.val(moment('{startDate}').format('DD/MM/YYYY'));
+
+        endDatePicker.datepicker(
+            {
+                dateFormat: 'dd/mm/yy',
+                defaultDate: moment('{endDate}').toDate(),
+                changeMonth: true,
+                changeYear: true
+            }
+        ).on("change", function () {
+            endDatePicker.datepicker("option", "maxDate", getDate(this));
+            drawChart();
+        });
+
+        endDatePicker.val(moment('{endDate}').format('DD/MM/YYYY'));
+
+
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages': ['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+
+            var engineerID = {engineerID};
+            var startDate = moment(startDatePicker.val(), 'DD/MM/YYYY');
+            var endDate = moment(endDatePicker.val(), 'DD/MM/YYYY');
+            this.ajaxOptions = {
+                url: '{dataFetchUrl}',
+                dataType: 'json',
+                mehtod: 'POST',
+                data: {
+                    engineerID: engineerID,
+                    startDate: startDate.format(),
+                    endDate: endDate.format()
+                }
+            };
+            this.data = $.ajax(this.ajaxOptions).then(function (result) {
+
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('date', 'Dates');
+                data.addColumn('number', 'Hours Logged');
+                data.addColumn('number', 'Average over 5 days');
+                data.addColumn('number', 'Average over Month');
+
+                data.addRows(
+                    result.map(function (row) {
+                        return [
+                            new Date(row['loggedDate']),
+                            row['loggedHours'],
+                            row['fiveDaysAvg'],
+                            row['monthAvg']
+                        ]
+                    })
+                );
+
+// Set chart options
+                var options = {
+                    'title': 'Hours Logged Over Time',
+                    seriesType: 'bars',
+                    series: {
+                        1: {type: 'line'},
+                        2: {type: 'line'}
+                    },
+                    legend: {
+                        position: 'bottom'
+                    },
+                    vAxis: {title: 'Hours Logged'}
+                };
+
+// Instantiate and draw our chart, passing in some options.
+                var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+
+
+                var data2 = new google.visualization.DataTable();
+                data2.addColumn('date', 'Dates');
+                data2.addColumn('number', '% Last 5 days');
+                data2.addColumn('number', '% Last Month');
+                data2.addColumn('number', 'Target %');
+
+                data2.addRows(
+                    result.map(function (row) {
+                        return [
+                            new Date(row['loggedDate']),
+                            row['fiveDaysTotal'] / row['fiveDaysToLog'] * 100,
+                            row['monthTotal'] / row['monthToLog'] * 100,
+                            row['target']
+                        ]
+                    })
+                );
+
+// Set chart options
+                var options2 = {
+                    'title': 'Logged Percentage Over Time',
+                    seriesType: 'line',
+                    series: {
+                        1: {type: 'line'},
+                        2: {type: 'line'}
+                    },
+                    legend: {
+                        position: 'bottom'
+                    },
+                    vAxis: {title: '% Of Time Logged'}
+                };
+
+// Instantiate and draw our chart, passing in some options.
+                var chart2 = new google.visualization.ComboChart(document.getElementById('chartTarget'));
+                chart2.draw(data2, options2);
+
+
+            });
+
+// Create the data table.
+
+        }
+    })
+
+</script>
+<style>
+    label {
+        display: inline-block;
+        width: 140px;
+        text-align: right;
+    }
+</style>
+<h1>
+    Detailed Logging Figures for {engineerName}.
+</h1>
+<div>
+    <label style="width: 80px">Start Date:</label>
+    <input type="text"
+           id="startDatePicker"
+    >
+</div>
+<div>
+    <label style="width: 80px">End Date:</label>
+    <input type="text"
+           id="endDatePicker"
+    >
+</div>
+<br>
+<div id="chart_div"></div>
+<br>
+<div id="chartTarget">
+
+</div>
+<!-- Template: HomeDetailCharts.inc.html -->

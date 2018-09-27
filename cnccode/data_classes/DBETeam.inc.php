@@ -8,6 +8,14 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBETeam extends DBEntity
 {
+
+    const TeamID = "teamID";
+    const Name = "name";
+    const TeamRoleID = "teamRoleID";
+    const Level = "level";
+    const ActiveFlag = "activeFlag";
+
+
     /**
      * calls constructor()
      * @access public
@@ -19,11 +27,11 @@ class DBETeam extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("team");
-        $this->addColumn("teamID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("name", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("teamRoleID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("level", DA_INTEGER, DA_NOT_NULL);
-        $this->addColumn("activeFlag", DA_YN, DA_NOT_NULL);
+        $this->addColumn(self::TeamID, DA_ID, DA_NOT_NULL);
+        $this->addColumn(self::Name, DA_STRING, DA_NOT_NULL);
+        $this->addColumn(self::TeamRoleID, DA_ID, DA_NOT_NULL);
+        $this->addColumn(self::Level, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::ActiveFlag, DA_YN, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

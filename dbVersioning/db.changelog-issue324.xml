@@ -1,0 +1,42 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue324-1536574744-0">
+        <tagDatabase tag="issue324"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue324-1536574744-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custitem" columnName="officialOrderNumber"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custitem">
+            <column name="officialOrderNumber" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue324-1536574744-2">
+        <preConditions>
+            <indexExists tableName="ordhead" indexName="ixodh_6"/>
+        </preConditions>
+        <sql>
+            ALTER TABLE `ordhead`
+            DROP INDEX `ixodh_6`,
+            ADD FULLTEXT INDEX `ixodh_6` (`odh_ref_cust`);
+        </sql>
+        <rollback>
+            <sql>
+                ALTER TABLE `ordhead`
+                DROP INDEX `ixodh_6`,
+                ADD INDEX `ixodh_6` (`odh_ref_cust`);
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue324-1536574744-3">
+        <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="text"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="varchar(23)"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

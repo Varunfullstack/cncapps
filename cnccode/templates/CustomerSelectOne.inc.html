@@ -1,26 +1,26 @@
 <html>
 <head>
-<script type="text/javascript">
-function submitCustomer(customerID, customerName) {
-	if ((opener) && (!opener.closed)) {
-		if(opener.document.getElementById("{parentIDField}")){
-			opener.document.getElementById("{parentIDField}").value=customerID;
-		}
-		if(opener.document.getElementById("{parentDescField}")){
-			opener.document.getElementById("{parentDescField}").value=customerName;
-		}
-    if(opener.document.getElementById("searchForm")){
-      opener.document.searchForm.submit();
-    }
-		window.close();
-	}
-}
-</script>
+    <script type="text/javascript">
+        function submitCustomer(customerID, customerName) {
+            if ((opener) && (!opener.closed)) {
+                if (opener.document.getElementById("{parentIDField}")) {
+                    opener.document.getElementById("{parentIDField}").value = customerID;
+                }
+                if (opener.document.getElementById("{parentDescField}")) {
+                    opener.document.getElementById("{parentDescField}").value = customerName;
+                }
+                if (opener.document.getElementById("searchForm") && !window.doNotSubmit) {
+                    opener.document.searchForm.submit();
+                }
+                window.close();
+            }
+        }
+    </script>
 </head>
 <body>
 <!-- BEGIN customerBlock -->
 <script type="text/javascript">
-submitCustomer({customerID}, '{customerName}')
+    submitCustomer({customerID}, '{customerName}')
 </script>
 <!-- END customerBlock -->
 </body>

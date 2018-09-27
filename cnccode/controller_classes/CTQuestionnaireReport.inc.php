@@ -21,6 +21,13 @@ class CTQuestionnaireReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "reports",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buQuestionnaireReport = new BUQuestionnaireReport($this);
 
         $this->dsSearchForm = new DSForm ($this);
@@ -79,12 +86,19 @@ class CTQuestionnaireReport extends CTCNC
                         'From' => $senderEmail,
                         'To' => $toEmail,
                         'Subject' => 'Questionnaire Report ' . $this->buQuestionnaireReport->getPeriod() . ' - ' . $this->buQuestionnaireReport->getQuestionnaireDescription(),
-                        'Date' => date("r")
+                        'Date' => date("r"),
+                        'Content-Type' => 'text/html; charset=UTF-8'
                     );
 
                     $buMail->mime->setHTMLBody($report);
 
-                    $body = $buMail->mime->get();
+                    $mime_params = array(
+                        'text_encoding' => '7bit',
+                        'text_charset' => 'UTF-8',
+                        'html_charset' => 'UTF-8',
+                        'head_charset' => 'UTF-8'
+                    );
+                    $body = $buMail->mime->get($mime_params);
 
                     $hdrs = $buMail->mime->headers($hdrs);
 

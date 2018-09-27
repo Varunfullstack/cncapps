@@ -1,11 +1,12 @@
 <!-- Template: SalesOrderSearch.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language='JavaScript' src='CommonJS.js'></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<script language='JavaScript'
+        src='CommonJS.js'
+></script>
+<script src=".javascript/fromDateToDate.js"></script>
 <script language='JavaScript'>
-    $(function () {
-        window.fromDate = $('#fromDate').get(0);
-        window.toDate = $('#toDate').get(0);
-    });
     var savedCustomerString;
 
     function saveCustomerString() {
@@ -51,10 +52,20 @@
         }
     }
 </script>
-<form name="searchForm" method="post" action="{submitURL}" AUTOCOMPLETE="off">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="post"
+      action="{submitURL}"
+      AUTOCOMPLETE="off"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100px" class="promptText">
+            <td width="100px"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td><input
@@ -135,18 +146,18 @@
             <td class="promptText">
                 <div align="right">Start Date</div>
             </td>
-            <td><input
-                    type="text"
-                    name="form[fromDate]"
-                    id="fromDate"
-                    value="{fromDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-            >
-                <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"></a>
+            <td>
+                <input
+                        type="text"
+                        name="form[fromDate]"
+                        id="fromDate"
+                        value="{fromDate}"
+                        size="10"
+                        maxlength="10"
+                        onKeypress="javascript:submitOnReturn()"
+                        class="jqueryCalendar"
+                        autocomplete="off"
+                >
                 <font class="formErrorMessage">{fromDateMessage}</font></td>
         </tr>
         <tr>
@@ -161,30 +172,65 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
             >
-                <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"></a>
                 <font class="formErrorMessage">{toDateMessage}</font></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td>
                 <!--				<input type="submit" name="Search" value="Search"> -->
-                <input type="button" name="Search" value="Search" onClick="submit();">
-                <input type="button" name="CreateQuote" value="New Quote" onClick="createQuote();">
-                <input type="button" name="CreateOrder" value="New Order" onClick="createOrder();">
-                <input type="button" name="Clear" value="Clear" onClick="document.location='{clearURL}'"></td>
+                <input type="button"
+                       name="Search"
+                       value="Search"
+                       onClick="submit();"
+                >
+                <input type="button"
+                       name="CreateQuote"
+                       value="New Quote"
+                       onClick="createQuote();"
+                >
+                <input type="button"
+                       name="CreateOrder"
+                       value="New Order"
+                       onClick="createOrder();"
+                >
+                <input type="button"
+                       name="Clear"
+                       value="Clear"
+                       onClick="document.location='{clearURL}'"
+                ></td>
         </tr>
     </table>
 </form>
-<table width="628" border="0" cellpadding="1" cellspacing="1" class="singleBorder">
+<table width="628"
+       border="0"
+       cellpadding="1"
+       cellspacing="1"
+       class="singleBorder"
+>
     <tr>
-        <td width="127" class="listHeadText">Customer</td>
-        <td width="101" class="listHeadText">Order No</td>
-        <td width="99" class="listHeadText">Type</td>
-        <td width="97" class="listHeadText">Date</td>
-        <td width="101" class="listHeadText">Cust PO Ref</td>
+        <td width="127"
+            class="listHeadText"
+        >Customer
+        </td>
+        <td width="101"
+            class="listHeadText"
+        >Order No
+        </td>
+        <td width="99"
+            class="listHeadText"
+        >Type
+        </td>
+        <td width="97"
+            class="listHeadText"
+        >Date
+        </td>
+        <td width="101"
+            class="listHeadText"
+        >Cust PO Ref
+        </td>
     </tr>
     <!-- BEGIN orderBlock -->
     <!--	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">  -->
@@ -193,8 +239,13 @@
         onmouseover="setPointer(this, {rowNum}, 'over', '#FFFFFF', '#FFFFCC', '#FFCC99');"
         onmouseout="setPointer(this, {rowNum}, 'out', '#FFFFFF', '#FFFFCC', '#FFCC99');"
     >
-        <td nowrap class="listItemText">{listCustomerLink}</td>
-        <td class="listItemText"><A HREF="{listOrderURL}" target="_blank">{listOrdheadID}</A></td>
+        <td nowrap
+            class="listItemText"
+        >{listCustomerLink}
+        </td>
+        <td class="listItemText"><A HREF="{listOrderURL}"
+                                    target="_blank"
+        >{listOrdheadID}</A></td>
         <td class="listItemText">{listOrderType}</td>
         <td class="listItemText">{listOrderDate}</td>
         <td class="listItemText">{listCustPORef}</td>

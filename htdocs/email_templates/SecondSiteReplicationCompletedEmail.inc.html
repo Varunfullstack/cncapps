@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Second Site Replication Validation</title>
+    <style>
+        p.incomplete {
+            color: #EE4354;
+        }
+
+        p.pathMissing {
+            color: #850776;
+        }
+
+        p.noImage {
+            color: #9971EB;
+        }
+
+        p.success {
+            color: #4ECF60;
+        }
+
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+        }
+
+        h1 {
+            font-size: 14pt;
+            font-weight: bold;
+
+        }
+
+        h2 {
+            font-size: 11pt;
+            font-weight: bold;
+
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+<h1>Second Site Validation</h1>
+
+<h2>Second Site Validation Routine Finished</h2>
+
+<p>Servers: {serverCount}</p>
+<p>Suspended Servers: {suspendedServerCount} </p>
+<p>Server Errors: {serverErrorCount}</p>
+<p>Images: {imageCount}</p>
+<p>Image Errors: {imageErrorCount}</p>
+<p>Passes: {successCount}</p>
+<p>Pass Rate: {successRate}%</p>
+
+<!-- BEGIN logBlock -->
+<p class="{class}">{message}</p>
+<!-- END logBlock -->
+<h2>Suspended Servers</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Customer</th>
+        <th>Server</th>
+        <th>Suspended Until</th>
+        <th>By User</th>
+        <th>On</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <!-- BEGIN suspendedCheckServerBlock -->
+    <tr>
+        <td>{customerName}</td>
+        <td>{serverName}</td>
+        <td>{suspendedUntilDate}</td>
+        <td>{suspendUser}</td>
+        <td>{suspendedDate}</td>
+    </tr>
+    <!-- END suspendedCheckServerBlock -->
+    </tbody>
+</table>
+
+<h2>Excluded Local Servers</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Customer</th>
+        <th>Server</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <!-- BEGIN excludedLocalServerBlock -->
+    <tr>
+        <td>{customerName}</td>
+        <td>{serverName}</td>
+    </tr>
+    <!-- END excludedLocalServerBlock -->
+    </tbody>
+</table>
+</body>
+
+</body>
+</html>

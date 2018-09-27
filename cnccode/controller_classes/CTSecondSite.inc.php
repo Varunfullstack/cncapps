@@ -10,9 +10,31 @@ class CTSecondSite extends CTCNC
 
     var $buSecondsite = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
+
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "technical",
+                "reports"
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
+        }
         $this->buSecondsite = new buSecondsite($this);
         $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
@@ -63,12 +85,21 @@ class CTSecondSite extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'edit') {
-                $this->buSecondsite->getSecondsiteImageByID($_REQUEST['secondsiteImageID'], $dsSecondsiteImage);
+                $this->buSecondsite->getSecondsiteImageByID(
+                    $_REQUEST['secondsiteImageID'],
+                    $dsSecondsiteImage
+                );
                 $secondsiteImageID = $_REQUEST['secondsiteImageID'];
             } else {                                                                    // creating new
                 $dsSecondsiteImage->initialise();
-                $dsSecondsiteImage->setValue('secondsiteImageID', '0');
-                $dsSecondsiteImage->setValue('customerItemID', $_REQUEST['customerItemID']);
+                $dsSecondsiteImage->setValue(
+                    'secondsiteImageID',
+                    '0'
+                );
+                $dsSecondsiteImage->setValue(
+                    'customerItemID',
+                    $_REQUEST['customerItemID']
+                );
                 $secondsiteImageID = '0';
             }
         } else {                                                                        // form validation error
@@ -81,7 +112,7 @@ class CTSecondSite extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'update',
+                    'action'            => 'update',
                     'secondsiteImageID' => $secondsiteImageID
                 )
             );
@@ -90,7 +121,7 @@ class CTSecondSite extends CTCNC
                 'CustomerItem.php',
                 array(
                     'customerItemID' => $this->dsSecondsiteImage->getValue('customerItemID'),
-                    'action' => 'displayCI'
+                    'action'         => 'displayCI'
                 )
             );
         $this->setPageTitle('Edit Secondsite Image');
@@ -120,7 +151,11 @@ class CTSecondSite extends CTCNC
                 'urlDisplayCustomerItem' => $urlDisplayCustomerItem
             )
         );
-        $this->template->parse('CONTENTS', 'SecondsiteImageEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'SecondsiteImageEdit',
+            true
+        );
         $this->parsePage();
     }
 
@@ -149,7 +184,7 @@ class CTSecondSite extends CTCNC
                 'CustomerItem.php',
                 array(
                     'customerItemID' => $this->dsSecondsiteImage->getValue('customerItemID'),
-                    'action' => 'displayCI'
+                    'action'         => 'displayCI'
                 )
             );
         header('Location: ' . $urlNext);
@@ -159,7 +194,10 @@ class CTSecondSite extends CTCNC
     {
         $this->setMethodName('delete');
 
-        $this->buSecondsite->getSecondsiteImageByID($_REQUEST['secondsiteImageID'], $dsSecondsiteImage);
+        $this->buSecondsite->getSecondsiteImageByID(
+            $_REQUEST['secondsiteImageID'],
+            $dsSecondsiteImage
+        );
 
         $this->buSecondsite->deleteSecondsiteImage($_REQUEST['secondsiteImageID']);
 
@@ -167,7 +205,7 @@ class CTSecondSite extends CTCNC
             $this->buildLink(
                 'CustomerItem.php',
                 array(
-                    'action' => 'displayCI',
+                    'action'         => 'displayCI',
                     'customerItemID' => $dsSecondsiteImage->getValue('customerItemID')
                 )
             );
@@ -180,7 +218,15 @@ class CTSecondSite extends CTCNC
      */
     function listAll()
     {
+        $selectedYear = @$_REQUEST['searchYear'];
+
+        if (!$selectedYear) {
+            $selectedYear = date('Y');
+        }
+
         $this->setMethodName('list');
+
+        $performanceData = $this->buSecondsite->getPerformanceDataForYear($selectedYear);
 
         $outOfDate = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_OUT_OF_DATE);
 
@@ -198,34 +244,110 @@ class CTSecondSite extends CTCNC
 
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteList.inc'));
 
-        $this->template->setBlock('SecondsiteList', 'outOfDateBlock', 'outOfDate');
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
+
+        $target = $dsHeader->getValue(DBEHeader::backupTargetSuccessRate);
+
+        $this->template->set_var(
+            [
+                "backupTargetSuccessRate" => $target,
+                "monthSuccessRate1Class"  => $performanceData[1] >= $target ? 'success' : 'fail',
+                "monthSuccessRate1"       => $this->validateAndRound($performanceData[1]),
+                "monthSuccessRate2Class"  => $performanceData[2] >= $target ? 'success' : 'fail',
+                "monthSuccessRate2"       => $this->validateAndRound($performanceData[2]),
+                "monthSuccessRate3Class"  => $performanceData[3] >= $target ? 'success' : 'fail',
+                "monthSuccessRate3"       => $this->validateAndRound($performanceData[3]),
+                "monthSuccessRate4Class"  => $performanceData[4] >= $target ? 'success' : 'fail',
+                "monthSuccessRate4"       => $this->validateAndRound($performanceData[4]),
+                "monthSuccessRate5Class"  => $performanceData[5] >= $target ? 'success' : 'fail',
+                "monthSuccessRate5"       => $this->validateAndRound($performanceData[5]),
+                "monthSuccessRate6Class"  => $performanceData[6] >= $target ? 'success' : 'fail',
+                "monthSuccessRate6"       => $this->validateAndRound($performanceData[6]),
+                "monthSuccessRate7Class"  => $performanceData[7] >= $target ? 'success' : 'fail',
+                "monthSuccessRate7"       => $this->validateAndRound($performanceData[7]),
+                "monthSuccessRate8Class"  => $performanceData[8] >= $target ? 'success' : 'fail',
+                "monthSuccessRate8"       => $this->validateAndRound($performanceData[8]),
+                "monthSuccessRate9Class"  => $performanceData[9] >= $target ? 'success' : 'fail',
+                "monthSuccessRate9"       => $this->validateAndRound($performanceData[9]),
+                "monthSuccessRate10Class" => $performanceData[10] >= $target ? 'success' : 'fail',
+                "monthSuccessRate10"      => $this->validateAndRound($performanceData[10]),
+                "monthSuccessRate11Class" => $performanceData[11] >= $target ? 'success' : 'fail',
+                "monthSuccessRate11"      => $this->validateAndRound($performanceData[11]),
+                "monthSuccessRate12Class" => $performanceData[12] >= $target ? 'success' : 'fail',
+                "monthSuccessRate12"      => $this->validateAndRound($performanceData[12])
+            ]
+        );
+
+        $this->template->setBlock(
+            'SecondsiteList',
+            'availableYearsBlock',
+            'availableYears'
+        );
+
+        $years = $this->buSecondsite->getPerformanceDataAvailableYears();
+
+        foreach ($years as $year) {
+            $this->template->set_var(
+                [
+                    "year"         => $year,
+                    "selectedYear" => $year == $selectedYear ? 'selected' : ''
+                ]
+            );
+            $this->template->parse(
+                'availableYears',
+                'availableYearsBlock',
+                true
+            );
+        };
+
+
+        $this->template->setBlock(
+            'SecondsiteList',
+            'outOfDateBlock',
+            'outOfDate'
+        );
 
         foreach ($outOfDate as $record) {
 
-            $imageTime = strftime("%d/%m/%Y %H:%M:%S", strtotime($record['imageTime']));
+            $imageTime = strftime(
+                "%d/%m/%Y %H:%M:%S",
+                strtotime($record['imageTime'])
+            );
 
-            $imageAgeDays = number_format((time() - strtotime($record['imageTime'])) / 86400, 0);
+            $imageAgeDays = number_format(
+                (time() - strtotime($record['imageTime'])) / 86400,
+                0
+            );
 
             $this->template->set_var(
 
                 array(
                     'customerName' => $record['cus_name'],
-                    'serverName' => $record['serverName'],
-                    'serverPath' => $record['secondsiteLocationPath'],
-                    'imageName' => $record['imageName'],
-                    'imagePath' => $record['imagePath'],
-                    'imageTime' => $imageTime,
+                    'serverName'   => $record['serverName'],
+                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'imageName'    => $record['imageName'],
+                    'imagePath'    => $record['imagePath'],
+                    'imageTime'    => $imageTime,
                     'imageAgeDays' => $imageAgeDays,
-                    'urlServer' => $this->getEditUrl($record['server_cuino']),
-                    'urlRunCheck' => $this->getRunUrl($record['server_cuino'])
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
                 )
             );
 
-            $this->template->parse('outOfDate', 'outOfDateBlock', true);
+            $this->template->parse(
+                'outOfDate',
+                'outOfDateBlock',
+                true
+            );
 
         }
 
-        $this->template->setBlock('SecondsiteList', 'serverNotFoundBlock', 'serverNotFound');
+        $this->template->setBlock(
+            'SecondsiteList',
+            'serverNotFoundBlock',
+            'serverNotFound'
+        );
 
         foreach ($serverNotFound as $record) {
 
@@ -233,19 +355,27 @@ class CTSecondSite extends CTCNC
 
                 array(
                     'customerName' => $record['cus_name'],
-                    'serverName' => $record['serverName'],
-                    'serverPath' => $record['secondsiteLocationPath'],
-                    'imageName' => $record['imageName'],
-                    'urlServer' => $this->getEditUrl($record['server_cuino']),
-                    'urlRunCheck' => $this->getRunUrl($record['server_cuino'])
+                    'serverName'   => $record['serverName'],
+                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'imageName'    => $record['imageName'],
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
                 )
             );
 
-            $this->template->parse('serverNotFound', 'serverNotFoundBlock', true);
+            $this->template->parse(
+                'serverNotFound',
+                'serverNotFoundBlock',
+                true
+            );
 
         }
 
-        $this->template->setBlock('SecondsiteList', 'imageNotFoundBlock', 'imageNotFound');
+        $this->template->setBlock(
+            'SecondsiteList',
+            'imageNotFoundBlock',
+            'imageNotFound'
+        );
 
         foreach ($imageNotFound as $record) {
 
@@ -253,20 +383,28 @@ class CTSecondSite extends CTCNC
 
                 array(
                     'customerName' => $record['cus_name'],
-                    'serverName' => $record['serverName'],
-                    'serverPath' => $record['secondsiteLocationPath'],
-                    'imageName' => $record['imageName'],
-                    'urlServer' => $this->getEditUrl($record['server_cuino']),
-                    'urlRunCheck' => $this->getRunUrl($record['server_cuino'])
+                    'serverName'   => $record['serverName'],
+                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'imageName'    => $record['imageName'],
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
 
                 )
             );
 
-            $this->template->parse('imageNotFound', 'imageNotFoundBlock', true);
+            $this->template->parse(
+                'imageNotFound',
+                'imageNotFoundBlock',
+                true
+            );
 
         }
 
-        $this->template->setBlock('SecondsiteList', 'badConfigBlock', 'badConfig');
+        $this->template->setBlock(
+            'SecondsiteList',
+            'badConfigBlock',
+            'badConfig'
+        );
 
         foreach ($badConfig as $record) {
 
@@ -274,28 +412,42 @@ class CTSecondSite extends CTCNC
 
                 array(
                     'customerName' => $record['cus_name'],
-                    'serverName' => $record['serverName'],
-                    'serverPath' => $record['secondsiteLocationPath'],
-                    'imagePath' => $record['imagePath'],
-                    'imageName' => $record['imageName'],
-                    'urlServer' => $this->getEditUrl($record['server_cuino']),
-                    'urlRunCheck' => $this->getRunUrl($record['server_cuino'])
+                    'serverName'   => $record['serverName'],
+                    'serverPath'   => $record['secondsiteLocationPath'],
+                    'imagePath'    => $record['imagePath'],
+                    'imageName'    => $record['imageName'],
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'urlRunCheck'  => $this->getRunUrl($record['server_cuino'])
 
                 )
             );
 
-            $this->template->parse('badConfig', 'badConfigBlock', true);
+            $this->template->parse(
+                'badConfig',
+                'badConfigBlock',
+                true
+            );
 
         }
 
-        $this->template->setBlock('SecondsiteList', 'suspendedBlock', 'suspended');
+        $this->template->setBlock(
+            'SecondsiteList',
+            'suspendedBlock',
+            'suspended'
+        );
 
         foreach ($suspended as $record) {
 
             if ($record['imageTime'] != '0000-00-00 00:00:00') {
-                $imageTime = strftime("%d/%m/%Y %H:%M:%S", strtotime($record['imageTime']));
+                $imageTime = strftime(
+                    "%d/%m/%Y %H:%M:%S",
+                    strtotime($record['imageTime'])
+                );
 
-                $imageAgeDays = number_format((time() - strtotime($record['imageTime'])) / 86400, 0);
+                $imageAgeDays = number_format(
+                    (time() - strtotime($record['imageTime'])) / 86400,
+                    0
+                );
             } else {
                 $imageTime = 'No Image';
 
@@ -303,7 +455,10 @@ class CTSecondSite extends CTCNC
 
             }
             if ($record['secondsiteValidationSuspendUntilDate'] != '0000-00-00') {
-                $suspendedUntil = strftime("%d/%m/%Y", strtotime($record['secondsiteValidationSuspendUntilDate']));
+                $suspendedUntil = strftime(
+                    "%d/%m/%Y",
+                    strtotime($record['secondsiteValidationSuspendUntilDate'])
+                );
             } else {
                 $suspendedUntil = 'No longer suspended';
             }
@@ -312,50 +467,84 @@ class CTSecondSite extends CTCNC
             $this->template->set_var(
 
                 array(
-                    'customerName' => $record['cus_name'],
-                    'serverName' => $record['serverName'],
-                    'serverPath' => $record['secondsiteLocationPath'],
-                    'imagePath' => $record['imagePath'],
-                    'imageName' => $record['imageName'],
+                    'customerName'   => $record['cus_name'],
+                    'serverName'     => $record['serverName'],
+                    'serverPath'     => $record['secondsiteLocationPath'],
+                    'imagePath'      => $record['imagePath'],
+                    'imageName'      => $record['imageName'],
                     'suspendedUntil' => $suspendedUntil,
-                    'imageTime' => $imageTime,
-                    'imageAgeDays' => $imageAgeDays,
-                    'urlServer' => $this->getEditUrl($record['server_cuino']),
-                    'urlRunCheck' => $this->getRunUrl($record['server_cuino']),
-                    'txtRunCheck' => $txtRunCheck
+                    'imageTime'      => $imageTime,
+                    'imageAgeDays'   => $imageAgeDays,
+                    'urlServer'      => $this->getEditUrl($record['server_cuino']),
+                    'urlRunCheck'    => $this->getRunUrl($record['server_cuino']),
+                    'txtRunCheck'    => $txtRunCheck
                 )
             );
 
-            $this->template->parse('suspended', 'suspendedBlock', true);
+            $this->template->parse(
+                'suspended',
+                'suspendedBlock',
+                true
+            );
 
         }
 
-        $this->template->setBlock('SecondsiteList', 'passedBlock', 'passed');
+        $this->template->setBlock(
+            'SecondsiteList',
+            'passedBlock',
+            'passed'
+        );
 
         foreach ($passed as $record) {
 
-            $imageTime = strftime("%d/%m/%Y %H:%M:%S", strtotime($record['imageTime']));
+            $imageTime = strftime(
+                "%d/%m/%Y %H:%M:%S",
+                strtotime($record['imageTime'])
+            );
 
-            $imageAgeDays = number_format((time() - strtotime($record['imageTime'])) / 86400, 0);
+            $imageAgeDays = number_format(
+                (time() - strtotime($record['imageTime'])) / 86400,
+                0
+            );
 
             $this->template->set_var(
 
                 array(
-                    'urlServer' => $this->getEditUrl($record['server_cuino']),
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
                     'customerName' => $record['cus_name'],
-                    'serverName' => $record['serverName'],
-                    'imageName' => $record['imageName'],
-                    'imagePath' => $record['imagePath'],
-                    'imageTime' => $imageTime,
+                    'serverName'   => $record['serverName'],
+                    'imageName'    => $record['imageName'],
+                    'imagePath'    => $record['imagePath'],
+                    'imageTime'    => $imageTime,
                     'imageAgeDays' => $imageAgeDays
                 )
             );
 
-            $this->template->parse('passed', 'passedBlock', true);
+            $this->template->parse(
+                'passed',
+                'passedBlock',
+                true
+            );
         }
 
-        $this->template->parse('CONTENTS', 'SecondsiteList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'SecondsiteList',
+            true
+        );
         $this->parsePage();
+    }
+
+    private function validateAndRound($value)
+    {
+        if (!is_numeric($value)) {
+            return $value;
+        }
+
+        return round(
+            $value,
+            1
+        );
     }
 
     /**
@@ -381,7 +570,7 @@ class CTSecondSite extends CTCNC
             $this->buildLink(
                 'SecondSite.php',
                 array(
-                    'action' => 'run',
+                    'action'         => 'run',
                     'customerItemID' => $server_cuino
                 )
             );
@@ -395,7 +584,7 @@ class CTSecondSite extends CTCNC
             $this->buildLink(
                 'CustomerItem.php',
                 array(
-                    'action' => 'displayCI',
+                    'action'         => 'displayCI',
                     'customerItemID' => $server_cuino
                 )
             );
@@ -410,6 +599,15 @@ class CTSecondSite extends CTCNC
     {
         global $cfg;
 
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "reports"
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
+        }
         $this->setMethodName('failureAnalysis');
 
         $dsSearchForm = new DSForm ($this);
@@ -430,24 +628,42 @@ class CTSecondSite extends CTCNC
 
                     if ($_REQUEST['Search'] == 'Generate CSV') {
 
-                        $template = new Template ($cfg["path_templates"], "remove");
+                        $template = new Template (
+                            $cfg["path_templates"],
+                            "remove"
+                        );
 
-                        $template->set_file('page', 'SecondsiteFailureAnalysisReport.inc.csv');
+                        $template->set_file(
+                            'page',
+                            'SecondsiteFailureAnalysisReport.inc.csv'
+                        );
 
-                        $template->set_block('page', 'rowsBlock', 'rows');
+                        $template->set_block(
+                            'page',
+                            'rowsBlock',
+                            'rows'
+                        );
 
                         foreach ($results as $row) {
                             $template->set_var(
                                 array(
                                     'customerName' => $row['customerName'],
-                                    'serverName' => $row['serverName'],
-                                    'period' => $row['period'],
-                                    'errors' => $row['errors']
+                                    'serverName'   => $row['serverName'],
+                                    'period'       => $row['period'],
+                                    'errors'       => $row['errors']
                                 )
                             );
-                            $template->parse('rows', 'rowsBlock', true);
+                            $template->parse(
+                                'rows',
+                                'rowsBlock',
+                                true
+                            );
                         }
-                        $template->parse('output', 'page', true);
+                        $template->parse(
+                            'output',
+                            'page',
+                            true
+                        );
 
                         $output = $template->get_var('output');
 
@@ -457,7 +673,11 @@ class CTSecondSite extends CTCNC
                         exit;
                     } else { // Screen Report
 
-                        $this->template->set_block('SecondsiteFailureAnalysisReport', 'rowsBlock', 'rows');
+                        $this->template->set_block(
+                            'SecondsiteFailureAnalysisReport',
+                            'rowsBlock',
+                            'rows'
+                        );
 
                         if (isset($_REQUEST['orderBy'])) {
                             foreach ($results as $key => $row) {
@@ -474,7 +694,11 @@ class CTSecondSite extends CTCNC
 
                             }
 
-                            array_multisort($$_REQUEST['orderBy'], $_SESSION['secondsiteSortDirection'], $results);
+                            array_multisort(
+                                $$_REQUEST['orderBy'],
+                                $_SESSION['secondsiteSortDirection'],
+                                $results
+                            );
                         }
                         foreach ($results as $key => $row) {
 
@@ -482,23 +706,27 @@ class CTSecondSite extends CTCNC
                                 $this->buildLink(
                                     'SecondSite.php',
                                     array(
-                                        'action' => 'failureAnalysis',
-                                        'searchForm[1][customerID]' => $_REQUEST ['searchForm'][1]['customerID'],
+                                        'action'                        => 'failureAnalysis',
+                                        'searchForm[1][customerID]'     => $_REQUEST ['searchForm'][1]['customerID'],
                                         'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
-                                        'searchForm[1][endYearMonth]' => $_REQUEST ['searchForm'][1]['endYearMonth'],
+                                        'searchForm[1][endYearMonth]'   => $_REQUEST ['searchForm'][1]['endYearMonth'],
                                     )
                                 );
 
                             $this->template->set_var(
                                 array(
                                     'customerName' => $row['customerName'],
-                                    'serverName' => $row['serverName'],
-                                    'period' => $row['period'],
-                                    'errors' => $row['errors'],
-                                    'reportUrl' => $reportUrl
+                                    'serverName'   => $row['serverName'],
+                                    'period'       => $row['period'],
+                                    'errors'       => $row['errors'],
+                                    'reportUrl'    => $reportUrl
                                 )
                             );
-                            $this->template->parse('rows', 'rowsBlock', true);
+                            $this->template->parse(
+                                'rows',
+                                'rowsBlock',
+                                true
+                            );
                         }
 
                     }
@@ -508,7 +736,10 @@ class CTSecondSite extends CTCNC
             }
 
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
+        );
 
         $urlSubmit = $this->buildLink(
             $_SERVER ['PHP_SELF'],
@@ -519,25 +750,54 @@ class CTSecondSite extends CTCNC
 
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue('customerID'),
+                $dsCustomer
+            );
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'startYearMonth' => $dsSearchForm->getValue('startYearMonth'),
-                'endYearMonth' => $dsSearchForm->getValue('endYearMonth'),
+                'formError'        => $this->formError,
+                'customerID'       => $dsSearchForm->getValue('customerID'),
+                'customerString'   => $customerString,
+                'startYearMonth'   => $dsSearchForm->getValue('startYearMonth'),
+                'endYearMonth'     => $dsSearchForm->getValue('endYearMonth'),
                 'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit,
+                'urlSubmit'        => $urlSubmit,
             )
         );
 
-        $this->template->parse('CONTENTS', 'SecondsiteFailureAnalysisReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'SecondsiteFailureAnalysisReport',
+            true
+        );
         $this->parsePage();
 
+    }
+
+    protected function getImageTime($time)
+    {
+        if (!$time) {
+            return 'N/A';
+        }
+        return strftime(
+            "%d/%m/%Y %H:%M:%S",
+            strtotime($time)
+        );
+    }
+
+    protected function getImageAge($time)
+    {
+        if (!$time) {
+            return 'N/A';
+        }
+        return number_format(
+            (time() - strtotime($time)) / 86400,
+            0
+        );
     }
 }// end of class
 ?>

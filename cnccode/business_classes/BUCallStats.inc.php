@@ -7,6 +7,7 @@
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_gc"] . "/DSForm.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 
 class BUCallStats extends Business
 {

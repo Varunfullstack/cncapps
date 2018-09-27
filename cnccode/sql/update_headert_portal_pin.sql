@@ -1,1 +1,0 @@
-ALTER TABLE `cncp1`.`headert` ADD COLUMN `hed_portal_pin` CHAR(5) NOT NULL AFTER `hed_gensup_itemno`; 

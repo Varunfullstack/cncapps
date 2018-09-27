@@ -3,42 +3,347 @@ This project changes will be shown here.
 
 ## [unreleased]
 - Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
-- Issue 151 - T&M Authorisation Process Error
 
-## [1.0.2] - 2017-12-21
-- Issue 125 - CNC017 - New SR from SO to Imt queue
-- Issue 56  - CNC004
+## [v1.11.1] - 2018-09-17
+### Fixed
+- Fix issue with Visit Confirmation emails.
+
+## [v1.11.0] - 2018-09-11
+### Fixed
+- Issue 315 - Monitored SR formatting issues.
+- Issue 328 - Spell checking within fields
+- Issue 337 - FOC activities email URL text error
+- Issue 340 - Hidden from customer flag showed as cleared under certain conditions.
+### Added
+- Issue 317 - Customer 3rd party contact information
+- Issue 318 - Create Change Request Dashboard
+- Issue 334 - Add total to Service Requests Open For More Than 7 Days on screen
+- Issue 319 - Implement Sales Request Approval Process
+- Issue 339 - Team Lead Dashboard view filtering by teams
+- Issue 325 - Calculate and display contract expiry date
+- Issue 324 - Official Order Number for Contracts
+### Changed
+- Issue 304 - Enhance First Time Fix Reporting
+- Issue 320 - Further Increase length of mail queue recipient database field
+- Issue 322 - Change Renewal Report Heading Expires to Invoiced Until
+- Issue 327 - SQL crash searching for customer with apostrophe in the name
+- Issue 326 - Enhance Items Not Received Process
+- Issue 331 - Renewal item creation warning
+- Issue 273 - Allow for contracts & T&Cs to be manually sent to a customer.
+- Issue 335 - Improve visit confirmation email addressing
+- Issue 338 - Change date picker on additional pages
+- Issue 268 - Customer Review Meeting formatting improvements
+
+## [v1.10.2] - 2018-08-20
+### Fixed
+- Issue 333 - Prepay Top Up value lost when saving customer
+
+## [v1.10.1] - 2018-08-03
+### Fixed
+- Fixed issue with First Time Fixes totals
+
+## [v1.10.0] - 2018-08-03
+### Added
+- Issue 259 - Contact changes audit log
+- Issue 309 - 2S Replication Check Exclusion feature
+### Fixed
+- Issue 308 - Bugs from release 1.9
+### Changed
+- Issue 314 - Increase length of mail queue recipient database field
+- Issue 313 - Monthly Customer Profitability Report email group update
+- Issue 307 - Dashboard figures to load asynchronously, daily fixed & first time fixes
+
+## [v1.9.2] - 2018-07-27
+### Fixed
+- Fixed problem with XX engineers in XX hours query
+- jQuery DatePicker to show Monday as first day of the week
+- Fixed issue with conflicting jQuery versions
+### Added
+- Added Monthly First Time Fix figures
+- Added Weekly Fixed and Reopened figures
+- Create script to send emails from Labtech database
+
+## [v1.9.1] - 2018-07-26
+### Fixed
+- 2nd Site Backup out of date calculations
+- Fix and improve holiday time logging calculations
+- Fix problem with item description quote page
+
+## [v1.9.0] - 2018-07-25
+### Changed
+- Issue 285 - Change length limit to customer item 'Item Text' field
+- Issue 267 - Auto Service Completion for Starters & Leavers
+- Issue 277 - Move reports to Technical menu for SD Managers
+- Issue 272 - Contract Analysis Report error handling
+- Issue 270 - Technical Change Request to default to Awaiting CNC
+- Issue 278 - Consider a negative 2nd Site date check to be a failure
+- Issue 281 - Add headings for the contract page popup.
+- Issue 293 - Team Performance Calculations Update To Include Previous Month
+- Issue 291 - Technical Change Request formatting change
+- Issue 274 - Set system updated SRs to status Awaiting CNC
+- Issue 294 - User performance graph tweaks
+- Issue 284 - Investigate length of fields allowed in quotes
+- Issue 296 - Change Open SR Report so non main contacts only see their SRs
+- Issue 249 - 2nd Site Replication check process
+- Issue 302 - 7 Day report to include awaiting status 
+- Issue 298 - Single Fixed Explanation within a Service Request
+- Issue 232 - Improve Uploading Files to Service Request Activities
+### Fixed
+- Issue 275 - Permissions error for PortalDocument
+- Issue 271 - CustomerAnalysis Report error handling
+- Issue 279 - Contracts not populating on Search page
+- Issue 300 - Error adding passwords from Sales Password page
+- Issue 276 - Occasional formatting issues for Monitored SR emails 
+### Added
+- Issue 280 - Restore ability to create customer documentation folder
+- Issue 121 - CNC014 - Add ability to log a new SR directly into a team
+- Issue 297 - First Time Fix figures
+- Issue 269 - Live fixed SR target & total.
+- Issue 266 - Helpdesk Manager Dashboard View
+### Removed
+- Issue 282 - Remove DNS records from domain name
+- Issue 283 - Remove Documentation link from Quotation Page
+
+## [v1.8.5]
+### Fixed
+- Issue 299 - Show link to create customer folder if it doesn't exist
+
+## [v1.8.4] - 2018-07-04
+### Fixed
+- Issue 292 - Skip Sales Order on Activity.php shows debug information
+
+## [v1.8.3] - 2018-06-29
+### Fixed
+- Issue 290 - T&M processing error for multiple activity
+
+## [v1.8.2] - 2018-06-28
+### Fixed
+- Issue 289 - Fix issues 
+ 
+## [v1.8.1] - 2018-06-26
+### Fixed
+- Issue 287 - Fix problem with sales orders
+
+## [v1.8.0] - 2018-06-26 
+### Added
+- Issue 195 - Graph to show user productivity
+- Issue 264 - Add option for Monthly in customer review meeting frequency
+### Changed
+- Issue 236 - Enhance Sales By Customer report 
+- Issue 239 - New navigation buttons in the activity pages
+- Issue 243 - Amend Contract Document details
+### Removed
+- Issue 260 - Remove Spend/Category from the Reports Menu
+## Fixed
+- Issue 262 - Problems With Customer CRM losing information
+- Issue 261 - Find out why activities end up with caa_status of O and resolve
+
+## [v1.7.5] - 2018-06-06
+### Fixed
+- Issue 265 - Daily Report sending some customer data to wrong people
+
+## [v1.7.3] - 2018-05-30
+### Fixed
+- Issue 258 - CustomerCRM searching and saving issues - hotfix required
+
+## [v1.7.2] - 2018-05-30
+### Fixed
+- Issue 257 - When running the Customer Review Meeting process it no longer creates the Renewal Report PDF. This can go 
+straight into live cncapps once fixed
+
+## [v1.7.1] - 2018-05-29
+### Fixed
+- Issue 257 - Bugs from release 1.7.0
+
+## [v1.7.0] - 2018-05-25
+### Added
+- Issue 246 - Add descriptions to Report pages
+- Issue 237 - ServiceRequestReport export tweak
+- Issue 244 - Show ItemsNotYetReceivedEmail as a menu link
+- Issue 245 - Outstanding SRs email to display on screen as well
+### Changed
+- Issue 233 - Amend Create Renewal Sales Order email destination
+- Issue 238 - SR Response and number amendment
+- Issue 240 - Standardise date displays in forms
+- Issue 252 - Ability to remove 'entire SR hidden from customer'
+### Fixed
+- Issue 229 - Purchase Authorisation Supplier pop out
+- Issue 253 - Error uploading a file to customer page, over 8MB warning
+### Removed
+- Issue 235 - Remove Awaiting Completion from menu, in the Technical heading
+- Issue 241 - Remove Customer Review Meeting from the Accounts menu
+
+## [v1.6.3] - 2018-05-23
+### Fixed
+- Issue 250 - Standardtext.php missing
+
+## [v1.6.2] - 2018-05-21
+### Fixed
+- Issue 234 - Permissions bug for sales order address page
+
+## [v1.6.1] - 2018-05-18
+### Fixed
+- Issue 231 - Bugs from release 1.6.0
+
+## [v1.6.0] - 2018-05-16
+### Added 
+- Issue 189 - Add version number to menu
+- Issue 183 - Add the ability to add time to a service request when in the managers queue
+- Issue 186 - Time limit request bug with IMT team
+- Issue 184 - Request 038 - Daily Open SR Report for customers
+- Issue 193 - Monitor SR feature to receive updates automatically
+- Issue 201 - Create items not yet received process
+- Issue 202 - UK National Holiday notification for Non UK customers
+- Issue 221 - Fixed pending closure on Service Request page
+- Issue 219 - Implement CNCAPPS security
+- Issue 217 - 2nd Site Validation test run
+- Issue 222 - Amend initial email content based on 24x7 support process
+
+### Changed
+- Issue 176 - Change background colours on service request page
+- Issue 194 - Old tables in the database that aren't used?
+- Issue 2-197 - Add Awaiting Completed to technical Menu
+- Issue 200 - Amend Unprinted Purchase Orders email
+- Issue 203 - Assigning a service request to qsysytem user does not record who assigned it
+- Issue 112 - CNC005
+- Issue 208 - Remove blank space from display of phone numbers
+- Issue 212 - Remove old items from menu
+- Issue 216 - Change list of activity types that are visible in SRs
+- Issue 224 - Change order of engineer list in drop down on Current Service Requests
+- Issue 225 - Record absence, force absent time to overwrite
+- Issue 169 - CNC034 - Review Meeting Automation
+
+### Fixed
+- Issue 161 - Customer Review Meeting Total SRs potential adding up issue
+- Issue 179 - Uploading a document in an activity has the same affect as clicking the 'update' button
+- Issue 187 - Special Attention customers are not showing as a red background
+- Issue 181 - Prevent a search all!
+- Issue 186 - Time limit request bug with IMT team
+- Issue 191 - Amend the value of the hours spent on critical SR activity email
+- Issue 192 - Passwords page crashes when incomplete customer name is used
+- Issue 206 - Goods In supplier tab out does not work
+- Issue 207 - Export Prepay Service Request calendar incorrectly linked
+- Issue 209 - Current Documentation Folder & Open Folder does not open when using Chrome
+- Issue 218 - 2nd Site Backup Calculations
+
+### Removed
+- Issue 223 - Remove Comment link from Activity Page
+
+## [v1.5.2] - 2018-04-11
+### Changed
+- Issue 210 - Request time pop up box text change
+
+## [v1.5.1] - 2018-03-27
+### Added
+- Issue 188 - New P5 SR for SSL hardcoded change
+
+##[v1.5.0]- 2018-03-20
+### Added
+- Issue 185 - Make change so that all pdf's generated are only PRINTABLE
+
+## [v1.4.0] - 2018-03-08
+### Fixed
+- Issue 175 - CNC037 - tidy up imported emails
+- Issue 155 - CNC034 - Profitability Report for PrePay counts as negative
+
+## [v1.3.0] - 2018-03-07
+### Added
+- Issue 174 - CNC036 - Record backup success as percentage
+
+### Changed
+- Issue 171 - CNC035 - Display Calendar link on all activities
+
+### Fixed
+- Issue 172 - CNC036 - Sales Order link not shown when editing an activity
+- Issue 173 - Remove Type field 'required' status from the Activity edit page
+- Issue 178 - When updating a activity the activity type limit checks don't work anymore
+- Issue 150 - The URI gets too large when working with the timer on and typing notes
+- Issue 167 - Fix problem with days not showing in allocation time window
+
+## [v1.2.1]
+### Fixed
+- Fix issue with time allocated emails not getting sent
+
+## [v1.2.0]
+### Added
+- Issue 167 - CNC033 - Hard limits
+
+## [v1.1.0]
+### Added
+- Issue 144 - CNC031 - Contract and numbers report
+- Issue 122 - CNC015 - Check activity length and flag if remote support and under 5 minutes
+- Issue 131 - CNC023 - When editing customer contacts make the main contact appear in red text
+- Issue 130 - CNC022 - Include Internal Notes that are saved with SSL auto renewals in the service request that’s created.
+
+## Changed
+- Issue 160 - Increase size of field for customer name
+- Issue 154 - Change the text in a calendar subject item
+- Issue 152 - CNC033 - Add decimal places to team performance fix hours
+
+### Fixed
+- Issue 142 - Pre-pay activity over £100 - where is the email address set?
+- Issue 124 - CNC016 - SR that doesn't have a site set it will crash with an SQL error
+- Issue 159 - Email Subject Change for: SR 434149 has been updated by another user
+- Issue 158 - Certain characters are displaying incorrectly in emails
+
+## [v1.0.5] - 2017-01-30
+### Fixed
+- Issue 165 - T&M Authorisation Bug
+
+## [v1.0.4] - 2017-01-29
+### Fixed
+- Issue 162 - Typo in subject line of email - Critial SR Activity For
+
+## [v1.0.3] - 2017-01-17
+### Added
+- Issue 120 - CNC013 - Allow searching for activities based on time spent
+
+### Fixed
+- Issue 164 - Create a system where a log of the scheduled tasks runs are located
+
+## [v1.0.2] - 2017-12-21
+### Added
 - Issue 149 - Create a Daily Report for P5 with sales orders to be sent to nosales@
-- Issue 129 - CNC021
 
-## [1.0.1] - 2017-12-14
+### Changed
+- Issue 125 - CNC017 - New SR from SO to Imt queue
+- Issue 129 - CNC021 - Add who fixed the SR to escalated email
+
+### Fixed
+- Issue 56  - CNC004 
+
+## [v1.0.1] - 2017-12-14
+### Added
 - Copy Username in password List.
 
-## [1.0.0] - 2017-07-15
+## [v1.0.0] - 2017-07-15
+### Added
+- Issue 115 - CNC008 - Open SR Activities report for managers
+- Issue 126 - CNC018 - upload a file when in an activity or on the fixed screen
+- Issue 116 - CNC009 - Copy to clipboard button for the passwords
+- Issue 114 - CNC007 - On home page no link to projects
+- Issue 54 - CNC002 - Email link within activity add subject
+ 
+### Changed
+- Issue 143 - CNC030 - Customer Analysis Report row layout
+- Issue 117 - CNC010 - Customer or contact notes should be visible when logging the SR
+- Issue 133 - CNC025 - Within customer contacts, only allow 1 statements contact
+
 ### Fixed
-- Issue 143 - CNC030
-- Issue 115 - CNC008
-- Issue 117 - CNC010
-- Issue 126 - CNC018
-- Issue 133 - CNC025
-- Issue 136 - CNC028
-- Issue 116 - CNC009
-- Issue 139
-- Issue 138
-- Issue 115 - CNC008
-- Issue 114 - CNC007
-- Issue 110
-- Issue 108 
-- Issue 109 
-- Issue 60
-- Issue 59 
-- Issue 58
-- Issue 57
-- Issue 55 - CNC003
-- Issue 54 - CNC002
-- Issue 53 - CNC001
-- Issue 52
-- Issue 51
-- Issue 50
-- Issue 49
-- Issue 48
+- Issue 136 - CNC028 - Change Request emails arriving incorrectly
+- Issue 139 - Issue with despatching
+- Issue 138 - Selecting Site on Add Customer Item 
+- Issue 110 - The renewal report no longer group together the heading like Internet Service, PC Application Software
+- Issue 108 - Purchase Invoice Authorisation VAT calculation
+- Issue 109 - Suppliers Contact lookup 
+- Issue 60 - The Date Icon do not work on the Sales Order Page in IE
+- Issue 59 - Contracts menu shows errors
+- Issue 58 - Invoices menu show errors, some file missing
+- Issue 57 - Warnings and errors show after login in
+- Issue 55 - CNC003 - Time breaching emails from HD not sending/working
+- Issue 53 - CNC001 - Remove activity number from search screen
+- Issue 52 - PurchaseOrder page the select date button doesn't work
+- Issue 51 - Customer Page the notes don't show right away
+- Issue 50 - SalesOrder ticking the box to toggle all related checkboxes won't toggle them
+- Issue 49 - SalesOrder Page shows errors
+- Issue 48 - F5 Toggle Doesn't Work anymore

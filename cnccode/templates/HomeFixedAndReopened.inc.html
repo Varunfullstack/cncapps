@@ -1,0 +1,79 @@
+<style>
+    .dailyFixedAndReopenedStatsTable td {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+</style>
+<script>
+    $(function () {
+        $.ajax({
+            url: '{fetchDataURL}',
+            method: 'GET',
+            type: 'GET',
+            dataType: 'json'
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                console.log(result);
+                var html =
+                    "<tr>" +
+                    "<td>Daily Fixed</td>" +
+                    "<td>" + result.dailyHdFixed + "</td>" +
+                    "<td>" + result.dailyEscFixed + "</td>" +
+                    "<td>" + result.dailyImtFixed + "</td>" +
+                    "<td>" + result.dailyTotalFixed + "</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                    "<td>Daily Reopened</td>" +
+                    "<td>" + result.dailyHdReopened + "</td>" +
+                    "<td>" + result.dailyEscReopened + "</td>" +
+                    "<td>" + result.dailyImtReopened + "</td>" +
+                    "<td>" + result.dailyTotalReopened + "</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                    "<td>Weekly Fixed</td>" +
+                    "<td>" + result.weeklyHdFixed + "</td>" +
+                    "<td>" + result.weeklyEscFixed + "</td>" +
+                    "<td>" + result.weeklyImtFixed + "</td>" +
+                    "<td>" + result.weeklyTotalFixed + "</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                    "<td>Weekly Reopened</td>" +
+                    "<td>" + result.weeklyHdReopened + "</td>" +
+                    "<td>" + result.weeklyEscReopened + "</td>" +
+                    "<td>" + result.weeklyImtReopened + "</td>" +
+                    "<td>" + result.weeklyTotalReopened + "</td>" +
+                    "</tr>";
+                console.log(html);
+                $('.dailyFixedAndReopenedStatsTable tbody').html(html);
+                $('.dailyFixedAndReopenedStatsTable').removeClass('invisible');
+                $('#dailyFixedAndReopenedStatsLoader').remove();
+            }
+        })
+    })
+
+</script>
+<h3>Daily Fixed & Reopened Stats</h3>
+<div class="parentLoading">
+    <table class="dailyFixedAndReopenedStatsTable invisible">
+        <thead>
+        <tr>
+            <td>Team</td>
+            <td>HD</td>
+            <td>ESC</td>
+            <td>IMT</td>
+            <td>Total</td>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <div class="loading"
+         id="dailyFixedAndReopenedStatsLoader"
+    >
+    </div>
+</div>

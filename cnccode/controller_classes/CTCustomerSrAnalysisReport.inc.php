@@ -8,7 +8,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerSrAnalysisReport extends CTCNC
@@ -17,9 +17,29 @@ class CTCustomerSrAnalysisReport extends CTCNC
     var $dsSearchForm = '';
     var $dsResults = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "reports",
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
+        }
         $this->buCustomerSrAnalysisReport = new BUCustomerSrAnalysisReport ($this);
     }
 
@@ -52,77 +72,82 @@ class CTCustomerSrAnalysisReport extends CTCNC
                 if ($dsSearchForm->getValue('fromDate') == '') {
 
                     $dsSearchForm->setUpdateModeUpdate();
-                    $dsSearchForm->setValue('fromDate', date('Y-m-d', strtotime("-1 year")));
+                    $dsSearchForm->setValue(
+                        'fromDate',
+                        date(
+                            'Y-m-d',
+                            strtotime("-1 year")
+                        )
+                    );
                     $dsSearchForm->post();
                 }
 
                 if (!$dsSearchForm->getValue('toDate')) {
                     $dsSearchForm->setUpdateModeUpdate();
-                    $dsSearchForm->setValue('toDate', date('Y-m-d'));
+                    $dsSearchForm->setValue(
+                        'toDate',
+                        date('Y-m-d')
+                    );
                     $dsSearchForm->post();
                 }
 
                 if ($results = $this->buCustomerSrAnalysisReport->search($dsSearchForm)) {
 
-                    $firstRow = true;
 
                     Header('Content-type: text/plain');
                     Header('Content-Disposition: attachment; filename=SRAnalysis.csv');
 
                     echo
                         'Period,' .
-                        'No. Of Priority 1-3 SRs,' .
-                        'Average Response for 1-3 SRs,' .
-                        'Average Fix for 1-3 SRs,' .
+                        'No. Of Priority 1 SRs,' .
+                        'Average Response for 1 SRs,' .
+                        'Average Fix for 1 SRs,' .
+                        'No. Of Priority 2 SRs,' .
+                        'Average Response for 2 SRs,' .
+                        'Average Fix for 2 SRs,' .
+                        'No. Of Priority 3 SRs,' .
+                        'Average Response for 3 SRs,' .
+                        'Average Fix for 3 SRs,' .
                         'No. Of Priority 4 SRs,' .
+                        'Average Response for 4 SRs,' .
+                        'Average Fix for 4 SRs,' .
                         'Contract' . "\n";
-                    foreach ($results as $key => $row) {
-                        echo
-                            $row['period'] . ',' .
-                            $row['serverCareCount1And3'] . ',' .
-                            number_format($row['serverCareHoursResponded'], 1) . ',' .
-                            number_format($row['serverCareHoursFix'], 1) . ',' .
-                            number_format($row['serverCareCount4'], 1) . ',' .
-                            'ServerCare' . "\n";
 
-                        echo
-                            $row['period'] . ',' .
-                            number_format($row['serviceDeskCount1And3'], 1) . ',' .
-                            number_format($row['serviceDeskHoursResponded'], 1) . ',' .
-                            number_format($row['serviceDeskHoursFix'], 1) . ',' .
-                            number_format($row['serviceDeskCount4'], 1) . ',' .
-                            'ServiceDesk' . "\n";
 
-                        echo
-                            $row['period'] . ',' .
-                            number_format($row['prepayCount1And3'], 1) . ',' .
-                            number_format($row['prepayHoursResponded'], 1) . ',' .
-                            number_format($row['prepayHoursFix'], 1) . ',' .
-                            number_format($row['prepayCount4'], 1) . ',' .
-                            'Prepay' . "\n";
+                    foreach ($results as $row) {
+                        foreach ($row['types'] as $type => $value) {
+                            echo $row['period'] . ',';
+                            foreach ($value as $priority => $data) {
 
-                        echo
-                            $row['period'] . ',' .
-                            number_format($row['otherCount1And3'], 1) . ',' .
-                            number_format($row['otherHoursResponded'], 1) . ',' .
-                            number_format($row['otherHoursFix'], 1) . ',' .
-                            number_format($row['otherCount4'], 1) . ',' .
-                            'Other' . "\n";
+                                echo $data['count'] . ',' .
+                                    number_format(
+                                        $data['hoursResponded'],
+                                        1
+                                    ) . ',' .
+                                    number_format(
+                                        $data['hoursFix'],
+                                        1
+                                    ) . ',';
+                            }
+                            echo $type . "\n";
+                        }
                     }
                 }
-                exit;
             }
-
+            exit;
         }
 
 
         $this->setPageTitle('Customer SR Analysis Report');
 
-        $this->setTemplateFiles('ServiceRequestReport', 'ServiceRequestReport.inc');
+        $this->setTemplateFiles(
+            'ServiceRequestReport',
+            'ServiceRequestReport.inc'
+        );
         $urlCustomerPopup = $this->buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
@@ -130,17 +155,22 @@ class CTCustomerSrAnalysisReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $dsSearchForm->getMessage('toDate'),
-                'urlCustomerPopup' => $urlCustomerPopup)
+                'formError'        => $this->formError,
+                'customerID'       => $dsSearchForm->getValue('customerID'),
+                'customerString'   => $customerString,
+                'fromDate'         => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
+                'fromDateMessage'  => $dsSearchForm->getMessage('fromDate'),
+                'toDate'           => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
+                'toDateMessage'    => $dsSearchForm->getMessage('toDate'),
+                'urlCustomerPopup' => $urlCustomerPopup
+            )
         );
 
-        $this->template->parse('CONTENTS', 'ServiceRequestReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestReport',
+            true
+        );
         $this->parsePage();
 
     } // end function displaySearchForm

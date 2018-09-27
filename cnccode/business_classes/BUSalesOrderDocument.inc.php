@@ -1,5 +1,6 @@
 <?php require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBESalesOrderDocument.inc.php");
+require_once($cfg["path_dbe"] . "/DBESalesOrderDocumentWithoutFile.php");
 
 class BUSalesOrderDocument extends Business
 {
@@ -26,7 +27,8 @@ class BUSalesOrderDocument extends Business
         /* file to add? */
         if ($userfile['name'] != '') {
             $this->dbeSalesOrderDocument->getRow($this->dbeSalesOrderDocumentWithoutFile->getPKValue());
-            $this->dbeSalesOrderDocument->setValue('file', fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size']));
+            $this->dbeSalesOrderDocument->setValue('file',
+                                                   fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size']));
             $this->dbeSalesOrderDocument->setValue('filename', ( string )$userfile ['name']);
             $this->dbeSalesOrderDocument->setValue('fileMimeType', ( string )$userfile ['type']);
             $this->dbeSalesOrderDocument->setValue('createdDate', date(CONFIG_MYSQL_DATETIME));

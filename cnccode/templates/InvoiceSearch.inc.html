@@ -1,15 +1,18 @@
 <!-- Template: InvoiceSearch.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
     $(function () {
         window.startDate = $('#startDate').get(0);
         window.endDate = $('#endDate').get(0);
     });
     var savedCustomerString
+
     function saveCustomerString() {
         savedCustomerString = document.searchForm.customerString.value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -24,31 +27,45 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function createInvoice() {
         if (document.searchForm.customerID.value != "") {
             document.location = '{urlCreateInvoice}&customerID=' + escape(document.searchForm.customerID.value)
         }
     }
+
     function createCreditNote() {
         if (document.searchForm.customerID.value != "") {
             document.location = '{urlCreateCreditNote}&customerID=' + escape(document.searchForm.customerID.value)
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
         }
     }
 </script>
-<form name="searchForm" method="post" action="{urlSubmit}" AUTOCOMPLETE="off">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="post"
+      action="{urlSubmit}"
+      AUTOCOMPLETE="off"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100px" class="promptText">
+            <td width="100px"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td><input
@@ -85,7 +102,10 @@
                 <select name="invoice[1][invoiceType]">
                     <option value="">All</option>
                     <!-- BEGIN invoiceTypeBlock -->
-                    <option {invoiceTypeSelected} value="{invoiceType}">{invoiceTypeDescription}</option>
+                    <option {invoiceTypeSelected}
+                            value="{invoiceType}"
+                    >{invoiceTypeDescription}
+                    </option>
                     <!-- END invoiceTypeBlock -->
                 </select>
             </td>
@@ -105,7 +125,12 @@
             <td class="promptText">
                 <div align="right">Printed</div>
             </td>
-            <td><INPUT name="invoice[1][printedFlag]" {DISABLED} type="checkbox" value="Y" {printedFlagChecked}>
+            <td><INPUT name="invoice[1][printedFlag]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="Y"
+                       {printedFlagChecked}
+            >
         </tr>
         <tr>
             <td class="promptText">
@@ -119,9 +144,9 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-                <font class="formErrorMessage">{startDateMessage}</font></td>
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            ><font class="formErrorMessage">{startDateMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -135,31 +160,63 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img src="images/calendar.gif"
-                                                                                               width="24" height="22"
-                                                                                               hspace="0" vspace="0"
-                                                                                               border="0"
-                                                                                               align="absmiddle"></a>
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
                 <font class="formErrorMessage">{endDateMessage}</font></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td><input type="button" name="Search" value="Search" onClick="submit();">
-                <input type="button" name="CreateInvoice" value="New Invoice" onClick="createInvoice();">
-                <input type="button" name="CreateCreditNote" value="New Credit Note" onClick="createCreditNote();">
+            <td><input type="button"
+                       name="Search"
+                       value="Search"
+                       onClick="submit();"
+            >
+                <input type="button"
+                       name="CreateInvoice"
+                       value="New Invoice"
+                       onClick="createInvoice();"
+                >
+                <input type="button"
+                       name="CreateCreditNote"
+                       value="New Credit Note"
+                       onClick="createCreditNote();"
+                >
         </tr>
     </table>
 </form>
-<table class="singleBorder" width="700px" border="0" cellspacing="1" cellpadding="1">
+<table class="singleBorder"
+       width="700px"
+       border="0"
+       cellspacing="1"
+       cellpadding="1"
+>
     <tr>
-        <td width="245px" class="listHeadText">Customer</td>
-        <td width="50px" class="listHeadText">Invoice No</td>
-        <td width="50px" class="listHeadText">SO No</td>
-        <td width="50px" class="listHeadText">Type</td>
-        <td width="250px" class="listHeadText">Cust PO Ref</td>
+        <td width="245px"
+            class="listHeadText"
+        >Customer
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >Invoice No
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >SO No
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >Type
+        </td>
+        <td width="250px"
+            class="listHeadText"
+        >Cust PO Ref
+        </td>
     </tr>
     <!-- BEGIN invoiceBlock -->
-    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+    <tr onMouseOver="this.bgColor='#FFFFCC';"
+        onMouseOut="this.bgColor='';"
+    >
         <td class="listItemText">{listCustomerName}</td>
         <td class="listItemText"><A HREF="{listInvoiceURL}">{listInvheadID}</A></td>
         <td class="listItemText">{listOrdheadID}</td>

@@ -16,9 +16,30 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
     private $buActivity;
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
+
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "reports",
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
+        }
         $this->buActivity = new BUActivity($this);
     }
 
@@ -65,7 +86,11 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
                 if ($results) {
 
-                    $this->renderReport('ServiceRequestsByCustomerReport', $results, $dsSearchForm);
+                    $this->renderReport(
+                        'ServiceRequestsByCustomerReport',
+                        $results,
+                        $dsSearchForm
+                    );
 
                 }//end if $results
 
@@ -73,35 +98,55 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         }
 
         $urlSubmit = $this->buildLink(
-            $_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH)
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
         );
 
         $this->setPageTitle('Service Requests By Customer Report');
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'days' => $dsSearchForm->getValue('days'),
-                'daysMessage' => $dsSearchForm->getMessage('days'),
-                'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
+                'formError'       => $this->formError,
+                'days'            => $dsSearchForm->getValue('days'),
+                'daysMessage'     => $dsSearchForm->getMessage('days'),
+                'fromDate'        => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
                 'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $dsSearchForm->getMessage('toDate'),
-                'urlSubmit' => $urlSubmit
+                'toDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
+                'toDateMessage'   => $dsSearchForm->getMessage('toDate'),
+                'urlSubmit'       => $urlSubmit
             )
         );
 
-        $this->template->parse('CONTENTS', 'ServiceRequestsByCustomerReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestsByCustomerReport',
+            true
+        );
         $this->parsePage();
     }
 
     function initialiseSearchForm()
     {
         $dsSearchForm = new DSForm ($this);
-        $dsSearchForm->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-        $dsSearchForm->addColumn('days', DA_INTEGER, DA_ALLOW_NULL);
-        $dsSearchForm->setValue('days', 7);
+        $dsSearchForm->addColumn(
+            'fromDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'toDate',
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->addColumn(
+            'days',
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $dsSearchForm->setValue(
+            'days',
+            7
+        );
 
         return $dsSearchForm;
 
@@ -110,25 +155,42 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     /*
     Render results section
     */
-    public function renderReport($templateName, $results, $dsSearchForm)
+    public function renderReport($templateName,
+                                 $results,
+                                 $dsSearchForm
+    )
     {
         $totalPercentage = 0;
         $totalHours = 0;
         $totalSrCount = 0;
 
-        $this->template->set_block($templateName, 'customersBlock', 'customers');
+        $this->template->set_block(
+            $templateName,
+            'customersBlock',
+            'customers'
+        );
 
         foreach ($results as $row) {
 
             $this->template->set_var(
                 array(
                     'customerName' => $row['cus_name'],
-                    'hours' => number_format($row['hours'], 1),
-                    'srCount' => $row['srCount'],
-                    'percentage' => number_format($row['percentage'], 1)
+                    'hours'        => number_format(
+                        $row['hours'],
+                        1
+                    ),
+                    'srCount'      => $row['srCount'],
+                    'percentage'   => number_format(
+                        $row['percentage'],
+                        1
+                    )
                 )
             );
-            $this->template->parse('customers', 'customersBlock', true);
+            $this->template->parse(
+                'customers',
+                'customersBlock',
+                true
+            );
 
             $totalHours += $row['hours'];
             $totalPercentage += $row['percentage'];
@@ -137,10 +199,16 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'days' => $dsSearchForm->getValue('days'),
-                'totalHours' => number_format($totalHours, 1),
-                'totalSrCount' => $totalSrCount,
-                'totalPercentage' => number_format($totalPercentage, 1)
+                'days'            => $dsSearchForm->getValue('days'),
+                'totalHours'      => number_format(
+                    $totalHours,
+                    1
+                ),
+                'totalSrCount'    => $totalSrCount,
+                'totalPercentage' => number_format(
+                    $totalPercentage,
+                    1
+                )
             )
         );
 
@@ -163,7 +231,10 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
         $days = $_REQUEST['days'];
 
-        $dsSearchForm->setValue('days', $days);
+        $dsSearchForm->setValue(
+            'days',
+            $days
+        );
 
         $results = $this->buActivity->getSrPercentages($days);
 
@@ -177,26 +248,47 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
             $toEmail = 'monthlysdreport@cnc-ltd.co.uk';
 
-            $this->template = new Template(EMAIL_TEMPLATE_DIR, "remove");
-            $this->template->set_file('page', 'ServiceRequestsByCustomerReportEmail.inc.html');
+            $this->template = new Template(
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+            $this->template->set_file(
+                'page',
+                'ServiceRequestsByCustomerReportEmail.inc.html'
+            );
 
-            $this->renderReport('page', $results, $dsSearchForm);
+            $this->renderReport(
+                'page',
+                $results,
+                $dsSearchForm
+            );
 
-            $this->template->parse('output', 'page', true);
+            $this->template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $this->template->get_var('output');
 
             $subject = 'Service Requests By Customer - Days: ' . $days;
 
             $hdrs = array(
-                'From' => $senderEmail,
-                'Subject' => $subject,
-                'Date' => date("r")
+                'From'         => $senderEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($body);
 
-            $body = $buMail->mime->get();
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
 
             $hdrs = $buMail->mime->headers($hdrs);
 

@@ -1,5 +1,6 @@
 <?php require_once($cfg["path_gc"] . "/Business.inc.php");
-require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocumentWithoutFile.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 
 class BUPortalCustomerDocument extends Business
 {
@@ -42,6 +43,11 @@ class BUPortalCustomerDocument extends Business
         return ($this->getData($this->dbePortalCustomerDocument, $dsResults));
     }
 
+    /**
+     * @param int|string $customerID
+     * @param DataSet $dsResults
+     * @return bool
+     */
     function getDocumentsByCustomerID($customerID, &$dsResults)
     {
         $this->dbePortalCustomerDocument->setValue('customerID', $customerID);

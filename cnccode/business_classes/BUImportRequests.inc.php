@@ -16,18 +16,11 @@ class BUImportRequests extends Business
 
     var $updateDb = false;
 
-    private $errors = array();
-
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->buActivity = new BUActivity($this);
         $this->updateDb = new dbSweetcode;
-    }
-
-    private function logError($errorString)
-    {
-        $this->errors[] = $errorString;
     }
 
     public function createServiceRequests()
@@ -55,30 +48,45 @@ class BUImportRequests extends Business
 
         $db->query($sql);
 
+        $toDelete = [];
+
         while ($db->next_record()) {
 
             $automatedRequestID = $db->Record['automatedRequestID'];
             echo 'Start processing ' . $db->Record['automatedRequestID'] . "<BR/>";
 
             $errorString = '';
-            if ($this->processMessage($db->Record, $errorString)) {      // error string returned
-
+            if ($this->processMessage(
+                $db->Record,
+                $errorString
+            )) {      // error string returned
                 echo $automatedRequestID . " processed successfully<BR/>";
-
-                $this->setImportedFlag($automatedRequestID);
-
                 $processedMessages++;
             } else {
                 echo $db->Record['automatedRequestID'] . " failed<BR/>";
-                if ($db->Record['importErrorFound'] == 'N') {
-                    $this->logError($db->Record['automatedRequestID'] . ' failed: ' . $errorString);
-                    $this->setImportErrorFound($db->Record['automatedRequestID']);
-                }
+                $this->sendFailureEmail(
+                    $db->Record['senderEmailAddress'],
+                    $db->Record['createDateTime'],
+                    $db->Record['subjectLine'],
+                    $db->Record['htmlBody'],
+                    $errorString
+                );
             }
+            $toDelete[] = $db->Record['automatedRequestID'];
 
         } // end while
 
         echo $processedMessages . " requests imported<BR/>";
+
+        if (count($toDelete)) {
+            echo 'Deleting requests';
+            $sql = "DELETE FROM automated_request
+                    WHERE automatedRequestId IN (" . implode(
+                    ',',
+                    $toDelete
+                ) . ")";
+            $db->query($sql);
+        }
 
         echo "End<BR/>";
 
@@ -86,47 +94,91 @@ class BUImportRequests extends Business
 
     }
 
-    private function setImportedFlag($id)
+    protected function processMessage($record,
+                                      &$errorString
+    )
     {
-        $sql = "
-      UPDATE
-        automated_request
-        
-      SET
-        importedFlag = 'Y',
-        importDateTime = NOW() 
-        
-      WHERE
-        automatedRequestID = $id";
-
-        $this->updateDb->query($sql);
+        return $this->buActivity->processAutomaticRequest(
+            $record,
+            $errorString
+        );
     }
 
-    private function setImportErrorFound($id)
+    function sendFailureEmail($sender,
+                              $dateTime,
+                              $subject,
+                              $body,
+                              $errorString
+    )
     {
-        $sql = "
-      UPDATE
-        automated_request
-      SET
-        importErrorFound = 'Y'
-      WHERE
-        automatedRequestID = $id";
+        global $cfg;
 
-        $this->updateDb->query($sql);
+        $buMail = new BUMail($this);
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $toEmail = "CNCServiceDesk@cnc-ltd.co.uk";
+
+        $template = new Template(
+            $cfg["path_templates"],
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'ImportRequestFailedEmail.inc.html'
+        );
+        $template->set_var(
+            'sender',
+            $sender
+        );
+        $template->set_var(
+            'dateTime',
+            $dateTime
+        );
+        $template->set_var(
+            'subject',
+            $subject
+        );
+        $template->set_var(
+            'body',
+            $body
+        );
+        $template->set_var(
+            'errorString',
+            $errorString
+        );
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+        $body = $template->get_var('output');
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => "Automated import failure from $sender",
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
     }
-
-    protected function processMessage($record, &$errorString)
-    {
-        $processed = false;
-
-        return $this->buActivity->processAutomaticRequest($record, $errorString);
-
-    }
-    /**
-     * Get the problemID from the subject string
-     *
-     * @param mixed $subject
-     */
-
 } // End of class
 ?>

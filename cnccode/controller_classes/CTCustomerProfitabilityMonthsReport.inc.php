@@ -9,7 +9,7 @@
  */
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerProfitabilityMonthsReport.inc.php');
-require_once($cfg ['path_bu'] . '/BUCustomerNew.inc.php');
+require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerProfitabilityMonthsReport extends CTCNC
@@ -18,6 +18,13 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "accounts",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buCustomerProfitabilityMonthsReport = new BUCustomerProfitabilityMonthsReport ($this);
     }
 
@@ -52,15 +59,17 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
             } else {
-                $periodRegx = '/^([0-9]{4})-([0-9]{2})$/';
+                $periodRegx = '/^(0[1-9]{1}|1[0-2]{1})\/\d{4}$/';
 
                 if (!preg_match($periodRegx, $dsSearchForm->getValue('startYearMonth'), $matches)) {
-                    $dsSearchForm->setMessage('startYearMonth', 'Use format YYYY-MM');
+                    $dsSearchForm->setMessage('startYearMonth', 'Use format MM/YYYY');
                     $this->setFormErrorOn();
                 } elseif (!preg_match($periodRegx, $dsSearchForm->getValue('endYearMonth'), $matches)) {
-                    $dsSearchForm->setMessage('endYearMonth', 'Use format YYYY-MM');
+                    $dsSearchForm->setMessage('endYearMonth', 'Use format MM/YYYY');
                     $this->setFormErrorOn();
                 } else {
+
+
 
                     $reportData =
                         $this->buCustomerProfitabilityMonthsReport->getReportData(
@@ -89,7 +98,8 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER, array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -98,7 +108,7 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(

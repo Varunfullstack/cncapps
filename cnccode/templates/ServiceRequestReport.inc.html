@@ -1,6 +1,7 @@
 <!-- Template: ActivitySearch.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
     $(function () {
         window.fromDate = $('#fromDate').get(0);
@@ -8,9 +9,11 @@
     });
     var state = 'none'; // display status
     var savedCustomerString;
+
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -25,22 +28,36 @@
             document.searchForm.customerID.value = "";
         }
     }
+
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
         }
     }
 </script>
+<div class="reportDescription">
+    This will create an export of Service Requests showing key facts, including priority, SLA and fix hours.
+</div>
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="get" action="{urlSubmit}">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -82,9 +99,9 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, fromDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-                <font class="formErrorMessage">{fromDateMessage}</font></td>
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            ><font class="formErrorMessage">{fromDateMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -98,17 +115,18 @@
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-            > <a href="javascript:;" onClick="popUpCalendar(this, toDate, 'dd/mm/yyyy')"><img src="images/calendar.gif"
-                                                                                              width="24" height="22"
-                                                                                              hspace="0" vspace="0"
-                                                                                              border="0"
-                                                                                              align="absmiddle"></a>
-                <font class="formErrorMessage">{toDateMessage}</font></td>
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            > <font class="formErrorMessage">{toDateMessage}</font></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Search" onClick="submit();">
+                <input type="submit"
+                       name="Search"
+                       value="Search"
+                       onClick="submit();"
+                >
             </td>
         </tr>
     </table>

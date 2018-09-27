@@ -24,6 +24,14 @@ class CTSECTOR extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "maintenance"
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buSector = new BUSector($this);
         $this->dsSector = new DSForm($this);
         $this->dsSector->copyColumnsFrom($this->buSector->dbeSector);
@@ -236,10 +244,10 @@ class CTSECTOR extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'sectorID' => $this->dsSector->getValue('sectorID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'sectorID' => $this->dsSector->getValue('sectorID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }

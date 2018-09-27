@@ -1,16 +1,43 @@
 <!-- Template: PrepayExport.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script type="application/javascript">
     $(function () {
         window.endDate = $('#endDate').get(0);
     });
+
+    function generate() {
+        var form = document.getElementById('form');
+
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        if (confirm('Are you sure you want to generate the statements?')) {
+            form.action = "{urlExport}";
+        } else return (false);
+    }
 </script>
 <P>Export Prepay up to the date entered. </P>
-<table width="100%" border="0" cellspacing="0" cellpadding="1">
-    <form name="previewForm" method="post" action="{urlPreview}">
+<table width="100%"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
+    <form name="previewForm"
+          method="post"
+          action="{urlPreview}"
+          id="form"
+    >
         <tr>
-            <td width="12%" class="promptText">End Date</td>
-            <td width="40%" class="field">
+            <td width="12%"
+                class="promptText"
+            >End Date
+            </td>
+            <td width="40%"
+                class="field"
+            >
                 <input
                         type="text"
                         name="export[1][endDate]"
@@ -18,10 +45,10 @@
                         value="{endDate}"
                         size="10"
                         maxlength="10"
+                        required
+                        autocomplete="off"
+                        class="jQueryCalendar"
                 >
-                <a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"></a>
                 <font class="formErrorMessage">{endDateMessage}</font>
                 <input
                         name="Preview"
@@ -29,11 +56,20 @@
                         type="submit"
                         id="Preview"
                 />
+                <input
+                        name="Export"
+                        value="Export"
+                        type="submit"
+                        id="Export"
+                        onClick="generate()"
+                />
             </td>
         </tr>
     </form>
 </table>
-<table width="100%" class="singleBorder">
+<table width="100%"
+       class="singleBorder"
+>
     <tr>
         <td class="listHeadText">Customer</td>
         <td class="listHeadText">Contract</td>
@@ -43,42 +79,24 @@
         <td class="listHeadText">Statement</td>
     </tr>
     <!-- BEGIN resultBlock -->
-    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+    <tr onMouseOver="this.bgColor='#FFFFCC';"
+        onMouseOut="this.bgColor='';"
+    >
         <td>{customerName}</td>
         <td>{contractType}</td>
         <td>{expiryDate}</td>
         <td>{currentBalance}</td>
         <td>{topUp}</td>
-        <td><A href="{webFileLink}" target="_blank">Statement</A></td>
+        <td><A href="{webFileLink}"
+               target="_blank"
+        >Statement</A></td>
     </tr>
     <!-- END resultBlock -->
 </table>
-<table width="100%" border="0" cellspacing="0" cellpadding="1">
-    <form name="previewForm" method="post" action="{urlExport}">
-        <tr>
-            <td width="12%" class="promptText">End Date</td>
-            <td width="40%" class="field">
-                <input
-                        type="text"
-                        name="export[1][endDate]"
-                        id="endDate"
-                        value="{endDate}"
-                        size="10"
-                        maxlength="10"
-                >
-                <a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"></a>
-                <font class="formErrorMessage">{endDateMessage}</font>
-                <input
-                        name="Export"
-                        value="Export"
-                        type="submit"
-                        id="Export"
-                        onClick="if(!confirm('Are you sure you want to generate the statements?')) return(false)"
-                />
-            </td>
-        </tr>
-    </form>
+<table width="100%"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
 </table>
 <!-- End Template: PrepayExport.inc.html -->

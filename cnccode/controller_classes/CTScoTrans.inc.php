@@ -16,6 +16,10 @@ class CTScoTrans extends Controller
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg, "", "", "", "");
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buScoTrans = new BUScoTrans($this);
     }
 

@@ -20,6 +20,14 @@ class CTPassword extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "sales",
+            "technical",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buPassword = new BUPassword($this);
     }
 
@@ -59,17 +67,11 @@ class CTPassword extends CTCNC
         $this->setMethodName('search');
 
         $this->buPassword->initialiseSearchForm($dsSearchForm);
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-
                 $this->setFormErrorOn();
-
             } else {
-
                 $customerID = $dsSearchForm->getValue('customerID');
-
                 $report = $this->displayList($customerID);
                 exit;
             }
@@ -92,25 +94,26 @@ class CTPassword extends CTCNC
         if ($dsSearchForm->getValue('customerID')) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
-            $customerString = $dsCustomer->getValue('name');
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $urlCustomerPopup =
             $this->buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
-                    'action' => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP)
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
             );
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $dsSearchForm->getValue('customerID'),
+                'formError'         => $this->formError,
+                'customerID'        => $dsSearchForm->getValue('customerID'),
                 'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
-                'customerString' => $customerString,
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit
+                'customerString'    => $customerString,
+                'urlCustomerPopup'  => $urlCustomerPopup,
+                'urlSubmit'         => $urlSubmit
             )
         );
 
@@ -126,6 +129,16 @@ class CTPassword extends CTCNC
      */
     function displayList($customerID = false)
     {
+        $dbeCustomer = new DBECustomer($this);
+
+        if ($_REQUEST['customerID']) {
+            $customerID = $_REQUEST['customerID'];
+        }
+        if (empty($customerID)) {
+            $this->raiseError('Please search for a customer by typing and then pressing tab');
+            exit;
+        }
+
         $this->setMethodName('displayList');
 
         $this->setPageTitle('Passwords');
@@ -133,12 +146,6 @@ class CTPassword extends CTCNC
         $this->setTemplateFiles(
             array('PasswordList' => 'PasswordList.inc')
         );
-
-        $dbeCustomer = new DBECustomer($this);
-
-        if ($_REQUEST['customerID']) {
-            $customerID = $_REQUEST['customerID'];
-        }
 
         $dbeCustomer->getRow($customerID);
 
@@ -151,16 +158,16 @@ class CTPassword extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'edit',
-                        'customerID' => $_REQUEST['customerID']
+                        'action'     => 'edit',
+                        'customerID' => $customerID
                     )
                 );
             $urlLoadFromCsv =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'loadFromCsv',
-                        'customerID' => $_REQUEST['customerID']
+                        'action'     => 'loadFromCsv',
+                        'customerID' => $customerID
                     )
                 );
 
@@ -173,19 +180,19 @@ class CTPassword extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'urlSubmit' => $urlSubmit,
-                    'urlAdd' => $urlAdd,
+                    'urlSubmit'      => $urlSubmit,
+                    'urlAdd'         => $urlAdd,
                     'urlLoadFromCsv' => $urlLoadFromCsv,
-                    'customerName' => $dbeCustomer->getValue('Name'),
-                    'customerID' => $_REQUEST['customerID'],
-                    'formError' => $this->getFormErrorMessage()
+                    'customerName'   => $dbeCustomer->getValue(DBECustomer::name),
+                    'customerID'     => $customerID,
+                    'formError'      => $this->getFormErrorMessage()
                 )
             );
 
             $urlCustomerPopup = $this->buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
-                    'action' => CTCNC_ACT_DISP_CUST_POPUP,
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
@@ -198,7 +205,7 @@ class CTPassword extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'edit',
+                            'action'     => 'edit',
                             'passwordID' => $dsPassword->getValue('passwordID')
                         )
                     );
@@ -206,7 +213,7 @@ class CTPassword extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'delete',
+                            'action'     => 'delete',
                             'passwordID' => $dsPassword->getValue('passwordID')
                         )
                     );
@@ -221,12 +228,12 @@ class CTPassword extends CTCNC
                     array(
                         'passwordID' => $dsPassword->getValue('passwordID'),
                         'customerID' => $dsPassword->getValue('customerID'),
-                        'username' => $dsPassword->getValue('username'),
-                        'service' => $dsPassword->getValue('service'),
-                        'password' => $dsPassword->getValue('password'),
-                        'notes' => $notes,
-                        'urlEdit' => $urlEdit,
-                        'urlDelete' => $urlDelete
+                        'username'   => $dsPassword->getValue('username'),
+                        'service'    => $dsPassword->getValue('service'),
+                        'password'   => $dsPassword->getValue('password'),
+                        'notes'      => $notes,
+                        'urlEdit'    => $urlEdit,
+                        'urlDelete'  => $urlDelete
 
                     )
                 );
@@ -264,7 +271,7 @@ class CTPassword extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'list',
+                            'action'     => 'list',
                             'customerID' => $dsPassword->getValue('customerID')
                         )
                     );
@@ -285,8 +292,8 @@ class CTPassword extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'edit',
-                    'ordheadID' => $passwordID,
+                    'action'     => 'edit',
+                    'ordheadID'  => $passwordID,
                     'customerID' => $customerID
                 )
             );
@@ -296,17 +303,17 @@ class CTPassword extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerID' => $dsPassword->getValue('customerID'),
-                'passwordID' => $dsPassword->getValue('passwordID'),
-                'username' => $dsPassword->getValue('username'),
+                'customerID'      => $dsPassword->getValue('customerID'),
+                'passwordID'      => $dsPassword->getValue('passwordID'),
+                'username'        => $dsPassword->getValue('username'),
                 'usernameMessage' => $dsPassword->getMessage('username'),
-                'service' => $dsPassword->getValue('service'),
-                'serviceMessage' => $dsPassword->getMessage('service'),
-                'password' => $dsPassword->getValue('password'),
+                'service'         => $dsPassword->getValue('service'),
+                'serviceMessage'  => $dsPassword->getMessage('service'),
+                'password'        => $dsPassword->getValue('password'),
                 'passwordMessage' => $dsPassword->getMessage('password'),
-                'notes' => $dsPassword->getValue('notes'),
-                'notesMessage' => $dsPassword->getMessage('notes'),
-                'urlEdit' => $urlEdit
+                'notes'           => $dsPassword->getValue('notes'),
+                'notesMessage'    => $dsPassword->getMessage('notes'),
+                'urlEdit'         => $urlEdit
             )
         );
 
@@ -358,7 +365,7 @@ class CTPassword extends CTCNC
                         $this->buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action' => 'list',
+                                'action'     => 'list',
                                 'customerID' => $customerID
                             )
                         );
@@ -385,7 +392,7 @@ class CTPassword extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'list',
+                    'action'     => 'list',
                     'customerID' => $dsPassword->getValue('customerID')
                 )
             );

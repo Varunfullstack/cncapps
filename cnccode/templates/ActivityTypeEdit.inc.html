@@ -1,188 +1,261 @@
 <!-- Template: ActvityTypeEdit.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript' src="CommonJS.js">
+</script>
 <script language='JavaScript'>
 
-function checkFunctionKey(field){
- 	if (event.keyCode == 120){			// F9 - edit
-		switch (field.id){
-			case "itemDescription": 
-				window.open(
-					'{urlItemEdit}&itemID=' +
-					escape(document.getElementById("itemID").value) +
-					'&parentIDField=itemID' +
-					'&parentDescField=itemDescription',
-					'item',
-					'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
-				);
-				break;
-		}		
- 	}
- 	return;
-}
-function validateItemDescription(){
-	if (Trim(document.getElementById("itemDescription").value) != ""){
-		window.open('{urlItemPopup}&itemDescription=' +
-		escape(document.getElementById("itemDescription").value) +
-		'&parentIDField=itemID' +
-		'&parentDescField=itemDescription',
-		'items','scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
-	}
-}
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {			// F9 - edit
+            switch (field.id) {
+                case "itemDescription":
+                    window.open(
+                        '{urlItemEdit}&itemID=' +
+                        escape(document.getElementById("itemID").value) +
+                        '&parentIDField=itemID' +
+                        '&parentDescField=itemDescription',
+                        'item',
+                        'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
+                    );
+                    break;
+            }
+        }
+        return;
+    }
+
+    function validateItemDescription() {
+        if (Trim(document.getElementById("itemDescription").value) != "") {
+            window.open('{urlItemPopup}&itemDescription=' +
+                escape(document.getElementById("itemDescription").value) +
+                '&parentIDField=itemID' +
+                '&parentDescField=itemDescription',
+                'items', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
+        }
+    }
 </SCRIPT>
 <TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
+    <TR>
+        <TD width="100px" class="navigateLink" valign="top">
+            <a href="{urlDisplayList}">Back to list</a>
+        </TD>
+        <TD width="100px" class="navigateLink" valign="top">
+            <a href="{urlDelete}">{txtDelete}</a>
+        </TD>
+    </TR>
 </table>
-<FORM  method="post" action="{urlUpdate}" name="callActType" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="callActType[1][callActTypeID]"
-			value="{callActTypeID}"
-		>
-		<tr> 
-			<td width="115" class="promptText">Type</td>
-			<td width="575" class="fieldText"> <input
-					name="callActType[1][description]"
-					type="text" value="{description}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Linked Item</td>
-			<td class="fieldText"> <input
-					type="hidden"
-					id = "itemID"
-					name="callActType[1][itemID]"
-					value="{itemID}"
-				> <input
-					type="text"
-					name="callActType[1][itemDescription]"
-					id="itemDescription"
-					value="{itemDescription}"
-					onChange="javascript:validateItemDescription()"
-					onKeydown="javascript:checkFunctionKey(itemDescription)"
-					size="50"
-					maxlength="50"
-				> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Value Activity Only</td>
-			<td class="fieldText"> <INPUT name="callActType[1][curValueFlag]" type="checkbox" value="Y" {curValueFlagChecked} id="curValueFlag">
-				Indicates that this type of activity has a value and not a duration</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Out of hours multiplier</td>
-			<td class="fieldText"> <input
-					type="text"
-					id="oohMultiplier"
-					name="callActType[1][oohMultiplier]"
-					value="{oohMultiplier}"
-					size="5"
-					maxlength="5"
-				> <span class="formErrorMessage">{oohMultiplierMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Minumum hours to charge</td>
-			<td class="fieldText"> <input
-					type="text"
-					id="minHours"
-					name="callActType[1][minHours]"
-					value="{minHours}"
-					size="5"
-					maxlength="5"
-				> <span class="formErrorMessage">{minHoursMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Maximum hours to charge</td>
-			<td class="fieldText"> <input
-					id="maxHours"
-					type="text"
-					name="callActType[1][maxHours]"
-					value="{maxHours}"
-					size="5"
-					maxlength="5"
-				> <span class="formErrorMessage">{maxHoursMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Send Emails To Customer</td>
-			<td class="fieldText"> <INPUT name="callActType[1][customerEmailFlag]" {DISABLED} type="checkbox" value="Y" {customerEmailFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Allow SCR Printing</td>
-			<td class="fieldText"> <INPUT name="callActType[1][allowSCRFlag]" {DISABLED} type="checkbox" value="Y" {allowSCRFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Requires Checking</td>
-			<td class="fieldText"> <INPUT name="callActType[1][requireCheckFlag]" {DISABLED} type="checkbox" value="Y" {requireCheckFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Allow Expenses</td>
-			<td class="fieldText"> <INPUT name="callActType[1][allowExpensesFlag]" {DISABLED} type="checkbox" value="Y" {allowExpensesFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Allow Reason Details</td>
-			<td class="fieldText"> <INPUT name="callActType[1][allowReasonFlag]" {DISABLED} type="checkbox" value="Y" {allowReasonFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Allow Action Details</td>
-			<td class="fieldText"> <INPUT name="callActType[1][allowActionFlag]" {DISABLED} type="checkbox" value="Y" {allowActionFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Allow Final Status Details</td>
-			<td class="fieldText"> <INPUT name="callActType[1][allowFinalStatusFlag]" {DISABLED} type="checkbox" value="Y" {allowFinalStatusFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Require Reason Details</td>
-			<td class="fieldText"> <INPUT name="callActType[1][reqReasonFlag]" {DISABLED} type="checkbox" value="Y" {reqReasonFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Require Action Details</td>
-			<td class="fieldText"> <INPUT name="callActType[1][reqActionFlag]" {DISABLED} type="checkbox" value="Y" {reqActionFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Require Final Status Details</td>
-			<td class="fieldText"> <INPUT name="callActType[1][reqFinalStatusFlag]" {DISABLED} type="checkbox" value="Y" {reqFinalStatusFlagChecked}>			</td>
-		</tr>
-		<tr>
-      <td class="promptText">Is this travel?</td>
-		  <td class="fieldText"><input name="callActType[1][travelFlag]" {DISABLED} type="checkbox" value="Y" {travelFlagChecked} />      </td>
-	  </tr>
-    <tr>
-      <td class="promptText">On-site?</td>
-      <td class="fieldText"><input name="callActType[1][onSiteFlag]" {DISABLED} type="checkbox" value="Y" {onSiteFlagChecked} />      </td>
-    </tr>
-    <tr>
-      <td class="promptText">Show in portal?</td>
-      <td class="fieldText"><input name="callActType[1][portalDisplayFlag]" {DISABLED} type="checkbox" value="Y" {portalDisplayFlagChecked} />      </td>
-    </tr>
-		<tr>
-				<td class="promptText">Is this active?</td>
-				<td class="fieldText"><input name="callActType[1][activeFlag]" {DISABLED} type="checkbox" value="Y" {activeFlagChecked} />				</td>
-		</tr>
-		<tr>
-				<td class="promptText">Show Non-chargable text on emails ?</td>
-				<td class="fieldText"><input name="callActType[1][showNotChargeableFlag]" type="checkbox" title="If this type has no charge, do not display not chargable on activity emails" value="Y" {DISABLED} {showNotChargeableFlagChecked} />				</td>
-		</tr>
-		<tr>
-				<td class="promptText">Allow engineer overtime </td>
-				<td class="fieldText"><input name="callActType[1][engineerOvertimeFlag]" type="checkbox" title="Do not pay engineer overtime" value="Y" {DISABLED} {engineerOvertimeFlagChecked} />
-				</td>
-		</tr>
-		<!--
-				'reqFinalStatusFlagChecked'	=> Controller::htmlChecked($dsCallActType->
-		getValue('reqFinalStatusFlag')), --> 
-		<tr>
-		  <td>&nbsp;</td>
-		  <td class="formErrorMessage">&nbsp;</td>
-	  </tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+<FORM method="post" action="{urlUpdate}" name="callActType" AUTOCOMPLETE="OFF">
+    <table width="700px" border="0">
+        <input type="hidden"
+               name="callActType[1][callActTypeID]"
+               value="{callActTypeID}"
+        >
+        <tr>
+            <td width="115" class="promptText">Type</td>
+            <td width="575" class="fieldText">
+                <input name="callActType[1][description]"
+                       type="text" value="{description}"
+                       size="50"
+                       maxlength="50"
+                >
+                <span class="formErrorMessage">{descriptionMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Linked Item</td>
+            <td class="fieldText">
+                <input type="hidden"
+                       id="itemID"
+                       name="callActType[1][itemID]"
+                       value="{itemID}"
+                >
+                <input
+                        type="text"
+                        name="callActType[1][itemDescription]"
+                        id="itemDescription"
+                        value="{itemDescription}"
+                        onChange="javascript:validateItemDescription()"
+                        onKeydown="javascript:checkFunctionKey(itemDescription)"
+                        size="50"
+                        maxlength="50"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Value Activity Only</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][curValueFlag]" type="checkbox" value="Y"
+                       {curValueFlagChecked} id="curValueFlag">
+                Indicates that this type of activity has a value and not a duration
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Out of hours multiplier</td>
+            <td class="fieldText">
+                <input type="text"
+                       id="oohMultiplier"
+                       name="callActType[1][oohMultiplier]"
+                       value="{oohMultiplier}"
+                       size="5"
+                       maxlength="5"
+                >
+                <span class="formErrorMessage">{oohMultiplierMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Minumum hours to charge</td>
+            <td class="fieldText">
+                <input type="text"
+                       id="minHours"
+                       name="callActType[1][minHours]"
+                       value="{minHours}"
+                       size="5"
+                       maxlength="5"
+                >
+                <span class="formErrorMessage">{minHoursMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Maximum hours to charge</td>
+            <td class="fieldText">
+                <input id="maxHours"
+                       type="text"
+                       name="callActType[1][maxHours]"
+                       value="{maxHours}"
+                       size="5"
+                       maxlength="5"
+                >
+                <span class="formErrorMessage">{maxHoursMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Visible In SRs</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][visibleInSRFlag]" {DISABLED} type="checkbox" value="Y"
+                       {visibleInSRFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Send Emails To Customer</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][customerEmailFlag]" {DISABLED} type="checkbox" value="Y"
+                       {customerEmailFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow SCR Printing</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][allowSCRFlag]" {DISABLED} type="checkbox" value="Y"
+                       {allowSCRFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Requires Checking</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][requireCheckFlag]" {DISABLED} type="checkbox" value="Y"
+                       {requireCheckFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow Expenses</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][allowExpensesFlag]" {DISABLED} type="checkbox" value="Y"
+                       {allowExpensesFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow Reason Details</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][allowReasonFlag]" {DISABLED} type="checkbox" value="Y"
+                       {allowReasonFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow Action Details</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][allowActionFlag]" {DISABLED} type="checkbox" value="Y"
+                       {allowActionFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow Final Status Details</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][allowFinalStatusFlag]" {DISABLED} type="checkbox"
+                       value="Y" {allowFinalStatusFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Reason Details</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][reqReasonFlag]" {DISABLED} type="checkbox" value="Y"
+                       {reqReasonFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Action Details</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][reqActionFlag]" {DISABLED} type="checkbox" value="Y"
+                       {reqActionFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Require Final Status Details</td>
+            <td class="fieldText">
+                <INPUT name="callActType[1][reqFinalStatusFlag]" {DISABLED} type="checkbox" value="Y"
+                       {reqFinalStatusFlagChecked}>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Is this travel?</td>
+            <td class="fieldText">
+                <input name="callActType[1][travelFlag]" {DISABLED} type="checkbox" value="Y"
+                       {travelFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">On-site?</td>
+            <td class="fieldText">
+                <input name="callActType[1][onSiteFlag]" {DISABLED} type="checkbox" value="Y"
+                       {onSiteFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Show in portal?</td>
+            <td class="fieldText">
+                <input name="callActType[1][portalDisplayFlag]" {DISABLED} type="checkbox" value="Y"
+                       {portalDisplayFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Is this active?</td>
+            <td class="fieldText">
+                <input name="callActType[1][activeFlag]" {DISABLED} type="checkbox" value="Y"
+                       {activeFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Show Non-chargable text on emails ?</td>
+            <td class="fieldText">
+                <input name="callActType[1][showNotChargeableFlag]" type="checkbox"
+                       title="If this type has no charge, do not display not chargable on activity emails"
+                       value="Y" {DISABLED} {showNotChargeableFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow engineer overtime</td>
+            <td class="fieldText">
+                <input name="callActType[1][engineerOvertimeFlag]" type="checkbox"
+                       title="Do not pay engineer overtime" value="Y" {DISABLED}
+                       {engineerOvertimeFlagChecked}/>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage">
+                <input type="submit" name="Submit" value="Update">
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: ActvityTypeEdit.inc.html -->

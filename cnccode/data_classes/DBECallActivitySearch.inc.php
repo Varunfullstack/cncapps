@@ -7,6 +7,49 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActivitySearch extends DBEntity
 {
+    const callActivityID = "callActivityID";
+    const siteNo = "siteNo";
+    const contactID = "contactID";
+    const sequenceNo = "sequenceNo";
+    const callActTypeID = "callActTypeID";
+    const activityType = "activityType";
+    const projectID = "projectID";
+    const problemID = "problemID";
+    const userID = "userID";
+    const userName = "userName";
+    const date = "date";
+    const startTime = "startTime";
+    const endTime = "endTime";
+    const status = "status";
+    const problemStatus = "problemStatus";
+    const reason = "reason";
+    const internalNotes = "internalNotes";
+    const curValue = "curValue";
+    const priority = "priority";
+    const statementYearMonth = "statementYearMonth";
+    const projectDescription = "projectDescription";
+    const duration = "duration";
+    const salePrice = "salePrice";
+    const customerID = "customerID";
+    const customerName = "customerName";
+    const postcode = "postcode";
+    const contactName = "contactName";
+    const customerItemID = "customerItemID";
+    const contractCustomerItemID = "contractCustomerItemID";
+    const contractDescription = "contractDescription";
+    const underContractFlag = "underContractFlag";
+    const allowExpensesFlag = "allowExpensesFlag";
+    const allowSCRFlag = "allowSCRFlag";
+    const slaResponseHours = "slaResponseHours";
+    const respondedHours = "respondedHours";
+    const workingHours = "workingHours";
+    const activityDurationHours = "activityDurationHours";
+    const rootCause = "rootCause";
+    const fixEngineer = "fixEngineer";
+    const activityCount = "activityCount";
+    const linkedSalesOrderID = "linkedSalesOrderID";
+    const managementReviewReason = "managementReviewReason";
+
     /**
      * calls constructor()
      * @access public
@@ -18,67 +61,270 @@ class DBECallActivitySearch extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("callactivity");
-        $this->addColumn("callActivityID", DA_ID, DA_NOT_NULL, "caa_callactivityno");
-        $this->addColumn("siteNo", DA_INTEGER, DA_NOT_NULL, "caa_siteno");
-        $this->addColumn("contactID", DA_INTEGER, DA_NOT_NULL, "caa_contno");        // customer contact
-        $this->addColumn("sequenceNo", DA_INTEGER, DA_ALLOW_NULL, "caa_item");
-        $this->addColumn("callActTypeID", DA_ID, DA_NOT_NULL, "caa_callacttypeno");
-        $this->addColumn("activityType", DA_STRING, DA_NOT_NULL, "cat_desc");
-        $this->addColumn("projectID", DA_ID, DA_NOT_NULL, "problem.pro_projectno");
-        $this->addColumn("problemID", DA_ID, DA_NOT_NULL, "caa_problemno");
-        $this->addColumn("userID", DA_ID, DA_NOT_NULL, "caa_consno");
-        $this->addColumn("userName", DA_STRING, DA_NOT_NULL, "consultant.cns_name");
-        $this->addColumn("date", DA_DATE, DA_NOT_NULL, "caa_date");
-        $this->addColumn("startTime", DA_DATETIME, DA_NOT_NULL, "caa_starttime");
-        $this->addColumn("endTime", DA_DATETIME, DA_ALLOW_NULL, "caa_endtime");
-        $this->addColumn("status", DA_STRING, DA_NOT_NULL, "caa_status");
-        $this->addColumn("problemStatus", DA_STRING, DA_NOT_NULL, "pro_status");
-        $this->addColumn("reason", DA_TEXT, DA_ALLOW_NULL);
-        $this->addColumn("internalNotes", DA_TEXT, DA_ALLOW_NULL);
-        $this->addColumn("curValue", DA_FLOAT, DA_ALLOW_NULL);
-        $this->addColumn("priority", DA_FLOAT, DA_ALLOW_NULL, 'pro_priority');
-        $this->addColumn("statementYearMonth", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("projectDescription", DA_STRING, DA_ALLOW_NULL, 'project.description');
-        $this->addColumn("duration", DA_FLOAT, DA_ALLOW_NULL, "TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime)");
-        $this->addColumn("salePrice", DA_FLOAT, DA_ALLOW_NULL, "activityItem.itm_sstk_price");
-        $this->addColumn("customerID", DA_ID, DA_ALLOW_NULL, "cus_custno");
-        $this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
-        $this->addColumn("postcode", DA_STRING, DA_NOT_NULL, "add_postcode");
-        $this->addColumn("contactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(con_first_name, ' ', con_last_name)");
-        $this->addColumn("customerItemID", DA_ID, DA_ALLOW_NULL, "caa_cuino");    // Customer Item
-        $this->addColumn("customerID", DA_ID, DA_NOT_NULL, "pro_custno");
-        $this->addColumn("contractCustomerItemID", DA_ID, DA_ALLOW_NULL, "pro_contract_cuino");
-        $this->addColumn("contractDescription", DA_STRING, DA_ALLOW_NULL, "IFNULL(contractitem.itm_desc, 'T & M')");
-        $this->addColumn("underContractFlag", DA_YN, DA_ALLOW_NULL, "caa_under_contract");
-        $this->addColumn("allowExpensesFlag", DA_YN, DA_ALLOW_NULL, "cat_allow_exp_flag");
-        $this->addColumn("allowSCRFlag", DA_YN, DA_ALLOW_NULL);
-        $this->addColumn("activityType", DA_STRING, DA_ALLOW_NULL, 'cat_desc');
-        $this->addColumn("slaResponseHours", DA_INTEGER, DA_ALLOW_NULL, "pro_sla_response_hours");
-        $this->addColumn("respondedHours", DA_INTEGER, DA_ALLOW_NULL, "pro_responded_hours");
-        $this->addColumn("workingHours", DA_INTEGER, DA_ALLOW_NULL, "pro_working_hours");
-        $this->addColumn("activityDurationHours", DA_INTEGER, DA_ALLOW_NULL, "pro_total_activity_duration_hours");
-        $this->addColumn("rootCause", DA_STRING, DA_ALLOW_NULL, "rootcause.rtc_desc");
-        $this->addColumn("fixEngineer", DA_STRING, DA_ALLOW_NULL, "CONCAT( fix_consultant.firstName, ' ', fix_consultant.lastName )");
-        $this->addColumn("activityCount", DA_INTEGER, DA_ALLOW_NULL, "( SELECT COUNT(*) FROM callactivity AS cac WHERE cac.caa_problemno = callactivity.caa_problemno )");
-        $this->addColumn("linkedSalesOrderID", DA_INTEGER, DA_ALLOW_NULL, "pro_linked_ordno");
-        $this->addColumn("managementReviewReason", DA_MEMO, DA_ALLOW_NULL, "pro_management_review_reason");
+        $this->addColumn(
+            self::callActivityID,
+            DA_ID,
+            DA_NOT_NULL,
+            "caa_callactivityno"
+        );
+        $this->addColumn(
+            self::siteNo,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "caa_siteno"
+        );
+        $this->addColumn(
+            self::contactID,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "caa_contno"
+        );        // customer contact
+        $this->addColumn(
+            self::sequenceNo,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "caa_item"
+        );
+        $this->addColumn(
+            self::callActTypeID,
+            DA_ID,
+            DA_NOT_NULL,
+            "caa_callacttypeno"
+        );
+        $this->addColumn(
+            self::activityType,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cat_desc"
+        );
+        $this->addColumn(
+            self::projectID,
+            DA_ID,
+            DA_NOT_NULL,
+            "problem.pro_projectno"
+        );
+        $this->addColumn(
+            self::problemID,
+            DA_ID,
+            DA_NOT_NULL,
+            "caa_problemno"
+        );
+        $this->addColumn(
+            self::userID,
+            DA_ID,
+            DA_NOT_NULL,
+            "caa_consno"
+        );
+        $this->addColumn(
+            self::userName,
+            DA_STRING,
+            DA_NOT_NULL,
+            "consultant.cns_name"
+        );
+        $this->addColumn(
+            self::date,
+            DA_DATE,
+            DA_NOT_NULL,
+            "caa_date"
+        );
+        $this->addColumn(
+            self::startTime,
+            DA_DATETIME,
+            DA_NOT_NULL,
+            "caa_starttime"
+        );
+        $this->addColumn(
+            self::endTime,
+            DA_DATETIME,
+            DA_ALLOW_NULL,
+            "caa_endtime"
+        );
+        $this->addColumn(
+            self::status,
+            DA_STRING,
+            DA_NOT_NULL,
+            "caa_status"
+        );
+        $this->addColumn(
+            self::problemStatus,
+            DA_STRING,
+            DA_NOT_NULL,
+            "pro_status"
+        );
+        $this->addColumn(
+            self::reason,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::internalNotes,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::curValue,
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::priority,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            'pro_priority'
+        );
+        $this->addColumn(
+            self::statementYearMonth,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::projectDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'project.description'
+        );
+        $this->addColumn(
+            self::duration,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime)"
+        );
+        $this->addColumn(
+            self::salePrice,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "activityItem.itm_sstk_price"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "cus_custno"
+        );
+        $this->addColumn(
+            self::customerName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            self::postcode,
+            DA_STRING,
+            DA_NOT_NULL,
+            "add_postcode"
+        );
+        $this->addColumn(
+            self::contactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(con_first_name, ' ', con_last_name)"
+        );
+        $this->addColumn(
+            self::customerItemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "caa_cuino"
+        );    // Customer Item
+        $this->addColumn(
+            self::contractCustomerItemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "pro_contract_cuino"
+        );
+        $this->addColumn(
+            self::contractDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "IFNULL(contractitem.itm_desc, 'T & M')"
+        );
+        $this->addColumn(
+            self::underContractFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "caa_under_contract"
+        );
+        $this->addColumn(
+            self::allowExpensesFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "cat_allow_exp_flag"
+        );
+        $this->addColumn(
+            self::allowSCRFlag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::slaResponseHours,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_sla_response_hours"
+        );
+        $this->addColumn(
+            self::respondedHours,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_responded_hours"
+        );
+        $this->addColumn(
+            self::workingHours,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_working_hours"
+        );
+        $this->addColumn(
+            self::activityDurationHours,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_total_activity_duration_hours"
+        );
+        $this->addColumn(
+            self::rootCause,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "rootcause.rtc_desc"
+        );
+        $this->addColumn(
+            self::fixEngineer,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT( fix_consultant.firstName, ' ', fix_consultant.lastName )"
+        );
+        $this->addColumn(
+            self::activityCount,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "( SELECT COUNT(*) FROM callactivity AS cac WHERE cac.caa_problemno = callactivity.caa_problemno )"
+        );
+        $this->addColumn(
+            self::linkedSalesOrderID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pro_linked_ordno"
+        );
+        $this->addColumn(
+            self::managementReviewReason,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            "pro_management_review_reason"
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
-
     function getRowsBySearchCriteria(
         $callActivityID,
         $problemID,
         $customerID,
-        $project,
         $userID,
         $status,
         $rootCauseID,
         $priority,
         $activityText,
-        $fromDate,                        // raised dates
+        $serviceRequestSpentTime,
+        $individualActivitySpentTime,
+        $fromDate,
         $toDate,
         $contractCustomerItemID,
         $callActTypeID,
@@ -87,13 +333,14 @@ class DBECallActivitySearch extends DBEntity
         $breachedSlaOption = '',
         $sortColumn = false,
         $sortDirection = 'ASC',
-        $limit = true                // limit rows to 500 max
+        $limit = true
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM
+            "
+            FROM
           callactivity 
           LEFT JOIN callacttype 
             ON caa_callacttypeno = cat_callacttypeno 
@@ -101,11 +348,11 @@ class DBECallActivitySearch extends DBEntity
             ON callactivity.caa_cuino = custitem.cui_cuino 
           LEFT JOIN problem 
             ON problem.pro_problemno = callactivity.caa_problemno 
-          LEFT JOIN project 
-            ON project.projectID = problem.pro_projectno 
           LEFT JOIN item 
             ON custitem.cui_itemno = item.itm_itemno 
-          LEFT JOIN item AS activityItem 
+          LEFT JOIN project 
+            ON project.projectID = problem.pro_projectno  
+          LEFT JOIN item AS activityItem
             ON callacttype.cat_itemno = activityItem.itm_itemno 
           LEFT JOIN custitem AS contract 
             ON problem.pro_contract_cuino = contract.cui_cuino 
@@ -133,7 +380,10 @@ class DBECallActivitySearch extends DBEntity
         $whereParameters = false;
 
         if ($callActivityID) {
-            if (strpos($callActivityID, ',')) {
+            if (strpos(
+                $callActivityID,
+                ','
+            )) {
                 $whereParameters .=
                     " AND caa_callactivityno IN (" . $callActivityID . ")";
 
@@ -143,7 +393,10 @@ class DBECallActivitySearch extends DBEntity
             }
         }
         if ($problemID) {
-            if (strpos($problemID, ',')) {
+            if (strpos(
+                $problemID,
+                ','
+            )) {
                 $whereParameters .=
                     " AND caa_problemno IN (" . $problemID . ")";
 
@@ -155,38 +408,69 @@ class DBECallActivitySearch extends DBEntity
 
         if ($customerID != '' AND $customerID != 0) {
             $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
+                " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
 
         if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
             $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName('linkedSalesOrderID') . "=" . $linkedSalesOrderID;
+                " AND " . $this->getDBColumnName(self::linkedSalesOrderID) . "=" . $linkedSalesOrderID;
         }
 
         if ($userID != '' AND $userID != 0) {
             $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName('userID') . "=" . $userID;
+                " AND " . $this->getDBColumnName(self::userID) . "=" . $userID;
         }
 
         if ($managementReviewOnly == 'Y') {
             $whereParameters = $whereParameters .
-                " AND " . $this->getDBColumnName('managementReviewReason') . "<> ''";
+                " AND " . $this->getDBColumnName(self::managementReviewReason) . "<> ''";
         }
 
         if ($activityText != '') {
             $whereParameters .=
                 " AND ( MATCH (reason)
-					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE)
+					AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $activityText
+                ) . "' IN BOOLEAN MODE)
           OR MATCH (pro_internal_notes)
-          AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $activityText) . "' IN BOOLEAN MODE) )";
+          AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $activityText
+                ) . "' IN BOOLEAN MODE) )";
         }
 
-        if ($project != '') {
-            $project = strtoupper($project);
+        if ($serviceRequestSpentTime != '' && $this->testSpentTimeSearchString($serviceRequestSpentTime)) {
+
+            if (preg_match(
+                    '/^\d/',
+                    $serviceRequestSpentTime
+                ) === 1) {
+                $serviceRequestSpentTime = '= ' . $serviceRequestSpentTime;
+            }
+
             $whereParameters .=
-                " AND (project.description LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $project) . "%'" .
-                " OR project.projectID = '" . mysqli_real_escape_string($this->db->link_id(), $project) . "')";
+                " and pro_total_activity_duration_hours " . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $serviceRequestSpentTime
+                );
         }
+
+        if ($individualActivitySpentTime != '' && $this->testSpentTimeSearchString($individualActivitySpentTime)) {
+            if (preg_match(
+                    '/^\d/',
+                    $individualActivitySpentTime
+                ) === 1) {
+                $individualActivitySpentTime = '= ' . $individualActivitySpentTime;
+            }
+
+            $whereParameters .=
+                " and ((TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime))/3600) " . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $individualActivitySpentTime
+                );
+        }
+
 
         switch ($status) {
             case 'INITIAL':
@@ -208,7 +492,7 @@ class DBECallActivitySearch extends DBEntity
             */
             case 'CHECKED_T_AND_M':
                 $whereParameters .=
-                    " AND caa_status = 'C' AND " . $this->getDBColumnName('contractCustomerItemID') . "= 0
+                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . "= 0
             AND pro_status = 'F'
             AND pro_complete_date <= now()
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
@@ -218,13 +502,13 @@ class DBECallActivitySearch extends DBEntity
             */
             case 'CHECKED_NON_T_AND_M':
                 $whereParameters .=
-                    " AND caa_status = 'C' AND " . $this->getDBColumnName('contractCustomerItemID') . "<> 0
+                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . "<> 0
 
             AND pro_status = 'F'
 
             AND pro_complete_date <= now()
             
-            AND " . $this->getDBColumnName('activityDurationHours') . "> 
+            AND " . $this->getDBColumnName(self::activityDurationHours) . "> 
             
             (
               SELECT
@@ -258,10 +542,10 @@ class DBECallActivitySearch extends DBEntity
 
         if ($contractCustomerItemID == '') {                        // Time and materials
             $whereParameters .=
-                " AND " . $this->getDBColumnName('contractCustomerItemID') . " = 0";
+                " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " = 0";
         } elseif ($contractCustomerItemID != 99) {        // anything other than All
             $whereParameters .=
-                " AND " . $this->getDBColumnName('contractCustomerItemID') . " = $contractCustomerItemID";
+                " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " = $contractCustomerItemID";
         }
 
         if ($fromDate != '') {
@@ -313,11 +597,20 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;
     }
-}
 
-?>
+    private function testSpentTimeSearchString($timeSpentString)
+    {
+        if ($timeSpentString == '') {
+            return true;
+        }
+
+        return preg_match(
+            "/((\d+(\.?\d+)?)|=|<|<=|>|>=|<>)\s*(\d+(\.?\d+)?)/",
+            $timeSpentString
+        );
+    }
+}

@@ -13,7 +13,9 @@ define("BUSINESS_NT_PSD", "not passed");    // ext for fk ref integrity error co
 
 class Business extends BaseObject
 {
-
+    /**
+     * @var mysqli $db
+     */
     protected $db;
 
     function __construct(&$owner)
@@ -57,8 +59,8 @@ class Business extends BaseObject
 
     /**
      * Get all rows from a data access object into a dataset
-     * @param Database &$Source Data access object
-     * @param DataSet &$Destinantion Set of data
+     * @param $dbSource
+     * @param $dsDestination
      * @return bool
      * @access private
      */
@@ -145,6 +147,7 @@ class Business extends BaseObject
      */
     function getDatasetByPK($pK, &$dbSource, &$dsResult)
     {
+
         $this->setMethodName("getDatasetByPK");
         if ($pK == '') {
             $this->raiseError($dbSource->getPKName() . ' ' . BUSINESS_NT_PSD);

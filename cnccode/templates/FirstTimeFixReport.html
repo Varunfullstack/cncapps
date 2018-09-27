@@ -1,0 +1,203 @@
+<style>
+    label {
+        float: left;
+        width: 10em;
+        margin-right: 1em;
+    }
+
+    .firstTimeFix thead td {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .totalRow td {
+        font-weight: bold;
+        font-size: 16px;
+    }
+</style>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script>
+    var savedCustomerName;
+
+    function doSearch() {
+        var formData = new FormData(event.target);
+
+        var object = {};
+        var hasValue = false;
+        formData.forEach(function (value, key) {
+            if (value) {
+                hasValue = true;
+            }
+            object[key] = value;
+        });
+
+        if (!hasValue) {
+            alert('You must provide at least one filter criteria');
+            return false;
+        }
+
+        var json = JSON.stringify(object);
+        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        $.ajax({
+            url: '{fetchDataURL}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                if (result.status == 'error') {
+                    alert('Failed to retrieve data');
+                } else {
+                    console.log(result);
+                    var html = "";
+                    result.engineers.map(function (engineerData) {
+                        html += "<tr>" +
+                            "<td>" + engineerData.name + "</td>" +
+                            "<td>" + engineerData.totalRaised + "</td>" +
+                            "<td>" + engineerData.attemptedFirstTimeFix + "</td>" +
+                            "<td>" + engineerData.firstTimeFix + "</td>" +
+                            "</tr>"
+                    });
+
+                    html += "<tr class='totalRow'>" +
+                        "<td>Total</td>" +
+                        "<td>" + result.phonedThroughRequests + "</td>" +
+                        "<td>" + result.firstTimeFixAttemptedPct + "%</td>" +
+                        "<td>" + result.firstTimeFixAchievedPct + "%</td>" +
+                        "</tr>";
+
+                    $('#firstTimeFiguresTable tbody').html(html);
+                }
+
+            }
+        }).catch(function () {
+
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
+        return false;
+    }
+
+    function validateCustomerName() {
+        if (Trim(document.getElementById("customerName").value) != "") {
+            if (document.getElementById("customerName").value != savedCustomerName) {
+                window.open('{customerPopupURL}&customerString=' +
+                    escape(document.getElementById("customerName").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerName',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        }
+        else {
+            document.report.customerID.value = "";
+        }
+    }
+</script>
+<form action=""
+      onsubmit="return doSearch();"
+>
+    <div>
+        <div>
+            <label for="customerName">
+                Customer Name
+            </label>
+            <input type="text"
+                   id="customerName"
+                   onchange="validateCustomerName()"
+            >
+            <input type="hidden"
+                   id="customerID"
+                   name="customerID"
+            >
+        </div>
+        <div>
+            <label for="engineerSelect">
+                Engineer
+            </label>
+            <select id="engineerSelect"
+                    name="engineerID"
+            >
+                <option value="">All</option>
+                <!-- BEGIN userBlock -->
+                <option value="{userID}">
+                    {userName}
+                </option>
+                <!-- END userBlock -->
+            </select>
+        </div>
+        <div>
+            <label for="startDate">Start Date</label>
+            <input type="text"
+                   class="jqueryCalendar"
+                   id="startDate"
+                   name="startDate"
+                   autocomplete="off"
+            >
+        </div>
+        <div>
+            <label for="endDate">End Date</label>
+            <input type="text"
+                   class="jqueryCalendar"
+                   id="endDate"
+                   name="endDate"
+                   autocomplete="off"
+            >
+        </div>
+    </div>
+    <div>
+        <input type="submit"
+               value="Search"
+        >
+    </div>
+</form>
+<div class="firstTimeFixContainer">
+    <div class="parentLoading">
+        <table class="firstTimeFix"
+               id="firstTimeFiguresTable"
+        >
+            <thead>
+            <tr>
+                <td>
+                    Name
+                </td>
+                <td>
+                    Raised
+                </td>
+                <td>
+                    Attempted
+                </td>
+                <td>
+                    Achieved
+                </td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{name}</td>
+                <td>{totalRaised}</td>
+                <td>{attemptedFirstTimeFix}</td>
+                <td>{firstTimeFix}</td>
+            </tr>
+            <tr class="totalRow">
+                <td>Total</td>
+                <td>{phonedThroughRequests}</td>
+                <td>{firstTimeFixAttemptedPct}%</td>
+                <td>{firstTimeFixAchievedPct}%</td>
+            </tr>
+            <tr class="totalRow">
+                <td>Monthly Total</td>
+                <td>{monthlyPhonedThroughRequests}</td>
+                <td>{monthlyFirstTimeFixAttemptedPct}%</td>
+                <td>{monthlyFirstTimeFixAchievedPct}%</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

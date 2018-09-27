@@ -420,14 +420,22 @@ class BUExpense extends Business
         $hdrs = array(
             'From' => 'grahaml@cnc-ltd.co.uk',
             'To' => $email_to,
-            'Subject' => 'Your Expenses'
+            'Subject' => 'Your Expenses',
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $crlf = "\r\n";
         $mime = new Mail_mime($crlf);
         $mime->setHTMLBody($email_body);
 
-        $body = $mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
         $hdrs = $mime->headers($hdrs);
 
         $result = $mail->send($email_to, $hdrs, $body);
@@ -467,7 +475,6 @@ class BUExpense extends Business
         hours.
         */
 
-        //   $otAdjustHourHHMM = common_convertDecimalToHHMM( $dsHeader->getValue('otAdjustHour') );
 
         $queryString = "
     SELECT 
@@ -756,7 +763,8 @@ class BUExpense extends Business
         $hdrs = array(
             'From' => 'grahaml@cnc-ltd.co.uk',
             'To' => $email_to,
-            'Subject' => 'Your Overtime'
+            'Subject' => 'Your Overtime',
+            'Content-Type' => 'text/html; charset=UTF-8'
         );
 
 
@@ -764,7 +772,13 @@ class BUExpense extends Business
         $mime = new Mail_mime($crlf);
         $mime->setHTMLBody($email_body);
 
-        $body = $mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $mime->get($mime_params);
         $hdrs = $mime->headers($hdrs);
 
         $result = $mail->send($email_to, $hdrs, $body);
@@ -793,7 +807,13 @@ class BUExpense extends Business
 
         $mime->addAttachment($filename);
 
-        $body = $mime->get();
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset' => 'UTF-8',
+            'html_charset' => 'UTF-8',
+            'head_charset' => 'UTF-8'
+        );
+        $body = $mime->get($mime_params);
 
         $hdrs = $mime->headers($hdrs);
 

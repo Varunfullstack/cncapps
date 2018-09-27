@@ -1,10 +1,12 @@
 <!-- Template: PrepayAdjustment.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
     $(function () {
         window.date = $('#date').get(0);
     });
+
     function validateCustomerName() {
         if (Trim(document.getElementById("customerName").value) != "") {
             window.open('{urlCustomerPopup}&customerString=' +
@@ -15,15 +17,23 @@
         }
     }
 </script>
-<form name="customerItem" method="post" action="{urlSubmit}">
-    <TABLE width="600" border="0" cellpadding="1" cellspacing="1">
+<form name="customerItem"
+      method="post"
+      action="{urlSubmit}"
+>
+    <TABLE width="600"
+           border="0"
+           cellpadding="1"
+           cellspacing="1"
+    >
         <TR>
             <td class="promptText">Customer</td>
             <td><input
                     type="hidden"
                     name="callActivity[1][customerID]"
                     id="customerID"
-                    value="{customerID}"/>
+                    value="{customerID}"
+            />
                 <input
                         type="text"
                         name="customerName"
@@ -56,21 +66,25 @@
                     maxlength="10"
                     name="callActivity[1][date]"
                     value="{date}"
-            ><a href="javascript:;" onclick="popUpCalendar(this, date, 'dd/mm/yyyy')"><img src="images/calendar.gif"
-                                                                                           alt="Calendar" width="24"
-                                                                                           height="22" hspace="0"
-                                                                                           vspace="0" border="0"
-                                                                                           align="absmiddle"/></a>
-                <span class="formErrorMessage">{dateMessage}</span></TD>
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            > <span class="formErrorMessage">{dateMessage}</span>
+            </TD>
         </TR>
         <tr>
-            <td valign="top" class="promptText">&nbsp;</td>
+            <td valign="top"
+                class="promptText"
+            >&nbsp;
+            </td>
             <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td colspan="2">
-                <input type="submit" name="Update" value="Save"></td>
+                <input type="submit"
+                       name="Update"
+                       value="Save"
+                ></td>
         </tr>
     </table>
 </form>

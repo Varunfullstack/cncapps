@@ -1,0 +1,59 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue249-1531989577-0">
+        <tagDatabase tag="issue249"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue249-1531989577-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custitem" columnName="secondSiteReplicationPath"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custitem">
+            <column name="secondSiteReplicationPath" type="char(200)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue249-1531989577-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="secondsite_image" columnName="replicationImagePath"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="secondsite_image">
+            <column name="replicationImagePath" type="char(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue249-1531989577-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="secondsite_image" columnName="replicationStatus"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="secondsite_image">
+            <column name="replicationStatus" type="char(20)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue249-1531989577-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="secondsite_image" columnName="replicationImageTime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="secondsite_image">
+            <column name="replicationImageTime" type="datetime"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue249-1531989577-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="secondSiteReplicationAdditionalDelayAllowance"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="secondSiteReplicationAdditionalDelayAllowance" type="int(3)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

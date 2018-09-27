@@ -24,6 +24,13 @@ class CTSecurityApp extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $roles = [
+            "maintenance",
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->buSecurityApp = new BUSecurityApp($this);
         $this->dsSecurityApp = new DSForm($this);
         $this->dsSecurityApp->copyColumnsFrom($this->buSecurityApp->dbeSecurityApp);
@@ -217,10 +224,10 @@ class CTSecurityApp extends CTCNC
 
         $urlNext =
             $this->buildLink($_SERVER['PHP_SELF'],
-                array(
-                    'securityAppID' => $this->dsSecurityApp->getValue('securityAppID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
+                             array(
+                                 'securityAppID' => $this->dsSecurityApp->getValue('securityAppID'),
+                                 'action' => CTCNC_ACT_VIEW
+                             )
             );
         header('Location: ' . $urlNext);
     }
