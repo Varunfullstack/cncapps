@@ -6766,8 +6766,7 @@ is currently a balance of ';
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
                     $reason .= $dsOrdline->getValue(DBEOrdline::qtyOrdered);
                 } else {
-                    $reason .= '&nbsp';
-
+                    $reason .= '&nbsp;';
                 }
 
 
@@ -6925,11 +6924,10 @@ is currently a balance of ';
                 'urlActivity'   => $urlActivity,
                 'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
                 'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'internalNotes' => str_replace(
-                    '&nbsp',
-                    '&nbsp;',
-                    $dbeJCallActivity->getValue(DBEJCallActivity::internalNotes)
-                ),
+                'internalNotes' =>
+                    $dbeJCallActivity->getValue(
+                        DBEJCallActivity::internalNotes
+                    ),
                 'CONFIG_SERVICE_REQUEST_DESC'
                                 => CONFIG_SERVICE_REQUEST_DESC
 
