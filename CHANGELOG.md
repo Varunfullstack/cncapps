@@ -8,6 +8,8 @@ This project changes will be shown here.
 - Issue 357 - Change Request reply, remove Further Details Required
 - Issue 348 - Show priority on Existing SRs page
 - Issue 354 - Improve loading speed of home page
+### Fixed
+- Issue 351 - &nbsp in SR from Sales order
 
 ## [v1.11.1] - 2018-09-17
 ### Fixed
