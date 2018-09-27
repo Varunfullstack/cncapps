@@ -23,7 +23,7 @@
             </not>
         </preConditions>
         <addColumn tableName="contact">
-            <column name="resetToken" type=""></column>
+            <column name="resetToken" type="char(60)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
