@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+- Issue 354 - Improve loading speed of home page
+
 ## [v1.11.1] - 2018-09-17
 ### Fixed
 - Fix issue with Visit Confirmation emails.
