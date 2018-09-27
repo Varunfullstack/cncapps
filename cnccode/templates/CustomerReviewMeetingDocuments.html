@@ -6,6 +6,12 @@
     .spacerRow {
         height: 13px;
     }
+
+    .promptText{
+        color: #992211;
+        white-space: nowrap;
+        text-align: left;
+    }
 </style>
 <script>
     function sendReviewMeetingEmails() {
@@ -251,7 +257,7 @@
 <table>
     <tbody>
     <tr>
-        <td class="promptText">Customer</td>
+        <td class="promptText" style="width: 115px">Customer</td>
         <td>
             <input type="hidden"
                    name="activity[1][customerID]"
@@ -271,18 +277,6 @@
         </td>
     </tr>
     <tr>
-        <td>
-            <button>Search</button>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<table id="uploadSection"
-       hidden
->
-    <tbody>
-    <tr>
         <td class="promptText">Review Meeting Date</td>
         <td>
             <input type="text"
@@ -293,8 +287,16 @@
             >
         </td>
     </tr>
+    </tbody>
+</table>
+
+<table id="uploadSection"
+       hidden
+>
+    <tbody>
+
     <tr>
-        <td class="promptText">Files</td>
+        <td class="promptText" style="width: 115px">Files</td>
         <td>
             <input type="file"
                    multiple
@@ -376,7 +378,7 @@
 <div id="previousMeetingSection"
      hidden
 >
-    <h1>Previous Meeting</h1>
+    <h1>Previous Meetings</h1>
     <table id="previousMeetingsTable"
     >
         <thead>
