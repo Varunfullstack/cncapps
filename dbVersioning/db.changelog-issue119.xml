@@ -5,10 +5,10 @@
     </changeSet>
     <changeSet id="issue119-330669905-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="questionnaire" columnName="qur_custom_logo_base64"/>
+            <columnExists tableName="questionnaire" columnName="logo"/>
         </preConditions>
         <addColumn tableName="questionnaire">
-            <column name="qur_custom_logo_base64" type="mediumtext" />
+            <column name="logo" type="mediumtext" />
         </addColumn>
     </changeSet>
 </databaseChangeLog>
