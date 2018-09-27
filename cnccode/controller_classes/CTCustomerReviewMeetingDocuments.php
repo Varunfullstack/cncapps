@@ -170,6 +170,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
 
     private function displaySearchForm()
     {
+        $this->setPageTitle('Customer Review Meeting Documents');
         $this->template->setFile(
             'customerReviewMeetingDocument',
             'CustomerReviewMeetingDocuments.html'
