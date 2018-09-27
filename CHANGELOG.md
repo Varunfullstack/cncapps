@@ -1,7 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
-###
+## [v1.12.0] - 2018-09-27
+### Changed
+- Issue 353 - Sales request wording change
+- Issue 356 - Remove the word Contracts from Call Activity page
+- Issue 357 - Change Request reply, remove Further Details Required
+- Issue 348 - Show priority on Existing SRs page
 
 ## [v1.11.1] - 2018-09-17
 ### Fixed
