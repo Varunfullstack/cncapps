@@ -7,13 +7,23 @@
         <tagDatabase tag="issue314"/>
     </changeSet>
     <changeSet author="pavwebdev" id="website-1534777348-1">
-       <preConditions>
+       <preConditions onFail="MARK_RAN">
            <not>
                <columnExists tableName="calldocument" columnName="createdContactID"/>
            </not>
        </preConditions>
         <addColumn tableName="calldocument">
             <column name="createdContactID" type="int(11)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="website-1534777348-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="resetToken"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="resetToken" type=""></column>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
