@@ -2242,7 +2242,7 @@ class BUActivity extends Business
         switch ($response) {
 
             case 'A':
-                $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
+                $reason = '<p>The following sales request has been approved by ' . $userName . '</p>';
 
                 $subject = 'Sales Request approved';
                 $approval = true;
@@ -2250,7 +2250,7 @@ class BUActivity extends Business
                 break;
 
             case 'D':
-                $reason = '<p>The following change request has been denied by ' . $userName . '</p>';
+                $reason = '<p>The following sales request has been denied by ' . $userName . '</p>';
 
                 $subject = 'Sales Request denied';
 
