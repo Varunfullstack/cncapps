@@ -1293,11 +1293,13 @@ class BUInvoice extends Business
     }
 
 
-    function printDirectDebitInvoices($dateToUse)
+    function printDirectDebitInvoices($dateToUse, $passphrase)
     {
         if ($dateToUse == '') {
             $dateToUse = date('Y-m-d');    // use today if blank
         }
+
+
 
         $dbeInvhead = new DBEInvhead($this);
 

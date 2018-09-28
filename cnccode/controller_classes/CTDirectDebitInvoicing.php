@@ -96,7 +96,10 @@ class CTDirectDebitInvoicing extends CTCNC
     {
         $buInvoice = new BUInvoice($this);
         // generate PDF invoices:
-        $invoiceCount = $buInvoice->printDirectDebitInvoices(date('Y-m-01'));
+        $invoiceCount = $buInvoice->printDirectDebitInvoices(
+            date('Y-m-01'),
+            $_REQUEST['passphrase']
+        );
 
         if ($invoiceCount == 0) {
             $this->setFormErrorMessage('There aren\'t any Un-sent invoices');
