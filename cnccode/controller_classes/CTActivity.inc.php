@@ -3109,7 +3109,11 @@ class CTActivity extends CTCNC
                     ),
                     'engineerName'           => $dsActiveSrs->getValue("engineerName"),
                     'urlCreateFollowOn'      => $urlCreateFollowOn,
-                    'urlProblemHistoryPopup' => $urlProblemHistoryPopup
+                    'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
+                    'priorityClass'          => $dsActiveSrs->getValue(
+                        DBEJProblem::priority
+                    ) == 1 ? 'class="redRow"' : null
                 )
             );
 

@@ -2242,7 +2242,7 @@ class BUActivity extends Business
         switch ($response) {
 
             case 'A':
-                $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
+                $reason = '<p>The following sales request has been approved by ' . $userName . '</p>';
 
                 $subject = 'Sales Request approved';
                 $approval = true;
@@ -2250,7 +2250,7 @@ class BUActivity extends Business
                 break;
 
             case 'D':
-                $reason = '<p>The following change request has been denied by ' . $userName . '</p>';
+                $reason = '<p>The following sales request has been denied by ' . $userName . '</p>';
 
                 $subject = 'Sales Request denied';
 
@@ -6766,8 +6766,7 @@ is currently a balance of ';
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
                     $reason .= $dsOrdline->getValue(DBEOrdline::qtyOrdered);
                 } else {
-                    $reason .= '&nbsp';
-
+                    $reason .= '&nbsp;';
                 }
 
 
@@ -6925,11 +6924,10 @@ is currently a balance of ';
                 'urlActivity'   => $urlActivity,
                 'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
                 'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'internalNotes' => str_replace(
-                    '&nbsp',
-                    '&nbsp;',
-                    $dbeJCallActivity->getValue(DBEJCallActivity::internalNotes)
-                ),
+                'internalNotes' =>
+                    $dbeJCallActivity->getValue(
+                        DBEJCallActivity::internalNotes
+                    ),
                 'CONFIG_SERVICE_REQUEST_DESC'
                                 => CONFIG_SERVICE_REQUEST_DESC
 
