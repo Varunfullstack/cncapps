@@ -290,7 +290,7 @@ class BURenDomain extends Business
                     );
 
 
-                    $buSalesOrder->InitialiseOrder(
+                    $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
                         $dsCustomer

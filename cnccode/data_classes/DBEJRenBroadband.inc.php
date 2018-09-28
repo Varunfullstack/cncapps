@@ -135,9 +135,8 @@ class DBEJRenBroadband extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     * @param bool $directDebit
      */
-    function getRenewalsDueRows($directDebit = false)
+    function getRenewalsDueRows()
     {
 
         $statement =
@@ -150,13 +149,7 @@ class DBEJRenBroadband extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
      AND renewalTypeID = 1
-		 AND declinedFlag = 'N'";
-
-        if ($directDebit) {
-            $statement .= " and directDebitFlag = 'Y' ";
-        } else {
-            $statement .= " and directDebitFlag <> 'Y' ";
-        }
+		 AND declinedFlag = 'N' and directDebitFlag <> 'Y'";
 
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);

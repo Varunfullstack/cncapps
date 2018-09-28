@@ -1523,7 +1523,8 @@ class BUInvoice extends Business
         $buMail->mime->addAttachment(
             $data,
             'Text/csv',
-            'bankExport.csv'
+            'bankExport.csv',
+            false
         );
 
         $mime_params = array(

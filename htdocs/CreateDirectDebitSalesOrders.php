@@ -8,23 +8,14 @@
 
 require_once("config.inc.php");
 GLOBAL $cfg;
-require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
-require_once($cfg['path_bu'] . '/BURenContract.inc.php');
-require_once($cfg['path_bu'] . '/BURenQuotation.inc.php');
-require_once($cfg['path_bu'] . '/BURenDomain.inc.php');
-
-$buRenBroadband = new BURenBroadband($this);
-$buRenContract = new BURenContract($this);
-$buRenHosting = new BURenHosting($this);
+require_once($cfg['path_bu'] . '/BUDirectDebitContracts.php');
 
 $toEmail = "CreateRenewalSalesOrders@cnc-ltd.co.uk";
+$thing = null;
+$buDirectDebitContracts = new BUDirectDebitContracts($this);
 
-$buRenBroadband->emailRenewalsSalesOrdersDue($toEmail, true);
-$buRenContract->emailRenewalsSalesOrdersDue($toEmail, true);
-$buRenHosting->emailRenewalsSalesOrdersDue($toEmail, true);
+$buDirectDebitContracts->emailRenewalsSalesOrdersDue($toEmail);
 
-$buRenBroadband->createRenewalsSalesOrders(true);
-$buRenContract->createRenewalsSalesOrders(true);
-$buRenHosting->createRenewalsSalesOrders(true);
+$buDirectDebitContracts->createRenewalsSalesOrders();
 echo "PROCESS COMPLETED";
 ?>

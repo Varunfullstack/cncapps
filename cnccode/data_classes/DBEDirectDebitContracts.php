@@ -1,86 +1,84 @@
-<?php /*
-* Renewal contract table
-* @authors Karim Ahmed
-* @access public
-*/
+<?php
+/**
+ * Created by PhpStorm.
+ * User: fizdalf
+ * Date: 28/09/2018
+ * Time: 14:50
+ */
+
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
-class DBEJRenContract extends DBECustomerItem
+
+class DBEDirectDebitContracts extends DBECustomerItem
+
 {
+    const customerName = "customerName";
+    const siteName = "siteName";
+    const itemID = "itemID";
+    const itemDescription = "itemDescription";
+    const itemTypeDescription = "itemTypeDescription";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "customerName",
+            self::customerName,
             DA_STRING,
             DA_NOT_NULL,
             "cus_name"
         );
         $this->addColumn(
-            "siteName",
+            self::siteName,
             DA_STRING,
             DA_NOT_NULL,
             "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)"
         );
         $this->addColumn(
-            "itemDescription",
+            self::itemID,
+            DA_STRING,
+            DA_NOT_NULL,
+            "itm_itemno"
+        );
+        $this->addColumn(
+            self::itemDescription,
             DA_STRING,
             DA_NOT_NULL,
             "itm_desc"
         );
         $this->addColumn(
-            "itemTypeDescription",
+            self::itemTypeDescription,
             DA_STRING,
             DA_NOT_NULL,
             "ity_desc"
         );
         $this->addColumn(
-            "itemID",
-            DA_ID,
-            DA_NOT_NULL,
-            "itm_itemno"
-        );
-        $this->addColumn(
-            "invoiceFromDate",
+            self::invoiceFromDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceToDate",
+            self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT(
- 				DATE_SUB(
- 					DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ),
- 					INTERVAL 1 DAY
- 				)
- 				, '%d/%m/%Y')"
+            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceFromDateYMD",
+            self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
         );
         $this->addColumn(
-            "invoiceToDateYMD",
+            self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
-        );
-        $this->addColumn(
-            "curUnitSale",
-            DA_FLOAT,
-            DA_NOT_NULL,
-            'cui_sale_price'
-        );
-        $this->addColumn(
-            "curUnitCost",
-            DA_FLOAT,
-            DA_NOT_NULL,
-            'cui_cost_price'
         );
         $this->setAddColumnsOff();
     }
@@ -95,9 +93,10 @@ class DBEJRenContract extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE " . $this->getPKWhere() .
-            " AND renewalTypeID = 2";
+            " AND renewalTypeID = 1";
 
         $this->setQueryString($statement);
+
         $ret = (parent::getRow());
     }
 
@@ -112,7 +111,8 @@ class DBEJRenContract extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			WHERE declinedFlag = 'N'
-        AND renewalTypeID = 2";
+        AND renewalTypeID = 1";
+
 
         if ($orderBy) {
             $statement .= " ORDER BY $orderBy";
@@ -135,8 +135,8 @@ class DBEJRenContract extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			WHERE declinedFlag = 'N'
+        AND renewalTypeID = 1
 				AND cui_custno = $customerID		
-        AND renewalTypeID = 2      
 			ORDER BY cus_name";
 
         $this->setQueryString($statement);
@@ -150,10 +150,9 @@ class DBEJRenContract extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     * @param bool $ignorePrePayContracts
+     * @param bool $directDebit
      */
-    function getRenewalsDueRows($ignorePrePayContracts = true
-    )
+    function getRenewalsDueRows()
     {
 
         $statement =
@@ -165,21 +164,15 @@ class DBEJRenContract extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
-		 AND declinedFlag = 'N'
-     AND renewalTypeID = 2 and directDebitFlag <> 'Y'";
+     AND renewalTypeID = 1 or renewalTypeID = 2 or renewalTypeID = 5
+		 AND declinedFlag = 'N' and directDebitFlag = 'Y' ORDER BY cui_custno, autoGenerateContractInvoice asc;";
 
-        if ($ignorePrePayContracts) {
-            $statement .= ' and itm_itemno <> 4111';
-        }
-
-        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
-        parent::getRows();
+        $ret = (parent::getRows());
     }
 
     /**
      * Get all renewals by IDs
-     *
      */
     function getRenewalsRowsByID($ids)
     {
@@ -192,13 +185,14 @@ class DBEJRenContract extends DBECustomerItem
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-     WHERE customerItemID IN ('" . implode(
+     WHERE cui_cuino IN ('" . implode(
                 '\',\'',
                 $ids
             ) . "')" .
-            " AND declinedFlag = 'N' and directDebitFlag <> 'Y'
-        AND renewalTypeID = 2";
-        $statement .= " ORDER BY cui_custno";
+            " AND declinedFlag = 'N'
+        AND renewalTypeID = 1 and directDebitFlag <> 'Y'
+      ORDER BY cui_custno
+     ";
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());
@@ -206,4 +200,4 @@ class DBEJRenContract extends DBECustomerItem
 
 }
 
-?>
+

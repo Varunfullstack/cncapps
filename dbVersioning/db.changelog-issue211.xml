@@ -69,7 +69,7 @@
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="sortCode" type="varchar(8)"/>
+            <column name="sortCode" type="mediumtext"/>
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-8" author="pavwebdev">
@@ -89,7 +89,7 @@
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="accountNumber" type="varchar(8)"/>
+            <column name="accountNumber" type="mediumtext"/>
         </addColumn>
     </changeSet>
     <changeSet id="issue211-1534414967-10" author="pavwebdev">

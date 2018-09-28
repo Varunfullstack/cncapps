@@ -708,6 +708,10 @@
                 <script>
                     let storedPassPhrase = null;
 
+                    const masks = {
+                        sortCode: '00-00-00',
+                        accountNumber: '00000000'
+                    };
 
                     function storePassPhrase(passPhrase) {
                         storedPassPhrase = passPhrase;
@@ -716,84 +720,101 @@
                         }, 30);
                     }
 
-                    $(function () {
-                        $('#sortCode').mask('00-00-00');
-                    });
 
-                    function editSortCode() {
+                    function editEncrypted(id, element) {
 
-                        let passPhrase = storedPassPhrase;
-                        if (!passPhrase) {
-                            passPhrase = prompt('Please provide secure passphrase');
-                            storePassPhrase(passPhrase);
-                        }
-                        if (!passPhrase) {
-                            return;
-                        }
+                        const el = $(element);
+                        debugger;
+                        const parent = el.closest('td');
 
-                        const formData = new FormData();
+                        let encryptedValue = parent.find('.encrypted').val();
+                        let promise;
 
-                        formData.append('passphrase', passPhrase);
-                        formData.append('encryptedData', $('#sortCode').val());
-
-                        fetch('?action=decrypt', {
-                            method: 'POST',
-                            body: formData
-                        }).then(response => {
-                            if (response.ok) {
-                                response.json().then((json) => {
-                                    json.data
-                                    $(event.target).parent().append('<input id="sortCode" name="form[customer][{customerID}][newSortCode]" value="'+json.data+'">')
-                                    $('#sortCode').mask('00-00-00');
-                                })
+                        if (encryptedValue) {
+                            let passPhrase = storedPassPhrase;
+                            if (!passPhrase) {
+                                passPhrase = prompt('Please provide secure passphrase');
+                                storePassPhrase(passPhrase);
                             }
+                            if (!passPhrase) {
+                                return;
+                            }
+
+                            const formData = new FormData();
+
+                            formData.append('passphrase', passPhrase);
+                            formData.append('encryptedData', encryptedValue);
+                            promise = fetch('?action=decrypt', {
+                                method: 'POST',
+                                body: formData
+                            }).then(response => {
+                                if (response.ok) {
+                                    return response.json()
+                                }
+                                return null;
+                            }).then(json => {
+                                if (json) {
+                                    return json.decryptedData;
+                                } else {
+                                    return null;
+                                }
+                            })
+                        } else {
+                            promise = new Promise(resolve => {
+                                resolve()
+                            });
+                        }
+
+                        promise.then(data => {
+                            parent.append('<input id="' + id + '" name="form[customer][{customerID}][new' + capitalize(id) + ']" value="' + data + '">');
+                            $('#' + id).mask(masks[id]);
+                            el.hide();
                         })
 
                     }
 
+                    function capitalize(string) {
+                        return string.charAt(0).toUpperCase() + string.slice(1);
+                    }
                 </script>
                 <tr>
                     <td class="content">Sort Code</td>
                     <td class="content">
-                        <button hidden><i class="fa fa-eye"></i></button>
-                        <button onclick="editSortCode()"><i class="fa fa-pencil {sortCodePencilColor}"></i></button>
+                        <button type="button"
+                                onclick="editEncrypted('sortCode',this)"
+                        ><i class="fa fa-pencil {sortCodePencilColor}"></i>
+                        </button>
                         <input type="hidden"
                                name="form[customer][{customerID}][sortCode]"
                                value="{sortCode}"
+                               class="encrypted"
                         >
                     </td>
                 </tr>
                 <tr>
                     <td class="content">Account Name</td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][accountName]"
-                                id="accountName"
-                                value="{accountName}"
-                                size="18"
-                                maxlength="18"
+                        <input {disabled}
+                               type="text"
+                               name="form[customer][{customerID}][accountName]"
+                               id="accountName"
+                               value="{accountName}"
+                               size="18"
+                               maxlength="18"
                         >
                     </td>
                 </tr>
-                <script>
-                    $(function () {
-                        $('#accountNumber').mask('00000000');
-                    })
-                </script>
                 <tr>
                     <td class="content">Account Number</td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][accountNumber]"
-                                id="accountNumber"
-                                value="{accountNumber}"
-                                size="8"
-                                maxlength="8"
-                                minlength="8"
+                        <button type="button"
+                                onclick="editEncrypted('accountNumber',this)"
+                        ><i class="fa fa-pencil {accountNumberPencilColor}"></i>
+                        </button>
+                        <input type="hidden"
+                               name="form[customer][{customerID}][accountNumber]"
+                               value="{accountNumber}"
+                               class="encrypted"
                         >
                     </td>
                 </tr>

@@ -137,11 +137,9 @@ class BURenBroadband extends Business
 
     }
 
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL,
-                                         $directDebit = false
-    )
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
-        $this->dbeJRenBroadband->getRenewalsDueRows($directDebit);
+        $this->dbeJRenBroadband->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
 
@@ -203,12 +201,12 @@ class BURenBroadband extends Business
     }
 
 
-    function createRenewalsSalesOrders($directDebit = false)
+    function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
-        $this->dbeJRenBroadband->getRenewalsDueRows($directDebit);
+        $this->dbeJRenBroadband->getRenewalsDueRows();
 
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
 
@@ -232,8 +230,7 @@ class BURenBroadband extends Business
                     (
                         !$generateInvoice &&
                         $this->dbeJRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
-                    ) ||
-                    $this->dbeJRenBroadband->getValue(DBECustomerItem::directDebitFlag) === 'Y'
+                    )
                 ) {
                     /*
                      * Create an invoice from each sales order (unless this is the first iteration)
@@ -264,12 +261,10 @@ class BURenBroadband extends Business
                         $dbeCustomer,
                         $dsCustomer
                     );
-                    $buSalesOrder->InitialiseOrder(
+                    $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
-                        $dsCustomer,
-                        $this->dbeJRenBroadband->getValue(DBECustomerItem::directDebitFlag) === 'Y',
-                        $this->dbeJRenBroadband->getValue(DBECustomerItem::transactionType)
+                        $dsCustomer
                     );
                     $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq

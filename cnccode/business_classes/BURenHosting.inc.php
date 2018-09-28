@@ -151,13 +151,11 @@ class BURenHosting extends Business
 
     /**
      * @param string $toEmail
-     * @param bool $directDebit
      */
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL,
-                                         $directDebit = false
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL
     )
     {
-        $this->dbeJRenHosting->getRenewalsDueRows($directDebit);
+        $this->dbeJRenHosting->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
@@ -217,13 +215,13 @@ class BURenHosting extends Business
 
     }
 
-    function createRenewalsSalesOrders($directDebit = false)
+    function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
 
-        $this->dbeJRenHosting->getRenewalsDueRows($directDebit);
+        $this->dbeJRenHosting->getRenewalsDueRows();
 
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
 
@@ -250,8 +248,7 @@ class BURenHosting extends Business
                     (
                         !$generateInvoice &&
                         $this->dbeJRenHosting->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
-                    ) ||
-                    $this->dbeJRenHosting->getValue(DBECustomerItem::directDebitFlag) === 'Y'
+                    )
                 ) {
 
                     /*
@@ -284,9 +281,7 @@ class BURenHosting extends Business
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
-                        $dsCustomer,
-                        $this->dbeJRenHosting->getValue(DBECustomerItem::directDebitFlag) === 'Y',
-                        $this->dbeJRenHosting->getValue(DBECustomerItem::transactionType)
+                        $dsCustomer
                     );
                     $generatedOrder = true;
                     $line = -1;  // initialise sales order line seq
@@ -305,10 +300,7 @@ class BURenHosting extends Business
                         'description',
                         $this->dbeJRenHosting->getValue('notes')
                     );
-                    $dbeOrdline->setValue(
-                        'lineType',
-                        'C'
-                    );
+
                     $dbeOrdline->setValue(
                         'renewalCustomerItemID',
                         ''
@@ -424,13 +416,13 @@ class BURenHosting extends Business
                 $dbeOrdline->setValue(
                     'curUnitSale',
                     ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $this->dbeJRenHosting->getValue(
-                        'invoicePeriodMonths'
+                        DBEJRenHosting::invoicePeriodMonths
                     )
                 );
                 $dbeOrdline->setValue(
                     'curUnitCost',
                     ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $this->dbeJRenHosting->getValue(
-                        'invoicePeriodMonths'
+                        DBEJRenHosting::invoicePeriodMonths
                     )
                 );
 
@@ -439,8 +431,8 @@ class BURenHosting extends Business
                 // period comment line
                 $line++;
                 $description = $this->dbeJRenHosting->getValue(
-                        'invoiceFromDate'
-                    ) . ' to ' . $this->dbeJRenHosting->getValue('invoiceToDate');
+                        DBEJRenHosting::invoiceFromDate
+                    ) . ' to ' . $this->dbeJRenHosting->getValue(DBEJRenHosting::invoiceToDate);
                 $dbeOrdline->setValue(
                     'lineType',
                     'C'

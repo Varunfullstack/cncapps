@@ -427,7 +427,7 @@ class BUSalesOrder extends Business
      * @return void : Success
      * @access public
      */
-    function InitialiseOrder(&$dsOrdhead,
+    function initialiseOrder(&$dsOrdhead,
                              &$dsOrdline,
                              &$dsCustomer,
                              $directDebit = false,
@@ -536,10 +536,20 @@ class BUSalesOrder extends Business
                 CONFIG_PAYMENT_TERMS_NO_INVOICE
             );    // switch to paymentTermsID
         } else {
-            $dsOrdhead->setValue(
-                DBEOrdhead::paymentTermsID,
-                CONFIG_PAYMENT_TERMS_30_DAYS
-            );    // switch to paymentTermsID
+
+            if ($directDebit) {
+                $dsOrdhead->setValue(
+                    DBEOrdhead::paymentTermsID,
+                    CONFIG_PAYMENT_TERMS_DIRECT_DEBIT
+                );    // switch to paymentTermsID
+            } ELSE {
+
+                $dsOrdhead->setValue(
+                    DBEOrdhead::paymentTermsID,
+                    CONFIG_PAYMENT_TERMS_30_DAYS
+                );    // switch to paymentTermsID
+            }
+
         }
         $dsOrdhead->setValue(
             DBEOrdhead::partInvoice,

@@ -7,6 +7,18 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenHosting extends DBECustomerItem
 {
+    const customerName = "customerName";
+    const siteName = "siteName";
+    const itemDescription = "itemDescription";
+    const itemTypeDescription = "itemTypeDescription";
+    const itemID = "itemID";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
+    const curUnitSale = "curUnitSale";
+    const curUnitCost = "curUnitCost";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -150,9 +162,8 @@ class DBEJRenHosting extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     * @param bool $directDebit
      */
-    function getRenewalsDueRows($directDebit = false)
+    function getRenewalsDueRows()
     {
 
         $statement =
@@ -164,14 +175,7 @@ class DBEJRenHosting extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
-		 AND declinedFlag = 'N' AND renewalTypeID = 5";
-
-        if ($directDebit) {
-            $statement .= " and directDebitFlag = 'Y' ";
-        } else {
-            $statement .= " and directDebitFlag <> 'Y' ";
-        }
-
+		 AND declinedFlag = 'N' AND renewalTypeID = 5 and directDebitFlag <> 'Y'";
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
 
         $this->setQueryString($statement);

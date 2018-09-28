@@ -121,6 +121,7 @@ define(
 
 class CTCustomer extends CTCNC
 {
+    const DECRYPT = "decrypt";
     var $customerID = '';
     var $customerString = '';                      // Used when searching for an entity by string
     var $contactString = '';                      // Used when searching for an entity by string
@@ -784,6 +785,16 @@ class CTCustomer extends CTCNC
                 $value['sortCode']
             );
 
+            if ($value['newSortCode']) {
+                $encryptedSortCode = $this->encrypt($value['newSortCode']);
+
+                $this->dsCustomer->setValue(
+                    DBECustomer::sortCode,
+                    base64_encode($encryptedSortCode)
+                );
+            }
+
+
             $this->dsCustomer->setValue(
                 DBECustomer::accountName,
                 $value['accountName']
@@ -794,8 +805,30 @@ class CTCustomer extends CTCNC
                 $value['accountNumber']
             );
 
+            if ($value['newAccountNumber']) {
+                $encryptedAccountNumber = $this->encrypt($value['newAccountNumber']);
+
+                $this->dsCustomer->setValue(
+                    DBECustomer::accountNumber,
+                    base64_encode($encryptedAccountNumber)
+                );
+            }
+
             $this->dsCustomer->post();
         }
+    }
+
+    function encrypt($unEncryptedData)
+    {
+        $publicKey = file_get_contents('c:\\keys\\privkey.pub');
+
+        openssl_public_encrypt(
+            $unEncryptedData,
+            $cryptedData,
+            $publicKey,
+            OPENSSL_PKCS1_OAEP_PADDING
+        );
+        return $cryptedData;
     }
 
     function setCustomerString($customerString)
@@ -1021,7 +1054,10 @@ class CTCustomer extends CTCNC
             case self::DECRYPT:
                 $response = ["status" => "ok"];
                 try {
-                    $this->decrypt(@$_REQUEST['encryptedData'], @$_REQUEST['passphrase']);
+                    $response['decryptedData'] = $this->decrypt(
+                        @$_REQUEST['encryptedData'],
+                        @$_REQUEST['passphrase']
+                    );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
                     $response['error'] = $exception->getMessage();
@@ -1990,6 +2026,9 @@ ORDER BY cus_name ASC  ";
                 'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),
                 'sortCodePencilColor'             => $this->dsCustomer->getValue(
                     DBECustomer::sortCode
+                ) ? "greenPencil" : "redPencil",
+                'accountNumberPencilColor'        => $this->dsCustomer->getValue(
+                    DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil"
 
             )
@@ -3187,11 +3226,29 @@ ORDER BY cus_name ASC  ";
         } // end if
     }
 
-    private function decrypt($param,
-                             $param1
+    private function decrypt($encryptedData,
+                             $passphrase
     )
     {
 
+        $keyData = file_get_contents('c:\\keys\\privkey.pem');
+
+        $key = openssl_pkey_get_private(
+            $keyData,
+            $passphrase
+        );
+
+        if (!$key) {
+            throw new Exception('Passphrase not valid');
+        }
+
+        openssl_private_decrypt(
+            base64_decode($encryptedData),
+            $decryptedData,
+            $key,
+            OPENSSL_PKCS1_OAEP_PADDING
+        );
+        return $decryptedData;
     } // end function documents
 }// end of class
 ?>

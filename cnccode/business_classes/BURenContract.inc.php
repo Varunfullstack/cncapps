@@ -136,13 +136,11 @@ class BURenContract extends Business
 
     /**
      * @param string $toEmail
-     * @param bool $directDebit
      */
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL,
-                                         $directDebit = false
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL
     )
     {
-        $this->dbeJRenContract->getRenewalsDueRows($directDebit);
+        $this->dbeJRenContract->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
@@ -198,7 +196,7 @@ class BURenContract extends Business
 
     }
 
-    function createRenewalsSalesOrders($directDebit = false
+    function createRenewalsSalesOrders(
     )
     {
         $buSalesOrder = new BUSalesOrder ($this);
@@ -206,7 +204,7 @@ class BURenContract extends Business
         $buInvoice = new BUInvoice ($this);
         $buActivity = new BUActivity ($this);
 
-        $this->dbeJRenContract->getRenewalsDueRows($directDebit);
+        $this->dbeJRenContract->getRenewalsDueRows();
 
         $dsRenContract = new DSForm($this);
         $dsRenContract->replicate($this->dbeJRenContract);
@@ -247,8 +245,7 @@ class BURenContract extends Business
                     (
                         !$generateInvoice &&
                         $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
-                    ) ||
-                    $dsRenContract->getValue(DBECustomerItem::directDebitFlag) === 'Y'
+                    )
                 ) {
                     /*
                     If generating invoices and an order has been started
@@ -280,9 +277,7 @@ class BURenContract extends Business
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
-                        $dsCustomer,
-                        $dsRenContract->getValue(DBECustomerItem::directDebitFlag) === 'Y',
-                        $dsRenContract->getValue(DBECustomerItem::transactionType)
+                        $dsCustomer
                     );
                     $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
@@ -440,11 +435,13 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     'curUnitSale',
-                    ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $dsRenContract->getValue('invoicePeriodMonths')
+                    ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12) *
+                    $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
                 $dbeOrdline->setValue(
                     'curUnitCost',
-                    ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $dsRenContract->getValue('invoicePeriodMonths')
+                    ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitCost) / 12) *
+                    $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
 
                 $dbeOrdline->insertRow();

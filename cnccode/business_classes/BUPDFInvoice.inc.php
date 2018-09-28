@@ -140,9 +140,11 @@ class BUPDFInvoice extends BaseObject
      * Generate one invoice and return file path
      *
      * @access private
+     * @param $dsInvhead
+     * @param bool $directDebit
      * @return String PDF disk file name or FALSE
      */
-    function generateFile($dsInvhead)
+    function generateFile($dsInvhead, $directDebit = false)
     {
 
         $this->_dsInvhead = $dsInvhead;
@@ -162,7 +164,7 @@ class BUPDFInvoice extends BaseObject
             'A4'
         );
 
-        $this->produceInvoice();
+        $this->produceInvoice($directDebit);
 
         $this->_buPDF->close();
 
@@ -213,7 +215,7 @@ class BUPDFInvoice extends BaseObject
         }
     }
 
-    function produceInvoice()
+    function produceInvoice($directDebit = false)
     {
         $this->invoiceHead();
         $this->_buInvoice->getInvoiceLines(
