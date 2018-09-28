@@ -67,6 +67,7 @@ class DBEJCallActivity extends DBECallActivity
     const allocatedUserID = "allocatedUserID";
     const queueNo = "queueNo";
 
+
     /**
      * calls constructor()
      * @access public
@@ -471,26 +472,17 @@ class DBEJCallActivity extends DBECallActivity
         return (parent::getRows());
     }
 
-    /*
-      function getRowsByProjectID( $projectID, $includeTravel = false ){
-
-          $query =
-              "SELECT ".
-                  $this->getDBColumnNamesAsString() .
-              " FROM " . $this->fromString .
-               " WHERE callactivity.projectID = '" . mysql_escape_string($projectID). "'";
-
-          if ( !$includeTravel ){
-              $query .= " AND travelFlag <> 'Y'  AND callactivity.caa_problemno <> 0";
-          }
-
-          $query .= " ORDER BY projectID, caa_date, caa_starttime";
-
-          $this->setQueryString( $query );
-
-          return (parent::getRows());
-      }
-    */
+    /**
+     * @param $problemID
+     * @param bool $includeTravel
+     * @param bool $includeOperationalTasks
+     * @param bool $descendingDate
+     * @param bool $fromDate
+     * @param bool $includeServerGuardUpdates
+     * @param null $activityType
+     * @param null $activityStatus
+     * @return bool
+     */
     function getRowsByProblemID(
         $problemID,
         $includeTravel = false,
@@ -498,7 +490,9 @@ class DBEJCallActivity extends DBECallActivity
         $descendingDate = false,
         $fromDate = false,
         // limits the number of activities returned
-        $includeServerGuardUpdates = true
+        $includeServerGuardUpdates = true,
+        $activityType = null,
+        $activityStatus = null
     )
     {
 
@@ -525,6 +519,14 @@ class DBEJCallActivity extends DBECallActivity
 
         if ($fromDate) {
             $query .= " AND caa_date > DATE( '" . $fromDate . "')";
+        }
+
+        if ($activityType) {
+            $query .= ' and caa_callacttypeno = ' . $activityType;
+        }
+
+        if ($activityStatus) {
+            $query .= ' and caa_status = "' . $activityStatus . '"';
         }
 
         if ($descendingDate) {
@@ -572,7 +574,7 @@ class DBEJCallActivity extends DBECallActivity
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 43";
+            " WHERE callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43";
         $this->setQueryString($query);
         return (parent::getRows());
     }

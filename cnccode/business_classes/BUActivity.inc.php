@@ -2464,26 +2464,15 @@ class BUActivity extends Business
         switch ($response) {
 
             case 'A':
-                $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
+                $reason = '<p>The following sales request has been approved by ' . $userName . '</p>';
 
                 $subject = 'Sales Request approved';
                 $approval = true;
 
-                $problem->setValue(
-                    DBEProblem::userID,
-                    0
-                );
-
-                $problem->setValue(
-                    DBEProblem::queueNo,
-                    4
-                );
-
-
                 break;
 
             case 'D':
-                $reason = '<p>The following change request has been denied by ' . $userName . '</p>';
+                $reason = '<p>The following sales request has been denied by ' . $userName . '</p>';
 
                 $subject = 'Sales Request denied';
 
@@ -2537,7 +2526,7 @@ class BUActivity extends Business
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
         $dbeCallActivity->setValue(
-            DBECallActivity::status,
+            DBECallActivity::salesRequestStatus,
             'C'
         );
 
@@ -6896,8 +6885,7 @@ is currently a balance of ';
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
                     $reason .= $dsOrdline->getValue(DBEOrdline::qtyOrdered);
                 } else {
-                    $reason .= '&nbsp';
-
+                    $reason .= '&nbsp;';
                 }
 
 
@@ -7055,11 +7043,10 @@ is currently a balance of ';
                 'urlActivity'   => $urlActivity,
                 'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
                 'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'internalNotes' => str_replace(
-                    '&nbsp',
-                    '&nbsp;',
-                    $dbeJCallActivity->getValue(DBEJCallActivity::internalNotes)
-                ),
+                'internalNotes' =>
+                    $dbeJCallActivity->getValue(
+                        DBEJCallActivity::internalNotes
+                    ),
                 'CONFIG_SERVICE_REQUEST_DESC'
                                 => CONFIG_SERVICE_REQUEST_DESC
 
@@ -9170,8 +9157,7 @@ is currently a balance of ';
         );
         $body = $buMail->mime->get($mime_params);
 
-        $bcc =
-            $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
+        $bcc = $dsCallActivity->getValue(DBEJCallActivity::userAccount) . '@cnc-ltd.co.uk' . ',' .
             CONFIG_SALES_EMAIL . ',' . "VisitConfirmation@cnc-ltd.co.uk";
 
         $recipients = $toEmail . ',' . $bcc . ',' . $cc;
@@ -10729,7 +10715,7 @@ is currently a balance of ';
      * @param $problemID
      * @param $message
      * @param string $status
-     * @return bool|DBEJCallActivity
+     * @return DBEJCallActivity
      */
     private function createSalesRequestActivity($problemID,
                                                 $message,
@@ -10771,12 +10757,19 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::salesRequestStatus,
             $status
-        );              // Checked
+        );
 
         $dbeCallActivity->insertRow();
 
-        return $this->getLastActivityInProblem($problemID);
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($dbeCallActivity->getPKValue());
+
+        return $dbejCallactivity;
     }
 
 
