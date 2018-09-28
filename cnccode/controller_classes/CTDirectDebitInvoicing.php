@@ -95,17 +95,34 @@ class CTDirectDebitInvoicing extends CTCNC
     private function sendInvoices()
     {
         $buInvoice = new BUInvoice($this);
-        // generate PDF invoices:
-        $invoiceCount = $buInvoice->printDirectDebitInvoices(
-            date('Y-m-01'),
-            $_REQUEST['passphrase']
-        );
 
-        if ($invoiceCount == 0) {
-            $this->setFormErrorMessage('There aren\'t any Un-sent invoices');
+        $keyData = file_get_contents('c:\\keys\\privkey.pem');
 
+
+        if (!isset($_POST['passphrase'])) {
+            $this->setFormErrorMessage('Secure Passphrase not provided');
         } else {
-            $this->setFormErrorMessage($invoiceCount . 'Invoices Sent');
+            $key = openssl_pkey_get_private(
+                $keyData,
+                $_POST['passphrase']
+            );
+
+            if (!$key) {
+                $this->setFormErrorMessage('Passphrase not valid');
+            } else {
+                // generate PDF invoices:
+                $invoiceCount = $buInvoice->printDirectDebitInvoices(
+                    date('Y-m-01'),
+                    $key
+                );
+
+                if ($invoiceCount == 0) {
+                    $this->setFormErrorMessage('There aren\'t any Un-sent invoices');
+
+                } else {
+                    $this->setFormErrorMessage($invoiceCount . 'Invoices Sent');
+                }
+            }
         }
 
         $this->displayStuff();

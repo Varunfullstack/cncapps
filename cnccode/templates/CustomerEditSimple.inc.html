@@ -225,6 +225,14 @@
         text-align: right;
         float: right
     }
+
+    .redPencil {
+        color: red;
+    }
+
+    .greenPencil {
+        color: green;
+    }
 </style>
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
@@ -698,22 +706,60 @@
                     </td>
                 </tr>
                 <script>
+                    let storedPassPhrase = null;
+
+
+                    function storePassPhrase(passPhrase) {
+                        storedPassPhrase = passPhrase;
+                        setTimeout(() => {
+                            storedPassPhrase = null;
+                        }, 30);
+                    }
+
                     $(function () {
                         $('#sortCode').mask('00-00-00');
-                    })
+                    });
+
+                    function editSortCode() {
+
+                        let passPhrase = storedPassPhrase;
+                        if (!passPhrase) {
+                            passPhrase = prompt('Please provide secure passphrase');
+                            storePassPhrase(passPhrase);
+                        }
+                        if (!passPhrase) {
+                            return;
+                        }
+
+                        const formData = new FormData();
+
+                        formData.append('passphrase', passPhrase);
+                        formData.append('encryptedData', $('#sortCode').val());
+
+                        fetch('?action=decrypt', {
+                            method: 'POST',
+                            body: formData
+                        }).then(response => {
+                            if (response.ok) {
+                                response.json().then((json) => {
+                                    json.data
+                                    $(event.target).parent().append('<input id="sortCode" name="form[customer][{customerID}][newSortCode]" value="'+json.data+'">')
+                                    $('#sortCode').mask('00-00-00');
+                                })
+                            }
+                        })
+
+                    }
+
                 </script>
                 <tr>
                     <td class="content">Sort Code</td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][sortCode]"
-                                id="sortCode"
-                                value="{sortCode}"
-                                size="8"
-                                maxlength="8"
-                                minlength="8"
+                        <button hidden><i class="fa fa-eye"></i></button>
+                        <button onclick="editSortCode()"><i class="fa fa-pencil {sortCodePencilColor}"></i></button>
+                        <input type="hidden"
+                               name="form[customer][{customerID}][sortCode]"
+                               value="{sortCode}"
                         >
                     </td>
                 </tr>

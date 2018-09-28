@@ -1018,6 +1018,17 @@ class CTCustomer extends CTCNC
             case 'csvContractAndNumbersReport':
                 $this->csvContractAndNumbersReport();
                 break;
+            case self::DECRYPT:
+                $response = ["status" => "ok"];
+                try {
+                    $this->decrypt(@$_REQUEST['encryptedData'], @$_REQUEST['passphrase']);
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                    http_response_code(400);
+                }
+                echo json_encode($response);
+                break;
             default:
                 $this->displaySearchForm();
                 break;
@@ -1977,6 +1988,9 @@ ORDER BY cus_name ASC  ";
                 'sortCode'                        => $this->dsCustomer->getValue(DBECustomer::sortCode),
                 'accountName'                     => $this->dsCustomer->getValue(DBECustomer::accountName),
                 'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),
+                'sortCodePencilColor'             => $this->dsCustomer->getValue(
+                    DBECustomer::sortCode
+                ) ? "greenPencil" : "redPencil"
 
             )
         );
@@ -3171,6 +3185,13 @@ ORDER BY cus_name ASC  ";
             } // end while
 
         } // end if
+    }
+
+    private function decrypt($param,
+                             $param1
+    )
+    {
+
     } // end function documents
 }// end of class
 ?>

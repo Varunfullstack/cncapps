@@ -35,6 +35,18 @@
         xhttp.responseType = 'blob';
         xhttp.send(JSON.stringify({}));
     }
+
+    function handlePassphrase() {
+        const passPhrase = prompt('To continue please provide the secure passphrase');
+
+        if (!passPhrase) {
+            return false;
+        }
+
+
+        $('form').append("<input type='hidden' value='" + passPhrase + "' name='passphrase'>");
+        return true;
+    }
 </script>
 <form name="invoice"
       method="post"
@@ -60,7 +72,7 @@
                        name="Print"
                        value="Send"
                        id="sendButton"
-                       onClick="if(!confirm('Are you sure you want to send the invoices?')) return(false)"
+                       onClick="return handlePassphrase();"
                 >
             </td>
         </tr>

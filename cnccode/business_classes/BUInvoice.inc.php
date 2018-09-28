@@ -1293,13 +1293,13 @@ class BUInvoice extends Business
     }
 
 
-    function printDirectDebitInvoices($dateToUse, $passphrase)
+    function printDirectDebitInvoices($dateToUse,
+                                      $privateKey
+    )
     {
         if ($dateToUse == '') {
             $dateToUse = date('Y-m-d');    // use today if blank
         }
-
-
 
         $dbeInvhead = new DBEInvhead($this);
 
@@ -1407,10 +1407,31 @@ class BUInvoice extends Business
             )->format('d M Y');
             $invoiceValue = $this->getInvoiceValue($dsInvhead->getValue('invheadID'));
 
+            if ($dsCustomer->getValue(DBECustomer::sortCode)) {
+
+                openssl_private_decrypt(
+                    base64_decode($dsCustomer->getValue(DBECustomer::sortCode)),
+                    $unEncryptedSortCode,
+                    $privateKey,
+                    OPENSSL_PKCS1_OAEP_PADDING
+                );
+            }
+
+            if ($dsCustomer->getValue(DBECustomer::accountNumber)) {
+
+                openssl_private_decrypt(
+                    base64_decode($dsCustomer->getValue(DBECustomer::accountNumber)),
+                    $unEncryptedAccountNumber,
+                    $privateKey,
+                    OPENSSL_PKCS1_OAEP_PADDING
+                );
+            }
+
+
             $bankRow = [
-                $dsCustomer->getValue(DBECustomer::sortCode),
+                $unEncryptedSortCode,
                 $dsCustomer->getValue(DBECustomer::accountName),
-                $dsCustomer->getValue(DBECustomer::accountNumber),
+                $unEncryptedAccountNumber,
                 $invoiceValue,
                 $dsInvhead->getValue(DBEInvhead::invheadID),
                 $dsInvhead->getValue(DBEInvhead::transactionType)
