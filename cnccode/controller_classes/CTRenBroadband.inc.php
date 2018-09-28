@@ -14,6 +14,13 @@ require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 
 class CTRenBroadband extends CTCNC
 {
+    const InitialContractLengthValues = [
+        12,
+        24,
+        36,
+        48,
+        60
+    ];
     var $dsRenBroadband = '';
     var $buRenBroadband = '';
     var $buCustomerItem = '';
@@ -402,6 +409,14 @@ class CTRenBroadband extends CTCNC
             $readonly = CTCNC_HTML_READONLY;
         }
 
+        $this->template->setBlock(
+            'RenBroadbandEdit',
+            'initialContractLengthBlock',
+            'initialContractLengths'
+        );
+
+        $this->parseInitialContractLength($dsRenBroadband->getValue(DBECustomerItem::initialContractLength));
+
         $urlItemPopup =
             $this->buildLink(
                 CTCNC_PAGE_ITEM,
@@ -655,7 +670,14 @@ class CTRenBroadband extends CTCNC
                 'urlDisplayList'                       => $urlDisplayList,
                 'disabled'                             => $disabled,
                 'readonly'                             => $readonly,
-                'urlEmailTo'                           => $urlEmailTo
+                'urlEmailTo'                           => $urlEmailTo,
+                'calculatedExpiryDate'                 => getExpiryDate(
+        DateTime::createFromFormat(
+            'Y-m-d',
+            $dsRenBroadband->getValue(DBECustomerItem::installationDate)
+        ),
+        $dsRenBroadband->getValue(DBECustomerItem::initialContractLength)
+    )->format('d/m/Y'),
             )
         );
 
@@ -716,7 +738,7 @@ class CTRenBroadband extends CTCNC
                 true
             );
         }
-        
+
         $this->template->parse(
             'CONTENTS',
             'RenBroadbandEdit',
@@ -833,5 +855,24 @@ class CTRenBroadband extends CTCNC
         header('Location: ' . $urlNext);
 
     }// end function emailTo()
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
+    }
 }// end of class
 ?>

@@ -6,12 +6,25 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Signable\ApiClient;
+use Signable\DocumentWithoutTemplate;
+use Signable\Envelopes;
+use Signable\Party;
+
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJOrdhead.inc.php');
 require_once($cfg['path_bu'] . '/BUPortalCustomerDocument.inc.php');
+require_once($cfg["path_bu"] . "/BURenBroadband.inc.php");
+require_once($cfg["path_bu"] . "/BURenContract.inc.php");
+require_once($cfg["path_bu"] . "/BURenQuotation.inc.php");
+require_once($cfg["path_bu"] . "/BURenDomain.inc.php");
+require_once($cfg["path_bu"] . "/BURenHosting.inc.php");
+require_once($cfg["path_bu"] . "/BUExternalItem.inc.php");
+require_once($cfg["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 // Parameters
 define(
@@ -672,10 +685,12 @@ class CTCustomer extends CTCNC
                 DBECustomer::createDate,
                 $value['createDate']
             );
+
             $this->dsCustomer->setValue(
                 DBECustomer::gscTopUpAmount,
                 $value['gscTopUpAmount']
             );
+
             $this->dsCustomer->setValue(
                 DBECustomer::becameCustomerDate,
                 $this->convertDateYMD($value['becameCustomerDate'])
@@ -1605,6 +1620,48 @@ ORDER BY cus_name ASC  ";
         }
     }
 
+
+    private function extractValidContracts($something)
+    {
+
+        $contracts = [];
+        $validItems = [
+            "2nd Site",
+            "Internet Services",
+            "Managed Service",
+            "ServerCare",
+            "ServiceDesk",
+            "Telecom Services",
+            "PrePay"
+        ];
+
+        while ($something->fetchNext()) {
+
+            $continue = true;
+
+            foreach ($validItems as $item) {
+                if (strpos(
+                        $something->getValue('itemTypeDescription'),
+                        $item
+                    ) !== false) {
+                    $continue = false;
+                }
+            }
+
+            if ($continue) {
+                continue;
+            }
+            $contracts[] = [
+                'itemTypeDescription' => $something->getValue("itemTypeDescription"),
+                'customerItemID'      => $something->getValue("customerItemID"),
+                'itemDescription'     => $something->getValue('itemDescription')
+            ];
+        }
+
+        return $contracts;
+
+    }
+
     /**
      * Form for editing customer details
      * @access private
@@ -1657,13 +1714,13 @@ ORDER BY cus_name ASC  ";
         } else {
             $_SESSION['save_page'] = false;
         }
-        $submitURL =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMER_ACT_UPDATE
-                )
-            );
+        $submitURL = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTCUSTOMER_ACT_UPDATE
+            )
+        );
+
 
         if ($_SESSION['save_page']) {
             $cancelURL = $_SESSION['save_page'];
@@ -1759,6 +1816,16 @@ ORDER BY cus_name ASC  ";
 
         $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
 
+        $thirdPartyLinkURL = $this->buildLink(
+            'ThirdPartyContact.php',
+            [
+                'action'     => 'list',
+                'customerID' => $this->getCustomerID()
+            ]
+        );
+
+        $thirdPartyLink = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
+
         $showInactiveContactsURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -1790,6 +1857,7 @@ ORDER BY cus_name ASC  ";
 
         $this->template->set_var(
             array(
+                'lastContractSent'                => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
                 'urlContactPopup'                 => $urlContactPopup,
                 'bodyTagExtras'                   => $bodyTagExtras,
                 /* hidden */
@@ -1838,9 +1906,6 @@ ORDER BY cus_name ASC  ";
                 'autoCloseEmailMainFlagChecked'   => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::autoCloseEmailMainFlag)
                 ),
-                'pcxFlagChecked'                  => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::pcxFlag)
-                ),
                 'createDate'                      => $this->dsCustomer->getValue(DBECustomer::createDate),
                 'mailshot1FlagDesc'               => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot1FlagDesc
@@ -1878,6 +1943,7 @@ ORDER BY cus_name ASC  ";
                 'submitURL'                       => $submitURL,
                 'renewalLink'                     => $renewalLink,
                 'passwordLink'                    => $passwordLink,
+                'thirdPartyContactsLink'          => $thirdPartyLink,
                 'deleteCustomerURL'               => $deleteCustomerURL,
                 'deleteCustomerText'              => $deleteCustomerText,
                 'cancelURL'                       => $cancelURL,
@@ -3105,9 +3171,6 @@ ORDER BY cus_name ASC  ";
             } // end while
 
         } // end if
-
-
     } // end function documents
-
 }// end of class
 ?>

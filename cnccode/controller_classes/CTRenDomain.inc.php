@@ -14,6 +14,13 @@ require_once($cfg['path_dbe'] . '/DBEArecord.inc.php');
 
 class CTRenDomain extends CTCNC
 {
+    const InitialContractLengthValues = [
+        12,
+        24,
+        36,
+        48,
+        60
+    ];
     var $dsRenDomain = '';
     var $buRenDomain = '';
     var $buCustomerItem = '';
@@ -397,6 +404,14 @@ class CTRenDomain extends CTCNC
             )
         );
 
+        $this->template->setBlock(
+            'RenDomainEdit',
+            'initialContractLengthBlock',
+            'initialContractLengths'
+        );
+
+        $this->parseInitialContractLength($dsRenDomain->getValue(DBECustomerItem::initialContractLength));
+
         $this->template->set_var(
             array(
                 'pricePerMonth'                      => $pricePerMonth,
@@ -446,7 +461,14 @@ class CTRenDomain extends CTCNC
                 'readonly'                           => $readonly,
                 'internalNotes'                      => Controller::htmlTextArea(
                     $dsRenDomain->getValue('internalNotes')
-                )
+                ),
+                'calculatedExpiryDate'       => getExpiryDate(
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenDomain->getValue(DBECustomerItem::installationDate)
+                    ),
+                    $dsRenDomain->getValue(DBECustomerItem::initialContractLength)
+                )->format('d/m/Y'),
 
             )
         );
@@ -685,6 +707,25 @@ class CTRenDomain extends CTCNC
 
         header('Location: ' . $urlNext);
         exit;
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
     }
 }// end of class
 ?>

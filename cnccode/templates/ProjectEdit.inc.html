@@ -1,20 +1,35 @@
 <!-- Template: ProjectEdit.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script type="application/javascript">
     $(function () {
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
     });
 </script>
-<TABLE border="0" cellpadding="2" cellspacing="1">
+<TABLE border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
     <TR>
 
-        <TD class="navigateLink" valign="top"><a href="{urlDisplayCustomer}">Back to customer</a></TD>
-        <TD class="navigateLink" valign="top"><a href="/">Back to Home</a></TD>
-        <TD class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+        <TD class="navigateLink"
+            valign="top"
+        ><a href="{urlDisplayCustomer}">Back to customer</a></TD>
+        <TD class="navigateLink"
+            valign="top"
+        ><a href="/">Back to Home</a></TD>
+        <TD class="navigateLink"
+            valign="top"
+        ><a href="{urlDelete}">{txtDelete}</a></TD>
     </TR>
 </table>
-<FORM method="post" action="{urlUpdate}" name="project" AUTOCOMPLETE="OFF">
+<FORM method="post"
+      action="{urlUpdate}"
+      name="project"
+      AUTOCOMPLETE="OFF"
+>
     <table border="0">
         <input
                 type="hidden"
@@ -30,16 +45,24 @@
             <td class="promptText">Description</td>
             <td class="fieldText"><input
                     name="project[1][description]"
-                    type="text" value="{description}"
+                    type="text"
+                    value="{description}"
                     size="50"
                     maxlength="50"
             > <span class="formErrorMessage">{descriptionMessage}</span></td>
         </tr>
         <tr>
-            <td class="promptText" valign="top">Notes</td>
+            <td class="promptText"
+                valign="top"
+            >Notes
+            </td>
             <td class="fieldText">
-                <textarea cols="100" rows="15" name="project[1][notes]">{notes}</textarea><span
-                    class="formErrorMessage">{notesMessage}</span></td>
+                <textarea cols="100"
+                          rows="15"
+                          name="project[1][notes]"
+                >{notes}</textarea><span
+                    class="formErrorMessage"
+            >{notesMessage}</span></td>
         </tr>
         <TR>
             <TD class="promptText">Project Start Date</TD>
@@ -50,27 +73,34 @@
                     value="{startDate}"
                     size="10"
                     maxlength="10"
-            > <a href="javascript:;" onClick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-                <font class="formErrorMessage">{startDateMessage}</font></TD>
+                    autocomplete="off"
+                    class="jQueryCalendar"
+            >
+                <font class="formErrorMessage">{startDateMessage}</font>
+            </TD>
         </TR>
         <TR>
             <TD class="promptText">Project Expiry Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="expiryDate"
-                    name="project[1][expiryDate]"
-                    value="{expiryDate}"
-                    size="10"
-                    maxlength="10"
-            > <a href="javascript:;" onClick="popUpCalendar(this, expiryDate, 'dd/mm/yyyy')"><img
-                    src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle"></a>
-                <font class="formErrorMessage">{expiryDateMessage}</font></TD>
+            <TD class="field">
+                <input type="text"
+                       id="expiryDate"
+                       name="project[1][expiryDate]"
+                       value="{expiryDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                >
+                <font class="formErrorMessage">{expiryDateMessage}</font>
+            </TD>
         </TR>
 
         <tr>
             <td>&nbsp;</td>
-            <td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+            <td class="formErrorMessage"><input type="submit"
+                                                name="Submit"
+                                                value="Update"
+            ></td>
         </tr>
     </table>
 </form>

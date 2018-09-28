@@ -24,6 +24,14 @@ class CTRenContract extends CTCNC
         "R" => "Renewed"
     );
 
+    const InitialContractLengthValues = [
+        12,
+        24,
+        36,
+        48,
+        60
+    ];
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -466,11 +474,11 @@ class CTRenContract extends CTCNC
                 ),
                 'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('invoicePeriodMonths')
-                ),
-                'totalInvoiceMonths'                 => Controller::htmlInputText(
+
+                ),'totalInvoiceMonths'                 => Controller::htmlInputText(
                     $dsRenContract->getValue('totalInvoiceMonths')
-                ),
-                'curUnitCost'                        => $dsRenContract->getValue('curUnitCost'),
+
+                ),'curUnitCost'                        => $dsRenContract->getValue('curUnitCost'),
                 'curUnitSale'                        => $dsRenContract->getValue('curUnitSale'),
                 'notes'                              => Controller::htmlInputText($dsRenContract->getValue('notes')),
                 'notesMessage'                       => Controller::htmlDisplayText(
@@ -503,8 +511,8 @@ class CTRenContract extends CTCNC
                 ),
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('controlPanelUrl')
-                ),
-                'ftpAddress'                         => Controller::htmlInputText(
+
+                ),'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenContract->getValue('ftpAddress')
                 ),
                 'ftpAddressMessage'                  => Controller::htmlDisplayText(
@@ -528,6 +536,8 @@ class CTRenContract extends CTCNC
                 'websiteDeveloperMessage'            => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('websiteDeveloper')
                 ),
+                'officialOrderNumber'        => Controller::htmlInputText(
+                    $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)),
                 'urlUpdate'                          => $urlUpdate,
                 'urlDelete'                          => $urlDelete,
                 'txtDelete'                          => $txtDelete,
@@ -551,6 +561,13 @@ class CTRenContract extends CTCNC
                 'expiryDate'                         => Controller::dateYMDtoDMY(
                     $dsRenContract->getValue('expiryDate')
                 ),
+                'calculatedExpiryDate'    => getExpiryDate(
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenContract->getValue(DBECustomerItem::installationDate)
+                    ),
+                    $dsRenContract->getValue(DBECustomerItem::initialContractLength)
+                )->format('d/m/Y'),
                 'expiryDateMessage'                  => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('expiryDate')
                 ),
@@ -581,6 +598,15 @@ class CTRenContract extends CTCNC
             'renewalStatuss'
         );
         $this->parseRenewalSelector($dsRenContract->getValue('renewalStatus'));
+
+
+        $this->template->setBlock(
+            'RenContractEdit',
+            'initialContractLengthBlock',
+            'initialContractLengths'
+        );
+
+        $this->parseInitialContractLength($dsRenContract->getValue(DBECustomerItem::initialContractLength));
 
         $buCustomerItem = new BUCustomerItem($this);
         $buCustomerItem->getCustomerItemsByContractID(
@@ -742,6 +768,25 @@ class CTRenContract extends CTCNC
             $this->template->parse(
                 'renewalStatuss',
                 'renewalStatusBlock',
+                true
+            );
+        }
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
                 true
             );
         }

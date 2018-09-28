@@ -16,6 +16,13 @@ require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 
 class CTRenHosting extends CTCNC
 {
+    const InitialContractLengthValues = [
+        12,
+        24,
+        36,
+        48,
+        60
+    ];
     var $dsRenHosting = '';
     var $buRenHosting = '';
     var $buCustomerItem = '';
@@ -481,8 +488,8 @@ class CTRenHosting extends CTCNC
                 ),
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
                     $dsRenHosting->getMessage('controlPanelUrl')
-                ),
-                'ftpAddress'                         => Controller::htmlInputText(
+
+                ),'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenHosting->getValue('ftpAddress')
                 ),
                 'ftpAddressMessage'                  => Controller::htmlDisplayText(
@@ -515,11 +522,25 @@ class CTRenHosting extends CTCNC
                 ),
                 'internalNotes'                      => Controller::htmlTextArea(
                     $dsRenHosting->getValue('internalNotes')
-                )
+                ),
+                'calculatedExpiryDate'       => getExpiryDate(
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenHosting->getValue(DBECustomerItem::installationDate)
+                    ),
+                    $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
+                )->format('d/m/Y'),
             )
         );
 
-        $this->template->set_block(
+
+        $this->template->setBlock(
+            'RenHostingEdit',
+            'initialContractLengthBlock',
+            'initialContractLengths'
+        );
+
+        $this->parseInitialContractLength($dsRenHosting->getValue(DBECustomerItem::initialContractLength));        $this->template->set_block(
             'RenHostingEdit',
             'TransactionTypesBlock',
             'transactionTypesOptions'
@@ -638,6 +659,25 @@ class CTRenHosting extends CTCNC
             $this->template->parse(
                 'renewalStatuss',
                 'renewalStatusBlock',
+                true
+            );
+        }
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
                 true
             );
         }

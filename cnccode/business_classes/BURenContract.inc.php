@@ -198,7 +198,8 @@ class BURenContract extends Business
 
     }
 
-    function createRenewalsSalesOrders($directDebit = false)
+    function createRenewalsSalesOrders($directDebit = false
+    )
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
@@ -287,6 +288,30 @@ class BURenContract extends Business
                     $line = -1;    // initialise sales order line seq
                 }
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
+
+                if ($dsRenContract->getValue(DBECustomerItem::officialOrderNumber)) {
+
+                    $custPORef = $dsRenContract->getValue(DBECustomerItem::officialOrderNumber);
+                    if ($dsOrdhead->getValue(DBEOrdhead::custPORef)) {
+                        $custPORef = $dsOrdhead->getValue(DBEOrdhead::custPORef) . '/' . $custPORef;
+                    }
+
+                    $ordHead = new DBEOrdhead($this);
+
+                    $ordHead->getRow($dsOrdhead->getValue(DBEOrdhead::ordheadID));
+
+                    $ordHead->setValue(
+                        DBEOrdhead::custPORef,
+                        $custPORef
+                    );
+                    $dsOrdhead->setValue(
+                        DBEOrdhead::custPORef,
+                        $custPORef
+                    );
+                    $ordHead->updateRow();
+                }
+
+
                 /**
                  * add notes as a comment line (if they exist)
                  */

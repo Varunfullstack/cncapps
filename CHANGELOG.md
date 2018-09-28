@@ -4,7 +4,51 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 211 - CNC040 - Direct Debit Specification
- 
+
+## [v1.12.0] - 2018-09-27
+### Changed
+- Issue 353 - Sales request wording change
+- Issue 356 - Remove the word Contracts from Call Activity page
+- Issue 357 - Change Request reply, remove Further Details Required
+- Issue 348 - Show priority on Existing SRs page
+- Issue 354 - Improve loading speed of home page
+### Fixed
+- Issue 351 - &nbsp in SR from Sales order
+
+## [v1.11.1] - 2018-09-17
+### Fixed
+- Fix issue with Visit Confirmation emails.
+
+## [v1.11.0] - 2018-09-11
+### Fixed
+- Issue 315 - Monitored SR formatting issues.
+- Issue 328 - Spell checking within fields
+- Issue 337 - FOC activities email URL text error
+- Issue 340 - Hidden from customer flag showed as cleared under certain conditions.
+### Added
+- Issue 317 - Customer 3rd party contact information
+- Issue 318 - Create Change Request Dashboard
+- Issue 334 - Add total to Service Requests Open For More Than 7 Days on screen
+- Issue 319 - Implement Sales Request Approval Process
+- Issue 339 - Team Lead Dashboard view filtering by teams
+- Issue 325 - Calculate and display contract expiry date
+- Issue 324 - Official Order Number for Contracts
+### Changed
+- Issue 304 - Enhance First Time Fix Reporting
+- Issue 320 - Further Increase length of mail queue recipient database field
+- Issue 322 - Change Renewal Report Heading Expires to Invoiced Until
+- Issue 327 - SQL crash searching for customer with apostrophe in the name
+- Issue 326 - Enhance Items Not Received Process
+- Issue 331 - Renewal item creation warning
+- Issue 273 - Allow for contracts & T&Cs to be manually sent to a customer.
+- Issue 335 - Improve visit confirmation email addressing
+- Issue 338 - Change date picker on additional pages
+- Issue 268 - Customer Review Meeting formatting improvements
+
+## [v1.10.2] - 2018-08-20
+### Fixed
+- Issue 333 - Prepay Top Up value lost when saving customer
+
 ## [v1.10.1] - 2018-08-03
 ### Fixed
 - Fixed issue with First Time Fixes totals

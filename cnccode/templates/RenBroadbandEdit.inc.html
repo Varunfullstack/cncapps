@@ -2,7 +2,8 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script src=".javascript/DirectDebitLogic.js"></script>
+<script src=".javascript/DirectDebitLogic.js"
+></script>
 <script language='JavaScript'>
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {      // F9 - edit
@@ -188,7 +189,23 @@
                     readonly="readonly"
                     id="installationDate"
             >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">
+                Initial Contract Length (months)
+            </td>
+            <td class="fieldText">
+                <select {disabled}
+                        name="renBroadband[1][initialContractLength]"
+                >
+                    <!-- BEGIN initialContractLengthBlock -->
+                    <option {initialContractLengthSelected}
+                            value="{initialContractLength}"
+                    >{initialContractLengthDescription}
+                    </option>
+                    <!-- END initialContractLengthBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
@@ -214,6 +231,10 @@
                     id="invoiceInterval"
             >
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Contract Expiry Date</td>
+            <td class="fieldText">{calculatedExpiryDate}</td>
         </tr>
         <tr>
             <td class="promptText">Next Invoice Period</td>
@@ -358,8 +379,8 @@
                     value="{initialSpeedTest}"
                     size="50"
                     maxlength="50"
-            >
-                <span class="formErrorMessage">{initialSpeedTestMessage}</span></td>
+
+            > <span class="formErrorMessage">{initialSpeedTestMessage}</span></td>
         </tr>
 
         <tr>
@@ -370,8 +391,8 @@
                     value="{bandwidthAllowance}"
                     size="10"
                     maxlength="10"
-            >
-                <span class="formErrorMessage">{bandwidthAllowanceMessage}</span></td>
+
+            > <span class="formErrorMessage">{bandwidthAllowanceMessage}</span></td>
         </tr>
         <!--
             <tr>
@@ -527,7 +548,7 @@
             >Internal Notes
             </td>
             <td colspan="2">
-                <textarea cols="80"
+                <textarea cols="52"
                           rows="10"
                           name="renBroadband[1][internalNotes]"
                 >{internalNotes}</textarea>

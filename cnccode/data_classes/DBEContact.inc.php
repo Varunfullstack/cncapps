@@ -622,18 +622,17 @@ class DBEContact extends DBCNCEntity
      * @param null $leadStatusID
      * @return DBEContact $this
      */
-    function getMainContactsByLeadStatus($leadStatusID = null)
+    function getContactsByLeadStatus($leadStatusID = null)
     {
         $sqlQuery =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " left join customer on con_custno = cus_custno 
-             WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y' ";
+            " left join customer on con_custno = cus_custno";
 
         if ($leadStatusID) {
-            $sqlQuery .= " and customer_lead_status_id = $leadStatusID";
+            $sqlQuery .= " where customer_lead_status_id = $leadStatusID";
         } else {
-            $sqlQuery .= " and customer_lead_status_id is not null and customer_lead_status_id <> 0";
+            $sqlQuery .= " where customer_lead_status_id is not null and customer_lead_status_id <> 0";
         }
         $this->setQueryString($sqlQuery);
 

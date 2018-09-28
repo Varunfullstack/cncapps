@@ -2,7 +2,8 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script src=".javascript/DirectDebitLogic.js"></script>
+<script src=".javascript/DirectDebitLogic.js"
+></script>
 <script language='JavaScript'>
     $(function () {
         window.despatchDate = $('#despatchDate').get(0);
@@ -182,15 +183,31 @@
                     type="text"
                     value="{installationDate}"
                     {readonly}
-                    size="40"
-                    maxlength="50"
+                    size="10"
+                    maxlength="10"
                     class="jqueryCalendar"
                     data-jqueryCalendarBeforeShowDay="beforeShowDay"
                     required
                     readonly="readonly"
                     id="installationDate"
             >
-                <span class="formErrorMessage">{installationDateMessage}</span></td>
+                <span class="formErrorMessage">{installationDateMessage}</span>
+            </td>
+            <td class="promptText">
+                Initial Contract Length (months)
+            </td>
+            <td class="fieldText">
+                <select {disabled}
+                        name="renContract[1][initialContractLength]"
+                >
+                    <!-- BEGIN initialContractLengthBlock -->
+                    <option {initialContractLengthSelected}
+                            value="{initialContractLength}"
+                    >{initialContractLengthDescription}
+                    </option>
+                    <!-- END initialContractLengthBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
@@ -219,8 +236,23 @@
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
         </tr>
         <tr>
+            <td class="promptText">Contract Expiry Date</td>
+            <td class="fieldText">{calculatedExpiryDate}</td>
+        </tr>
+        <tr>
             <td class="promptText">Next Invoice Period</td>
             <td class="fieldText">{invoiceFromDate} to {invoiceToDate}</td>
+        </tr>
+        <tr>
+            <td class="promptText">Official Order Number</td>
+            <td class="fieldText">
+                <input type="text"
+                       name="renContract[1][officialOrderNumber]"
+                       maxlength="100"
+                       size="80"
+                       value="{officialOrderNumber}"
+                >
+            </td>
         </tr>
         <tr>
             <td class="promptText">Sales Order Comment</td>
@@ -255,30 +287,23 @@
         </tr>
         <TR>
             <TD class="promptText">Printed Contract Start Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="despatchDate"
-                    name="renContract[1][despatchDate]"
-                    size="10"
-                    maxlength="10"
-                    {readonly}
-                    value="{despatchDate}"
-            > <a href="javascript:;"
-                 onClick="popUpCalendar(this, despatchDate, 'dd/mm/yyyy')"
-            ><img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            ></a>
+            <TD class="field">
+                <input
+                        type="text"
+                        id="despatchDate"
+                        name="renContract[1][despatchDate]"
+                        size="10"
+                        maxlength="10"
+                        {readonly}
+                        value="{despatchDate}"
+                        autocomplete="off"
+                        class="jQueryCalendar"
+                >
                 <font class="formErrorMessage">{despatchDateMessage}</font></TD>
         </TR>
         {renContractPrePayFields}
         <TR>
-            <TD class="promptText">Contract Expiry</TD>
+            <TD class="promptText">Billing End Date</TD>
             <TD class="field"><input
                     type="text"
                     id="expiryDate"
@@ -287,17 +312,9 @@
                     size="10"
                     maxlength="10"
                     value="{expiryDate}"
-            > <a href="javascript:;"
-                 onClick="popUpCalendar(this, expiryDate, 'dd/mm/yyyy')"
-            ><img
-                    src="images/calendar.gif"
-                    width="24"
-                    height="22"
-                    hspace="0"
-                    vspace="0"
-                    border="0"
-                    align="absmiddle"
-            ></a>
+                    autocomplete="off"
+                    class="jQueryCalendar"
+            >
                 <font class="formErrorMessage">{expiryDateMessage}</font></TD>
         </TR>
 
@@ -305,8 +322,8 @@
             <td class="promptText">
                 <div align="right">Renewal Status</div>
             </td>
-            <td><select
-                    {disabled}
+            <td>
+                <select {disabled}
                     name="renContract[1][renewalStatus]"
             >
                 <option value=""></option>

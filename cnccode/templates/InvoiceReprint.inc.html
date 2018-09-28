@@ -1,15 +1,21 @@
 <!-- Template: InvoiceReprint.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
     $(function () {
         window.startDate = $('#startDate').get(0);
         window.endDate = $('#endDate').get(0);
     });
     var savedCustomerString
+
     function saveCustomerString() {
         savedCustomerString = document.invoice.customerString.value
     }
+
     function validateCustomerString() {
         if (Trim(document.getElementById("customerString").value) != "") {
             if (document.getElementById("customerString").value != savedCustomerString) {
@@ -24,20 +30,30 @@
             document.invoice.customerID.value = "";
         }
     }
+
     function validateCustomerStringOnReturn() {
         if (event.keyCode == 13) {
             validateCustomerString();
         }
     }
 </script>
-<form name="invoice" method="post" action="{urlSubmit}">
+<form name="invoice"
+      method="post"
+      action="{urlSubmit}"
+>
     <P>
         Reprint invoices by either Printed Date or Invoice Number range. Only invoices that have been previously printed
         will be included.
     </P>
-    <table width="100%" border="0" cellspacing="0" cellpadding="1">
+    <table width="100%"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100px" class="promptText">
+            <td width="100px"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td><input
@@ -58,24 +74,28 @@
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>
-            <td width="20%" class="promptText">Start Date</td>
+            <td width="20%"
+                class="promptText"
+            >Start Date
+            </td>
             <td class="field">
-                <input
-                        type="text"
-                        name="invoice[1][startDate]"
-                        id="startDate"
-                        value="{startDate}"
-                        size="10"
-                        maxlength="10"
+                <input type="text"
+                       name="invoice[1][startDate]"
+                       id="startDate"
+                       value="{startDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
                 >
-                <a href="javascript:;" onClick="popUpCalendar(this, startDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"></a>
                 <font class="formErrorMessage">{startDateMessage}</font>
             </td>
         </tr>
         <tr>
-            <td width="20%" class="promptText">End Date</td>
+            <td width="20%"
+                class="promptText"
+            >End Date
+            </td>
             <td class="field">
                 <input
                         type="text"
@@ -84,15 +104,17 @@
                         value="{endDate}"
                         size="10"
                         maxlength="10"
+                        autocomplete="off"
+                        class="jQueryCalendar"
                 >
-                <a href="javascript:;" onClick="popUpCalendar(this, endDate, 'dd/mm/yyyy')"><img
-                        src="images/calendar.gif" width="24" height="22" hspace="0" vspace="0" border="0"
-                        align="absmiddle"></a>
                 <font class="formErrorMessage">{endDateMessage}</font>
             </td>
         </tr>
         <tr>
-            <td width="20%" class="promptText">Start Invoice No</td>
+            <td width="20%"
+                class="promptText"
+            >Start Invoice No
+            </td>
             <td class="field">
                 <input
                         type="text"
@@ -106,7 +128,10 @@
             </td>
         </tr>
         <tr>
-            <td width="20%" class="promptText">End Invoice No</td>
+            <td width="20%"
+                class="promptText"
+            >End Invoice No
+            </td>
             <td class="field">
                 <input
                         type="text"
@@ -122,7 +147,10 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Print" value="Print">
+                <input type="submit"
+                       name="Print"
+                       value="Print"
+                >
             </td>
         </tr>
     </table>

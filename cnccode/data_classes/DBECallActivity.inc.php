@@ -37,6 +37,7 @@ class DBECallActivity extends DBEntity
     const hideFromCustomerFlag = "hideFromCustomerFlag";
     const secondsiteErrorServer = "secondsiteErrorServer";
     const secondsiteErrorCustomerItemID = "secondsiteErrorCustomerItemID";
+    const salesRequestStatus = 'salesRequestStatus';
 
     /**
      * calls constructor()
@@ -103,6 +104,13 @@ class DBECallActivity extends DBEntity
             DA_ALLOW_NULL,
             "caa_endtime"
         );
+        /**
+         * Status can be one of
+         * A => Authorized
+         * C => Checked
+         * O => Open
+         * F => ?
+         */
         $this->addColumn(
             self::status,
             DA_STRING,
@@ -210,6 +218,12 @@ class DBECallActivity extends DBEntity
             DA_INTEGER,
             DA_ALLOW_NULL,
             'caa_secondsite_error_cuino'
+        );
+
+        $this->addColumn(
+            self::salesRequestStatus,
+            DA_TEXT,
+            DA_NOT_NULL
         );
 
         $this->setPK(0);
