@@ -475,10 +475,12 @@ class CTRenContract extends CTCNC
                 'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('invoicePeriodMonths')
 
-                ),'totalInvoiceMonths'                 => Controller::htmlInputText(
+                ),
+                'totalInvoiceMonths'                 => Controller::htmlInputText(
                     $dsRenContract->getValue('totalInvoiceMonths')
 
-                ),'curUnitCost'                        => $dsRenContract->getValue('curUnitCost'),
+                ),
+                'curUnitCost'                        => $dsRenContract->getValue('curUnitCost'),
                 'curUnitSale'                        => $dsRenContract->getValue('curUnitSale'),
                 'notes'                              => Controller::htmlInputText($dsRenContract->getValue('notes')),
                 'notesMessage'                       => Controller::htmlDisplayText(
@@ -512,7 +514,8 @@ class CTRenContract extends CTCNC
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('controlPanelUrl')
 
-                ),'ftpAddress'                         => Controller::htmlInputText(
+                ),
+                'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenContract->getValue('ftpAddress')
                 ),
                 'ftpAddressMessage'                  => Controller::htmlDisplayText(
@@ -536,8 +539,9 @@ class CTRenContract extends CTCNC
                 'websiteDeveloperMessage'            => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('websiteDeveloper')
                 ),
-                'officialOrderNumber'        => Controller::htmlInputText(
-                    $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)),
+                'officialOrderNumber'                => Controller::htmlInputText(
+                    $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)
+                ),
                 'urlUpdate'                          => $urlUpdate,
                 'urlDelete'                          => $urlDelete,
                 'txtDelete'                          => $txtDelete,
@@ -561,7 +565,7 @@ class CTRenContract extends CTCNC
                 'expiryDate'                         => Controller::dateYMDtoDMY(
                     $dsRenContract->getValue('expiryDate')
                 ),
-                'calculatedExpiryDate'    => getExpiryDate(
+                'calculatedExpiryDate'               => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
                         $dsRenContract->getValue(DBECustomerItem::installationDate)
@@ -579,6 +583,9 @@ class CTRenContract extends CTCNC
                 ),
                 'urlItemPopup'                       => $urlItemPopup,
                 'urlItemEdit'                        => $urlItemEdit,
+                'allowDirectDebit'                 => $dsRenContract->getValue(
+                    DBEJRenContract::allowDirectDebit
+                ) === 'Y' ? 'true' : 'false'
             )
         );
 

@@ -489,7 +489,8 @@ class CTRenHosting extends CTCNC
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
                     $dsRenHosting->getMessage('controlPanelUrl')
 
-                ),'ftpAddress'                         => Controller::htmlInputText(
+                ),
+                'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenHosting->getValue('ftpAddress')
                 ),
                 'ftpAddressMessage'                  => Controller::htmlDisplayText(
@@ -523,13 +524,16 @@ class CTRenHosting extends CTCNC
                 'internalNotes'                      => Controller::htmlTextArea(
                     $dsRenHosting->getValue('internalNotes')
                 ),
-                'calculatedExpiryDate'       => getExpiryDate(
+                'calculatedExpiryDate'               => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
                         $dsRenHosting->getValue(DBECustomerItem::installationDate)
                     ),
                     $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
                 )->format('d/m/Y'),
+                "allowDirectDebit"                   => $dsRenHosting->getValue(
+                    DBEJRenHosting::allowDirectDebit
+                ) == 'Y' ? 'true' : 'false'
             )
         );
 
@@ -540,7 +544,8 @@ class CTRenHosting extends CTCNC
             'initialContractLengths'
         );
 
-        $this->parseInitialContractLength($dsRenHosting->getValue(DBECustomerItem::initialContractLength));        $this->template->set_block(
+        $this->parseInitialContractLength($dsRenHosting->getValue(DBECustomerItem::initialContractLength));
+        $this->template->set_block(
             'RenHostingEdit',
             'TransactionTypesBlock',
             'transactionTypesOptions'

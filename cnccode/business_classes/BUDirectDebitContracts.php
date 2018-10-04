@@ -110,27 +110,40 @@ class BUDirectDebitContracts extends Business
         $dsOrdhead = null;
         $generatedOrder = false;
         while ($this->dbeDirectDebitContracts->fetchNext()) {
-            $generatedOrder = false;
+            ?>
+            <div>
+                <div>
+                    contract number: <?= $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::customerItemID) ?>
+                </div>
+            <?php
+
             if ($dbeJCustomerItem->getRow(
                 $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::customerItemID)
             )) {
-
-                if (strpos(
-                        $dbeJCustomerItem->getValue('itemDescription'),
-                        'SSL'
-                    ) !== false) {
-                    $isSslCertificate = true;
-                } else {
-                    $isSslCertificate = false;
-                }
+                ?>
+                 <div>
+                    customer:<?= $dbeJCustomerItem->getValue('customerID')?>
+                </div>
+                <?php
 
                 if (
                     $previousCustomerID != $dbeJCustomerItem->getValue('customerID')
                 ) {
+
+                     ?>
+                 <div>
+                    We have a new customer
+                </div>
+                <?php
                     /*
                      * Create an invoice from each sales order (unless this is the first iteration)
                      */
                     if ($dsOrdhead) {
+                           ?>
+                    <div>
+                        We have a previous order, create an invoice from it!
+                    </div>
+                    <?php
                         /*
                          * Finalise previous sales order and create an invoice
                          */
@@ -147,7 +160,11 @@ class BUDirectDebitContracts extends Business
                         );
                     }
 
-
+                    ?>
+                        <div>
+                        generate a new order!!!
+                        </div>
+                    <?php
                     /*
                      *  create new sales order header
                      */
@@ -165,7 +182,11 @@ class BUDirectDebitContracts extends Business
                     );
                     $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
-
+                       ?>
+                 <div>
+                    We have a new order with id : <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?>
+                </div>
+                <?php
                 }
 
                 if ($dbeJCustomerItem->getValue(DBECustomerItem::officialOrderNumber)) {
@@ -243,7 +264,7 @@ class BUDirectDebitContracts extends Business
                     0
                 );
 
-                switch ($dbeJCustomerItem->getValue(DBECustomerItem::renQuotationTypeID)) {
+                switch ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::renewalTypeID)) {
                     case CONFIG_HOSTING_RENEWAL_TYPE_ID:
                         $dbeOrdline->setValue(
                             'description',
@@ -331,7 +352,7 @@ class BUDirectDebitContracts extends Business
                     1
                 ); // default 1
 
-                switch ($dbeJCustomerItem->getValue(DBECustomerItem::renQuotationTypeID)) {
+                switch ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::renewalTypeID)) {
                     case CONFIG_CONTRACT_RENEWAL_TYPE_ID:
                     case CONFIG_HOSTING_RENEWAL_TYPE_ID:
                         $dbeOrdline->setValue(
@@ -445,124 +466,7 @@ class BUDirectDebitContracts extends Business
 
                 $dbeOrdline->insertRow();
 
-                // SSL Installation charge
-                if ($isSslCertificate) {
-                    $line++;
-                    $description = 'Installation Charge';
-                    $dbeOrdline->setValue(
-                        'lineType',
-                        'I'
-                    );
-                    $dbeOrdline->setValue(
-                        'ordheadID',
-                        $dsOrdhead->getValue('ordheadID')
-                    );
-                    $dbeOrdline->setValue(
-                        'customerID',
-                        $dsOrdhead->getValue('customerID')
-                    );
-                    $dbeOrdline->setValue(
-                        'itemID',
-                        CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID
-                    );
-                    $dbeOrdline->setValue(
-                        'description',
-                        $description
-                    );
-                    $dbeOrdline->setValue(
-                        'supplierID',
-                        CONFIG_SALES_STOCK_SUPPLIERID
-                    );
-                    $dbeOrdline->setValue(
-                        'sequenceNo',
-                        $line
-                    );
-                    $dbeOrdline->setValue(
-                        'qtyOrdered',
-                        1
-                    ); // default 1
-                    $dbeOrdline->setValue(
-                        'qtyDespatched',
-                        0
-                    );
-                    $dbeOrdline->setValue(
-                        'qtyLastDespatched',
-                        0
-                    );
-                    $dbeOrdline->setValue(
-                        'curUnitSale',
-                        35.00
-                    );
-                    $dbeOrdline->setValue(
-                        'curUnitCost',
-                        0
-                    );
-                    $dbeOrdline->insertRow();
-
-
-                    $dsInput = new DSForm($this);
-                    $dsInput->addColumn(
-                        'etaDate',
-                        DA_DATE,
-                        DA_ALLOW_NULL
-                    );
-                    $dsInput->addColumn(
-                        'serviceRequestCustomerItemID',
-                        DA_INTEGER,
-                        DA_ALLOW_NULL
-                    );
-                    $dsInput->addColumn(
-                        'serviceRequestPriority',
-                        DA_INTEGER,
-                        DA_ALLOW_NULL
-                    );
-                    $dsInput->addColumn(
-                        'serviceRequestText',
-                        DA_STRING,
-                        DA_ALLOW_NULL
-                    );
-
-                    $dsInput->setValue(
-                        'etaDate',
-                        date('Y-m-d')
-                    );
-
-                    $internalNotes = $dbeJCustomerItem->getValue('internalNotes');
-                    $internalNotes = nl2br($internalNotes);
-
-                    $renContractId = $dbeJCustomerItem->getValue('customerItemID');
-
-                    $serviceRequestText = <<<HEREDOC
-                        <p>$internalNotes</p>
-                        <p>Please update SSL contract item internal notes with the servers that have the SSL installed 
-                        onto: <a href="http://cncapps/RenContract.php?action=edit&ID=$renContractId">Contract</a></p> 
-                        <p>Please check that the above SSL Certificate is still required before renewing</p>
-                        <p style="color: red">PLEASE RENEW FOR 2 YEARS</p>
-HEREDOC;
-
-                    $dsInput->setValue(
-                        'serviceRequestText',
-                        $serviceRequestText
-                    );
-                    $dsInput->setValue(
-                        'serviceRequestCustomerItemID',
-                        ''
-                    );
-                    $dsInput->setValue(
-                        'serviceRequestPriority',
-                        5
-                    );
-
-                    $buActivity->createSalesServiceRequest(
-                        $dsOrdhead->getValue('ordheadID'),
-                        $dsInput
-                    );
-
-
-                }
-
-
-                if($dbeJCustomerItem->getValue(DBECustomerItem::renQuotationTypeID == CONFIG_CONTRACT_RENEWAL_TYPE_ID)){
+                if ($dbeJCustomerItem->getValue(DBECustomerItem::renQuotationTypeID) == CONFIG_CONTRACT_RENEWAL_TYPE_ID) {
                     /**
                      * add customer items linked to this contract as a comment lines
                      */
@@ -671,6 +575,11 @@ HEREDOC;
          * Finalise last sales order and create an invoice
          */
         if ($generatedOrder) {
+            ?>
+                        <div>
+                        We have finished going through all the items and we have an order from which we have to generate an invoice
+                        </div>
+                    <?php
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
             $buSalesOrder->getOrderByOrdheadID(
@@ -679,10 +588,15 @@ HEREDOC;
                 $dsOrdline
             );
 
-            $buInvoice->createInvoiceFromOrder(
+            $invHeadId =$buInvoice->createInvoiceFromOrder(
                 $dsOrdhead,
                 $dsOrdline
             );
+            ?>
+                        <div>
+                        Generated invoice with id <?= $invHeadId?>
+                        </div>
+                    <?php
         }
     }
 }

@@ -18,6 +18,7 @@ class DBEJRenHosting extends DBECustomerItem
     const invoiceToDateYMD = "invoiceToDateYMD";
     const curUnitSale = "curUnitSale";
     const curUnitCost = "curUnitCost";
+    const allowDirectDebit = "allowDirectDebit";
 
     function __construct(&$owner)
     {
@@ -94,6 +95,13 @@ class DBEJRenHosting extends DBECustomerItem
             DA_NOT_NULL,
             'cui_cost_price'
         );
+
+        $this->addColumn(
+            self::allowDirectDebit,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setAddColumnsOff();
     }
 

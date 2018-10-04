@@ -112,4 +112,17 @@
             <column name="transactionType" type="char(2)" defaultValue="01"/>
         </addColumn>
     </changeSet>
+    <changeSet id="issue211-1534414967-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="item" columnName="allowDirectDebit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="item">
+            <column name="allowDirectDebit" type="char(2)" defaultValue="N"/>
+        </addColumn>
+        <sql>
+            update item set allowDirectDebit = if(renewalTypeID in (1,2,5) and itm_itemno not in (4111, 13956, 17427, 15241, 15242, 14525, 10856, 15835, 15613, 16222, 15893), 'Y','N')
+        </sql>
+    </changeSet>
 </databaseChangeLog>

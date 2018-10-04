@@ -502,6 +502,11 @@ class BUInvoice extends Business
         }
 
         if ($totalValue == 0) {
+            ?>
+            <div>
+                total value is 0, no invoice gets generated!
+            </div>
+            <?php
             return false;
         }
 
@@ -1429,11 +1434,11 @@ class BUInvoice extends Business
 
 
             $bankRow = [
-                $unEncryptedSortCode,
                 $dsCustomer->getValue(DBECustomer::accountName),
+                $unEncryptedSortCode,
                 $unEncryptedAccountNumber,
-                $invoiceValue,
                 $dsInvhead->getValue(DBEInvhead::invheadID),
+                $invoiceValue,
                 $dsInvhead->getValue(DBEInvhead::transactionType)
             ];
 

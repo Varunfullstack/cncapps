@@ -8,7 +8,19 @@
     $(function () {
         window.despatchDate = $('#despatchDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
-    })
+        checkDirectDebit();
+    });
+
+    function checkDirectDebit() {
+        const directDebitCheckbox = $('#directDebit');
+        if ($('#allowDirectDebit').val() !== 'false') {
+            directDebitCheckbox.attr('disabled', false);
+        } else {
+            directDebitCheckbox.attr('disabled', true);
+            directDebitCheckbox.prop('checked', false)
+        }
+
+    }
 
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {      // F9 - edit
@@ -87,47 +99,43 @@
     <table width="700px"
            border="0"
     >
-        <input
-                type="hidden"
-                name="renContract[1][customerItemID]"
-                value="{customerItemID}"
+        <input type="hidden"
+               value="{allowDirectDebit}"
+               id="allowDirectDebit"
         >
-        <input
-                type="hidden"
-                name="renContract[1][customerID]"
-                id="customerID"
-                value="{customerID}"
+        <input type="hidden"
+               name="renContract[1][customerItemID]"
+               value="{customerItemID}"
         >
-        <input
-                type="hidden"
-                name="renContract[1][customerName]"
-                value="{customerName}"
+        <input type="hidden"
+               name="renContract[1][customerID]"
+               id="customerID"
+               value="{customerID}"
         >
-        <input
-                type="hidden"
-                name="renContract[1][siteNo]"
-                id="siteNo"
-                value="{siteNo}"
+        <input type="hidden"
+               name="renContract[1][customerName]"
+               value="{customerName}"
         >
-        <input
-                type="hidden"
-                name="renContract[1][curUnitSale]"
-                value="{curUnitSale}"
+        <input type="hidden"
+               name="renContract[1][siteNo]"
+               id="siteNo"
+               value="{siteNo}"
         >
-        <input
-                type="hidden"
-                name="renContract[1][curUnitCost]"
-                value="{curUnitCost}"
+        <input type="hidden"
+               name="renContract[1][curUnitSale]"
+               value="{curUnitSale}"
         >
-        <input
-                type="hidden"
-                name="renContract[1][invoiceFromDate]"
-                value="{invoiceFromDate}"
+        <input type="hidden"
+               name="renContract[1][curUnitCost]"
+               value="{curUnitCost}"
         >
-        <input
-                type="hidden"
-                name="renContract[1][invoiceToDate]"
-                value="{invoiceToDate}"
+        <input type="hidden"
+               name="renContract[1][invoiceFromDate]"
+               value="{invoiceFromDate}"
+        >
+        <input type="hidden"
+               name="renContract[1][invoiceToDate]"
+               value="{invoiceToDate}"
         >
         <tr>
             <td width="167"
@@ -143,53 +151,49 @@
         <TR>
             <TD class="promptText">Site</TD>
             <TD class="displayfield">
-                <input
-                        type="text"
-                        name="renContract[1][siteDesc]"
-                        id="siteDesc"
-                        value="{siteDesc}"
-                        onKeydown="javascript:checkFunctionKey(siteDesc)"
-                        onChange="javascript:validateSiteDesc()"
-                        {DISABLED}
-                        size="50"
-                        maxlength="50"
+                <input type="text"
+                       name="renContract[1][siteDesc]"
+                       id="siteDesc"
+                       value="{siteDesc}"
+                       onKeydown="javascript:checkFunctionKey(siteDesc)"
+                       onChange="javascript:validateSiteDesc()"
+                       {DISABLED}
+                       size="50"
+                       maxlength="50"
                 >
             </TD>
         </TR>
         <tr>
             <td class="promptText">Item</td>
-            <td class="field"><input
-                    type="hidden"
-                    name="renContract[1][itemID]"
-                    id="itemID"
-                    value="{itemID}"
-            > <input
-                    type="text"
-                    {readonly}
-                    name="renContract[1][itemDescription]"
-                    id="itemDescription"
-                    value="{itemDescription}"
-                    onChange="javascript:validateItemDescription()"
-                    onKeydown="javascript:checkFunctionKey(itemDescription)"
-                    size="50"
-                    maxlength="50"
+            <td class="field"><input type="hidden"
+                                     name="renContract[1][itemID]"
+                                     id="itemID"
+                                     value="{itemID}"
+            > <input type="text"
+                     {readonly}
+                     name="renContract[1][itemDescription]"
+                     id="itemDescription"
+                     value="{itemDescription}"
+                     onChange="javascript:validateItemDescription()"
+                     onKeydown="javascript:checkFunctionKey(itemDescription)"
+                     size="50"
+                     maxlength="50"
             > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
         </tr>
         {prices}
         <tr>
             <td class="promptText">Installation Date</td>
-            <td class="fieldText"><input
-                    name="renContract[1][installationDate]"
-                    type="text"
-                    value="{installationDate}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
-                    class="jqueryCalendar"
-                    data-jqueryCalendarBeforeShowDay="beforeShowDay"
-                    required
-                    readonly="readonly"
-                    id="installationDate"
+            <td class="fieldText"><input name="renContract[1][installationDate]"
+                                         type="text"
+                                         value="{installationDate}"
+                                         {readonly}
+                                         size="10"
+                                         maxlength="10"
+                                         class="jqueryCalendar"
+                                         data-jqueryCalendarBeforeShowDay="beforeShowDay"
+                                         required
+                                         readonly="readonly"
+                                         id="installationDate"
             >
                 <span class="formErrorMessage">{installationDateMessage}</span>
             </td>
@@ -211,27 +215,25 @@
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
-            <td class="fieldText"><input
-                    name="renContract[1][totalInvoiceMonths]"
-                    type="text"
-                    value="{totalInvoiceMonths}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renContract[1][totalInvoiceMonths]"
+                                         type="text"
+                                         value="{totalInvoiceMonths}"
+                                         {readonly}
+                                         size="10"
+                                         maxlength="10"
             >
                 <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Invoice Interval (months)</td>
             <td class="fieldText">
-                <input
-                        name="renContract[1][invoicePeriodMonths]"
-                        {readonly}
-                        type="text"
-                        value="{invoicePeriodMonths}"
-                        size="10"
-                        maxlength="10"
-                        id="invoiceInterval"
+                <input name="renContract[1][invoicePeriodMonths]"
+                       {readonly}
+                       type="text"
+                       value="{invoicePeriodMonths}"
+                       size="10"
+                       maxlength="10"
+                       id="invoiceInterval"
                 >
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
         </tr>
@@ -257,26 +259,24 @@
         <tr>
             <td class="promptText">Sales Order Comment</td>
             <td class="fieldText">
-                <input
-                        name="renContract[1][notes]"
-                        type="text"
-                        value="{notes}"
-                        title="Appears as a comment line on the generated sales order before the item line"
-                        {readonly}
-                        size="45"
-                        maxlength="45"
+                <input name="renContract[1][notes]"
+                       type="text"
+                       value="{notes}"
+                       title="Appears as a comment line on the generated sales order before the item line"
+                       {readonly}
+                       size="45"
+                       maxlength="45"
                 >
                 <span class="formErrorMessage">{notesMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Number of Users</td>
-            <td class="fieldText"><input
-                    name="renContract[1][users]"
-                    type="text"
-                    value="{users}"
-                    title="Users"
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renContract[1][users]"
+                                         type="text"
+                                         value="{users}"
+                                         title="Users"
+                                         size="10"
+                                         maxlength="10"
             >
                 <span class="formErrorMessage">{usersMessage}</span></td>
         </tr>
@@ -288,32 +288,30 @@
         <TR>
             <TD class="promptText">Printed Contract Start Date</TD>
             <TD class="field">
-                <input
-                        type="text"
-                        id="despatchDate"
-                        name="renContract[1][despatchDate]"
-                        size="10"
-                        maxlength="10"
-                        {readonly}
-                        value="{despatchDate}"
-                        autocomplete="off"
-                        class="jQueryCalendar"
+                <input type="text"
+                       id="despatchDate"
+                       name="renContract[1][despatchDate]"
+                       size="10"
+                       maxlength="10"
+                       {readonly}
+                       value="{despatchDate}"
+                       autocomplete="off"
+                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{despatchDateMessage}</font></TD>
         </TR>
         {renContractPrePayFields}
         <TR>
             <TD class="promptText">Billing End Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="expiryDate"
-                    {readonly}
-                    name="renContract[1][expiryDate]"
-                    size="10"
-                    maxlength="10"
-                    value="{expiryDate}"
-                    autocomplete="off"
-                    class="jQueryCalendar"
+            <TD class="field"><input type="text"
+                                     id="expiryDate"
+                                     {readonly}
+                                     name="renContract[1][expiryDate]"
+                                     size="10"
+                                     maxlength="10"
+                                     value="{expiryDate}"
+                                     autocomplete="off"
+                                     class="jQueryCalendar"
             >
                 <font class="formErrorMessage">{expiryDateMessage}</font></TD>
         </TR>
@@ -324,16 +322,16 @@
             </td>
             <td>
                 <select {disabled}
-                    name="renContract[1][renewalStatus]"
-            >
-                <option value=""></option>
-                <!-- BEGIN renewalStatusBlock -->
-                <option {renewalStatusSelected}
-                        value="{renewalStatus}"
-                >{renewalStatusDescription}
-                </option>
-                <!-- END renewalStatusBlock -->
-            </select></td>
+                        name="renContract[1][renewalStatus]"
+                >
+                    <option value=""></option>
+                    <!-- BEGIN renewalStatusBlock -->
+                    <option {renewalStatusSelected}
+                            value="{renewalStatus}"
+                    >{renewalStatusDescription}
+                    </option>
+                    <!-- END renewalStatusBlock -->
+                </select></td>
         </tr>
         <tr>
             <td valign="top"

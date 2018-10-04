@@ -7,6 +7,8 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenContract extends DBECustomerItem
 {
+    const allowDirectDebit = 'allowDirectDebit';
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -82,6 +84,13 @@ class DBEJRenContract extends DBECustomerItem
             DA_NOT_NULL,
             'cui_cost_price'
         );
+
+        $this->addColumn(
+            self::allowDirectDebit,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setAddColumnsOff();
     }
 

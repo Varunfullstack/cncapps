@@ -12,7 +12,7 @@ require_once($cfg['path_bu'] . '/BUDirectDebitContracts.php');
 
 $toEmail = "CreateRenewalSalesOrders@cnc-ltd.co.uk";
 $thing = null;
-$buDirectDebitContracts = new BUDirectDebitContracts($this);
+$buDirectDebitContracts = new BUDirectDebitContracts($thing);
 
 $buDirectDebitContracts->emailRenewalsSalesOrdersDue($toEmail);
 

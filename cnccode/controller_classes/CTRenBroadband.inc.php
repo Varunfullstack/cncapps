@@ -672,12 +672,15 @@ class CTRenBroadband extends CTCNC
                 'readonly'                             => $readonly,
                 'urlEmailTo'                           => $urlEmailTo,
                 'calculatedExpiryDate'                 => getExpiryDate(
-        DateTime::createFromFormat(
-            'Y-m-d',
-            $dsRenBroadband->getValue(DBECustomerItem::installationDate)
-        ),
-        $dsRenBroadband->getValue(DBECustomerItem::initialContractLength)
-    )->format('d/m/Y'),
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenBroadband->getValue(DBECustomerItem::installationDate)
+                    ),
+                    $dsRenBroadband->getValue(DBECustomerItem::initialContractLength)
+                )->format('d/m/Y'),
+                'allowDirectDebit'                     => $dsRenBroadband->getValue(
+                    DBEJRenBroadband::allowDirectDebit
+                ) == 'Y' ? 'true' : 'false'
             )
         );
 

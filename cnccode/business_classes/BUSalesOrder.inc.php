@@ -496,10 +496,6 @@ class BUSalesOrder extends Business
             DBEOrdhead::type,
             $type
         );
-        $dsOrdhead->setValue(
-            DBEOrdhead::directDebit,
-            $directDebit
-        );
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
@@ -571,6 +567,12 @@ class BUSalesOrder extends Business
             DBEOrdhead::expectedDate,
             '0000-00-00'
         );
+
+        $dsOrdhead->setValue(
+            DBEOrdhead::directDebit,
+            $directDebit
+        );
+
         $dsOrdhead->setValue(
             DBEOrdhead::invSiteNo,
             $dsCustomer->getValue(DBECustomer::invoiceSiteNo)

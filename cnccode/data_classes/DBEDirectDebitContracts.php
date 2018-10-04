@@ -21,6 +21,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
     const invoiceToDate = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const renewalTypeID = 'renewalTypeID';
 
     function __construct(&$owner)
     {
@@ -80,6 +81,13 @@ class DBEDirectDebitContracts extends DBECustomerItem
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
         );
+
+        $this->addColumn(
+            self::renewalTypeID,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
         $this->setAddColumnsOff();
     }
 
@@ -164,7 +172,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
-     AND renewalTypeID = 1 or renewalTypeID = 2 or renewalTypeID = 5
+     AND (renewalTypeID = 1 or renewalTypeID = 2 or renewalTypeID = 5 )
 		 AND declinedFlag = 'N' and directDebitFlag = 'Y' ORDER BY cui_custno, autoGenerateContractInvoice asc;";
 
         $this->setQueryString($statement);

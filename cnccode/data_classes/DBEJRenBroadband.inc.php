@@ -7,6 +7,8 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenBroadband extends DBECustomerItem
 {
+    const allowDirectDebit = "allowDirectDebit";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -65,6 +67,13 @@ class DBEJRenBroadband extends DBECustomerItem
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
         );
+
+        $this->addColumn(
+            self::allowDirectDebit,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setAddColumnsOff();
     }
 
