@@ -122,7 +122,11 @@
             <column name="allowDirectDebit" type="char(2)" defaultValue="N"/>
         </addColumn>
         <sql>
-            update item set allowDirectDebit = if(renewalTypeID in (1,2,5) and itm_itemno not in (4111, 13956, 17427, 15241, 15242, 14525, 10856, 15835, 15613, 16222, 15893), 'Y','N')
+            update item set allowDirectDebit = if(renewalTypeID in (1,2,5) and itm_itemno not in (4111, 13956, 17427,
+            15241, 15242, 14525, 10856, 15835, 15613, 16222, 15893), 'Y','N')
         </sql>
+        <rollback>
+            <dropColumn tableName="item" columnName="allowDirectDebit"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
