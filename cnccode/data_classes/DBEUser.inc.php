@@ -270,6 +270,19 @@ class DBEUser extends DBEntity
 
         return (parent::getRows());
     }
+
+    function getActiveUsers()
+    {
+        $this->setMethodName("getRowsInGroup");
+
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE activeFlag = 'Y' ORDER BY firstName, lastName";
+
+        $this->setQueryString($query);
+
+        return (parent::getRows());
+    }
 }
 
 ?>

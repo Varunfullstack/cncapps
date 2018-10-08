@@ -11,8 +11,13 @@ class DBEProject extends DBEntity
     const customerID = "customerID";
     const description = "description";
     const notes = "notes";
-    const startDate = "startDate";
-    const expiryDate = "expiryDate";
+    const openedDate = "startDate";
+    const completedDate = "expiryDate";
+    const projectEngineer = "consultantID";
+    const commenceDate = "commenceDate";
+    const planFileName = "planFileName";
+    const planFile = "planFile";
+    const planMIMEType = "planMIMEType";
 
     /**
      * calls constructor()
@@ -46,15 +51,45 @@ class DBEProject extends DBEntity
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            self::startDate,
+            self::openedDate,
             DA_DATE,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $this->addColumn(
-            self::expiryDate,
+            self::completedDate,
             DA_DATE,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::projectEngineer,
+            DA_ID,
             DA_NOT_NULL
         );
+
+        $this->addColumn(
+            self::commenceDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::planFileName,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::planFile,
+            DA_BLOB,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::planMIMEType,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+
         $this->setPK(0);
         $this->setAddColumnsOff();
 
@@ -80,7 +115,7 @@ class DBEProject extends DBEntity
 
         if ($activityDate) {
             $queryString .=
-                " AND " . $this->getDBColumnName(self::expiryDate) . ">= '$activityDate'";
+                " AND " . $this->getDBColumnName(self::completedDate) . ">= '$activityDate'";
         }
 
         $this->setQueryString($queryString);

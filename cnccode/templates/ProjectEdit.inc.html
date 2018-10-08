@@ -1,8 +1,13 @@
 <!-- Template: ProjectEdit.inc.html -->
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
 ></script>
 <script type="application/javascript">
+    function showHistoryPopup() {
+        window.open('{historyPopupURL}',
+            'Updates History', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+    }
+
     $(function () {
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
@@ -16,13 +21,27 @@
 
         <TD class="navigateLink"
             valign="top"
-        ><a href="{urlDisplayCustomer}">Back to customer</a></TD>
+        >
+            <a href="{urlDisplayCustomer}">Back to customer</a>
+        </TD>
         <TD class="navigateLink"
             valign="top"
-        ><a href="/">Back to Home</a></TD>
+        >
+            <a href="/">Back to Home</a>
+        </TD>
         <TD class="navigateLink"
             valign="top"
-        ><a href="{urlDelete}">{txtDelete}</a></TD>
+        >
+            <a href="/">SR Link </a>
+        </TD>
+        <TD class="navigateLink"
+            valign="top"
+        >
+            <a {downloadProjectPlanURL}
+               {downloadProjectPlanClass}
+            >Project Plan</a>
+        </TD>
+
     </TR>
 </table>
 <FORM method="post"
@@ -31,56 +50,76 @@
       AUTOCOMPLETE="OFF"
 >
     <table border="0">
-        <input
-                type="hidden"
-                name="project[1][projectID]"
-                value="{projectID}"
+        <input type="hidden"
+               name="project[1][projectID]"
+               value="{projectID}"
         >
-        <input
-                type="hidden"
-                name="project[1][customerID]"
-                value="{customerID}"
+        <input type="hidden"
+               name="project[1][customerID]"
+               value="{customerID}"
         >
         <tr>
             <td class="promptText">Description</td>
-            <td class="fieldText"><input
-                    name="project[1][description]"
-                    type="text"
-                    value="{description}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{descriptionMessage}</span></td>
+            <td class="fieldText">
+                <input name="project[1][description]"
+                       type="text"
+                       value="{description}"
+                       size="50"
+                       maxlength="50"
+                >
+                <span class="formErrorMessage">{descriptionMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText"
                 valign="top"
-            >Notes
+            >
+                Project Summary
             </td>
             <td class="fieldText">
                 <textarea cols="100"
                           rows="15"
                           name="project[1][notes]"
-                >{notes}</textarea><span
-                    class="formErrorMessage"
-            >{notesMessage}</span></td>
+                          id="summary"
+                >{notes}</textarea>
+                <span class="formErrorMessage">{notesMessage}</span>
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace('summary', {customConfig: '/ckeditor_config.js'});
+                </script>
+            </td>
         </tr>
         <TR>
-            <TD class="promptText">Project Start Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="startDate"
-                    name="project[1][startDate]"
-                    value="{startDate}"
-                    size="10"
-                    maxlength="10"
-                    autocomplete="off"
-                    class="jQueryCalendar"
-            >
+            <TD class="promptText">Project Opened Date</TD>
+            <TD class="field">
+                <input type="text"
+                       id="startDate"
+                       name="project[1][startDate]"
+                       value="{startDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                >
                 <font class="formErrorMessage">{startDateMessage}</font>
             </TD>
         </TR>
         <TR>
-            <TD class="promptText">Project Expiry Date</TD>
+            <TD class="promptText">Project Commence Date</TD>
+            <TD class="field">
+                <input type="text"
+                       id="commenceDate"
+                       name="project[1][commenceDate]"
+                       value="{commenceDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                >
+                <font class="formErrorMessage">{commenceDateMessage}</font>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Completed Date</TD>
             <TD class="field">
                 <input type="text"
                        id="expiryDate"
@@ -94,13 +133,53 @@
                 <font class="formErrorMessage">{expiryDateMessage}</font>
             </TD>
         </TR>
+        <TR>
+            <TD class="promptText">Last Update</TD>
+            <TD class="field">
+                <span style="font-weight: bold">{lastUpdateDate} by {lastUpdateEngineer}:</span> {lastUpdateComment}
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText"></TD>
+            <TD class="field">
+                See Complete update history <a onclick="showHistoryPopup()">here</a>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Add Update</TD>
+            <TD class="field">
+                <input type="text"
+                       id="newUpdate"
+                       name="newComment"
+                       size="50"
+                       maxlength="50"
+                >
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Project Engineer</TD>
+            <TD class="field">
+                <select name="project[1][consultantID]"
+                        required
+                >
+                    <option value="">Please Select an Engineer</option>
+                    <!-- BEGIN consultantBlock -->
+                    <option {consultantSelected}
+                            value="{consultantID}"
+                    >{consultantName}
+                    </option>
+                    <!-- END consultantBlock -->
+                </select>
+            </TD>
+        </TR>
 
         <tr>
             <td>&nbsp;</td>
-            <td class="formErrorMessage"><input type="submit"
-                                                name="Submit"
-                                                value="Update"
-            ></td>
+            <td class="formErrorMessage">
+                <input type="submit"
+                       name="Submit"
+                       value="Update"
+                ></td>
         </tr>
     </table>
 </form>

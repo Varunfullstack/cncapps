@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue341-1538730591-0">
+        <tagDatabase tag="issue341"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="consultantID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="consultantID" type="int(11)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="commenceDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="commenceDate" type="date"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="projectUpdates"/>
+            </not>
+        </preConditions>
+        <createTable tableName="projectUpdates">
+            <column name="id" type="int(11)" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="createdAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="createdBy" type="tinytext"/>
+            <column name="projectID" type="int(11)"/>
+            <column name="comment" type="tinytext"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="planFileName"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="planFileName" type="VARCHAR(100)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue341-1538730591-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="planFile"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="planFile" type="LONGBLOB"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue341-1538730591-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="planMIMEType"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="planMIMEType" type="VARCHAR(100)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
