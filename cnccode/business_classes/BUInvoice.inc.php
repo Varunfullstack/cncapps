@@ -1434,11 +1434,14 @@ class BUInvoice extends Business
 
 
             $bankRow = [
-                $dsCustomer->getValue(DBECustomer::accountName),
                 $unEncryptedSortCode,
+                $dsCustomer->getValue(DBECustomer::accountName),
                 $unEncryptedAccountNumber,
+                number_format(
+                    $invoiceValue,
+                    2
+                ),
                 $dsInvhead->getValue(DBEInvhead::invheadID),
-                $invoiceValue,
                 $dsInvhead->getValue(DBEInvhead::transactionType)
             ];
 
@@ -1459,7 +1462,10 @@ class BUInvoice extends Business
                         "date"         => (new DateTime())->format('d M Y'),
                         "invoiceNo"    => $dsInvhead->getValue('invheadID'),
                         "paymentDate"  => $paymentDate,
-                        "totalAmount"  => $invoiceValue
+                        "totalAmount"  => number_format(
+                            $invoiceValue,
+                            2
+                        )
                     ]
                 );
 
@@ -1468,8 +1474,9 @@ class BUInvoice extends Business
                     'page',
                     true
                 );
+                $body = $template->get_var('output');
 
-                $buMail->mime->setHTMLBody($template->get_var('output'));
+                $buMail->mime->setHTMLBody($body);
                 $toEmail = $dsContact->getValue('email');
                 $hdrs = array(
                     'From'    => $senderName . " <" . $senderEmail . ">",
@@ -1478,7 +1485,7 @@ class BUInvoice extends Business
                 );
 
                 $mime_params = array(
-                    'text_encoding' => '7bit',
+                    'text_encoding' => 'quoted-printable',
                     'text_charset'  => 'UTF-8',
                     'html_charset'  => 'UTF-8',
                     'head_charset'  => 'UTF-8'
