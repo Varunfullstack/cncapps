@@ -1364,17 +1364,6 @@ class BUInvoice extends Business
             */
             $fileName = $dsInvhead->getValue('invheadID') . '.pdf';
 
-            $buMail = new BUMail($this);
-
-            $buMail->mime->addAttachment(
-                $pdfFileName,
-                'Application/pdf',
-                $fileName
-            );
-
-            unlink($pdfFileName); // delete temp file
-
-
             $template = new Template (
                 EMAIL_TEMPLATE_DIR,
                 "remove"
@@ -1448,6 +1437,14 @@ class BUInvoice extends Business
             $bankData[] = $bankRow;
             while ($dsContact->fetchNext()) {
 
+                $buMail = new BUMail($this);
+
+                $buMail->mime->addAttachment(
+                    $pdfFileName,
+                    'Application/pdf',
+                    $fileName
+                );
+
                 $contactName = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
                         DBEContact::lastName
                     );
@@ -1472,7 +1469,7 @@ class BUInvoice extends Business
                 $template->parse(
                     'output',
                     'page',
-                    true
+                    false
                 );
                 $body = $template->get_var('output');
 
@@ -1501,6 +1498,7 @@ class BUInvoice extends Business
                 );
 
             }
+            unlink($pdfFileName); // delete temp file
         }
 
         $this->buSageExport->generateSageSalesDataByInvoiceNumbers($invoiceNumbers);
