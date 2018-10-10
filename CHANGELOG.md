@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
+### Fixed
+- Issue 352 - CNCWEB contacts bugs
 
 ## [v1.12.0] - 2018-09-27
 ### Changed

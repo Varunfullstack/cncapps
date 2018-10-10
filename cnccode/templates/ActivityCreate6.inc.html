@@ -14,10 +14,10 @@
     function checkauthorisedBy() {
         if ($('#contactID').find(':selected').text().indexOf('- Delegate') > -1) {
             $("#authorisedRow").show();
-            $("#authorisedByContactID").attr('required', true);
+            $("#authorisedBy").prop('required', true);
         } else {
+            $("#authorisedBy").prop('required', false);
             $("#authorisedRow").hide();
-            $("#authorisedByContactID").attr('required', false);
         }
     }
 
@@ -91,9 +91,9 @@
                 Authorised By
             </td>
             <td class="mainHeadText">
-                <select
-                        name="authorisedBy"
+                <select name="authorisedBy"
                         id="authorisedBy"
+                        required
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN contactOnlyMainAndSupervisorsBlock -->
