@@ -171,10 +171,16 @@ class CTProject extends CTCNC
 
         $row = $result->fetch_assoc();
 
-        $updateDate = DateTime::createFromFormat(
-            'Y-m-d H:i:s',
-            $row['createdAt']
-        );
+        if ($row['createdAt']) {
+
+            $updateDate = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $row['createdAt']
+            );
+
+            $formattedDate = $updateDate->format('d/m/Y H:i');
+        }
+
 
         $historyPopupURL = $this->buildLink(
             'Project.php',
@@ -201,7 +207,7 @@ class CTProject extends CTCNC
                 'urlDelete'          => $urlDelete,
                 'txtDelete'          => $txtDelete,
                 'urlDisplayCustomer' => $urlDisplayCustomer,
-                'lastUpdateDate'     => $updateDate->format('d/m/Y H:i'),
+                'lastUpdateDate'     => $formattedDate,
                 'lastUpdateEngineer' => $row['createdBy'],
                 'lastUpdateComment'  => $row['comment'],
                 'historyPopupURL'    => $historyPopupURL
