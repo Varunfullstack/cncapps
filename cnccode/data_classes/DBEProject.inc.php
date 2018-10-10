@@ -19,6 +19,8 @@ class DBEProject extends DBEntity
     const planFile = "planFile";
     const planMIMEType = "planMIMEType";
     const ordHeadID = "ordHeadID";
+    const outOfHoursBudgetDays = "outOfHoursBudgetDays";
+    const inHoursBudgetDays = "inHoursBudgetDays";
 
     /**
      * calls constructor()
@@ -96,6 +98,17 @@ class DBEProject extends DBEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::outOfHoursBudgetDays,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::inHoursBudgetDays,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();

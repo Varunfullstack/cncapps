@@ -36,6 +36,7 @@ class CTProject extends CTCNC
 {
     const UPLOAD_PROJECT_PLAN = "uploadProjectPlan";
     const DOWNLOAD_PROJECT_PLAN = "downloadProjectPlan";
+    const CALCULATE_BUDGET = "calculateBudget";
     var $dsProject = '';
     /** @var BUProject */
     var $buProject;
@@ -128,6 +129,9 @@ class CTProject extends CTCNC
                 header('Content-Length: ' . strlen($dbeDocuments->getValue(DBEProject::planFile)));
                 echo $dbeDocuments->getValue(DBEProject::planFile);
                 exit;
+            case self::CALCULATE_BUDGET:
+                $this->calculateBudget();
+                break;
         }
     }
 
@@ -266,12 +270,42 @@ class CTProject extends CTCNC
         $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
         $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
 
+        $projectCalculateBudgetURL =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                [
+                    'action'    => self::CALCULATE_BUDGET,
+                    'projectID' => $projectID
+                ]
+            );
+
+        $projectCalculateBudgetURL = "href='$projectCalculateBudgetURL'";
+
+        $projectCalculateBudgetLinkClick = "onclick='return confirm(\"Are you sure? You can only do this once.\")'";
+
+        if ($dsProject->getValue(
+            DBEProject::inHoursBudgetDays
+        )) {
+            $projectCalculateBudgetURL = "href='#'";
+            $projectCalculateBudgetClass = "class='grayedOut'";
+            $projectCalculateBudgetLinkClick = null;
+        }
+
+        $projectCalculateBudgetLink = null;
+
+
+        if ($dsProject->getValue(DBEProject::ordHeadID)) {
+            $projectCalculateBudgetLink = "<a  $projectCalculateBudgetURL  $projectCalculateBudgetClass $projectCalculateBudgetLinkClick>Calculate Budget</a>";
+        }
+
 
         $this->template->set_var(
             array(
                 'customerID'             => $dsProject->getValue(DBEProject::customerID),
                 'projectID'              => $projectID,
-                'description'            => Controller::htmlInputText($dsProject->getValue(DBEProject::description)),
+                'description'            => Controller::htmlInputText(
+                    $dsProject->getValue(DBEProject::description)
+                ),
                 'descriptionMessage'     => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::description)
                 ),
@@ -281,7 +315,9 @@ class CTProject extends CTCNC
                 'startDateMessage'       => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::openedDate)
                 ),
-                'expiryDate'             => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::completedDate)),
+                'expiryDate'             => Controller::dateYMDtoDMY(
+                    $dsProject->getValue(DBEProject::completedDate)
+                ),
                 'expiryDateMessage'      => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::completedDate)
                 ),
@@ -298,7 +334,8 @@ class CTProject extends CTCNC
                 'uploadProjectPlanURL'   => $uploadProjectPlanURL,
                 'hasProjectPlan'         => $hasProjectPlan ? "true" : "false",
                 'projectPlanLink'        => $projectPlanLink,
-                'projectPlanDownloadURL' => $projectPlanDownloadURL
+                'projectPlanDownloadURL' => $projectPlanDownloadURL,
+                'calculateBudgetLink'    => $projectCalculateBudgetLink
             )
         );
         $this->template->parse(
@@ -627,6 +664,39 @@ class CTProject extends CTCNC
             );
 
             $dbeProject->updateRow();
+        }
+
+    }
+
+    private function calculateBudget()
+    {
+
+        $projectID = @$_REQUEST['projectID'];
+
+        if ($projectID) {
+            echo 'There is no project ID';
+            exit;
+        }
+        $dbeProject = new DBEProject($this);
+        $dbeProject->getRow($_REQUEST['projectID']);
+
+        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
+            echo 'The project does not have a linked Sales Order';
+            exit;
+        }
+
+        $buSalesOrder = new BUSalesOrder($this);
+
+        $dsOrdHead = new DataSet($this);
+        $dsOrdLine = new DataSet($this);
+
+        $buSalesOrder->getOrderByOrdheadID($dbeProject->getValue(DBEProject::ordHeadID), $dsOrdHead, $dsOrdLine);
+
+
+        while($dsOrdLine->fetchNext()){
+            if($dsOrdLine->getValue(DBEOrdline::lineType) == 'I'){
+
+            }
         }
 
     }

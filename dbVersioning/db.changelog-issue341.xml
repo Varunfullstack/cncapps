@@ -94,4 +94,28 @@
             <column name="projectCommenceNotification" type="int(11)"/>
         </addColumn>
     </changeSet>
+
+    <changeSet author="pavwebdev" id="issue341-1538730591-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="outOfHoursBudgetDays"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="outOfHoursBudgetDays" type="int(11)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="issue341-1538730591-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="inHoursBudgetDays"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="inHoursBudgetDays" type="int(11)"/>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>
