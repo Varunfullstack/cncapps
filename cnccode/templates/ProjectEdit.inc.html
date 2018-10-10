@@ -12,6 +12,15 @@
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
     });
+
+    function linkedSalesOrderPopup() {
+        window.open(
+            '{urlLinkedSalesOrder}',
+            'salesOrder',
+            'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
+        );
+
+    }
 </script>
 <TABLE border="0"
        cellpadding="2"
@@ -32,7 +41,7 @@
         <TD class="navigateLink"
             valign="top"
         >
-            <a href="/">SR Link </a>
+            {salesOrderLink}
         </TD>
         <TD class="navigateLink"
             valign="top"

@@ -74,4 +74,14 @@
             <column name="planMIMEType" type="VARCHAR(100)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="ordHeadID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="ordHeadID" type="int(11)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

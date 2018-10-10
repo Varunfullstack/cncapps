@@ -9,6 +9,7 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
 // Actions
 define(
     'CTPROJECT_ACT_DISPLAY_LIST',
@@ -34,7 +35,8 @@ define(
 class CTProject extends CTCNC
 {
     var $dsProject = '';
-    var $buProject = '';
+    /** @var BUProject */
+    var $buProject;
 
     function __construct($requestMethod,
                          $postVars,
@@ -85,6 +87,9 @@ class CTProject extends CTCNC
                 break;
             case 'historyPopup':
                 $this->historyPopup();
+                break;
+            case 'editLinkedSalesOrder':
+                $this->editLinkedSalesOrder();
                 break;
         }
     }
@@ -191,26 +196,38 @@ class CTProject extends CTCNC
             )
         );
 
+        $urlLinkedSalesOrder =
+            $this->buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'editLinkedSalesOrder',
+                    'htmlFmt'   => CT_HTML_FMT_POPUP,
+                    'projectID' => $dsProject->getValue('projectID')
+                )
+            );
+
         $this->template->set_var(
             array(
-                'customerID'         => $dsProject->getValue(DBEProject::customerID),
-                'projectID'          => $projectID,
-                'description'        => Controller::htmlInputText($dsProject->getValue(DBEProject::description)),
-                'descriptionMessage' => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::description)),
-                'notes'              => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
-                'notesMessage'       => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
-                'startDate'          => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
-                'startDateMessage'   => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::openedDate)),
-                'expiryDate'         => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::completedDate)),
-                'expiryDateMessage'  => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::completedDate)),
-                'urlUpdate'          => $urlUpdate,
-                'urlDelete'          => $urlDelete,
-                'txtDelete'          => $txtDelete,
-                'urlDisplayCustomer' => $urlDisplayCustomer,
-                'lastUpdateDate'     => $formattedDate,
-                'lastUpdateEngineer' => $row['createdBy'],
-                'lastUpdateComment'  => $row['comment'],
-                'historyPopupURL'    => $historyPopupURL
+                'customerID'          => $dsProject->getValue(DBEProject::customerID),
+                'projectID'           => $projectID,
+                'description'         => Controller::htmlInputText($dsProject->getValue(DBEProject::description)),
+                'descriptionMessage'  => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::description)),
+                'notes'               => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
+                'notesMessage'        => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
+                'startDate'           => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
+                'startDateMessage'    => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::openedDate)),
+                'expiryDate'          => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::completedDate)),
+                'expiryDateMessage'   => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::completedDate)),
+                'urlUpdate'           => $urlUpdate,
+                'urlDelete'           => $urlDelete,
+                'txtDelete'           => $txtDelete,
+                'urlDisplayCustomer'  => $urlDisplayCustomer,
+                'lastUpdateDate'      => $formattedDate,
+                'lastUpdateEngineer'  => $row['createdBy'],
+                'lastUpdateComment'   => $row['comment'],
+                'historyPopupURL'     => $historyPopupURL,
+                'salesOrderLink'      => $this->getSalesOrderLink($dsProject->getValue(DBEProject::ordHeadID)),
+                'urlLinkedSalesOrder' => $urlLinkedSalesOrder
             )
         );
         $this->template->parse(
@@ -220,6 +237,23 @@ class CTProject extends CTCNC
         );
         $this->parsePage();
     }// end function editFurther Action()
+
+    function getSalesOrderLink($linkedOrdheadID)
+    {
+        if ($linkedOrdheadID) {
+
+            $linkURL =
+                $this->buildLink(
+                    'SalesOrder.php',
+                    array(
+                        'action'    => 'displaySalesOrder',
+                        'ordheadID' => $linkedOrdheadID
+                    )
+                );
+            return '<a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
+        }
+        return ' <a href="#" style="color: red" onclick="linkedSalesOrderPopup()">Sales Order</a>';
+    }
 
     /**
      * Update call Further Action details
@@ -424,6 +458,65 @@ class CTProject extends CTCNC
         $this->template->parse(
             'CONTENTS',
             'ProjectPopup',
+            true
+        );
+        $this->parsePage();
+    }
+
+    function editLinkedSalesOrder()
+    {
+        $this->setMethodName('editLinkedSalesOrder');
+
+        $this->setPageTitle('Linked Sales Order');
+
+        $errorMessage = '';
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            if ($_POST['linkedOrderID']) {
+                $projectID = $_POST['projectID'];
+                $linkedOrderID = $_POST['linkedOrderID'];
+
+                try {
+
+                    $this->buProject->updateLinkedSalesOrder(
+                        $projectID,
+                        $linkedOrderID
+                    );
+                    echo '<script type="text/javascript"> window.opener.location.reload(false); window.close(); </script>';
+                } catch (Exception $exception) {
+                    $errorMessage = $exception->getMessage();
+                }
+
+            } else {
+                $errorMessage = "Sales Order ID Required";
+            }
+
+        } else {
+            $projectID = $_REQUEST['projectID'];
+            $linkedOrderID = '';
+        }
+
+        $this->setTemplateFiles(
+            array(
+                'ProjectEditLinkedSalesOrder' => 'ProjectEditLinkedSalesOrder'
+            )
+        );
+
+        $this->setHTMLFmt(CT_HTML_FMT_POPUP);
+
+        $this->template->set_var(
+            array(
+                'projectID'     => $projectID,
+                'errorMessage'  => $errorMessage,
+                'linkedOrderID' => $linkedOrderID
+            )
+        );
+
+
+        $this->template->parse(
+            'CONTENTS',
+            'ProjectEditLinkedSalesOrder',
             true
         );
         $this->parsePage();

@@ -18,6 +18,7 @@ class DBEProject extends DBEntity
     const planFileName = "planFileName";
     const planFile = "planFile";
     const planMIMEType = "planMIMEType";
+    const ordHeadID = "ordHeadID";
 
     /**
      * calls constructor()
@@ -86,6 +87,12 @@ class DBEProject extends DBEntity
         $this->addColumn(
             self::planMIMEType,
             DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::ordHeadID,
+            DA_ID,
             DA_ALLOW_NULL
         );
 

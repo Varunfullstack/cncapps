@@ -1,0 +1,17 @@
+<!-- Template: projectEditLinkedSalesOrder.inc.html -->
+<form name="linkedSalesOrder" method="post" action="Project.php?action=editLinkedSalesOrder">
+    <input type="hidden" name="projectID" value="{projectID}">
+    <table>
+        <tr>
+            <td colspan="2">{errorMessage}</td>
+        </tr>
+        <tr>
+            <td>Order ID</td>
+            <td><input type="text" name="linkedOrderID" value="{linkedOrderID}">{linkedSalesOrderMessage}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="Update" ></td>
+        </tr>
+    </table>
+</form>
+<!-- End Template: projectEditLinkedSalesOrder.inc.html -->
