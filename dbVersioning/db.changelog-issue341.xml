@@ -84,4 +84,14 @@
             <column name="ordHeadID" type="int(11)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectCommenceNotification"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectCommenceNotification" type="int(11)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

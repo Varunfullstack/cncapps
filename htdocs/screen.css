@@ -196,6 +196,10 @@ DIV.purchOrderSearchScroll {
     BACKGROUND-COLOR: #f4f2f2
 }
 
+.redText {
+    color: red;
+}
+
 /* Classes are specialised to modify attributes within a general tag definition above */
 .message {
     color: #FF9900;

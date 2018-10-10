@@ -3,6 +3,10 @@
         src="ckeditor/ckeditor.js"
 ></script>
 <script type="application/javascript">
+
+    const projectPlanDownloadURL = "{projectPlanDownloadURL}";
+    let projectPlan = {hasProjectPlan};
+
     function showHistoryPopup() {
         window.open('{historyPopupURL}',
             'Updates History', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
@@ -19,8 +23,38 @@
             'salesOrder',
             'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
         );
-
     }
+
+    function checkUploadFilesBtn() {
+
+
+        const files = document.querySelector('[type=file]').files;
+
+        if (projectPlan) {
+            if (!confirm("The previous project plan file will be overwritten, are you sure?")) {
+                return;
+            }
+        }
+        const url = '{uploadProjectPlanURL}';
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            formData.append('files[]', file);
+        }
+
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (!projectPlan) {
+                $('#projectPlanLink').removeClass('redText');
+                $('#projectPlanLink').attr('href', projectPlanDownloadURL);
+                projectPlan = true;
+            }
+        });
+    }
+
 </script>
 <TABLE border="0"
        cellpadding="2"
@@ -46,9 +80,7 @@
         <TD class="navigateLink"
             valign="top"
         >
-            <a {downloadProjectPlanURL}
-               {downloadProjectPlanClass}
-            >Project Plan</a>
+            {projectPlanLink}
         </TD>
 
     </TR>
@@ -181,14 +213,27 @@
                 </select>
             </TD>
         </TR>
-
+        <tr>
+            <td class="promptText"
+                style="width: 115px"
+            >
+                Project Plan Update
+            </td>
+            <td>
+                <input type="file"
+                       accept="application/pdf"
+                       onchange="checkUploadFilesBtn()"
+                >
+            </td>
+        </tr>
         <tr>
             <td>&nbsp;</td>
             <td class="formErrorMessage">
                 <input type="submit"
                        name="Submit"
                        value="Update"
-                ></td>
+                >
+            </td>
         </tr>
     </table>
 </form>

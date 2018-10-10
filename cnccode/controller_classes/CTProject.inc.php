@@ -34,6 +34,8 @@ define(
 
 class CTProject extends CTCNC
 {
+    const UPLOAD_PROJECT_PLAN = "uploadProjectPlan";
+    const DOWNLOAD_PROJECT_PLAN = "downloadProjectPlan";
     var $dsProject = '';
     /** @var BUProject */
     var $buProject;
@@ -91,6 +93,41 @@ class CTProject extends CTCNC
             case 'editLinkedSalesOrder':
                 $this->editLinkedSalesOrder();
                 break;
+            case self::UPLOAD_PROJECT_PLAN:
+                $response = [];
+                try {
+                    $this->uploadProjectPlan();
+                    $response['status'] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                }
+                echo json_encode($response);
+                break;
+            case self::DOWNLOAD_PROJECT_PLAN:
+
+                if (!isset($_REQUEST['projectID'])) {
+                    echo 'Project ID missing';
+                    http_response_code(400);
+                    exit;
+                }
+                $dbeDocuments = new DBEProject($this);
+                $dbeDocuments->getRow($_REQUEST['projectID']);
+
+                header('Content-Description: File Transfer');
+                header('Content-Type: ' . $dbeDocuments->getValue(DBEProject::planMIMEType));
+                header(
+                    'Content-Disposition: attachment; filename="' . $dbeDocuments->getValue(
+                        DBEProject::planFileName
+                    ) . '"'
+                );
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . strlen($dbeDocuments->getValue(DBEProject::planFile)));
+                echo $dbeDocuments->getValue(DBEProject::planFile);
+                exit;
         }
     }
 
@@ -206,28 +243,62 @@ class CTProject extends CTCNC
                 )
             );
 
+        $uploadProjectPlanURL = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            [
+                'action'    => self::UPLOAD_PROJECT_PLAN,
+                'projectID' => $projectID
+            ]
+        );
+
+        $hasProjectPlan = !!$dsProject->getValue(DBEProject::planFileName);
+
+        $projectPlanDownloadURL =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                [
+                    'action'    => self::DOWNLOAD_PROJECT_PLAN,
+                    'projectID' => $projectID
+                ]
+            );
+
+        $downloadProjectPlanClass = $hasProjectPlan ? '' : 'class="redText"';
+        $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
+        $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
+
+
         $this->template->set_var(
             array(
-                'customerID'          => $dsProject->getValue(DBEProject::customerID),
-                'projectID'           => $projectID,
-                'description'         => Controller::htmlInputText($dsProject->getValue(DBEProject::description)),
-                'descriptionMessage'  => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::description)),
-                'notes'               => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
-                'notesMessage'        => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
-                'startDate'           => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
-                'startDateMessage'    => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::openedDate)),
-                'expiryDate'          => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::completedDate)),
-                'expiryDateMessage'   => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::completedDate)),
-                'urlUpdate'           => $urlUpdate,
-                'urlDelete'           => $urlDelete,
-                'txtDelete'           => $txtDelete,
-                'urlDisplayCustomer'  => $urlDisplayCustomer,
-                'lastUpdateDate'      => $formattedDate,
-                'lastUpdateEngineer'  => $row['createdBy'],
-                'lastUpdateComment'   => $row['comment'],
-                'historyPopupURL'     => $historyPopupURL,
-                'salesOrderLink'      => $this->getSalesOrderLink($dsProject->getValue(DBEProject::ordHeadID)),
-                'urlLinkedSalesOrder' => $urlLinkedSalesOrder
+                'customerID'             => $dsProject->getValue(DBEProject::customerID),
+                'projectID'              => $projectID,
+                'description'            => Controller::htmlInputText($dsProject->getValue(DBEProject::description)),
+                'descriptionMessage'     => Controller::htmlDisplayText(
+                    $dsProject->getMessage(DBEProject::description)
+                ),
+                'notes'                  => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
+                'notesMessage'           => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
+                'startDate'              => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
+                'startDateMessage'       => Controller::htmlDisplayText(
+                    $dsProject->getMessage(DBEProject::openedDate)
+                ),
+                'expiryDate'             => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::completedDate)),
+                'expiryDateMessage'      => Controller::htmlDisplayText(
+                    $dsProject->getMessage(DBEProject::completedDate)
+                ),
+                'urlUpdate'              => $urlUpdate,
+                'urlDelete'              => $urlDelete,
+                'txtDelete'              => $txtDelete,
+                'urlDisplayCustomer'     => $urlDisplayCustomer,
+                'lastUpdateDate'         => $formattedDate,
+                'lastUpdateEngineer'     => $row['createdBy'],
+                'lastUpdateComment'      => $row['comment'],
+                'historyPopupURL'        => $historyPopupURL,
+                'salesOrderLink'         => $this->getSalesOrderLink($dsProject->getValue(DBEProject::ordHeadID)),
+                'urlLinkedSalesOrder'    => $urlLinkedSalesOrder,
+                'uploadProjectPlanURL'   => $uploadProjectPlanURL,
+                'hasProjectPlan'         => $hasProjectPlan ? "true" : "false",
+                'projectPlanLink'        => $projectPlanLink,
+                'projectPlanDownloadURL' => $projectPlanDownloadURL
             )
         );
         $this->template->parse(
@@ -254,6 +325,7 @@ class CTProject extends CTCNC
         }
         return ' <a href="#" style="color: red" onclick="linkedSalesOrderPopup()">Sales Order</a>';
     }
+
 
     /**
      * Update call Further Action details
@@ -520,6 +592,43 @@ class CTProject extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    private function uploadProjectPlan()
+    {
+        if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
+            throw new Exception('At least one file must be provided');
+        }
+
+        if (!isset($_REQUEST['projectID'])) {
+            throw new Exception('Project ID is missing');
+        }
+
+
+        $dbeProject = new DBEProject($this);
+        $dbeProject->getRow($_REQUEST['projectID']);
+        foreach ($_FILES['files']['name'] as $fileName) {
+
+            $dbeProject->setUpdateModeUpdate();
+
+
+            $dbeProject->setValue(
+                DBEProject::planFile,
+                file_get_contents($_FILES['files']['tmp_name'][0])
+            );
+
+            $dbeProject->setValue(
+                DBEProject::planFileName,
+                $fileName
+            );
+            $dbeProject->setValue(
+                DBEProject::planMIMEType,
+                $_FILES['files']['type'][0]
+            );
+
+            $dbeProject->updateRow();
+        }
+
     }
 }// end of class
 ?>

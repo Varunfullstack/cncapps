@@ -88,6 +88,7 @@ class DBEHeader extends DBEntity
     const SDDashboardEngineersInSRInPastHours = "SDDashboardEngineersInSRInPastHours";
     const secondSiteReplicationAdditionalDelayAllowance = "secondSiteReplicationAdditionalDelayAllowance";
     const SDDashboardEngineersInSREngineersMaxCount = "SDDashboardEngineersInSREngineersMaxCount";
+    const projectCommenceNotification = "projectCommenceNotification";
 
     /**
      * calls constructor()
@@ -585,6 +586,13 @@ class DBEHeader extends DBEntity
             DA_NOT_NULL,
             'secondSiteReplicationAdditionalDelayAllowance'
         );
+
+        $this->addColumn(
+            self::projectCommenceNotification,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
