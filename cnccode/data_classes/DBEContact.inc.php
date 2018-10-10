@@ -807,7 +807,7 @@ class DBEContact extends DBCNCEntity
             $query = "insert into contactauditlog select
                               'update'                  as action,
                               current_timestamp         as createdAt,
-                              $currentLoggedInUserID as userId,
+                              $currentLoggedInUserID    as userId,
                               null                      as contactId,
                               contact.*
                             from contact

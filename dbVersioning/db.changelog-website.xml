@@ -26,4 +26,14 @@
             <column name="resetToken" type="char(60)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="website-1534777348-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="resetToken"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="resetToken" type="char(60)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
