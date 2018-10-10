@@ -3897,7 +3897,7 @@ class CTActivity extends CTCNC
             }
 
 
-            if (!$this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) !== 'Y') {
+            if ($this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y') {
                 $canChangeInitialDateAndTime = true;
             }
 

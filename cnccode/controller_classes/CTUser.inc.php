@@ -12,12 +12,30 @@ require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBETeam.inc.php');
 // Actions
-define('CTUSER_ACT_DISPLAY_LIST', 'userList');
-define('CTUSER_ACT_CREATE', 'createUser');
-define('CTUSER_ACT_EDIT', 'editUser');
-define('CTUSER_ACT_DELETE', 'deleteUser');
-define('CTUSER_ACT_UPDATE', 'updateUser');
-define('CTUSER_ACT_ABSENCE_EDIT', 'absenceEdit');
+define(
+    'CTUSER_ACT_DISPLAY_LIST',
+    'userList'
+);
+define(
+    'CTUSER_ACT_CREATE',
+    'createUser'
+);
+define(
+    'CTUSER_ACT_EDIT',
+    'editUser'
+);
+define(
+    'CTUSER_ACT_DELETE',
+    'deleteUser'
+);
+define(
+    'CTUSER_ACT_UPDATE',
+    'updateUser'
+);
+define(
+    'CTUSER_ACT_ABSENCE_EDIT',
+    'absenceEdit'
+);
 
 class CTUser extends CTCNC
 {
@@ -25,9 +43,20 @@ class CTUser extends CTCNC
     var $dsAbsence = '';
     var $buUser = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "accounts",
         ];
@@ -40,9 +69,21 @@ class CTUser extends CTCNC
         $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
 
         $this->dsAbsence = new DSForm($this);
-        $this->dsAbsence->addColumn('userID', DA_INTEGER, DA_NOT_NULL);
-        $this->dsAbsence->addColumn('startDate', DA_DATE, DA_NOT_NULL);
-        $this->dsAbsence->addColumn('days', DA_INTEGER, DA_NOT_NULL);
+        $this->dsAbsence->addColumn(
+            'userID',
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->dsAbsence->addColumn(
+            'startDate',
+            DA_DATE,
+            DA_NOT_NULL
+        );
+        $this->dsAbsence->addColumn(
+            'days',
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
     }
 
     /**
@@ -110,7 +151,11 @@ class CTUser extends CTCNC
         );
 
         if ($dsUser->rowCount() > 0) {
-            $this->template->set_block('UserList', 'userBlock', 'users');
+            $this->template->set_block(
+                'UserList',
+                'userBlock',
+                'users'
+            );
             while ($dsUser->fetchNext()) {
                 $userID = $dsUser->getValue('userID');
 
@@ -159,10 +204,18 @@ class CTUser extends CTCNC
                         'txtEdit' => $txtEdit
                     )
                 );
-                $this->template->parse('users', 'userBlock', true);
+                $this->template->parse(
+                    'users',
+                    'userBlock',
+                    true
+                );
             }//while $dsUser->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'UserList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'UserList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -177,11 +230,17 @@ class CTUser extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == CTUSER_ACT_EDIT) {
-                $this->buUser->getUserByID($_REQUEST['userID'], $dsUser);
+                $this->buUser->getUserByID(
+                    $_REQUEST['userID'],
+                    $dsUser
+                );
                 $userID = $_REQUEST['userID'];
             } else {                                                                    // creating new
                 $dsUser->initialise();
-                $dsUser->setValue('userID', '0');
+                $dsUser->setValue(
+                    'userID',
+                    '0'
+                );
                 $userID = '0';
             }
         } else {                                                                        // form validation error
@@ -224,105 +283,146 @@ class CTUser extends CTCNC
         );
         $this->template->setVar(
             array(
-                'bodyTagExtras' => 'OnLoad="validateCustomer()"',
-                'userID' => $dsUser->getValue('userID'),
-                'name' => Controller::htmlInputText($dsUser->getValue('name')),
-                'nameMessage' => Controller::htmlDisplayText($dsUser->getMessage('name')),
-                'salutation' => Controller::htmlInputText($dsUser->getValue('salutation')),
-                'salutationMessage' => Controller::htmlDisplayText($dsUser->getMessage('salutation')),
-                'add1' => Controller::htmlInputText($dsUser->getValue('add1')),
-                'add1Message' => Controller::htmlDisplayText($dsUser->getMessage('add1')),
-                'add2' => Controller::htmlInputText($dsUser->getValue('add2')),
-                'add3' => Controller::htmlInputText($dsUser->getValue('add3')),
-                'town' => Controller::htmlInputText($dsUser->getValue('town')),
-                'townMessage' => Controller::htmlDisplayText($dsUser->getMessage('town')),
-                'county' => Controller::htmlInputText($dsUser->getValue('county')),
-                'postcode' => Controller::htmlInputText($dsUser->getValue('postcode')),
-                'postcodeMessage' => Controller::htmlDisplayText($dsUser->getMessage('postcode')),
-                'username' => Controller::htmlInputText($dsUser->getValue('username')),
-                'usernameMessage' => Controller::htmlDisplayText($dsUser->getMessage('username')),
-                'employeeNo' => Controller::htmlInputText($dsUser->getValue('employeeNo')),
-                'employeeNoMessage' => Controller::htmlDisplayText($dsUser->getMessage('employeeNo')),
-                'jobTitle' => Controller::htmlInputText($dsUser->getValue('jobTitle')),
-                'jobTitleMessage' => Controller::htmlDisplayText($dsUser->getMessage('jobTitle')),
-                'petrolRate' => Controller::htmlInputText($dsUser->getValue('petrolRate')),
-                'petrolRateMessage' => Controller::htmlDisplayText($dsUser->getMessage('petrolRate')),
-                'hourlyPayRate' => Controller::htmlInputText($dsUser->getValue('hourlyPayRate')),
-                'hourlyPayRateMessage' => Controller::htmlDisplayText($dsUser->getMessage('hourlyPayRate')),
-                'standardDayHours' => Controller::htmlInputText($dsUser->getValue('standardDayHours')),
-                'standardDayHoursMessage' => Controller::htmlDisplayText($dsUser->getMessage('standardDayHours')),
-                'signatureFilename' => Controller::htmlInputText($dsUser->getValue('signatureFilename')),
+                'bodyTagExtras'            => 'OnLoad="validateCustomer()"',
+                'userID'                   => $dsUser->getValue('userID'),
+                'name'                     => Controller::htmlInputText($dsUser->getValue('name')),
+                'nameMessage'              => Controller::htmlDisplayText($dsUser->getMessage('name')),
+                'salutation'               => Controller::htmlInputText($dsUser->getValue('salutation')),
+                'salutationMessage'        => Controller::htmlDisplayText($dsUser->getMessage('salutation')),
+                'add1'                     => Controller::htmlInputText($dsUser->getValue('add1')),
+                'add1Message'              => Controller::htmlDisplayText($dsUser->getMessage('add1')),
+                'add2'                     => Controller::htmlInputText($dsUser->getValue('add2')),
+                'add3'                     => Controller::htmlInputText($dsUser->getValue('add3')),
+                'town'                     => Controller::htmlInputText($dsUser->getValue('town')),
+                'townMessage'              => Controller::htmlDisplayText($dsUser->getMessage('town')),
+                'county'                   => Controller::htmlInputText($dsUser->getValue('county')),
+                'postcode'                 => Controller::htmlInputText($dsUser->getValue('postcode')),
+                'postcodeMessage'          => Controller::htmlDisplayText($dsUser->getMessage('postcode')),
+                'username'                 => Controller::htmlInputText($dsUser->getValue('username')),
+                'usernameMessage'          => Controller::htmlDisplayText($dsUser->getMessage('username')),
+                'employeeNo'               => Controller::htmlInputText($dsUser->getValue('employeeNo')),
+                'employeeNoMessage'        => Controller::htmlDisplayText($dsUser->getMessage('employeeNo')),
+                'jobTitle'                 => Controller::htmlInputText($dsUser->getValue('jobTitle')),
+                'jobTitleMessage'          => Controller::htmlDisplayText($dsUser->getMessage('jobTitle')),
+                'petrolRate'               => Controller::htmlInputText($dsUser->getValue('petrolRate')),
+                'petrolRateMessage'        => Controller::htmlDisplayText($dsUser->getMessage('petrolRate')),
+                'hourlyPayRate'            => Controller::htmlInputText($dsUser->getValue('hourlyPayRate')),
+                'hourlyPayRateMessage'     => Controller::htmlDisplayText($dsUser->getMessage('hourlyPayRate')),
+                'standardDayHours'         => Controller::htmlInputText($dsUser->getValue('standardDayHours')),
+                'standardDayHoursMessage'  => Controller::htmlDisplayText($dsUser->getMessage('standardDayHours')),
+                'signatureFilename'        => Controller::htmlInputText($dsUser->getValue('signatureFilename')),
                 'signatureFilenameMessage' => Controller::htmlDisplayText($dsUser->getMessage('signatureFilename')),
-                'firstName' => Controller::htmlInputText($dsUser->getValue('firstName')),
-                'firstNameMessage' => Controller::htmlDisplayText($dsUser->getMessage('firstName')),
-                'lastName' => Controller::htmlInputText($dsUser->getValue('lastName')),
-                'lastNameMessage' => Controller::htmlDisplayText($dsUser->getMessage('lastName')),
-                'activeFlagChecked' => Controller::htmlChecked($dsUser->getValue('activeFlag')),
+                'firstName'                => Controller::htmlInputText($dsUser->getValue('firstName')),
+                'firstNameMessage'         => Controller::htmlDisplayText($dsUser->getMessage('firstName')),
+                'lastName'                 => Controller::htmlInputText($dsUser->getValue('lastName')),
+                'lastNameMessage'          => Controller::htmlDisplayText($dsUser->getMessage('lastName')),
+                'activeFlagChecked'        => Controller::htmlChecked($dsUser->getValue('activeFlag')),
 
-                'receiveSdManagerEmailFlagChecked' => Controller::htmlChecked($dsUser->getValue('receiveSdManagerEmailFlag')),
+                'receiveSdManagerEmailFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue('receiveSdManagerEmailFlag')
+                ),
 
                 'appearInQueueFlagChecked' => Controller::htmlChecked($dsUser->getValue('appearInQueueFlag')),
 
-                'changePriorityFlagChecked' => Controller::htmlChecked($dsUser->getValue(
-                    'changePriorityFlag')),
+                'changePriorityFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue(
+                        'changePriorityFlag'
+                    )
+                ),
 
                 'weekdayOvertimeFlagChecked' => Controller::htmlChecked($dsUser->getValue('weekdayOvertimeFlag')),
-                'helpdeskFlagChecked' => Controller::htmlChecked($dsUser->getValue('helpdeskFlag')),
+                'helpdeskFlagChecked'        => Controller::htmlChecked($dsUser->getValue('helpdeskFlag')),
 
-                'salesChecked' => (strpos($dsUser->getValue('perms'), PHPLIB_PERM_SALES) !== FALSE) ? CT_CHECKED : '',
+                'salesChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_SALES
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'accountsChecked' => (strpos($dsUser->getValue('perms'),
-                                             PHPLIB_PERM_ACCOUNTS) !== FALSE) ? CT_CHECKED : '',
+                'accountsChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_ACCOUNTS
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'technicalChecked' => (strpos($dsUser->getValue('perms'),
-                                              PHPLIB_PERM_TECHNICAL) !== FALSE) ? CT_CHECKED : '',
+                'technicalChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_TECHNICAL
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'supervisorChecked' => (strpos($dsUser->getValue('perms'),
-                                               PHPLIB_PERM_SUPERVISOR) !== FALSE) ? CT_CHECKED : '',
+                'supervisorChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_SUPERVISOR
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'maintenanceChecked' => (strpos($dsUser->getValue('perms'),
-                                                PHPLIB_PERM_MAINTENANCE) !== FALSE) ? CT_CHECKED : '',
+                'maintenanceChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_MAINTENANCE
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'customerChecked' => (strpos($dsUser->getValue('perms'),
-                                             PHPLIB_PERM_CUSTOMER) !== FALSE) ? CT_CHECKED : '',
+                'customerChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_CUSTOMER
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'renewalsChecked' => (strpos($dsUser->getValue('perms'),
-                                             PHPLIB_PERM_RENEWALS) !== FALSE) ? CT_CHECKED : '',
+                'renewalsChecked' => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_RENEWALS
+                    ) !== FALSE) ? CT_CHECKED : '',
 
-                'changeApproverFlagChecked' => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
-                'excludeFromStatsFlagChecked' => Controller::htmlChecked($dsUser->getValue(DBEUser::excludeFromStatsFlag)),
-                'reportsChecked' => (strpos($dsUser->getValue('perms'),
-                                            PHPLIB_PERM_REPORTS) !== FALSE) ? CT_CHECKED : '',
-                'teamMessage' => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'changeApproverFlagChecked'       => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
+                'changeInitialDateAndTimeFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
+                ),
+                'excludeFromStatsFlagChecked'     => Controller::htmlChecked(
+                    $dsUser->getValue(DBEUser::excludeFromStatsFlag)
+                ),
+                'reportsChecked'                  => (strpos(
+                        $dsUser->getValue('perms'),
+                        PHPLIB_PERM_REPORTS
+                    ) !== FALSE) ? CT_CHECKED : '',
+                'teamMessage'                     => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
+                'urlUpdate'                       => $urlUpdate,
+                'urlDelete'                       => $urlDelete,
+                'txtDelete'                       => $txtDelete,
+                'urlDisplayList'                  => $urlDisplayList
             )
         );
 
         // manager selection
         $dbeManager = new DBEUser($this);
         $dbeManager->getRows();
-        $this->template->set_block('UserEdit', 'managerBlock', 'managers');
+        $this->template->set_block(
+            'UserEdit',
+            'managerBlock',
+            'managers'
+        );
         while ($dbeManager->fetchNext()) {
             if ($dbeManager->getValue("userID") != $dsUser->getValue("userID")) {                // exclude this user
-                $managerSelected = ($dsUser->getValue("managerID") == $dbeManager->getValue("userID")) ? CT_SELECTED : '';
+                $managerSelected = ($dsUser->getValue("managerID") == $dbeManager->getValue(
+                        "userID"
+                    )) ? CT_SELECTED : '';
                 $this->template->set_var(
                     array(
                         'managerSelected' => $managerSelected,
-                        'managerID' => $dbeManager->getValue("userID"),
-                        'managerName' => $dbeManager->getValue("name")
+                        'managerID'       => $dbeManager->getValue("userID"),
+                        'managerName'     => $dbeManager->getValue("name")
                     )
                 );
-                $this->template->parse('managers', 'managerBlock', true);
+                $this->template->parse(
+                    'managers',
+                    'managerBlock',
+                    true
+                );
             }
         }
 
         // team selection
         $dbeTeam = new DBETeam($this);
         $dbeTeam->getRows();
-        $this->template->set_block('UserEdit', 'teamBlock', 'teams');
+        $this->template->set_block(
+            'UserEdit',
+            'teamBlock',
+            'teams'
+        );
         while ($dbeTeam->fetchNext()) {
 
             $teamSelected = ($dsUser->getValue("teamID") == $dbeTeam->getValue("teamID")) ? CT_SELECTED : '';
@@ -330,30 +430,48 @@ class CTUser extends CTCNC
             $this->template->set_var(
                 array(
                     'teamSelected' => $teamSelected,
-                    'teamID' => $dbeTeam->getValue("teamID"),
-                    'teamName' => $dbeTeam->getValue("name")
+                    'teamID'       => $dbeTeam->getValue("teamID"),
+                    'teamName'     => $dbeTeam->getValue("name")
                 )
             );
-            $this->template->parse('teams', 'teamBlock', true);
+            $this->template->parse(
+                'teams',
+                'teamBlock',
+                true
+            );
         }
 
         // customer selection
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRows(DBECustomer::name);
-        $this->template->set_block('UserEdit', 'customerBlock', 'customers');
+        $this->template->set_block(
+            'UserEdit',
+            'customerBlock',
+            'customers'
+        );
         while ($dbeCustomer->fetchNext()) {
-            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(DBECustomer::customerID)) ? CT_SELECTED : '';
+            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(
+                    DBECustomer::customerID
+                )) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'customerSelected' => $customerSelected,
-                    'customerID' => $dbeCustomer->getValue(DBECustomer::customerID),
-                    'customerName' => $dbeCustomer->getValue(DBECustomer::name)
+                    'customerID'       => $dbeCustomer->getValue(DBECustomer::customerID),
+                    'customerName'     => $dbeCustomer->getValue(DBECustomer::name)
                 )
             );
-            $this->template->parse('customers', 'customerBlock', true);
+            $this->template->parse(
+                'customers',
+                'customerBlock',
+                true
+            );
         }
 
-        $this->template->parse('CONTENTS', 'UserEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'UserEdit',
+            true
+        );
         $this->parsePage();
     }// end function edit()
 
@@ -366,9 +484,16 @@ class CTUser extends CTCNC
         $this->setMethodName('update');
         $dsUser = &$this->dsUser;
         $this->formError = (!$this->dsUser->populateFromArray($_REQUEST['user']));
+
         if (isset($_REQUEST['perms'])) {
             $this->dsUser->setUpdateModeUpdate();
-            $this->dsUser->setValue('perms', implode(',', $_REQUEST['perms']));
+            $this->dsUser->setValue(
+                'perms',
+                implode(
+                    ',',
+                    $_REQUEST['perms']
+                )
+            );
             $this->dsUser->post();
         }
         if ($this->formError) {
@@ -384,11 +509,12 @@ class CTUser extends CTCNC
         $this->buUser->updateUser($this->dsUser);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'userID' => $this->dsUser->getValue('userID'),
-                                 'action' => CTCNC_ACT_VIEW
-                             )
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'userID' => $this->dsUser->getValue('userID'),
+                    'action' => CTCNC_ACT_VIEW
+                )
             );
         header('Location: ' . $urlNext);
     }
@@ -450,25 +576,41 @@ class CTUser extends CTCNC
             /*
             defaults
             */
-            $this->dsAbsence->setValue('userID', $_REQUEST['userID']);
-            $this->dsAbsence->setValue('startDate', date(CONFIG_MYSQL_DATE));
-            $this->dsAbsence->setValue('days', 1);
+            $this->dsAbsence->setValue(
+                'userID',
+                $_REQUEST['userID']
+            );
+            $this->dsAbsence->setValue(
+                'startDate',
+                date(CONFIG_MYSQL_DATE)
+            );
+            $this->dsAbsence->setValue(
+                'days',
+                1
+            );
         }
 
-        $this->buUser->getUserByID($this->dsAbsence->getValue('userID'), $dsUser);
+        $this->buUser->getUserByID(
+            $this->dsAbsence->getValue('userID'),
+            $dsUser
+        );
 
         $this->template->setVar(
             array(
-                'userID' => $this->dsAbsence->getValue('userID'),
-                'startDate' => Controller::dateYMDtoDMY($this->dsAbsence->getValue('startDate')),
+                'userID'           => $this->dsAbsence->getValue('userID'),
+                'startDate'        => Controller::dateYMDtoDMY($this->dsAbsence->getValue('startDate')),
                 'startDateMessage' => $this->dsAbsence->getMessage('startDate'),
-                'daysMessage' => $this->dsAbsence->getMessage('days'),
-                'userName' => $dsUser->getValue('name'),
-                'urlUpdate' => $urlUpdate
+                'daysMessage'      => $this->dsAbsence->getMessage('days'),
+                'userName'         => $dsUser->getValue('name'),
+                'urlUpdate'        => $urlUpdate
             )
         );
 
-        $this->template->set_block('UserAbsenceEdit', 'daysBlock', 'records');
+        $this->template->set_block(
+            'UserAbsenceEdit',
+            'daysBlock',
+            'records'
+        );
 
         for ($days = 1; $days <= 30; $days++) {
 
@@ -477,14 +619,22 @@ class CTUser extends CTCNC
             $this->template->set_var(
                 array(
                     'daySelected' => $daySelected,
-                    'days' => $days
+                    'days'        => $days
                 )
             );
 
-            $this->template->parse('records', 'daysBlock', true);
+            $this->template->parse(
+                'records',
+                'daysBlock',
+                true
+            );
         }
 
-        $this->template->parse('CONTENTS', 'UserAbsenceEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'UserAbsenceEdit',
+            true
+        );
 
         $this->parsePage();
     }
