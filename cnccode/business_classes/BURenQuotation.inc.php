@@ -31,7 +31,7 @@ class BURenQuotation extends Business
     function updateRenQuotation(&$dsData)
     {
         $this->setMethodName('updateRenQuotation');
-        $this->updateDataaccessObject($dsData, $this->dbeRenQuotation);
+        $this->updateDataAccessObject($dsData, $this->dbeRenQuotation);
 
         return TRUE;
     }

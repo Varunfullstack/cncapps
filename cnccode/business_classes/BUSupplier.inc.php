@@ -104,7 +104,7 @@ class BUSupplier extends Business
     function updateSupplier(&$dsSupplier)
     {
         $this->setMethodName('updateSupplier');
-        return ($this->updateDataaccessObject($dsSupplier, $this->dbeSupplier));
+        return ($this->updateDataAccessObject($dsSupplier, $this->dbeSupplier));
     }
 }// End of class
 ?>

@@ -38,7 +38,7 @@ class BURenContract extends Business
     function updateRenContract(&$dsData)
     {
         $this->setMethodName('updateRenContract');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeRenContract
         );

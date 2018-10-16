@@ -32,7 +32,7 @@ class BURenHosting extends Business
     function updateRenHosting(&$dsData)
     {
         $this->setMethodName('updateRenHosting');
-        $this->updateDataaccessObject($dsData, $this->dbeRenHosting);
+        $this->updateDataAccessObject($dsData, $this->dbeRenHosting);
 
         return TRUE;
     }

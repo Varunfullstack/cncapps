@@ -1064,7 +1064,7 @@ class BUActivity extends Business
             $enteredEndTime = false;
         }
 
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsCallActivity,
             $dbeCallActivity
         );
@@ -5298,7 +5298,7 @@ is currently a balance of ';
         ); // user that created activity
         $dsCallActivity->post();
 
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsCallActivity,
             $dbeCallActivity
         ); // Update the DB

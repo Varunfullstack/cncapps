@@ -386,8 +386,6 @@ class CTHome extends CTCNC
                         'backToHome' => true
                     )
                 );
-
-
             $this->template->set_var(
                 array(
                     'projectID'    => $project['projectID'],
@@ -398,11 +396,16 @@ class CTHome extends CTCNC
                         "%d/%m/%Y",
                         strtotime($project['startDate'])
                     ),
+                    'commenceDate' => strftime(
+                        "%d/%m/%Y",
+                        strtotime($project['startDate'])
+                    ),
                     'expiryDate'   => strftime(
                         "%d/%m/%Y",
                         strtotime($project['expiryDate'])
                     ),
-                    'urlEdit'      => $editProjectLink
+                    'urlEdit'      => $editProjectLink,
+                    'engineerName' => $project['engineerName']
                 )
             );
 

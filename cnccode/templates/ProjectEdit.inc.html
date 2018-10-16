@@ -27,13 +27,13 @@
         </tr>
         <tr>
             <td>In Hours</td>
-            <td>{% stats.inHoursAllocated %}</td>
-            <td>{% stats.inHoursUsed %}</td>
+            <td>{% stats.inHoursAllocated %} days</td>
+            <td>{% getTotalInDays %} days</td>
         </tr>
         <tr>
             <td>Out of Hours</td>
-            <td>{% stats.ooHoursAllocated %}</td>
-            <td>{% stats.ooHoursUsed %}</td>
+            <td>{% stats.ooHoursAllocated %} days</td>
+            <td>{% getTotalOutDays %} days</td>
         </tr>
     </table>
     <div>
@@ -88,6 +88,7 @@
             </td>
         </tr>
     </table>
+    <h2>Time Breakdown</h2>
     <table>
         <thead>
         <tr>
@@ -132,8 +133,26 @@
         <tr>
             <td>Total</td>
             {% #consultants %}
-            <td>{% totalOutHours() %}</td>
+            <td>{% totalHours %}</td>
             {% /consultants %}
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Total (in Hours)</td>
+            <td>{% totalInHours %}</td>
+        </tr>
+        <tr>
+            <td>Total (Out of Hours)</td>
+            <td>{% totalOutHours %}</td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Expenses Total:</td>
+            <td>Some value</td>
         </tr>
         </tbody>
     </table>
@@ -155,7 +174,7 @@
     });
 
     function linkedSalesOrderPopup() {
-        window.open(
+        const newWindow = window.open(
             '{urlLinkedSalesOrder}',
             'salesOrder',
             'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
@@ -215,8 +234,16 @@
                 // we have to build a table, that has a column per consultant and a row per activity type
                 const consultants = [];
                 const activities = [];
-                let totalInHours = 0;
-                let totalOutHours = 0;
+                context.totalInHours = 0;
+                context.totalOutHours = 0;
+
+                context.getTotalInDays = function () {
+                    return ((this.totalInHours * 60) / this.minutesPerDay).toFixed(2);
+                };
+
+                context.getTotalOutDays = function () {
+                    return ((this.totalOutHours * 60) / this.minutesPerDay).toFixed(2);
+                };
 
                 context.test.forEach(item => {
                     const consultantKey = item.firstName + item.lastName;
@@ -228,7 +255,7 @@
                             activities: {},
                             name: item.firstName[0] + item.lastName[0],
                             totalHours: function () {
-                                return this.totalInHours + this.totalOutHours
+                                return this.totalOutHours + this.totalInHours;
                             }
                         };
                     }
@@ -241,8 +268,8 @@
 
                     consultants[consultantKey].totalInHours += item.inHours;
                     consultants[consultantKey].totalOutHours += item.outHours;
-                    totalInHours += item.inHours;
-                    totalOutHours += item.outHours;
+                    context.totalInHours += item.inHours;
+                    context.totalOutHours += item.outHours;
                     consultants[consultantKey].activities[activityKey] = {
                         inHours: item.inHours,
                         outHours: item.outHours
@@ -280,8 +307,8 @@
                 }, []);
                 context.activities = activityRows;
 
+
                 const source = document.getElementById("project-budget-stats-template").innerHTML;
-                debugger;
                 const html = Mustache.to_html(source, context);
 
                 const projectBudgetElm = $('.projectBudget').html('');

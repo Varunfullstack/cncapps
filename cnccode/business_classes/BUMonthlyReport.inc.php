@@ -128,7 +128,7 @@ class BUMonthlyReport extends Business
     {
         $dbeServiceDeskReport = new DBEServiceDeskReport($this);
 
-        $this->updateDataaccessObject($dsServiceDeskReport, $dbeServiceDeskReport);
+        $this->updateDataAccessObject($dsServiceDeskReport, $dbeServiceDeskReport);
 
         return $dbeServiceDeskReport->getPKValue();
 

@@ -32,7 +32,7 @@ class BURenBroadband extends Business
     function updateRenBroadband(&$dsData)
     {
         $this->setMethodName('updateRenBroadband');
-        $this->updateDataaccessObject($dsData, $this->dbeRenBroadband);
+        $this->updateDataAccessObject($dsData, $this->dbeRenBroadband);
 
         return TRUE;
     }

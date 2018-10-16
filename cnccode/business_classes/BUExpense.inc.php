@@ -124,7 +124,7 @@ class BUExpense extends Business
             $dsExpense->post();
         }
         $dbeExpense = new DBEExpense($this);
-        $this->updateDataaccessObject($dsExpense, $dbeExpense);
+        $this->updateDataAccessObject($dsExpense, $dbeExpense);
         return TRUE;
     }
 

@@ -6,8 +6,13 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use PhpOffice\PhpWord\Shared\Converter;
+use PhpOffice\PhpWord\Style\TablePosition;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
+require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
 // Actions
@@ -42,6 +47,7 @@ class CTProject extends CTCNC
     const DAILY_OOH_LABOUR_CHARGE = 1503;
     const HOURLY_OOH_LABOUR_CHARGE = 16865;
     const GET_BUDGET_DATA = "getBudgetData";
+    const CURRENT_PROJECTS_REPORT = "currentProjectsReport";
     var $dsProject = '';
     /** @var BUProject */
     var $buProject;
@@ -178,6 +184,11 @@ class CTProject extends CTCNC
                     JSON_NUMERIC_CHECK
                 );
                 break;
+            case self::CURRENT_PROJECTS_REPORT:
+                $this->currentProjectReport();
+                break;
+            default:
+                $this->showList();
         }
     }
 
@@ -373,6 +384,10 @@ class CTProject extends CTCNC
                 'expiryDateMessage'       => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::completedDate)
                 ),
+                'commenceDate'            => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::commenceDate)),
+                'commenceDateMessage'     => Controller::htmlDisplayText(
+                    $dsProject->getMessage(DBEProject::commenceDate)
+                ),
                 'urlUpdate'               => $urlUpdate,
                 'urlDelete'               => $urlDelete,
                 'txtDelete'               => $txtDelete,
@@ -430,6 +445,12 @@ class CTProject extends CTCNC
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);
 
+        $dbeProject = new DBEProject($this);
+        $projectID = $_REQUEST['projectID'];
+
+        $dbeProject->getRow($projectID);
+
+        $this->dsProject->replicate($dbeProject);
 
         $this->formError = (!$this->dsProject->populateFromArray($_REQUEST['project']));
         if ($this->formError) {
@@ -442,25 +463,24 @@ class CTProject extends CTCNC
             exit;
         }
 
-
         if ($this->dsProject->getValue("inHoursQuantity")) {
             // we need to add the amount of hours or days to the in hours budget
             $currentDays = (float)$this->dsProject->getValue(DBEProject::inHoursBudgetDays);
             switch ($this->dsProject->getValue('inHoursMeasure')) {
-                case'hours':
+                case 'hours':
                     $toAddMinutes = (int)$this->dsProject->getValue("inHoursQuantity") * 60;
+                    $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
                     break;
                 case 'days':
-                    $toAddMinutes = (float)$this->dsProject->getValue('inHoursQuantity') * $dbeHeader->getValue(
-                            DBEHeader::ImplementationTeamMinutesInADay
-                        );
+                    $toAddDays = (float)$this->dsProject->getValue('inHoursQuantity');
             }
-            $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
             $this->dsProject->setValue(
                 DBEProject::inHoursBudgetDays,
                 $currentDays + $toAddDays
             );
+            $this->dsProject->setUpdateModeUpdate();
+            $this->dsProject->post();
         }
 
         if ($this->dsProject->getValue("outOfHoursQuantity")) {
@@ -469,20 +489,20 @@ class CTProject extends CTCNC
             switch ($this->dsProject->getValue('outOfHoursMeasure')) {
                 case'hours':
                     $toAddMinutes = (int)$this->dsProject->getValue("outOfHoursQuantity") * 60;
+                    $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
                     break;
                 case 'days':
-                    $toAddMinutes = (float)$this->dsProject->getValue('outOfHoursQuantity') * $dbeHeader->getValue(
-                            DBEHeader::ImplementationTeamMinutesInADay
-                        );
+                    $toAddDays = (float)$this->dsProject->getValue('outOfHoursQuantity');
             }
-            $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
             $this->dsProject->setValue(
                 DBEProject::outOfHoursBudgetDays,
                 $currentDays + $toAddDays
             );
-        }
+            $this->dsProject->setUpdateModeUpdate();
+            $this->dsProject->post();
 
+        }
 
         $this->buProject->updateProject($this->dsProject);
 
@@ -771,10 +791,9 @@ class CTProject extends CTCNC
 
     private function calculateBudget()
     {
-
         $projectID = @$_REQUEST['projectID'];
 
-        if ($projectID) {
+        if (!$projectID) {
             echo 'There is no project ID';
             exit;
         }
@@ -802,7 +821,8 @@ class CTProject extends CTCNC
             $dsOrdLine
         );
 
-        $dbeHeader = new DBEHeader($this);
+        $BUHeader = new BUHeader($this);
+        $BUHeader->getHeader($dbeHeader);
         $minutesInADay = $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
         $normalMinutes = 0;
@@ -824,9 +844,12 @@ class CTProject extends CTCNC
                         $oohMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
                         break;
                 }
+                echo "<div>Normal Minutes: $normalMinutes</div><div>Out Of Hours Minutes: $oohMinutes</div>";
+
             }
         }
-
+        echo "<div> inHours budget days " . ($normalMinutes / $minutesInADay) . "</div>";
+        echo "<div> out of Hours budget days " . ($oohMinutes / $minutesInADay) . "</div>";
         $dbeProject->setValue(
             DBEProject::inHoursBudgetDays,
             $normalMinutes / $minutesInADay
@@ -837,37 +860,28 @@ class CTProject extends CTCNC
             $oohMinutes / $minutesInADay
         );
 
+        $dbeProject->setValue(
+            DBEProject::calculatedBudget,
+            1
+        );
+
         $dbeProject->updateRow();
+
+        $urlNext =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'projectID' => $projectID,
+                    'action'    => CTPROJECT_ACT_EDIT
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
 
     }
 
-    private function fetchBudgetData()
+    private function usedBudgetData($salesOrderID)
     {
-        if (!isset($_REQUEST['projectID'])) {
-            throw new Exception('Project ID is missing');
-        }
-
-
-        $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($_REQUEST['projectID']);
-
-
-        $data = [
-            "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
-            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget),
-            "stats"            => [
-                "inHoursAllocated" => 'N/A',
-                "inHoursUsed"      => 'N/A',
-                "ooHoursAllocated" => 'N/A',
-                "ooHoursUsed"      => 'N/A',
-            ]
-        ];
-        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
-            return $data;
-        }
-
-        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
-
         $startTime = '09:00';
         $endTime = '18:00';
 
@@ -939,10 +953,45 @@ GROUP BY caa_callacttypeno,
         global $db;
 
         $db->query($query);
-
+        $data = [];
         while ($db->next_record(MYSQLI_ASSOC)) {
-            $data['test'][] = $db->Record;
+            $data[] = $db->Record;
         }
+        return $data;
+    }
+
+    private function fetchBudgetData()
+    {
+        if (!isset($_REQUEST['projectID'])) {
+            throw new Exception('Project ID is missing');
+        }
+
+
+        $dbeProject = new DBEProject($this);
+        $dbeProject->getRow($_REQUEST['projectID']);
+        $buHeader = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $buHeader->getHeader($dbeHeader);
+
+
+        $data = [
+            "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
+            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget),
+            "stats"            => [
+                "inHoursAllocated" => 'N/A',
+                "inHoursUsed"      => 'N/A',
+                "ooHoursAllocated" => 'N/A',
+                "ooHoursUsed"      => 'N/A',
+            ],
+            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+        ];
+        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
+            return $data;
+        }
+
+        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
+
+        $data['test'] = $this->usedBudgetData($salesOrderID);
 
         if (!$dbeProject->getValue(DBEProject::calculatedBudget)) {
             return $data;
@@ -953,5 +1002,316 @@ GROUP BY caa_callacttypeno,
 
         return $data;
     }
+
+    private function showList()
+    {
+
+
+        $this->setPageTitle('Projects');
+        $this->setTemplateFiles(
+            array('ProjectList' => 'ProjectList')
+        );
+
+        $dbeProject = new DBEProject($this);
+
+        $this->template->set_block(
+            'ProjectList',
+            'projectBlock',
+            'project'
+        );
+        $currentProjects = $dbeProject->getCurrentProjects();
+
+        foreach ($currentProjects as $project) {
+            $hasProjectPlan = !!$project['planFileName'];
+
+            $projectPlanDownloadURL =
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action'    => self::DOWNLOAD_PROJECT_PLAN,
+                        'projectID' => $project['projectID']
+                    ]
+                );
+
+            $downloadProjectPlanClass = $hasProjectPlan ? '' : 'class="redText"';
+            $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
+            $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
+
+            $historyPopupURL = $this->buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'historyPopup',
+                    'projectID' => $project['projectID'],
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+
+            $lastUpdated = 'No updates';
+
+            if ($project['createdBy']) {
+                $lastUpdated = "<span style='font-weight: bold'>$project[createdAt] by $project[createdBy]:</span> $project[comment]";
+            }
+
+            $this->template->setVar(
+                [
+                    "description"     => $project['description'],
+                    "commenceDate"    => $project['commenceDate'],
+                    "projectPlanLink" => $projectPlanLink,
+                    "latestUpdate"    => $lastUpdated,
+                    "historyPopupURL" => $historyPopupURL,
+                ]
+            );
+            $this->template->parse(
+                'project',
+                'projectBlock',
+                true
+            );
+        }
+
+        $this->template->parse(
+            'CONTENTS',
+            'ProjectList',
+            true
+        );
+
+        $this->parsePage();
+    }
+
+
+
+    private function calculateInHoursOutHoursUsed($projectID)
+    {
+        $dbeProject = new DBEProject($this);
+        $dbeProject->getRow($projectID);
+        $buHeader = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $buHeader->getHeader($dbeHeader);
+
+
+        $data = [
+            "inHoursUsed"   => 0,
+            "outHoursUsed"  => 0,
+            "minutesPerDay" => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+        ];
+        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
+            return $data;
+        }
+
+        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
+
+        $activities = $this->usedBudgetData($salesOrderID);
+
+        foreach ($activities as $activity) {
+            $data['inHoursUsed'] += $activity['inHours'];
+            $data['outHoursUsed'] += $activity['outHours'];
+        }
+
+        $data['inHoursUsed'] = ($data['inHoursUsed'] * 60) / $data['minutesPerDay'];
+        $data['outHoursUsed'] = ($data['outHoursUsed'] * 60) / $data['minutesPerDay'];
+        return $data;
+    }
+
+    private function currentProjectReport()
+    {
+        $dbeProject = new DBEProject($this);
+        $currentProjects = $dbeProject->getCurrentProjects();
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord->setDefaultFontName('Arial');
+        $phpWord->setDefaultFontSize(8);
+
+        $sectionStyle = ["orientation" => 'landscape', "marginLeft" => 500];
+        $section = $phpWord->addSection($sectionStyle);
+        $fancyTableStyleName = 'Fancy Table';
+        $tableStyle = new \PhpOffice\PhpWord\Style\Table;
+
+        $fancyTableStyle = array(
+            'borderSize'  => 6,
+            'borderColor' => '006699',
+            'cellMargin'  => 80,
+            'alignment'   => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+            'cellSpacing' => 50,
+        );
+        $fancyTableFirstRowStyle = array(
+            'borderBottomSize'  => 18,
+            'borderBottomColor' => '0000FF',
+            'bgColor'           => '66BBFF'
+        );
+        $fancyTableCellStyle = array('valign' => 'center');
+        $fancyTableFontStyle = array('bold' => true);
+        $phpWord->addTableStyle(
+            $fancyTableStyleName,
+            $fancyTableStyle,
+            $fancyTableFirstRowStyle
+        );
+        $table = $section->addTable($fancyTableStyleName);
+        $table->addRow(900);
+        $cellWidth = 1600;
+
+        $pStyle = ['align' => 'center'];
+
+        $customerNameWidth = 1450;
+        $summaryWidth = 3000;
+
+        $table->addCell(
+            $customerNameWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Customer Name',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+        $table->addCell(
+            $summaryWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Summary',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Commence',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Engineer',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Service Request',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Budget',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'To Date',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Latest Update',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+
+        $table->addCell(
+            $cellWidth,
+            $fancyTableCellStyle
+        )->addText(
+            'Notes',
+            $fancyTableFontStyle,
+            $pStyle
+        );
+
+        foreach ($currentProjects as $project) {
+            $table->addRow();
+
+            $table->addCell(200)->addText(
+                $project['customerName'],
+                null,
+                $pStyle
+            );
+
+            $table->addCell(200)->addText(
+                $project['description'],
+                null,
+                $pStyle
+            );
+
+            $table->addCell(200)->addText(
+                $project['commenceDate'],
+                null,
+                $pStyle
+            );
+
+            $table->addCell(200)->addText(
+                $project['engineerName'],
+                null,
+                $pStyle
+            );
+
+            $table->addCell(200)->addText(
+                "service request ..what?",
+                null,
+                $pStyle
+            );
+            $text = "In Hours " . round(
+                    $project['inHoursBudgetDays'],
+                    2
+                ) . " days \nOut of Hours " . round(
+                    $project['outOfHoursBudgetDays'],
+                    2
+                ) . " days";
+            $table->addCell(200)->addText(
+                $text,
+                null,
+                $pStyle
+            );
+
+            $hoursData = $this->calculateInHoursOutHoursUsed($project['projectID']);
+
+            $text = "In Hours " . round(
+                    $hoursData['inHoursUsed'],
+                    2
+                ) . " days \nOut of Hours " . round(
+                    $hoursData['outHoursUsed'],
+                    2
+                ) . " days";
+
+            $table->addCell(200)->addText(
+                $text,
+                null,
+                $pStyle
+            );
+
+            $table->addCell(200)->addText(
+                $project['comment'],
+                null,
+                $pStyle
+            );
+
+            $table->addCell(200)->addText(
+                $project['notes'],
+                null,
+                $pStyle
+            );
+        }
+
+        // Save file
+        $phpWord->save(
+            'test.docx',
+            'Word2007',
+            true
+        );
+    }
+
+
 }// end of class
+
 ?>

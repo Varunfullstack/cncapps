@@ -26,7 +26,7 @@ class BUProject extends Business
     function updateProject(&$dsData)
     {
         $this->setMethodName('updateProject');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeProject
         );

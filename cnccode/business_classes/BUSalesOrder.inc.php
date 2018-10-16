@@ -164,7 +164,7 @@ class BUSalesOrder extends Business
     function insertQuotation(&$dsData)
     {
         $this->setMethodName('insertQuotation');
-        $this->updateDataaccessObject($dsData, $this->dbeQuotation);
+        $this->updateDataAccessObject($dsData, $this->dbeQuotation);
         return $dsData->getValue('quotationID');
     }
 
@@ -395,7 +395,7 @@ class BUSalesOrder extends Business
             $dsOrdhead
         );
         $dsOrdhead->post();
-        $this->updateDataaccessObject($dsOrdhead, $dbeOrdhead);
+        $this->updateDataAccessObject($dsOrdhead, $dbeOrdhead);
         $dsOrdline = new DataSet($this);
         $dbeOrdline = new DBEOrdline($this);
         $dsOrdline->copyColumnsFrom($dbeOrdline);
@@ -772,7 +772,7 @@ class BUSalesOrder extends Business
             $dsOrdhead->setValue('type', 'I'); // all lines selected so convert to initial order
             $dsOrdhead->setValue('date', date('Y-m-d'));
             $dsOrdhead->post();
-            $this->updateDataaccessObject($dsOrdhead, $dbeOrdhead);
+            $this->updateDataAccessObject($dsOrdhead, $dbeOrdhead);
             $ret = $ordheadID;
         } else {        // create new initial order (leaving quote intact)
             $dsOrdhead->setUpdateModeUpdate();
@@ -781,7 +781,7 @@ class BUSalesOrder extends Business
             $dsOrdhead->setValue('quotationOrdheadID', $originalNo);
             $dsOrdhead->setValue('date', date('Y-m-d'));
             $dsOrdhead->post();
-            $this->updateDataaccessObject($dsOrdhead, $dbeOrdhead);    // create new order header
+            $this->updateDataAccessObject($dsOrdhead, $dbeOrdhead);    // create new order header
             $newOrdheadID = $dsOrdhead->getValue('ordheadID');
             // Add selected lines to new order
             $sequenceNo = 0;
@@ -887,7 +887,7 @@ class BUSalesOrder extends Business
         $dsOrdhead->setValue('originalOrdheadID', $originalNo);
         $dsOrdhead->setValue('date', date('Y-m-d'));
         $dsOrdhead->post();
-        $this->updateDataaccessObject($dsOrdhead, $dbeOrdhead);    // create new order header
+        $this->updateDataAccessObject($dsOrdhead, $dbeOrdhead);    // create new order header
         $newOrdheadID = $dsOrdhead->getValue('ordheadID');
         // Add selected lines to new order
         $sequenceNo = 0;

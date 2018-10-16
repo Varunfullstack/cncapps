@@ -1,0 +1,32 @@
+<script>
+    function showHistoryPopup(url) {
+        window.open(url,
+            'Updates History', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+    }
+</script>
+
+<table>
+    <thead>
+    <tr>
+        <th>Description</th>
+        <th>Commencement Date</th>
+        <th>Project Plan Link</th>
+        <th>Latest Update</th>
+        <th>History of updates Link</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN projectBlock -->
+    <tr>
+        <td>{description}</td>
+        <td>{commenceDate}</td>
+        <td>{projectPlanLink}</td>
+        <td>{latestUpdate}</td>
+        <td>Update History <a onclick="showHistoryPopup('{historyPopupURL}')">here</a></td>
+    </tr>
+    <!-- END projectBlock -->
+    </tbody>
+</table>
+<button onclick="window.open('?action=currentProjectsReport','_blank')">
+    View Report
+</button>

@@ -679,3 +679,19 @@ div.reportDescription {
         transform: rotate(360deg);
     }
 }
+
+.makeItColor td {
+    font-size: large;
+}
+
+.makeItColor td:nth-child(3n+1) {
+    background: red;
+}
+
+.makeItColor td:nth-child(3n+2) {
+    background: green;
+}
+
+.makeItColor td:nth-child(3n+3) {
+    background: yellow;
+}

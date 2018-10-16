@@ -27,7 +27,7 @@ class BUUser extends Business
     function updateUser(&$dsData)
     {
         $this->setMethodName('updateUser');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeUser
         );

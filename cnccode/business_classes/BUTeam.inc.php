@@ -26,7 +26,7 @@ class BUTeam extends Business
     function updateTeam(&$dsData)
     {
         $this->setMethodName('updateTeam');
-        $this->updateDataaccessObject($dsData, $this->dbeTeam);
+        $this->updateDataAccessObject($dsData, $this->dbeTeam);
         return TRUE;
     }
 

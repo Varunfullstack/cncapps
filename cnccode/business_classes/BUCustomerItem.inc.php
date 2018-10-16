@@ -346,7 +346,7 @@ class BUCustomerItem extends Business
             );
             $dsCustomerItem->post();
         }
-        if ($success = $this->updateDataaccessObject(
+        if ($success = $this->updateDataAccessObject(
             $dsCustomerItem,
             $dbeCustomerItem
         )) {

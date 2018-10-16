@@ -2381,8 +2381,13 @@ class CTActivity extends CTCNC
             $dsProject,
             date(CONFIG_MYSQL_DATE)
         );
-        if ($dsProject->fetchNext()) {
+        $link = '';
 
+        while ($dsProject->fetchNext()) {
+
+            if (!$link) {
+                $link = "<table><tr class='makeItColor'><td style='color: black'>SEE CURRENT PROJECTS</td>";
+            }
             $url = $this->buildLink(
                 'Project.php',
                 array(
@@ -2391,11 +2396,14 @@ class CTActivity extends CTCNC
                     'htmlFmt'   => CT_HTML_FMT_POPUP
                 )
             );
-            $link = '<h2 class="projectAlert">SEE CURRENT PROJECT: <A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
+            $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
                     'description'
-                ) . '</A></h2>';
-        } else {
-            $link = '';
+                ) . '</A></td>';
+
+        }
+
+        if ($link) {
+            $link .= "</tr></table>";
         }
 
         return $link;
