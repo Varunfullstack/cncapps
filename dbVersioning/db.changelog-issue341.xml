@@ -102,7 +102,7 @@
             </not>
         </preConditions>
         <addColumn tableName="project">
-            <column name="outOfHoursBudgetDays" type="int(11)"/>
+            <column name="outOfHoursBudgetDays" type="decimal(4,4)"/>
         </addColumn>
     </changeSet>
 
@@ -113,7 +113,17 @@
             </not>
         </preConditions>
         <addColumn tableName="project">
-            <column name="inHoursBudgetDays" type="int(11)"/>
+            <column name="inHoursBudgetDays" type="decimal(4,4)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="calculatedBudget"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="project">
+            <column name="calculatedBudget" type="bool" defaultValue="false"/>
         </addColumn>
     </changeSet>
 

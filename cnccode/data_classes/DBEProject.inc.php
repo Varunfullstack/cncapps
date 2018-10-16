@@ -21,6 +21,7 @@ class DBEProject extends DBEntity
     const ordHeadID = "ordHeadID";
     const outOfHoursBudgetDays = "outOfHoursBudgetDays";
     const inHoursBudgetDays = "inHoursBudgetDays";
+    const calculatedBudget = "calculatedBudget";
 
     /**
      * calls constructor()
@@ -100,13 +101,19 @@ class DBEProject extends DBEntity
 
         $this->addColumn(
             self::outOfHoursBudgetDays,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL
         );
 
         $this->addColumn(
             self::inHoursBudgetDays,
-            DA_INTEGER,
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::calculatedBudget,
+            DA_BOOLEAN,
             DA_ALLOW_NULL
         );
 

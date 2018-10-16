@@ -1,13 +1,145 @@
 <!-- Template: ProjectEdit.inc.html -->
 <style>
-    .greyedOut {
+    .grayedOut {
         color: gray;
     }
 </style>
 <script type="text/javascript"
+        src=".javascript/handlebars-v4.0.11.js"
+></script>
+<script type="text/javascript"
+        src=".javascript/mustache.min.js"
+></script>
+<script type="text/javascript"
         src="ckeditor/ckeditor.js"
 ></script>
+<script id="project-budget-stats-template"
+        type="text/template"
+>
+    <div>
+        Project Budget
+    </div>
+    <table>
+        <tr>
+            <td></td>
+            <td>Allocated</td>
+            <td>Used To Date</td>
+        </tr>
+        <tr>
+            <td>In Hours</td>
+            <td>{% stats.inHoursAllocated %}</td>
+            <td>{% stats.inHoursUsed %}</td>
+        </tr>
+        <tr>
+            <td>Out of Hours</td>
+            <td>{% stats.ooHoursAllocated %}</td>
+            <td>{% stats.ooHoursUsed %}</td>
+        </tr>
+    </table>
+    <div>
+        Budget
+    </div>
+    <table>
+        <tr>
+            <td>In Hours</td>
+            <td>Grant Extra Time</td>
+            <td>
+                <input type="text"
+                       {%
+                       #disabled
+                       %}
+                       disabled
+                       {% /disabled %}
+                name="project[1][inHoursQuantity]"
+                >
+                <select name="project[1][inHoursMeasure]"
+                        {%
+                        #disabled
+                        %}
+                        disabled
+                        {% /disabled %}>
+                <option value="days">Days</option>
+                <option value="hours">Hours</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Out Of Hours</td>
+            <td>Grant Extra Time</td>
+            <td>
+                <input type="text"
+                       {%
+                       #disabled
+                       %}
+                       disabled
+                       {% /disabled %}
+                name="project[1][outOfHoursQuantity]"
+                >
+                <select name="project[1][outOfHoursMeasure]"
+                        {%
+                        #disabled
+                        %}
+                        disabled
+                        {% /disabled %}
+                >
+                <option value="days">Days</option>
+                <option value="hours">Hours</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+        <tr>
+            <th>Activity</th>
+            {% #consultants %}
+            <th>{% name %}</th>
+            {% /consultants %}
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% #activities %}
+        <tr>
+            <td>
+                {% activityKey %}
+            </td>
+            {% #columns %}
+            <td>
+                {% value %}
+            </td>
+            {% /columns %}
+            <td>
+                {% total %}
+            </td>
+        </tr>
+        {% /activities %}
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td>In hours Total</td>
+            {% #consultants %}
+            <td>{% totalInHours %}</td>
+            {% /consultants %}
+        </tr>
+        <tr>
+            <td>Out of hours Total</td>
+            {% #consultants %}
+            <td>{% totalOutHours %}</td>
+            {% /consultants %}
+        </tr>
+        <tr>
+            <td>Total</td>
+            {% #consultants %}
+            <td>{% totalOutHours() %}</td>
+            {% /consultants %}
+        </tr>
+        </tbody>
+    </table>
+</script>
 <script type="application/javascript">
+    Mustache.tags = ['{%', '%}'];
 
     const projectPlanDownloadURL = "{projectPlanDownloadURL}";
     let projectPlan = {hasProjectPlan};
@@ -59,6 +191,107 @@
             }
         });
     }
+
+
+    function fetchProjectBudget() {
+        const url = '{getProjectBudgetDataURL}';
+        const formData = new FormData();
+
+        formData.append('projectID', {projectID});
+        fetch(url, {method: 'GET'}).then(response => {
+            return response.json();
+        })
+            .then(jsonResponse => {
+
+                const context = jsonResponse.data;
+
+                if (!context.calculatedBudget) {
+                    context.disabled = true;
+                } else {
+                    context.disabled = false;
+                }
+
+
+                // we have to build a table, that has a column per consultant and a row per activity type
+                const consultants = [];
+                const activities = [];
+                let totalInHours = 0;
+                let totalOutHours = 0;
+
+                context.test.forEach(item => {
+                    const consultantKey = item.firstName + item.lastName;
+                    const activityKey = item.cat_desc;
+                    if (!consultants[consultantKey]) {
+                        consultants[consultantKey] = {
+                            totalInHours: 0,
+                            totalOutHours: 0,
+                            activities: {},
+                            name: item.firstName[0] + item.lastName[0],
+                            totalHours: function () {
+                                return this.totalInHours + this.totalOutHours
+                            }
+                        };
+                    }
+
+
+                    if (!activities[activityKey]) {
+                        activities[activityKey] = true;
+                    }
+
+
+                    consultants[consultantKey].totalInHours += item.inHours;
+                    consultants[consultantKey].totalOutHours += item.outHours;
+                    totalInHours += item.inHours;
+                    totalOutHours += item.outHours;
+                    consultants[consultantKey].activities[activityKey] = {
+                        inHours: item.inHours,
+                        outHours: item.outHours
+                    };
+                });
+
+                const activityRows = Object.keys(activities).reduce((activityRowAccumulator, activityKey) => {
+
+                    const row = {activityKey: activityKey, columns: [], total: 0};
+
+                    Object.keys(consultants).forEach(consultantKey => {
+
+                        let value = 0;
+                        if (consultants[consultantKey] && consultants[consultantKey].activities[activityKey]) {
+                            value = consultants[consultantKey].activities[activityKey].inHours + consultants[consultantKey].activities[activityKey].outHours;
+                            row.total += value;
+                        }
+
+                        row.columns.push(
+                            {
+                                colName: consultantKey,
+                                value: value
+                            }
+                        );
+                    });
+
+                    activityRowAccumulator.push(row);
+
+                    return activityRowAccumulator;
+                }, []);
+
+                context.consultants = Object.keys(consultants).reduce((acc, consultantKey) => {
+                    acc.push(consultants[consultantKey]);
+                    return acc;
+                }, []);
+                context.activities = activityRows;
+
+                const source = document.getElementById("project-budget-stats-template").innerHTML;
+                debugger;
+                const html = Mustache.to_html(source, context);
+
+                const projectBudgetElm = $('.projectBudget').html('');
+
+                projectBudgetElm.append(html);
+
+            })
+    }
+
+    fetchProjectBudget();
 
 </script>
 <TABLE border="0"
@@ -246,5 +479,11 @@
             </td>
         </tr>
     </table>
+    <br>
+    <div class="projectBudget">
+
+    </div>
+
+
 </form>
 <!-- End Template: ProjectEdit.inc.html -->

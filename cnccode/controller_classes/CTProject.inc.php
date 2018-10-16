@@ -37,6 +37,11 @@ class CTProject extends CTCNC
     const UPLOAD_PROJECT_PLAN = "uploadProjectPlan";
     const DOWNLOAD_PROJECT_PLAN = "downloadProjectPlan";
     const CALCULATE_BUDGET = "calculateBudget";
+    const DAILY_LABOUR_CHARGE = 1502;
+    const HOURLY_LABOUR_CHARGE = 2237;
+    const DAILY_OOH_LABOUR_CHARGE = 1503;
+    const HOURLY_OOH_LABOUR_CHARGE = 16865;
+    const GET_BUDGET_DATA = "getBudgetData";
     var $dsProject = '';
     /** @var BUProject */
     var $buProject;
@@ -67,6 +72,32 @@ class CTProject extends CTCNC
         $this->buProject = new BUProject($this);
         $this->dsProject = new DSForm($this);
         $this->dsProject->copyColumnsFrom($this->buProject->dbeProject);
+        $this->dsProject->setAddColumnsOn();
+        $this->dsProject->addColumn(
+            "inHoursQuantity",
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
+        $this->dsProject->addColumn(
+            "inHoursMeasure",
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+        $this->dsProject->addColumn(
+            "outOfHoursQuantity",
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
+        $this->dsProject->addColumn(
+            "outOfHoursMeasure",
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+        $this->dsProject->setAddColumnsOff();
     }
 
     /**
@@ -131,6 +162,21 @@ class CTProject extends CTCNC
                 exit;
             case self::CALCULATE_BUDGET:
                 $this->calculateBudget();
+                break;
+            case self::GET_BUDGET_DATA:
+                $response = [];
+                try {
+                    $response['data'] = $this->fetchBudgetData();
+                    $response['status'] = "ok";
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                }
+                echo json_encode(
+                    $response,
+                    JSON_NUMERIC_CHECK
+                );
                 break;
         }
     }
@@ -283,9 +329,7 @@ class CTProject extends CTCNC
 
         $projectCalculateBudgetLinkClick = "onclick='return confirm(\"Are you sure? You can only do this once.\")'";
 
-        if ($dsProject->getValue(
-            DBEProject::inHoursBudgetDays
-        )) {
+        if ($dsProject->getValue(DBEProject::calculatedBudget)) {
             $projectCalculateBudgetURL = "href='#'";
             $projectCalculateBudgetClass = "class='grayedOut'";
             $projectCalculateBudgetLinkClick = null;
@@ -299,43 +343,52 @@ class CTProject extends CTCNC
         }
 
 
+        $fetchProjectDataURL = $this->buildLink(
+            $_SERVER['PHP_SELF'],
+            [
+                'action'    => self::GET_BUDGET_DATA,
+                'projectID' => $projectID
+            ]
+        );
+
         $this->template->set_var(
             array(
-                'customerID'             => $dsProject->getValue(DBEProject::customerID),
-                'projectID'              => $projectID,
-                'description'            => Controller::htmlInputText(
+                'customerID'              => $dsProject->getValue(DBEProject::customerID),
+                'projectID'               => $projectID,
+                'description'             => Controller::htmlInputText(
                     $dsProject->getValue(DBEProject::description)
                 ),
-                'descriptionMessage'     => Controller::htmlDisplayText(
+                'descriptionMessage'      => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::description)
                 ),
-                'notes'                  => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
-                'notesMessage'           => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
-                'startDate'              => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
-                'startDateMessage'       => Controller::htmlDisplayText(
+                'notes'                   => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
+                'notesMessage'            => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
+                'startDate'               => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
+                'startDateMessage'        => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::openedDate)
                 ),
-                'expiryDate'             => Controller::dateYMDtoDMY(
+                'expiryDate'              => Controller::dateYMDtoDMY(
                     $dsProject->getValue(DBEProject::completedDate)
                 ),
-                'expiryDateMessage'      => Controller::htmlDisplayText(
+                'expiryDateMessage'       => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::completedDate)
                 ),
-                'urlUpdate'              => $urlUpdate,
-                'urlDelete'              => $urlDelete,
-                'txtDelete'              => $txtDelete,
-                'urlDisplayCustomer'     => $urlDisplayCustomer,
-                'lastUpdateDate'         => $formattedDate,
-                'lastUpdateEngineer'     => $row['createdBy'],
-                'lastUpdateComment'      => $row['comment'],
-                'historyPopupURL'        => $historyPopupURL,
-                'salesOrderLink'         => $this->getSalesOrderLink($dsProject->getValue(DBEProject::ordHeadID)),
-                'urlLinkedSalesOrder'    => $urlLinkedSalesOrder,
-                'uploadProjectPlanURL'   => $uploadProjectPlanURL,
-                'hasProjectPlan'         => $hasProjectPlan ? "true" : "false",
-                'projectPlanLink'        => $projectPlanLink,
-                'projectPlanDownloadURL' => $projectPlanDownloadURL,
-                'calculateBudgetLink'    => $projectCalculateBudgetLink
+                'urlUpdate'               => $urlUpdate,
+                'urlDelete'               => $urlDelete,
+                'txtDelete'               => $txtDelete,
+                'urlDisplayCustomer'      => $urlDisplayCustomer,
+                'lastUpdateDate'          => $formattedDate,
+                'lastUpdateEngineer'      => $row['createdBy'],
+                'lastUpdateComment'       => $row['comment'],
+                'historyPopupURL'         => $historyPopupURL,
+                'salesOrderLink'          => $this->getSalesOrderLink($dsProject->getValue(DBEProject::ordHeadID)),
+                'urlLinkedSalesOrder'     => $urlLinkedSalesOrder,
+                'uploadProjectPlanURL'    => $uploadProjectPlanURL,
+                'hasProjectPlan'          => $hasProjectPlan ? "true" : "false",
+                'projectPlanLink'         => $projectPlanLink,
+                'projectPlanDownloadURL'  => $projectPlanDownloadURL,
+                'calculateBudgetLink'     => $projectCalculateBudgetLink,
+                'getProjectBudgetDataURL' => $fetchProjectDataURL
             )
         );
         $this->template->parse(
@@ -372,6 +425,12 @@ class CTProject extends CTCNC
     {
         $this->setMethodName('update');
         $dsProject = &$this->dsProject;
+
+        $buHeader = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $buHeader->getHeader($dbeHeader);
+
+
         $this->formError = (!$this->dsProject->populateFromArray($_REQUEST['project']));
         if ($this->formError) {
             if ($this->dsProject->getValue('projectID') == '') {                    // attempt to insert
@@ -382,6 +441,48 @@ class CTProject extends CTCNC
             $this->edit();
             exit;
         }
+
+
+        if ($this->dsProject->getValue("inHoursQuantity")) {
+            // we need to add the amount of hours or days to the in hours budget
+            $currentDays = (float)$this->dsProject->getValue(DBEProject::inHoursBudgetDays);
+            switch ($this->dsProject->getValue('inHoursMeasure')) {
+                case'hours':
+                    $toAddMinutes = (int)$this->dsProject->getValue("inHoursQuantity") * 60;
+                    break;
+                case 'days':
+                    $toAddMinutes = (float)$this->dsProject->getValue('inHoursQuantity') * $dbeHeader->getValue(
+                            DBEHeader::ImplementationTeamMinutesInADay
+                        );
+            }
+            $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+            $this->dsProject->setValue(
+                DBEProject::inHoursBudgetDays,
+                $currentDays + $toAddDays
+            );
+        }
+
+        if ($this->dsProject->getValue("outOfHoursQuantity")) {
+            // we need to add the amount of hours or days to the in hours budget
+            $currentDays = (float)$this->dsProject->getValue(DBEProject::outOfHoursBudgetDays);
+            switch ($this->dsProject->getValue('outOfHoursMeasure')) {
+                case'hours':
+                    $toAddMinutes = (int)$this->dsProject->getValue("outOfHoursQuantity") * 60;
+                    break;
+                case 'days':
+                    $toAddMinutes = (float)$this->dsProject->getValue('outOfHoursQuantity') * $dbeHeader->getValue(
+                            DBEHeader::ImplementationTeamMinutesInADay
+                        );
+            }
+            $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+            $this->dsProject->setValue(
+                DBEProject::outOfHoursBudgetDays,
+                $currentDays + $toAddDays
+            );
+        }
+
 
         $this->buProject->updateProject($this->dsProject);
 
@@ -685,20 +786,172 @@ class CTProject extends CTCNC
             exit;
         }
 
+        if ($dbeProject->getValue(DBEProject::calculatedBudget)) {
+            echo 'The project budget has already been calculated';
+            exit;
+        }
+
         $buSalesOrder = new BUSalesOrder($this);
 
         $dsOrdHead = new DataSet($this);
         $dsOrdLine = new DataSet($this);
 
-        $buSalesOrder->getOrderByOrdheadID($dbeProject->getValue(DBEProject::ordHeadID), $dsOrdHead, $dsOrdLine);
+        $buSalesOrder->getOrderByOrdheadID(
+            $dbeProject->getValue(DBEProject::ordHeadID),
+            $dsOrdHead,
+            $dsOrdLine
+        );
 
+        $dbeHeader = new DBEHeader($this);
+        $minutesInADay = $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
-        while($dsOrdLine->fetchNext()){
-            if($dsOrdLine->getValue(DBEOrdline::lineType) == 'I'){
+        $normalMinutes = 0;
+        $oohMinutes = 0;
 
+        while ($dsOrdLine->fetchNext()) {
+            if ($dsOrdLine->getValue(DBEOrdline::lineType) == 'I') {
+                switch ($dsOrdLine->getValue(DBEOrdline::itemID)) {
+                    case self::DAILY_LABOUR_CHARGE:
+                        $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                        break;
+                    case self::HOURLY_LABOUR_CHARGE:
+                        $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                        break;
+                    case self::DAILY_OOH_LABOUR_CHARGE:
+                        $oohMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                        break;
+                    case self::HOURLY_OOH_LABOUR_CHARGE:
+                        $oohMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                        break;
+                }
             }
         }
 
+        $dbeProject->setValue(
+            DBEProject::inHoursBudgetDays,
+            $normalMinutes / $minutesInADay
+        );
+
+        $dbeProject->setValue(
+            DBEProject::outOfHoursBudgetDays,
+            $oohMinutes / $minutesInADay
+        );
+
+        $dbeProject->updateRow();
+
+    }
+
+    private function fetchBudgetData()
+    {
+        if (!isset($_REQUEST['projectID'])) {
+            throw new Exception('Project ID is missing');
+        }
+
+
+        $dbeProject = new DBEProject($this);
+        $dbeProject->getRow($_REQUEST['projectID']);
+
+
+        $data = [
+            "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
+            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget),
+            "stats"            => [
+                "inHoursAllocated" => 'N/A',
+                "inHoursUsed"      => 'N/A',
+                "ooHoursAllocated" => 'N/A',
+                "ooHoursUsed"      => 'N/A',
+            ]
+        ];
+        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
+            return $data;
+        }
+
+        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
+
+        $startTime = '09:00';
+        $endTime = '18:00';
+
+        // here we get the information about the inHours and outOfHours time used
+        $query = "SELECT   ROUND(
+    COALESCE(
+      SUM(
+        COALESCE(
+          TIME_TO_SEC(
+            IF(
+              caa_endtime > '$endTime',
+              '$endTime',
+              caa_endtime
+            )
+          ) - TIME_TO_SEC(
+            IF(
+              caa_starttime < '$startTime',
+              '$startTime',
+              caa_starttime
+            )
+          ),
+          0
+        )
+      ) / 3600,
+      0
+    ),
+    2
+  ) AS inHours,
+  ROUND(
+    COALESCE(
+      SUM(
+        IF(
+          caa_starttime < '$startTime',
+          COALESCE(
+            TIME_TO_SEC('$startTime') - TIME_TO_SEC(caa_starttime),
+            0
+          ),
+          0
+        ) + IF(
+          caa_endtime > '$endTime',
+          COALESCE(
+            TIME_TO_SEC(caa_endtime) - TIME_TO_SEC('$endTime'),
+            0
+          ),
+          0
+        )
+      ) / 3600,
+      0
+    ),
+    2
+  ) AS outHours,
+  callactivity.`caa_callacttypeno`,
+  callacttype.`cat_desc`,
+  callactivity.`caa_consno`,
+  consultant.`firstName`,
+  consultant.`lastName`
+FROM
+  callactivity 
+  LEFT JOIN problem 
+    ON callactivity.`caa_problemno` = problem.`pro_problemno` 
+  LEFT JOIN callacttype 
+    ON callactivity.`caa_callacttypeno` = callacttype.`cat_callacttypeno`
+    LEFT JOIN consultant 
+    ON `callactivity`.`caa_consno` = consultant.`cns_consno` 
+WHERE pro_linked_ordno = $salesOrderID
+GROUP BY caa_callacttypeno,
+  caa_consno ";
+
+        global $db;
+
+        $db->query($query);
+
+        while ($db->next_record(MYSQLI_ASSOC)) {
+            $data['test'][] = $db->Record;
+        }
+
+        if (!$dbeProject->getValue(DBEProject::calculatedBudget)) {
+            return $data;
+        }
+
+        $data['stats']['inHoursAllocated'] = $dbeProject->getValue(DBEProject::inHoursBudgetDays);
+        $data['stats']['ooHoursAllocated'] = $dbeProject->getValue(DBEProject::outOfHoursBudgetDays);
+
+        return $data;
     }
 }// end of class
 ?>
