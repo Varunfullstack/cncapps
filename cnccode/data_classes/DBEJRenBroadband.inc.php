@@ -161,6 +161,7 @@ class DBEJRenBroadband extends DBECustomerItem
 		 AND declinedFlag = 'N' and directDebitFlag <> 'Y'";
 
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
+        var_dump($statement);
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
