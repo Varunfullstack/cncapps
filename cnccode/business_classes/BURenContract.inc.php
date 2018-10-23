@@ -224,6 +224,12 @@ class BURenContract extends Business
         $generatedOrder = false;
         while ($dsRenContract->fetchNext()) {
             $generatedOrder = false;
+                    ?>
+
+                <div>
+                    contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
+                </div>
+            <?php
             if ($dbeJCustomerItem->getRow($dsRenContract->getValue('customerItemID'))) {
                 /*
                  * Group many contracts for same customer under one sales order

@@ -251,6 +251,11 @@ class BURenDomain extends Business
 
         while ($this->dbeJRenDomain->fetchNext()) {
             $generatedOrder = false;
+            ?>
+            <div>
+                contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
+            </div>
+            <?php
             if ($dbeJCustomerItem->getRow($this->dbeJRenDomain->getValue('customerItemID'))) {
                 /*
                  * Group many domains for same customer under one sales order

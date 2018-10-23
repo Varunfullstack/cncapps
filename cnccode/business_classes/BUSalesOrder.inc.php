@@ -538,7 +538,7 @@ class BUSalesOrder extends Business
                     DBEOrdhead::paymentTermsID,
                     CONFIG_PAYMENT_TERMS_DIRECT_DEBIT
                 );    // switch to paymentTermsID
-            } ELSE {
+            } else {
 
                 $dsOrdhead->setValue(
                     DBEOrdhead::paymentTermsID,

@@ -237,7 +237,12 @@ class BURenHosting extends Business
         $generatedOrder = false;
         while ($this->dbeJRenHosting->fetchNext()) {
             $generatedOrder = false;
+                    ?>
 
+                <div>
+                    contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
+                </div>
+            <?php
             if ($dbeJCustomerItem->getRow($this->dbeJRenHosting->getValue('customerItemID'))) {
                 /*
                  * Group many contracts for same customer under one sales order
