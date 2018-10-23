@@ -122,7 +122,6 @@ class DBEJInvhead extends DBEInvhead
         $queryString .= " and " . $this->getDBColumnName(self::directDebit) . " = " . ($directDebit ? 'TRUE' : 'FALSE');
 
         $queryString .= ' ORDER BY ' . $this->getDBColumnName('customerID');
-
         $this->setQueryString($queryString);
         return ($this->getRows());
     }

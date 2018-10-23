@@ -171,7 +171,7 @@ class DBEDirectDebitContracts extends DBECustomerItem
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
+		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + 1 MONTH ) )
      AND (renewalTypeID = 1 or renewalTypeID = 2 or renewalTypeID = 5 )
 		 AND declinedFlag = 'N' and directDebitFlag = 'Y' ORDER BY cui_custno, autoGenerateContractInvoice asc;";
 
