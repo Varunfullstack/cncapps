@@ -8731,14 +8731,39 @@ is currently a balance of ';
                 )
             )
         );
-        /*
-    Extract email domain
-    */
+
         $pieces = explode(
             '@',
             $sender
         );
         $emailDomain = strtolower(trim($pieces[1]));
+
+        //try to find a specific contact by email
+        $sql = "
+            SELECT
+              con_contno,
+              con_custno,
+              con_siteno
+            FROM
+              contact
+            WHERE
+              con_email = '" . mysqli_real_escape_string(
+                $db->link_id(),
+                $record['senderEmailAddress']
+            ) . "'
+              AND con_custno <> 0 
+              AND (supportLevel = 'main' or supportLevel = 'support' or supportLevel = 'delegate')";
+
+        $db->query($sql);
+        if ($db->next_record()) {
+            $ret['isSupportContact'] = true;
+            $ret['isMainContact'] = false;
+            $ret['contactID'] = $db->Record[0];
+            $ret['customerID'] = $db->Record[1];
+            $ret['siteNo'] = $db->Record[2];
+        } /*
+
+
         /*
     Try to match email domain against any customer
     */
@@ -8751,8 +8776,7 @@ is currently a balance of ';
             contact
           WHERE
             con_email LIKE '%$emailDomain%'
-            AND con_custno <> 0
-            AND (supportLevel = 'main' or supportLevel = 'support')";
+            AND con_custno <> 0";
 
         $db->query($sql);
 
@@ -8782,7 +8806,7 @@ is currently a balance of ';
                     $record['senderEmailAddress']
                 ) . "'
               AND con_custno <> 0 
-              AND (supportLevel = 'main' or supportLevel = 'support')";
+              AND (supportLevel = 'main' or supportLevel = 'support' or supportLevel = 'delegate' or supportLevel = 'supervisor')";
 
             $db->query($sql);
             if ($db->next_record()) {
