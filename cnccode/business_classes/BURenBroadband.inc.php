@@ -220,14 +220,15 @@ class BURenBroadband extends Business
         $generatedOrder = false;
         while ($this->dbeJRenBroadband->fetchNext()) {
 
+            ?>
+
+            <div>
+                contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
+            </div>
+            <?php
             $generatedOrder = false;
             if ($dbeJCustomerItem->getRow($this->dbeJRenBroadband->getValue('customerItemID'))) {
-                   ?>
 
-                <div>
-                    contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
-                </div>
-            <?php
                 /*
                  * Group many renewals for same customer under one sales order
                  */

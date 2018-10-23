@@ -539,6 +539,7 @@ class BUSalesOrder extends Business
         } else {
 
             if ($directDebit) {
+                echo '<div>direct debit payment term</div>';
                 $dsOrdhead->setValue(
                     DBEOrdhead::paymentTermsID,
                     CONFIG_PAYMENT_TERMS_DIRECT_DEBIT
@@ -601,7 +602,7 @@ class BUSalesOrder extends Business
             $dsOrdhead
         );
         $dsOrdhead->post();
-        var_dump($dsOrdhead->getValue(DBEOrdhead::directDebit));
+
         $this->updateDataaccessObject(
             $dsOrdhead,
             $dbeOrdhead
