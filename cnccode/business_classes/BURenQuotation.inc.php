@@ -256,6 +256,7 @@ class BURenQuotation extends Business
 
         while ($this->dbeJRenQuotation->fetchNext()) {
             ?>
+            quotation
             <div>
                 contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
             </div>

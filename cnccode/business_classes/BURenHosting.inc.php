@@ -238,7 +238,7 @@ class BURenHosting extends Business
         while ($this->dbeJRenHosting->fetchNext()) {
             $generatedOrder = false;
                     ?>
-
+                hosting
                 <div>
                     contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
                 </div>

@@ -252,6 +252,7 @@ class BURenDomain extends Business
         while ($this->dbeJRenDomain->fetchNext()) {
             $generatedOrder = false;
             ?>
+            domain
             <div>
                 contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
             </div>

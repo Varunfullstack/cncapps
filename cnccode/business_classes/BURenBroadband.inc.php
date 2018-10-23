@@ -221,8 +221,9 @@ class BURenBroadband extends Business
         while ($this->dbeJRenBroadband->fetchNext()) {
 
             ?>
-
+            broadband
             <div>
+
                 contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
             </div>
             <?php

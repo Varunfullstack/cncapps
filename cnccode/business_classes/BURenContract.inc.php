@@ -225,7 +225,7 @@ class BURenContract extends Business
         while ($dsRenContract->fetchNext()) {
             $generatedOrder = false;
                     ?>
-
+            renewals
                 <div>
                     contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
                 </div>
