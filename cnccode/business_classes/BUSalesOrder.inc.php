@@ -470,6 +470,9 @@ class BUSalesOrder extends Business
     )
     {
 
+        var_dump ($directDebit);
+        var_dump($transactionType);
+
         $this->setMethodName('initialiseQuote');
         $dsOrdhead = new DataSet($this);
         $dbeOrdhead = new DBEOrdhead($this);
@@ -598,6 +601,7 @@ class BUSalesOrder extends Business
             $dsOrdhead
         );
         $dsOrdhead->post();
+        var_dump($dsOrdhead->getValue(DBEOrdhead::directDebit));
         $this->updateDataaccessObject(
             $dsOrdhead,
             $dbeOrdhead
