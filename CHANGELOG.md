@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
+- Issue 358 - Review automatic email creation process so that it's compatible with the new contacts in 215
 ### Fixed
 - Issue 352 - CNCWEB contacts bugs
 ### Added
