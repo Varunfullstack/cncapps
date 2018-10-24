@@ -435,8 +435,6 @@ class BUSalesOrder extends Business
     )
     {
         // simply call with type set to I!
-        var_dump ($directDebit);
-        var_dump($transactionType);
         $this->initialiseQuote(
             $dsOrdhead,
             $dsOrdline,
@@ -469,10 +467,6 @@ class BUSalesOrder extends Business
                              $transactionType = "01"
     )
     {
-
-        var_dump ($directDebit);
-        var_dump($transactionType);
-
         $this->setMethodName('initialiseQuote');
         $dsOrdhead = new DataSet($this);
         $dbeOrdhead = new DBEOrdhead($this);

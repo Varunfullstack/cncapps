@@ -440,6 +440,8 @@ class BUInvoice extends Business
             $dsOrdhead->getValue(DBEOrdhead::directDebit)
         );
 
+
+
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatCode = $dsOrdhead->getValue('vatCode');
@@ -474,7 +476,9 @@ class BUInvoice extends Business
             'datePrinted',
             '0000-00-00'
         );
+
         $this->dbeInvhead->insertRow();
+
         return $this->dbeInvhead->getPKValue();
     }
 

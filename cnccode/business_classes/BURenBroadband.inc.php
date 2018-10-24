@@ -255,6 +255,16 @@ class BURenBroadband extends Business
                             $dsOrdhead,
                             $dsOrdline
                         );
+
+                        ?>
+                        <div>
+                            Generating a new invoice
+                        </div>
+                        <div>
+                            Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebit) ? 'true' : 'false' ?>
+                        </div>
+                        <?php
+
                         $buInvoice->createInvoiceFromOrder(
                             $dsOrdhead,
                             $dsOrdline
@@ -276,6 +286,15 @@ class BURenBroadband extends Business
                         $dsCustomer
                     );
                     $generatedOrder = true;
+                    ?>
+                    <div>
+                        we just created a new order...ID: <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?>
+                    </div>
+                    <div>
+
+                        Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebit) ? 'true' : 'false' ?>
+                    </div>
+                    <?php
                     $line = -1;    // initialise sales order line seq
 
                 }
@@ -501,11 +520,6 @@ class BURenBroadband extends Business
                     $this->dbeJRenBroadband->getValue('invoicePeriodMonths')
                 );
 
-                $this->dbeRenBroadband->setValue(
-                    DBECustomerItem::transactionType,
-                    '17'
-                );
-
                 $this->dbeRenBroadband->updateRow();
 
                 $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
@@ -515,6 +529,14 @@ class BURenBroadband extends Business
          * Finalise last sales order and create an invoice
          */
         if ($generateInvoice && $generatedOrder) {
+            ?>
+            <div>
+                Generating a new invoice
+            </div>
+            <div>
+                Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebit) ? 'true' : 'false' ?>
+            </div>
+            <?php
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
             $buSalesOrder->getOrderByOrdheadID(
