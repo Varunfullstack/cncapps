@@ -18,9 +18,21 @@ class DBEInvoiceTotals extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("invhead");
-        $this->addColumn("count", DA_INTEGER, DA_NOT_NULL);
-        $this->addColumn("costValue", DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn("saleValue", DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(
+            "count",
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            "costValue",
+            DA_FLOAT,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            "saleValue",
+            DA_FLOAT,
+            DA_NOT_NULL
+        );
         $this->setAddColumnsOff();
         $this->db->connect();
     }
@@ -28,10 +40,13 @@ class DBEInvoiceTotals extends DBEntity
     /**
      * Count and Sales and Cost Values of unprinted credit notes or invoices
      * @param string $type I=Invoices C=Credit Notes
+     * @param bool $directDebit
      * @return Boolean Success
      * @access public
      */
-    function getRow($type = 'I')
+    function getRow($type = 'I',
+                    $directDebit = false
+    )
     {
         $this->setQueryString(
             "SELECT" .
@@ -40,10 +55,14 @@ class DBEInvoiceTotals extends DBEntity
             "SUM( inl_qty * inl_unit_price )" .
             " FROM " . $this->getTableName() .
             " JOIN invline ON inh_invno =inl_invno" .
-            " WHERE inh_type='" . mysqli_real_escape_string($this->db->link_id(), $type) . "'" .
+            " WHERE inh_type='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $type
+            ) . "'" .
             " AND inh_date_printed ='0000-00-00'" .
             " AND inl_unit_price IS NOT NULL" .
-            " AND inl_line_type = 'I'"
+            " AND inl_line_type = 'I' 
+              AND directDebit = " . ($directDebit ? 1 : 0)
         );
         return (parent::getRow());
     }

@@ -592,11 +592,11 @@ class BUInvoice extends Business
         ));
     }
 
-    function getUnprintedInvoiceValues(&$dsResults)
+    function getUnprintedInvoiceValues(&$dsResults, $directDebit = false)
     {
         $this->setMethodName('getUnprintedInvoiceValues');
         $dbeInvoiceTotals = new DBEInvoiceTotals($this);
-        $dbeInvoiceTotals->getRow('I');
+        $dbeInvoiceTotals->getRow('I', $directDebit);
         return ($this->getData(
             $dbeInvoiceTotals,
             $dsResults
