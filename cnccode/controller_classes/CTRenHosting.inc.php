@@ -427,6 +427,14 @@ class CTRenHosting extends CTCNC
             )
         );
 
+
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($dsRenHosting->getValue(DBECustomerItem::customerID));
+        $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
+                DBECustomer::accountName
+            ) && $dsCustomer->getValue(DBECustomer::accountNumber);
+
+
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenHosting->getValue('customerItemID'),
@@ -533,7 +541,8 @@ class CTRenHosting extends CTCNC
                 )->format('d/m/Y'),
                 "allowDirectDebit"                   => $dsRenHosting->getValue(
                     DBEJRenHosting::allowDirectDebit
-                ) == 'Y' ? 'true' : 'false'
+                ) == 'Y' ? 'true' : 'false',
+                'clientCheckDirectDebit'             => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
 

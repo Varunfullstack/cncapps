@@ -785,12 +785,14 @@ class CTCustomer extends CTCNC
                 $value['sortCode']
             );
 
-            if ($value['newSortCode']) {
-                $encryptedSortCode = $this->encrypt($value['newSortCode']);
-
+            if (isset($value['newSortCode'])) {
+                $sortCode = null;
+                if ($value['newSortCode']) {
+                    $sortCode = base64_encode($this->encrypt($value['newSortCode']));
+                }
                 $this->dsCustomer->setValue(
                     DBECustomer::sortCode,
-                    base64_encode($encryptedSortCode)
+                    $sortCode
                 );
             }
 
@@ -805,12 +807,16 @@ class CTCustomer extends CTCNC
                 $value['accountNumber']
             );
 
-            if ($value['newAccountNumber']) {
-                $encryptedAccountNumber = $this->encrypt($value['newAccountNumber']);
+            if (isset($value['newAccountNumber'])) {
+                $accountNumber = null;
+
+                if ($value['newAccountNumber']) {
+                    $accountNumber = base64_encode($this->encrypt($value['newAccountNumber']));
+                }
 
                 $this->dsCustomer->setValue(
                     DBECustomer::accountNumber,
-                    base64_encode($encryptedAccountNumber)
+                    $accountNumber
                 );
             }
 
@@ -1902,6 +1908,11 @@ ORDER BY cus_name ASC  ";
                 )
             );
 
+        $buItem = new BUCustomerItem($this);
+
+        $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
+
+
         $this->template->set_var(
             array(
                 'lastContractSent'                => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
@@ -2029,7 +2040,8 @@ ORDER BY cus_name ASC  ";
                 ) ? "greenPencil" : "redPencil",
                 'accountNumberPencilColor'        => $this->dsCustomer->getValue(
                     DBECustomer::accountNumber
-                ) ? "greenPencil" : "redPencil"
+                ) ? "greenPencil" : "redPencil",
+                'forceDirectDebit'                => $forceDirectDebit ? 'true' : 'false'
 
             )
         );

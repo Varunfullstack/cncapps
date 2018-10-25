@@ -450,6 +450,13 @@ class CTRenBroadband extends CTCNC
             )
         );
 
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($dsRenBroadband->getValue(DBEJRenBroadband::customerID));
+
+        $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
+                DBECustomer::accountName
+            ) && $dsCustomer->getValue(DBECustomer::accountNumber);
+
         $this->template->set_var(
             array(
                 'itemDescription'                      => Controller::htmlDisplayText(
@@ -680,7 +687,8 @@ class CTRenBroadband extends CTCNC
                 )->format('d/m/Y'),
                 'allowDirectDebit'                     => $dsRenBroadband->getValue(
                     DBEJRenBroadband::allowDirectDebit
-                ) == 'Y' ? 'true' : 'false'
+                ) == 'Y' ? 'true' : 'false',
+                'clientCheckDirectDebit'               => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
 

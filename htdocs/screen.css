@@ -11,6 +11,10 @@ TD, INPUT, SELECT, TEXTAREA {
     padding: 2px;
 }
 
+.redText {
+    color: red;
+}
+
 P {
     margin-bottom: 0;
     margin-top: 0;

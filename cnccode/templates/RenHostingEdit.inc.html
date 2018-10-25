@@ -5,11 +5,21 @@
 <script src=".javascript/DirectDebitLogic.js"></script>
 <script language='JavaScript'>
 
+    const clientCheckDirectDebit = {clientCheckDirectDebit};
     function checkDirectDebit() {
         const directDebitCheckbox = $('#directDebit');
-        if ($('#allowDirectDebit').val() !== 'false') {
+        const parent = directDebitCheckbox.parent();
+        if (clientCheckDirectDebit && $('#allowDirectDebit').val() !== 'false') {
             directDebitCheckbox.attr('disabled', false);
+            if (parent.children().length > 1) {
+                parent.find('span').remove();
+            }
         } else {
+            if (!clientCheckDirectDebit) {
+                if (parent.children().length < 2) {
+                    parent.append('<span class="redText">This customer needs bank details before Direct Debit can be used.</span>')
+                }
+            }
             directDebitCheckbox.attr('disabled', true);
             directDebitCheckbox.prop('checked', false)
         }

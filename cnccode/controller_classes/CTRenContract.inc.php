@@ -444,6 +444,13 @@ class CTRenContract extends CTCNC
                 )
             );
 
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($dsRenContract->getValue(DBECustomerItem::customerID));
+
+        $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
+                DBECustomer::accountName
+            ) && $dsCustomer->getValue(DBECustomer::accountNumber);
+
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenContract->getValue('customerItemID'),
@@ -585,7 +592,8 @@ class CTRenContract extends CTCNC
                 'urlItemEdit'                        => $urlItemEdit,
                 'allowDirectDebit'                 => $dsRenContract->getValue(
                     DBEJRenContract::allowDirectDebit
-                ) === 'Y' ? 'true' : 'false'
+                ) === 'Y' ? 'true' : 'false',
+                'clientCheckDirectDebit'               => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
 

@@ -37,7 +37,7 @@ class BUDirectDebitContracts extends Business
             array(
                 'From'         => $senderEmail,
                 'To'           => $toEmail,
-                'Subject'      => 'Broadband Renewals Due Today',
+                'Subject'      => 'Direct Debit Renewals Due Today',
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );

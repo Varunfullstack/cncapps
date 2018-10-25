@@ -166,6 +166,11 @@
         );
     }
 
+    const sortCode = '{sortCode}';
+    const accountNumber = '{accountNumber}';
+    const accountName = '{accountName}';
+    const forceDirectDebit = {forceDirectDebit};
+
 
     function checkMailShotOptions() {
 
@@ -204,6 +209,48 @@
         if (!count) {
             alert('There needs to be at least one "inv" option selected');
             return false;
+        }
+
+
+        if (forceDirectDebit) {
+
+            let existSortCode = false;
+            let newSortCode = null;
+            const sortCodeElm = $('#sortCode');
+            if (sortCodeElm.length) {
+                existSortCode = true;
+                newSortCode = sortCodeElm.val();
+            }
+
+            if (
+                existSortCode && !newSortCode ||
+                !sortCode && !newSortCode
+            ) {
+                alert('This customer needs to have a sort code, as it has direct debit renewals');
+                return false;
+            }
+
+            let existAccountNumber = false;
+            let newAccountNumber = null;
+            const accountNumberElm = $('#accountNumber');
+            if (accountNumberElm.length) {
+                existAccountNumber = true;
+                newAccountNumber = accountNumberElm.val();
+            }
+
+            if (existAccountNumber && !newAccountNumber ||
+                !accountNumber && !newAccountNumber) {
+                alert("This customer needs to have an account number, as it has direct debit renewals");
+                return false;
+            }
+
+            const accountNameElm = $('#accountName');
+            const newAccountName = accountNameElm.val();
+
+            if (!newAccountName) {
+                alert("This customer needs to have an account name, as it has direct debit renewals");
+                return false;
+            }
         }
 
         return true;
@@ -706,6 +753,8 @@
                     </td>
                 </tr>
                 <script>
+
+
                     let storedPassPhrase = null;
 
                     const masks = {
@@ -724,7 +773,6 @@
                     function editEncrypted(id, element) {
 
                         const el = $(element);
-                        debugger;
                         const parent = el.closest('td');
 
                         let encryptedValue = parent.find('.encrypted').val();
