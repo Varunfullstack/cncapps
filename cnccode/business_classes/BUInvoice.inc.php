@@ -1425,13 +1425,15 @@ class BUInvoice extends Business
                 );
             }
 
+            $vatValue = $invoiceValue * ($dbeInvhead->getValue(DBEInvhead::vatRate) / 100);
+            $totalAmount = $invoiceValue + $vatValue;
 
             $bankRow = [
                 $unEncryptedSortCode,
                 $dsCustomer->getValue(DBECustomer::accountName),
                 $unEncryptedAccountNumber,
                 number_format(
-                    $invoiceValue,
+                    $totalAmount,
                     2
                 ),
                 $dsInvhead->getValue(DBEInvhead::invheadID),
@@ -1464,7 +1466,7 @@ class BUInvoice extends Business
                         "invoiceNo"    => $dsInvhead->getValue('invheadID'),
                         "paymentDate"  => $paymentDate,
                         "totalAmount"  => number_format(
-                            $invoiceValue,
+                            $totalAmount,
                             2
                         )
                     ]
