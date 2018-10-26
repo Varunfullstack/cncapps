@@ -255,7 +255,12 @@ class BURenQuotation extends Business
         $previousCustomerID = 99999;
 
         while ($this->dbeJRenQuotation->fetchNext()) {
-
+            ?>
+            quotation
+            <div>
+                contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
+            </div>
+            <?php
             if ($dbeJCustomerItem->getRow($this->dbeJRenQuotation->getValue('customerItemID'))) {
                 /*
                  * Group many renewals for same customer under one quote

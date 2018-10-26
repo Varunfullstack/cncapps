@@ -629,9 +629,12 @@ class CTCustomerItem extends CTCNC
             $dsCustomerItem->fetchNext();
             $this->template->set_var(
                 array(
-                    'itemDescription' => addslashes($dsCustomerItem->getValue("itemDescription")), // for javascript
-                    'warrantyID'      => $dsCustomerItem->getValue("warrantyID"),
-                    'customerItemID'  => $dsCustomerItem->getValue("customerItemID")
+                    'itemDescription'  => addslashes($dsCustomerItem->getValue("itemDescription")), // for javascript
+                    'warrantyID'       => $dsCustomerItem->getValue("warrantyID"),
+                    'customerItemID'   => $dsCustomerItem->getValue("customerItemID"),
+                    'allowDirectDebit' => $dsCustomerItem->getValue(
+                        DBEItem::allowDirectDebit
+                    ) === 'Y' ? 'true' : 'false'
                 )
             );
         } else {
@@ -672,7 +675,10 @@ class CTCustomerItem extends CTCNC
                                 addslashes($dsCustomerItem->getValue("itemDescription"))
                             ),
                             'customerItemID'    => $dsCustomerItem->getValue("customerItemID"),
-                            'warrantyID'        => $dsCustomerItem->getValue("warrantyID")
+                            'warrantyID'        => $dsCustomerItem->getValue("warrantyID"),
+                            'allowDirectDebit'  => $dsCustomerItem->getValue(
+                                DBEItem::allowDirectDebit
+                            ) === 'Y' ? 'true' : 'false'
                         )
                     );
                     $this->template->parse(

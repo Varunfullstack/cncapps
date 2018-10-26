@@ -76,7 +76,9 @@ define(
 
 class BUPDFInvoice extends BaseObject
 {
-    var $_buPDF = '';                    // BUPDF object
+    /** @var BUPDF */
+    var $_buPDF = '';
+    /** @var BUInvoice */
     var $_buInvoice = '';
     var $_buNotepad = '';
     var $_dsInvhead = '';
@@ -140,9 +142,13 @@ class BUPDFInvoice extends BaseObject
      * Generate one invoice and return file path
      *
      * @access private
+     * @param $dsInvhead
+     * @param bool $directDebit
      * @return String PDF disk file name or FALSE
      */
-    function generateFile($dsInvhead)
+    function generateFile($dsInvhead,
+                          $directDebit = false
+    )
     {
 
         $this->_dsInvhead = $dsInvhead;
@@ -162,7 +168,7 @@ class BUPDFInvoice extends BaseObject
             'A4'
         );
 
-        $this->produceInvoice();
+        $this->produceInvoice($directDebit);
 
         $this->_buPDF->close();
 
@@ -216,15 +222,19 @@ class BUPDFInvoice extends BaseObject
     function produceInvoice()
     {
         $this->invoiceHead();
+        $dsInvline = new DataSet($this);
         $this->_buInvoice->getInvoiceLines(
             $this->_dsInvhead->getValue('invheadID'),
             $dsInvline
         );
         $this->_buPDF->CR();
         $lineCount = 0;
+        $linesForLastPage = 5;
+        $linesForLogo = 10;
+
         while ($dsInvline->fetchNext()) {
             $lineCount++;
-            if ($lineCount > BUPDFINV_NUMBER_OF_LINES - 4) {
+            if ($lineCount > BUPDFINV_NUMBER_OF_LINES - $linesForLastPage) {
                 $this->_buPDF->printStringAt(
                     BUPDFINV_DETAILS_COL,
                     'Continued on next page...'
@@ -302,7 +312,30 @@ class BUPDFInvoice extends BaseObject
                     $dsInvline->getValue('description')
                 ); // comment line
             }
+
             $this->_buPDF->CR();
+        }
+
+
+        if ($this->_dsInvhead->getValue(
+            DBEInvhead::directDebit
+        )) {
+
+            if ($lineCount > BUPDFINV_NUMBER_OF_LINES - $linesForLastPage - $linesForLogo) {
+                $this->_buPDF->printStringAt(
+                    BUPDFINV_DETAILS_COL,
+                    'Continued on next page...'
+                );
+                $this->invoiceHead();
+                $this->_buPDF->printStringAt(
+                    BUPDFINV_DETAILS_COL,
+                    '... continued from previous page'
+                );
+                $this->_buPDF->CR();
+            }
+
+            $this->_buPDF->moveYTo((BUPDFINV_NUMBER_OF_LINES - 13.0) * $this->_buPDF->getFontSize());
+            $this->_buPDF->placeImageAt(IMAGES_DIR.'/PAID.gif','gif',BUPDFINV_DETAILS_COL,90);
         }
 
         $this->_buPDF->setBoldOn();

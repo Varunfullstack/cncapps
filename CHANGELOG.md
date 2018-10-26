@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
+- Issue 211 - CNC040 - Direct Debit Specification
 
 ## [v1.12.0] - 2018-09-27
 ### Changed

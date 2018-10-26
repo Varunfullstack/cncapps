@@ -121,6 +121,7 @@ define(
 
 class CTCustomer extends CTCNC
 {
+    const DECRYPT = "decrypt";
     var $customerID = '';
     var $customerString = '';                      // Used when searching for an entity by string
     var $contactString = '';                      // Used when searching for an entity by string
@@ -774,8 +775,66 @@ class CTCustomer extends CTCNC
                 DBECustomer::slaP5,
                 $value['slaP5']
             );
+            $this->dsCustomer->setValue(
+                DBECustomer::gscTopUpAmount,
+                $this->getYN($value['pcxFlag'])
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::sortCode,
+                $value['sortCode']
+            );
+
+            if (isset($value['newSortCode'])) {
+                $sortCode = null;
+                if ($value['newSortCode']) {
+                    $sortCode = base64_encode($this->encrypt($value['newSortCode']));
+                }
+                $this->dsCustomer->setValue(
+                    DBECustomer::sortCode,
+                    $sortCode
+                );
+            }
+
+
+            $this->dsCustomer->setValue(
+                DBECustomer::accountName,
+                $value['accountName']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::accountNumber,
+                $value['accountNumber']
+            );
+
+            if (isset($value['newAccountNumber'])) {
+                $accountNumber = null;
+
+                if ($value['newAccountNumber']) {
+                    $accountNumber = base64_encode($this->encrypt($value['newAccountNumber']));
+                }
+
+                $this->dsCustomer->setValue(
+                    DBECustomer::accountNumber,
+                    $accountNumber
+                );
+            }
+
             $this->dsCustomer->post();
         }
+    }
+
+    function encrypt($unEncryptedData)
+    {
+        $publicKey = file_get_contents('c:\\keys\\privkey.pub');
+
+        openssl_public_encrypt(
+            $unEncryptedData,
+            $cryptedData,
+            $publicKey,
+            OPENSSL_PKCS1_OAEP_PADDING
+        );
+        return $cryptedData;
     }
 
     function setCustomerString($customerString)
@@ -997,6 +1056,20 @@ class CTCustomer extends CTCNC
                 break;
             case 'csvContractAndNumbersReport':
                 $this->csvContractAndNumbersReport();
+                break;
+            case self::DECRYPT:
+                $response = ["status" => "ok"];
+                try {
+                    $response['decryptedData'] = $this->decrypt(
+                        @$_REQUEST['encryptedData'],
+                        @$_REQUEST['passphrase']
+                    );
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                    http_response_code(400);
+                }
+                echo json_encode($response);
                 break;
             default:
                 $this->displaySearchForm();
@@ -1835,6 +1908,11 @@ ORDER BY cus_name ASC  ";
                 )
             );
 
+        $buItem = new BUCustomerItem($this);
+
+        $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
+
+
         $this->template->set_var(
             array(
                 'lastContractSent'                => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
@@ -1953,7 +2031,18 @@ ORDER BY cus_name ASC  ";
                 'slaP2'                           => $this->dsCustomer->getValue(DBECustomer::slaP2),
                 'slaP3'                           => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                           => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5)
+                'slaP5'                           => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'sortCode'                        => $this->dsCustomer->getValue(DBECustomer::sortCode),
+                'accountName'                     => $this->dsCustomer->getValue(DBECustomer::accountName),
+                'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),
+                'sortCodePencilColor'             => $this->dsCustomer->getValue(
+                    DBECustomer::sortCode
+                ) ? "greenPencil" : "redPencil",
+                'accountNumberPencilColor'        => $this->dsCustomer->getValue(
+                    DBECustomer::accountNumber
+                ) ? "greenPencil" : "redPencil",
+                'forceDirectDebit'                => $forceDirectDebit ? 'true' : 'false'
+
             )
         );
         if ((!$this->formError) & ($this->getAction(
@@ -3147,6 +3236,31 @@ ORDER BY cus_name ASC  ";
             } // end while
 
         } // end if
+    }
+
+    private function decrypt($encryptedData,
+                             $passphrase
+    )
+    {
+
+        $keyData = file_get_contents('c:\\keys\\privkey.pem');
+
+        $key = openssl_pkey_get_private(
+            $keyData,
+            $passphrase
+        );
+
+        if (!$key) {
+            throw new Exception('Passphrase not valid');
+        }
+
+        openssl_private_decrypt(
+            base64_decode($encryptedData),
+            $decryptedData,
+            $key,
+            OPENSSL_PKCS1_OAEP_PADDING
+        );
+        return $decryptedData;
     } // end function documents
 }// end of class
 ?>
