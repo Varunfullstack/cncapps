@@ -167,7 +167,7 @@
 
     Mustache.Formatters = {
         decimal: function (number) {
-            if(typeof number !== 'number'){
+            if (typeof number !== 'number') {
                 return number;
             }
 
@@ -260,6 +260,7 @@
                     return ((this.totalOutHours * 60) / this.minutesPerDay).toFixed(2);
                 };
 
+                debugger;
                 context.data.forEach(item => {
                     const consultantKey = item.firstName + item.lastName;
                     const activityKey = item.cat_desc;
@@ -283,8 +284,13 @@
 
                     consultants[consultantKey].totalInHours += item.inHours;
                     consultants[consultantKey].totalOutHours += item.outHours;
-                    context.totalInHours += item.inHours;
-                    context.totalOutHours += item.outHours;
+
+                    const validTypesForTotal = [4, 8];
+
+                    if (validTypesForTotal.includes(item.caa_callacttypeno)) {
+                        context.totalInHours += item.inHours;
+                        context.totalOutHours += item.outHours;
+                    }
                     consultants[consultantKey].activities[activityKey] = {
                         inHours: item.inHours,
                         outHours: item.outHours
