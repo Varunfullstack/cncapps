@@ -126,6 +126,191 @@
             <column name="calculatedBudget" type="char(1)" defaultValue="N"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-12">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(routine_name) > 0
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="FUNCTION"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND ROUTINE_NAME = 'getNextWeekDay';
+            </sqlCheck>
+        </preConditions>
+        <createProcedure procedureName="getNextWeekDay">
+            CREATE
+            FUNCTION `getNextWeekDay`(X DATE, dayOfTheWeek INTEGER)
+            RETURNS DATE
+            BEGIN
+            DECLARE dateWeekDay INT(2);
+            DECLARE offsetDays INT(2);
+            SET dateWeekDay = dayofweek(X);
+
+            IF (dateWeekDay > (dayOfTheWeek - 1) ) THEN
+            SET offsetDays = (7 + dayOfTheWeek ) - 2 * dateWeekDay;
+            ELSE
+            SET offsetDays = dayOfTheWeek - 2 * dateWeekDay;
+            END IF;
+
+            RETURN DATE_ADD(X,INTERVAL (dateWeekDay + offsetDays) DAY);
+
+            END;
+        </createProcedure>
+        <rollback>
+            <sql>
+                drop function if exists getNextWeekDay
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-13">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(routine_name) > 0
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="FUNCTION"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND ROUTINE_NAME = 'getEasterDate';
+            </sqlCheck>
+        </preConditions>
+        <createProcedure procedureName="getEasterDate">
+            CREATE
+            FUNCTION `getEasterDate`(year integer)
+            RETURNS DATE
+            BEGIN
+            DECLARE K,M,S,A,D,R,OG,SZ,OE,OS INT;
+            DECLARE EASTERDATE DATE;
+            SET K = year DIV 100;
+            SET M = 15 + (3*K + 3) DIV 4 - (8*K + 13) DIV 25;
+            SET S = 2 - (3*K + 3) DIV 4;
+            SET A = year MOD 19;
+            SET D = (19*A + M) MOD 30;
+            SET R = (D + A DIV 11) DIV 29;
+            SET OG = 21 + D - R ;
+            SET SZ = 7 - (year + year DIV 4 + S) MOD 7;
+            SET OE = 7 - (OG - SZ) MOD 7;
+            SET OS = OG + OE;
+            SET EASTERDATE = DATE_ADD(CONCAT(year, '-03-01'), INTERVAL OS-1 DAY);
+            RETURN EASTERDATE;
+            END
+        </createProcedure>
+        <rollback>
+            <sql>
+                drop function if exists getEasterDate
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-14">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(routine_name) > 0
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="FUNCTION"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND ROUTINE_NAME = 'isBankHoliday';
+            </sqlCheck>
+        </preConditions>
+        <createProcedure procedureName="isBankHoliday">
+            CREATE FUNCTION `isBankHoliday` (X DATE) RETURNS BOOL
+            BEGIN
+            DECLARE m INTEGER;
+            DECLARE Y INTEGER;
+            DECLARE d INTEGER;
+            DECLARE wd INTEGER;
+            DECLARE easter DATE;
+            DECLARE nextEasterMonday DATE;
+            DECLARE lastEasterFriday DATE;
+            DECLARE firstOfMay DATE;
+            DECLARE firstMondayOfMay DATE;
+            DECLARE lastMondayOfMay DATE;
+            DECLARE firstOfAugust DATE;
+            DECLARE lastMondayOfAugust DATE;
+            DECLARE xMasDay DATE;
+            DECLARE xMasWeekDay INTEGER;
+            DECLARE nextXMasMonday DATE;
+            DECLARE nextXMasTuesday DATE;
+            DECLARE nextXMasDay DATE;
+
+            SET m = MONTH(X) ;
+            SET Y = YEAR(X) ;
+            SET d = DAY(X) ;
+            SET wd = DAYOFWEEK(X) ;
+            IF (wd = 1 OR wd = 7) THEN RETURN TRUE ;
+            END IF;
+
+            IF (m = 1 AND d = 1) THEN RETURN TRUE ;
+            END IF;
+
+            SET easter = getEasterDate(Y) ;
+            SET nextEasterMonday = getNextWeekDay (easter, 2) ;
+            IF (X = nextEasterMonday) THEN RETURN TRUE;
+            END IF;
+
+            SET lastEasterFriday = getNextWeekDay (DATE_SUB(easter, INTERVAL 7 DAY), 6) ;
+            IF ( X= lastEasterFriday) THEN RETURN TRUE;
+            END IF;
+
+            IF m = 5 THEN
+            SET firstOfMay = CONCAT(Y, '-05-01');
+            SET firstMondayOfMay = DATE_ADD(firstOfMay, INTERVAL MOD(9 - DAYOFWEEK(firstOfMay), 7) DAY);
+            IF (firstMondayOfMay = X) THEN RETURN TRUE; END IF ;
+
+            SET lastMondayOfMay = getNextWeekDay(DATE_SUB(LAST_DAY(firstOfMay), INTERVAL 7 DAY),2);
+
+            IF (lastMondayOfMay = X) THEN RETURN TRUE; END IF;
+
+            END IF ;
+
+            IF (m = 8) THEN
+            SET firstOfAugust = CONCAT(Y,'-08-01');
+            SET lastMondayOfAugust = getNextWeekDay(DATE_SUB(LAST_DAY(firstOfAugust), INTERVAL 7 DAY),2);
+
+            IF (lastMondayOfAugust = X) THEN RETURN TRUE; END IF;
+            END IF;
+
+            SET xMasDay = CONCAT(Y,'-12-25');
+
+            IF (X = xMasDay) THEN RETURN TRUE; END IF;
+
+            SET xMasWeekDay = DAYOFWEEK(xMasDay);
+
+            IF xMasWeekDay = 6 THEN
+            SET nextXMasMonday = getNextWeekDay(xMasDay, 2);
+
+            IF X = nextXMasMonday THEN RETURN TRUE;
+            END IF;
+            ELSEIF xMasWeekDay = 7 OR xMasWeekDay = 1 THEN
+
+            SET nextXMasMonday = getNextWeekDay(xMasDay, 2);
+            SET nextXMasTuesday = getNextWeekDay(xMasDay, 3);
+
+            IF X = nextXMasMonday OR X = nextXMasTuesday THEN RETURN TRUE;
+            END IF;
+            ELSE
+            SET nextXMasDay = DATE_ADD(xMasDay,INTERVAL 1 DAY);
+            IF X = nextXMasDay THEN RETURN TRUE;
+            END IF;
+
+            END IF;
+
+            RETURN FALSE;
+            END
+        </createProcedure>
+        <rollback>
+            <sql>
+                drop function if exists isBankHoliday
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-14">
+        <sql>
+            GRANT EXECUTE ON * TO 'webuser'@'%';
+        </sql>
+        <rollback>
+
+        </rollback>
+    </changeSet>
 
 
 </databaseChangeLog>

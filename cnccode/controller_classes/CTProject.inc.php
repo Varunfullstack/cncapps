@@ -882,28 +882,38 @@ class CTProject extends CTCNC
 
     private function usedBudgetData($salesOrderID)
     {
-        $startTime = '09:00';
+        $startTime = '08:00';
         $endTime = '18:00';
 
         // here we get the information about the inHours and outOfHours time used
-        $query = "SELECT   ROUND(
-    COALESCE(
-      SUM(
-        COALESCE(
+        $query = "SELECT 
+  ROUND(
+      COALESCE(
+          SUM(
+        IF(
+        isBankHoliday (`caa_date`),
+          0,
           TIME_TO_SEC(
             IF(
-              caa_endtime > '$endTime',
-              '$endTime',
-              caa_endtime
+                caa_endtime < '$startTime',
+              '$startTime',
+              IF(
+                  caa_endtime > '$endTime',
+                '$endTime',
+                caa_endtime
+              )
             )
           ) - TIME_TO_SEC(
             IF(
-              caa_starttime < '$startTime',
-              '$startTime',
-              caa_starttime
+                caa_starttime >= '$startTime',
+              IF(
+                  caa_starttime > '$endTime',
+                '$endTime',
+                caa_starttime
+              ),
+              '$startTime'
             )
-          ),
-          0
+          )
         )
       ) / 3600,
       0
@@ -911,22 +921,29 @@ class CTProject extends CTCNC
     2
   ) AS inHours,
   ROUND(
-    COALESCE(
-      SUM(
+      COALESCE(
+          SUM(
         IF(
-          caa_starttime < '$startTime',
+        isBankHoliday (`caa_date`),
           COALESCE(
-            TIME_TO_SEC('$startTime') - TIME_TO_SEC(caa_starttime),
-            0
+              TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime),
+              0
           ),
-          0
-        ) + IF(
-          caa_endtime > '$endTime',
-          COALESCE(
-            TIME_TO_SEC(caa_endtime) - TIME_TO_SEC('$endTime'),
+          IF(
+              caa_starttime < '$startTime',
+            COALESCE(
+                TIME_TO_SEC('$startTime') - TIME_TO_SEC(caa_starttime),
+                0
+            ),
             0
-          ),
-          0
+          ) + IF(
+        caa_endtime > '$endTime',
+            COALESCE(
+                TIME_TO_SEC(caa_endtime) - TIME_TO_SEC('$endTime'),
+                0
+            ),
+            0
+          )
         )
       ) / 3600,
       0
@@ -937,18 +954,18 @@ class CTProject extends CTCNC
   callacttype.`cat_desc`,
   callactivity.`caa_consno`,
   consultant.`firstName`,
-  consultant.`lastName`
+  consultant.`lastName` 
 FROM
   callactivity 
   LEFT JOIN problem 
     ON callactivity.`caa_problemno` = problem.`pro_problemno` 
   LEFT JOIN callacttype 
-    ON callactivity.`caa_callacttypeno` = callacttype.`cat_callacttypeno`
-    LEFT JOIN consultant 
+    ON callactivity.`caa_callacttypeno` = callacttype.`cat_callacttypeno` 
+  LEFT JOIN consultant 
     ON `callactivity`.`caa_consno` = consultant.`cns_consno` 
-WHERE pro_linked_ordno = $salesOrderID
+WHERE pro_linked_ordno = $salesOrderID 
 GROUP BY caa_callacttypeno,
-  caa_consno ";
+  caa_consno";
 
         global $db;
 
