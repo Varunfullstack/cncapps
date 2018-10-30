@@ -106,15 +106,15 @@
         <tbody>
         {% #activities %}
         <tr>
-            <td>
+            <td >
                 {% activityKey %}
             </td>
             {% #columns %}
-            <td>
+            <td {% value| ligtGrayClass %}>
                 {% value | decimal %}
             </td>
             {% /columns %}
-            <td>
+            <td {% total| ligtGrayClass %}>
                 {% total | decimal %}
             </td>
         </tr>
@@ -123,33 +123,38 @@
             <td></td>
         </tr>
         <tr>
-            <td>In hours Total</td>
+            <td >In hours Total</td>
             {% #consultants %}
-            <td>{% totalInHours | decimal %}</td>
+            <td  {% totalInHours| ligtGrayClass %}>{% totalInHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td>Out of hours Total</td>
             {% #consultants %}
-            <td>{% totalOutHours | decimal %}</td>
+            <td {% totalOutHours| ligtGrayClass %}>{% totalOutHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td>Total</td>
             {% #consultants %}
-            <td>{% totalHours | decimal %}</td>
+            <td {% totalHours| ligtGrayClass %}>{% totalHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td></td>
         </tr>
         <tr>
-            <td>Total (in Hours)</td>
+            <td {%
+                totalInHours|
+                lightGrayClass
+                %}
+            >Total (in Hours)
+            </td>
             <td>{% totalInHours | decimal %}</td>
         </tr>
         <tr>
             <td>Total (Out of Hours)</td>
-            <td>{% totalOutHours | decimal %}</td>
+            <td {% totalOutHours| ligtGrayClass %}>{% totalOutHours | decimal %}</td>
         </tr>
         <tr>
             <td></td>
@@ -172,7 +177,20 @@
             }
 
             return number.toFixed(2);
+        },
+        lightGrayClass: function (number) {
+            debugger;
+            if (typeof number !== 'number') {
+                return null;
+            }
+
+            if (number != 0) {
+                return null;
+            }
+
+            return "class='grayedOut'"
         }
+
     };
 
     const projectPlanDownloadURL = "{projectPlanDownloadURL}";
@@ -260,7 +278,6 @@
                     return ((this.totalOutHours * 60) / this.minutesPerDay).toFixed(2);
                 };
 
-                debugger;
                 context.data.forEach(item => {
                     const consultantKey = item.firstName + item.lastName;
                     const activityKey = item.cat_desc;
