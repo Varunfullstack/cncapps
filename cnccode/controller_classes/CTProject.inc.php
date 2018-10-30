@@ -340,7 +340,7 @@ class CTProject extends CTCNC
 
         $projectCalculateBudgetLinkClick = "onclick='return confirm(\"Are you sure? You can only do this once.\")'";
 
-        if ($dsProject->getValue(DBEProject::calculatedBudget)) {
+        if ($dsProject->getValue(DBEProject::calculatedBudget) == 'Y') {
             $projectCalculateBudgetURL = "href='#'";
             $projectCalculateBudgetClass = "class='grayedOut'";
             $projectCalculateBudgetLinkClick = null;
@@ -805,7 +805,7 @@ class CTProject extends CTCNC
             exit;
         }
 
-        if ($dbeProject->getValue(DBEProject::calculatedBudget)) {
+        if ($dbeProject->getValue(DBEProject::calculatedBudget) == 'Y') {
             echo 'The project budget has already been calculated';
             exit;
         }
@@ -862,7 +862,7 @@ class CTProject extends CTCNC
 
         $dbeProject->setValue(
             DBEProject::calculatedBudget,
-            1
+            'Y'
         );
 
         $dbeProject->updateRow();
@@ -976,14 +976,15 @@ GROUP BY caa_callacttypeno,
 
         $data = [
             "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
-            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget),
+            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget) == 'Y',
             "stats"            => [
                 "inHoursAllocated" => 'N/A',
                 "inHoursUsed"      => 'N/A',
                 "ooHoursAllocated" => 'N/A',
                 "ooHoursUsed"      => 'N/A',
             ],
-            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay),
+            "data" => []
         ];
         if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
             return $data;
@@ -991,9 +992,9 @@ GROUP BY caa_callacttypeno,
 
         $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
 
-        $data['test'] = $this->usedBudgetData($salesOrderID);
+        $data['data'] = $this->usedBudgetData($salesOrderID);
 
-        if (!$dbeProject->getValue(DBEProject::calculatedBudget)) {
+        if ($dbeProject->getValue(DBEProject::calculatedBudget) != 'Y' ) {
             return $data;
         }
 

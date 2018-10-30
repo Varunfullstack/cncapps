@@ -123,7 +123,7 @@
             </not>
         </preConditions>
         <addColumn tableName="project">
-            <column name="calculatedBudget" type="boolean" defaultValue="false"/>
+            <column name="calculatedBudget" type="char(1)" defaultValue="N"/>
         </addColumn>
     </changeSet>
 

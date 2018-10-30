@@ -113,8 +113,8 @@ class DBEProject extends DBEntity
 
         $this->addColumn(
             self::calculatedBudget,
-            DA_BOOLEAN,
-            DA_ALLOW_NULL
+            DA_YN_FLAG,
+            DA_NOT_NULL
         );
 
         $this->setPK(0);

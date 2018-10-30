@@ -13,6 +13,10 @@
 <script type="text/javascript"
         src="ckeditor/ckeditor.js"
 ></script>
+<script type="application/javascript"
+        src=".javascript/mustache-wax.min.js"
+></script>
+
 <script id="project-budget-stats-template"
         type="text/template"
 >
@@ -27,13 +31,13 @@
         </tr>
         <tr>
             <td>In Hours</td>
-            <td>{% stats.inHoursAllocated %} days</td>
-            <td>{% getTotalInDays %} days</td>
+            <td>{% stats.inHoursAllocated | decimal %} days</td>
+            <td>{% getTotalInDays | decimal %} days</td>
         </tr>
         <tr>
             <td>Out of Hours</td>
-            <td>{% stats.ooHoursAllocated %} days</td>
-            <td>{% getTotalOutDays %} days</td>
+            <td>{% stats.ooHoursAllocated | decimal %} days</td>
+            <td>{% getTotalOutDays | decimal %} days</td>
         </tr>
     </table>
     <div>
@@ -107,11 +111,11 @@
             </td>
             {% #columns %}
             <td>
-                {% value %}
+                {% value | decimal %}
             </td>
             {% /columns %}
             <td>
-                {% total %}
+                {% total | decimal %}
             </td>
         </tr>
         {% /activities %}
@@ -121,19 +125,19 @@
         <tr>
             <td>In hours Total</td>
             {% #consultants %}
-            <td>{% totalInHours %}</td>
+            <td>{% totalInHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td>Out of hours Total</td>
             {% #consultants %}
-            <td>{% totalOutHours %}</td>
+            <td>{% totalOutHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td>Total</td>
             {% #consultants %}
-            <td>{% totalHours %}</td>
+            <td>{% totalHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
@@ -141,11 +145,11 @@
         </tr>
         <tr>
             <td>Total (in Hours)</td>
-            <td>{% totalInHours %}</td>
+            <td>{% totalInHours | decimal %}</td>
         </tr>
         <tr>
             <td>Total (Out of Hours)</td>
-            <td>{% totalOutHours %}</td>
+            <td>{% totalOutHours | decimal %}</td>
         </tr>
         <tr>
             <td></td>
@@ -158,7 +162,18 @@
     </table>
 </script>
 <script type="application/javascript">
+
     Mustache.tags = ['{%', '%}'];
+
+    Mustache.Formatters = {
+        decimal: function (number) {
+            if(typeof number !== 'number'){
+                return number;
+            }
+
+            return number.toFixed(2);
+        }
+    };
 
     const projectPlanDownloadURL = "{projectPlanDownloadURL}";
     let projectPlan = {hasProjectPlan};
@@ -245,7 +260,7 @@
                     return ((this.totalOutHours * 60) / this.minutesPerDay).toFixed(2);
                 };
 
-                context.test.forEach(item => {
+                context.data.forEach(item => {
                     const consultantKey = item.firstName + item.lastName;
                     const activityKey = item.cat_desc;
                     if (!consultants[consultantKey]) {
@@ -255,7 +270,7 @@
                             activities: {},
                             name: item.firstName[0] + item.lastName[0],
                             totalHours: function () {
-                                return this.totalOutHours + this.totalInHours;
+                                return (this.totalOutHours + this.totalInHours).toFixed(2);
                             }
                         };
                     }
