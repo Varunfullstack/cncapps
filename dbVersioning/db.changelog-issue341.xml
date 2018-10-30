@@ -303,7 +303,7 @@
             </sql>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue341-1538730591-14">
+    <changeSet author="pavwebdev" id="issue341-1538730591-15">
         <sql>
             GRANT EXECUTE ON * TO 'webuser'@'%';
         </sql>
