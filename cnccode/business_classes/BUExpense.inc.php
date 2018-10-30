@@ -820,5 +820,9 @@ class BUExpense extends Business
         $result = $mail->send(CONFIG_SALES_MANAGER_EMAIL, $hdrs, $body);
     }
 
+    public function getTotalExpensesForSalesOrder($salesOrderID) {
+        return $this->dbeJExpense->getTotalExpensesForSalesOrder($salesOrderID);
+    }
+
 }// End of class
 ?>

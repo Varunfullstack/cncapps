@@ -174,7 +174,7 @@ class DBEProject extends DBEntity
     {
         $queryString =
             "SELECT 
-  project.projectID as projectID,
+  project.projectID AS projectID,
   project.customerID,
   description,
   notes,
@@ -186,24 +186,25 @@ class DBEProject extends DBEntity
   projectUpdates.`createdAt`,
   projectUpdates.`createdBy`,
   project.`planFileName`,
-  concat_ws(' ', engineer.firstName, engineer.lastName) as engineerName,
+  CONCAT_WS(' ', engineer.firstName, engineer.lastName) AS engineerName,
   outOfHoursBudgetDays,
-  inHoursBudgetDays
+  inHoursBudgetDays,
+  (SELECT GROUP_CONCAT(problem.`pro_problemno`) FROM problem WHERE pro_linked_ordno = project.`ordHeadID`) problemno
 FROM
   project 
-  left join consultant engineer on project.consultantID = engineer.cns_consno
+  LEFT JOIN consultant engineer ON project.consultantID = engineer.cns_consno
   JOIN customer 
-    ON cus_custno = project.customerID 
+    ON cus_custno = project.customerID
   LEFT JOIN projectUpdates 
     ON projectUpdates.projectID = project.projectID 
-    AND projectUpdates.projectID = 
+    AND projectUpdates.`id` = 
     (SELECT 
-      MAX(projectID) 
+      MAX(z.id) 
     FROM
       projectUpdates z 
     WHERE z.projectID = projectUpdates.projectID) 
     
-WHERE expiryDate >= NOW() OR expiryDate IS NULL OR expiryDate = '0000-00-00' order by customerName asc";
+WHERE expiryDate >= NOW() OR expiryDate IS NULL OR expiryDate = '0000-00-00' ORDER BY customerName ASC";
 
         $this->db->query($queryString);
 

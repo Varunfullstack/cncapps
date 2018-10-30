@@ -20,9 +20,7 @@
 <script id="project-budget-stats-template"
         type="text/template"
 >
-    <div>
-        Project Budget
-    </div>
+    <h2> Project Budget </h2>
     <table>
         <tr>
             <td></td>
@@ -40,9 +38,8 @@
             <td>{% getTotalOutDays | decimal %} days</td>
         </tr>
     </table>
-    <div>
-        Budget
-    </div>
+    <br>
+    <h2> Allocate Budget </h2>
     <table>
         <tr>
             <td>In Hours</td>
@@ -92,7 +89,7 @@
             </td>
         </tr>
     </table>
-    <h2>Time Breakdown</h2>
+    <h2>Time Breakdown (hours)</h2>
     <table>
         <thead>
         <tr>
@@ -106,15 +103,15 @@
         <tbody>
         {% #activities %}
         <tr>
-            <td >
+            <td>
                 {% activityKey %}
             </td>
             {% #columns %}
-            <td {% value| ligtGrayClass %}>
+            <td class="{% value | lightGrayClass %}">
                 {% value | decimal %}
             </td>
             {% /columns %}
-            <td {% total| ligtGrayClass %}>
+            <td class="{% total| lightGrayClass %}">
                 {% total | decimal %}
             </td>
         </tr>
@@ -123,50 +120,52 @@
             <td></td>
         </tr>
         <tr>
-            <td >In hours Total</td>
+            <td>In hours Total</td>
             {% #consultants %}
-            <td  {% totalInHours| ligtGrayClass %}>{% totalInHours | decimal %}</td>
+            <td class="{% totalInHours| lightGrayClass %}">{% totalInHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td>Out of hours Total</td>
             {% #consultants %}
-            <td {% totalOutHours| ligtGrayClass %}>{% totalOutHours | decimal %}</td>
-            {% /consultants %}
-        </tr>
-        <tr>
-            <td>Total</td>
-            {% #consultants %}
-            <td {% totalHours| ligtGrayClass %}>{% totalHours | decimal %}</td>
+            <td class="{% totalOutHours| lightGrayClass %}">{% totalOutHours | decimal %}</td>
             {% /consultants %}
         </tr>
         <tr>
             <td></td>
         </tr>
         <tr>
-            <td {%
-                totalInHours|
-                lightGrayClass
-                %}
-            >Total (in Hours)
+            <td>Total</td>
+            {% #consultants %}
+            <td class="{% totalHours |lightGrayClass %}">{% totalHours | decimal %}</td>
+            {% /consultants %}
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="{% totalInHours | lightGrayClass %}"
+            >Grand Total (in hours)
             </td>
             <td>{% totalInHours | decimal %}</td>
         </tr>
         <tr>
-            <td>Total (Out of Hours)</td>
-            <td {% totalOutHours| ligtGrayClass %}>{% totalOutHours | decimal %}</td>
+            <td>Grand Total (out of hours)</td>
+            <td class="{% totalOutHours| lightGrayClass %}">{% totalOutHours | decimal %}</td>
         </tr>
         <tr>
             <td></td>
         </tr>
         <tr>
             <td>Expenses Total:</td>
-            <td>Some value</td>
+            <td>{% stats.expenses %}</td>
         </tr>
         </tbody>
     </table>
 </script>
 <script type="application/javascript">
+
+    const projectManagementCheck = '{projectManagementCheck}';
 
     Mustache.tags = ['{%', '%}'];
 
@@ -179,8 +178,9 @@
             return number.toFixed(2);
         },
         lightGrayClass: function (number) {
-            debugger;
-            if (typeof number !== 'number') {
+
+            if (isNaN(parseFloat(number)) || !isFinite(number)) {
+                debugger;
                 return null;
             }
 
@@ -188,7 +188,7 @@
                 return null;
             }
 
-            return "class='grayedOut'"
+            return "grayedOut"
         }
 
     };
@@ -198,7 +198,7 @@
 
     function showHistoryPopup() {
         window.open('{historyPopupURL}',
-            'Updates History', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            'Updates History', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
     }
 
     $(function () {
@@ -257,7 +257,7 @@
 
                 const context = jsonResponse.data;
 
-                if (!context.calculatedBudget) {
+                if (!context.calculatedBudget || projectManagementCheck ) {
                     context.disabled = true;
                 } else {
                     context.disabled = false;
@@ -415,6 +415,7 @@
                        value="{description}"
                        size="50"
                        maxlength="50"
+                       {projectManagementCheck}
                 >
                 <span class="formErrorMessage">{descriptionMessage}</span>
             </td>
@@ -430,6 +431,7 @@
                           rows="15"
                           name="project[1][notes]"
                           id="summary"
+                          {projectManagementCheck}
                 >{notes}</textarea>
                 <span class="formErrorMessage">{notesMessage}</span>
                 <script type="text/javascript">
@@ -448,6 +450,7 @@
                        maxlength="10"
                        autocomplete="off"
                        class="jQueryCalendar"
+                       {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{startDateMessage}</font>
             </TD>
@@ -463,6 +466,7 @@
                        maxlength="10"
                        autocomplete="off"
                        class="jQueryCalendar"
+                       {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{commenceDateMessage}</font>
             </TD>
@@ -478,6 +482,7 @@
                        maxlength="10"
                        autocomplete="off"
                        class="jQueryCalendar"
+                       {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{expiryDateMessage}</font>
             </TD>
@@ -510,6 +515,7 @@
             <TD class="field">
                 <select name="project[1][consultantID]"
                         required
+                        {projectManagementCheck}
                 >
                     <option value="">Please Select an Engineer</option>
                     <!-- BEGIN consultantBlock -->
@@ -531,6 +537,7 @@
                 <input type="file"
                        accept="application/pdf"
                        onchange="checkUploadFilesBtn()"
+                       {projectManagementCheck}
                 >
             </td>
         </tr>

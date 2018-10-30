@@ -15,6 +15,7 @@ require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
+require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 // Actions
 define(
     'CTPROJECT_ACT_DISPLAY_LIST',
@@ -67,8 +68,7 @@ class CTProject extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
-            "technical",
+            "reports",
         ];
 
         if (!self::hasPermissions($roles)) {
@@ -127,6 +127,9 @@ class CTProject extends CTCNC
                 break;
             case 'historyPopup':
                 $this->historyPopup();
+                break;
+            case 'lastUpdate':
+                $this->historyPopup(true);
                 break;
             case 'editLinkedSalesOrder':
                 $this->editLinkedSalesOrder();
@@ -353,7 +356,6 @@ class CTProject extends CTCNC
             $projectCalculateBudgetLink = "<a  $projectCalculateBudgetURL  $projectCalculateBudgetClass $projectCalculateBudgetLinkClick>Calculate Budget</a>";
         }
 
-
         $fetchProjectDataURL = $this->buildLink(
             $_SERVER['PHP_SELF'],
             [
@@ -361,6 +363,9 @@ class CTProject extends CTCNC
                 'projectID' => $projectID
             ]
         );
+
+        $isProjectManager = $this->dbeUser->getValue(DBEUser::projectManagementFlag) === 'Y';
+
 
         $this->template->set_var(
             array(
@@ -403,7 +408,8 @@ class CTProject extends CTCNC
                 'projectPlanLink'         => $projectPlanLink,
                 'projectPlanDownloadURL'  => $projectPlanDownloadURL,
                 'calculateBudgetLink'     => $projectCalculateBudgetLink,
-                'getProjectBudgetDataURL' => $fetchProjectDataURL
+                'getProjectBudgetDataURL' => $fetchProjectDataURL,
+                'projectManagementCheck'  => $isProjectManager ? '' : 'readonly disabled'
             )
         );
         $this->template->parse(
@@ -588,10 +594,7 @@ class CTProject extends CTCNC
         );
         $this->template->set_var(
             array(
-                'notes'      => Controller::htmlDisplayText(
-                    $dsProject->getValue('notes'),
-                    1
-                ),
+                'notes'      => $dsProject->getValue('notes'),
                 'startDate'  => Controller::dateYMDtoDMY($dsProject->getValue('startDate')),
                 'expiryDate' => Controller::dateYMDtoDMY($dsProject->getValue('expiryDate')),
             )
@@ -640,7 +643,7 @@ class CTProject extends CTCNC
         }
     }
 
-    private function historyPopup()
+    private function historyPopup($lastUpdateOnly = false)
     {
         $this->setPageTitle('Project Updates History');
         $this->setTemplateFiles(
@@ -648,9 +651,13 @@ class CTProject extends CTCNC
         );
 
         global $db;
+        $query = "select * from projectUpdates where projectID = ? order by createdAt desc";
 
+        if ($lastUpdateOnly) {
+            $query .= " limit 1";
+        }
         $result = $db->preparedQuery(
-            "select * from projectUpdates where projectID = ? order by createdAt desc",
+            $query,
             [['type' => 'i', 'value' => $_REQUEST['projectID']]]
         );
 
@@ -963,7 +970,8 @@ FROM
     ON callactivity.`caa_callacttypeno` = callacttype.`cat_callacttypeno` 
   LEFT JOIN consultant 
     ON `callactivity`.`caa_consno` = consultant.`cns_consno` 
-WHERE pro_linked_ordno = $salesOrderID and caa_starttime <> '' and caa_starttime is not null and caa_endtime <> '' and caa_starttime is not null
+WHERE pro_linked_ordno = $salesOrderID and caa_starttime <> '' and caa_starttime is not null and caa_endtime <> '' and caa_starttime is not null 
+and callactivity.`caa_callacttypeno` <> 51 and callactivity.`caa_callacttypeno` <> 60
 GROUP BY caa_callacttypeno,
   caa_consno";
 
@@ -1001,7 +1009,7 @@ GROUP BY caa_callacttypeno,
                 "ooHoursUsed"      => 'N/A',
             ],
             "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay),
-            "data" => []
+            "data"             => []
         ];
         if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
             return $data;
@@ -1011,7 +1019,11 @@ GROUP BY caa_callacttypeno,
 
         $data['data'] = $this->usedBudgetData($salesOrderID);
 
-        if ($dbeProject->getValue(DBEProject::calculatedBudget) != 'Y' ) {
+        $buExpense = new BUExpense($this);
+
+        $data['stats']['expenses'] = $buExpense->getTotalExpensesForSalesOrder($salesOrderID);
+
+        if ($dbeProject->getValue(DBEProject::calculatedBudget) != 'Y') {
             return $data;
         }
 
@@ -1064,6 +1076,16 @@ GROUP BY caa_callacttypeno,
                 )
             );
 
+            $projectEditURL = $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                [
+                    "action"    => 'edit',
+                    "projectID" => $project['projectID']
+                ]
+            );
+
+            $projectLink = "<a href='$projectEditURL'>$project[description]</a>";
+
             $lastUpdated = 'No updates';
 
             if ($project['createdBy']) {
@@ -1072,8 +1094,9 @@ GROUP BY caa_callacttypeno,
 
             $this->template->setVar(
                 [
-                    "description"     => $project['description'],
+                    "description"     => $projectLink,
                     "commenceDate"    => $project['commenceDate'],
+                    'customerName'    => $project['customerName'],
                     "projectPlanLink" => $projectPlanLink,
                     "latestUpdate"    => $lastUpdated,
                     "historyPopupURL" => $historyPopupURL,
@@ -1094,7 +1117,6 @@ GROUP BY caa_callacttypeno,
 
         $this->parsePage();
     }
-
 
 
     private function calculateInHoursOutHoursUsed($projectID)
@@ -1133,7 +1155,9 @@ GROUP BY caa_callacttypeno,
     {
         $dbeProject = new DBEProject($this);
         $currentProjects = $dbeProject->getCurrentProjects();
+        \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
+
         $phpWord->setDefaultFontName('Arial');
         $phpWord->setDefaultFontSize(8);
 
@@ -1273,12 +1297,37 @@ GROUP BY caa_callacttypeno,
                 null,
                 $pStyle
             );
+            $problemsCell = $table->addCell(200);
 
-            $table->addCell(200)->addText(
-                "service request ..what?",
-                null,
-                $pStyle
-            );
+            if ($project['problemno']) {
+                $problems = explode(
+                    ',',
+                    $project['problemno']
+                );
+
+                foreach ($problems as $problemID) {
+
+                    $link = $this->buildLink(
+                        "http://cncapps/Activity.php",
+                        [
+                            "action"    => 'displayFirstActivity',
+                            "problemID" => $problemID
+                        ]
+                    );
+
+
+                    $problemsCell->addLink(
+                        $link,
+                        $problemID,
+                        'Link',
+                        'Heading2'
+                    );
+                }
+            }
+
+//
+
+
             $text = "In Hours " . round(
                     $project['inHoursBudgetDays'],
                     2

@@ -311,6 +311,16 @@
 
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue341-1538730591-16">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="projectManagementFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="projectManagementFlag" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
 
 
 </databaseChangeLog>
