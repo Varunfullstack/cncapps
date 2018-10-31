@@ -941,14 +941,14 @@ class CTProject extends CTCNC
           IF(
               caa_starttime < '$startTime',
             COALESCE(
-                TIME_TO_SEC('$startTime') - TIME_TO_SEC(caa_starttime),
+                TIME_TO_SEC(IF(caa_endtime >  '$startTime',  '$startTime', caa_endtime)) - TIME_TO_SEC(caa_starttime),
                 0
             ),
             0
           ) + IF(
         caa_endtime > '$endTime',
             COALESCE(
-                TIME_TO_SEC(caa_endtime) - TIME_TO_SEC('$endTime'),
+                TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(IF(caa_starttime < '$endTime', '$endTime', caa_starttime)),
                 0
             ),
             0
@@ -1089,9 +1089,9 @@ GROUP BY caa_callacttypeno,
             $projectLink = "<a href='$projectEditURL'>$project[description]</a>";
 
             $lastUpdated = 'No updates';
-
+            var_dump($project);
             if ($project['createdBy']) {
-                $lastUpdated = "<span style='font-weight: bold'>$project[createdAt] by $project[createdBy]:</span> $project[comment]";
+                $lastUpdated = "<span style='font-weight: bold'>By $project[createdBy]:</span> $project[comment]";
             }
 
             $this->template->setVar(

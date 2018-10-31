@@ -1,7 +1,7 @@
 <script>
     function showHistoryPopup(url) {
         window.open(url,
-            'Updates History', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            'Updates History', 'scrollbars=yes,resizable=no,width=870,height=300,copyhistory=no, menubar=0')
     }
 </script>
 
@@ -11,7 +11,7 @@
         <th>Description</th>
         <th>Customer Name</th>
         <th>Commencement</th>
-        <th>Project Plan Link</th>
+        <th>Project Plan</th>
         <th>Latest Update</th>
         <th>Updates</th>
     </tr>
@@ -24,7 +24,7 @@
         <td>{commenceDate}</td>
         <td>{projectPlanLink}</td>
         <td>{latestUpdate}</td>
-        <td>Update History <a onclick="showHistoryPopup('{historyPopupURL}')">here</a></td>
+        <td><a onclick="showHistoryPopup('{historyPopupURL}')">History</a></td>
     </tr>
     <!-- END projectBlock -->
     </tbody>
