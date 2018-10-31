@@ -69,6 +69,8 @@ class CTProject extends CTCNC
         );
         $roles = [
             "reports",
+            "sales",
+            "technical"
         ];
 
         if (!self::hasPermissions($roles)) {
@@ -1089,7 +1091,11 @@ GROUP BY caa_callacttypeno,
             $lastUpdated = 'No updates';
 
             if ($project['createdBy']) {
-                $lastUpdated = "<span style='font-weight: bold'>".substr($project['createdAt'], 0, -8)." by $project[createdBy]:</span> $project[comment]";
+                $lastUpdated = "<span style='font-weight: bold'>" . substr(
+                        $project['createdAt'],
+                        0,
+                        -8
+                    ) . " by $project[createdBy]:</span> $project[comment]";
             }
 
             $inHoursBudget = "Uncalculated";
