@@ -1,13 +1,7 @@
 <?php
 
-$contents = file_get_contents("htdocs/email_templates/DirectDebitInvoiceEmail.html");
 
-if (preg_match(
-    '/[^\x00-\x7F]/',
-    $contents,
-    $matches
-)) {
-    var_dump($matches);
-} else {
-    echo 'no match';
-}
+
+require_once($cfg["path_bu"] . "/BUMail.inc.php");
+require_once($cfg ["path_func"] . "/Common.inc.php");
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');

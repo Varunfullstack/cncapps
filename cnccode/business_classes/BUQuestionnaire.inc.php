@@ -36,7 +36,7 @@ class BUQuestionnaire extends Business
     function updateQuestionnaire(&$dsData)
     {
         $this->setMethodName('updateQuestionnaire');
-        $this->updateDataaccessObject($dsData, $this->dbeQuestionnaire);
+        $this->updateDataAccessObject($dsData, $this->dbeQuestionnaire);
         return TRUE;
     }
 
@@ -93,7 +93,7 @@ class BUQuestionnaire extends Business
     function updateQuestion(&$dsData)
     {
         $this->setMethodName('updateQuestion');
-        $this->updateDataaccessObject($dsData, $this->dbeQuestion);
+        $this->updateDataAccessObject($dsData, $this->dbeQuestion);
         return TRUE;
     }
 

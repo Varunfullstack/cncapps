@@ -25,7 +25,7 @@ class BUThirdPartyContact extends Business
     function updateThirdPartyContact(&$dsData)
     {
         $this->setMethodName('updateThirdPartyContact');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeThirdPartyContact
         );

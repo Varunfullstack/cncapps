@@ -398,7 +398,7 @@ class BUCustomer extends Business
             'beforeUpdateCustomer'
         );
 
-        return ($this->updateDataaccessObject(
+        return ($this->updateDataAccessObject(
             $dsData,
             $this->dbeCustomer
         ));
@@ -508,7 +508,7 @@ class BUCustomer extends Business
             $this,
             'setCustomerID'
         );
-        $ret = ($this->updateDataaccessObject(
+        $ret = ($this->updateDataAccessObject(
             $dsData,
             $this->dbeSite
         ));
@@ -598,7 +598,7 @@ class BUCustomer extends Business
     function updateContact(&$dsData)
     {
         $this->setMethodName('updateContact');
-        $ret = $this->updateDataaccessObject(
+        $ret = $this->updateDataAccessObject(
             $dsData,
             $this->dbeContact
         );

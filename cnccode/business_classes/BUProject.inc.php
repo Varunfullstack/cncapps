@@ -26,21 +26,38 @@ class BUProject extends Business
     function updateProject(&$dsData)
     {
         $this->setMethodName('updateProject');
-        $this->updateDataaccessObject($dsData, $this->dbeProject);
+        $this->updateDataAccessObject(
+            $dsData,
+            $this->dbeProject
+        );
         return TRUE;
     }
 
-    function getProjectByID($ID, &$dsResults)
+    function getProjectByID($ID,
+                            &$dsResults
+    )
     {
         $this->dbeProject->setPKValue($ID);
         $this->dbeProject->getRow();
-        return ($this->getData($this->dbeProject, $dsResults));
+        return ($this->getData(
+            $this->dbeProject,
+            $dsResults
+        ));
     }
 
-    function getProjectsByCustomerID($customerID, &$dsResults, $activityDate = false)
+    function getProjectsByCustomerID($customerID,
+                                     &$dsResults,
+                                     $activityDate = false
+    )
     {
-        $this->dbeProject->getRowsByCustomerID($customerID, $activityDate);
-        return ($this->getData($this->dbeProject, $dsResults));
+        $this->dbeProject->getRowsByCustomerID(
+            $customerID,
+            $activityDate
+        );
+        return ($this->getData(
+            $this->dbeProject,
+            $dsResults
+        ));
     }
 
     function getCurrentProjects()
@@ -66,7 +83,10 @@ class BUProject extends Business
     {
         $dbeProblem = new DBEProblem($this);
         // validate no activities of this type
-        $dbeProblem->setValue('projectID', $ID);
+        $dbeProblem->setValue(
+            'projectID',
+            $ID
+        );
         if ($dbeProblem->countRowsByColumn('projectID') < 1) {
             return TRUE;
         } else {
@@ -78,7 +98,9 @@ class BUProject extends Business
      *    isCurrent
      * Has it expired?
      */
-    function isCurrent($ID, $activityDate = false)
+    function isCurrent($ID,
+                       $activityDate = false
+    )
     {
         $this->dbeProject->getRow($ID);
 
@@ -94,6 +116,44 @@ class BUProject extends Business
             $ret = true;
         }
         return $ret;
+    }
+
+    public function updateLinkedSalesOrder($projectID,
+                                           $linkedOrderID
+    )
+    {
+        $dbeSalesOrder = new DBEOrdhead($this);
+        if (!$dbeSalesOrder->getRow($linkedOrderID)) {
+            throw new Exception('Sales order does not exist');
+        }
+
+        $dbeProject = new DBEProject($this);
+
+        $dbeProject->getRow($projectID);
+
+        if ($dbeProject->getValue('customerID') != $dbeSalesOrder->getValue('customerID')) {
+            throw new Exception("Sales Order Not For This Customer");
+        }
+
+        $testProject = new DBEProject($this);
+
+        $testProject->setValue(
+            DBEProject::ordHeadID,
+            $linkedOrderID
+        );
+
+        $testProject->getRowByColumn(DBEProject::ordHeadID);
+
+        if ($testProject->rowCount()) {
+            throw new Exception('The Sales Order given does already have a linked project');
+        };
+
+
+        $dbeProject->setValue(
+            DBEProject::ordHeadID,
+            $linkedOrderID
+        );
+        $dbeProject->updateRow();
     }
 }// End of class
 ?>

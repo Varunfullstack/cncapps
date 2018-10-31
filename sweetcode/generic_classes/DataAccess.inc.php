@@ -32,6 +32,7 @@ define(
     "DA_MEMO",
     "memo"
 );
+
 define(
     "DA_FLOAT",
     "float"

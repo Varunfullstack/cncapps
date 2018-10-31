@@ -148,7 +148,7 @@ class BUItem extends Business
         }
         $dsItem->setValue('stockcat', $dbeItemType->getValue('stockcat'));
         $dsItem->post();
-        return ($this->updateDataaccessObject($dsItem, $this->dbeItem));
+        return ($this->updateDataAccessObject($dsItem, $this->dbeItem));
     }
 
     function discontinue(

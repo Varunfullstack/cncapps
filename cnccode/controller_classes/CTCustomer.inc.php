@@ -2308,11 +2308,11 @@ ORDER BY cus_name ASC  ";
                         ),
                         'startDate'         => strftime(
                             "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::startDate))
+                            strtotime($dsProject->getValue(DBEProject::openedDate))
                         ),
                         'expiryDate'        => strftime(
                             "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::expiryDate))
+                            strtotime($dsProject->getValue(DBEProject::completedDate))
                         ),
                         'editProjectLink'   => $editProjectLink,
                         'deleteProjectLink' => $deleteProjectLink,

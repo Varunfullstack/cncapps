@@ -4,29 +4,58 @@
         text-align: left;
     }
 </style>
+<script>
+    function showHistoryPopup(projectID) {
+        let URL = '{historyPopupURL}';
+
+        URL += "&projectID=" + projectID;
+        window.open(URL,
+            'History', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
+    }
+</script>
 <H2>Current Projects</H2>
-<table class="singleBorder" width="700" border="0" cellspacing="1" cellpadding="2" id="dashBoardProjectList">
+<table class="singleBorder"
+       width="700"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+       id="dashBoardProjectList"
+>
     <tr>
         <td class="listHeadText">Project</td>
         <td class="listHeadText">Customer</td>
-        <td class="listHeadText">Start</td>
-        <td class="listHeadText">Expires</td>
-        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">Commences</td>
+        <td class="listHeadText">Lead Engineer</td>
+        <td class="listHeadText">Plan</td>
+        <td class="listHeadText">Updates</td>
     </tr>
     <!-- BEGIN projectBlock -->
 
-    <tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';">
-        <td class="orderLineItem" style="">
+    <tr valign="top"
+        onMouseOver="this.bgColor='#ffffcc';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td class="orderLineItem"
+            style=""
+        >
             <a href="{urlEdit}">{description}</a>
         </td>
         <td class="orderLineItem">
             <div align="left">{customerName}</div>
         </td>
         <td class="orderLineItem">
-            <div align="left">{startDate}</div>
+            <div align="left">{commenceDate}</div>
         </td>
         <td class="orderLineItem">
-            <div align="left">{expiryDate}</div>
+            <div align="left">{engineerName}</div>
+        </td>
+        <td class="orderLineItem">
+            <div align="left">{projectPlanLink}</div>
+        </td>
+        <td class="orderLineItem">
+            <div align="left"><a href="#"
+                                 onclick="showHistoryPopup({projectID})"
+            >History</a></div>
         </td>
     </tr>
     <!-- END projectBlock -->

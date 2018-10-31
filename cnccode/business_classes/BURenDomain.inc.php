@@ -35,7 +35,7 @@ class BURenDomain extends Business
     function updateRenDomain(&$dsData)
     {
         $this->setMethodName('updateRenDomain');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeRenDomain
         );
@@ -57,7 +57,7 @@ class BURenDomain extends Business
     function updateArecord(&$dsData)
     {
         $this->setMethodName('updateArecord');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeArecord
         );

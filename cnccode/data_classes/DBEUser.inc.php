@@ -40,6 +40,7 @@ class DBEUser extends DBEntity
     CONST changeApproverFlag = "changeApproverFlag";
     const admin = 'admin';
     const excludeFromStatsFlag = "excludeFromStatsFlag";
+    const projectManagementFlag = 'projectManagementFlag';
 
     /**
      * calls constructor()
@@ -221,6 +222,12 @@ class DBEUser extends DBEntity
             DA_NOT_NULL
         );
 
+        $this->addColumn(
+            self::projectManagementFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -267,6 +274,19 @@ class DBEUser extends DBEntity
         $sql = "select * from permissions inner join " . $this->getTableName() . " on " . $this->getPKName(
             ) . " = permissions.userID where page = '$page'";
         $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
+    function getActiveUsers()
+    {
+        $this->setMethodName("getRowsInGroup");
+
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE activeFlag = 'Y' ORDER BY firstName, lastName";
+
+        $this->setQueryString($query);
 
         return (parent::getRows());
     }

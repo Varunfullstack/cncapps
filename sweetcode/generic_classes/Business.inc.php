@@ -27,12 +27,12 @@ class Business extends BaseObject
 
     /**
      * Insert/update one or more rows from a source DataSet into a destination DBObject
-     * @param DataSet &$Source Set of data
-     * @param DBObject &$Destinantion DataAccess object
+     * @param $dsSource
+     * @param $dbDestination
      * @return bool
      * @access private
      */
-    function updateDataaccessObject(&$dsSource, &$dbDestination)
+    function updateDataAccessObject(DataSet &$dsSource, DataAccess  &$dbDestination)
     {
         $this->setMethodName("updateDataaccessObject");
         if (!is_object($dsSource)) {

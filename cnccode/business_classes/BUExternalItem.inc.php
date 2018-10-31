@@ -28,7 +28,7 @@ class BUExternalItem extends Business
     function updateExternalItem(&$dsData)
     {
         $this->setMethodName('updateExternalItem');
-        $this->updateDataaccessObject($dsData, $this->dbeExternalItem);
+        $this->updateDataAccessObject($dsData, $this->dbeExternalItem);
         return TRUE;
     }
 

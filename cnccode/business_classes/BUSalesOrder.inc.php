@@ -222,7 +222,7 @@ class BUSalesOrder extends Business
     function insertQuotation(&$dsData)
     {
         $this->setMethodName('insertQuotation');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeQuotation
         );
@@ -597,7 +597,7 @@ class BUSalesOrder extends Business
         );
         $dsOrdhead->post();
 
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsOrdhead,
             $dbeOrdhead
         );
@@ -1371,7 +1371,7 @@ class BUSalesOrder extends Business
                 date('Y-m-d')
             );
             $dsOrdhead->post();
-            $this->updateDataaccessObject(
+            $this->updateDataAccessObject(
                 $dsOrdhead,
                 $dbeOrdhead
             );
@@ -1395,7 +1395,7 @@ class BUSalesOrder extends Business
                 date('Y-m-d')
             );
             $dsOrdhead->post();
-            $this->updateDataaccessObject(
+            $this->updateDataAccessObject(
                 $dsOrdhead,
                 $dbeOrdhead
             );    // create new order header
@@ -1554,7 +1554,7 @@ class BUSalesOrder extends Business
             date('Y-m-d')
         );
         $dsOrdhead->post();
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsOrdhead,
             $dbeOrdhead
         );    // create new order header
