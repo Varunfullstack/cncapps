@@ -814,10 +814,10 @@ class CTProject extends CTCNC
             exit;
         }
 
-//        if ($dbeProject->getValue(DBEProject::calculatedBudget) == 'Y') {
-//            echo 'The project budget has already been calculated';
-//            exit;
-//        }
+        if ($dbeProject->getValue(DBEProject::calculatedBudget) == 'Y') {
+            echo 'The project budget has already been calculated';
+            exit;
+        }
 
         $buSalesOrder = new BUSalesOrder($this);
 
