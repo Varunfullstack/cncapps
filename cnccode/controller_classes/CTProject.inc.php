@@ -367,8 +367,6 @@ class CTProject extends CTCNC
         );
 
 
-
-
         $this->template->set_var(
             array(
                 'customerID'              => $dsProject->getValue(DBEProject::customerID),
@@ -1328,33 +1326,37 @@ GROUP BY caa_callacttypeno,
             }
 
 //
+            $budgetText = "No Budget Calculated";
+            $usedText = "No Budget Calculated";
+            if ($project['calculatedBudget'] == 'Y') {
 
+                $budgetText = "In Hours " . round(
+                        $project['inHoursBudgetDays'],
+                        2
+                    ) . " days \nOut of Hours " . round(
+                        $project['outOfHoursBudgetDays'],
+                        2
+                    ) . " days";
 
-            $text = "In Hours " . round(
-                    $project['inHoursBudgetDays'],
-                    2
-                ) . " days \nOut of Hours " . round(
-                    $project['outOfHoursBudgetDays'],
-                    2
-                ) . " days";
+                $hoursData = $this->calculateInHoursOutHoursUsed($project['projectID']);
+
+                $usedText = "In Hours " . round(
+                        $hoursData['inHoursUsed'],
+                        2
+                    ) . " days \nOut of Hours " . round(
+                        $hoursData['outHoursUsed'],
+                        2
+                    ) . " days";
+            }
             $table->addCell(200)->addText(
-                $text,
+                $budgetText,
                 null,
                 $pStyle
             );
 
-            $hoursData = $this->calculateInHoursOutHoursUsed($project['projectID']);
-
-            $text = "In Hours " . round(
-                    $hoursData['inHoursUsed'],
-                    2
-                ) . " days \nOut of Hours " . round(
-                    $hoursData['outHoursUsed'],
-                    2
-                ) . " days";
 
             $table->addCell(200)->addText(
-                $text,
+                $usedText,
                 null,
                 $pStyle
             );
@@ -1371,10 +1373,10 @@ GROUP BY caa_callacttypeno,
                 $pStyle
             );
         }
-
+        $date = (new DateTime())->format('d-m-Y');
         // Save file
         $phpWord->save(
-            'test.docx',
+            "Project Summary $date.docx",
             'Word2007',
             true
         );
