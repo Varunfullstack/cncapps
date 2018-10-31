@@ -40,6 +40,7 @@ class DBEUser extends DBEntity
     CONST changeApproverFlag = "changeApproverFlag";
     const admin = 'admin';
     const excludeFromStatsFlag = "excludeFromStatsFlag";
+    const changeInitialDateAndTimeFlag = 'changeInitialDateAndTimeFlag';
     const projectManagementFlag = 'projectManagementFlag';
 
     /**
@@ -224,6 +225,12 @@ class DBEUser extends DBEntity
 
         $this->addColumn(
             self::projectManagementFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::changeInitialDateAndTimeFlag,
             DA_YN,
             DA_NOT_NULL
         );

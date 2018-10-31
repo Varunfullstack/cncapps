@@ -3889,19 +3889,26 @@ class CTActivity extends CTCNC
         /*
       Only enable the date and time if not initial activity type
       */
+        $initial_disabled = '';
+        $canChangeInitialDateAndTime = false;
         if (
-            in_array(
-                $dsCallActivity->getValue('callActTypeID'),
-                array(
-                    CONFIG_INITIAL_ACTIVITY_TYPE_ID,
-                    CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
-                )
-            ) &&
-            !$this->hasPermissions(PHPLIB_PERM_MAINTENANCE)
+        in_array(
+            $dsCallActivity->getValue('callActTypeID'),
+            array(
+                CONFIG_INITIAL_ACTIVITY_TYPE_ID,
+                CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
+            )
+        )
         ) {
-            $initial_disabled = CTCNC_HTML_DISABLED;
-        } else {
-            $initial_disabled = '';
+            if (!$this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
+                $initial_disabled = CTCNC_HTML_DISABLED;
+            }
+
+
+            if ($this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y') {
+                $canChangeInitialDateAndTime = true;
+            }
+
         }
 
         $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue('problemID'));
@@ -4140,6 +4147,7 @@ class CTActivity extends CTCNC
                 'DISABLED'                     => $disabled,
                 'COMPLETE_DISABLED'            => $complete_disabled,
                 'INITIAL_DISABLED'             => $initial_disabled,
+                'INITIAL_DATE_DISABLED'        => $canChangeInitialDateAndTime ? '' : "disabled",
                 'PRIORITY_DISABLED'            => $priority_disabled,
                 'CONTRACT_DISABLED'            => $contract_disabled,
                 'setTimeNowLink'               => $setTimeNowLink,

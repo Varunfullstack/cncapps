@@ -36,19 +36,19 @@
       action="{urlUpdate}"
       name="user"
       AUTOCOMPLETE="OFF"
->
-    <table width="700px"
+
+>    <table width="700px"
            border="0"
+
     >
-        <input
-                type="hidden"
-                name="user[1][userID]"
-                value="{userID}"
+        <input type="hidden"
+               name="user[1][userID]"
+               value="{userID}"
         >
         <tr>
             <td class="promptText">Name</td>
-            <td class="fieldText"><input
-                    {DISABLED}
+            <td class="fieldText">
+                <input {DISABLED}
                     name="user[1][name]"
                     type="text"
                     value="{name}"
@@ -58,8 +58,8 @@
         </tr>
         <tr>
             <td class="promptText">Salutation</td>
-            <td class="fieldText"><input
-                    {DISABLED}
+            <td class="fieldText">
+                <input {DISABLED}
                     name="user[1][salutation]"
                     type="text"
                     value="{salutation}"
@@ -97,178 +97,194 @@
                     >{teamName}
                     </option>
                     <!-- END teamBlock -->
-                </select></td>
+                </select>
+            </td>
         </tr>
         <tr>
             <td width="20%"
                 class="promptText"
             >Address
             </td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][add1]"
-                    value="{add1}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{add1Message}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][add1]"
+                       value="{add1}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{add1Message}</span>
+            </td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][add2]"
-                    value="{add2}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{add2Message}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][add2]"
+                       value="{add2}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{add2Message}</span>
+            </td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][add3]"
-                    value="{add3}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{add3Message}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][add3]"
+                       value="{add3}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{add3Message}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Town</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][town]"
-                    value="{town}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{townMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][town]"
+                       value="{town}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{townMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">County</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][county]"
-                    value="{county}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{countyMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][county]"
+                       value="{county}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{countyMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Postcode</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][postcode]"
-                    value="{postcode}"
-                    size="20"
-                    maxlength="20"
-            > <span class="formErrorMessage">{postcodeMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][postcode]"
+                       value="{postcode}"
+                       size="20"
+                       maxlength="20"
+                > <span class="formErrorMessage">{postcodeMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Username</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][username]"
-                    value="{username}"
-                    size="20"
-                    maxlength="20"
-            > <span class="formErrorMessage">{usernameMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][username]"
+                       value="{username}"
+                       size="20"
+                       maxlength="20"
+                > <span class="formErrorMessage">{usernameMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Employee No</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][employeeNo]"
-                    value="{employeeNo}"
-                    size="20"
-                    maxlength="20"
-            > <span class="formErrorMessage">{employeeNoMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][employeeNo]"
+                       value="{employeeNo}"
+                       size="20"
+                       maxlength="20"
+                > <span class="formErrorMessage">{employeeNoMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Petrol Rate</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][petrolRate]"
-                    value="{petrolRate}"
-                    size="10"
-                    maxlength="10"
-            > <span class="formErrorMessage">{petrolRateMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][petrolRate]"
+                       value="{petrolRate}"
+                       size="10"
+                       maxlength="10"
+                > <span class="formErrorMessage">{petrolRateMessage}</span>
+            </td>
         </tr>
 
         <tr>
             <td class="promptText">Hourly Pay Rate</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][hourlyPayRate]"
-                    value="{hourlyPayRate}"
-                    size="10"
-                    maxlength="10"
-            > <span class="formErrorMessage">{hourlyPayRateMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][hourlyPayRate]"
+                       value="{hourlyPayRate}"
+                       size="10"
+                       maxlength="10"
+                > <span class="formErrorMessage">{hourlyPayRateMessage}</span>
+            </td>
         </tr>
 
         <tr>
             <td class="promptText">Hours In Standard Day</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][standardDayHours]"
-                    value="{standardDayHours}"
-                    size="10"
-                    maxlength="10"
-            > <span class="formErrorMessage">{standardDayHoursMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][standardDayHours]"
+                       value="{standardDayHours}"
+                       size="10"
+                       maxlength="10"
+                > <span class="formErrorMessage">{standardDayHoursMessage}</span>
+            </td>
         </tr>
 
         <tr>
             <td class="promptText">Signature File</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][signatureFilename]"
-                    value="{signatureFilename}"
-                    size="10"
-                    maxlength="10"
-            > <span class="formErrorMessage">{signatureFilenameMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][signatureFilename]"
+                       value="{signatureFilename}"
+                       size="10"
+                       maxlength="10"
+                > <span class="formErrorMessage">{signatureFilenameMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Job Title</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][jobTitle]"
-                    value="{jobTitle}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{jobTitleMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][jobTitle]"
+                       value="{jobTitle}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{jobTitleMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">First Name</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][firstName]"
-                    value="{firstName}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{firstNameMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][firstName]"
+                       value="{firstName}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{firstNameMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Last Name</td>
-            <td class="field"><input
-                    {DISABLED}
-                    type="text"
-                    name="user[1][lastName]"
-                    value="{lastName}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{lastNameMessage}</span></td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][lastName]"
+                       value="{lastName}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{lastNameMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Overtime on Weekdays</td>
@@ -324,6 +340,18 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Change Initial Activity Date And Time</td>
+            <td class="fieldText">
+                <input name="user[1][changeInitialDateAndTimeFlag]"
+                       type="checkbox"
+                       id="user[1][changeInitialDateAndTimeFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {changeInitialDateAndTimeFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Exclude from Stats</td>
             <td class="fieldText"><input name="user[1][excludeFromStatsFlag]"
                                          type="checkbox"
@@ -376,13 +404,15 @@
                 title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenence"
             >Sales
             </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="sales"
-                                         type="checkbox"
-                                         value="sales"
-                                         {salesChecked}
-            ></td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       id="sales"
+                       type="checkbox"
+                       value="sales"
+                       {salesChecked}
+                >
+            </td>
         </tr>
         <tr>
             <td class="promptText"

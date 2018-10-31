@@ -369,6 +369,9 @@ class CTUser extends CTCNC
                     ) !== FALSE) ? CT_CHECKED : '',
 
                 'changeApproverFlagChecked'    => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
+                'changeInitialDateAndTimeFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
+                ),
                 'excludeFromStatsFlagChecked'  => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::excludeFromStatsFlag)
                 ),
@@ -484,6 +487,7 @@ class CTUser extends CTCNC
         $this->setMethodName('update');
         $dsUser = &$this->dsUser;
         $this->formError = (!$this->dsUser->populateFromArray($_REQUEST['user']));
+
         if (isset($_REQUEST['perms'])) {
             $this->dsUser->setUpdateModeUpdate();
             $this->dsUser->setValue(
