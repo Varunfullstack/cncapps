@@ -1077,9 +1077,8 @@ GROUP BY caa_callacttypeno,
             $historyPopupURL = $this->buildLink(
                 'Project.php',
                 array(
-                    'action'    => 'historyPopup',
-                    'projectID' => $project['projectID'],
-                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                    'action'  => 'historyPopup',
+                    'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
 
@@ -1412,7 +1411,7 @@ GROUP BY caa_callacttypeno,
             );
 
             $table->addCell(200)->addText(
-                $project['notes'],
+                null,
                 null,
                 $pStyle
             );

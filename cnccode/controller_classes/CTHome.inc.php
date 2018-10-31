@@ -429,6 +429,14 @@ class CTHome extends CTCNC
                 $lastUpdated = '<a href="#" onclick="showLastUpdatedPopup(' . $project['projectID'] . ')" >Status</a>';
             }
 
+            $historyPopupURL = $this->buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'historyPopup',
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+
             $this->template->set_var(
                 array(
                     'projectID'       => $project['projectID'],
@@ -436,22 +444,15 @@ class CTHome extends CTCNC
                     'description'     => $project['description'],
                     'notes'           => $project['notes'],
                     'projectPlanLink' => $projectPlanLink,
-                    'startDate'       => strftime(
+                    'commenceDate'    => $project['commenceDate'] ? strftime(
                         "%d/%m/%Y",
-                        strtotime($project['startDate'])
-                    ),
-                    'commenceDate'    => strftime(
-                        "%d/%m/%Y",
-                        strtotime($project['startDate'])
-                    ),
-                    'expiryDate'      => strftime(
-                        "%d/%m/%Y",
-                        strtotime($project['expiryDate'])
-                    ),
+                        strtotime($project['commenceDate'])
+                    ) : '',
                     'urlEdit'         => $editProjectLink,
                     'engineerName'    => $project['engineerName'],
                     'lastUpdatePopup' => $lastUpdated,
                     'lastUpdateURL'   => $lastUpdatedURL,
+                    'historyPopupURL' => $historyPopupURL
                 )
             );
 

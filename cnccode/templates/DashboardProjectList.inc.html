@@ -5,12 +5,12 @@
     }
 </style>
 <script>
-    function showLastUpdatedPopup(projectID) {
-        let URL = '{lastUpdateURL}';
+    function showHistoryPopup(projectID) {
+        let URL = '{historyPopupURL}';
 
         URL += "&projectID=" + projectID;
         window.open(URL,
-            'Last Update', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
+            'History', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
     }
 </script>
 <H2>Current Projects</H2>
@@ -27,7 +27,7 @@
         <td class="listHeadText">Commences</td>
         <td class="listHeadText">Lead Engineer</td>
         <td class="listHeadText">Plan</td>
-        <td class="listHeadText">Last Update</td>
+        <td class="listHeadText">Updates</td>
     </tr>
     <!-- BEGIN projectBlock -->
 
@@ -53,7 +53,9 @@
             <div align="left">{projectPlanLink}</div>
         </td>
         <td class="orderLineItem">
-            <div align="left">{lastUpdatePopup}</div>
+            <div align="left"><a href="#"
+                                 onclick="showHistoryPopup({projectID})"
+            >History</a></div>
         </td>
     </tr>
     <!-- END projectBlock -->
