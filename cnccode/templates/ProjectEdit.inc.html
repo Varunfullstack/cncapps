@@ -145,13 +145,23 @@
         </tr>
         <tr>
             <td class="{% totalInHours | lightGrayClass %}"
-            >Grand Total (in hours)
+            >Chargeable Total (in hours)
             </td>
             <td>{% totalInHours | decimal %}</td>
         </tr>
         <tr>
-            <td>Grand Total (out of hours)</td>
+            <td>Chargeable Total (out of hours)</td>
             <td class="{% totalOutHours| lightGrayClass %}">{% totalOutHours | decimal %}</td>
+        </tr>
+        <tr>
+            <td class="{% grandTotalInHours | lightGrayClass %}"
+            >Grand Total (in hours)
+            </td>
+            <td>{% grandTotalInHours | decimal %}</td>
+        </tr>
+        <tr>
+            <td>Grand Total (out of hours)</td>
+            <td class="{% grandTotalOutHours | lightGrayClass %}">{% grandTotalOutHours | decimal %}</td>
         </tr>
         <tr>
             <td></td>
@@ -257,7 +267,7 @@
 
                 const context = jsonResponse.data;
 
-                if (!context.calculatedBudget || projectManagementCheck ) {
+                if (!context.calculatedBudget || projectManagementCheck) {
                     context.disabled = true;
                 } else {
                     context.disabled = false;
@@ -269,6 +279,8 @@
                 const activities = [];
                 context.totalInHours = 0;
                 context.totalOutHours = 0;
+                context.grandTotalInHours = 0;
+                context.grandTotalOutHours = 0;
 
                 context.getTotalInDays = function () {
                     return ((this.totalInHours * 60) / this.minutesPerDay).toFixed(2);
@@ -303,6 +315,9 @@
                     consultants[consultantKey].totalOutHours += item.outHours;
 
                     const validTypesForTotal = [4, 8];
+
+                    context.grandTotalInHours += item.inHours;
+                    context.grandTotalOutHours += item.outHours;
 
                     if (validTypesForTotal.includes(item.caa_callacttypeno)) {
                         context.totalInHours += item.inHours;
