@@ -182,29 +182,23 @@ class DBEProject extends DBEntity
   expiryDate,
   commenceDate,
   cus_name AS customerName,
-  projectUpdates.`comment` ,
-  projectUpdates.`createdAt`,
-  projectUpdates.`createdBy`,
-  project.`planFileName`,
+  pu.`comment` ,
+  pu.`createdAt`,
+  pu.`createdBy`,
+  `planFileName`,
   CONCAT_WS(' ', engineer.firstName, engineer.lastName) AS engineerName,
-  outOfHoursBudgetDays,
-  inHoursBudgetDays,
-  (SELECT GROUP_CONCAT(problem.`pro_problemno`) FROM problem WHERE pro_linked_ordno = project.`ordHeadID`) problemno
+  round(outOfHoursBudgetDays,2) as outOfHoursBudgetDays,
+  round(inHoursBudgetDays,2) as inHoursBudgetDays,
+  (SELECT GROUP_CONCAT(problem.`pro_problemno`) FROM problem WHERE pro_linked_ordno = project.`ordHeadID`) problemno,
+  calculatedBudget
 FROM
   project 
   LEFT JOIN consultant engineer ON project.consultantID = engineer.cns_consno
   JOIN customer 
     ON cus_custno = project.customerID
-  LEFT JOIN projectUpdates 
-    ON projectUpdates.projectID = project.projectID 
-    AND projectUpdates.`id` = 
-    (SELECT 
-      MAX(z.id) 
-    FROM
-      projectUpdates z 
-    WHERE z.projectID = projectUpdates.projectID) 
-    
-WHERE expiryDate >= NOW() OR expiryDate IS NULL OR expiryDate = '0000-00-00' ORDER BY customerName ASC";
+  LEFT JOIN (SELECT * FROM (SELECT  * FROM projectUpdates ORDER BY createdAt DESC) reOrderedProjectUpdates GROUP BY projectID) pu ON pu.projectID = project.`projectID`
+WHERE expiryDate >= NOW() OR expiryDate IS NULL OR expiryDate = '0000-00-00'
+ORDER BY customerName ASC";
 
         $this->db->query($queryString);
 

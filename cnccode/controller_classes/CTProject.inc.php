@@ -1087,9 +1087,23 @@ GROUP BY caa_callacttypeno,
             $projectLink = "<a href='$projectEditURL'>$project[description]</a>";
 
             $lastUpdated = 'No updates';
-            var_dump($project);
+
             if ($project['createdBy']) {
                 $lastUpdated = "<span style='font-weight: bold'>By $project[createdBy]:</span> $project[comment]";
+            }
+
+            $inHoursBudget = "Uncalculated";
+            $inHoursUsed = "Uncalculated";
+            $outHoursBudget = "Uncalculated";
+            $outHoursUsed = "Uncalculated";
+
+
+            if ($project['calculatedBudget'] == 'Y') {
+                $hoursUsed = $this->calculateInHoursOutHoursUsed($project['projectID']);
+                $inHoursBudget = $project['inHoursBudgetDays'];
+                $inHoursUsed = $hoursUsed['inHoursUsed'];
+                $outHoursBudget = $project['outOfHoursBudgetDays'];
+                $outHoursUsed = $hoursUsed['outHoursUsed'];
             }
 
             $this->template->setVar(
@@ -1100,6 +1114,10 @@ GROUP BY caa_callacttypeno,
                     "projectPlanLink" => $projectPlanLink,
                     "latestUpdate"    => $lastUpdated,
                     "historyPopupURL" => $historyPopupURL,
+                    "inHoursBudget"   => $inHoursBudget,
+                    "inHoursUsed"     => $inHoursUsed,
+                    "outHoursBudget"  => $outHoursBudget,
+                    "outHoursUsed"    => $outHoursUsed,
                 ]
             );
             $this->template->parse(
@@ -1141,13 +1159,28 @@ GROUP BY caa_callacttypeno,
 
         $activities = $this->usedBudgetData($salesOrderID);
 
+        $chargeableActivities = [4, 8];
+
         foreach ($activities as $activity) {
+            if (!in_array(
+                $activity['caa_callacttypeno'],
+                $chargeableActivities
+            )) {
+                continue;
+            }
+
             $data['inHoursUsed'] += $activity['inHours'];
             $data['outHoursUsed'] += $activity['outHours'];
         }
 
-        $data['inHoursUsed'] = ($data['inHoursUsed'] * 60) / $data['minutesPerDay'];
-        $data['outHoursUsed'] = ($data['outHoursUsed'] * 60) / $data['minutesPerDay'];
+        $data['inHoursUsed'] = round(
+            ($data['inHoursUsed'] * 60) / $data['minutesPerDay'],
+            2
+        );
+        $data['outHoursUsed'] = round(
+            ($data['outHoursUsed'] * 60) / $data['minutesPerDay'],
+            2
+        );
         return $data;
     }
 

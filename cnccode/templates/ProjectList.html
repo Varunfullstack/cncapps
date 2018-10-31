@@ -4,7 +4,12 @@
             'Updates History', 'scrollbars=yes,resizable=no,width=870,height=300,copyhistory=no, menubar=0')
     }
 </script>
-
+<style>
+    .heading {
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
 <table>
     <thead>
     <tr>
@@ -12,6 +17,10 @@
         <th>Customer Name</th>
         <th>Commencement</th>
         <th>Project Plan</th>
+        <th title="In hours budget in days">IHB</th>
+        <th title="In house used in days">INU</th>
+        <th title="Out of hours budget in days">OOHB</th>
+        <th title="Out of hours used in days">OOHU</th>
         <th>Latest Update</th>
         <th>Updates</th>
     </tr>
@@ -23,6 +32,10 @@
         <td>{customerName}</td>
         <td>{commenceDate}</td>
         <td>{projectPlanLink}</td>
+        <td>{inHoursBudget}</td>
+        <td>{inHoursUsed}</td>
+        <td>{outHoursBudget}</td>
+        <td>{outHoursUsed}</td>
         <td>{latestUpdate}</td>
         <td><a onclick="showHistoryPopup('{historyPopupURL}')">History</a></td>
     </tr>
