@@ -845,10 +845,10 @@ class CTProject extends CTCNC
 
                 switch ($dsOrdLine->getValue(DBEOrdline::itemID)) {
                     case self::DAILY_LABOUR_CHARGE:
-                        $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                        $normalMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
                         break;
                     case self::HOURLY_LABOUR_CHARGE:
-                        $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                        $normalMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
                         break;
                     case self::DAILY_OOH_LABOUR_CHARGE:
                         $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
