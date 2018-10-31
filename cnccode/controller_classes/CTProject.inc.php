@@ -847,6 +847,7 @@ class CTProject extends CTCNC
                         $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
                         break;
                     case self::DAILY_OOH_LABOUR_CHARGE:
+
                         $oohMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
                         break;
                     case self::HOURLY_OOH_LABOUR_CHARGE:
@@ -884,7 +885,7 @@ class CTProject extends CTCNC
                     'action'    => CTPROJECT_ACT_EDIT
                 )
             );
-        header('Location: ' . $urlNext);
+//        header('Location: ' . $urlNext);
         exit;
 
     }
