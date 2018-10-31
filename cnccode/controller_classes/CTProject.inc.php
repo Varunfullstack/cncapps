@@ -814,10 +814,10 @@ class CTProject extends CTCNC
             exit;
         }
 
-        if ($dbeProject->getValue(DBEProject::calculatedBudget) == 'Y') {
-            echo 'The project budget has already been calculated';
-            exit;
-        }
+//        if ($dbeProject->getValue(DBEProject::calculatedBudget) == 'Y') {
+//            echo 'The project budget has already been calculated';
+//            exit;
+//        }
 
         $buSalesOrder = new BUSalesOrder($this);
 
@@ -838,7 +838,11 @@ class CTProject extends CTCNC
         $oohMinutes = 0;
 
         while ($dsOrdLine->fetchNext()) {
+
             if ($dsOrdLine->getValue(DBEOrdline::lineType) == 'I') {
+                echo "<div>sequence: " . $dsOrdLine->getValue(DBEOrdline::sequenceNo) . " </div>";
+                echo "<div>itemID: " . $dsOrdLine->getValue(DBEOrdline::itemID) . "</div>";
+
                 switch ($dsOrdLine->getValue(DBEOrdline::itemID)) {
                     case self::DAILY_LABOUR_CHARGE:
                         $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
@@ -847,16 +851,16 @@ class CTProject extends CTCNC
                         $normalMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
                         break;
                     case self::DAILY_OOH_LABOUR_CHARGE:
-
-                        $oohMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                        $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
                         break;
                     case self::HOURLY_OOH_LABOUR_CHARGE:
-                        $oohMinutes += ((int)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                        $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
                         break;
                 }
                 echo "<div>Normal Minutes: $normalMinutes</div><div>Out Of Hours Minutes: $oohMinutes</div>";
 
             }
+
         }
         echo "<div> inHours budget days " . ($normalMinutes / $minutesInADay) . "</div>";
         echo "<div> out of Hours budget days " . ($oohMinutes / $minutesInADay) . "</div>";
@@ -885,7 +889,7 @@ class CTProject extends CTCNC
                     'action'    => CTPROJECT_ACT_EDIT
                 )
             );
-//        header('Location: ' . $urlNext);
+        header('Location: ' . $urlNext);
         exit;
 
     }
