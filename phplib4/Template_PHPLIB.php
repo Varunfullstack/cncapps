@@ -328,6 +328,9 @@ class Template_PHPLIB
     {
         if (!is_array($handle)) {
             $str = $this->subst($handle);
+            if($this->debug){
+                var_dump($str);
+            }
             ($append) ? $this->setVar(
                 $target,
                 $this->getVar($target) . $str
@@ -403,6 +406,9 @@ class Template_PHPLIB
     function getVar($varname)
     {
         if (!is_array($varname)) {
+            if($this->debug){
+                var_dump($this->_varVals[$varname]);
+            }
             if (isset($this->_varVals[$varname])) {
                 return $this->_varVals[$varname];
             } else {
