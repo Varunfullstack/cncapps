@@ -4161,7 +4161,8 @@ class CTActivity extends CTCNC
                 'esUsedMinutes'             => $esUsedMinutes,
                 'imAssignedMinutes'         => $imAssignedMinutes,
                 'imUsedMinutes'             => $imUsedMinutes,
-                'userWarned'                => $this->userWarned
+                'userWarned'                => $this->userWarned,
+                'salesRequestStatus'        => $dsCallActivity->getValue(DBECallActivity::salesRequestStatus)
             )
         );
 
