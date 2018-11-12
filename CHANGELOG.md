@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 360 - SD Dashboard Assignment display issue
+
 ## [v1.12.0] - 2018-09-27
 ### Changed
 - Issue 353 - Sales request wording change

@@ -33,7 +33,23 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     {
         switch ($_REQUEST['action']) {
             case 'allocateUser':
-                $this->allocateUser();
+                $options = [];
+
+
+                if ($_SESSION['HD']) {
+                    $options['HD'] = true;
+                }
+                if ($_SESSION['ES']) {
+                    $options['ES'] = true;
+                }
+                if ($_SESSION['IM']) {
+                    $options['IM'] = true;
+                }
+                if ($_SESSION['p5']) {
+                    $options['p5'] = true;
+                }
+
+                $this->allocateUser($options);
                 break;
             default:
                 $this->display();
@@ -49,6 +65,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $showHelpDesk = isset($_REQUEST['HD']);
         $showEscalation = isset($_REQUEST['ES']);
         $showImplementation = isset($_REQUEST['IM']);
+        $_SESSION['HD'] = $showHelpDesk;
+        $_SESSION['ES'] = $showEscalation;
+        $_SESSION['IM'] = $showImplementation;
+        $_SESSION['p5'] = $isP5;
 
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : ''));
 
