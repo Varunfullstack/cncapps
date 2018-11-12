@@ -570,7 +570,7 @@ class BUSalesOrder extends Business
 
         $dsOrdhead->setValue(
             DBEOrdhead::directDebitFlag,
-            $directDebit
+            $directDebit ? 'Y' : 'N'
         );
 
         $dsOrdhead->setValue(
