@@ -54,6 +54,7 @@
         }
     }
 
+
     // function validateHhMm(value) {
     //     return /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value);
     // }
@@ -100,6 +101,27 @@
             'salesOrder',
             'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
         );
+
+    }
+
+    function changeContactNotes() {
+        const object = {contactID: event.target.value};
+        $.LoadingOverlay("show", {text: 'Fetching contact notes'});
+        $.ajax({
+            url: '?action=contactNotes',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            $('#contactNotes').val(result.data);
+            $('#contactNotesAlert').text(result.data);
+            $('#moreContactNotes').text(result.data);
+        }).catch(function () {
+
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
 
     }
 </script>
@@ -287,8 +309,7 @@
             <td></td>
             <td class="promptText">Type</td>
             <td class="fieldText">
-                <select
-                        {INITIAL_DISABLED}
+                <select {INITIAL_DISABLED}
                         {typeDisabled}
                         onchange="setFormChanged();"
                         id="{contractID}"
@@ -312,15 +333,15 @@
             <td></td>
             <td></td>
             <td class="promptText">Value</td>
-            <td class="fieldText"><input
-                    {DISABLED}
-                    type="text"
-                    name="callActivity[1][curValue]"
-                    value="{curValue}"
-                    size="10"
-                    maxlength="10"
-                    onchange="setFormChanged();"
-            />
+            <td class="fieldText">
+                <input {DISABLED}
+                       type="text"
+                       name="callActivity[1][curValue]"
+                       value="{curValue}"
+                       size="10"
+                       maxlength="10"
+                       onchange="setFormChanged();"
+                />
                 <span class="formErrorMessage">{curValueMessage}</span>
             </td>
         </tr>
@@ -329,6 +350,7 @@
             <td class="mainHeadText">
                 <select name="callActivity[1][contactID]"
                         required
+                        onchange="changeContactNotes()"
                 >
 
                     <option value="">Please Select</option>
@@ -551,16 +573,15 @@
         <tr>
             <td class="promptText">Customer Notes</td>
             <td class="contactNotes">
-                <input
-                        type="text"
-                        title="Customer Notes"
-                        name="callActivity[1][techNotes]"
-                        id="techNotes"
-                        value="{techNotes}"
-                        {DISABLED}
-                        size="100"
-                        maxlength="200"
-                        onchange="setFormChanged();"
+                <input type="text"
+                       title="Customer Notes"
+                       name="callActivity[1][techNotes]"
+                       id="techNotes"
+                       value="{techNotes}"
+                       {DISABLED}
+                       size="100"
+                       maxlength="200"
+                       onchange="setFormChanged();"
                 />
                 <span class="formErrorMessage">{techNotesMessage}</span>
             </td>
@@ -584,6 +605,7 @@
         <tr>
             <td colspan="6"
                 class="notesAlert"
+                id="contactNotesAlert"
             >{contactNotes}
             </td>
         </tr>
