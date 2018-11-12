@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Fixed 
+- Issue 359 - Management Review Summary shows blank To: field
 
 ## [v1.12.0] - 2018-09-27
 ### Changed
