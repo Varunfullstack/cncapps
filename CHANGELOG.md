@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 366 - Automatically raised SRs set to no Initial time
+
 ## [v1.12.0] - 2018-09-27
 ### Changed
 - Issue 353 - Sales request wording change

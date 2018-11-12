@@ -7613,16 +7613,15 @@ is currently a balance of ';
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
         );
+        $startTime = date('H:i');
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
-            date('H:i')
+            $startTime
         );
-
-        $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            $endTime
+            $startTime
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
