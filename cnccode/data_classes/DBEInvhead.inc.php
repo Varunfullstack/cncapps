@@ -33,7 +33,7 @@ class DBEInvhead extends DBEntity
     const vatOnly = "vatOnly";
     const datePrinted = "datePrinted";
     const pdfFile = "pdfFile";
-    const directDebit = "directDebit";
+    const directDebitFlag = "directDebitFlag";
     const transactionType = "transactionType";
 
     /**
@@ -198,10 +198,9 @@ class DBEInvhead extends DBEntity
             "inh_pdf_file"
         );
         $this->addColumn(
-            self::directDebit,
-            DA_BOOLEAN,
+            self::directDebitFlag,
+            DA_YN_FLAG,
             DA_NOT_NULL,
-            'directDebit'
         );
 
         $this->addColumn(
@@ -238,9 +237,9 @@ class DBEInvhead extends DBEntity
             " WHERE " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'";
 
         if (!$directDebit) {
-            $queryString .= " and " . $this->getDBColumnName(self::directDebit) . ' = false ';
+            $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
         } else {
-            $queryString .= " and " . $this->getDBColumnName(self::directDebit) . ' = true ';
+            $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' = "Y" ';
         }
 
         $this->setQueryString($queryString);
@@ -268,9 +267,9 @@ class DBEInvhead extends DBEntity
             ) . "'" .
             " AND " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'";
         if (!$directDebit) {
-            $queryString .= " and " . $this->getDBColumnName(self::directDebit) . ' = false ';
+            $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
         } else {
-            $queryString .= " and " . $this->getDBColumnName(self::directDebit) . ' = true ';
+            $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' = "Y" ';
         }
 
         $this->setQueryString($queryString);
@@ -305,9 +304,9 @@ class DBEInvhead extends DBEntity
             " AND inl_unit_price IS NOT NULL";
 
         if (!$directDebit) {
-            $queryString .= " and " . $this->getDBColumnName(self::directDebit) . ' = false ';
+            $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
         } else {
-            $queryString .= " and " . $this->getDBColumnName(self::directDebit) . ' = true ';
+            $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' = "Y" ';
         }
         $this->setQueryString($queryString);
         if ($this->runQuery()) {

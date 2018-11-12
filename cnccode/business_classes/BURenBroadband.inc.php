@@ -261,7 +261,7 @@ class BURenBroadband extends Business
                             Generating a new invoice
                         </div>
                         <div>
-                            Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebit) ? 'true' : 'false' ?>
+                            Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebitFlag) == "Y" ? 'true' : 'false' ?>
                         </div>
                         <?php
 
@@ -292,7 +292,7 @@ class BURenBroadband extends Business
                     </div>
                     <div>
 
-                        Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebit) ? 'true' : 'false' ?>
+                        Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebitFlag) == "Y" ? 'true' : 'false' ?>
                     </div>
                     <?php
                     $line = -1;    // initialise sales order line seq
@@ -534,7 +534,7 @@ class BURenBroadband extends Business
                 Generating a new invoice
             </div>
             <div>
-                Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebit) ? 'true' : 'false' ?>
+                Ord head direct debit is <?= $dsOrdhead->getValue(DBEOrdhead::directDebitFlag) == "Y" ? 'true' : 'false' ?>
             </div>
             <?php
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));

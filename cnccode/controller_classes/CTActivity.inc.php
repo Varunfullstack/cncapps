@@ -3890,7 +3890,7 @@ class CTActivity extends CTCNC
       Only enable the date and time if not initial activity type
       */
         $initial_disabled = '';
-        $canChangeInitialDateAndTime = false;
+        $canChangeInitialDateAndTime = true;
         if (
         in_array(
             $dsCallActivity->getValue('callActTypeID'),

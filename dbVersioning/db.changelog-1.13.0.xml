@@ -10,4 +10,42 @@
     <include file="db.changelog-issue211.xml"/>
     <include file="db.changelog-issue341.xml"/>
     <include file="db.changelog-issue321.xml"/>
+    <changeSet author="pavwebdev" id="release1.13.0-1536656551-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="true">
+                SELECT data_type = 'bit' FROM information_schema.`COLUMNS` WHERE table_name = 'invhead' AND column_name
+                = 'directDebit'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="invhead" columnName="directDebit" newDataType="char(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.13.0-1536656551-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="invhead" columnName="directDebitFlag"/>
+            </not>
+        </preConditions>
+        <renameColumn tableName="invhead" oldColumnName="directDebit" newColumnName="directDebitFlag"/>
+        <addDefaultValue tableName="invhead" columnName="directDebitFlag" defaultValue="N"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.13.0-1536656551-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="true">
+                SELECT data_type = 'bit' FROM information_schema.`COLUMNS` WHERE table_name = 'ordhead' AND column_name
+                = 'directDebit'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="ordhead" columnName="directDebit" newDataType="char(1)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.13.0-1536656551-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="directDebitFlag"/>
+            </not>
+        </preConditions>
+        <renameColumn tableName="ordhead" oldColumnName="directDebit" newColumnName="directDebitFlag"/>
+        <addDefaultValue tableName="ordhead" columnName="directDebitFlag" defaultValue="N"/>
+    </changeSet>
 </databaseChangeLog>
