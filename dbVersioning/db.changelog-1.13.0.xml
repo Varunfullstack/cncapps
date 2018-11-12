@@ -26,7 +26,8 @@
                 <columnExists tableName="invhead" columnName="directDebitFlag"/>
             </not>
         </preConditions>
-        <renameColumn tableName="invhead" oldColumnName="directDebit" newColumnName="directDebitFlag"/>
+        <renameColumn tableName="invhead" oldColumnName="directDebit" newColumnName="directDebitFlag"
+                      columnDataType="char(1)"/>
         <addDefaultValue tableName="invhead" columnName="directDebitFlag" defaultValue="N"/>
     </changeSet>
     <changeSet author="pavwebdev" id="release1.13.0-1536656551-3">
@@ -45,7 +46,26 @@
                 <columnExists tableName="ordhead" columnName="directDebitFlag"/>
             </not>
         </preConditions>
-        <renameColumn tableName="ordhead" oldColumnName="directDebit" newColumnName="directDebitFlag"/>
+        <renameColumn tableName="ordhead" oldColumnName="directDebit" newColumnName="directDebitFlag"
+                      columnDataType="char(1)"/>
         <addDefaultValue tableName="ordhead" columnName="directDebitFlag" defaultValue="N"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.13.0-1536656551-5">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ordhead" columnName="directDebitFlag"/>
+        </preConditions>
+        <sql>
+            update ordhead set directDebitFlag = 'N'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="release1.13.0-1536656551-6">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="invhead" columnName="directDebitFlag"/>
+        </preConditions>
+        <sql>
+            update invhead set directDebitFlag = 'N'
+        </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
