@@ -61,7 +61,7 @@ class DBEOrdhead extends DBEntity
     const serviceRequestPriority = "serviceRequestPriority";
     const serviceRequestText = "serviceRequestText";
     const quotationCreateDate = "quotationCreateDate";
-    const directDebitFlag = "directDebitFlag";
+    const directDebitFlag = "ordhead.directDebitFlag";
     const transactionType = 'ordhead.transactionType';
 
     /**
