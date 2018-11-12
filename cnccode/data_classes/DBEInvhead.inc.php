@@ -200,7 +200,7 @@ class DBEInvhead extends DBEntity
         $this->addColumn(
             self::directDebitFlag,
             DA_YN_FLAG,
-            DA_NOT_NULL,
+            DA_NOT_NULL
         );
 
         $this->addColumn(

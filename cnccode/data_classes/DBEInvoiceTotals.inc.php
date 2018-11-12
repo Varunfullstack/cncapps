@@ -62,7 +62,7 @@ class DBEInvoiceTotals extends DBEntity
             " AND inh_date_printed ='0000-00-00'" .
             " AND inl_unit_price IS NOT NULL" .
             " AND inl_line_type = 'I' 
-              AND directDebit = " . ($directDebit ? 1 : 0)
+              AND directDebitFlag " . ($directDebit ? " = 'Y' " : " <> 'Y' ")
         );
         return (parent::getRow());
     }
