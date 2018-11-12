@@ -460,11 +460,25 @@ class CTHome extends CTCNC
                 );
             }
 
+            if (round($result['esTeamActualSlaPercentage']) == 100) {
+                $this->template->setVar(
+                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                    'performance-green'
+                );
+            }
+
             if (round($result['hdTeamActualSlaPercentage']) < $result['hdTeamTargetSlaPercentage']) {
 
                 $this->template->set_var(
                     'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
                     'performance-warn'
+                );
+            }
+
+            if (round($result['hdTeamActualSlaPercentage']) == 100) {
+                $this->template->setVar(
+                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                    'performance-green'
                 );
             }
 
@@ -475,6 +489,15 @@ class CTHome extends CTCNC
                     'performance-warn'
                 );
             }
+
+
+            if (round($result['imTeamActualSlaPercentage']) == 100) {
+                $this->template->setVar(
+                    'imTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                    'performance-green'
+                );
+            }
+
 
             if ($result['esTeamActualFixQty'] < $result['esTeamTargetFixQty']) {
 
@@ -508,14 +531,27 @@ class CTHome extends CTCNC
                 );
             }
 
-            if ($result['hdTeamActualFixHours'] > round(
-                    $result['hdTeamTargetFixHours'],
-                    0
-                )) {
+            if ($result['esTeamTargetFixHours'] - $result['esTeamActualFixHours'] > 1) {
+
+                $this->template->set_var(
+                    'esTeamActualFixHours' . $result['quarter'] . 'Class',
+                    'performance-green'
+                );
+            }
+
+            if ($result['hdTeamActualFixHours'] > $result['hdTeamTargetFixHours']) {
 
                 $this->template->set_var(
                     'hdTeamActualFixHours' . $result['quarter'] . 'Class',
                     'performance-warn'
+                );
+            }
+
+            if ($result['hdTeamTargetFixHours'] - $result['hdTeamActualFixHours'] > 1) {
+
+                $this->template->set_var(
+                    'hdTeamActualFixHours' . $result['quarter'] . 'Class',
+                    'performance-green'
                 );
             }
 
@@ -524,6 +560,14 @@ class CTHome extends CTCNC
                 $this->template->set_var(
                     'imTeamActualFixHours' . $result['quarter'] . 'Class',
                     'performance-warn'
+                );
+            }
+
+            if ($result['imTeamTargetFixHours'] - $result['imTeamActualFixHours'] > 1) {
+
+                $this->template->set_var(
+                    'imTeamActualFixHours' . $result['quarter'] . 'Class',
+                    'performance-green'
                 );
             }
 
@@ -696,18 +740,23 @@ class CTHome extends CTCNC
                 30
             );
 
-            if ($weekly['performancePercentage'] < $hdTeamTargetLogPercentage) {
+            $weeklyPercentageClass = '';
 
+            if ($weekly['performancePercentage'] < $hdTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
-            } else {
-                $weeklyPercentageClass = '';
             }
 
-            if ($monthly['performancePercentage'] < $hdTeamTargetLogPercentage) {
+            if ($weekly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
 
+            $monthlyPercentageClass = '';
+
+            if ($monthly['performancePercentage'] < $hdTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
-            } else {
-                $monthlyPercentageClass = '';
+            }
+            if ($monthly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
             }
 
             $this->template->set_var(
@@ -767,18 +816,24 @@ class CTHome extends CTCNC
                 30
             );
 
+            $weeklyPercentageClass = '';
             if ($weekly['performancePercentage'] < $esTeamTargetLogPercentage) {
 
                 $weeklyPercentageClass = 'performance-warn';
-            } else {
-                $weeklyPercentageClass = '';
             }
+
+            if ($weekly['performancePercentage'] >= $esTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+
+            $monthlyPercentageClass = '';
 
             if ($monthly['performancePercentage'] < $esTeamTargetLogPercentage) {
 
                 $monthlyPercentageClass = 'performance-warn';
-            } else {
-                $monthlyPercentageClass = '';
+            }
+            if ($monthly['performancePercentage'] >= $esTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
             }
 
             $this->template->set_var(
@@ -840,18 +895,23 @@ class CTHome extends CTCNC
                 30
             );
 
-            if ($weekly['performancePercentage'] < $imTeamTargetLogPercentage) {
 
+            $weeklyPercentageClass = '';
+
+            if ($weekly['performancePercentage'] < $imTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
-            } else {
-                $weeklyPercentageClass = '';
             }
 
-            if ($monthly['performancePercentage'] < $imTeamTargetLogPercentage) {
+            if ($weekly['performancePercentage'] >= $imTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
 
+            $monthlyPercentageClass = '';
+            if ($monthly['performancePercentage'] < $imTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
-            } else {
-                $monthlyPercentageClass = '';
+            }
+            if ($monthly['performancePercentage'] >= $imTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
             }
 
             $this->template->set_var(
