@@ -249,7 +249,6 @@ class BURenHosting extends Business
                  */
                 if (
                     $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
-                    $this->dbeJRenHosting->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
                     (
                         !$generateInvoice &&
                         $this->dbeJRenHosting->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'

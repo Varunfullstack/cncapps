@@ -263,7 +263,6 @@ class BURenDomain extends Business
                  */
                 if (
                     $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
-                    $this->dbeJRenDomain->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
                     (
                         !$generateInvoice &&
                         $this->dbeJRenDomain->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'

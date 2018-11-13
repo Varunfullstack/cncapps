@@ -245,9 +245,8 @@ class BURenContract extends Business
                 }
 
                 if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') OR
+                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
                     $isSslCertificate ||
-                    $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
                     (
                         !$generateInvoice &&
                         $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'

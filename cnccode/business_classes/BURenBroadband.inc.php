@@ -235,7 +235,6 @@ class BURenBroadband extends Business
                  */
                 if (
                     $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
-                    $this->dbeJRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'N' ||
                     (
                         !$generateInvoice &&
                         $this->dbeJRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
