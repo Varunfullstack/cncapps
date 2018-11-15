@@ -7,6 +7,8 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenDomain extends DBECustomerItem
 {
+
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -87,6 +89,8 @@ class DBEJRenDomain extends DBECustomerItem
             DA_NOT_NULL,
             "itm_sstk_cost"
         );
+
+
         $this->setAddColumnsOff();
     }
 
@@ -171,7 +175,6 @@ class DBEJRenDomain extends DBECustomerItem
         AND renewalTypeID = 4 and directDebitFlag <> 'Y'
 			 ORDER BY cui_custno, autoGenerateContractInvoice asc
 		";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }

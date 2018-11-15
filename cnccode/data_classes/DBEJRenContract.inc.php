@@ -8,6 +8,7 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 class DBEJRenContract extends DBECustomerItem
 {
     const allowDirectDebit = 'allowDirectDebit';
+    const isSSL = "isSSL";
 
     function __construct(&$owner)
     {
@@ -89,6 +90,13 @@ class DBEJRenContract extends DBECustomerItem
             self::allowDirectDebit,
             DA_YN,
             DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::isSSL,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "itm_desc like '%SSL%' as isSSL "
         );
 
         $this->setAddColumnsOff();
@@ -181,7 +189,7 @@ class DBEJRenContract extends DBECustomerItem
             $statement .= ' and itm_itemno <> 4111';
         }
 
-        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc, isSSL";
         $this->setQueryString($statement);
         parent::getRows();
     }

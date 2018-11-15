@@ -196,8 +196,7 @@ class BURenContract extends Business
 
     }
 
-    function createRenewalsSalesOrders(
-    )
+    function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
@@ -222,15 +221,15 @@ class BURenContract extends Business
 
         $generateInvoice = false;
         $generatedOrder = false;
+        echo "<div> Contract Renewals - START </div>";
         while ($dsRenContract->fetchNext()) {
             $generatedOrder = false;
-                    ?>
-            renewals
-                <div>
-                    contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
-                </div>
+            ?>
+            <div>
+                contract number: <?= $dsRenContract->getValue(DBECustomerItem::customerItemID) ?>
+            </div>
             <?php
-            if ($dbeJCustomerItem->getRow($dsRenContract->getValue('customerItemID'))) {
+            if ($dbeJCustomerItem->getRow($dsRenContract->getValue(DBECustomerItem::customerItemID))) {
                 /*
                  * Group many contracts for same customer under one sales order
          * unless it is an SSL cert in which case it has it's own order
@@ -269,6 +268,10 @@ class BURenContract extends Business
                             $dsOrdhead,
                             $dsOrdline
                         );
+
+                        ?>
+                        <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+                        <?php
                     }
                     /*
                      *  create order header
@@ -286,6 +289,10 @@ class BURenContract extends Business
                     );
                     $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
+
+                    ?>
+                    <div>Creating new Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+                    <?php
                 }
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
 
@@ -750,7 +757,13 @@ HEREDOC;
                 $dsOrdhead,
                 $dsOrdline
             );
+
+            ?>
+            <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+            <?php
         }
+
+        echo "<div> Contract Renewals - END </div>";
     }
 
 
