@@ -1975,14 +1975,10 @@ class BUSalesOrder extends Business
         Get a list of existing ordlinenos
         */
         $statement =
-            "SELECT
-        GROUP_CONCAT(`odl_ordlineno`) AS ordlinenos
-
-      FROM
-        ordline
-
-      WHERE
-        odl_ordno = " . $ordheadID;
+            "SELECT GROUP_CONCAT(`odl_ordlineno`) AS ordlinenos
+FROM ordline
+WHERE odl_ordno = $ordheadID
+  AND (odl_itemno = 1502 OR odl_itemno = 1503)";
 
         $db->query($statement);
         $db->next_record();
@@ -2017,7 +2013,7 @@ class BUSalesOrder extends Business
 
         WHERE
           odl_ordno = $ordheadID
-
+          AND (odl_itemno = 1502 OR odl_itemno = 1503)
         GROUP BY
           odl_desc, odl_e_unit, odl_d_unit
           
@@ -2027,12 +2023,7 @@ class BUSalesOrder extends Business
         /*
         Remove original order lines
         */
-        $statement =
-            "DELETE FROM
-        ordline
-
-      WHERE
-        odl_ordlineno IN (" . $oldOrdlinenos . ")";
+        $statement = "DELETE FROM ordline WHERE odl_ordlineno IN (" . $oldOrdlinenos . ")";
 
         $db->query($statement);
     }
