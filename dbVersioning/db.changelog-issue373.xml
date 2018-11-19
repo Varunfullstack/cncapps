@@ -3,10 +3,10 @@
                    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-    <changeSet author="pavwebdev" id="issue373-1531213570-0">
+    <changeSet author="pavwebdev" id="issue373-1542643720-0">
         <tagDatabase tag="issue373"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue373-1531213570-1">
+    <changeSet author="pavwebdev" id="issue373-1542643720-1">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="staffAppraisalQuestion"/>
@@ -22,7 +22,7 @@
             <column name="orderSequence" type="smallint"/>
         </createTable>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue373-1531213570-2">
+    <changeSet author="pavwebdev" id="issue373-1542643720-2">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="staffAppraisalQuestionnaire"/>
@@ -30,15 +30,10 @@
         </preConditions>
         <createTable tableName="staffAppraisalQuestionnaire">
             <column name="id" type="int(11)"/>
-            <column name="questionnaireID" type="int(11)"/>
-            <column name="answerTypeID" type="int(11)"/>
             <column name="description" type="varchar(150)"/>
-            <column name="activeFlag" type="char(1)"/>
-            <column name="requiredFlag" type="char(1)"/>
-            <column name="orderSequence" type="smallint"/>
         </createTable>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue373-1531213570-3">
+    <changeSet author="pavwebdev" id="issue373-1542643720-3">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="answertype" columnName="answerOptions"/>
@@ -47,17 +42,37 @@
         <addColumn tableName="answertype">
             <column name="answerOptions" type="text"/>
         </addColumn>
+        <addColumn tableName="answertype">
+            <column name="needsOptions" type="int(1)" defaultValue="0"/>
+        </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue373-1531213570-4">
+    <changeSet author="pavwebdev" id="issue373-1542643720-4">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="false">
+            <sqlCheck expectedResult="0">
                 SELECT COUNT(*) > 0 FROM answertype WHERE ant_answertypeno = 5
             </sqlCheck>
         </preConditions>
         <sql>
-            insert into answertype values (5, "Rating on a scale of 1 to 7", null)
+            insert into answertype values (5, "Rating on a scale of 1 to 7", null, 1)
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalAnswer"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalAnswer">
+            <column name="answerID" type="int(11)"/>
+            <column name="questionID" type="int(11)"/>
+            <column name="staffAnswer" type="text"/>
+            <column name="staffMemberId" type="int(11)"/>
+            <column name="managerId" type="int(11)"/>
+            <column name="managerAnswer" type="text"/>
+            <column name="managerNote" type="text"/>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>

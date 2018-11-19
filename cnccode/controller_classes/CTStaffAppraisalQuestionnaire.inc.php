@@ -122,7 +122,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             while ($dsQuestionnaire->fetchNext()) {
 
-                $questionnaireID = $dsQuestionnaire->getValue('questionnaireID');
+                $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
 
                 $urlDisplayQuestionList =
                     $this->buildLink(
@@ -215,7 +215,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             } else {                                                                    // creating new
                 $dsQuestionnaire->initialise();
                 $dsQuestionnaire->setValue(
-                    'questionnaireID',
+                    DBEStaffAppraisalQuestionnaire::id,
                     '0'
                 );
                 $questionnaireID = '0';
@@ -223,7 +223,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         } else {                                                                        // form validation error
             $dsQuestionnaire->initialise();
             $dsQuestionnaire->fetchNext();
-            $questionnaireID = $dsQuestionnaire->getValue('questionnaireID');
+            $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
         }
         if ($_REQUEST['action'] == 'edit' && $this->buQuestionnaire->canDelete($_REQUEST['questionnaireID'])) {
             $urlDelete =
@@ -256,27 +256,27 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             );
         $this->setPageTitle('Edit Questionnaire');
         $this->setTemplateFiles(
-            array('QuestionnaireEdit' => 'QuestionnaireEdit.inc')
+            array('QuestionnaireEdit' => 'StaffAppraisalQuestionnaireEdit.inc')
         );
         $this->template->set_var(
             array(
-                'questionnaireID'     => $questionnaireID,
-                'description'         => Controller::htmlInputText($dsQuestionnaire->getValue('description')),
-                'descriptionMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('description')),
-                'intro'               => Controller::htmlInputText($dsQuestionnaire->getValue('intro')),
-                'introMessage'        => Controller::htmlDisplayText($dsQuestionnaire->getMessage('intro')),
-                'thankYou'            => Controller::htmlInputText($dsQuestionnaire->getValue('thankYou')),
-                'thankYouMessage'     => Controller::htmlDisplayText($dsQuestionnaire->getMessage('thankYou')),
-                'rating1Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue('rating1Desc')),
-                'rating1DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating1Desc')),
-                'rating5Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue('rating5Desc')),
-                'rating5DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating5Desc')),
-                'nameRequiredChecked' => Controller::htmlChecked($dsQuestionnaire->getValue('nameRequired')),
-                'nameRequiredMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('nameRequired')),
-                'urlUpdate'           => $urlUpdate,
-                'urlDelete'           => $urlDelete,
-                'txtDelete'           => $txtDelete,
-                'urlDisplayList'      => $urlDisplayList
+                'id'                 => $questionnaireID,
+                'description'        => Controller::htmlInputText($dsQuestionnaire->getValue('description')),
+                'descriptionMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('description')),
+                //                'intro'               => Controller::htmlInputText($dsQuestionnaire->getValue('intro')),
+                //                'introMessage'        => Controller::htmlDisplayText($dsQuestionnaire->getMessage('intro')),
+                //                'thankYou'            => Controller::htmlInputText($dsQuestionnaire->getValue('thankYou')),
+                //                'thankYouMessage'     => Controller::htmlDisplayText($dsQuestionnaire->getMessage('thankYou')),
+                //                'rating1Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue('rating1Desc')),
+                //                'rating1DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating1Desc')),
+                //                'rating5Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue('rating5Desc')),
+                //                'rating5DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating5Desc')),
+                //                'nameRequiredChecked' => Controller::htmlChecked($dsQuestionnaire->getValue('nameRequired')),
+                //                'nameRequiredMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('nameRequired')),
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList
             )
         );
         $this->template->parse(
@@ -295,9 +295,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('update');
         $dsQuestionnaire = &$this->dsQuestionnaire;
+//        var_dump($_REQUEST);
         $this->formError = (!$this->dsQuestionnaire->populateFromArray($_REQUEST['questionnaire']));
         if ($this->formError) {
-            if ($this->dsQuestionnaire->getValue('questionnaireID') == '') {                    // attempt to insert
+            var_dump($this->formError);
+            var_dump($this->formErrorMessage);
+            if ($this->dsQuestionnaire->getValue(
+                    DBEStaffAppraisalQuestionnaire::id
+                ) == '') {                    // attempt to insert
                 $_REQUEST['action'] = 'edit';
             } else {
                 $_REQUEST['action'] = 'create';
@@ -312,7 +317,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'questionnaireID' => $this->dsQuestionnaire->getValue('questionnaireID'),
+                    'questionnaireID' => $this->dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id),
                     'action'          => 'view'
                 )
             );
@@ -352,7 +357,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('displayQuestions');
         $this->setTemplateFiles(
-            array('QuestionList' => 'QuestionList.inc')
+            array('QuestionList' => 'StaffAppraisalQuestionList.inc')
         );
 
         $this->buQuestionnaire->getAllQuestions(
@@ -391,7 +396,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             while ($dsQuestion->fetchNext()) {
 
-                $questionID = $dsQuestion->getValue('questionID');
+                $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
 
                 $urlEdit =
                     $this->buildLink(
@@ -418,15 +423,24 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     $txtDelete = '';
                 }
 
+
                 $this->template->set_var(
                     array(
                         'questionID'               => $questionID,
-                        'description'              => Controller::htmlDisplayText($dsQuestion->getValue('description')),
-                        'answerType'               => Controller::htmlDisplayText($dsQuestion->getValue('answerType')),
-                        'weight'                   => Controller::htmlDisplayText($dsQuestion->getValue('weight')),
-                        'activeFlag'               => Controller::htmlDisplayText($dsQuestion->getValue('activeFlag')),
+                        'description'              => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::description)
+                        ),
+                        'answerType'               => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEJStaffAppraisalQuestion::answerTypeName)
+                        ),
+                        'orderSequence'            => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::orderSequence)
+                        ),
+                        'activeFlag'               => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::activeFlag)
+                        ),
                         'questionnaireDescription' => Controller::htmlDisplayText(
-                            $dsQuestionnaire->getValue('description')
+                            $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
                         ),
                         'urlEdit'                  => $urlEdit,
                         'urlDelete'                => $urlDelete,
@@ -470,7 +484,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             } else {                                  // creating new
                 $dsQuestion->initialise();
                 $dsQuestion->setValue(
-                    'questionID',
+                    DBEStaffAppraisalQuestion::id,
                     '0'
                 );
                 $dsQuestion->setValue(
@@ -482,7 +496,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         } else {                                    // form validation error
             $dsQuestion->initialise();
             $dsQuestion->fetchNext();
-            $questionID = $dsQuestion->getValue('questionID');
+            $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
         }
         if (
             $_REQUEST['action'] == 'editQuestion' &&
@@ -519,31 +533,46 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             );
         $this->setPageTitle('Edit Question');
         $this->setTemplateFiles(
-            array('QuestionEdit' => 'QuestionEdit.inc')
+            array('QuestionEdit' => 'StaffAppraisalQuestionEdit.inc')
         );
         $this->template->set_var(
             array(
-                'questionID'      => $questionID,
-                'questionnaireID' => $dsQuestion->getValue('questionnaireID'),
-
-                'description'         => Controller::htmlInputText($dsQuestion->getValue('description')),
-                'descriptionMessage'  => Controller::htmlDisplayText($dsQuestion->getMessage('description')),
-                'activeFlagChecked'   => $dsQuestion->getValue('activeFlag') == 'Y' ? 'CHECKED' : '',
-                'activeFlagMessage'   => Controller::htmlDisplayText($dsQuestion->getMessage('activeFlag')),
-                'requiredFlagChecked' => $dsQuestion->getValue('requiredFlag') == 'Y' ? 'CHECKED' : '',
-                'requiredFlagMessage' => Controller::htmlDisplayText($dsQuestion->getMessage('requiredFlag')),
-                'weight'              => Controller::htmlInputText($dsQuestion->getValue('weight')),
-                'weightMessage'       => Controller::htmlDisplayText($dsQuestion->getMessage('weight')),
-                'urlUpdate'           => $urlUpdate,
-                'urlDelete'           => $urlDelete,
-                'txtDelete'           => $txtDelete,
-                'urlDisplayList'      => $urlDisplayList
+                'questionID'           => $questionID,
+                'questionnaireID'      => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
+                'orderSequence'        => Controller::htmlInputText(
+                    $dsQuestion->getValue(DBEStaffAppraisalQuestion::orderSequence)
+                ),
+                'orderSequenceMessage' => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::orderSequence)
+                ),
+                'description'          => Controller::htmlInputText(
+                    $dsQuestion->getValue(DBEStaffAppraisalQuestion::description)
+                ),
+                'descriptionMessage'   => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::description)
+                ),
+                'activeFlagChecked'    => $dsQuestion->getValue(
+                    DBEStaffAppraisalQuestion::activeFlag
+                ) == 'Y' ? 'CHECKED' : '',
+                'activeFlagMessage'    => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::activeFlag)
+                ),
+                'requiredFlagChecked'  => $dsQuestion->getValue(
+                    DBEStaffAppraisalQuestion::requiredFlag
+                ) == 'Y' ? 'CHECKED' : '',
+                'requiredFlagMessage'  => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::requiredFlag)
+                ),
+                'urlUpdate'            => $urlUpdate,
+                'urlDelete'            => $urlDelete,
+                'txtDelete'            => $txtDelete,
+                'urlDisplayList'       => $urlDisplayList
             )
         );
         /*
         Answer types
         */
-        $this->answerTypeDropdown($dsQuestion->getValue('answerTypeID'));
+        $this->answerTypeDropdown($dsQuestion->getValue(DBEStaffAppraisalQuestion::answerTypeID));
 
         $this->template->parse(
             'CONTENTS',
@@ -573,12 +602,25 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
                     'answerTypeID'
                 ) == $answerTypeID) ? CT_SELECTED : '';
+            $shouldBeConfig = (int)$this->buQuestionnaire->dbeAnswerType->getValue(
+                DBEAnswerType::needsOptions
+            );
+
+            $isConfigured = $this->buQuestionnaire->dbeAnswerType->getValue(DBEAnswerType::answerOptions);
+
+            $configFailed = $shouldBeConfig && !$isConfigured;
 
             $this->template->set_var(
                 array(
-                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue("answerTypeID"),
-                    'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue("description"),
-                    'answerTypeSelected'    => $answerTypeSelected
+                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
+                        DBEAnswerType::answerTypeID
+                    ),
+                    'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue(
+                            DBEAnswerType::description
+                        ) . ($configFailed ? ' (Needs configuration)' : '')
+                    ,
+                    'answerTypeSelected'    => $answerTypeSelected,
+                    'disabled'              => $configFailed ? 'disabled' : ''
                 )
             );
 
@@ -601,6 +643,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('updateQuestion');
         $dsQuestion = &$this->dsQuestion;
+        var_dump($_REQUEST['question']);
         $this->formError = (!$this->dsQuestion->populateFromArray($_REQUEST['question']));
         if ($this->formError) {
             if ($this->dsQuestion->getValue('questionID') == '') {          // attempt to insert

@@ -86,7 +86,7 @@ class BUStaffAppraisalQuestionnaire extends Business
     function canDelete($ID)
     {
 
-        $dbeQuestion = new DBEQuestion($this);
+        $dbeQuestion = new DBEStaffAppraisalQuestion($this);
 
         $dbeQuestion->setValue(
             'questionnaireID',
@@ -159,7 +159,7 @@ class BUStaffAppraisalQuestionnaire extends Business
     function canDeleteQuestion($ID)
     {
 
-        $dbeAnswer = new DBEAnswer($this);
+        $dbeAnswer = new DBEStaffAppraisalAnswer($this);
 
         $dbeAnswer->setValue(
             'questionID',

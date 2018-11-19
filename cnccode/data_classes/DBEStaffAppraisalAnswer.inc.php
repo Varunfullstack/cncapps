@@ -7,6 +7,15 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEStaffAppraisalAnswer extends DBEntity
 {
+
+    const answerID = "answerID";
+    const questionID = "questionID";
+    const staffAnswer = "staffAnswer";
+    const staffMemberId = "staffMemberId";
+    const managerId = "managerId";
+    const managerAnswer = "managerAnswer";
+    const managerNote = "managerNote";
+
     /**
      * calls constructor()
      * @access public
@@ -17,12 +26,48 @@ class DBEStaffAppraisalAnswer extends DBEntity
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->setTableName("answer");
-        $this->addColumn("answerID", DA_ID, DA_NOT_NULL, "ans_answerno");
-        $this->addColumn("questionID", DA_ID, DA_NOT_NULL, "ans_questionno");
-        $this->addColumn("answer", DA_STRING, DA_NOT_NULL, "ans_answer");
-        $this->addColumn("name", DA_STRING, DA_NOT_NULL, "ans_name");
-        $this->addColumn("date", DA_DATE, DA_NOT_NULL, "ans_date");
+        $this->setTableName("staffAppraisalAnswer");
+        $this->addColumn(
+            self::answerID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::questionID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::staffAnswer,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::staffMemberId,
+            DA_ID,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::managerId,
+            DA_ID,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::managerAnswer,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::managerNote,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

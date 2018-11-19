@@ -7,13 +7,8 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEStaffAppraisalQuestionnaire extends DBEntity
 {
-    const questionnaireID = "questionnaireID";
+    const id = "id";
     const description = "description";
-    const intro = "intro";
-    const thankYou = "thankYou";
-    const rating1Desc = "rating1Desc";
-    const rating5Desc = "rating5Desc";
-    const nameRequired = "nameRequired";
 
     /**
      * calls constructor()
@@ -27,18 +22,13 @@ class DBEStaffAppraisalQuestionnaire extends DBEntity
         parent::__construct($owner);
         $this->setTableName("staffAppraisalQuestionnaire");
         $this->addColumn(
-            self::questionnaireID,
+            self::id,
             DA_ID,
             DA_NOT_NULL
         );
         $this->addColumn(
             self::description,
             DA_STRING,
-            DA_NOT_NULL
-        );
-        $this->addColumn(
-            self::intro,
-            DA_MEMO,
             DA_NOT_NULL
         );
 

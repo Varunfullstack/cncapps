@@ -7,6 +7,8 @@ require_once($cfg["path_dbe"] . "/DBEStaffAppraisalQuestion.inc.php");
 
 class DBEJStaffAppraisalQuestion extends DBEStaffAppraisalQuestion
 {
+    const answerTypeName = "answerTypeName";
+
     /**
      * calls constructor()
      * @access public
@@ -18,7 +20,12 @@ class DBEJStaffAppraisalQuestion extends DBEStaffAppraisalQuestion
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("answerType", DA_STRING, DA_NOT_NULL, 'ant_desc');
+        $this->addColumn(
+            self::answerTypeName,
+            DA_STRING,
+            DA_NOT_NULL,
+            'ant_desc'
+        );
         $this->setAddColumnsOff();
     }
 
@@ -32,9 +39,12 @@ class DBEJStaffAppraisalQuestion extends DBEStaffAppraisalQuestion
         $this->setMethodName("getRowsByQuestionnaireID");
         $this->setQueryString(
             'SELECT ' . $this->getDBColumnNamesAsString() .
-            ' FROM ' . $this->getTableName() . ' LEFT JOIN answertype ON ' . $this->getTableName() . '.' . $this->getDBColumnName('answerTypeID') . '=answertype.ant_answertypeno' .
-            ' WHERE que_questionnaireno = ' . $questionnaireID .
-            ' ORDER BY que_weight'
+            ' FROM ' . $this->getTableName() . ' LEFT JOIN answertype ON ' . $this->getTableName(
+            ) . '.' . $this->getDBColumnName(self::answerTypeID) . '=answertype.ant_answertypeno' .
+            ' WHERE ' . $this->getTableName() . '.' . $this->getDBColumnName(
+                self::questionnaireID
+            ) . ' = ' . $questionnaireID .
+            ' ORDER BY ' . $this->getTableName() . '.' . $this->getDBColumnName(self::orderSequence)
         );
         return (parent::getRows());
     }

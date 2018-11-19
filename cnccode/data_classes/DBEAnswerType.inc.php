@@ -9,8 +9,9 @@ class DBEAnswerType extends DBEntity
 {
 
     const answerOptions = "answerOptions";
-    const description = "answerTypeID";
-    const answerTypeID = "description";
+    const description = "description";
+    const answerTypeID = "answerTypeID";
+    const needsOptions = "needsOptions";
 
     /**
      * calls constructor()
@@ -39,6 +40,12 @@ class DBEAnswerType extends DBEntity
             self::answerOptions,
             DA_STRING,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::needsOptions,
+            DA_INTEGER,
+            DA_NOT_NULL
         );
         $this->setAddColumnsOff();
         $this->setPK(0);
