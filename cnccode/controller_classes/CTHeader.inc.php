@@ -324,6 +324,12 @@ class CTHeader extends CTCNC
                 DBEHeader::secondSiteReplicationAdditionalDelayAllowance . 'Message' => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::secondSiteReplicationAdditionalDelayAllowance)
                 ),
+                DBEHeader::projectCommenceNotification => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::projectCommenceNotification)
+                ),
+                DBEHeader::projectCommenceNotification . 'Message' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::projectCommenceNotification)
+                ),
                 'urlItemPopup' => $urlItemPopup,
                 'urlUpdate'    => $urlUpdate
             )

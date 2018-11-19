@@ -296,6 +296,12 @@
             <td></td>
             <td class="promptText">Type</td>
             <td class="fieldText">
+                <div>
+                    {INITIAL_DISABLED}
+                </div>
+                <div>
+                    {typeDisabled}
+                </div>
                 <select
                         {INITIAL_DISABLED}
                         {typeDisabled}
@@ -366,19 +372,26 @@
                 <span id="imRemainMinutes">IM:{imRemainMinutes}</span>
             </td>
             <td class="promptText">Date</td>
-            <td class="fieldText"><input
-                    type="text"
-                    name="callActivity[1][date]"
-                    id="date"
-                    value="{date}"
+            <td class="fieldText">
+                <DIV>
+
+                {INITIAL_DATE_DISABLED}
+                </DIV>
+                <DIV>
                     {DISABLED}
-                    {INITIAL_DISABLED}
-                    size="10"
-                    maxlength="10"
-                    onchange="setFormChanged();"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            />
+                </DIV>
+                <input type="text"
+                       name="callActivity[1][date]"
+                       id="date"
+                       value="{date}"
+                       {DISABLED}
+                       {INITIAL_DATE_DISABLED}
+                       size="10"
+                       maxlength="10"
+                       onchange="setFormChanged();"
+                       class="jqueryCalendar"
+                       autocomplete="off"
+                />
                 {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
             </td>
         </tr>
@@ -409,7 +422,7 @@
             <td class="fieldText"><input
                     type="text"
                     {DISABLED}
-                    {INITIAL_DISABLED}
+                    {INITIAL_DATE_DISABLED}
                     name="callActivity[1][startTime]"
                     value="{startTime}"
                     size="5"
@@ -421,7 +434,7 @@
                 <span class="formErrorMessage">{startTimeMessage}</span>
                 to <input
                         {DISABLED}
-                        {INITIAL_DISABLED}
+                        {INITIAL_DATE_DISABLED}
                         type="text"
                         name="callActivity[1][endTime]"
                         id="endTime"

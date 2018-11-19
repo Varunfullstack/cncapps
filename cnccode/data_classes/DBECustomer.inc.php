@@ -63,6 +63,9 @@ class DBECustomer extends DBCNCEntity
     const opportunityDeal = 'opportunityDeal';
     const rating = 'rating';
     const lastContractSent = 'lastContractSent';
+    const sortCode = 'sortCode';
+    const accountName = 'accountName';
+    const accountNumber = 'accountNumber';
 
     /**
      * calls constructor()
@@ -376,6 +379,7 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL,
             "opportunity_deal"
         );
+
         $this->addColumn(
             self::rating,
             DA_INTEGER,
@@ -388,6 +392,24 @@ class DBECustomer extends DBCNCEntity
             DA_TEXT,
             DA_ALLOW_NULL,
             "lastContractSent"
+        );
+
+        $this->addColumn(
+            self::sortCode,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::accountName,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::accountNumber,
+            DA_TEXT,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);

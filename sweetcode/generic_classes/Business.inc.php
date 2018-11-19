@@ -32,7 +32,7 @@ class Business extends BaseObject
      * @return bool
      * @access private
      */
-    function updateDataaccessObject(&$dsSource, &$dbDestination)
+    function updateDataAccessObject(DataSet &$dsSource, DataAccess  &$dbDestination)
     {
         $this->setMethodName("updateDataaccessObject");
         if (!is_object($dsSource)) {

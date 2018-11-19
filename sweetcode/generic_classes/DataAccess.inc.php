@@ -32,6 +32,7 @@ define(
     "DA_MEMO",
     "memo"
 );
+
 define(
     "DA_FLOAT",
     "float"
@@ -1262,9 +1263,10 @@ class DataAccess extends BaseObject
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             if (
-                ($this->getNull($ixColumn) == DA_NOT_NULL) &
-                ($value == "") &
-                ($this->getPK() != $ixColumn) &
+                ($this->getNull($ixColumn) == DA_NOT_NULL) &&
+                ($this->colType[$ixColumn] != DA_BOOLEAN) &&
+                ($value == "") &&
+                ($this->getPK() != $ixColumn) &&
                 (!$this->getIgnoreNULL())
             ) {
                 $this->raiseError(

@@ -427,69 +427,122 @@ class CTRenHosting extends CTCNC
             )
         );
 
+
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($dsRenHosting->getValue(DBECustomerItem::customerID));
+        $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
+                DBECustomer::accountName
+            ) && $dsCustomer->getValue(DBECustomer::accountNumber);
+
+
         $this->template->set_var(
             array(
-                'customerItemID'             => $dsRenHosting->getValue('customerItemID'),
-                'customerName'               => Controller::htmlDisplayText($dsRenHosting->getValue('customerName')),
-                'customerID'                 => Controller::htmlDisplayText($dsRenHosting->getValue('customerID')),
-                'users'                      => Controller::htmlDisplayText($dsRenHosting->getValue('users')),
-                'siteName'                   => Controller::htmlDisplayText($dsRenHosting->getValue('siteName')),
-                'siteNo'                     => $dsRenHosting->getValue('siteNo'),
-                'itemID'                     => Controller::htmlDisplayText($dsRenHosting->getValue('itemID')),
-                'itemDescription'            => Controller::htmlDisplayText($dsRenHosting->getValue('itemDescription')),
-                'invoiceFromDate'            => $dsRenHosting->getValue('invoiceFromDate'),
-                'installationDate'           => Controller::dateYMDtoDMY($dsRenHosting->getValue('installationDate')),
-                'invoiceToDate'              => $dsRenHosting->getValue('invoiceToDate'),
-                'invoicePeriodMonths'        => Controller::htmlInputText(
+                'customerItemID'                     => $dsRenHosting->getValue('customerItemID'),
+                'customerName'                       => Controller::htmlDisplayText(
+                    $dsRenHosting->getValue('customerName')
+                ),
+                'customerID'                         => Controller::htmlDisplayText(
+                    $dsRenHosting->getValue('customerID')
+                ),
+                'users'                              => Controller::htmlDisplayText($dsRenHosting->getValue('users')),
+                'siteName'                           => Controller::htmlDisplayText(
+                    $dsRenHosting->getValue('siteName')
+                ),
+                'siteNo'                             => $dsRenHosting->getValue('siteNo'),
+                'itemID'                             => Controller::htmlDisplayText($dsRenHosting->getValue('itemID')),
+                'itemDescription'                    => Controller::htmlDisplayText(
+                    $dsRenHosting->getValue('itemDescription')
+                ),
+                'invoiceFromDate'                    => $dsRenHosting->getValue('invoiceFromDate'),
+                'installationDate'                   => Controller::dateYMDtoDMY(
+                    $dsRenHosting->getValue('installationDate')
+                ),
+                'invoiceToDate'                      => $dsRenHosting->getValue('invoiceToDate'),
+                'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenHosting->getValue('invoicePeriodMonths')
                 ),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText(
+                'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
                     $dsRenHosting->getMessage('invoicePeriodMonths')
                 ),
-                'totalInvoiceMonths'         => Controller::htmlInputText(
+                'totalInvoiceMonths'                 => Controller::htmlInputText(
                     $dsRenHosting->getValue('totalInvoiceMonths')
                 ),
-                'notes'                      => Controller::htmlInputText($dsRenHosting->getValue('notes')),
-                'notesMessage'               => Controller::htmlDisplayText($dsRenHosting->getMessage('notes')),
-                'hostingCompany'             => Controller::htmlInputText($dsRenHosting->getValue('hostingCompany')),
-                'hostingCompanyMessage'      => Controller::htmlDisplayText(
+                'notes'                              => Controller::htmlInputText($dsRenHosting->getValue('notes')),
+                'notesMessage'                       => Controller::htmlDisplayText($dsRenHosting->getMessage('notes')),
+                'hostingCompany'                     => Controller::htmlInputText(
+                    $dsRenHosting->getValue('hostingCompany')
+                ),
+                'hostingCompanyMessage'              => Controller::htmlDisplayText(
                     $dsRenHosting->getMessage('hostingCompany')
                 ),
-                'hostingUserName'            => Controller::htmlInputText($dsRenHosting->getValue('hostingUserName')),
-                'hostingUserNameMessage'     => Controller::htmlDisplayText(
+                'hostingUserName'                    => Controller::htmlInputText(
+                    $dsRenHosting->getValue('hostingUserName')
+                ),
+                'hostingUserNameMessage'             => Controller::htmlDisplayText(
                     $dsRenHosting->getMessage('hostingUserName')
                 ),
-                'password'                   => Controller::htmlInputText($dsRenHosting->getValue('password')),
-                'passwordMessage'            => Controller::htmlDisplayText($dsRenHosting->getMessage('password')),
-                'osPlatform'                 => Controller::htmlInputText($dsRenHosting->getValue('osPlatform')),
-                'osPlatformMessage'          => Controller::htmlDisplayText($dsRenHosting->getMessage('osPlatform')),
-                'controlPanelUrl'            => Controller::htmlInputText($dsRenHosting->getValue('controlPanelUrl')),
-                'controlPanelUrlMessage'     => Controller::htmlDisplayText(
-                    $dsRenHosting->getMessage('controlPanelUrl')
+                'password'                           => Controller::htmlInputText($dsRenHosting->getValue('password')),
+                'passwordMessage'                    => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('password')
                 ),
-                'ftpAddress'                 => Controller::htmlInputText($dsRenHosting->getValue('ftpAddress')),
-                'ftpAddressMessage'          => Controller::htmlDisplayText($dsRenHosting->getMessage('ftpAddress')),
-                'ftpUsername'                => Controller::htmlInputText($dsRenHosting->getValue('ftpUsername')),
-                'ftpUsernameMessage'         => Controller::htmlDisplayText($dsRenHosting->getMessage('ftpUsername')),
-                'curUnitSale'                => $dsRenHosting->getValue('curUnitSale'),
-                'curUnitCost'                => $dsRenHosting->getValue('curUnitCost'),
-                'urlUpdate'                  => $urlUpdate,
-                'urlDelete'                  => $urlDelete,
-                'txtDelete'                  => $txtDelete,
-                'urlItemEdit'                => $urlItemEdit,
-                'urlItemPopup'               => $urlItemPopup,
-                'urlDisplayList'             => $urlDisplayList,
-                'disabled'                   => $disabled,
-                'readonly'                   => $readonly,
-                'customerItemNotes'          => Controller::htmlTextArea($dsRenHosting->getValue('customerItemNotes')),
-                'internalNotes'              => Controller::htmlTextArea($dsRenHosting->getValue('internalNotes')),
-                'calculatedExpiryDate'       => getExpiryDate(
+                'osPlatform'                         => Controller::htmlInputText(
+                    $dsRenHosting->getValue('osPlatform')
+                ),
+                'osPlatformMessage'                  => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('osPlatform')
+                ),
+                'controlPanelUrl'                    => Controller::htmlInputText(
+                    $dsRenHosting->getValue('controlPanelUrl')
+                ),
+                'controlPanelUrlMessage'             => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('controlPanelUrl')
+
+                ),
+                'ftpAddress'                         => Controller::htmlInputText(
+                    $dsRenHosting->getValue('ftpAddress')
+                ),
+                'ftpAddressMessage'                  => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('ftpAddress')
+                ),
+                'ftpUsername'                        => Controller::htmlInputText(
+                    $dsRenHosting->getValue('ftpUsername')
+                ),
+                'ftpUsernameMessage'                 => Controller::htmlDisplayText(
+                    $dsRenHosting->getMessage('ftpUsername')
+                ),
+                'autoGenerateContractInvoiceChecked' => Controller::htmlChecked(
+                    $dsRenHosting->getValue('autoGenerateContractInvoice')
+                ),
+                'directDebitFlagChecked'             => Controller::htmlChecked(
+                    $dsRenHosting->getValue(DBECustomerItem::directDebitFlag)
+                ),
+                'curUnitSale'                        => $dsRenHosting->getValue('curUnitSale'),
+                'curUnitCost'                        => $dsRenHosting->getValue('curUnitCost'),
+                'urlUpdate'                          => $urlUpdate,
+                'urlDelete'                          => $urlDelete,
+                'txtDelete'                          => $txtDelete,
+                'urlItemEdit'                        => $urlItemEdit,
+                'urlItemPopup'                       => $urlItemPopup,
+                'urlDisplayList'                     => $urlDisplayList,
+                'disabled'                           => $disabled,
+                'readonly'                           => $readonly,
+                'customerItemNotes'                  => Controller::htmlTextArea(
+                    $dsRenHosting->getValue('customerItemNotes')
+                ),
+                'internalNotes'                      => Controller::htmlTextArea(
+                    $dsRenHosting->getValue('internalNotes')
+                ),
+                'calculatedExpiryDate'               => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
                         $dsRenHosting->getValue(DBECustomerItem::installationDate)
                     ),
                     $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
                 )->format('d/m/Y'),
+                "allowDirectDebit"                   => $dsRenHosting->getValue(
+                    DBEJRenHosting::allowDirectDebit
+                ) == 'Y' ? 'true' : 'false',
+                'clientCheckDirectDebit'             => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
 
@@ -501,7 +554,30 @@ class CTRenHosting extends CTCNC
         );
 
         $this->parseInitialContractLength($dsRenHosting->getValue(DBECustomerItem::initialContractLength));
-
+        $this->template->set_block(
+            'RenHostingEdit',
+            'TransactionTypesBlock',
+            'transactionTypesOptions'
+        );
+        $transactionTypes = [
+            "01",
+            "17",
+        ];
+        foreach ($transactionTypes as $transactionType) {
+            $this->template->set_var(
+                array(
+                    'transactionType' => $transactionType,
+                    'selected'        => $dsRenHosting->getValue(
+                        DBECustomerItem::transactionType
+                    ) == $transactionType ? 'selected' : null,
+                )
+            );
+            $this->template->parse(
+                'transactionTypesOptions',
+                'TransactionTypesBlock',
+                true
+            );
+        }
         $this->template->set_block(
             'RenHostingEdit',
             'renewalStatusBlock',

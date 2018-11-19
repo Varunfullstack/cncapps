@@ -450,6 +450,13 @@ class CTRenBroadband extends CTCNC
             )
         );
 
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($dsRenBroadband->getValue(DBEJRenBroadband::customerID));
+
+        $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
+                DBECustomer::accountName
+            ) && $dsCustomer->getValue(DBECustomer::accountNumber);
+
         $this->template->set_var(
             array(
                 'itemDescription'                      => Controller::htmlDisplayText(
@@ -652,6 +659,12 @@ class CTRenBroadband extends CTCNC
                 'bandwidthAllowanceMessage'            => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('bandwidthAllowance')
                 ),
+                'autoGenerateContractInvoiceChecked'   => Controller::htmlChecked(
+                    $dsRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice)
+                ),
+                'directDebitFlagChecked'               => Controller::htmlChecked(
+                    $dsRenBroadband->getValue(DBECustomerItem::directDebitFlag)
+                ),
                 'urlUpdate'                            => $urlUpdate,
                 'urlItemEdit'                          => $urlItemEdit,
                 'urlItemPopup'                         => $urlItemPopup,
@@ -672,6 +685,10 @@ class CTRenBroadband extends CTCNC
                     ),
                     $dsRenBroadband->getValue(DBECustomerItem::initialContractLength)
                 )->format('d/m/Y'),
+                'allowDirectDebit'                     => $dsRenBroadband->getValue(
+                    DBEJRenBroadband::allowDirectDebit
+                ) == 'Y' ? 'true' : 'false',
+                'clientCheckDirectDebit'               => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
 
@@ -708,6 +725,30 @@ class CTRenBroadband extends CTCNC
             );
         }
 
+        $this->template->set_block(
+            'RenBroadbandEdit',
+            'TransactionTypesBlock',
+            'transactionTypesOptions'
+        );
+        $transactionTypes = [
+            "01",
+            "17",
+        ];
+        foreach ($transactionTypes as $transactionType) {
+            $this->template->set_var(
+                array(
+                    'transactionType' => $transactionType,
+                    'selected'        => $dsRenBroadband->getValue(
+                        DBECustomerItem::transactionType
+                    ) == $transactionType ? 'selected' : null,
+                )
+            );
+            $this->template->parse(
+                'transactionTypesOptions',
+                'TransactionTypesBlock',
+                true
+            );
+        }
 
         $this->template->parse(
             'CONTENTS',
