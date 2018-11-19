@@ -317,9 +317,7 @@ class BUPDFInvoice extends BaseObject
         }
 
 
-        if ($this->_dsInvhead->getValue(
-            DBEInvhead::directDebit
-        )) {
+        if ($this->_dsInvhead->getValue(DBEInvhead::directDebitFlag) == "Y") {
 
             if ($lineCount > BUPDFINV_NUMBER_OF_LINES - $linesForLastPage - $linesForLogo) {
                 $this->_buPDF->printStringAt(
@@ -335,7 +333,12 @@ class BUPDFInvoice extends BaseObject
             }
 
             $this->_buPDF->moveYTo((BUPDFINV_NUMBER_OF_LINES - 13.0) * $this->_buPDF->getFontSize());
-            $this->_buPDF->placeImageAt(IMAGES_DIR.'/PAID.gif','gif',BUPDFINV_DETAILS_COL,90);
+            $this->_buPDF->placeImageAt(
+                IMAGES_DIR . '/PAID.gif',
+                'gif',
+                BUPDFINV_DETAILS_COL,
+                90
+            );
         }
 
         $this->_buPDF->setBoldOn();

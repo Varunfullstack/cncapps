@@ -61,7 +61,7 @@ class DBEOrdhead extends DBEntity
     const serviceRequestPriority = "serviceRequestPriority";
     const serviceRequestText = "serviceRequestText";
     const quotationCreateDate = "quotationCreateDate";
-    const directDebit = "directDebit";
+    const directDebitFlag = "ordhead.directDebitFlag";
     const transactionType = 'ordhead.transactionType';
 
     /**
@@ -398,10 +398,9 @@ class DBEOrdhead extends DBEntity
             "odh_quotation_create_date"
         );
         $this->addColumn(
-            self::directDebit,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            'directDebit'
+            self::directDebitFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL
         );
 
         $this->addColumn(

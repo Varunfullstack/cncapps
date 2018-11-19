@@ -119,7 +119,7 @@ class DBEJInvhead extends DBEInvhead
             ' JOIN paymentterms ON invhead.paymentTermsID = paymentterms.paymentTermsID ' .
             ' WHERE ' . $this->getDBColumnName('datePrinted') . ' = \'0000-00-00\'';
 
-        $queryString .= " and " . $this->getDBColumnName(self::directDebit) . " = " . ($directDebit ? 'TRUE' : 'FALSE');
+        $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ($directDebit ? ' = "Y" ' : ' <> "Y" ');
 
         $queryString .= ' ORDER BY ' . $this->getDBColumnName('customerID');
 

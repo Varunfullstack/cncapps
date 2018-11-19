@@ -436,8 +436,8 @@ class BUInvoice extends Business
         );
 
         $this->dbeInvhead->setValue(
-            DBEInvhead::directDebit,
-            $dsOrdhead->getValue(DBEOrdhead::directDebit)
+            DBEInvhead::directDebitFlag,
+            $dsOrdhead->getValue(DBEOrdhead::directDebitFlag)
         );
 
 
