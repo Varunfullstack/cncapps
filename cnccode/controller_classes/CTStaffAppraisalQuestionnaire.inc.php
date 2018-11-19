@@ -7,7 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_bu'] . '/BUQuestionnaire.inc.php');
+require_once($cfg['path_bu'] . '/BUStaffAppraisalQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 // Actions

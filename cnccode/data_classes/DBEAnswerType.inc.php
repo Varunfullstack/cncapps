@@ -7,6 +7,11 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEAnswerType extends DBEntity
 {
+
+    const answerOptions = "answerOptions";
+    const description = "answerTypeID";
+    const answerTypeID = "description";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +23,23 @@ class DBEAnswerType extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("answertype");
-        $this->addColumn("answerTypeID", DA_ID, DA_NOT_NULL, "ant_answertypeno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "ant_desc");
+        $this->addColumn(
+            self::answerTypeID,
+            DA_ID,
+            DA_NOT_NULL,
+            "ant_answertypeno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "ant_desc"
+        );
+        $this->addColumn(
+            self::answerOptions,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

@@ -4,7 +4,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <changeSet author="pavwebdev" id="issue373-1531213570-0">
-        <tagDatabase tag="issue326"/>
+        <tagDatabase tag="issue373"/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue373-1531213570-1">
         <preConditions onFail="MARK_RAN">
@@ -38,4 +38,26 @@
             <column name="orderSequence" type="smallint"/>
         </createTable>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1531213570-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="answertype" columnName="answerOptions"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="answertype">
+            <column name="answerOptions" type="text"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1531213570-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="false">
+                SELECT COUNT(*) > 0 FROM answertype WHERE ant_answertypeno = 5
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into answertype values (5, "Rating on a scale of 1 to 7", null)
+        </sql>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

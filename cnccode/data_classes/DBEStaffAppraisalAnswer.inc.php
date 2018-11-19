@@ -20,7 +20,6 @@ class DBEStaffAppraisalAnswer extends DBEntity
         $this->setTableName("answer");
         $this->addColumn("answerID", DA_ID, DA_NOT_NULL, "ans_answerno");
         $this->addColumn("questionID", DA_ID, DA_NOT_NULL, "ans_questionno");
-        $this->addColumn("problemID", DA_ID, DA_NOT_NULL, "ans_problemno");
         $this->addColumn("answer", DA_STRING, DA_NOT_NULL, "ans_answer");
         $this->addColumn("name", DA_STRING, DA_NOT_NULL, "ans_name");
         $this->addColumn("date", DA_DATE, DA_NOT_NULL, "ans_date");

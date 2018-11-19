@@ -1,6 +1,6 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTQuestionnaire.inc.php");
+require_once($cfg["path_ct"]."/CTStaffAppraisalQuestionnaire.inc.php");
 session_start();
 page_open(
 	array(
@@ -12,7 +12,7 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctQuestionnaire= new CTQuestionnaire(
+$ctQuestionnaire= new CTStaffAppraisalQuestionnaire(
 	$_SERVER['REQUEST_METHOD'],
 	$_POST,
 	$_GET,
