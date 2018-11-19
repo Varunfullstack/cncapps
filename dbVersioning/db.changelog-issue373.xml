@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue373-1531213570-0">
+        <tagDatabase tag="issue326"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1531213570-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestion"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestion">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireID" type="int(11)"/>
+            <column name="answerTypeID" type="int(11)"/>
+            <column name="description" type="varchar(150)"/>
+            <column name="activeFlag" type="char(1)"/>
+            <column name="requiredFlag" type="char(1)"/>
+            <column name="orderSequence" type="smallint"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1531213570-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestionnaire"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestionnaire">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireID" type="int(11)"/>
+            <column name="answerTypeID" type="int(11)"/>
+            <column name="description" type="varchar(150)"/>
+            <column name="activeFlag" type="char(1)"/>
+            <column name="requiredFlag" type="char(1)"/>
+            <column name="orderSequence" type="smallint"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
