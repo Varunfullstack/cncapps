@@ -211,7 +211,22 @@
                 >{internalNotes}</textarea>
             </td>
         </tr>
-
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >
+                Auto-generate Sales Invoice
+            </td>
+            <td colspan="2">
+                <input type="checkbox"
+                       name="renDomain[1][autoGenerateContractInvoice]"
+                       value="Y"
+                       {autoGenerateContractInvoiceChecked}
+                       title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created"
+                       id="autoGenerateContractInvoice"
+                >
+            </td>
+        </tr>
         <tr>
             <td>&nbsp;</td>
             <td class="formErrorMessage">&nbsp;</td>

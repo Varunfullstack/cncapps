@@ -1,0 +1,132 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue211-1534414967-0">
+        <tagDatabase tag="issue211"/>
+    </changeSet>
+    <changeSet id="issue211-1534414967-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custitem" columnName="directDebitFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custitem">
+            <column name="directDebitFlag" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custitem" columnName="transactionType"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custitem">
+            <column name="transactionType" type="char(2)" defaultValue="01"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="custitem" columnName="transactionType"/>
+        </preConditions>
+        <sql>
+            update custitem set transactionType = '01'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue211-1534414967-4" author="pavwebdev">
+        <sql>
+            update custitem JOIN item ON itm_itemno = cui_itemno set autoGenerateContractInvoice = 'Y' where
+            renewalTypeID in (1,4,5)
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue211-1534414967-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="invhead" columnName="directDebit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="invhead">
+            <column name="directDebit" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="directDebit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="directDebit" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="sortCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="sortCode" type="mediumtext"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-8" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="accountName"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="accountName" type="varchar(18)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-9" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="accountNumber"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="accountNumber" type="mediumtext"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-10" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="transactionType"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="transactionType" type="char(2)" defaultValue="01"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-11" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="invhead" columnName="accountNumber"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="invhead">
+            <column name="transactionType" type="char(2)" defaultValue="01"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue211-1534414967-12" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="item" columnName="allowDirectDebit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="item">
+            <column name="allowDirectDebit" type="char(2)" defaultValue="N"/>
+        </addColumn>
+        <sql>
+            update item set allowDirectDebit = if(renewalTypeID in (1,2,5) and itm_itemno not in (4111, 13956, 17427,
+            15241, 15242, 14525, 10856, 15835, 15613, 16222, 15893), 'Y','N')
+        </sql>
+        <rollback>
+            <dropColumn tableName="item" columnName="allowDirectDebit"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

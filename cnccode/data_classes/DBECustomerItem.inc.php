@@ -97,6 +97,8 @@ class DBECustomerItem extends DBCNCEntity
     const secondSiteReplicationExcludeFlag = "secondSiteReplicationExcludeFlag";
     const officialOrderNumber = "officialOrderNumber";
 
+    const directDebitFlag = "directDebitFlag";
+    const transactionType = "transactionType";
 
     /**
      * calls constructor()
@@ -645,6 +647,20 @@ class DBECustomerItem extends DBCNCEntity
             DA_TEXT,
             DA_ALLOW_NULL,
             'custitem.officialOrderNumber'
+        );
+
+        $this->addColumn(
+            self::directDebitFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "custitem.directDebitFlag"
+        );
+
+        $this->addColumn(
+            self::transactionType,
+            DA_STRING,
+            DA_NOT_NULL,
+            'custitem.transactionType'
         );
 
         $this->setPK(0);

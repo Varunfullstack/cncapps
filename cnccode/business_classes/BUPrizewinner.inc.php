@@ -42,7 +42,7 @@ class BUPrizewinner extends Business
         }
 
 
-        $this->updateDataaccessObject($dsData, $this->dbePrizewinner);
+        $this->updateDataAccessObject($dsData, $this->dbePrizewinner);
 
         if ($dsData->getValue('approvedFlag') == 'Y' AND $approvedFlagBefore == 'N') {
 

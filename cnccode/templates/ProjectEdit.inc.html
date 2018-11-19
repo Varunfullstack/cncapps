@@ -1,12 +1,388 @@
 <!-- Template: ProjectEdit.inc.html -->
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
+<style>
+    .grayedOut {
+        color: gray;
+    }
+
+    .grey {
+        color: #cccccc;
+    }
+</style>
+<script type="text/javascript"
+        src=".javascript/handlebars-v4.0.11.js"
 ></script>
+<script type="text/javascript"
+        src=".javascript/mustache.min.js"
+></script>
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
+<script type="application/javascript"
+        src=".javascript/mustache-wax.min.js"
+></script>
+
+<script id="project-budget-stats-template"
+        type="text/template"
+>
+    <h2> Project Budget </h2>
+    <table>
+        <tr>
+            <td></td>
+            <td>Allocated</td>
+            <td>Used To Date</td>
+        </tr>
+        <tr>
+            <td>In Hours</td>
+            <td>{% stats.inHoursAllocated | decimal %} days</td>
+            <td>{% getTotalInDays | decimal %} days</td>
+        </tr>
+        <tr>
+            <td>Out of Hours</td>
+            <td>{% stats.ooHoursAllocated | decimal %} days</td>
+            <td>{% getTotalOutDays | decimal %} days</td>
+        </tr>
+    </table>
+    <br>
+    <h2> Allocate Budget </h2>
+    <table>
+        <tr>
+            <td>In Hours</td>
+            <td>Grant Extra Time</td>
+            <td>
+                <input type="text"
+                       {%
+                       #disabled
+                       %}
+                       disabled
+                       {% /disabled %}
+                name="project[1][inHoursQuantity]"
+                >
+                <select name="project[1][inHoursMeasure]"
+                        {%
+                        #disabled
+                        %}
+                        disabled
+                        {% /disabled %}>
+                <option value="days">Days</option>
+                <option value="hours">Hours</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Out Of Hours</td>
+            <td>Grant Extra Time</td>
+            <td>
+                <input type="text"
+                       {%
+                       #disabled
+                       %}
+                       disabled
+                       {% /disabled %}
+                name="project[1][outOfHoursQuantity]"
+                >
+                <select name="project[1][outOfHoursMeasure]"
+                        {%
+                        #disabled
+                        %}
+                        disabled
+                        {% /disabled %}
+                >
+                <option value="days">Days</option>
+                <option value="hours">Hours</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <h2>Time Breakdown (hours)</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Activity</th>
+            {% #consultants %}
+            <th>{% name %}</th>
+            {% /consultants %}
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% #activities %}
+        <tr>
+            <td>
+                {% activityKey %}
+            </td>
+            {% #columns %}
+            <td class="{% value | lightGrayClass %}">
+                {% value | decimal %}
+            </td>
+            {% /columns %}
+            <td class="{% total| lightGrayClass %}">
+                {% total | decimal %}
+            </td>
+        </tr>
+        {% /activities %}
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td>In hours Total</td>
+            {% #consultants %}
+            <td class="{% totalInHours| lightGrayClass %}">{% totalInHours | decimal %}</td>
+            {% /consultants %}
+        </tr>
+        <tr>
+            <td>Out of hours Total</td>
+            {% #consultants %}
+            <td class="{% totalOutHours| lightGrayClass %}">{% totalOutHours | decimal %}</td>
+            {% /consultants %}
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Total</td>
+            {% #consultants %}
+            <td class="{% totalHours |lightGrayClass %}">{% totalHours | decimal %}</td>
+            {% /consultants %}
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="{% totalInHours | lightGrayClass %}"
+            >Chargeable Total (in hours)
+            </td>
+            <td>{% totalInHours | decimal %}</td>
+        </tr>
+        <tr>
+            <td>Chargeable Total (out of hours)</td>
+            <td class="{% totalOutHours| lightGrayClass %}">{% totalOutHours | decimal %}</td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="{% grandTotalInHours | lightGrayClass %}"
+            >Grand Total (in hours)
+            </td>
+            <td>{% grandTotalInHours | decimal %}</td>
+        </tr>
+        <tr>
+            <td>Grand Total (out of hours)</td>
+            <td class="{% grandTotalOutHours | lightGrayClass %}">{% grandTotalOutHours | decimal %}</td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Expenses Total:</td>
+            <td>{% stats.expenses %}</td>
+        </tr>
+        </tbody>
+    </table>
+</script>
 <script type="application/javascript">
+
+    const projectManagementCheck = '{projectManagementCheck}';
+
+    Mustache.tags = ['{%', '%}'];
+
+    Mustache.Formatters = {
+        decimal: function (number) {
+            if (typeof number !== 'number') {
+                return number;
+            }
+
+            return number.toFixed(2);
+        },
+        lightGrayClass: function (number) {
+
+            if (isNaN(parseFloat(number)) || !isFinite(number)) {
+                debugger;
+                return null;
+            }
+
+            if (number != 0) {
+                return null;
+            }
+
+            return "grey"
+        }
+
+    };
+
+    const projectPlanDownloadURL = "{projectPlanDownloadURL}";
+    let projectPlan = {hasProjectPlan};
+
+    function showHistoryPopup() {
+        window.open('{historyPopupURL}',
+            'Updates History', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
+    }
+
     $(function () {
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
     });
+
+    function linkedSalesOrderPopup() {
+        const newWindow = window.open(
+            '{urlLinkedSalesOrder}',
+            'salesOrder',
+            'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
+        );
+    }
+
+    function checkUploadFilesBtn() {
+
+
+        const files = document.querySelector('[type=file]').files;
+
+        if (projectPlan) {
+            if (!confirm("The previous project plan file will be overwritten, are you sure?")) {
+                return;
+            }
+        }
+        const url = '{uploadProjectPlanURL}';
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            formData.append('files[]', file);
+        }
+
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (!projectPlan) {
+                $('#projectPlanLink').removeClass('redText');
+                $('#projectPlanLink').attr('href', projectPlanDownloadURL);
+                projectPlan = true;
+            }
+        });
+    }
+
+
+    function fetchProjectBudget() {
+        const url = '{getProjectBudgetDataURL}';
+        const formData = new FormData();
+
+        formData.append('projectID', {projectID});
+        fetch(url, {method: 'GET'}).then(response => {
+            return response.json();
+        })
+            .then(jsonResponse => {
+
+                const context = jsonResponse.data;
+
+                if (!context.calculatedBudget || projectManagementCheck) {
+                    context.disabled = true;
+                } else {
+                    context.disabled = false;
+                }
+
+
+                // we have to build a table, that has a column per consultant and a row per activity type
+                const consultants = [];
+                const activities = [];
+                context.totalInHours = 0;
+                context.totalOutHours = 0;
+                context.grandTotalInHours = 0;
+                context.grandTotalOutHours = 0;
+
+                context.getTotalInDays = function () {
+                    return ((this.totalInHours * 60) / this.minutesPerDay).toFixed(2);
+                };
+
+                context.getTotalOutDays = function () {
+                    return ((this.totalOutHours * 60) / this.minutesPerDay).toFixed(2);
+                };
+
+                context.data.forEach(item => {
+                    const consultantKey = item.firstName + item.lastName;
+                    const activityKey = item.cat_desc;
+                    if (!consultants[consultantKey]) {
+                        consultants[consultantKey] = {
+                            totalInHours: 0,
+                            totalOutHours: 0,
+                            activities: {},
+                            name: item.firstName[0] + item.lastName[0],
+                            totalHours: function () {
+                                return (this.totalOutHours + this.totalInHours).toFixed(2);
+                            }
+                        };
+                    }
+
+
+                    if (!activities[activityKey]) {
+                        activities[activityKey] = true;
+                    }
+
+
+                    consultants[consultantKey].totalInHours += item.inHours;
+                    consultants[consultantKey].totalOutHours += item.outHours;
+
+                    const validTypesForTotal = [4, 8];
+
+                    context.grandTotalInHours += item.inHours;
+                    context.grandTotalOutHours += item.outHours;
+
+                    if (validTypesForTotal.includes(item.caa_callacttypeno)) {
+                        context.totalInHours += item.inHours;
+                        context.totalOutHours += item.outHours;
+                    }
+                    consultants[consultantKey].activities[activityKey] = {
+                        inHours: item.inHours,
+                        outHours: item.outHours
+                    };
+                });
+
+                const activityRows = Object.keys(activities).reduce((activityRowAccumulator, activityKey) => {
+
+                    const row = {activityKey: activityKey, columns: [], total: 0};
+
+                    Object.keys(consultants).forEach(consultantKey => {
+
+                        let value = 0;
+                        if (consultants[consultantKey] && consultants[consultantKey].activities[activityKey]) {
+                            value = consultants[consultantKey].activities[activityKey].inHours + consultants[consultantKey].activities[activityKey].outHours;
+                            row.total += value;
+                        }
+
+                        row.columns.push(
+                            {
+                                colName: consultantKey,
+                                value: value
+                            }
+                        );
+                    });
+
+                    activityRowAccumulator.push(row);
+
+                    return activityRowAccumulator;
+                }, []);
+
+                context.consultants = Object.keys(consultants).reduce((acc, consultantKey) => {
+                    acc.push(consultants[consultantKey]);
+                    return acc;
+                }, []);
+                context.activities = activityRows;
+
+
+                const source = document.getElementById("project-budget-stats-template").innerHTML;
+                const html = Mustache.to_html(source, context);
+
+                const projectBudgetElm = $('.projectBudget').html('');
+
+                projectBudgetElm.append(html);
+
+            })
+    }
+
+    fetchProjectBudget();
+
 </script>
 <TABLE border="0"
        cellpadding="2"
@@ -16,13 +392,30 @@
 
         <TD class="navigateLink"
             valign="top"
-        ><a href="{urlDisplayCustomer}">Back to customer</a></TD>
+        >
+            <a href="{urlDisplayCustomer}">Back to customer</a>
+        </TD>
         <TD class="navigateLink"
             valign="top"
-        ><a href="/">Back to Home</a></TD>
+        >
+            <a href="/">Back to Home</a>
+        </TD>
         <TD class="navigateLink"
             valign="top"
-        ><a href="{urlDelete}">{txtDelete}</a></TD>
+        >
+            {salesOrderLink}
+        </TD>
+        <TD class="navigateLink"
+            valign="top"
+        >
+            {calculateBudgetLink}
+        </TD>
+        <TD class="navigateLink"
+            valign="top"
+        >
+            {projectPlanLink}
+        </TD>
+
     </TR>
 </table>
 <FORM method="post"
@@ -31,56 +424,80 @@
       AUTOCOMPLETE="OFF"
 >
     <table border="0">
-        <input
-                type="hidden"
-                name="project[1][projectID]"
-                value="{projectID}"
+        <input type="hidden"
+               name="project[1][projectID]"
+               value="{projectID}"
         >
-        <input
-                type="hidden"
-                name="project[1][customerID]"
-                value="{customerID}"
+        <input type="hidden"
+               name="project[1][customerID]"
+               value="{customerID}"
         >
         <tr>
             <td class="promptText">Description</td>
-            <td class="fieldText"><input
-                    name="project[1][description]"
-                    type="text"
-                    value="{description}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{descriptionMessage}</span></td>
+            <td class="fieldText">
+                <input name="project[1][description]"
+                       type="text"
+                       value="{description}"
+                       size="50"
+                       maxlength="50"
+                       {projectManagementCheck}
+                >
+                <span class="formErrorMessage">{descriptionMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText"
                 valign="top"
-            >Notes
+            >
+                Project Summary
             </td>
             <td class="fieldText">
                 <textarea cols="100"
                           rows="15"
                           name="project[1][notes]"
-                >{notes}</textarea><span
-                    class="formErrorMessage"
-            >{notesMessage}</span></td>
+                          id="summary"
+                          {projectManagementCheck}
+                >{notes}</textarea>
+                <span class="formErrorMessage">{notesMessage}</span>
+                <script type="text/javascript">
+                    reason = CKEDITOR.replace('summary', {customConfig: '/ckeditor_config.js'});
+                </script>
+            </td>
         </tr>
         <TR>
-            <TD class="promptText">Project Start Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="startDate"
-                    name="project[1][startDate]"
-                    value="{startDate}"
-                    size="10"
-                    maxlength="10"
-                    autocomplete="off"
-                    class="jQueryCalendar"
-            >
+            <TD class="promptText">Project Opened Date</TD>
+            <TD class="field">
+                <input type="text"
+                       id="startDate"
+                       name="project[1][startDate]"
+                       value="{startDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                       {projectManagementCheck}
+                >
                 <font class="formErrorMessage">{startDateMessage}</font>
             </TD>
         </TR>
         <TR>
-            <TD class="promptText">Project Expiry Date</TD>
+            <TD class="promptText">Project Commence Date</TD>
+            <TD class="field">
+                <input type="text"
+                       id="commenceDate"
+                       name="project[1][commenceDate]"
+                       value="{commenceDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                       {projectManagementCheck}
+                >
+                <font class="formErrorMessage">{commenceDateMessage}</font>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Completed Date</TD>
             <TD class="field">
                 <input type="text"
                        id="expiryDate"
@@ -90,18 +507,80 @@
                        maxlength="10"
                        autocomplete="off"
                        class="jQueryCalendar"
+                       {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{expiryDateMessage}</font>
             </TD>
         </TR>
-
+        <TR>
+            <TD class="promptText">Last Update</TD>
+            <TD class="field">
+                <span style="font-weight: bold">{lastUpdateDate} by {lastUpdateEngineer}:</span> {lastUpdateComment}
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText"></TD>
+            <TD class="field">
+                See complete update history <a onclick="showHistoryPopup()">here</a>
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Add Update</TD>
+            <TD class="field">
+                <input type="text"
+                       id="newUpdate"
+                       name="newComment"
+                       size="50"
+                       maxlength="50"
+                >
+            </TD>
+        </TR>
+        <TR>
+            <TD class="promptText">Project Engineer</TD>
+            <TD class="field">
+                <select name="project[1][consultantID]"
+                        required
+                        {projectManagementCheck}
+                >
+                    <option value="">Please Select an Engineer</option>
+                    <!-- BEGIN consultantBlock -->
+                    <option {consultantSelected}
+                            value="{consultantID}"
+                    >{consultantName}
+                    </option>
+                    <!-- END consultantBlock -->
+                </select>
+            </TD>
+        </TR>
+        <tr>
+            <td class="promptText"
+                style="width: 115px"
+            >
+                Project Plan Update
+            </td>
+            <td>
+                <input type="file"
+                       accept="application/pdf"
+                       onchange="checkUploadFilesBtn()"
+                       {projectManagementCheck}
+                >
+            </td>
+        </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="formErrorMessage"><input type="submit"
-                                                name="Submit"
-                                                value="Update"
-            ></td>
+            <td class="formErrorMessage">
+                <input type="submit"
+                       name="Submit"
+                       value="Update"
+                >
+            </td>
         </tr>
     </table>
+    <br>
+    <div class="projectBudget">
+
+    </div>
+
+
 </form>
 <!-- End Template: ProjectEdit.inc.html -->

@@ -27,7 +27,7 @@ class BUExpenseType extends Business
     function updateExpenseType(&$dsData)
     {
         $this->setMethodName('updateExpenseType');
-        $this->updateDataaccessObject($dsData, $this->dbeExpenseType);
+        $this->updateDataAccessObject($dsData, $this->dbeExpenseType);
         return TRUE;
     }
 

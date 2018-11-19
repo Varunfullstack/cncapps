@@ -807,7 +807,7 @@ class BUSecondsite extends Business
     function updateSecondsiteImage(&$dsData)
     {
         $this->setMethodName('updateSecondsiteImage');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeSecondsiteImage
         );

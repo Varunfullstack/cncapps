@@ -7,21 +7,73 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenBroadband extends DBECustomerItem
 {
+    const allowDirectDebit = "allowDirectDebit";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("customerName", DA_STRING, DA_NOT_NULL, "cus_name");
-        $this->addColumn("siteName", DA_STRING, DA_NOT_NULL, "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)");
-        $this->addColumn("itemID", DA_STRING, DA_NOT_NULL, "itm_itemno");
-        $this->addColumn("itemDescription", DA_STRING, DA_NOT_NULL, "itm_desc");
-        $this->addColumn("itemTypeDescription", DA_STRING, DA_NOT_NULL, "ity_desc");
-        $this->addColumn("invoiceFromDate", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y')");
-        $this->addColumn("invoiceToDate", DA_DATE, DA_NOT_NULL, "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')");
-        $this->addColumn("invoiceFromDateYMD", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
-        $this->addColumn("invoiceToDateYMD", DA_DATE, DA_NOT_NULL, "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
+        $this->addColumn(
+            "customerName",
+            DA_STRING,
+            DA_NOT_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            "siteName",
+            DA_STRING,
+            DA_NOT_NULL,
+            "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)"
+        );
+        $this->addColumn(
+            "itemID",
+            DA_STRING,
+            DA_NOT_NULL,
+            "itm_itemno"
+        );
+        $this->addColumn(
+            "itemDescription",
+            DA_STRING,
+            DA_NOT_NULL,
+            "itm_desc"
+        );
+        $this->addColumn(
+            "itemTypeDescription",
+            DA_STRING,
+            DA_NOT_NULL,
+            "ity_desc"
+        );
+        $this->addColumn(
+            "invoiceFromDate",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y')"
+        );
+        $this->addColumn(
+            "invoiceToDate",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')"
+        );
+        $this->addColumn(
+            "invoiceFromDateYMD",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
+        );
+        $this->addColumn(
+            "invoiceToDateYMD",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+        );
+
+        $this->addColumn(
+            self::allowDirectDebit,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setAddColumnsOff();
     }
 
@@ -92,7 +144,6 @@ class DBEJRenBroadband extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     *
      */
     function getRenewalsDueRows()
     {
@@ -107,10 +158,9 @@ class DBEJRenBroadband extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
      AND renewalTypeID = 1
-		 AND declinedFlag = 'N'
-		 ORDER BY cui_custno
-		 ";
+		 AND declinedFlag = 'N' and directDebitFlag <> 'Y'";
 
+        $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -129,9 +179,12 @@ class DBEJRenBroadband extends DBECustomerItem
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-     WHERE cui_cuino IN ('" . implode('\',\'', $ids) . "')" .
+     WHERE cui_cuino IN ('" . implode(
+                '\',\'',
+                $ids
+            ) . "')" .
             " AND declinedFlag = 'N'
-        AND renewalTypeID = 1
+        AND renewalTypeID = 1 and directDebitFlag <> 'Y'
       ORDER BY cui_custno
      ";
 

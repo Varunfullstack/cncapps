@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.13.0]
+### Added
+- Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
+- Issue 211 - CNC040 - Direct Debit Specification
+### Changed
+- Issue 341 - Project lifecycle and management
+- Issue 321 - Permissions to edit Initial activity type
+
 ## [v1.12.0] - 2018-09-27
 ### Changed
 - Issue 353 - Sales request wording change

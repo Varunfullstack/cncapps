@@ -25,7 +25,7 @@ class BURootCause extends Business
     function updateRootCause(&$dsData)
     {
         $this->setMethodName('updateRootCause');
-        $this->updateDataaccessObject($dsData, $this->dbeRootCause);
+        $this->updateDataAccessObject($dsData, $this->dbeRootCause);
         return TRUE;
     }
 

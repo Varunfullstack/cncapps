@@ -26,7 +26,7 @@ class BUCustomerType extends Business
     function updateCustomerType(&$dsData)
     {
         $this->setMethodName('updateCustomerType');
-        $this->updateDataaccessObject($dsData, $this->dbeCustomerType);
+        $this->updateDataAccessObject($dsData, $this->dbeCustomerType);
         return TRUE;
     }
 
