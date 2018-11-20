@@ -1,8 +1,12 @@
 # Changelog
 This project changes will be shown here.
-
-## [v1.13.1] 
-
+ 
+## [v1.13.1] - 2018-11-20 
+## Changed
+- Allow more than 50 characters in project updates
+## Fixed
+- Fix issue with banners not showing when project end date was not set
+- Fix issue with banners showing incorrect projects
 
 
 ## [v1.13.0] - 2018-11-19
