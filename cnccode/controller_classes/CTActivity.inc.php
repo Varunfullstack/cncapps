@@ -2395,7 +2395,6 @@ class CTActivity extends CTCNC
         );
         $link = '';
 
-        var_dump($dsProject->rowCount());
         while ($dsProject->fetchNext()) {
 
             if (!$link) {
