@@ -22,7 +22,7 @@ class BUPortalCustomerDocument extends Business
          * Upload new document from local disk
          * @access private
          */
-        $this->updateDataaccessObject($dsData, $this->dbePortalCustomerDocumentWithoutFile);
+        $this->updateDataAccessObject($dsData, $this->dbePortalCustomerDocumentWithoutFile);
 
         /* file to add? */
         if ($userfile['name'] != '') {

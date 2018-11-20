@@ -41,7 +41,7 @@ class BUHeader extends Business
     function updateHeader(&$dsData)
     {
         $this->setMethodName('updateHeader');
-        $this->updateDataaccessObject($dsData, $this->dbeHeader);
+        $this->updateDataAccessObject($dsData, $this->dbeHeader);
         return TRUE;
     }
 

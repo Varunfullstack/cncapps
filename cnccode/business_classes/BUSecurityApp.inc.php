@@ -25,7 +25,7 @@ class BUSecurityApp extends Business
     function updateSecurityApp(&$dsData)
     {
         $this->setMethodName('updateSecurityApp');
-        $this->updateDataaccessObject($dsData, $this->dbeSecurityApp);
+        $this->updateDataAccessObject($dsData, $this->dbeSecurityApp);
         return TRUE;
     }
 

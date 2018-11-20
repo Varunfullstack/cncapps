@@ -22,7 +22,7 @@ class BUSalesOrderDocument extends Business
          * Upload new document from local disk
          * @access private
          */
-        $this->updateDataaccessObject($dsData, $this->dbeSalesOrderDocumentWithoutFile);
+        $this->updateDataAccessObject($dsData, $this->dbeSalesOrderDocumentWithoutFile);
 
         /* file to add? */
         if ($userfile['name'] != '') {

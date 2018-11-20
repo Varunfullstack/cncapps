@@ -28,7 +28,7 @@ class BUActivityType extends Business
     function updateActivityType(&$dsData)
     {
         $this->setMethodName('updateActivityType');
-        $this->updateDataaccessObject($dsData, $this->dbeCallActType);
+        $this->updateDataAccessObject($dsData, $this->dbeCallActType);
         return TRUE;
     }
 

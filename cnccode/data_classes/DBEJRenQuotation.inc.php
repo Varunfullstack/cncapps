@@ -133,7 +133,7 @@ class DBEJRenQuotation extends DBECustomerItem
         CURDATE() >= ( DATE_ADD(`startDate`, INTERVAL 11 MONTH) )
 			  AND dateGenerated = '0000-00-00' AND dateGenerated IS NOT NULL
 		    AND declinedFlag = 'N'
-        AND renewalTypeID = 3
+        AND renewalTypeID = 3 and directDebitFlag <> 'Y'
 		 ORDER BY cui_custno";
 
         $this->setQueryString($statement);
@@ -159,7 +159,7 @@ class DBEJRenQuotation extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
       JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
       WHERE cui_cuino IN ( " . $commaListOfIDs . " )
-        AND renewalTypeID = 3
+        AND renewalTypeID = 3 and directDebitFlag <> 'Y'
       ORDER BY cui_custno
      ";
 
