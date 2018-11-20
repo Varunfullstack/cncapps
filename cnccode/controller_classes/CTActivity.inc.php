@@ -2387,7 +2387,7 @@ class CTActivity extends CTCNC
     function getCurrentProjectLink($customerID)
     {
         $buProject = new BUProject($this);
-
+        $dsProject = new DataSet($this);
         $buProject->getProjectsByCustomerID(
             $customerID,
             $dsProject,
@@ -2395,6 +2395,7 @@ class CTActivity extends CTCNC
         );
         $link = '';
 
+        var_dump($dsProject->rowCount());
         while ($dsProject->fetchNext()) {
 
             if (!$link) {

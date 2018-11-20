@@ -10,7 +10,11 @@ This project changes will be shown here.
 ### Added
 - Issue 347 - Customer Review Management documents
 
-## [v1.13.0]
+## [v1.13.1] 
+
+
+
+## [v1.13.0] - 2018-11-19
 ### Added
 - Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
 - Issue 211 - CNC040 - Direct Debit Specification
