@@ -148,9 +148,11 @@ class DBEProject extends DBEntity
 
         if ($activityDate) {
             $queryString .=
-                " AND " . $this->getDBColumnName(
+                " AND (" . $this->getDBColumnName(
                     self::completedDate
-                ) . ">= '$activityDate' or " . $this->getDBColumnName(self::completedDate) . " is null";
+                ) . ">= '$activityDate' or " . $this->getDBColumnName(
+                    self::completedDate
+                ) . " is null or " . $this->getDBColumnName(self::completedDate) . " = '0000-00-00')";
         }
 
         $this->setQueryString($queryString);
