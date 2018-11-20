@@ -191,7 +191,7 @@ class DBEProject extends DBEntity
   CONCAT_WS(' ', engineer.firstName, engineer.lastName) AS engineerName,
   round(outOfHoursBudgetDays,2) as outOfHoursBudgetDays,
   round(inHoursBudgetDays,2) as inHoursBudgetDays,
-  (SELECT GROUP_CONCAT(problem.`pro_problemno`) FROM problem WHERE pro_linked_ordno = project.`ordHeadID`) problemno,
+  (SELECT GROUP_CONCAT(problem.`pro_problemno`) FROM problem WHERE pro_linked_ordno = project.`ordHeadID` AND project.ordHeadID <> 0) problemno,
   calculatedBudget
 FROM
   project 
