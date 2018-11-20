@@ -154,7 +154,7 @@ class DBEProject extends DBEntity
                     self::completedDate
                 ) . " is null or " . $this->getDBColumnName(self::completedDate) . " = '0000-00-00')";
         }
-
+        var_dump($queryString);
         $this->setQueryString($queryString);
 
         return ($this->getRows());
