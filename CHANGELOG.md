@@ -11,8 +11,11 @@ This project changes will be shown here.
 - Issue 347 - Customer Review Management documents
 
 ## [v1.13.1] 
-
-
+## Changed
+- Allow more than 50 characters in project updates
+## Fixed
+- Fix issue with banners not showing when project end date was not set
+- Fix issue with banners showing incorrect projects
 
 ## [v1.13.0] - 2018-11-19
 ### Added
