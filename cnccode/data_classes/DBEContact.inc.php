@@ -728,9 +728,9 @@ class DBEContact extends DBCNCEntity
              WHERE " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
 
         if ($leadStatusID) {
-            $sqlQuery .= " where customer_lead_status_id = $leadStatusID";
+            $sqlQuery .= " and customer_lead_status_id = $leadStatusID";
         } else {
-            $sqlQuery .= " where customer_lead_status_id is not null and customer_lead_status_id <> 0";
+            $sqlQuery .= " and customer_lead_status_id is not null and customer_lead_status_id <> 0";
         }
         $this->setQueryString($sqlQuery);
 
