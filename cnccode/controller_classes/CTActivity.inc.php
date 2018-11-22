@@ -2375,14 +2375,19 @@ class CTActivity extends CTCNC
     function getCurrentProjectLink($customerID)
     {
         $buProject = new BUProject($this);
-
+        $dsProject = new DataSet($this);
         $buProject->getProjectsByCustomerID(
             $customerID,
             $dsProject,
             date(CONFIG_MYSQL_DATE)
         );
-        if ($dsProject->fetchNext()) {
+        $link = '';
 
+        while ($dsProject->fetchNext()) {
+
+            if (!$link) {
+                $link = "<table><tr class='makeItColor'><td style='color: black'>SEE CURRENT PROJECTS</td>";
+            }
             $url = $this->buildLink(
                 'Project.php',
                 array(
@@ -2391,11 +2396,14 @@ class CTActivity extends CTCNC
                     'htmlFmt'   => CT_HTML_FMT_POPUP
                 )
             );
-            $link = '<h2 class="projectAlert">SEE CURRENT PROJECT: <A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
+            $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
                     'description'
-                ) . '</A></h2>';
-        } else {
-            $link = '';
+                ) . '</A></td>';
+
+        }
+
+        if ($link) {
+            $link .= "</tr></table>";
         }
 
         return $link;
@@ -3881,19 +3889,26 @@ class CTActivity extends CTCNC
         /*
       Only enable the date and time if not initial activity type
       */
+        $initial_disabled = '';
+        $canChangeInitialDateAndTime = true;
         if (
-            in_array(
-                $dsCallActivity->getValue('callActTypeID'),
-                array(
-                    CONFIG_INITIAL_ACTIVITY_TYPE_ID,
-                    CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
-                )
-            ) &&
-            !$this->hasPermissions(PHPLIB_PERM_MAINTENANCE)
+        in_array(
+            $dsCallActivity->getValue('callActTypeID'),
+            array(
+                CONFIG_INITIAL_ACTIVITY_TYPE_ID,
+                CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
+            )
+        )
         ) {
-            $initial_disabled = CTCNC_HTML_DISABLED;
-        } else {
-            $initial_disabled = '';
+            if (!$this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
+                $initial_disabled = CTCNC_HTML_DISABLED;
+            }
+
+
+            if ($this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y') {
+                $canChangeInitialDateAndTime = true;
+            }
+
         }
 
         $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue('problemID'));
@@ -4132,6 +4147,7 @@ class CTActivity extends CTCNC
                 'DISABLED'                     => $disabled,
                 'COMPLETE_DISABLED'            => $complete_disabled,
                 'INITIAL_DISABLED'             => $initial_disabled,
+                'INITIAL_DATE_DISABLED'        => $canChangeInitialDateAndTime ? '' : "disabled",
                 'PRIORITY_DISABLED'            => $priority_disabled,
                 'CONTRACT_DISABLED'            => $contract_disabled,
                 'setTimeNowLink'               => $setTimeNowLink,

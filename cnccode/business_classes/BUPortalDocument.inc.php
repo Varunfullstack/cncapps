@@ -22,7 +22,7 @@ class BUPortalDocument extends Business
          * Upload new document from local disk
          * @access private
          */
-        $this->updateDataaccessObject($dsData, $this->dbePortalDocumentWithoutFile);
+        $this->updateDataAccessObject($dsData, $this->dbePortalDocumentWithoutFile);
 
         if ($this->dbePortalDocumentWithoutFile->getValue('requiresAcceptanceFlag')) {
             $this->dbePortalDocumentWithoutFile->unsetAllOtherRequiresAcceptanceFlag();

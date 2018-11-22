@@ -696,13 +696,15 @@ define(
     'CONFIG_FIXED_ACTIVITY_TYPE_ID',
     57
 
-);define(
+);
+define(
     'CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID',
     60
 );
 define(
     'CONFIG_SALES_ACTIVITY_TYPE_ID',
-    43);
+    43
+);
 define(
     'CONFIG_SERVER_HEALTH_CHECK_ACTIVITY_TYPE_ID',
     12
@@ -711,19 +713,23 @@ define(
     'CONFIG_SERVER_HEALTH_CHECK_CHECKLIST_ACTIVITY_TYPE_ID',
     48
 
-);define(
+);
+define(
     'CONFIG_SERVER_HEALTH_CHECK_OFF_SITE_ACTIVITY_TYPE_ID',
     12
 
-);define(
+);
+define(
     'CONFIG_SERVER_HEALTH_CHECK_ON_SITE_ACTIVITY_TYPE_ID',
     50
 
-);define(
+);
+define(
     'CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID',
     55
 
-);define(
+);
+define(
     'CONFIG_2NDSITE_BACKUP_ACTIVITY_TYPE_ID',
     49
 );
@@ -806,6 +812,11 @@ define(
 define(
     'CONFIG_PAYMENT_TERMS_30_DAYS',
     9
+);
+
+define(
+    'CONFIG_PAYMENT_TERMS_DIRECT_DEBIT',
+    11
 );
 define(
     'CONFIG_PAYMENT_TERMS_NO_INVOICE',

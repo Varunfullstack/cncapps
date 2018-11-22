@@ -15,6 +15,8 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUTeamPerformance.inc.php');
+require_once($cfg['path_ct'] . '/CTProject.inc.php');
+
 
 class CTHome extends CTCNC
 {
@@ -375,7 +377,23 @@ class CTHome extends CTCNC
 
         $projects = $buProject->getCurrentProjects();
 
+
         foreach ($projects as $project) {
+
+            $hasProjectPlan = !!$project['planFileName'];
+
+            $projectPlanDownloadURL =
+                $this->buildLink(
+                    '/Project.php',
+                    [
+                        'action'    => CTProject::DOWNLOAD_PROJECT_PLAN,
+                        'projectID' => $project['projectID']
+                    ]
+                );
+
+            $downloadProjectPlanClass = $hasProjectPlan ? '' : 'class="redText"';
+            $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
+            $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
 
             $editProjectLink =
                 $this->buildLink(
@@ -387,22 +405,54 @@ class CTHome extends CTCNC
                     )
                 );
 
+            $lastUpdated = 'No updates';
+
+            $lastUpdatedURL =
+                $this->buildLink(
+                    'Project.php',
+                    [
+                        'action'  => 'lastUpdate',
+                        'htmlFmt' => 'popup'
+                    ]
+                );
+
+            if ($project['createdBy']) {
+                $editProjectLink =
+                    $this->buildLink(
+                        'Project.php',
+                        array(
+                            'action'     => 'edit',
+                            'projectID'  => $project['projectID'],
+                            'backToHome' => true
+                        )
+                    );
+                $lastUpdated = '<a href="#" onclick="showLastUpdatedPopup(' . $project['projectID'] . ')" >Status</a>';
+            }
+
+            $historyPopupURL = $this->buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'historyPopup',
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
 
             $this->template->set_var(
                 array(
-                    'projectID'    => $project['projectID'],
-                    'customerName' => $project['customerName'],
-                    'description'  => $project['description'],
-                    'notes'        => $project['notes'],
-                    'startDate'    => strftime(
+                    'projectID'       => $project['projectID'],
+                    'customerName'    => $project['customerName'],
+                    'description'     => $project['description'],
+                    'notes'           => $project['notes'],
+                    'projectPlanLink' => $projectPlanLink,
+                    'commenceDate'    => $project['commenceDate'] ? strftime(
                         "%d/%m/%Y",
-                        strtotime($project['startDate'])
-                    ),
-                    'expiryDate'   => strftime(
-                        "%d/%m/%Y",
-                        strtotime($project['expiryDate'])
-                    ),
-                    'urlEdit'      => $editProjectLink
+                        strtotime($project['commenceDate'])
+                    ) : '',
+                    'urlEdit'         => $editProjectLink,
+                    'engineerName'    => $project['engineerName'],
+                    'lastUpdatePopup' => $lastUpdated,
+                    'lastUpdateURL'   => $lastUpdatedURL,
+                    'historyPopupURL' => $historyPopupURL
                 )
             );
 

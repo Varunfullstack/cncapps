@@ -1,9 +1,25 @@
 # Changelog
 This project changes will be shown here.
 
+
 ## [unreleased]
 ### Added
 - Issue 373 - Staff Appraisal Process
+
+## [v1.13.1] - 2018-11-20
+## Changed
+- Allow more than 50 characters in project updates
+## Fixed
+- Fix issue with banners not showing when project end date was not set
+- Fix issue with banners showing incorrect projects
+
+## [v1.13.0] - 2018-11-19
+### Added
+- Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
+- Issue 211 - CNC040 - Direct Debit Specification
+### Changed
+- Issue 341 - Project lifecycle and management
+- Issue 321 - Permissions to edit Initial activity type
 
 ## [v1.12.0] - 2018-09-27
 ### Changed

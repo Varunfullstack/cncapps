@@ -237,6 +237,15 @@ class DBEJCustomerItem extends DBECustomerItem
         $db->next_record();
         return $db->Record['contracts'];
     }
+
+    public function getCountCustomerDirectDebitItems($customerID) {
+        $db = new dbSweetcode();
+        $select =
+            "SELECT COUNT(custitem.`cui_cuino`) as directDebitCount FROM custitem WHERE directDebitFlag = 'Y' AND `cui_custno` = $customerID";
+        $db->query($select);
+        $db->next_record();
+        return $db->Record['directDebitCount'];
+    }
 }
 
 ?>

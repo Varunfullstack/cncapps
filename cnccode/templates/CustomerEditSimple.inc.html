@@ -166,6 +166,11 @@
         );
     }
 
+    const sortCode = '{sortCode}';
+    const accountNumber = '{accountNumber}';
+    const accountName = '{accountName}';
+    const forceDirectDebit = {forceDirectDebit};
+
 
     function checkMailShotOptions() {
 
@@ -206,6 +211,48 @@
             return false;
         }
 
+
+        if (forceDirectDebit) {
+
+            let existSortCode = false;
+            let newSortCode = null;
+            const sortCodeElm = $('#sortCode');
+            if (sortCodeElm.length) {
+                existSortCode = true;
+                newSortCode = sortCodeElm.val();
+            }
+
+            if (
+                existSortCode && !newSortCode ||
+                !sortCode && !newSortCode
+            ) {
+                alert('This customer needs to have a sort code, as it has direct debit renewals');
+                return false;
+            }
+
+            let existAccountNumber = false;
+            let newAccountNumber = null;
+            const accountNumberElm = $('#accountNumber');
+            if (accountNumberElm.length) {
+                existAccountNumber = true;
+                newAccountNumber = accountNumberElm.val();
+            }
+
+            if (existAccountNumber && !newAccountNumber ||
+                !accountNumber && !newAccountNumber) {
+                alert("This customer needs to have an account number, as it has direct debit renewals");
+                return false;
+            }
+
+            const accountNameElm = $('#accountName');
+            const newAccountName = accountNameElm.val();
+
+            if (!newAccountName) {
+                alert("This customer needs to have an account name, as it has direct debit renewals");
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -224,6 +271,14 @@
     .float-right {
         text-align: right;
         float: right
+    }
+
+    .redPencil {
+        color: red;
+    }
+
+    .greenPencil {
+        color: green;
     }
 </style>
 <link rel="stylesheet"
@@ -697,6 +752,121 @@
                         </select>
                     </td>
                 </tr>
+                <script>
+
+
+                    let storedPassPhrase = null;
+
+                    const masks = {
+                        sortCode: '00-00-00',
+                        accountNumber: '00000000'
+                    };
+
+                    function storePassPhrase(passPhrase) {
+                        storedPassPhrase = passPhrase;
+                        setTimeout(() => {
+                            storedPassPhrase = null;
+                        }, 30);
+                    }
+
+
+                    function editEncrypted(id, element) {
+
+                        const el = $(element);
+                        const parent = el.closest('td');
+
+                        let encryptedValue = parent.find('.encrypted').val();
+                        let promise;
+
+                        if (encryptedValue) {
+                            let passPhrase = storedPassPhrase;
+                            if (!passPhrase) {
+                                passPhrase = prompt('Please provide secure passphrase');
+                                storePassPhrase(passPhrase);
+                            }
+                            if (!passPhrase) {
+                                return;
+                            }
+
+                            const formData = new FormData();
+
+                            formData.append('passphrase', passPhrase);
+                            formData.append('encryptedData', encryptedValue);
+                            promise = fetch('?action=decrypt', {
+                                method: 'POST',
+                                body: formData
+                            }).then(response => {
+                                if (response.ok) {
+                                    return response.json()
+                                }
+                                return null;
+                            }).then(json => {
+                                if (json) {
+                                    return json.decryptedData;
+                                } else {
+                                    return null;
+                                }
+                            })
+                        } else {
+                            promise = new Promise(resolve => {
+                                resolve()
+                            });
+                        }
+
+                        promise.then(data => {
+                            parent.append('<input id="' + id + '" name="form[customer][{customerID}][new' + capitalize(id) + ']" value="' + data + '">');
+                            $('#' + id).mask(masks[id]);
+                            el.hide();
+                        })
+
+                    }
+
+                    function capitalize(string) {
+                        return string.charAt(0).toUpperCase() + string.slice(1);
+                    }
+                </script>
+                <tr>
+                    <td class="content">Sort Code</td>
+                    <td class="content">
+                        <button type="button"
+                                onclick="editEncrypted('sortCode',this)"
+                        ><i class="fa fa-pencil {sortCodePencilColor}"></i>
+                        </button>
+                        <input type="hidden"
+                               name="form[customer][{customerID}][sortCode]"
+                               value="{sortCode}"
+                               class="encrypted"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">Account Name</td>
+                    <td class="content">
+                        <input {disabled}
+                               type="text"
+                               name="form[customer][{customerID}][accountName]"
+                               id="accountName"
+                               value="{accountName}"
+                               size="18"
+                               maxlength="18"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content">Account Number</td>
+                    <td class="content">
+                        <button type="button"
+                                onclick="editEncrypted('accountNumber',this)"
+                        ><i class="fa fa-pencil {accountNumberPencilColor}"></i>
+                        </button>
+                        <input type="hidden"
+                               name="form[customer][{customerID}][accountNumber]"
+                               value="{accountNumber}"
+                               class="encrypted"
+                        >
+                    </td>
+                </tr>
+
             </table>
 
         </div> <!-- customerEditMainLeftColumn -->

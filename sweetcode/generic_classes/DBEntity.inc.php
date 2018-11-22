@@ -35,7 +35,10 @@
  * This means we can be safe to always apply mysql_escape_string() to values going into DB without doubling-up.
  */
 require_once($cfg["path_gc"] . "/DataAccess.inc.php");
-define("DBE_DB_COLUMN_NAME", "dbcolumnname");
+define(
+    "DBE_DB_COLUMN_NAME",
+    "dbcolumnname"
+);
 
 class DBEntity extends DataAccess
 {
@@ -269,8 +272,14 @@ class DBEntity extends DataAccess
         }
         if ($this->getLogSQL()) {
             $logFile = CONFIG_SQL_LOG;
-            $handle = fopen($logFile, 'a');
-            fwrite($handle, $this->getClassname() . ": " . $this->getQueryString() . "<BR/><HR/>");
+            $handle = fopen(
+                $logFile,
+                'a'
+            );
+            fwrite(
+                $handle,
+                $this->getClassname() . ": " . $this->getQueryString() . "<BR/><HR/>"
+            );
         }
         // Save current row values
         if ($this->db->query($this->getQueryString())) {
@@ -309,15 +318,25 @@ class DBEntity extends DataAccess
         $name = func_get_arg(0);
         $type = func_get_arg(1);
         $null = func_get_arg(2);
-        $ixColumnNo = parent::addColumn($name, $type, $null);
+        $ixColumnNo = parent::addColumn(
+            $name,
+            $type,
+            $null
+        );
         $ret = $ixColumnNo;
         $numArgs = func_num_args();
         if ($ixColumnNo != DA_OUT_OF_RANGE) {
             if ($numArgs == 4) {
                 $dbColumnName = func_get_arg(3);
-                $this->setDBColumnName($ixColumnNo, $dbColumnName);
+                $this->setDBColumnName(
+                    $ixColumnNo,
+                    $dbColumnName
+                );
             } else {
-                $this->setDBColumnName($ixColumnNo, $name);
+                $this->setDBColumnName(
+                    $ixColumnNo,
+                    $name
+                );
             }
         }
         return $ret;
@@ -332,7 +351,10 @@ class DBEntity extends DataAccess
     {
         $colCount = $this->colCount();
         for ($ixCol = 0; $ixCol < $colCount; $ixCol++) {
-            parent::setValueNoCheckByColumnNumber($ixCol, $this->db->Record[$ixCol]);
+            parent::setValueNoCheckByColumnNumber(
+                $ixCol,
+                $this->db->Record[$ixCol]
+            );
         }
     }
 
@@ -354,7 +376,9 @@ class DBEntity extends DataAccess
      * @param string Database column name
      * @return boolean Success
      */
-    function setDBColumnName($ixColumn, $dbColumnName)
+    function setDBColumnName($ixColumn,
+                             $dbColumnName
+    )
     {
         $ixColumn = $this->columnExists($ixColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
@@ -378,7 +402,9 @@ class DBEntity extends DataAccess
         if ($ixColumn != DA_OUT_OF_RANGE) {
             return $this->dbColName[$ixColumn];
         } else {
-            $this->raiseError("getDBColumnName: Could not get DB column name because column " . $ixColumnPassed . " out of range");
+            $this->raiseError(
+                "getDBColumnName: Could not get DB column name because column " . $ixColumnPassed . " out of range"
+            );
             return DA_OUT_OF_RANGE;
         }
     }
@@ -475,7 +501,8 @@ class DBEntity extends DataAccess
                 $result = $this->deleteRow();
                 break;
             case DA_MODE_UPDATE:
-                if ($this->getRowBefore() != $this->getColumnValuesAsString()) {            // Only apply update if the row has been changed.
+                if ($this->getRowBefore() != $this->getColumnValuesAsString(
+                    )) {            // Only apply update if the row has been changed.
                     $result = $this->updateRow();
                 } else {
                     $this->resetQueryString();
@@ -527,9 +554,10 @@ class DBEntity extends DataAccess
                     }
                 }
             }
-            $this->setQueryString("SELECT " . $this->getDBColumnNamesAsString() .
-                                  " FROM " . $this->getTableName() .
-                                  " WHERE " . $this->getPKWhere()
+            $this->setQueryString(
+                "SELECT " . $this->getDBColumnNamesAsString() .
+                " FROM " . $this->getTableName() .
+                " WHERE " . $this->getPKWhere()
             );
         }
         if (!$this->runQuery()) {
@@ -720,11 +748,17 @@ class DBEntity extends DataAccess
         $this->setMethodName("getColumnValuesAsString");
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
+
             if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-            $colString = $colString .
-                $this->quoteForColumnValues .
-                $this->prepareForSQL($this->getValue($ixCol)) .
-                $this->quoteForColumnValues;
+
+            if ($this->colType[$ixCol] == DA_BOOLEAN) {
+                $colString = $colString . ($this->getValue($ixCol) ? 1 : 0);
+            } else {
+                $colString = $colString .
+                    $this->quoteForColumnValues .
+                    $this->prepareForSQL($this->getValue($ixCol)) .
+                    $this->quoteForColumnValues;
+            }
         }
         return $colString;
     }
@@ -781,7 +815,9 @@ class DBEntity extends DataAccess
      */
     function getFormattedLikeValue($ixColumn)
     {
-        return $this->quoteForColumnValues . '%' . $this->prepareForSQL($this->getValue($ixColumn)) . '%' . $this->quoteForColumnValues;
+        return $this->quoteForColumnValues . '%' . $this->prepareForSQL(
+                $this->getValue($ixColumn)
+            ) . '%' . $this->quoteForColumnValues;
     }
 
     /**
@@ -837,10 +873,17 @@ class DBEntity extends DataAccess
      * @param string $value value to set
      * @return bool
      */
-    function setValue($ixPassedColumn, $value)
+    function setValue($ixPassedColumn,
+                      $value
+    )
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
+
+            if ($this->colType[$ixColumn] == DA_BOOLEAN) {
+                $value = $value ? 1 : 0;
+            }
+
             $this->db->Record[$ixColumn] = $value;
             return TRUE;
         } else {
@@ -862,13 +905,17 @@ class DBEntity extends DataAccess
      * @param string $value Value
      * @return boolean Success
      */
-    function setValueNoCheckByColumnNumber($ixColumn, $value)
+    function setValueNoCheckByColumnNumber($ixColumn,
+                                           $value
+    )
     {
         $this->db->Record[$ixColumn] = $value;
         return TRUE;
     }
 
-    function getRowsByColumn($column, $sortColumn = '')
+    function getRowsByColumn($column,
+                             $sortColumn = ''
+    )
     {
         $this->setMethodName("getRowsByColumn");
         if ($column == '') {
@@ -968,14 +1015,20 @@ class DBEntity extends DataAccess
     {
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             if ($this->getType($ixCol) == DA_YN && $this->getValue($ixCol) == '') {
-                $this->setValue($ixCol, 'N');
+                $this->setValue(
+                    $ixCol,
+                    'N'
+                );
             }
         }
     }
 
     function prepareForSQL($string)
     {
-        $escapedString = mysqli_real_escape_string($this->db->link_id(), $string);
+        $escapedString = mysqli_real_escape_string(
+            $this->db->link_id(),
+            $string
+        );
         return $escapedString;
     }
 }
