@@ -50,6 +50,17 @@ class DBEAnswerType extends DBEntity
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
+
+    public function getConfigurableAnswerTypes()
+    {
+        $query = "select " . $this->getDBColumnNamesAsString() . " from " . $this->getTableName(
+            ) . " where " . $this->getDBColumnName(self::needsOptions) . " = 1";
+
+        $this->setQueryString($query);
+
+        $ret = (parent::getRows());
+        return $ret;
+    }
 }
 
 ?>

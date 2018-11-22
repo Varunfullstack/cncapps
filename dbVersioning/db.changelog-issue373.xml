@@ -55,7 +55,9 @@
         <sql>
             insert into answertype values (5, "Rating on a scale of 1 to 7", null, 1)
         </sql>
-        <rollback/>
+        <rollback>
+            delete from answertype where ant_answertypeno = 5
+        </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue373-1542643720-5">
         <preConditions onFail="MARK_RAN">

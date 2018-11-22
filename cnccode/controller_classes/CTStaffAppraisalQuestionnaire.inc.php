@@ -602,6 +602,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
                     'answerTypeID'
                 ) == $answerTypeID) ? CT_SELECTED : '';
+
             $shouldBeConfig = (int)$this->buQuestionnaire->dbeAnswerType->getValue(
                 DBEAnswerType::needsOptions
             );
@@ -609,6 +610,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $isConfigured = $this->buQuestionnaire->dbeAnswerType->getValue(DBEAnswerType::answerOptions);
 
             $configFailed = $shouldBeConfig && !$isConfigured;
+
+            var_dump($shouldBeConfig, $isConfigured, $configFailed);
 
             $this->template->set_var(
                 array(
