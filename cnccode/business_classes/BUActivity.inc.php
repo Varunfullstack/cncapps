@@ -7298,6 +7298,8 @@ is currently a balance of ';
                     $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
                     $details .= 'Reopened from SR ' . $record['serviceRequestID'];
 
+                    //
+
                     return $this->processIsSenderAuthorised(
                         $details,
                         $contact,
