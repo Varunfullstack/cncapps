@@ -105,6 +105,4 @@
             <column name="comment" type="text"/>
         </createTable>
     </changeSet>
-
-
 </databaseChangeLog>
