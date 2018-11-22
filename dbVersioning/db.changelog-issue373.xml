@@ -62,17 +62,47 @@
     <changeSet author="pavwebdev" id="issue373-1542643720-5">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="staffAppraisalAnswer"/>
+                <tableExists tableName="staffAppraisalQuestionAnswer"/>
             </not>
         </preConditions>
-        <createTable tableName="staffAppraisalAnswer">
+        <createTable tableName="staffAppraisalQuestionAnswer">
             <column name="answerID" type="int(11)"/>
             <column name="questionID" type="int(11)"/>
+            <column name="questionnaireAnswerID" type="int(11)"/>
             <column name="staffAnswer" type="text"/>
-            <column name="staffMemberId" type="int(11)"/>
-            <column name="managerId" type="int(11)"/>
             <column name="managerAnswer" type="text"/>
             <column name="managerNote" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestionnaireAnswer"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestionnaireAnswer">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireID" type="int(11)"/>
+            <column name="staffMemberID" type="int(11)"/>
+            <column name="managerID" type="int(11)"/>
+            <column name="startedAt" type="datetime"/>
+            <column name="completed" type="tinyint(1)" defaultValue="0"/>
+            <column name="sickDaysThisYear" type="decimal(3,1)"/>
+            <column name="proposedSalary" type="int(11)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalObjectives"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalObjectives">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireAnswerID" type="int(11)"/>
+            <column name="requirement" type="text"/>
+            <column name="measure" type="text"/>
+            <column name="comment" type="text"/>
         </createTable>
     </changeSet>
 

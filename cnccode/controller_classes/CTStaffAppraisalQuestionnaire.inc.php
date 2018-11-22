@@ -56,6 +56,9 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
         switch ($_REQUEST['action']) {
+            case 'employeeAnswer':
+                $this->showEmployeeAnswer();
+                break;
             case 'createQuestion':
             case 'editQuestion':
                 $this->editQuestion();
@@ -611,8 +614,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $configFailed = $shouldBeConfig && !$isConfigured;
 
-            var_dump($shouldBeConfig, $isConfigured, $configFailed);
-
             $this->template->set_var(
                 array(
                     'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
@@ -694,6 +695,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             header('Location: ' . $urlNext);
             exit;
         }
+    }
+
+    private function showEmployeeAnswer($questionnaireID) {
+        // we first need to know if there's a questionnaire answer for this questionnaire ID and user
+
+
+
+
     }
 }// end of class
 ?>

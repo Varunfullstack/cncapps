@@ -5,14 +5,13 @@
 */
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
-class DBEStaffAppraisalAnswer extends DBEntity
+class DBEStaffAppraisalQuestionAnswer extends DBEntity
 {
 
     const answerID = "answerID";
     const questionID = "questionID";
+    const questionnaireAnswerID = "questionnaireAnswerID";
     const staffAnswer = "staffAnswer";
-    const staffMemberId = "staffMemberId";
-    const managerId = "managerId";
     const managerAnswer = "managerAnswer";
     const managerNote = "managerNote";
 
@@ -26,7 +25,7 @@ class DBEStaffAppraisalAnswer extends DBEntity
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        $this->setTableName("staffAppraisalAnswer");
+        $this->setTableName("staffAppraisalQuestionAnswer");
         $this->addColumn(
             self::answerID,
             DA_ID,
@@ -37,22 +36,17 @@ class DBEStaffAppraisalAnswer extends DBEntity
             DA_ID,
             DA_NOT_NULL
         );
+
+        $this->addColumn(
+            self::questionnaireAnswerID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+
         $this->addColumn(
             self::staffAnswer,
             DA_STRING,
             DA_ALLOW_NULL
-        );
-
-        $this->addColumn(
-            self::staffMemberId,
-            DA_ID,
-            DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::managerId,
-            DA_ID,
-            DA_NOT_NULL
         );
 
         $this->addColumn(

@@ -19,7 +19,7 @@ class BUStaffAppraisalQuestionnaire extends Business
     public $dbeQuestion;
     /** @var DBEAnswerType */
     public $dbeAnswerType;
-    /** @var DBEStaffAppraisalAnswer */
+    /** @var DBEStaffAppraisalQuestionAnswer */
     public $dbeAnswer;
 
     /**
@@ -34,7 +34,7 @@ class BUStaffAppraisalQuestionnaire extends Business
         $this->dbeQuestion = new DBEStaffAppraisalQuestion($this);
         $this->dbeJQuestion = new DBEJStaffAppraisalQuestion($this);
         $this->dbeAnswerType = new DBEAnswerType($this);
-        $this->dbeAnswer = new DBEStaffAppraisalAnswer($this);
+        $this->dbeAnswer = new DBEStaffAppraisalQuestionAnswer($this);
     }
 
     function updateQuestionnaire(&$dsData)
@@ -159,7 +159,7 @@ class BUStaffAppraisalQuestionnaire extends Business
     function canDeleteQuestion($ID)
     {
 
-        $dbeAnswer = new DBEStaffAppraisalAnswer($this);
+        $dbeAnswer = new DBEStaffAppraisalQuestionAnswer($this);
 
         $dbeAnswer->setValue(
             'questionID',
