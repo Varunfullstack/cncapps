@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v.13.2]
+## Fixed
+- Contract expiry dates incorrect
+- Remove debugging information
+
 ## [v1.13.1] - 2018-11-20
 ## Changed
 - Allow more than 50 characters in project updates
