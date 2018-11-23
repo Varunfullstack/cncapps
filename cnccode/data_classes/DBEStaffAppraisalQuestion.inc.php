@@ -65,6 +65,16 @@ class DBEStaffAppraisalQuestion extends DBEntity
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
+
+    public function getRowsForQuestionnaire($questionnaireID)
+    {
+        $query = "select " . $this->getDBColumnNamesAsString() . " from " . $this->getTableName(
+            ) . " where " . $this->getDBColumnName(
+                self::questionnaireID
+            ) . " = $questionnaireID order by " . $this->getDBColumnName(self::orderSequence) . " asc";
+        $this->setQueryString($query);
+        $this->getRows();
+    }
 }
 
 ?>

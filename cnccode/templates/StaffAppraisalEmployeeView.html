@@ -1,0 +1,54 @@
+<h2>
+    Welcome to this questionnaire :D
+</h2>
+<h2>
+    Data
+</h2>
+<style>
+    .questionnaireData tr td:nth-child(odd) {
+        font-weight: bold;
+    }
+</style>
+<h1>Flowers, Unicorns and Ribbons!!</h1>
+<table class="questionnaireData">
+    <tbody>
+    <tr>
+        <td>
+            Appraisee:
+        </td>
+        <td>
+            {employeeName}
+        </td>
+        <td>
+            Appraiser:
+        </td>
+        <td>
+            {managerName}
+        </td>
+    </tr>
+    <tr>
+        <td>Employment Start:</td>
+        <td>{employeeStartDate}</td>
+        <td>Position:</td>
+        <td>{employeePosition}</td>
+    </tr>
+    <tr>
+        <td>Sick Days This Year:</td>
+        <td>
+            <input type="number"
+                   step="0.5"
+                   name="sickDaysThisYear"
+                   value="{sickDaysThisYear}"
+                   {disableInputs}
+            >
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div class="questions">
+    {questions}
+</div>
+
+<h2>Development and Objectives</h2>
+<p>Discuss and agree the specific objectives that will enable the appraise to reach competence and to meet performance
+    in current job</p>

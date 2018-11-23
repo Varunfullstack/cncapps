@@ -749,15 +749,58 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     DBEStaffAppraisalObjectives::questionnaireAnswerID,
                     $questionnaireAnswerID
                 );
-                $dbeObjective->setShowSQLOn();
                 $dbeObjective->insertRow();
-                $dbeObjective->setLogSQLOff();
             }
         }
+
+
         //here we should have a valid and populated questionnaire answer :D
         $this->setTemplateFiles(
-            array('QuestionList' => 'StaffAppraisalQuestionList.inc')
+            array('StaffAppraisalEmployeeView' => 'StaffAppraisalEmployeeView')
         );
+
+        $managerID = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerId);
+
+        $dbeManager = new DBEUser($this);
+        $dbeManager->getRow($managerID);
+
+        $this->template->setVar(
+            [
+                "employeeName"      => $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                        DBEUser::lastName
+                    ),
+                "managerName"       => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
+                        DBEUser::lastName
+                    ),
+                "employeeStartDate" => (new DateTime())->format('Y-m-d'),
+                "employeePosition"  => "Minion",
+                "sickDaysThisYear"  => $dbeQuestionnaireAnswer->getValue(
+                    DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear
+                )
+            ]
+        );
+
+        $dbeQuestions = new DBEStaffAppraisalQuestion($this);
+
+        $dbeQuestions->getRowsForQuestionnaire($questionnaireID);
+
+
+        $previousQuestionType = null;
+        while ($dbeQuestions->fetchNext()) {
+
+
+
+            if ($previousQuestionType != $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID)) {
+
+            }
+        }
+
+        $this->template->parse(
+            'CONTENTS',
+            'StaffAppraisalEmployeeView',
+            true
+        );
+        $this->parsePage();
 
     }
 }// end of class
