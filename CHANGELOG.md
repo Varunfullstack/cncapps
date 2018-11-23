@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v.13.2]
+## [v.13.2] - 2018-11-23
 ## Fixed
 - Contract expiry dates incorrect
 - Remove debugging information
