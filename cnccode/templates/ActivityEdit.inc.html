@@ -48,8 +48,7 @@
     function proceedWithCancel(form) {
         if (formChanged == true) {
             return confirm('Are you sure that you want to cancel without saving your changes?');
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -287,14 +286,7 @@
             <td></td>
             <td class="promptText">Type</td>
             <td class="fieldText">
-                <div>
-                    {INITIAL_DISABLED}
-                </div>
-                <div>
-                    {typeDisabled}
-                </div>
-                <select
-                        {INITIAL_DISABLED}
+                <select {INITIAL_DISABLED}
                         {typeDisabled}
                         onchange="setFormChanged();"
                         id="{contractID}"
@@ -361,7 +353,7 @@
             <td class="fieldText">
                 <DIV>
 
-                {INITIAL_DATE_DISABLED}
+                    {INITIAL_DATE_DISABLED}
                 </DIV>
                 <DIV>
                     {DISABLED}
