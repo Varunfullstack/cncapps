@@ -407,7 +407,8 @@ function common_stripEverything($description)
 
 function getExpiryDate(DateTime $installDate,
                        $initialContractLength = 12,
-                       DateTime $today = null
+                       DateTime $today = null,
+                       $debug = false
 )
 {
 
@@ -419,35 +420,73 @@ function getExpiryDate(DateTime $installDate,
 
     $firstExpiryDate->add(new DateInterval('P' . $initialContractLength . 'M'));
 
-    if ($today <= $firstExpiryDate) {
-        $nextExpiryDate = clone $firstExpiryDate;
-    } else {
-        //get next expiry date
-
-        $expiryDay = (int)$installDate->format('d');
-        $expiryMonth = (int)$installDate->format('m');
-
-        // we need to check
-        $expiryYear = (int)$today->format('Y');
-
-        if ($expiryMonth < (int)$today->format('m') ||
-            $expiryMonth == (int)$today->format('m') &&
-            $expiryDay < (int)$today->format('d')) {
-            $expiryYear += 1;
-        }
-
-        $nextExpiryDate = DateTime::createFromFormat(
-            'Y-m-d',
-            "$expiryYear-$expiryMonth-$expiryDay"
-        );
+    if ($debug) {
+        echo '<div>';
+        echo 'Installation Date: ' . $installDate->format('Y-m-d');
+        echo '</div>';
+        echo '<div>';
+        echo 'First Expiry Date: ' . $firstExpiryDate->format('Y-m-d');
+        echo '</div>';
     }
 
-    $difference = (int)$nextExpiryDate->diff($today)->format('%m');
+    $expiryDay = (int)$installDate->format('d');
+    $expiryMonth = (int)$installDate->format('m');
 
+    // we need to check
+    $expiryYear = (int)$today->format('Y');
+
+    if ($expiryMonth < (int)$today->format('m') ||
+        $expiryMonth == (int)$today->format('m') &&
+        $expiryDay < (int)$today->format('d')) {
+        $expiryYear += 1;
+    }
+
+    $nextExpiryDate = DateTime::createFromFormat(
+        'Y-m-d',
+        "$expiryYear-$expiryMonth-$expiryDay"
+    );
+
+    if ($firstExpiryDate > $nextExpiryDate) {
+        $nextExpiryDate = clone  $firstExpiryDate;
+    }
+
+    if ($debug) {
+        echo '<div>';
+        echo 'Next Expiry date would be: ' . $nextExpiryDate->format('Y-m-d');
+        echo '</div>';
+    }
+
+    $diff = $nextExpiryDate->diff($today);
+    $difference = $diff->m;
+    $differenceInYears = $diff->y;
+    $differenceInDays = $diff->d;
     $expiryDate = clone $nextExpiryDate;
-    if ($difference < 3) {
+    if ($debug) {
+        echo '<div>';
+        echo 'Difference between Today and Next Expiry Date in months: ' . $difference;
+        echo '</div>';
+        echo '</div>';
+        echo 'Difference between Today and Next Expiry Date in years : ' . $differenceInYears;
+        echo '<div>';
+        echo '</div>';
+        echo 'Difference between Today and Next Expiry Date in days : ' . $differenceInDays;
+        echo '<div>';
+    }
+    if (!$differenceInYears && $difference < 3) {
+        if ($debug) {
+            echo '<div>';
+            echo ' The difference is less than three months, we need to add one year to the expiry date';
+            echo '<div>';
+        }
         $expiryDate->add(new DateInterval("P1Y"));
     }
+
+    if ($debug) {
+        echo '<div>';
+        echo 'Calculated Expiry date: ' . $expiryDate->format('Y-m-d');
+        echo '<div>';
+    }
+
 
     return $expiryDate;
 }
