@@ -9,7 +9,8 @@ require_once($cfg["path_dbe"] . "/DBEStaffAppraisalQuestionnaire.inc.php");
 require_once($cfg["path_dbe"] . "/DBEStaffAppraisalQuestion.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJStaffAppraisalQuestion.inc.php");
 require_once($cfg["path_dbe"] . "/DBEAnswerType.inc.php");
-require_once($cfg["path_dbe"] . "/DBEStaffAppraisalAnswer.inc.php");
+require_once($cfg["path_dbe"] . "/DBEStaffAppraisalQuestionAnswer.inc.php");
+require_once($cfg["path_dbe"] . "/DBEStaffAppraisalQuestionnaireAnswer.php");
 
 class BUStaffAppraisalQuestionnaire extends Business
 {

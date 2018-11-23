@@ -77,4 +77,16 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
         $this->setPK(0);
     }
 
+    public function getRowByQuestionnaireAndStaff($questionnaireID,
+                                                  int $staffID
+    )
+    {
+        $query = "select " . $this->getDBColumnNamesAsString(
+            ) . " from " . $this->tableName . " where " . $this->getDBColumnName(
+                self::questionnaireID
+            ) . " = " . $questionnaireID . " and " . $this->getDBColumnName(self::staffMemberId) . " = " . $staffID;
+        $this->setQueryString($query);
+
+        $this->getRow();
+    }
 }

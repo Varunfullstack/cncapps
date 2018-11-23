@@ -9,6 +9,7 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUStaffAppraisalQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEStaffAppraisalObjectives.php');
 
 // Actions
 
@@ -57,7 +58,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
         switch ($_REQUEST['action']) {
             case 'employeeAnswer':
-                $this->showEmployeeAnswer();
+                $this->showEmployeeAnswer($_REQUEST['questionnaireID']);
                 break;
             case 'createQuestion':
             case 'editQuestion':
@@ -647,7 +648,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('updateQuestion');
         $dsQuestion = &$this->dsQuestion;
-        var_dump($_REQUEST['question']);
         $this->formError = (!$this->dsQuestion->populateFromArray($_REQUEST['question']));
         if ($this->formError) {
             if ($this->dsQuestion->getValue('questionID') == '') {          // attempt to insert
@@ -697,11 +697,67 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         }
     }
 
-    private function showEmployeeAnswer($questionnaireID) {
+    private function showEmployeeAnswer($questionnaireID)
+    {
+        if (!$questionnaireID) {
+            $this->displayFatalError('Questionnaire ID is missing');
+            exit;
+        }
         // we first need to know if there's a questionnaire answer for this questionnaire ID and user
+        $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
+        $staffID = $this->userID;
+        $dbeQuestionnaireAnswer->getRowByQuestionnaireAndStaff(
+            $questionnaireID,
+            $staffID
+        );
+        $managerID = $this->dbeUser->getValue(DBEUser::managerID);
+        if (!$managerID) {
+            $this->displayFatalError('The logged in user does not have a valid manager assigned');
+            exit;
+        }
 
+        if (!$dbeQuestionnaireAnswer->rowCount()) {
+            // we need to create it as there's none
+            $dbeQuestionnaireAnswer->setValue(
+                DBEStaffAppraisalQuestionnaireAnswer::staffMemberId,
+                $staffID
+            );
+            $dbeQuestionnaireAnswer->setValue(
+                DBEStaffAppraisalQuestionnaireAnswer::questionnaireID,
+                $questionnaireID
+            );
 
+            $dbeQuestionnaireAnswer->setValue(
+                DBEStaffAppraisalQuestionnaireAnswer::managerId,
+                $managerID
+            );
 
+            $dbeQuestionnaireAnswer->insertRow();
+            $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
+
+            // we have to create the 4 Objectives
+
+            $dbeObjective = new DBEStaffAppraisalObjectives($this);
+
+            for ($i = 1; $i < 5; $i++) {
+
+                $dbeObjective->setValue(
+                    DBEStaffAppraisalObjectives::id,
+                    $i
+                );
+                $dbeObjective->setValue(
+                    DBEStaffAppraisalObjectives::questionnaireAnswerID,
+                    $questionnaireAnswerID
+                );
+                $dbeObjective->setShowSQLOn();
+                $dbeObjective->insertRow();
+                $dbeObjective->setLogSQLOff();
+            }
+        }
+        //here we should have a valid and populated questionnaire answer :D
+        $this->setTemplateFiles(
+            array('QuestionList' => 'StaffAppraisalQuestionList.inc')
+        );
 
     }
 }// end of class

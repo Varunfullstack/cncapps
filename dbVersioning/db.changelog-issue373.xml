@@ -91,7 +91,7 @@
             <column name="proposedSalary" type="int(11)"/>
         </createTable>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue373-1542643720-6">
+    <changeSet author="pavwebdev" id="issue373-1542643720-7">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="staffAppraisalObjectives"/>
