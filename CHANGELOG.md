@@ -7,6 +7,8 @@ This project changes will be shown here.
 - Issue 359 - Management Review Summary shows blank To: field
 - Issue 372 - Email display header missing
 - Issue 360 - SD Dashboard Assignment display issue
+### Changed 
+- Issue 365 - Performance table formatting improvements
 
 ## [v1.13.2] - 2018-11-23
 ## Fixed
