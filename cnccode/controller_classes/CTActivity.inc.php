@@ -481,6 +481,9 @@ class CTActivity extends CTCNC
             case 'salesRequestReview':
                 $this->salesRequestReview();
                 break;
+            case 'contactNotes':
+                echo json_encode(['data' => $this->getContactNotes()]);
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -6798,6 +6801,20 @@ class CTActivity extends CTCNC
         );
 
         $this->redirectToDisplay($_REQUEST['callActivityID']);
+    }
+
+    private function getContactNotes()
+    {
+        $contactId = @$_REQUEST['contactID'];
+
+        if (!$contactId) {
+            throw new Exception('Contact ID is missing');
+        }
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($contactId);
+
+        return $dbeContact->getValue(DBEContact::notes);
     }
 }
 

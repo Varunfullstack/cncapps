@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 376 - Contact notes being copied to other contacts
+
 ## [v1.13.2] - 2018-11-23
 ## Fixed
 - Contract expiry dates incorrect
