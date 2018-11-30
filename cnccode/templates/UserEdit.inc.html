@@ -6,7 +6,7 @@
 
     function updateHourlyRate(salary, hoursInStandardDay) {
 
-        $('#hourlyPayRateInput').val((salary / 52 / hoursInStandardDay * 5).toFixed(2));
+        $('#hourlyPayRateInput').val((salary / 52 / (hoursInStandardDay * 5)).toFixed(2));
     }
 
     function onHoursInAStandardDayChanged() {
