@@ -1,19 +1,132 @@
 <!-- Template: UserEdit.inc.html -->
 <script type="text/javascript">
-    function validateCustomer() {
-        if (document.getElementById("customer").checked == true) {
-            document.getElementById("maintenance").checked = false;
-            document.getElementById("accounts").checked = false;
-            document.getElementById("technical").checked = false;
-            document.getElementById("service").checked = false;
-            document.getElementById("sales").checked = false;
-            document.getElementById("reports").checked = false;
-            document.getElementById("customerID").disabled = 0;
+    function onSalaryChanged() {
+        updateHourlyRate($('#salary').val(), $('#hoursInStandardDay').val());
+    }
+
+    function updateHourlyRate(salary, hoursInStandardDay) {
+
+        $('#hourlyPayRateInput').val((salary / 52 / hoursInStandardDay * 5).toFixed(2));
+    }
+
+    function onHoursInAStandardDayChanged() {
+        updateHoursWorkedInAWeek();
+        let salaryInput = $('#salary')[0];
+
+        let promise = new Promise(resolve => {
+            resolve(salaryInput)
+        });
+        if (!salaryInput) {
+            promise = editEncrypted('salary', $('#salaryButton')[0], null, null, null, {
+                onchange: 'onSalaryChanged()',
+                type: 'number'
+            }).then(() => {
+                return $('#salary')[0];
+            })
+
         }
-        else {
-            document.getElementById("customerID").disabled = 1;
-            document.getElementById("customerID").selectedIndex = 0;
+        promise.then(salaryInput => {
+            updateHourlyRate(salaryInput.value, $('#hoursInStandardDay').val());
+        })
+    }
+
+
+    $(function () {
+        updateHoursWorkedInAWeek();
+    })
+
+    function updateHoursWorkedInAWeek() {
+        $('#hoursWorkedInAWeek').html("Hours Worked In A Week: " + $('#hoursInStandardDay').val() * 5 + " hours")
+    }
+
+    function checkSalaryChanges() {
+
+        const salaryInput = $('#salary')[0];
+
+        if (salaryInput)
+
+
+            return false;
+    }
+
+
+    window.storedPassPhrase = null;
+
+    function storePassPhrase(passPhrase) {
+        storedPassPhrase = passPhrase;
+        setTimeout(() => {
+            window.storedPassPhrase = null;
+        }, 300000);
+    }
+
+
+    function editEncrypted(id, element, extraData = null, additionalClass = null, additionalFunction = null, additionalAttribute = null) {
+        const el = $(element);
+        const parent = el.closest('td');
+
+        let encryptedValue = parent.find('.encrypted').val();
+        let promise;
+
+        if (encryptedValue) {
+            let passPhrase = window.storedPassPhrase;
+            if (!passPhrase) {
+                passPhrase = prompt('Please provide secure passphrase');
+                storePassPhrase(passPhrase);
+            }
+            if (!passPhrase) {
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('passphrase', passPhrase);
+            formData.append('encryptedData', encryptedValue);
+            if (extraData) {
+                formData.append('extraData', extraData)
+            }
+            promise = fetch('?action=decrypt', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                return null;
+            }).then(json => {
+                if (json) {
+                    return json;
+                } else {
+                    return {decryptedData: ''};
+                }
+            })
+        } else {
+            promise = new Promise(resolve => {
+                resolve({decryptedData: ''})
+            });
         }
+
+        return promise.then(data => {
+            let additionalAttributes = "";
+            if (additionalAttribute) {
+                additionalAttributes = Object.keys(additionalAttribute).reduce((acc, key) => {
+                    acc += " " + key + " ='" + additionalAttribute[key] + "'";
+                    return acc;
+                }, "")
+            }
+
+            parent.append('<input id="' + id + '" ' + additionalAttributes + (additionalClass ? " class='" + additionalClass + "'" : '') + ' name="user[1][' + id + ']" value="' + data.decryptedData + '">');
+
+            if (data.extraData) {
+                parent.append('<span>' + data.extraData + '</span>');
+            }
+
+            if (additionalFunction) {
+                additionalFunction();
+            }
+
+            el.hide();
+        })
+
     }
 </script>
 <TABLE width="200px"
@@ -36,8 +149,8 @@
       action="{urlUpdate}"
       name="user"
       AUTOCOMPLETE="OFF"
-
->    <table width="700px"
+>
+    <table width="700px"
            border="0"
 
     >
@@ -49,218 +162,23 @@
             <td class="promptText">Name</td>
             <td class="fieldText">
                 <input {DISABLED}
-                    name="user[1][name]"
-                    type="text"
-                    value="{name}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{nameMessage}</span></td>
+                       name="user[1][name]"
+                       type="text"
+                       value="{name}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{nameMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Salutation</td>
             <td class="fieldText">
                 <input {DISABLED}
-                    name="user[1][salutation]"
-                    type="text"
-                    value="{salutation}"
-                    size="50"
-                    maxlength="50"
-            > <span class="formErrorMessage">{salutationMessage}</span></td>
-        </tr>
-        <tr>
-            <td class="promptText">Manager</td>
-            <td class="fieldText"><select
-                    {DISABLED}
-                    type="text"
-                    name="user[1][managerID]"
-            >
-                <option value="0">None</option>
-                <!-- BEGIN managerBlock -->
-                <option {managerSelected}
-                        value="{managerID}"
-                >{managerName}
-                </option>
-                <!-- END managerBlock -->
-            </select></td>
-        </tr>
-        <tr>
-            <td class="promptText">Team</td>
-            <td class="fieldText">
-                <select
-                        {DISABLED}
-                        type="text"
-                        name="user[1][teamID]"
-                >
-                    <!-- BEGIN teamBlock -->
-                    <option {teamSelected}
-                            value="{teamID}"
-                    >{teamName}
-                    </option>
-                    <!-- END teamBlock -->
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td width="20%"
-                class="promptText"
-            >Address
-            </td>
-            <td class="field">
-                <input {DISABLED}
+                       name="user[1][salutation]"
                        type="text"
-                       name="user[1][add1]"
-                       value="{add1}"
+                       value="{salutation}"
                        size="50"
                        maxlength="50"
-                > <span class="formErrorMessage">{add1Message}</span>
-            </td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][add2]"
-                       value="{add2}"
-                       size="50"
-                       maxlength="50"
-                > <span class="formErrorMessage">{add2Message}</span>
-            </td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][add3]"
-                       value="{add3}"
-                       size="50"
-                       maxlength="50"
-                > <span class="formErrorMessage">{add3Message}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Town</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][town]"
-                       value="{town}"
-                       size="50"
-                       maxlength="50"
-                > <span class="formErrorMessage">{townMessage}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">County</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][county]"
-                       value="{county}"
-                       size="50"
-                       maxlength="50"
-                > <span class="formErrorMessage">{countyMessage}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Postcode</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][postcode]"
-                       value="{postcode}"
-                       size="20"
-                       maxlength="20"
-                > <span class="formErrorMessage">{postcodeMessage}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Username</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][username]"
-                       value="{username}"
-                       size="20"
-                       maxlength="20"
-                > <span class="formErrorMessage">{usernameMessage}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Employee No</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][employeeNo]"
-                       value="{employeeNo}"
-                       size="20"
-                       maxlength="20"
-                > <span class="formErrorMessage">{employeeNoMessage}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Petrol Rate</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][petrolRate]"
-                       value="{petrolRate}"
-                       size="10"
-                       maxlength="10"
-                > <span class="formErrorMessage">{petrolRateMessage}</span>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="promptText">Hourly Pay Rate</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][hourlyPayRate]"
-                       value="{hourlyPayRate}"
-                       size="10"
-                       maxlength="10"
-                > <span class="formErrorMessage">{hourlyPayRateMessage}</span>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="promptText">Hours In Standard Day</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][standardDayHours]"
-                       value="{standardDayHours}"
-                       size="10"
-                       maxlength="10"
-                > <span class="formErrorMessage">{standardDayHoursMessage}</span>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="promptText">Signature File</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][signatureFilename]"
-                       value="{signatureFilename}"
-                       size="10"
-                       maxlength="10"
-                > <span class="formErrorMessage">{signatureFilenameMessage}</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Job Title</td>
-            <td class="field">
-                <input {DISABLED}
-                       type="text"
-                       name="user[1][jobTitle]"
-                       value="{jobTitle}"
-                       size="50"
-                       maxlength="50"
-                > <span class="formErrorMessage">{jobTitleMessage}</span>
-            </td>
+                > <span class="formErrorMessage">{salutationMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">First Name</td>
@@ -287,10 +205,336 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Job Title</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][jobTitle]"
+                       value="{jobTitle}"
+                       size="50"
+                       maxlength="50"
+                > <span class="formErrorMessage">{jobTitleMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Team</td>
+            <td class="fieldText">
+                <select
+                        {DISABLED}
+                        type="text"
+                        name="user[1][teamID]"
+                >
+                    <!-- BEGIN teamBlock -->
+                    <option {teamSelected}
+                            value="{teamID}"
+                    >{teamName}
+                    </option>
+                    <!-- END teamBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Manager</td>
+            <td class="fieldText"><select
+                    {DISABLED}
+                    type="text"
+                    name="user[1][managerID]"
+            >
+                <option value="0">None</option>
+                <!-- BEGIN managerBlock -->
+                <option {managerSelected}
+                        value="{managerID}"
+                >{managerName}
+                </option>
+                <!-- END managerBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">Username</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][username]"
+                       value="{username}"
+                       size="20"
+                       maxlength="20"
+                > <span class="formErrorMessage">{usernameMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Employee No</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][employeeNo]"
+                       value="{employeeNo}"
+                       size="20"
+                       maxlength="20"
+                > <span class="formErrorMessage">{employeeNoMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Start Date</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('startDate',this, 'lengthOfService', 'jqueryCalendar',reAttachCalendars)"
+                ><i class="fa fa-pencil {startDatePencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedStartDate]"
+                       value="{encryptedStartDate}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Date Of Birth</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('dateOfBirth',this, 'age', 'jqueryCalendar', reAttachCalendars)"
+                ><i class="fa fa-pencil {dateOfBirthPencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedDateOfBirth]"
+                       value="{encryptedDateOfBirth}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td width="20%"
+                class="promptText"
+            >Address
+            </td>
+
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('address1',this)"
+                ><i class="fa fa-pencil {address1PencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedAddress1]"
+                       value="{encryptedAddress1}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('address2',this)"
+                ><i class="fa fa-pencil {address2PencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedAddress2]"
+                       value="{encryptedAddress2}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('address3',this)"
+                ><i class="fa fa-pencil {address3PencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedAddress3]"
+                       value="{encryptedAddress3}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Town</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('town',this)"
+                ><i class="fa fa-pencil {townPencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedTown]"
+                       value="{encryptedTown}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">County</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('county',this)"
+                ><i class="fa fa-pencil {countyPencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedCounty]"
+                       value="{encryptedCounty}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Postcode</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('postcode',this)"
+                ><i class="fa fa-pencil {postcodePencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedPostcode]"
+                       value="{encryptedPostcode}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Petrol Rate</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][petrolRate]"
+                       value="{petrolRate}"
+                       size="10"
+                       maxlength="10"
+                > <span class="formErrorMessage">{petrolRateMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Company Healthcare Start Date</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][companyHealthcareStartDate]"
+                       value="{companyHealthcareStartDate}"
+                       size="10"
+                       maxlength="10"
+                       class="jqueryCalendar"
+                > <span class="formErrorMessage">{companyHealthcareStartDateMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Enhanced CNC 2 year pension Start Date</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][enhancedCNC2YearPensionStartDate]"
+                       value="{enhancedCNC2YearPensionStartDate}"
+                       size="10"
+                       maxlength="10"
+                       class="jqueryCalendar"
+                > <span class="formErrorMessage">{enhancedCNC2YearPensionStartDateMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Pension Additional payments</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('pensionAdditionalPayments',this)"
+                ><i class="fa fa-pencil {pensionAdditionalPaymentsPencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedPensionAdditionalPayments]"
+                       value="{encryptedPensionAdditionalPayments}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Salary</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('salary',this, null, null, null, {onchange: 'onSalaryChanged()', type: 'number'})"
+                        id="salaryButton"
+                ><i class="fa fa-pencil {salaryPencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedSalary]"
+                       value="{encryptedSalary}"
+                       class="encrypted"
+
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Hourly Pay Rate</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][hourlyPayRate]"
+                       value="{hourlyPayRate}"
+                       size="10"
+                       maxlength="10"
+                       readonly
+                       id="hourlyPayRateInput"
+                > <span class="formErrorMessage">{hourlyPayRateMessage}</span>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Hours In Standard Day</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][standardDayHours]"
+                       value="{standardDayHours}"
+                       size="10"
+                       maxlength="10"
+                       onchange="onHoursInAStandardDayChanged()"
+                       id="hoursInStandardDay"
+                ><span id="hoursWorkedInAWeek"></span> <span class="formErrorMessage">{standardDayHoursMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Salary Sacrifice</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('salarySacrifice',this)"
+                ><i class="fa fa-pencil {salarySacrificePencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedSalarySacrifice]"
+                       value="{encryptedSalarySacrifice}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">National Insurance Number</td>
+            <td class="field">
+                <button type="button"
+                        onclick="editEncrypted('nationalInsuranceNumber',this)"
+                ><i class="fa fa-pencil {nationalInsuranceNumberPencilColor}"></i>
+                </button>
+                <input type="hidden"
+                       name="user[1][encryptedNationalInsuranceNumber]"
+                       value="{encryptedNationalInsuranceNumber}"
+                       class="encrypted"
+                >
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Signature File</td>
+            <td class="field">
+                <input {DISABLED}
+                       type="text"
+                       name="user[1][signatureFilename]"
+                       value="{signatureFilename}"
+                       size="10"
+                       maxlength="10"
+                > <span class="formErrorMessage">{signatureFilenameMessage}</span>
+            </td>
+        </tr>
+
+
+        <tr>
             <td class="promptText">Overtime on Weekdays</td>
             <td class="fieldText"><input name="user[1][weekdayOvertimeFlag]"
                                          type="checkbox"
-                                         id="user[1][weekdayOvertimeFlag]"
                                          value="Y"
                                          {DISABLED}
                                          {weekdayOvertimeFlagChecked}
@@ -497,10 +741,12 @@
 
         <tr>
             <td>&nbsp;</td>
-            <td class="formErrorMessage"><input type="submit"
-                                                name="Submit"
-                                                value="Update"
-            ></td>
+            <td class="formErrorMessage">
+                <input type="submit"
+                       name="Submit"
+                       value="Update"
+                >
+            </td>
         </tr>
     </table>
 </form>

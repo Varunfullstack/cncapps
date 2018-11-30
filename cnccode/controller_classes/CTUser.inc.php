@@ -39,6 +39,8 @@ define(
 
 class CTUser extends CTCNC
 {
+    const DECRYPT = 'decrypt';
+    const GetAge = 'getAge';
     var $dsUser = '';
     var $dsAbsence = '';
     var $buUser = '';
@@ -67,6 +69,70 @@ class CTUser extends CTCNC
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
         $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
+
+        $this->dsUser->setAddColumnsOn();
+        $this->dsUser->addColumn(
+            "dateOfBirth",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "startDate",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "pensionAdditionalPayments",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "salary",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "salarySacrifice",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "nationalInsuranceNumber",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "address1",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "address2",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "address3",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "town",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "county",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->dsUser->addColumn(
+            "postcode",
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
+        $this->dsUser->setAddColumnsOff();
 
         $this->dsAbsence = new DSForm($this);
         $this->dsAbsence->addColumn(
@@ -107,6 +173,50 @@ class CTUser extends CTCNC
             case CTUSER_ACT_ABSENCE_EDIT:
                 $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
                 $this->absenceEdit();
+                break;
+            case self::DECRYPT:
+                $response = ["status" => "ok"];
+                try {
+                    $response['decryptedData'] = \CNCLTD\Encryption::decrypt(
+                        USER_ENCRYPTION_PRIVATE_KEY,
+                        @$_REQUEST['passphrase'],
+                        @$_REQUEST['encryptedData']
+                    );
+
+                    if (isset($_REQUEST['extraData']) && $response['decryptedData']) {
+                        switch ($_REQUEST['extraData']) {
+                            case 'age':
+                                $response['extraData'] = (new DateTime())->diff(
+                                        DateTime::createFromFormat(
+                                            'd/m/Y',
+                                            $response['decryptedData']
+                                        )
+                                    )->y . " years old";
+                                break;
+                            case 'lengthOfService':
+                                $difference = (new DateTime())->diff(
+                                    DateTime::createFromFormat(
+                                        'd/m/Y',
+                                        $response['decryptedData']
+                                    )
+                                );
+
+                                $differenceTotal = $difference->y + $difference->m / 12;
+
+                                $response['extraData'] = "Length Of Service : " . number_format(
+                                        $differenceTotal,
+                                        1
+                                    ) . " years";
+                                break;
+                        }
+                    }
+
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                    http_response_code(400);
+                }
+                echo json_encode($response);
                 break;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
@@ -283,40 +393,109 @@ class CTUser extends CTCNC
         );
         $this->template->setVar(
             array(
-                'bodyTagExtras'            => 'OnLoad="validateCustomer()"',
-                'userID'                   => $dsUser->getValue('userID'),
-                'name'                     => Controller::htmlInputText($dsUser->getValue('name')),
-                'nameMessage'              => Controller::htmlDisplayText($dsUser->getMessage('name')),
-                'salutation'               => Controller::htmlInputText($dsUser->getValue('salutation')),
-                'salutationMessage'        => Controller::htmlDisplayText($dsUser->getMessage('salutation')),
-                'add1'                     => Controller::htmlInputText($dsUser->getValue('add1')),
-                'add1Message'              => Controller::htmlDisplayText($dsUser->getMessage('add1')),
-                'add2'                     => Controller::htmlInputText($dsUser->getValue('add2')),
-                'add3'                     => Controller::htmlInputText($dsUser->getValue('add3')),
-                'town'                     => Controller::htmlInputText($dsUser->getValue('town')),
-                'townMessage'              => Controller::htmlDisplayText($dsUser->getMessage('town')),
-                'county'                   => Controller::htmlInputText($dsUser->getValue('county')),
-                'postcode'                 => Controller::htmlInputText($dsUser->getValue('postcode')),
-                'postcodeMessage'          => Controller::htmlDisplayText($dsUser->getMessage('postcode')),
-                'username'                 => Controller::htmlInputText($dsUser->getValue('username')),
-                'usernameMessage'          => Controller::htmlDisplayText($dsUser->getMessage('username')),
-                'employeeNo'               => Controller::htmlInputText($dsUser->getValue('employeeNo')),
-                'employeeNoMessage'        => Controller::htmlDisplayText($dsUser->getMessage('employeeNo')),
-                'jobTitle'                 => Controller::htmlInputText($dsUser->getValue('jobTitle')),
-                'jobTitleMessage'          => Controller::htmlDisplayText($dsUser->getMessage('jobTitle')),
-                'petrolRate'               => Controller::htmlInputText($dsUser->getValue('petrolRate')),
-                'petrolRateMessage'        => Controller::htmlDisplayText($dsUser->getMessage('petrolRate')),
-                'hourlyPayRate'            => Controller::htmlInputText($dsUser->getValue('hourlyPayRate')),
-                'hourlyPayRateMessage'     => Controller::htmlDisplayText($dsUser->getMessage('hourlyPayRate')),
-                'standardDayHours'         => Controller::htmlInputText($dsUser->getValue('standardDayHours')),
-                'standardDayHoursMessage'  => Controller::htmlDisplayText($dsUser->getMessage('standardDayHours')),
-                'signatureFilename'        => Controller::htmlInputText($dsUser->getValue('signatureFilename')),
-                'signatureFilenameMessage' => Controller::htmlDisplayText($dsUser->getMessage('signatureFilename')),
-                'firstName'                => Controller::htmlInputText($dsUser->getValue('firstName')),
-                'firstNameMessage'         => Controller::htmlDisplayText($dsUser->getMessage('firstName')),
-                'lastName'                 => Controller::htmlInputText($dsUser->getValue('lastName')),
-                'lastNameMessage'          => Controller::htmlDisplayText($dsUser->getMessage('lastName')),
-                'activeFlagChecked'        => Controller::htmlChecked($dsUser->getValue('activeFlag')),
+                'userID'                               => $dsUser->getValue('userID'),
+                'name'                                 => Controller::htmlInputText($dsUser->getValue('name')),
+                'nameMessage'                          => Controller::htmlDisplayText($dsUser->getMessage('name')),
+                'salutation'                           => Controller::htmlInputText($dsUser->getValue('salutation')),
+                'salutationMessage'                    => Controller::htmlDisplayText(
+                    $dsUser->getMessage('salutation')
+                ),
+                'address1PencilColor'                  => $this->dsUser->getValue(
+                    DBEUser::encryptedAddress1
+                ) ? "greenPencil" : "redPencil",
+                'encryptedAddress1'                    => $this->dsUser->getValue(
+                    DBEUser::encryptedAddress1
+                ),
+                "dateOfBirthPencilColor"               => $this->dsUser->getValue(
+                    DBEUser::encryptedDateOfBirth
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedDateOfBirth"                 => $this->dsUser->getValue(DBEUser::encryptedDateOfBirth),
+                "startDatePencilColor"                 => $this->dsUser->getValue(
+                    DBEUser::encryptedStartDate
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedStartDate"                   => $this->dsUser->getValue(DBEUser::encryptedStartDate),
+                "pensionAdditionalPaymentsPencilColor" => $this->dsUser->getValue(
+                    DBEUser::encryptedPensionAdditionalPayments
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedPensionAdditionalPayments"   => $this->dsUser->getValue(
+                    DBEUser::encryptedPensionAdditionalPayments
+                ),
+                "salaryPencilColor"                    => $this->dsUser->getValue(
+                    DBEUser::encryptedSalary
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedSalary"                      => $this->dsUser->getValue(DBEUser::encryptedSalary),
+                "salarySacrificePencilColor"           => $this->dsUser->getValue(
+                    DBEUser::encryptedSalarySacrifice
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedSalarySacrifice"             => $this->dsUser->getValue(DBEUser::encryptedSalarySacrifice),
+                "nationalInsuranceNumberPencilColor"   => $this->dsUser->getValue(
+                    DBEUser::encryptedNationalInsuranceNumber
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedNationalInsuranceNumber"     => $this->dsUser->getValue(
+                    DBEUser::encryptedNationalInsuranceNumber
+                ),
+                "address2PencilColor"                  => $this->dsUser->getValue(
+                    DBEUser::encryptedAddress2
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedAddress2"                    => $this->dsUser->getValue(DBEUser::encryptedAddress2),
+                "address3PencilColor"                  => $this->dsUser->getValue(
+                    DBEUser::encryptedAddress3
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedAddress3"                    => $this->dsUser->getValue(DBEUser::encryptedAddress3),
+                "townPencilColor"                      => $this->dsUser->getValue(
+                    DBEUser::encryptedTown
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedTown"                        => $this->dsUser->getValue(DBEUser::encryptedTown),
+                "countyPencilColor"                    => $this->dsUser->getValue(
+                    DBEUser::encryptedCounty
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedCounty"                      => $this->dsUser->getValue(DBEUser::encryptedCounty),
+                "postcodePencilColor"                  => $this->dsUser->getValue(
+                    DBEUser::encryptedPostcode
+                ) ? 'greenPencil' : 'redPencil',
+                "encryptedPostcode"                    => $this->dsUser->getValue(DBEUser::encryptedPostcode),
+                'add1'                                 => Controller::htmlInputText($dsUser->getValue('add1')),
+                'add1Message'                          => Controller::htmlDisplayText($dsUser->getMessage('add1')),
+                'add2'                                 => Controller::htmlInputText($dsUser->getValue('add2')),
+                'add3'                                 => Controller::htmlInputText($dsUser->getValue('add3')),
+                'town'                                 => Controller::htmlInputText($dsUser->getValue('town')),
+                'townMessage'                          => Controller::htmlDisplayText($dsUser->getMessage('town')),
+                'county'                               => Controller::htmlInputText($dsUser->getValue('county')),
+                'postcode'                             => Controller::htmlInputText($dsUser->getValue('postcode')),
+                'postcodeMessage'                      => Controller::htmlDisplayText($dsUser->getMessage('postcode')),
+                'username'                             => Controller::htmlInputText($dsUser->getValue('username')),
+                'usernameMessage'                      => Controller::htmlDisplayText($dsUser->getMessage('username')),
+                'employeeNo'                           => Controller::htmlInputText($dsUser->getValue('employeeNo')),
+                'employeeNoMessage'                    => Controller::htmlDisplayText(
+                    $dsUser->getMessage('employeeNo')
+                ),
+                'jobTitle'                             => Controller::htmlInputText($dsUser->getValue('jobTitle')),
+                'jobTitleMessage'                      => Controller::htmlDisplayText($dsUser->getMessage('jobTitle')),
+                'petrolRate'                           => Controller::htmlInputText($dsUser->getValue('petrolRate')),
+                'petrolRateMessage'                    => Controller::htmlDisplayText(
+                    $dsUser->getMessage('petrolRate')
+                ),
+                'hourlyPayRate'                        => Controller::htmlInputText($dsUser->getValue('hourlyPayRate')),
+                'hourlyPayRateMessage'                 => Controller::htmlDisplayText(
+                    $dsUser->getMessage('hourlyPayRate')
+                ),
+                'standardDayHours'                     => Controller::htmlInputText(
+                    $dsUser->getValue('standardDayHours')
+                ),
+                'standardDayHoursMessage'              => Controller::htmlDisplayText(
+                    $dsUser->getMessage('standardDayHours')
+                ),
+                'signatureFilename'                    => Controller::htmlInputText(
+                    $dsUser->getValue('signatureFilename')
+                ),
+                'signatureFilenameMessage'             => Controller::htmlDisplayText(
+                    $dsUser->getMessage('signatureFilename')
+                ),
+                'firstName'                            => Controller::htmlInputText($dsUser->getValue('firstName')),
+                'firstNameMessage'                     => Controller::htmlDisplayText($dsUser->getMessage('firstName')),
+                'lastName'                             => Controller::htmlInputText($dsUser->getValue('lastName')),
+                'lastNameMessage'                      => Controller::htmlDisplayText($dsUser->getMessage('lastName')),
+                'activeFlagChecked'                    => Controller::htmlChecked($dsUser->getValue('activeFlag')),
 
                 'receiveSdManagerEmailFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue('receiveSdManagerEmailFlag')
@@ -368,25 +547,27 @@ class CTUser extends CTCNC
                         PHPLIB_PERM_RENEWALS
                     ) !== FALSE) ? CT_CHECKED : '',
 
-                'changeApproverFlagChecked'    => Controller::htmlChecked($dsUser->getValue('changeApproverFlag')),
+                'changeApproverFlagChecked'           => Controller::htmlChecked(
+                    $dsUser->getValue('changeApproverFlag')
+                ),
                 'changeInitialDateAndTimeFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
                 ),
-                'excludeFromStatsFlagChecked'  => Controller::htmlChecked(
+                'excludeFromStatsFlagChecked'         => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::excludeFromStatsFlag)
                 ),
-                'projectManagementFlagChecked' => Controller::htmlChecked(
+                'projectManagementFlagChecked'        => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::projectManagementFlag)
                 ),
-                'reportsChecked'               => (strpos(
+                'reportsChecked'                      => (strpos(
                         $dsUser->getValue('perms'),
                         PHPLIB_PERM_REPORTS
                     ) !== FALSE) ? CT_CHECKED : '',
-                'teamMessage'                  => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
-                'urlUpdate'                    => $urlUpdate,
-                'urlDelete'                    => $urlDelete,
-                'txtDelete'                    => $txtDelete,
-                'urlDisplayList'               => $urlDisplayList
+                'teamMessage'                         => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
+                'urlUpdate'                           => $urlUpdate,
+                'urlDelete'                           => $urlDelete,
+                'txtDelete'                           => $txtDelete,
+                'urlDisplayList'                      => $urlDisplayList
             )
         );
 
@@ -508,6 +689,123 @@ class CTUser extends CTCNC
             $this->edit();
             exit;
         }
+
+        if ($this->dsUser->getValue("dateOfBirth")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedDateOfBirth,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("dateOfBirth")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("startDate")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedStartDate,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("startDate")
+                )
+            );
+        }
+
+        if ($this->dsUser->getValue("pensionAdditionalPayments")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedPensionAdditionalPayments,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("pensionAdditionalPayments")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("salary")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedSalary,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("salary")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("salarySacrifice")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedSalarySacrifice,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("salarySacrifice")
+                )
+            );
+        }
+
+        if ($this->dsUser->getValue("nationalInsuranceNumber")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedNationalInsuranceNumber,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("nationalInsuranceNumber")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("address1")) {
+
+            $this->dsUser->setValue(
+                DBEUser::encryptedAddress1,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("address1")
+                )
+            );
+
+//            var_dump($this->dsUser->getValue(DBEUser::encryptedAddress1));
+//            exit;
+        }
+        if ($this->dsUser->getValue("address2")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedAddress2,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("address2")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("address3")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedAddress3,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("address3")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("town")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedTown,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("town")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("county")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedCounty,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("county")
+                )
+            );
+        }
+        if ($this->dsUser->getValue("postcode")) {
+            $this->dsUser->setValue(
+                DBEUser::encryptedPostcode,
+                \CNCLTD\Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $this->dsUser->getValue("postcode")
+                )
+            );
+        }
+        $this->dsUser->setUpdateModeUpdate();
+        $this->dsUser->post();
 
         $this->buUser->updateUser($this->dsUser);
 

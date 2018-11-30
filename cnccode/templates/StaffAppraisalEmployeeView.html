@@ -1,54 +1,258 @@
-<h2>
-    Welcome to this questionnaire :D
-</h2>
-<h2>
-    Data
-</h2>
 <style>
     .questionnaireData tr td:nth-child(odd) {
         font-weight: bold;
     }
+
+    .requiredStar {
+        color: red;
+    }
+
+    .flexboxContainer {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+
+    .spacer {
+        flex-grow: 1;
+    }
+
+    .central {
+        width: 1000px;
+    }
+
+    .flexboxContainer table {
+        width: 100%;
+        /*border: 1px solid black;*/
+        border-collapse: collapse;
+    }
+
+    .flexboxContainer tr, .flexboxContainer td, .flexboxContainer th {
+        border: 1px solid black;
+    }
+
+    .flexboxContainer textarea {
+        width: 100%;
+    }
+
+
 </style>
-<h1>Flowers, Unicorns and Ribbons!!</h1>
-<table class="questionnaireData">
-    <tbody>
-    <tr>
-        <td>
-            Appraisee:
-        </td>
-        <td>
-            {employeeName}
-        </td>
-        <td>
-            Appraiser:
-        </td>
-        <td>
-            {managerName}
-        </td>
-    </tr>
-    <tr>
-        <td>Employment Start:</td>
-        <td>{employeeStartDate}</td>
-        <td>Position:</td>
-        <td>{employeePosition}</td>
-    </tr>
-    <tr>
-        <td>Sick Days This Year:</td>
-        <td>
-            <input type="number"
-                   step="0.5"
-                   name="sickDaysThisYear"
-                   value="{sickDaysThisYear}"
-                   {disableInputs}
+<script>
+    function saveAndExit() {
+        saveQuestionnaire().then(function () {
+            alert("Your answers have been saved");
+            window.location = '/';
+        })
+    }
+
+
+    $(function () {
+        setInterval(saveQuestionnaire, 30000);
+    });
+
+
+    function saveQuestionnaire() {
+        const formObject = $('#questionnaireForm').serializeArray().reduce((acc, item) => {
+            acc[item.name] = item.value;
+            return acc;
+        }, {});
+
+        console.log(formObject);
+        //we are going to modify the array we receive from jQuery and make it an object
+
+        return $.ajax({
+            url: '{autoSaveQuestionnaireURL}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: formObject
+        }).then(function (result) {
+            console.log(result);
+        })
+    }
+
+    function test() {
+        alert('You have completed the questionnaire');
+        return true;
+    }
+
+</script>
+<div class="flexboxContainer">
+    <div class="spacer">
+        &nbsp;
+    </div>
+    <div class="central">
+        <h2>
+            Welcome to this questionnaire :D
+        </h2>
+        <h2>
+            Data
+        </h2>
+        <form id="questionnaireForm"
+              action="{completeQuestionnaireURL}"
+              method="post"
+              onsubmit="return test();"
+        >
+            <input type="hidden"
+                   name="questionnaireAnswerID"
+                   value="{questionnaireAnswerID}"
             >
-        </td>
-    </tr>
-    </tbody>
-</table>
-<div class="questions">
-    {questions}
+            <table class="questionnaireData">
+                <tbody>
+                <tr>
+                    <td>
+                        Appraisee:
+                    </td>
+                    <td>
+                        {employeeName}
+                    </td>
+                    <td>
+                        Appraiser:
+                    </td>
+                    <td>
+                        {managerName}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Employment Start:</td>
+                    <td>{employeeStartDate}</td>
+                    <td>Position:</td>
+                    <td>{employeePosition}</td>
+                </tr>
+                <tr {displayManager}>
+                    <td>Sick Days This Year:</td>
+                    <td>
+                        <input type="number"
+                               step="0.5"
+                               name="sickDaysThisYear"
+                               value="{sickDaysThisYear}"
+                               {disableInputs}
+                        >
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="questions">
+                {questions}
+            </div>
+
+            <h2>Development and Objectives</h2>
+            <p>Discuss and agree the specific objectives that will enable the appraise to reach competence and to meet
+                performance
+                in current job
+            </p>
+            <table>
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Objective</th>
+                    <th>Measure/Standard</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN objectivesBlock -->
+                <tr>
+                    <td>{number}</td>
+                    <td>
+                        <input type="text"
+                               name="objective[{id}][objective]"
+                               value="{objective}"
+                        >
+                    </td>
+                    <td>
+                        <input type="text"
+                               name="objective[{id}][measure]"
+                               value="{measure}"
+                        >
+                    </td>
+                    <td>
+                        <input type="text"
+                               name="objective[{id}][comment]"
+                               value="{comment}"
+                        >
+                    </td>
+                </tr>
+                <!-- END objectivesBlock -->
+                </tbody>
+            </table>
+            <br>
+            <table>
+                <thead>
+                <tr>
+                    <td>Current Salary</td>
+                    <td {displayManager}>Proposed Salary</td>
+                    <td {displayManager}>Proposed Bonus</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{currentSalary}</td>
+                    <td {displayManager}>
+                        <input name="proposedSalary"
+                               value="{proposedSalary}"
+                               width="100%"
+                        >
+                    </td>
+                    <td {displayManager}>
+                        <input name="proposedBonus"
+                               value="{proposedBonus}"
+                               width="100%"
+                        >
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <table {displayManager}>
+                <thead>
+                <tr>
+                    <th>Team Leader Comments</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <textarea name="teamLeaderComments"
+                                  rows="5"
+                        >{teamLeaderComments}</textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <table {displayManager}>
+                <thead>
+                <tr>
+                    <th>Manager Comments</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <textarea name="managerComments"
+                                  rows="5"
+                        >{managerComments}</textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <button type="button"
+                    onclick="saveAndExit()"
+            >Save & Exit
+            </button>
+            <button type="submit">Complete Questionnaire</button>
+
+            <input type="hidden"
+                   name="completeFor"
+                   value="{completePerson}"
+            >
+        </form>
+
+    </div>
+    <div class="spacer">
+        &nbsp;
+    </div>
 </div>
 
-<h2>Development and Objectives</h2>
-<p>Discuss and agree the specific objectives that will enable the appraise to reach competence and to meet performance
-    in current job</p>

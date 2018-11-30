@@ -43,6 +43,22 @@ class DBEUser extends DBEntity
     const changeInitialDateAndTimeFlag = 'changeInitialDateAndTimeFlag';
     const projectManagementFlag = 'projectManagementFlag';
 
+    const encryptedDateOfBirth = "encryptedDateOfBirth";
+    const encryptedStartDate = "encryptedStartDate";
+    const companyHealthcareStartDate = "companyHealthcareStartDate";
+    const enhancedCNC2YearPensionStartDate = "enhancedCNC2YearPensionStartDate";
+    const encryptedPensionAdditionalPayments = "encryptedPensionAdditionalPayments";
+    const encryptedSalary = "encryptedSalary";
+    const encryptedSalarySacrifice = "encryptedSalarySacrifice";
+    const hoursWorkedInAWeek = "hoursWorkedInAWeek";
+    const encryptedNationalInsuranceNumber = "encryptedNationalInsuranceNumber";
+    const encryptedAddress1 = "encryptedAddress1";
+    const encryptedAddress2 = "encryptedAddress2";
+    const encryptedAddress3 = "encryptedAddress3";
+    const encryptedTown = "encryptedTown";
+    const encryptedCounty = "encryptedCounty";
+    const encryptedPostcode = "encryptedPostcode";
+
     /**
      * calls constructor()
      * @access public
@@ -235,6 +251,82 @@ class DBEUser extends DBEntity
             DA_NOT_NULL
         );
 
+        $this->addColumn(
+            self::encryptedDateOfBirth,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedStartDate,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::companyHealthcareStartDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::enhancedCNC2YearPensionStartDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedPensionAdditionalPayments,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedSalary,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedSalarySacrifice,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::hoursWorkedInAWeek,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedNationalInsuranceNumber,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedAddress1,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedAddress2,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedAddress3,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedTown,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedCounty,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::encryptedPostcode,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -296,6 +388,26 @@ class DBEUser extends DBEntity
         $this->setQueryString($query);
 
         return (parent::getRows());
+    }
+
+    public function getAppraisalUsers()
+    {
+        $ignoredUsers = [67, 97, 111, 115];
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(
+                self::userID
+            ) . " not in (select distinct managers." . $this->getDBColumnName(
+                self::managerID
+            ) . " from " . $this->tableName . " managers) and " .
+            $this->getDBColumnName(self::activeFlag) . " = 'Y' and " . $this->getDBColumnName(
+                self::userID
+            ) . " not in (" . implode(
+                ',',
+                $ignoredUsers
+            ) . ")";
+        $this->setQueryString($query);
+        return parent::getRows();
     }
 }
 

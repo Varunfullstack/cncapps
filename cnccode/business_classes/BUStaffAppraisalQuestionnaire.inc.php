@@ -181,5 +181,83 @@ class BUStaffAppraisalQuestionnaire extends Business
         return $ret;
 
     }
+
+    public function getStats($managerID)
+    {
+
+        global $db;
+        $db->query(
+            "SELECT 
+       questionnaireID,
+       (select description from StaffAppraisalQuestionnaire where id = questionnaireID) as description,
+  SUM(IF(NOT a.staffCompleted, 1, 0)) AS staffPending,
+  SUM(a.`staffCompleted`) AS managerPending,
+  SUM(a.`managerCompleted`) AS completed
+FROM
+  StaffAppraisalQuestionnaireAnswer a 
+WHERE a.managerID = $managerID 
+GROUP BY a.`questionnaireID` "
+        );
+
+        $stats = [];
+
+        while ($db->next_record(MYSQLI_ASSOC)) {
+            $stats[] = [
+                "questionnaireID" => $db->Record['questionnaireID'],
+                "description"     => $db->Record['description'],
+                "staffPending"    => $db->Record['staffPending'],
+                "managerPending"  => $db->Record['managerPending'],
+                'completed'       => $db->Record['completed']
+            ];
+
+        };
+        return $stats;
+    }
+
+    public function getManagerData($managerID,
+                                   $type,
+                                   $questionnaireID
+    )
+    {
+        global $db;
+        $db->query(
+            "SELECT 
+  * 
+FROM
+  (SELECT 
+    questionnaireID,
+    a.`staffMemberID`,
+    consultant.`firstName`,
+    consultant.`lastName`,
+    IF(
+      NOT staffCompleted,
+      'staffPending',
+      IF(
+        NOT `managerCompleted`,
+        'managerPending',
+        'completed'
+      )
+    ) AS STATUS 
+  FROM
+    StaffAppraisalQuestionnaireAnswer a 
+    LEFT JOIN `consultant` ON consultant.`cns_consno` = staffMemberID
+  WHERE a.managerID = $managerID and questionnaireID = $questionnaireID) test 
+WHERE test.status = '$type' order by firstName, lastName"
+        );
+
+        $stats = [];
+
+        while ($db->next_record(MYSQLI_ASSOC)) {
+            $stats[] = [
+                "questionnaireID" => $db->Record['questionnaireID'],
+                "staffMemberID"   => $db->Record['staffMemberID'],
+                "firstName"       => $db->Record['firstName'],
+                "lastName"        => $db->Record['lastName'],
+                'status'          => $db->Record['status']
+            ];
+
+        };
+        return $stats;
+    }
 }// End of class
 ?>

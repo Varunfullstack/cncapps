@@ -12,12 +12,16 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
 {
     const id = "id";
     const questionnaireID = "questionnaireID";
-    const staffMemberId = "staffMemberId";
-    const managerId = "managerId";
+    const staffMemberID = "staffMemberID";
+    const managerID = "managerID";
     const startedAt = "startedAt";
-    const completed = "completed";
+    const staffCompleted = "staffCompleted";
+    const managerCompleted = "managerCompleted";
     const sickDaysThisYear = "sickDaysThisYear";
     const proposedSalary = "proposedSalary";
+    const proposedBonus = "proposedBonus";
+    const teamLeaderComments = "teamLeaderComments";
+    const managerComments = "managerComments";
 
     /**
      * calls constructor()
@@ -42,12 +46,12 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
             DA_NOT_NULL
         );
         $this->addColumn(
-            self::staffMemberId,
+            self::staffMemberID,
             DA_ID,
             DA_NOT_NULL
         );
         $this->addColumn(
-            self::managerId,
+            self::managerID,
             DA_ID,
             DA_NOT_NULL
         );
@@ -57,10 +61,17 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            self::completed,
+            self::staffCompleted,
             DA_INTEGER,
             DA_NOT_NULL
         );
+
+        $this->addColumn(
+            self::managerCompleted,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
         $this->addColumn(
             self::sickDaysThisYear,
             DA_INTEGER,
@@ -72,6 +83,23 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::proposedBonus,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::teamLeaderComments,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::managerComments,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
 
         $this->setAddColumnsOff();
         $this->setPK(0);
@@ -84,7 +112,7 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
         $query = "select " . $this->getDBColumnNamesAsString(
             ) . " from " . $this->tableName . " where " . $this->getDBColumnName(
                 self::questionnaireID
-            ) . " = " . $questionnaireID . " and " . $this->getDBColumnName(self::staffMemberId) . " = " . $staffID;
+            ) . " = " . $questionnaireID . " and " . $this->getDBColumnName(self::staffMemberID) . " = " . $staffID;
         $this->setQueryString($query);
 
         $this->getRow();

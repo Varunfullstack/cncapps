@@ -9,6 +9,7 @@ class DBEStaffAppraisalQuestionnaire extends DBEntity
 {
     const id = "id";
     const description = "description";
+    const dateSent = "dateSent";
 
     /**
      * calls constructor()
@@ -30,6 +31,12 @@ class DBEStaffAppraisalQuestionnaire extends DBEntity
             self::description,
             DA_STRING,
             DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::dateSent,
+            DA_DATETIME,
+            DA_ALLOW_NULL
         );
 
         $this->setAddColumnsOff();

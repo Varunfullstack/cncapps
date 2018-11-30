@@ -124,4 +124,14 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         }
         return $colString;
     }
+
+    public function getRowsByAnswerID(string $questionnaireAnswerID)
+    {
+        $query = "select " . $this->getDBColumnNamesAsString(
+            ) . " from " . $this->tableName . " where " . $this->getDBColumnName(
+                self::questionnaireAnswerID
+            ) . " = $questionnaireAnswerID";
+        $this->setQueryString($query);
+        $this->getRows(self::id);
+    }
 }

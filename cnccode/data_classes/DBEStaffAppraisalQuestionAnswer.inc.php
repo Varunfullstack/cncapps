@@ -13,7 +13,7 @@ class DBEStaffAppraisalQuestionAnswer extends DBEntity
     const questionnaireAnswerID = "questionnaireAnswerID";
     const staffAnswer = "staffAnswer";
     const managerAnswer = "managerAnswer";
-    const managerNote = "managerNote";
+    const managerComment = "managerComment";
 
     /**
      * calls constructor()
@@ -56,7 +56,7 @@ class DBEStaffAppraisalQuestionAnswer extends DBEntity
         );
 
         $this->addColumn(
-            self::managerNote,
+            self::managerComment,
             DA_STRING,
             DA_ALLOW_NULL
         );
@@ -64,6 +64,20 @@ class DBEStaffAppraisalQuestionAnswer extends DBEntity
 
         $this->setAddColumnsOff();
         $this->setPK(0);
+    }
+
+    public function getRowByIDAndQuestionnaireAnswerID($questionID,
+                                                       $questionnaireAnswerID
+    )
+    {
+        $query = "select " . $this->getDBColumnNamesAsString() .
+            " from " . $this->getTableName() . " where " . $this->getDBColumnName(
+                self::questionID
+            ) . " =  $questionID and " . $this->getDBColumnName(
+                self::questionnaireAnswerID
+            ) . " = $questionnaireAnswerID";
+        $this->setQueryString($query);
+        $this->getRow();
     }
 }
 

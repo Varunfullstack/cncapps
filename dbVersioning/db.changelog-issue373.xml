@@ -31,6 +31,7 @@
         <createTable tableName="staffAppraisalQuestionnaire">
             <column name="id" type="int(11)"/>
             <column name="description" type="varchar(150)"/>
+            <column name="dateSent" type="datetime"/>
         </createTable>
     </changeSet>
     <changeSet author="pavwebdev" id="issue373-1542643720-3">
@@ -71,7 +72,7 @@
             <column name="questionnaireAnswerID" type="int(11)"/>
             <column name="staffAnswer" type="text"/>
             <column name="managerAnswer" type="text"/>
-            <column name="managerNote" type="text"/>
+            <column name="managerComment" type="text"/>
         </createTable>
     </changeSet>
     <changeSet author="pavwebdev" id="issue373-1542643720-6">
@@ -86,9 +87,13 @@
             <column name="staffMemberID" type="int(11)"/>
             <column name="managerID" type="int(11)"/>
             <column name="startedAt" type="datetime"/>
-            <column name="completed" type="tinyint(1)" defaultValue="0"/>
+            <column name="staffCompleted" type="tinyint(1)" defaultValue="0"/>
+            <column name="managerCompleted" type="tinyint(1)" defaultValue="0"/>
             <column name="sickDaysThisYear" type="decimal(3,1)"/>
             <column name="proposedSalary" type="int(11)"/>
+            <column name="proposedBonus" type="int(11)"/>
+            <column name="teamLeaderComments" type="text"/>
+            <column name="managerComments" type="text"/>
         </createTable>
     </changeSet>
     <changeSet author="pavwebdev" id="issue373-1542643720-7">
@@ -104,5 +109,29 @@
             <column name="measure" type="text"/>
             <column name="comment" type="text"/>
         </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="encryptedDateOfBirth"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="encryptedDateOfBirth" type="mediumtext"/>
+            <column name="encryptedStartDate" type="mediumtext"/>
+            <column name="companyHealthcareStartDate" type="date"/>
+            <column name="enhancedCNC2YearPensionStartDate" type="date"/>
+            <column name="encryptedPensionAdditionalPayments" type="mediumtext"/>
+            <column name="encryptedSalary" type="mediumtext"/>
+            <column name="encryptedSalarySacrifice" type="mediumtext"/>
+            <column name="hoursWorkedInAWeek" type="int(11)"/>
+            <column name="encryptedNationalInsuranceNumber" type="mediumtext"/>
+            <column name="encryptedAddress1" type="mediumtext"/>
+            <column name="encryptedAddress2" type="mediumtext"/>
+            <column name="encryptedAddress3" type="mediumtext"/>
+            <column name="encryptedTown" type="mediumtext"/>
+            <column name="encryptedCounty" type="mediumtext"/>
+            <column name="encryptedPostcode" type="mediumtext"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
