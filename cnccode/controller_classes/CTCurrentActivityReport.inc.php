@@ -295,7 +295,7 @@ class CTCurrentActivityReport extends CTCNC
 
     }
 
-    function allocateUser()
+    function allocateUser($options = [])
     {
         $dbeUser = new DBEUser ($this);
         $dbeUser->setValue(
@@ -313,8 +313,9 @@ class CTCurrentActivityReport extends CTCNC
         $urlNext =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
-                array()
+                $options ? $options : []
             );
+
         header('Location: ' . $urlNext);
         exit;
     }

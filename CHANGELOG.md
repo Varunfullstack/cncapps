@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 376 - Contact notes being copied to other contacts
 - Issue 359 - Management Review Summary shows blank To: field
 - Issue 372 - Email display header missing
+- Issue 360 - SD Dashboard Assignment display issue
 
 ## [v1.13.2] - 2018-11-23
 ## Fixed
