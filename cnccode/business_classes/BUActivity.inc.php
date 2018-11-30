@@ -10426,9 +10426,11 @@ is currently a balance of ';
         );
 
         $body = $template->get_var('output');
+        $toEmail = 'managementreview@' . CONFIG_PUBLIC_DOMAIN;
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => 'Management Review Summary Added ' . $dbeJProblem->getValue(
                     DBEJProblem::customerName
                 ) . ' SR ' . $problemID,
@@ -10449,7 +10451,6 @@ is currently a balance of ';
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $toEmail = 'managementreview@' . CONFIG_PUBLIC_DOMAIN;
 
         $buMail->putInQueue(
             $senderEmail,
