@@ -892,8 +892,6 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
 
         $currentSalaryEncrypted = $this->staffMember->getValue(\DBEUser::encryptedSalary);
 
-        var_dump($currentSalaryEncrypted);
-        exit;
         if ($currentSalaryEncrypted) {
 
 

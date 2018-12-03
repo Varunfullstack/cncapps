@@ -386,7 +386,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         $this->setMethodName('update');
         $dsQuestionnaire = &$this->dsQuestionnaire;
-//        var_dump($_REQUEST);
         $this->formError = (!$this->dsQuestionnaire->populateFromArray($_REQUEST['questionnaire']));
         if ($this->formError) {
             if ($this->dsQuestionnaire->getValue(
@@ -1596,6 +1595,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->sendStaffCompleteManagerEmail($dbeQuestionnaireAnswer);
         }
 
+
         if ($isManager) {
 
             $passPhrase = $_REQUEST['passPhrase'];
@@ -1608,6 +1608,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 DBEStaffAppraisalQuestionnaireAnswer::managerCompleted,
                 1
             );
+
 
             // we have to generate the PDF, and send it to signable
             $this->sendToSignable(
@@ -1626,13 +1627,16 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                                          $passPhrase
     )
     {
+
         $questionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
         $questionnaireAnswer->getRow($questionnaireAnswerID);
+
 
         $mainPDF = new CNCLTD\StaffAppraisalPDF(
             $questionnaireAnswer,
             $passPhrase
         );
+
         $fileName = PDF_TEMP_DIR . '/test.pdf';
         $mainPDF->Output(
             'F',
