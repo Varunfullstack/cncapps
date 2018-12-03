@@ -413,7 +413,6 @@ class DBEUser extends DBEntity
                 ',',
                 $ignoredUsers
             ) . ")";
-        var_dump($query);
         $this->setQueryString($query);
         return parent::getRows();
     }

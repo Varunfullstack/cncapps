@@ -45,13 +45,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
         $this->buQuestionnaire = new BUStaffAppraisalQuestionnaire($this);
         $this->dsQuestionnaire = new DSForm($this);
         $this->dsQuestionnaire->copyColumnsFrom($this->buQuestionnaire->dbeQuestionnaire);
@@ -978,6 +971,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
     private function showEmployeeAnswer($questionnaireID)
     {
+
         if (!$questionnaireID) {
             $this->displayFatalError('Questionnaire ID is missing');
             exit;
@@ -992,6 +986,9 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->displayFatalError('The questionnaire does not exist');
             exit;
         }
+
+        $this->setPageTitle($dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
+
         // we first need to know if there's a questionnaire answer for this questionnaire ID and user
         $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
         $staffID = $this->userID;
