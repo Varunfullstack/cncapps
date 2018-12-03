@@ -57,7 +57,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
         switch ($_REQUEST['action']) {
             case 'generatePDF':
                 $filename = $this->getPDFQuestionnaire(
