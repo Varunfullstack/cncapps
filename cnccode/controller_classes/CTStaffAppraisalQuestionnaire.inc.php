@@ -212,14 +212,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                             'questionnaireID' => $questionnaireID
                         )
                     );
-                $urlView =
-                    $this->buildLink(
-                        'http://cnc-ltd.co.uk/questionnaire/index.php',
-                        array(
-                            'questionnaireno' => $questionnaireID
-                        )
-                    );
-
                 $urlEdit =
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
@@ -229,6 +221,19 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         )
                     );
                 $txtEdit = '[edit]';
+
+                $sendURL = $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action'          => 'sendQuestionnaire',
+                        'questionnaireID' => $questionnaireID
+                    ]
+                );
+                $sendLink = "<a href='$sendURL'>[Send To Staff members]</a>";
+                $dateSent = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
+                if ($dateSent && $dateSent != '0000-00-00 00:00:00') {
+                    $sendLink = "";
+                }
 
                 if ($this->buQuestionnaire->canDelete($questionnaireID)) {
                     $urlDelete =
@@ -243,11 +248,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 } else {
                     $urlDelete = '';
                     $txtDelete = '';
-                }
-
-                $sendLink = '';
-                if (!$dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent)) {
-                    $sendLink = '[Send]';
                 }
 
                 $this->template->set_var(
@@ -1673,18 +1673,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
                 $questionnaireID = $stat['id'];
 
-                $sendURL = $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    [
-                        'action'          => 'sendQuestionnaire',
-                        'questionnaireID' => $questionnaireID
-                    ]
-                );
-                $sendLink = "<a href='$sendURL'>Send</a>";
-                if ($stat['dateSent'] && $stat['dateSent'] != '0000-00-00 00:00:00') {
-                    $sendLink = "";
-                }
-
                 $this->template->set_var(
                     array(
                         'questionnaireID' => $questionnaireID,
@@ -1692,7 +1680,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         'staffPending'    => $stat['staffPending'],
                         'managerPending'  => $stat['managerPending'],
                         'completed'       => $stat['completed'],
-                        "sendLink"        => $sendLink
                     )
                 );
 
@@ -1703,17 +1690,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 );
             }//while $dsQuestionnaire->fetchNext()
         }
-
-        $sendURL = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'sendQuestionnaire',
-            ]
-        );
-
-        $this->template->setVar(
-            ["sendQuestionnaireURL" => $sendURL]
-        );
 
         $this->template->parse(
             'CONTENTS',
