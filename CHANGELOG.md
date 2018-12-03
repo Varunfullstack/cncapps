@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [V1.14.0]
+### Added
+- Issue 373 - Staff Appraisal Process
 
 ## [v1.13.2] - 2018-11-23
 ## Fixed
