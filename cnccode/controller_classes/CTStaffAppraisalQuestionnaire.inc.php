@@ -167,6 +167,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
      */
     function displayList()
     {
+
+        if (!self::isAppraiser()) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->setMethodName('displayList');
         $this->setPageTitle('Questionnaires');
         $this->setTemplateFiles(
@@ -1644,6 +1649,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
     private function showManagerQuestionnaireList()
     {
+        if (!self::isAppraiser()) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->setMethodName('displayQuestions');
         $this->setTemplateFiles(
             array('StaffAppraisalManagerQuestionnaireList' => 'StaffAppraisalManagerQuestionnaireList.inc')

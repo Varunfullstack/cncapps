@@ -58,6 +58,7 @@ class DBEUser extends DBEntity
     const encryptedTown = "encryptedTown";
     const encryptedCounty = "encryptedCounty";
     const encryptedPostcode = "encryptedPostcode";
+    const staffAppraiserFlag = 'staffAppraiserFlag';
 
     /**
      * calls constructor()
@@ -326,6 +327,12 @@ class DBEUser extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
+
+        $this->addColumn(
+            self::staffAppraiserFlag,
+            DA_YN,
+            DA_NOT_NULL
+        ); // does user get overtime in weekdays
 
         $this->setPK(0);
         $this->setAddColumnsOff();

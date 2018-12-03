@@ -493,8 +493,10 @@ class CTUser extends CTCNC
                 'lastName'                             => Controller::htmlInputText($dsUser->getValue('lastName')),
                 'lastNameMessage'                      => Controller::htmlDisplayText($dsUser->getMessage('lastName')),
                 'activeFlagChecked'                    => Controller::htmlChecked($dsUser->getValue('activeFlag')),
-
-                'receiveSdManagerEmailFlagChecked' => Controller::htmlChecked(
+                'staffAppraiserFlagChecked'            => Controller::htmlChecked(
+                    $dsUser->getValue(DBEUser::staffAppraiserFlag)
+                ),
+                'receiveSdManagerEmailFlagChecked'     => Controller::htmlChecked(
                     $dsUser->getValue('receiveSdManagerEmailFlag')
                 ),
 
@@ -567,7 +569,6 @@ class CTUser extends CTCNC
                 'urlDisplayList'                      => $urlDisplayList
             )
         );
-
         // manager selection
         $dbeManager = new DBEUser($this);
         $dbeManager->getRows();
@@ -782,7 +783,6 @@ class CTUser extends CTCNC
 
         if (isset($_REQUEST['user'][1]["town"])) {
             if ($_REQUEST['user'][1]["town"]) {
-                var_dump('it has a value');
                 $_REQUEST['user'][1]["encryptedTown"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
@@ -790,10 +790,8 @@ class CTUser extends CTCNC
                     );
 
             } else {
-                var_dump('it does not have a value');
                 $_REQUEST['user'][1]["encryptedTown"] = null;
             }
-//            exit;
         }
 
         if (isset($_REQUEST['user'][1]["county"])) {
@@ -823,10 +821,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedPostcode"] = null;
             }
         }
-
-
         $this->formError = (!$this->dsUser->populateFromArray($_REQUEST['user']));
-
         if (isset($_REQUEST['perms'])) {
             $this->dsUser->setUpdateModeUpdate();
             $this->dsUser->setValue(

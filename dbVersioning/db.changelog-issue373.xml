@@ -132,6 +132,7 @@
             <column name="encryptedTown" type="mediumtext"/>
             <column name="encryptedCounty" type="mediumtext"/>
             <column name="encryptedPostcode" type="mediumtext"/>
+            <column name="staffAppraiserFlag" type="char(1)" defaultValue="N"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

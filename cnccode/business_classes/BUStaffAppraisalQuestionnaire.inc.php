@@ -186,18 +186,20 @@ class BUStaffAppraisalQuestionnaire extends Business
     {
 
         global $db;
-        $db->query(
-            "SELECT * FROM StaffAppraisalQuestionnaire LEFT JOIN 
+        $query = "SELECT * FROM StaffAppraisalQuestionnaire LEFT JOIN 
 
 (SELECT 
        questionnaireID,
-  SUM(IF(NOT a.staffCompleted, 1, 0)) AS staffPending,
-  SUM(a.`staffCompleted`) AS managerPending,
-  SUM(a.`managerCompleted`) AS completed
+  SUM(NOT staffCompleted AND NOT managerCompleted) AS staffPending,
+      SUM(staffCompleted AND NOT managerCompleted) AS managerPending,
+      SUM(staffCompleted AND managerCompleted) AS completed 
 FROM
   StaffAppraisalQuestionnaireAnswer a 
 WHERE a.managerID = $managerID
-GROUP BY a.`questionnaireID`) stats ON stats.questionnaireID = id"
+GROUP BY a.`questionnaireID`) stats ON stats.questionnaireID = id";
+
+        $db->query(
+            $query
         );
 
         $stats = [];
