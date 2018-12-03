@@ -6,6 +6,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Signable\ApiClient;
+use Signable\DocumentWithoutTemplate;
+use Signable\Envelopes;
+use Signable\Party;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUStaffAppraisalQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -61,7 +67,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
         switch ($_REQUEST['action']) {
             case 'generatePDF':
-                $filename = $this->getPDFQuestionnaire($_REQUEST['questionnaireAnswerID']);
+                $filename = $this->getPDFQuestionnaire(
+                    $_REQUEST['questionnaireAnswerID'],
+                    'grass-fridge-mouse-boat'
+                );
                 header('Pragma: public');
                 header('Expires: 0');
                 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -128,6 +137,21 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 break;
             case 'completeQuestionnaire':
                 $this->completeQuestionnaire();
+                break;
+            case 'decrypt':
+                $response = ["status" => "ok"];
+                try {
+                    $response['decryptedData'] = \CNCLTD\Encryption::decrypt(
+                        USER_ENCRYPTION_PRIVATE_KEY,
+                        @$_REQUEST['passphrase'],
+                        @$_REQUEST['encryptedData']
+                    );
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                    http_response_code(400);
+                }
+                echo json_encode($response);
                 break;
             case 'displayList':
             default:
@@ -802,6 +826,9 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             exit;
         }
 
+        $staffMember = new DBEUser($this);
+        $staffMember->getRow($staffID);
+
 
         //here we should have a valid and populated questionnaire answer :D
         $this->setTemplateFiles(
@@ -815,29 +842,38 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $this->template->setVar(
             [
-                "employeeName"       => $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(
+                "employeeName"             => $staffMember->getValue(
+                        DBEUser::firstName
+                    ) . ' ' . $staffMember->getValue(
                         DBEUser::lastName
                     ),
-                "managerName"        => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
+                "managerName"              => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
                         DBEUser::lastName
                     ),
-                "employeeStartDate"  => (new DateTime())->format('Y-m-d'),
-                "employeePosition"   => "Minion",
-                "sickDaysThisYear"   => $dbeQuestionnaireAnswer->getValue(
+                "employeeStartDate"        => $staffMember->getValue(DBEUser::startDate),
+                "employeePosition"         => $staffMember->getValue(DBEUser::jobTitle),
+                "sickDaysThisYear"         => $dbeQuestionnaireAnswer->getValue(
                     DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear
                 ),
-                "completePerson"     => "manager",
-                "proposedSalary"     => $dbeQuestionnaireAnswer->getValue(
+                "completePerson"           => "manager",
+                "proposedSalary"           => $dbeQuestionnaireAnswer->getValue(
                     DBEStaffAppraisalQuestionnaireAnswer::proposedSalary
                 ),
-                "proposedBonus"      => $dbeQuestionnaireAnswer->getValue(
+                "proposedBonus"            => $dbeQuestionnaireAnswer->getValue(
                     DBEStaffAppraisalQuestionnaireAnswer::proposedBonus
                 ),
-                "teamLeaderComments" => $dbeQuestionnaireAnswer->getValue(
+                "teamLeaderComments"       => $dbeQuestionnaireAnswer->getValue(
                     DBEStaffAppraisalQuestionnaireAnswer::teamLeaderComments
                 ),
-                "managerComments"    => $dbeQuestionnaireAnswer->getValue(
+                "managerComments"          => $dbeQuestionnaireAnswer->getValue(
                     DBEStaffAppraisalQuestionnaireAnswer::managerComments
+                ),
+                "encryptedSalary"          => $staffMember->getValue(DBEUser::encryptedSalary),
+                "completeQuestionnaireURL" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'completeQuestionnaire'
+                    )
                 ),
 
             ]
@@ -1022,10 +1058,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 "managerName"              => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
                         DBEUser::lastName
                     ),
-                "employeeStartDate"        => (new DateTime())->format('Y-m-d'),
-                "employeePosition"         => "Minion",
+                "employeeStartDate"        => $this->dbeUser->getValue(DBEUser::startDate),
+                "employeePosition"         => $this->dbeUser->getValue(
+                    DBEUser::jobTitle
+                ),
                 "displayManager"           => "style='display: none'",
-                "currentSalary"            => "lots of moneys",
                 "completeQuestionnaireURL" => $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
@@ -1294,7 +1331,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $required = $isRequired ? "required='required'" : '';
                 $managerAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerAnswer);
                 $question = "<p>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : '') .
-                    "</p><br><textarea rows='5' name='question[$questionID][staffMemberAnswer]'>$value</textarea>";
+                    "</p><br><textarea rows='5' name='question[$questionID][staffMemberAnswer]'>$value</textarea><br><br>";
                 if ($isManager) {
                     $question = "
                     <tr>
@@ -1559,9 +1596,22 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         }
 
         if ($isManager) {
+
+            $passPhrase = $_REQUEST['passPhrase'];
+
+            if (!$passPhrase) {
+                throw new Exception('Passphrase is needed for decrypting data');
+            }
+
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerCompleted,
                 1
+            );
+
+            // we have to generate the PDF, and send it to signable
+            $this->sendToSignable(
+                $dbeQuestionnaireAnswer,
+                $passPhrase
             );
         }
 
@@ -1570,12 +1620,18 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         Header("Location: /");
     }
 
-    private function getPDFQuestionnaire($questionnaireAnswerID)
+
+    private function getPDFQuestionnaire($questionnaireAnswerID,
+                                         $passPhrase
+    )
     {
         $questionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
         $questionnaireAnswer->getRow($questionnaireAnswerID);
 
-        $mainPDF = new CNCLTD\StaffAppraisalPDF($questionnaireAnswer);
+        $mainPDF = new CNCLTD\StaffAppraisalPDF(
+            $questionnaireAnswer,
+            $passPhrase
+        );
         $fileName = PDF_TEMP_DIR . '/test.pdf';
         $mainPDF->Output(
             'F',
@@ -1606,7 +1662,19 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             foreach ($stats as $stat) {
 
-                $questionnaireID = $stat['questionnaireID'];
+                $questionnaireID = $stat['id'];
+
+                $sendURL = $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action'          => 'sendQuestionnaire',
+                        'questionnaireID' => $questionnaireID
+                    ]
+                );
+                $sendLink = "<a href='$sendURL'>Send</a>";
+                if ($stat['dateSent'] && $stat['dateSent'] != '0000-00-00 00:00:00') {
+                    $sendLink = "";
+                }
 
                 $this->template->set_var(
                     array(
@@ -1614,7 +1682,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         'description'     => $stat['description'],
                         'staffPending'    => $stat['staffPending'],
                         'managerPending'  => $stat['managerPending'],
-                        'completed'       => $stat['completed']
+                        'completed'       => $stat['completed'],
+                        "sendLink"        => $sendLink
                     )
                 );
 
@@ -1623,7 +1692,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     'QuestionnaireBlock',
                     true
                 );
-
             }//while $dsQuestionnaire->fetchNext()
         }
 
@@ -1660,7 +1728,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             throw new Exception('The questionnaire does not exist');
         }
 
-        if ($dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent)) {
+        $dateSent = $dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
+
+
+        if ($dateSent && $dateSent != "0000-00-00 00:00:00") {
             throw new Exception('This questionnaire has already been sent');
         }
 
@@ -1670,6 +1741,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $buMail = new BUMail($this);
         while ($dbeUser->fetchNext()) {
+
             // we have to create the answer for the user, and send the link through email
             $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
             $staffID = $dbeUser->getValue(DBEUser::userID);
@@ -1742,7 +1814,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $body = $template->getVar('OUTPUT');
 
-            $emailTo = $dbeUser->getValue(DBEUser::name) . "@cnc-ltd.co.uk";
+            $emailTo = $dbeUser->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
 
             $hdrs = array(
                 'From'         => CONFIG_SUPPORT_EMAIL,
@@ -1780,7 +1852,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             (new DateTime())->format(COMMON_MYSQL_DATETIME)
         );
         $dbeQuestionnaire->updateRow();
-        echo json_encode(['status' => 'ok']);
+        return $this->showManagerQuestionnaireList();
     }
 
     private function getQuestionnaireManagerData($type,
@@ -1853,7 +1925,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $body = $template->getVar('OUTPUT');
 
-        $emailTo = $manager->getValue(DBEUser::name) . "@cnc-ltd.co.uk";
+        $emailTo = $manager->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
 
         $hdrs = array(
             'From'         => CONFIG_SUPPORT_EMAIL,
@@ -1884,6 +1956,85 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $hdrs,
             $body
         );
+    }
+
+    private function sendToSignable(DBEStaffAppraisalQuestionnaireAnswer $dbeQuestionnaireAnswer,
+                                    $passPhrase
+    )
+    {
+        ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
+
+        $envDocs = [];
+
+        $fileName =
+            $this->getPDFQuestionnaire(
+                $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::id),
+                $passPhrase
+            );
+
+        $manager = new DBEUser($this);
+
+        $manager->getRow($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID));
+
+        $staffMember = new DBEUser($this);
+
+        $staffMember->getRow($dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::staffMemberID));
+
+        $firstName = $staffMember->getValue(DBEUser::firstName);
+        $managerFirstName = $manager->getValue(DBEUser::firstName);
+        $lastName = $staffMember->getValue(DBEUser::lastName);
+        $managerLastName = $manager->getValue(DBEUser::lastName);
+        $email = $staffMember->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
+        $managerEmail = $manager->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
+
+        $envelopeDocument = new DocumentWithoutTemplate(
+            'Staff Appraisal',
+            null,
+            base64_encode(file_get_contents($fileName)),
+            "StaffAppraisal.pdf"
+        );
+
+        $envDocs[] = $envelopeDocument;
+
+        $envelopeParties = [];
+
+        $envelopeParty = new Party(
+            $firstName . ' ' . $lastName,
+            $email,
+            'signer1',
+            'Please sign here',
+            'no',
+            false
+        );
+
+        $managerParty = new \Signable\Party(
+            $managerFirstName . ' ' . $managerLastName,
+            $managerEmail,
+            'signer2',
+            'Please sign here',
+            'no',
+            false
+        );
+
+        $envelopeParties[] = $envelopeParty;
+        $envelopeParties[] = $managerParty;
+
+
+        $response = Envelopes::createNewWithoutTemplate(
+            "Document #Appraisal" . "_" . uniqid(),
+            $envDocs,
+            $envelopeParties,
+            null,
+            false,
+            null,
+            0,
+            0
+        );
+
+        if ($response && $response->http == 202) {
+            return true;
+        }
+        return false;
     }
 }// end of class
 ?>

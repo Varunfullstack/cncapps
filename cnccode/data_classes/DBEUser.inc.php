@@ -44,7 +44,7 @@ class DBEUser extends DBEntity
     const projectManagementFlag = 'projectManagementFlag';
 
     const encryptedDateOfBirth = "encryptedDateOfBirth";
-    const encryptedStartDate = "encryptedStartDate";
+    const startDate = "startDate";
     const companyHealthcareStartDate = "companyHealthcareStartDate";
     const enhancedCNC2YearPensionStartDate = "enhancedCNC2YearPensionStartDate";
     const encryptedPensionAdditionalPayments = "encryptedPensionAdditionalPayments";
@@ -257,8 +257,8 @@ class DBEUser extends DBEntity
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            self::encryptedStartDate,
-            DA_TEXT,
+            self::startDate,
+            DA_DATE,
             DA_ALLOW_NULL
         );
         $this->addColumn(
@@ -406,6 +406,7 @@ class DBEUser extends DBEntity
                 ',',
                 $ignoredUsers
             ) . ")";
+        var_dump($query);
         $this->setQueryString($query);
         return parent::getRows();
     }

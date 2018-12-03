@@ -59,11 +59,18 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
     private $teamLeaderCommentWidth;
     private $hideFooter = false;
     private $hideHeader = false;
+    private $passPhrase;
+    /** @var \DBEUser */
+    private $staffMember;
 
-    public function __construct(\DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer
+    public function __construct(\DBEStaffAppraisalQuestionnaireAnswer $questionnaireAnswer,
+                                $passPhrase
     )
     {
         parent::__construct();
+
+        $this->passPhrase = $passPhrase;
+
         $this->SetFont(
             'Arial',
             '',
@@ -114,6 +121,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $staffMember = new \DBEUser($this);
         $staffMember->getRow($staffMemberID);
 
+        $this->staffMember = $staffMember;
 
         $managerID = $questionnaireAnswer->getValue(\DBEStaffAppraisalQuestionnaireAnswer::managerID);
         $manager = new \DBEUser($this);
@@ -153,10 +161,11 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
             'Employment Start:'
         );
         $this->resetFont();
+
         $this->Cell(
             50,
             10,
-            'we do not have this yet'
+            $staffMember->getValue(\DBEUser::startDate)
         );
         $this->setBold();
         $this->Cell(
@@ -168,7 +177,7 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            'we do not have this yet'
+            $staffMember->getValue(\DBEUser::jobTitle)
         );
         $this->Ln();
         $this->setBold();
@@ -878,15 +887,35 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         );
         $this->resetFont();
         $this->Ln();
-        $this->Cell(
-            $this->objectiveDescriptionWidth,
-            $this->questionSeparation,
-            \Controller::formatNumberCur(
-                0,
+
+        $currentSalary = "Not Set";
+
+        $currentSalaryEncrypted = $this->staffMember->getValue(\DBEUser::encryptedSalary);
+
+        var_dump($currentSalaryEncrypted);
+        exit;
+        if ($currentSalaryEncrypted) {
+
+
+            $currentSalaryValue = Encryption::decrypt(
+                USER_ENCRYPTION_PRIVATE_KEY,
+                $this->passPhrase,
+                $currentSalaryEncrypted
+            );
+            $currentSalary = \Controller::formatNumberCur(
+                $currentSalaryValue,
                 2,
                 ',',
                 false
-            )
+            );
+
+        }
+
+
+        $this->Cell(
+            $this->objectiveDescriptionWidth,
+            $this->questionSeparation,
+            $currentSalary
         );
         $this->Cell(
             $this->objectiveMeasureWidth,

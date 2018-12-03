@@ -410,10 +410,7 @@ class CTUser extends CTCNC
                     DBEUser::encryptedDateOfBirth
                 ) ? 'greenPencil' : 'redPencil',
                 "encryptedDateOfBirth"                 => $this->dsUser->getValue(DBEUser::encryptedDateOfBirth),
-                "startDatePencilColor"                 => $this->dsUser->getValue(
-                    DBEUser::encryptedStartDate
-                ) ? 'greenPencil' : 'redPencil',
-                "encryptedStartDate"                   => $this->dsUser->getValue(DBEUser::encryptedStartDate),
+                "startDate"                            => $this->dsUser->getValue(DBEUser::startDate),
                 "pensionAdditionalPaymentsPencilColor" => $this->dsUser->getValue(
                     DBEUser::encryptedPensionAdditionalPayments
                 ) ? 'greenPencil' : 'redPencil',
@@ -667,6 +664,167 @@ class CTUser extends CTCNC
     {
         $this->setMethodName('update');
         $dsUser = &$this->dsUser;
+
+
+        if (isset($_REQUEST['user'][1]["dateOfBirth"])) {
+
+            if ($_REQUEST['user'][1]["dateOfBirth"]) {
+                $_REQUEST['user'][1]["encryptedDateOfBirth"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("dateOfBirth")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedDateOfBirth"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["pensionAdditionalPayments"])) {
+
+            if ($_REQUEST['user'][1]["pensionAdditionalPayments"]) {
+                $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("pensionAdditionalPayments")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["salary"])) {
+
+            if ($_REQUEST['user'][1]["salary"]) {
+                $_REQUEST['user'][1]["encryptedSalary"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("salary")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedSalary"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["salarySacrifice"])) {
+
+            if ($_REQUEST['user'][1]["salarySacrifice"]) {
+                $_REQUEST['user'][1]["encryptedSalarySacrifice"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("salarySacrifice")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedSalarySacrifice"] = null;
+            }
+        }
+
+
+        if (isset($_REQUEST['user'][1]["nationalInsuranceNumber"])) {
+
+            if ($_REQUEST['user'][1]["nationalInsuranceNumber"]) {
+                $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("nationalInsuranceNumber")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["address1"])) {
+
+            if ($_REQUEST['user'][1]["address1"]) {
+                $_REQUEST['user'][1]["encryptedAddress1"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("address1")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedAddress1"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["address2"])) {
+
+            if ($_REQUEST['user'][1]["address2"]) {
+                $_REQUEST['user'][1]["encryptedAddress2"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("address2")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedAddress2"] = null;
+            }
+        }
+
+
+        if (isset($_REQUEST['user'][1]["address3"])) {
+
+            if ($_REQUEST['user'][1]["address3"]) {
+                $_REQUEST['user'][1]["encryptedAddress3"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("address3")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedAddress3"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["town"])) {
+            if ($_REQUEST['user'][1]["town"]) {
+                var_dump('it has a value');
+                $_REQUEST['user'][1]["encryptedTown"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("town")
+                    );
+
+            } else {
+                var_dump('it does not have a value');
+                $_REQUEST['user'][1]["encryptedTown"] = null;
+            }
+//            exit;
+        }
+
+        if (isset($_REQUEST['user'][1]["county"])) {
+
+            if ($_REQUEST['user'][1]["county"]) {
+                $_REQUEST['user'][1]["encryptedCounty"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("county")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedCounty"] = null;
+            }
+        }
+
+        if (isset($_REQUEST['user'][1]["postcode"])) {
+
+            if ($_REQUEST['user'][1]["postcode"]) {
+                $_REQUEST['user'][1]["encryptedPostcode"] =
+                    \CNCLTD\Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->dsUser->getValue("postcode")
+                    );
+
+            } else {
+                $_REQUEST['user'][1]["encryptedPostcode"] = null;
+            }
+        }
+
+
         $this->formError = (!$this->dsUser->populateFromArray($_REQUEST['user']));
 
         if (isset($_REQUEST['perms'])) {
@@ -690,120 +848,7 @@ class CTUser extends CTCNC
             exit;
         }
 
-        if ($this->dsUser->getValue("dateOfBirth")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedDateOfBirth,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("dateOfBirth")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("startDate")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedStartDate,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("startDate")
-                )
-            );
-        }
 
-        if ($this->dsUser->getValue("pensionAdditionalPayments")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedPensionAdditionalPayments,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("pensionAdditionalPayments")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("salary")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedSalary,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("salary")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("salarySacrifice")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedSalarySacrifice,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("salarySacrifice")
-                )
-            );
-        }
-
-        if ($this->dsUser->getValue("nationalInsuranceNumber")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedNationalInsuranceNumber,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("nationalInsuranceNumber")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("address1")) {
-
-            $this->dsUser->setValue(
-                DBEUser::encryptedAddress1,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("address1")
-                )
-            );
-
-//            var_dump($this->dsUser->getValue(DBEUser::encryptedAddress1));
-//            exit;
-        }
-        if ($this->dsUser->getValue("address2")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedAddress2,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("address2")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("address3")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedAddress3,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("address3")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("town")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedTown,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("town")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("county")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedCounty,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("county")
-                )
-            );
-        }
-        if ($this->dsUser->getValue("postcode")) {
-            $this->dsUser->setValue(
-                DBEUser::encryptedPostcode,
-                \CNCLTD\Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $this->dsUser->getValue("postcode")
-                )
-            );
-        }
         $this->dsUser->setUpdateModeUpdate();
         $this->dsUser->post();
 

@@ -118,7 +118,7 @@
         </preConditions>
         <addColumn tableName="consultant">
             <column name="encryptedDateOfBirth" type="mediumtext"/>
-            <column name="encryptedStartDate" type="mediumtext"/>
+            <column name="startDate" type="date"/>
             <column name="companyHealthcareStartDate" type="date"/>
             <column name="enhancedCNC2YearPensionStartDate" type="date"/>
             <column name="encryptedPensionAdditionalPayments" type="mediumtext"/>

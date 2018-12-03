@@ -187,27 +187,29 @@ class BUStaffAppraisalQuestionnaire extends Business
 
         global $db;
         $db->query(
-            "SELECT 
+            "SELECT * FROM StaffAppraisalQuestionnaire LEFT JOIN 
+
+(SELECT 
        questionnaireID,
-       (select description from StaffAppraisalQuestionnaire where id = questionnaireID) as description,
   SUM(IF(NOT a.staffCompleted, 1, 0)) AS staffPending,
   SUM(a.`staffCompleted`) AS managerPending,
   SUM(a.`managerCompleted`) AS completed
 FROM
   StaffAppraisalQuestionnaireAnswer a 
-WHERE a.managerID = $managerID 
-GROUP BY a.`questionnaireID` "
+WHERE a.managerID = $managerID
+GROUP BY a.`questionnaireID`) stats ON stats.questionnaireID = id"
         );
 
         $stats = [];
 
         while ($db->next_record(MYSQLI_ASSOC)) {
             $stats[] = [
-                "questionnaireID" => $db->Record['questionnaireID'],
-                "description"     => $db->Record['description'],
-                "staffPending"    => $db->Record['staffPending'],
-                "managerPending"  => $db->Record['managerPending'],
-                'completed'       => $db->Record['completed']
+                "id"             => $db->Record['id'],
+                "description"    => $db->Record['description'],
+                "staffPending"   => $db->Record['staffPending'],
+                "managerPending" => $db->Record['managerPending'],
+                'completed'      => $db->Record['completed'],
+                'dateSent'       => $db->Record['dateSent']
             ];
 
         };

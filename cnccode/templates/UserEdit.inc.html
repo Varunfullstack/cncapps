@@ -1,11 +1,60 @@
 <!-- Template: UserEdit.inc.html -->
+<script type="application/javascript"
+        src=".javascript/luxon.min.js"
+></script>
 <script type="text/javascript">
+    function editEncryptedNew() {
+        const el = $(event.target);
+        const parent = el.closest('td');
+
+        const encryptedElement = parent.find('.encrypted');
+
+        let encryptedValue = encryptedElement.val();
+
+
+        let passPhrase = window.storedPassPhrase;
+        if (!passPhrase) {
+            passPhrase = prompt('Please provide secure passphrase');
+            storePassPhrase(passPhrase);
+        }
+        if (!passPhrase) {
+            return;
+        }
+
+        const data = encryptedElement.data();
+
+        const formData = new FormData();
+
+        formData.append('passphrase', passPhrase);
+        formData.append('encryptedData', encryptedValue);
+        if (data.extraData) {
+            formData.append('extraData', data.extraData)
+        }
+        return fetch('?action=decrypt', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+            return null;
+        }).then(json => {
+            if (json) {
+                return json;
+            } else {
+                return {decryptedData: ''};
+            }
+        }).then(serverData => {
+            return generateInput(data.name, parent, serverData, data.extraData, data.customClass, data.customFunction, data.additionalAttributes);
+        })
+    }
+
     function onSalaryChanged() {
         updateHourlyRate($('#salary').val(), $('#hoursInStandardDay').val());
     }
 
     function updateHourlyRate(salary, hoursInStandardDay) {
-
+        console.log(salary, hoursInStandardDay);
         $('#hourlyPayRateInput').val((salary / 52 / (hoursInStandardDay * 5)).toFixed(2));
     }
 
@@ -17,10 +66,7 @@
             resolve(salaryInput)
         });
         if (!salaryInput) {
-            promise = editEncrypted('salary', $('#salaryButton')[0], null, null, null, {
-                onchange: 'onSalaryChanged()',
-                type: 'number'
-            }).then(() => {
+            promise = editEncryptedNew().then(() => {
                 return $('#salary')[0];
             })
 
@@ -33,22 +79,46 @@
 
     $(function () {
         updateHoursWorkedInAWeek();
-    })
+        updateLengthOfService();
+        generateEmptyInputs();
+    });
+
+    function updateLengthOfService() {
+
+        let newValue = null;
+        const dateValue = $('#startDate').val();
+        try {
+            const date = luxon.DateTime.fromFormat(dateValue, 'dd/mm/yyyy');
+            if (date.isValid) {
+                const today = luxon.DateTime.local();
+
+                const difference = today.diff(date, ['years', 'months'], {conversionAccuracy: 'longterm'});
+
+                newValue = (difference.years + difference.months / 12).toFixed(1);
+
+            }
+
+
+        } catch (e) {
+        }
+        let message = "Not Valid Start Date";
+        if (newValue) {
+            message = "Length Of Service: " + newValue + " years";
+        }
+        $('#lengthOfService').html(message);
+    }
 
     function updateHoursWorkedInAWeek() {
         $('#hoursWorkedInAWeek').html("Hours Worked In A Week: " + $('#hoursInStandardDay').val() * 5 + " hours")
     }
 
-    function checkSalaryChanges() {
-
-        const salaryInput = $('#salary')[0];
-
-        if (salaryInput)
-
-
-            return false;
+    function isEmpty(obj) {
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
     }
-
 
     window.storedPassPhrase = null;
 
@@ -59,75 +129,113 @@
         }, 300000);
     }
 
+    function generateEmptyInputs() {
+        $('.encrypted[value=""]').each(function () {
+            const data = $(this).data();
 
-    function editEncrypted(id, element, extraData = null, additionalClass = null, additionalFunction = null, additionalAttribute = null) {
-        const el = $(element);
-        const parent = el.closest('td');
+            generateInput(
+                data.name,
+                $(this).closest('td'),
+                {decryptedData: ''},
+                data.extraData,
+                data.customClass,
+                data.customFunction,
+                data.additionalAttributes
+            );
+        })
+    }
 
-        let encryptedValue = parent.find('.encrypted').val();
-        let promise;
-
-        if (encryptedValue) {
-            let passPhrase = window.storedPassPhrase;
-            if (!passPhrase) {
-                passPhrase = prompt('Please provide secure passphrase');
-                storePassPhrase(passPhrase);
-            }
-            if (!passPhrase) {
-                return;
-            }
-
-            const formData = new FormData();
-
-            formData.append('passphrase', passPhrase);
-            formData.append('encryptedData', encryptedValue);
-            if (extraData) {
-                formData.append('extraData', extraData)
-            }
-            promise = fetch('?action=decrypt', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (response.ok) {
-                    return response.json()
-                }
-                return null;
-            }).then(json => {
-                if (json) {
-                    return json;
-                } else {
-                    return {decryptedData: ''};
-                }
-            })
-        } else {
-            promise = new Promise(resolve => {
-                resolve({decryptedData: ''})
-            });
+    function generateInput(id, parent, data, extraData, additionalClass, additionalFunction, additionalAttribute) {
+        let additionalAttributes = "";
+        if (additionalAttribute) {
+            additionalAttributes = Object.keys(additionalAttribute).reduce((acc, key) => {
+                acc += " " + key + " ='" + additionalAttribute[key] + "'";
+                return acc;
+            }, "")
         }
 
-        return promise.then(data => {
-            let additionalAttributes = "";
-            if (additionalAttribute) {
-                additionalAttributes = Object.keys(additionalAttribute).reduce((acc, key) => {
-                    acc += " " + key + " ='" + additionalAttribute[key] + "'";
-                    return acc;
-                }, "")
-            }
+        parent.append('<input id="' + id + '" ' + additionalAttributes + (additionalClass ? " class='" + additionalClass + "'" : '') + ' name="user[1][' + id + ']" value="' + data.decryptedData + '">');
 
-            parent.append('<input id="' + id + '" ' + additionalAttributes + (additionalClass ? " class='" + additionalClass + "'" : '') + ' name="user[1][' + id + ']" value="' + data.decryptedData + '">');
+        if (data.extraData) {
+            parent.append('<span>' + data.extraData + '</span>');
+        }
 
-            if (data.extraData) {
-                parent.append('<span>' + data.extraData + '</span>');
-            }
+        if (additionalFunction) {
+            window[additionalFunction]();
+        }
 
-            if (additionalFunction) {
-                additionalFunction();
-            }
-
-            el.hide();
-        })
-
+        parent.find('button').hide();
     }
+
+    // function editEncrypted() {
+    //     return editEncryptedNew();
+    //     const el = $(element);
+    //     const parent = el.closest('td');
+    //
+    //     let encryptedValue = parent.find('.encrypted').val();
+    //     let promise;
+    //
+    //     if (encryptedValue) {
+    //         let passPhrase = window.storedPassPhrase;
+    //         if (!passPhrase) {
+    //             passPhrase = prompt('Please provide secure passphrase');
+    //             storePassPhrase(passPhrase);
+    //         }
+    //         if (!passPhrase) {
+    //             return;
+    //         }
+    //
+    //         const formData = new FormData();
+    //
+    //         formData.append('passphrase', passPhrase);
+    //         formData.append('encryptedData', encryptedValue);
+    //         if (extraData) {
+    //             formData.append('extraData', extraData)
+    //         }
+    //         promise = fetch('?action=decrypt', {
+    //             method: 'POST',
+    //             body: formData
+    //         }).then(response => {
+    //             if (response.ok) {
+    //                 return response.json()
+    //             }
+    //             return null;
+    //         }).then(json => {
+    //             if (json) {
+    //                 return json;
+    //             } else {
+    //                 return {decryptedData: ''};
+    //             }
+    //         })
+    //     } else {
+    //         promise = new Promise(resolve => {
+    //             resolve({decryptedData: ''})
+    //         });
+    //     }
+    //
+    //     return promise.then(data => {
+    //         let additionalAttributes = "";
+    //         if (additionalAttribute) {
+    //             additionalAttributes = Object.keys(additionalAttribute).reduce((acc, key) => {
+    //                 acc += " " + key + " ='" + additionalAttribute[key] + "'";
+    //                 return acc;
+    //             }, "")
+    //         }
+    //
+    //         parent.append('<input id="' + id + '" ' + additionalAttributes + (additionalClass ? " class='" + additionalClass + "'" : '') + ' name="user[1][' + id + ']" value="' + data.decryptedData + '">');
+    //
+    //         if (data.extraData) {
+    //             parent.append('<span>' + data.extraData + '</span>');
+    //         }
+    //
+    //         if (additionalFunction) {
+    //             additionalFunction();
+    //         }
+    //
+    //         el.hide();
+    //     })
+    //
+    // }
 </script>
 <TABLE width="200px"
        border="0"
@@ -167,6 +275,7 @@
                        value="{name}"
                        size="50"
                        maxlength="50"
+                       required
                 > <span class="formErrorMessage">{nameMessage}</span></td>
         </tr>
         <tr>
@@ -178,6 +287,7 @@
                        value="{salutation}"
                        size="50"
                        maxlength="50"
+                       required
                 > <span class="formErrorMessage">{salutationMessage}</span></td>
         </tr>
         <tr>
@@ -189,6 +299,7 @@
                        value="{firstName}"
                        size="50"
                        maxlength="50"
+                       required
                 > <span class="formErrorMessage">{firstNameMessage}</span>
             </td>
         </tr>
@@ -201,6 +312,7 @@
                        value="{lastName}"
                        size="50"
                        maxlength="50"
+                       required
                 > <span class="formErrorMessage">{lastNameMessage}</span>
             </td>
         </tr>
@@ -213,6 +325,7 @@
                        value="{jobTitle}"
                        size="50"
                        maxlength="50"
+                       required
                 > <span class="formErrorMessage">{jobTitleMessage}</span>
             </td>
         </tr>
@@ -258,6 +371,7 @@
                        value="{username}"
                        size="20"
                        maxlength="20"
+                       required
                 > <span class="formErrorMessage">{usernameMessage}</span>
             </td>
         </tr>
@@ -276,28 +390,30 @@
         <tr>
             <td class="promptText">Start Date</td>
             <td class="field">
-                <button type="button"
-                        onclick="editEncrypted('startDate',this, 'lengthOfService', 'jqueryCalendar',reAttachCalendars)"
-                ><i class="fa fa-pencil {startDatePencilColor}"></i>
-                </button>
-                <input type="hidden"
-                       name="user[1][encryptedStartDate]"
-                       value="{encryptedStartDate}"
-                       class="encrypted"
+                <input name="user[1][startDate]"
+                       value="{startDate}"
+                       class="jqueryCalendar"
+                       onchange="updateLengthOfService()"
+                       id="startDate"
                 >
+                <span id="lengthOfService"></span> <span class="formErrorMessage">{startDateMessage}</span>
             </td>
         </tr>
         <tr>
             <td class="promptText">Date Of Birth</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('dateOfBirth',this, 'age', 'jqueryCalendar', reAttachCalendars)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {dateOfBirthPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedDateOfBirth]"
                        value="{encryptedDateOfBirth}"
                        class="encrypted"
+                       data-name="dateOfBirth"
+                       data-extra-data="age"
+                       data-custom-class="jqueryCalendar"
+                       data-custom-function="reAttachCalendars"
                 >
             </td>
         </tr>
@@ -309,13 +425,14 @@
 
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('address1',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {address1PencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedAddress1]"
                        value="{encryptedAddress1}"
                        class="encrypted"
+                       data-name="address1"
                 >
             </td>
         </tr>
@@ -323,13 +440,14 @@
             <td>&nbsp;</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('address2',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {address2PencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedAddress2]"
                        value="{encryptedAddress2}"
                        class="encrypted"
+                       data-name="address2"
                 >
             </td>
         </tr>
@@ -337,13 +455,14 @@
             <td>&nbsp;</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('address3',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {address3PencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedAddress3]"
                        value="{encryptedAddress3}"
                        class="encrypted"
+                       data-name="address3"
                 >
             </td>
         </tr>
@@ -351,13 +470,14 @@
             <td class="promptText">Town</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('town',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {townPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedTown]"
                        value="{encryptedTown}"
                        class="encrypted"
+                       data-name="town"
                 >
             </td>
         </tr>
@@ -365,13 +485,14 @@
             <td class="promptText">County</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('county',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {countyPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedCounty]"
                        value="{encryptedCounty}"
                        class="encrypted"
+                       data-name="county"
                 >
             </td>
         </tr>
@@ -379,13 +500,14 @@
             <td class="promptText">Postcode</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('postcode',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {postcodePencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedPostcode]"
                        value="{encryptedPostcode}"
                        class="encrypted"
+                       data-name="postcode"
                 >
             </td>
         </tr>
@@ -431,13 +553,14 @@
             <td class="promptText">Pension Additional payments</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('pensionAdditionalPayments',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {pensionAdditionalPaymentsPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedPensionAdditionalPayments]"
                        value="{encryptedPensionAdditionalPayments}"
                        class="encrypted"
+                       data-name="pensionAdditionalPayments"
                 >
             </td>
         </tr>
@@ -445,7 +568,7 @@
             <td class="promptText">Salary</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('salary',this, null, null, null, {onchange: 'onSalaryChanged()', type: 'number'})"
+                        onclick="editEncryptedNew()"
                         id="salaryButton"
                 ><i class="fa fa-pencil {salaryPencilColor}"></i>
                 </button>
@@ -453,6 +576,8 @@
                        name="user[1][encryptedSalary]"
                        value="{encryptedSalary}"
                        class="encrypted"
+                       data-name="salary"
+                       data-additional-attributes='{"onchange": "onSalaryChanged()", "type": "number", "required": true}'
 
                 >
             </td>
@@ -492,13 +617,14 @@
             <td class="promptText">Salary Sacrifice</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('salarySacrifice',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {salarySacrificePencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedSalarySacrifice]"
                        value="{encryptedSalarySacrifice}"
                        class="encrypted"
+                       data-name="salarySacrifice"
                 >
             </td>
         </tr>
@@ -506,13 +632,14 @@
             <td class="promptText">National Insurance Number</td>
             <td class="field">
                 <button type="button"
-                        onclick="editEncrypted('nationalInsuranceNumber',this)"
+                        onclick="editEncryptedNew()"
                 ><i class="fa fa-pencil {nationalInsuranceNumberPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedNationalInsuranceNumber]"
                        value="{encryptedNationalInsuranceNumber}"
                        class="encrypted"
+                       data-name="nationalInsuranceNumber"
                 >
             </td>
         </tr>

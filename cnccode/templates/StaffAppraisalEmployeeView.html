@@ -38,6 +38,66 @@
 
 </style>
 <script>
+
+    var storedPassPhrase = null;
+
+    function storePassPhrase(passPhrase) {
+        storedPassPhrase = passPhrase;
+        setTimeout(() => {
+            storedPassPhrase = null;
+        }, 30000);
+    }
+
+    function showEncrypted() {
+
+        const el = $(event.target);
+        const parent = el.closest('td');
+
+        let encryptedValue = parent.find('.encrypted').val();
+        let promise;
+
+        if (encryptedValue) {
+            let passPhrase = storedPassPhrase;
+            if (!passPhrase) {
+                passPhrase = prompt('Please provide secure passphrase');
+                storePassPhrase(passPhrase);
+            }
+            if (!passPhrase) {
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('passphrase', passPhrase);
+            formData.append('encryptedData', encryptedValue);
+            promise = fetch('?action=decrypt', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                return null;
+            }).then(json => {
+                if (json) {
+                    return json.decryptedData;
+                } else {
+                    return null;
+                }
+            })
+        } else {
+            promise = new Promise(resolve => {
+                resolve('Not set')
+            });
+        }
+
+        promise.then(data => {
+            parent.append('<span>' + data + '</span>');
+            el.parent().hide();
+        })
+
+    }
+
     function saveAndExit() {
         saveQuestionnaire().then(function () {
             alert("Your answers have been saved");
@@ -56,8 +116,6 @@
             acc[item.name] = item.value;
             return acc;
         }, {});
-
-        console.log(formObject);
         //we are going to modify the array we receive from jQuery and make it an object
 
         return $.ajax({
@@ -67,11 +125,28 @@
             dataType: 'json',
             data: formObject
         }).then(function (result) {
-            console.log(result);
+            // console.log(result);
         })
     }
 
     function test() {
+        // if we are completing the questionnaire as a manager we need the passphrase sent, so we need to add a hidden
+        // input with the value
+
+        if ($('input[name="completeFor"]').val() == 'manager') {
+            if (!storedPassPhrase) {
+                storedPassPhrase = prompt('Please provide secure passphrase');
+            }
+
+            if (!storedPassPhrase) {
+                alert('Cannot continue without the passphrase');
+                return false;
+            }
+
+            $('form').append("<input type='hidden' name='passPhrase' value='" + storedPassPhrase + "'>");
+        }
+
+
         alert('You have completed the questionnaire');
         return true;
     }
@@ -177,24 +252,34 @@
                 </tbody>
             </table>
             <br>
-            <table>
+            <table {displayManager}>
                 <thead>
                 <tr>
                     <td>Current Salary</td>
-                    <td {displayManager}>Proposed Salary</td>
-                    <td {displayManager}>Proposed Bonus</td>
+                    <td>Proposed Salary</td>
+                    <td>Proposed Bonus</td>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td>{currentSalary}</td>
-                    <td {displayManager}>
+                    <td>
+                        <button type="button"
+                                onclick="showEncrypted()"
+                        >
+                            <i class="fa fa-eye"></i>
+                        </button>
+                        <input type="hidden"
+                               value="{encryptedSalary}"
+                               class="encrypted"
+                        >
+                    </td>
+                    <td>
                         <input name="proposedSalary"
                                value="{proposedSalary}"
                                width="100%"
                         >
                     </td>
-                    <td {displayManager}>
+                    <td>
                         <input name="proposedBonus"
                                value="{proposedBonus}"
                                width="100%"

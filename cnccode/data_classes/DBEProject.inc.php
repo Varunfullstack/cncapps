@@ -180,7 +180,7 @@ class DBEProject extends DBEntity
   project.customerID,
   description,
   notes,
-  startDate,
+  project.startDate,
   expiryDate,
   commenceDate,
   cus_name AS customerName,
