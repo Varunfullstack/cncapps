@@ -410,7 +410,9 @@ class CTUser extends CTCNC
                     DBEUser::encryptedDateOfBirth
                 ) ? 'greenPencil' : 'redPencil',
                 "encryptedDateOfBirth"                 => $this->dsUser->getValue(DBEUser::encryptedDateOfBirth),
-                "startDate"                            => $this->dsUser->getValue(DBEUser::startDate),
+                "startDate"                            => Controller::dateYMDtoDMY(
+                    $this->dsUser->getValue(DBEUser::startDate)
+                ),
                 "pensionAdditionalPaymentsPencilColor" => $this->dsUser->getValue(
                     DBEUser::encryptedPensionAdditionalPayments
                 ) ? 'greenPencil' : 'redPencil',

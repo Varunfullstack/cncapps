@@ -10,6 +10,10 @@ This project changes will be shown here.
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 
+## [v1.14.1] - 2018-12-04
+### Fixed
+Staff Appraisal start date field value loads with the wrong format
+
 ## [V1.14.0]
 ### Added
 - Issue 373 - Staff Appraisal Process
