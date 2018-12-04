@@ -88,7 +88,7 @@
         let newValue = null;
         const dateValue = $('#startDate').val();
         try {
-            const date = luxon.DateTime.fromFormat(dateValue, 'dd/mm/yyyy');
+            const date = luxon.DateTime.fromFormat(dateValue, 'dd/MM/yyyy');
             if (date.isValid) {
                 const today = luxon.DateTime.local();
 
