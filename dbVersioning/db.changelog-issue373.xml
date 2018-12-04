@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue373-1542643720-0">
+        <tagDatabase tag="issue373"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestion"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestion">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireID" type="int(11)"/>
+            <column name="answerTypeID" type="int(11)"/>
+            <column name="description" type="varchar(150)"/>
+            <column name="activeFlag" type="char(1)"/>
+            <column name="requiredFlag" type="char(1)"/>
+            <column name="orderSequence" type="smallint"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestionnaire"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestionnaire">
+            <column name="id" type="int(11)"/>
+            <column name="description" type="varchar(150)"/>
+            <column name="dateSent" type="datetime"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="answertype" columnName="answerOptions"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="answertype">
+            <column name="answerOptions" type="text"/>
+        </addColumn>
+        <addColumn tableName="answertype">
+            <column name="needsOptions" type="int(1)" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) > 0 FROM answertype WHERE ant_answertypeno = 5
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into answertype values (5, "Rating on a scale of 1 to 7", null, 1)
+        </sql>
+        <rollback>
+            delete from answertype where ant_answertypeno = 5
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestionAnswer"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestionAnswer">
+            <column name="answerID" type="int(11)"/>
+            <column name="questionID" type="int(11)"/>
+            <column name="questionnaireAnswerID" type="int(11)"/>
+            <column name="staffAnswer" type="text"/>
+            <column name="managerAnswer" type="text"/>
+            <column name="managerComment" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalQuestionnaireAnswer"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalQuestionnaireAnswer">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireID" type="int(11)"/>
+            <column name="staffMemberID" type="int(11)"/>
+            <column name="managerID" type="int(11)"/>
+            <column name="startedAt" type="datetime"/>
+            <column name="staffCompleted" type="tinyint(1)" defaultValue="0"/>
+            <column name="managerCompleted" type="tinyint(1)" defaultValue="0"/>
+            <column name="sickDaysThisYear" type="decimal(3,1)"/>
+            <column name="proposedSalary" type="int(11)"/>
+            <column name="proposedBonus" type="int(11)"/>
+            <column name="teamLeaderComments" type="text"/>
+            <column name="managerComments" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="staffAppraisalObjectives"/>
+            </not>
+        </preConditions>
+        <createTable tableName="staffAppraisalObjectives">
+            <column name="id" type="int(11)"/>
+            <column name="questionnaireAnswerID" type="int(11)"/>
+            <column name="requirement" type="text"/>
+            <column name="measure" type="text"/>
+            <column name="comment" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue373-1542643720-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="encryptedDateOfBirth"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="encryptedDateOfBirth" type="mediumtext"/>
+            <column name="startDate" type="date"/>
+            <column name="companyHealthcareStartDate" type="date"/>
+            <column name="enhancedCNC2YearPensionStartDate" type="date"/>
+            <column name="encryptedPensionAdditionalPayments" type="mediumtext"/>
+            <column name="encryptedSalary" type="mediumtext"/>
+            <column name="encryptedSalarySacrifice" type="mediumtext"/>
+            <column name="hoursWorkedInAWeek" type="int(11)"/>
+            <column name="encryptedNationalInsuranceNumber" type="mediumtext"/>
+            <column name="encryptedAddress1" type="mediumtext"/>
+            <column name="encryptedAddress2" type="mediumtext"/>
+            <column name="encryptedAddress3" type="mediumtext"/>
+            <column name="encryptedTown" type="mediumtext"/>
+            <column name="encryptedCounty" type="mediumtext"/>
+            <column name="encryptedPostcode" type="mediumtext"/>
+            <column name="staffAppraiserFlag" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

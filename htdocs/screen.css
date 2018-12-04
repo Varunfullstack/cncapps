@@ -699,3 +699,11 @@ div.reportDescription {
 .makeItColor td:nth-child(3n+3) {
     background: yellow;
 }
+
+.redPencil {
+    color: red;
+}
+
+.greenPencil {
+    color: green;
+}

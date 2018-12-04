@@ -10,6 +10,10 @@ This project changes will be shown here.
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 
+## [V1.14.0]
+### Added
+- Issue 373 - Staff Appraisal Process
+
 ## [v1.13.2] - 2018-11-23
 ## Fixed
 - Contract expiry dates incorrect
@@ -21,6 +25,7 @@ This project changes will be shown here.
 ## Fixed
 - Fix issue with banners not showing when project end date was not set
 - Fix issue with banners showing incorrect projects
+
 ## [v1.13.0] - 2018-11-19
 ### Added
 - Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page

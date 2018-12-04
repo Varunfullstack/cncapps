@@ -1,0 +1,53 @@
+<form action="{saveURL}" method="post">
+    <style>
+        table th {
+            text-align: center;
+        }
+    </style>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                0
+            </th>
+            <th>
+                1
+            </th>
+            <th>
+                2
+            </th>
+            <th>
+                3
+            </th>
+            <th>
+                4
+            </th>
+            <th>
+                5
+            </th>
+            <th>
+                6
+            </th>
+            <th>
+                7
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <!-- BEGIN ratingValueBlock -->
+            <td>
+                <input type="text"
+                       name="config[{ratingValueID}]"
+                       value="{ratingValueValue}"
+                       required
+                >
+            </td>
+            <!-- END ratingValueBlock -->
+        </tr>
+        </tbody>
+    </table>
+    <input type="submit"
+           value="Save Config"
+    >
+</form>
