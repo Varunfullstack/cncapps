@@ -8436,7 +8436,8 @@ is currently a balance of ';
 
         $this->createFixedActivity(
             $problemID,
-            $resolutionSummary
+            $resolutionSummary,
+            $fixedUserID == USER_SYSTEM
         );
 
         $this->sendMonitoringEmails(
@@ -8501,7 +8502,8 @@ is currently a balance of ';
     }
 
     function createFixedActivity($problemID,
-                                 $resolutionSummary
+                                 $resolutionSummary,
+                                 $zeroTime = false
     )
     {
         /*
@@ -8521,9 +8523,15 @@ is currently a balance of ';
             date('H:i')
         );
 
+        $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
+
+        if (!$zeroTime) {
+            $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
+        }
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID)
+            $endTime
         );
 
         $dbeCallActivity->setValue(

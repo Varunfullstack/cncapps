@@ -13,4 +13,11 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue366-1531213570-2">
+        <sql>
+            UPDATE callactivity SET callactivity.`caa_endtime` = callactivity.`caa_starttime` WHERE
+            callactivity.`caa_callacttypeno` = 57 AND callactivity.`caa_consno` = 67
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
