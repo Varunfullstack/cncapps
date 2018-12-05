@@ -1,8 +1,42 @@
 <!-- Template: BroadbandServiceEdit.inc.html -->
+<style>
+    .redText {
+        color: red;
+    }
+</style>
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
+<script src=".javascript/DirectDebitLogic.js"
+></script>
 <script language='JavaScript'>
+
+    const clientCheckDirectDebit = {clientCheckDirectDebit};
+
+    $(function () {
+        checkDirectDebit();
+    });
+
+    function checkDirectDebit() {
+        const directDebitCheckbox = $('#directDebit');
+        const parent = directDebitCheckbox.parent();
+        if (clientCheckDirectDebit && $('#allowDirectDebit').val() !== 'false') {
+            directDebitCheckbox.attr('disabled', false);
+            if (parent.children().length > 1) {
+                parent.find('span').remove();
+            }
+        } else {
+            if (!clientCheckDirectDebit) {
+                if (parent.children().length < 2) {
+                    parent.append('<span class="redText">This customer needs bank details before Direct Debit can be used.</span>')
+                }
+            }
+            directDebitCheckbox.attr('disabled', true);
+            directDebitCheckbox.prop('checked', false)
+        }
+
+    }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {      // F9 - edit
             switch (field.id) {
@@ -79,39 +113,37 @@
     <table width="700px"
            border="0"
     >
-        <input
-                type="hidden"
-                name="renBroadband[1][customerItemID]"
-                value="{customerItemID}"
+        <input type="hidden"
+               value="{allowDirectDebit}"
+               id="allowDirectDebit"
         >
-        <input
-                type="hidden"
-                name="renBroadband[1][customerID]"
-                id="customerID"
-                value="{customerID}"
+        <input type="hidden"
+               name="renBroadband[1][customerItemID]"
+               value="{customerItemID}"
         >
-        <input
-                type="hidden"
-                name="renBroadband[1][customerName]"
-                value="{customerName}"
+        <input type="hidden"
+               name="renBroadband[1][customerID]"
+               id="customerID"
+               value="{customerID}"
         >
-        <input
-                type="hidden"
-                name="renBroadband[1][siteNo]"
-                id="siteNo"
-                value="{siteNo}"
+        <input type="hidden"
+               name="renBroadband[1][customerName]"
+               value="{customerName}"
         >
-        <input
-                name="renBroadband[1][salePricePerMonth]"
-                type="hidden"
-                value="{salePricePerMonth}"
-                value="{salePricePerMonth}"
+        <input type="hidden"
+               name="renBroadband[1][siteNo]"
+               id="siteNo"
+               value="{siteNo}"
         >
-        <input
-                name="renBroadband[1][costPricePerMonth]"
-                type="hidden"
-                value="{costPricePerMonth}"
-                value="{costPricePerMonth}"
+        <input name="renBroadband[1][salePricePerMonth]"
+               type="hidden"
+               value="{salePricePerMonth}"
+               value="{salePricePerMonth}"
+        >
+        <input name="renBroadband[1][costPricePerMonth]"
+               type="hidden"
+               value="{costPricePerMonth}"
+               value="{costPricePerMonth}"
         >
         <tr>
             <td width="167"
@@ -127,60 +159,60 @@
         <TR>
             <TD class="promptText">Site</TD>
             <TD class="displayfield">
-                <input
-                        type="text"
-                        name="renBroadband[1][siteDesc]"
-                        id="siteDesc"
-                        value="{siteDesc}"
-                        onKeydown="javascript:checkFunctionKey(siteDesc)"
-                        onChange="javascript:validatesiteDesc()"
-                        {DISABLED}
-                        size="50"
-                        maxlength="50"
+                <input type="text"
+                       name="renBroadband[1][siteDesc]"
+                       id="siteDesc"
+                       value="{siteDesc}"
+                       onKeydown="javascript:checkFunctionKey(siteDesc)"
+                       onChange="javascript:validatesiteDesc()"
+                       {DISABLED}
+                       size="50"
+                       maxlength="50"
                 >
             </TD>
         </TR>
         <tr>
             <td class="promptText">Item</td>
-            <td class="field"><input
-                    type="hidden"
-                    name="renBroadband[1][itemID]"
-                    id="itemID"
-                    value="{itemID}"
-            > <input
-                    type="text"
-                    {readonly}
-                    name="renBroadband[1][itemDescription]"
-                    id="itemDescription"
-                    value="{itemDescription}"
-                    onChange="javascript:validateItemDescription()"
-                    onKeydown="javascript:checkFunctionKey(itemDescription)"
-                    size="50"
-                    maxlength="50"
+            <td class="field"><input type="hidden"
+                                     name="renBroadband[1][itemID]"
+                                     id="itemID"
+                                     value="{itemID}"
+            > <input type="text"
+                     {readonly}
+                     name="renBroadband[1][itemDescription]"
+                     id="itemDescription"
+                     value="{itemDescription}"
+                     onChange="javascript:validateItemDescription()"
+                     onKeydown="javascript:checkFunctionKey(itemDescription)"
+                     size="50"
+                     maxlength="50"
             > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">Duration of Contract(months)</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][months]"
-                    type="text"
-                    value="{months}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renBroadband[1][months]"
+                                         type="text"
+                                         value="{months}"
+                                         {readonly}
+                                         size="10"
+                                         maxlength="10"
             >
                 <span class="formErrorMessage">{monthsMessage}</span></td>
         </tr>
         {pricePerMonth}
         <tr>
             <td class="promptText">Installation Date</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][installationDate]"
-                    type="text"
-                    value="{installationDate}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renBroadband[1][installationDate]"
+                                         type="text"
+                                         value="{installationDate}"
+                                         {readonly}
+                                         size="50"
+                                         maxlength="50"
+                                         class="jqueryCalendar"
+                                         data-jqueryCalendarBeforeShowDay="beforeShowDay"
+                                         required
+                                         readonly="readonly"
+                                         id="installationDate"
             >
                 <span class="formErrorMessage">{installationDateMessage}</span>
             </td>
@@ -202,25 +234,24 @@
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][totalInvoiceMonths]"
-                    type="text"
-                    value="{totalInvoiceMonths}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renBroadband[1][totalInvoiceMonths]"
+                                         type="text"
+                                         value="{totalInvoiceMonths}"
+                                         {readonly}
+                                         size="10"
+                                         maxlength="10"
             >
                 <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Invoice Interval (months)</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][invoicePeriodMonths]"
-                    type="text"
-                    value="{invoicePeriodMonths}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renBroadband[1][invoicePeriodMonths]"
+                                         type="text"
+                                         value="{invoicePeriodMonths}"
+                                         {readonly}
+                                         size="10"
+                                         maxlength="10"
+                                         id="invoiceInterval"
             >
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
         </tr>
@@ -234,78 +265,71 @@
         </tr>
         <tr>
             <td class="promptText">ispID</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][ispID]"
-                    type="text"
-                    value="{ispID}"
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renBroadband[1][ispID]"
+                                         type="text"
+                                         value="{ispID}"
+                                         size="10"
+                                         maxlength="10"
             >
                 <span class="formErrorMessage">{ispIDMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">ADSL Phone</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][adslPhone]"
-                    type="text"
-                    value="{adslPhone}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][adslPhone]"
+                                         type="text"
+                                         value="{adslPhone}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{adslPhoneMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Firewall Interface</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][macCode]"
-                    type="text"
-                    value="{macCode}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][macCode]"
+                                         type="text"
+                                         value="{macCode}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{macCodeMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Reference</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][reference]"
-                    type="text"
-                    value="{reference}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][reference]"
+                                         type="text"
+                                         value="{reference}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{referenceMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Firewall IP</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][defaultGateway]"
-                    type="text"
-                    value="{defaultGateway}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][defaultGateway]"
+                                         type="text"
+                                         value="{defaultGateway}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{defaultGatewayMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Network Address</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][networkAddress]"
-                    type="text"
-                    value="{networkAddress}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][networkAddress]"
+                                         type="text"
+                                         value="{networkAddress}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{networkAddressMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Subnet Mask</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][subnetMask]"
-                    type="text"
-                    value="{subnetMask}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][subnetMask]"
+                                         type="text"
+                                         value="{subnetMask}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{subnetMaskMessage}</span></td>
         </tr>
@@ -324,34 +348,31 @@
         </tr>
         <tr>
             <td class="promptText">User Name</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][userName]"
-                    type="text"
-                    value="{userName}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][userName]"
+                                         type="text"
+                                         value="{userName}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{userNameMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Password</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][password]"
-                    type="text"
-                    value="{password}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][password]"
+                                         type="text"
+                                         value="{password}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{passwordMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">eta Date</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][etaDate]"
-                    type="text"
-                    value="{etaDate}"
-                    size="50"
-                    maxlength="50"
+            <td class="fieldText"><input name="renBroadband[1][etaDate]"
+                                         type="text"
+                                         value="{etaDate}"
+                                         size="50"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{etaDateMessage}</span></td>
         </tr>
@@ -365,32 +386,29 @@
         </tr>
         <tr>
             <td class="promptText">Initial Speed Test</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][initialSpeedTest]"
-                    type="text"
-                    value="{initialSpeedTest}"
-                    size="50"
-                    maxlength="50"
-            >
-                <span class="formErrorMessage">{initialSpeedTestMessage}</span></td>
+            <td class="fieldText"><input name="renBroadband[1][initialSpeedTest]"
+                                         type="text"
+                                         value="{initialSpeedTest}"
+                                         size="50"
+                                         maxlength="50"
+
+            > <span class="formErrorMessage">{initialSpeedTestMessage}</span></td>
         </tr>
 
         <tr>
             <td class="promptText">Bandwidth Allowance(GB)</td>
-            <td class="fieldText"><input
-                    name="renBroadband[1][bandwidthAllowance]"
-                    type="text"
-                    value="{bandwidthAllowance}"
-                    size="10"
-                    maxlength="10"
-            >
-                <span class="formErrorMessage">{bandwidthAllowanceMessage}</span></td>
+            <td class="fieldText"><input name="renBroadband[1][bandwidthAllowance]"
+                                         type="text"
+                                         value="{bandwidthAllowance}"
+                                         size="10"
+                                         maxlength="10"
+
+            > <span class="formErrorMessage">{bandwidthAllowanceMessage}</span></td>
         </tr>
         <!--
             <tr>
                     <td class="promptText">DNS Company</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][dnsCompany]"
+                    <td class="fieldText"><input                        name="renBroadband[1][dnsCompany]"
                         type="text" value="{dnsCompany}"
                         size="50"
                         maxlength="50">
@@ -398,8 +416,7 @@
             </tr>
             <tr>
                     <td class="promptText">IP Current Number</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][ipCurrentNo]"
+                    <td class="fieldText"><input                        name="renBroadband[1][ipCurrentNo]"
                         type="text" value="{ipCurrentNo}"
                         size="50"
                         maxlength="50">
@@ -407,8 +424,7 @@
             </tr>
             <tr>
                     <td class="promptText">MX</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][mx]"
+                    <td class="fieldText"><input                        name="renBroadband[1][mx]"
                         type="text" value="{mx}"
                         size="30"
                         maxlength="30">
@@ -417,8 +433,7 @@
 
             <tr>
                     <td class="promptText">Secure Server (ssl)</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][secureServer]"
+                    <td class="fieldText"><input                        name="renBroadband[1][secureServer]"
                         type="text" value="{secureServer}"
                         size="50"
                         maxlength="50">
@@ -426,8 +441,7 @@
             </tr>
             <tr>
                     <td class="promptText">VPNs</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][vpns]"
+                    <td class="fieldText"><input                        name="renBroadband[1][vpns]"
                         type="text" value="{vpns}"
                         size="50"
                         maxlength="50">
@@ -435,8 +449,7 @@
             </tr>
             <tr>
                     <td class="promptText">OWA</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][owa]"
+                    <td class="fieldText"><input                        name="renBroadband[1][owa]"
                         type="text" value="{owa}"
                         size="50"
                         maxlength="50">
@@ -444,8 +457,7 @@
             </tr>
             <tr>
                     <td class="promptText">OMA</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][oma]"
+                    <td class="fieldText"><input                        name="renBroadband[1][oma]"
                         type="text" value="{oma}"
                         size="50"
                         maxlength="50">
@@ -453,8 +465,7 @@
             </tr>
             <tr>
                     <td class="promptText">Remote Portal</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][remotePortal]"
+                    <td class="fieldText"><input                        name="renBroadband[1][remotePortal]"
                         type="text" value="{remotePortal}"
                         size="50"
                         maxlength="50">
@@ -462,8 +473,7 @@
             </tr>
             <tr>
                     <td class="promptText">smartHost</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][smartHost]"
+                    <td class="fieldText"><input                        name="renBroadband[1][smartHost]"
                         type="text" value="{smartHost}"
                         size="50"
                         maxlength="50">
@@ -471,8 +481,7 @@
             </tr>
             <tr>
                     <td class="promptText">preparation Records</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][preparationRecords]"
+                    <td class="fieldText"><input                        name="renBroadband[1][preparationRecords]"
                         type="text" value="{preparationRecords}"
                         size="50"
                         maxlength="50">
@@ -480,8 +489,7 @@
             </tr>
             <tr>
                     <td class="promptText">assigned To</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][assignedTo]"
+                    <td class="fieldText"><input                        name="renBroadband[1][assignedTo]"
                         type="text" value="{assignedTo}"
                         size="50"
                         maxlength="50">
@@ -489,8 +497,7 @@
             </tr>
             <tr>
                     <td class="promptText">initial Speed Test</td>
-                    <td class="fieldText"><input
-                        name="renBroadband[1][initialSpeedTest]"
+                    <td class="fieldText"><input                        name="renBroadband[1][initialSpeedTest]"
                         type="text" value="{initialSpeedTest}"
                         size="50"
                         maxlength="50">
@@ -516,8 +523,7 @@
             </tr>
             <tr>
                 <td class="promptText">Docs Updated And Checks Completed</td>
-                <td class="fieldText"><input
-                        name="renBroadband[1][docsUpdatedAndChecksCompleted]"
+                <td class="fieldText"><input                        name="renBroadband[1][docsUpdatedAndChecksCompleted]"
                         type="text" value="{docsUpdatedAndChecksCompleted}"
                         size="50"
                         maxlength="50">			</td>
@@ -526,12 +532,11 @@
         <tr>
             <td class="promptText">Declined</td>
             <td class="fieldText">
-                <input
-                        name="renBroadband[1][declinedFlag]"
-                        {readonly}
-                        type="checkbox"
-                        value="Y"
-                        {declinedFlagChecked}
+                <input name="renBroadband[1][declinedFlag]"
+                       {readonly}
+                       type="checkbox"
+                       value="Y"
+                       {declinedFlagChecked}
                 /></td>
         </tr>
         <tr>
@@ -546,7 +551,55 @@
                 >{internalNotes}</textarea>
             </td>
         </tr>
-
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Auto-generate Sales Invoice
+            </td>
+            <td colspan="2">
+                <input type="checkbox"
+                       name="renBroadband[1][autoGenerateContractInvoice]"
+                       value="Y"
+                       {autoGenerateContractInvoiceChecked}
+                       title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created"
+                       id="autoGenerateContractInvoice"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Direct Debit
+            </td>
+            <td colspan="2">
+                <input type="checkbox"
+                       name="renBroadband[1][directDebitFlag]"
+                       value="Y"
+                       {directDebitFlagChecked}
+                       title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created"
+                       id="directDebit"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >
+                Transaction Type
+            </td>
+            <td colspan="2">
+                <select name="renBroadband[1][transactionType]"
+                >
+                    <!-- BEGIN TransactionTypesBlock   -->
+                    <option value="{transactionType}"
+                            {selected}
+                    >
+                        {transactionType}
+                    </option>
+                    <!-- END TransactionTypesBlock   -->
+                </select>
+            </td>
+        </tr>
         <tr>
             <td>&nbsp;</td>
             <td class="formErrorMessage">&nbsp;</td>

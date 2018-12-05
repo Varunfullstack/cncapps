@@ -61,6 +61,8 @@ class DBEOrdhead extends DBEntity
     const serviceRequestPriority = "serviceRequestPriority";
     const serviceRequestText = "serviceRequestText";
     const quotationCreateDate = "quotationCreateDate";
+    const directDebitFlag = "ordhead.directDebitFlag";
+    const transactionType = 'ordhead.transactionType';
 
     /**
      * calls constructor()
@@ -73,73 +75,359 @@ class DBEOrdhead extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("Ordhead");
-        $this->addColumn(self::ordheadID, DA_ID, DA_NOT_NULL, "odh_ordno");
-        $this->addColumn(self::customerID, DA_ID, DA_NOT_NULL, "odh_custno");
-        $this->addColumn(self::type, DA_STRING, DA_NOT_NULL, "odh_type");
-        $this->addColumn(self::partInvoice, DA_YN, DA_NOT_NULL, "odh_part_invoice");
-        $this->addColumn(self::date, DA_DATE, DA_NOT_NULL, "odh_date");
-        $this->addColumn(self::requestedDate, DA_DATE, DA_ALLOW_NULL, "odh_req_date");
-        $this->addColumn(self::promisedDate, DA_DATE, DA_ALLOW_NULL, "odh_prom_date");
-        $this->addColumn(self::expectedDate, DA_DATE, DA_ALLOW_NULL, "odh_expect_date");
-        $this->addColumn(self::quotationOrdheadID, DA_STRING, DA_ALLOW_NULL, "odh_quotation_ordno");
-        $this->addColumn(self::custPORef, DA_STRING, DA_ALLOW_NULL, "odh_ref_cust");
-        $this->addColumn(self::vatCode, DA_STRING, DA_ALLOW_NULL, "odh_vat_code");
-        $this->addColumn(self::vatRate, DA_STRING, DA_ALLOW_NULL, "odh_vat_rate");
-        $this->addColumn(self::invSiteNo, DA_ID, DA_NOT_NULL, "odh_inv_siteno");
-        $this->addColumn(self::invAdd1, DA_STRING, DA_NOT_NULL, "odh_inv_add1");
-        $this->addColumn(self::invAdd2, DA_STRING, DA_ALLOW_NULL, "odh_inv_add2");
-        $this->addColumn(self::invAdd3, DA_STRING, DA_ALLOW_NULL, "odh_inv_add3");
-        $this->addColumn(self::invTown, DA_STRING, DA_ALLOW_NULL, "odh_inv_town");
-        $this->addColumn(self::invCounty, DA_STRING, DA_ALLOW_NULL, "odh_inv_county");
-        $this->addColumn(self::invPostcode, DA_STRING, DA_ALLOW_NULL, "odh_inv_postcode");
-        $this->addColumn(self::invContactID, DA_ID, DA_NOT_NULL, "odh_inv_contno");
-        $this->addColumn(self::invContactName, DA_STRING, DA_ALLOW_NULL, "odh_inv_contact");
-        $this->addColumn(self::invContactSalutation, DA_STRING, DA_ALLOW_NULL, "odh_inv_salutation");
-        $this->addColumn(self::invContactPhone, DA_STRING, DA_ALLOW_NULL, "odh_inv_phone");
-        $this->addColumn(self::invSitePhone, DA_STRING, DA_ALLOW_NULL, "odh_inv_sphone");
-        $this->addColumn(self::invContactFax, DA_STRING, DA_ALLOW_NULL, "odh_inv_fax");
-        $this->addColumn(self::invContactEmail, DA_STRING, DA_ALLOW_NULL, "odh_inv_email");
-        $this->addColumn(self::delSiteNo, DA_ID, DA_NOT_NULL, "odh_del_siteno");
-        $this->addColumn(self::delAdd1, DA_STRING, DA_NOT_NULL, "odh_del_add1");
-        $this->addColumn(self::delAdd2, DA_STRING, DA_ALLOW_NULL, "odh_del_add2");
-        $this->addColumn(self::delAdd3, DA_STRING, DA_ALLOW_NULL, "odh_del_add3");
-        $this->addColumn(self::delTown, DA_STRING, DA_ALLOW_NULL, "odh_del_town");
-        $this->addColumn(self::delCounty, DA_STRING, DA_ALLOW_NULL, "odh_del_county");
-        $this->addColumn(self::delPostcode, DA_STRING, DA_ALLOW_NULL, "odh_del_postcode");
-        $this->addColumn(self::delContactID, DA_ID, DA_NOT_NULL, "odh_del_contno");
-        $this->addColumn(self::delContactName, DA_STRING, DA_ALLOW_NULL, "odh_del_contact");
-        $this->addColumn(self::delContactSalutation, DA_STRING, DA_ALLOW_NULL, "odh_del_salutation");
-        $this->addColumn(self::delContactPhone, DA_STRING, DA_ALLOW_NULL, "odh_del_phone");
-        $this->addColumn(self::delSitePhone, DA_STRING, DA_ALLOW_NULL, "odh_del_sphone");
-        $this->addColumn(self::delContactFax, DA_STRING, DA_ALLOW_NULL, "odh_del_fax");
-        $this->addColumn(self::delContactEmail, DA_STRING, DA_ALLOW_NULL, "odh_del_email");
-        $this->addColumn(self::debtorCode, DA_STRING, DA_ALLOW_NULL, "odh_debtor_code");
-        $this->addColumn(self::wip, DA_YN, DA_ALLOW_NULL, "odh_wip");
-        $this->addColumn(self::consultantID, DA_ID, DA_ALLOW_NULL, "odh_consno");
-        $this->addColumn(self::payMethod, DA_STRING, DA_ALLOW_NULL, "odh_pay_method");
-        $this->addColumn(self::paymentTermsID, DA_ID, DA_NOT_NULL);
-        $this->addColumn(self::addItem, DA_YN, DA_ALLOW_NULL, "odh_add_item");
-        $this->addColumn(self::callID, DA_ID, DA_ALLOW_NULL, "odh_callno");
-        $this->addColumn(self::quotationSubject, DA_STRING, DA_ALLOW_NULL, "odh_quotation_subject");
-        $this->addColumn(self::quotationIntroduction, DA_STRING, DA_ALLOW_NULL, "odh_quotation_introduction");
-        $this->addColumn(self::updatedTime, DA_DATETIME, DA_ALLOW_NULL);
-        $this->addColumn(self::serviceRequestCustomerItemID, DA_ID, DA_ALLOW_NULL, 'odh_service_request_custitemno');
-        $this->addColumn(self::serviceRequestPriority, DA_ID, DA_ALLOW_NULL, 'odh_service_request_priority');
-        $this->addColumn(self::serviceRequestText, DA_MEMO, DA_ALLOW_NULL, 'odh_service_request_text');
-        $this->addColumn(self::quotationCreateDate, DA_DATE, DA_ALLOW_NULL, "odh_quotation_create_date");
+        $this->addColumn(
+            self::ordheadID,
+            DA_ID,
+            DA_NOT_NULL,
+            "odh_ordno"
+        );
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_NOT_NULL,
+            "odh_custno"
+        );
+        $this->addColumn(
+            self::type,
+            DA_STRING,
+            DA_NOT_NULL,
+            "odh_type"
+        );
+        $this->addColumn(
+            self::partInvoice,
+            DA_YN,
+            DA_NOT_NULL,
+            "odh_part_invoice"
+        );
+        $this->addColumn(
+            self::date,
+            DA_DATE,
+            DA_NOT_NULL,
+            "odh_date"
+        );
+        $this->addColumn(
+            self::requestedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "odh_req_date"
+        );
+        $this->addColumn(
+            self::promisedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "odh_prom_date"
+        );
+        $this->addColumn(
+            self::expectedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "odh_expect_date"
+        );
+        $this->addColumn(
+            self::quotationOrdheadID,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_quotation_ordno"
+        );
+        $this->addColumn(
+            self::custPORef,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_ref_cust"
+        );
+        $this->addColumn(
+            self::vatCode,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_vat_code"
+        );
+        $this->addColumn(
+            self::vatRate,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_vat_rate"
+        );
+        $this->addColumn(
+            self::invSiteNo,
+            DA_ID,
+            DA_NOT_NULL,
+            "odh_inv_siteno"
+        );
+        $this->addColumn(
+            self::invAdd1,
+            DA_STRING,
+            DA_NOT_NULL,
+            "odh_inv_add1"
+        );
+        $this->addColumn(
+            self::invAdd2,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_add2"
+        );
+        $this->addColumn(
+            self::invAdd3,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_add3"
+        );
+        $this->addColumn(
+            self::invTown,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_town"
+        );
+        $this->addColumn(
+            self::invCounty,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_county"
+        );
+        $this->addColumn(
+            self::invPostcode,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_postcode"
+        );
+        $this->addColumn(
+            self::invContactID,
+            DA_ID,
+            DA_NOT_NULL,
+            "odh_inv_contno"
+        );
+        $this->addColumn(
+            self::invContactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_contact"
+        );
+        $this->addColumn(
+            self::invContactSalutation,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_salutation"
+        );
+        $this->addColumn(
+            self::invContactPhone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_phone"
+        );
+        $this->addColumn(
+            self::invSitePhone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_sphone"
+        );
+        $this->addColumn(
+            self::invContactFax,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_fax"
+        );
+        $this->addColumn(
+            self::invContactEmail,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_inv_email"
+        );
+        $this->addColumn(
+            self::delSiteNo,
+            DA_ID,
+            DA_NOT_NULL,
+            "odh_del_siteno"
+        );
+        $this->addColumn(
+            self::delAdd1,
+            DA_STRING,
+            DA_NOT_NULL,
+            "odh_del_add1"
+        );
+        $this->addColumn(
+            self::delAdd2,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_add2"
+        );
+        $this->addColumn(
+            self::delAdd3,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_add3"
+        );
+        $this->addColumn(
+            self::delTown,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_town"
+        );
+        $this->addColumn(
+            self::delCounty,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_county"
+        );
+        $this->addColumn(
+            self::delPostcode,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_postcode"
+        );
+        $this->addColumn(
+            self::delContactID,
+            DA_ID,
+            DA_NOT_NULL,
+            "odh_del_contno"
+        );
+        $this->addColumn(
+            self::delContactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_contact"
+        );
+        $this->addColumn(
+            self::delContactSalutation,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_salutation"
+        );
+        $this->addColumn(
+            self::delContactPhone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_phone"
+        );
+        $this->addColumn(
+            self::delSitePhone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_sphone"
+        );
+        $this->addColumn(
+            self::delContactFax,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_fax"
+        );
+        $this->addColumn(
+            self::delContactEmail,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_del_email"
+        );
+        $this->addColumn(
+            self::debtorCode,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_debtor_code"
+        );
+        $this->addColumn(
+            self::wip,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "odh_wip"
+        );
+        $this->addColumn(
+            self::consultantID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "odh_consno"
+        );
+        $this->addColumn(
+            self::payMethod,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_pay_method"
+        );
+        $this->addColumn(
+            self::paymentTermsID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::addItem,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "odh_add_item"
+        );
+        $this->addColumn(
+            self::callID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "odh_callno"
+        );
+        $this->addColumn(
+            self::quotationSubject,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_quotation_subject"
+        );
+        $this->addColumn(
+            self::quotationIntroduction,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "odh_quotation_introduction"
+        );
+        $this->addColumn(
+            self::updatedTime,
+            DA_DATETIME,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::serviceRequestCustomerItemID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            'odh_service_request_custitemno'
+        );
+        $this->addColumn(
+            self::serviceRequestPriority,
+            DA_ID,
+            DA_ALLOW_NULL,
+            'odh_service_request_priority'
+        );
+        $this->addColumn(
+            self::serviceRequestText,
+            DA_MEMO,
+            DA_ALLOW_NULL,
+            'odh_service_request_text'
+        );
+        $this->addColumn(
+            self::quotationCreateDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "odh_quotation_create_date"
+        );
+        $this->addColumn(
+            self::directDebitFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::transactionType,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
     function insertRow()
     {
-        $this->setValue(self::updatedTime, date('Y-m-d H:i:s'));
+        $this->setValue(
+            self::updatedTime,
+            date('Y-m-d H:i:s')
+        );
         parent::insertRow();
     }
 
     function updateRow()
     {
-        $this->setValue(self::updatedTime, date('Y-m-d H:i:s'));
+        $this->setValue(
+            self::updatedTime,
+            date('Y-m-d H:i:s')
+        );
         parent::updateRow();
     }
 
@@ -148,7 +436,10 @@ class DBEOrdhead extends DBEntity
         if ($this->getPKValue() == '') {
             $this->raiseError('ordheadID not set');
         }
-        $this->setValue(self::updatedTime, date('Y-m-d H:i:s'));
+        $this->setValue(
+            self::updatedTime,
+            date('Y-m-d H:i:s')
+        );
         $this->setQueryString(
             "UPDATE " . $this->getTableName() .
             " SET " . $this->getDBColumnName(self::updatedTime) . "='" . date('Y-m-d H:i:s') . "'" .
@@ -174,7 +465,9 @@ class DBEOrdhead extends DBEntity
         return TRUE;
     }
 
-    function countRowsByCustomerSiteNo($customerID, $siteNo)
+    function countRowsByCustomerSiteNo($customerID,
+                                       $siteNo
+    )
     {
         $this->setQueryString(
             "SELECT COUNT(*) FROM " . $this->getTableName() .

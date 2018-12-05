@@ -1156,7 +1156,7 @@ class CTSalesOrder extends CTCNC
                 return;
             }
             if ($this->getAction() == CTSALESORDER_ACT_CREATE_ORDER) {
-                $this->buSalesOrder->InitialiseOrder(
+                $this->buSalesOrder->initialiseOrder(
                     $dsOrdhead,
                     $dsOrdline,
                     $dsCustomer

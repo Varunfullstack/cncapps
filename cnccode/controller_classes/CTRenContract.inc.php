@@ -444,87 +444,156 @@ class CTRenContract extends CTCNC
                 )
             );
 
+        $dsCustomer = new DBECustomer($this);
+        $dsCustomer->getRow($dsRenContract->getValue(DBECustomerItem::customerID));
+
+        $isDirectDebitAllowed = $dsCustomer->getValue(DBECustomer::sortCode) && $dsCustomer->getValue(
+                DBECustomer::accountName
+            ) && $dsCustomer->getValue(DBECustomer::accountNumber);
+
         $this->template->set_var(
             array(
-                'customerItemID'             => $dsRenContract->getValue('customerItemID'),
-                'customerName'               => Controller::htmlDisplayText($dsRenContract->getValue('customerName')),
-                'customerID'                 => Controller::htmlDisplayText($dsRenContract->getValue('customerID')),
-                'users'                      => Controller::htmlDisplayText($dsRenContract->getValue('users')),
-                'siteDesc'                   => Controller::htmlDisplayText($dsRenContract->getValue('siteName')),
-                'siteNo'                     => $dsRenContract->getValue('siteNo'),
-                'urlSitePopup'               => $urlSitePopup,
-                'urlSiteEdit'                => $urlSiteEdit,
-                'itemID'                     => Controller::htmlDisplayText($dsRenContract->getValue('itemID')),
-                'itemDescription'            => Controller::htmlDisplayText(
+                'customerItemID'                     => $dsRenContract->getValue('customerItemID'),
+                'customerName'                       => Controller::htmlDisplayText(
+                    $dsRenContract->getValue('customerName')
+                ),
+                'customerID'                         => Controller::htmlDisplayText(
+                    $dsRenContract->getValue('customerID')
+                ),
+                'users'                              => Controller::htmlDisplayText($dsRenContract->getValue('users')),
+                'siteDesc'                           => Controller::htmlDisplayText(
+                    $dsRenContract->getValue('siteName')
+                ),
+                'siteNo'                             => $dsRenContract->getValue('siteNo'),
+                'urlSitePopup'                       => $urlSitePopup,
+                'urlSiteEdit'                        => $urlSiteEdit,
+                'itemID'                             => Controller::htmlDisplayText($dsRenContract->getValue('itemID')),
+                'itemDescription'                    => Controller::htmlDisplayText(
                     $dsRenContract->getValue('itemDescription')
                 ),
-                'invoiceFromDate'            => $dsRenContract->getValue('invoiceFromDate'),
-                'installationDate'           => Controller::dateYMDtoDMY($dsRenContract->getValue('installationDate')),
-                'invoiceToDate'              => $dsRenContract->getValue('invoiceToDate'),
-                'invoicePeriodMonths'        => Controller::htmlInputText(
+                'invoiceFromDate'                    => $dsRenContract->getValue('invoiceFromDate'),
+                'installationDate'                   => Controller::dateYMDtoDMY(
+                    $dsRenContract->getValue('installationDate')
+                ),
+                'invoiceToDate'                      => $dsRenContract->getValue('invoiceToDate'),
+                'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenContract->getValue('invoicePeriodMonths')
                 ),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText(
+                'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('invoicePeriodMonths')
-                ),
-                'totalInvoiceMonths'         => Controller::htmlInputText(
-                    $dsRenContract->getValue('totalInvoiceMonths')
-                ),
 
-                'curUnitCost'             => $dsRenContract->getValue('curUnitCost'),
-                'curUnitSale'             => $dsRenContract->getValue('curUnitSale'),
-                'notes'                   => Controller::htmlInputText($dsRenContract->getValue('notes')),
-                'notesMessage'            => Controller::htmlDisplayText($dsRenContract->getMessage('notes')),
-                'hostingCompany'          => Controller::htmlInputText($dsRenContract->getValue('hostingCompany')),
-                'hostingCompanyMessage'   => Controller::htmlDisplayText($dsRenContract->getMessage('hostingCompany')
-                ),'password'                => Controller::htmlInputText($dsRenContract->getValue('password')),
-                'passwordMessage'         => Controller::htmlDisplayText($dsRenContract->getMessage('password')),
-                'osPlatform'              => Controller::htmlInputText($dsRenContract->getValue('osPlatform')),
-                'osPlatformMessage'       => Controller::htmlDisplayText($dsRenContract->getMessage('osPlatform')),
-                'domainNames'             => Controller::htmlInputText($dsRenContract->getValue('domainNames')),
-                'domainNamesMessage'      => Controller::htmlDisplayText($dsRenContract->getMessage('domainNames')),
-                'controlPanelUrl'         => Controller::htmlInputText($dsRenContract->getValue('controlPanelUrl')),
-                'controlPanelUrlMessage'  => Controller::htmlDisplayText($dsRenContract->getMessage('controlPanelUrl')
-                ),'ftpAddress'              => Controller::htmlInputText($dsRenContract->getValue('ftpAddress')),
-                'ftpAddressMessage'       => Controller::htmlDisplayText($dsRenContract->getMessage('ftpAddress')),
-                'ftpUsername'             => Controller::htmlInputText($dsRenContract->getValue('ftpUsername')),
-                'ftpUsernameMessage'      => Controller::htmlDisplayText($dsRenContract->getMessage('ftpUsername')),
-                'wwwAddress'              => Controller::htmlInputText($dsRenContract->getValue('wwwAddress')),
-                'wwwAddressMessage'       => Controller::htmlDisplayText($dsRenContract->getMessage('wwwAddress')),
-                'websiteDeveloper'        => Controller::htmlInputText($dsRenContract->getValue('websiteDeveloper')),
-                'websiteDeveloperMessage' => Controller::htmlDisplayText(
+                ),
+                'totalInvoiceMonths'                 => Controller::htmlInputText(
+                    $dsRenContract->getValue('totalInvoiceMonths')
+
+                ),
+                'curUnitCost'                        => $dsRenContract->getValue('curUnitCost'),
+                'curUnitSale'                        => $dsRenContract->getValue('curUnitSale'),
+                'notes'                              => Controller::htmlInputText($dsRenContract->getValue('notes')),
+                'notesMessage'                       => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('notes')
+                ),
+                'hostingCompany'                     => Controller::htmlInputText(
+                    $dsRenContract->getValue('hostingCompany')
+                ),
+                'hostingCompanyMessage'              => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('hostingCompany')
+                ),
+                'password'                           => Controller::htmlInputText($dsRenContract->getValue('password')),
+                'passwordMessage'                    => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('password')
+                ),
+                'osPlatform'                         => Controller::htmlInputText(
+                    $dsRenContract->getValue('osPlatform')
+                ),
+                'osPlatformMessage'                  => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('osPlatform')
+                ),
+                'domainNames'                        => Controller::htmlInputText(
+                    $dsRenContract->getValue('domainNames')
+                ),
+                'domainNamesMessage'                 => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('domainNames')
+                ),
+                'controlPanelUrl'                    => Controller::htmlInputText(
+                    $dsRenContract->getValue('controlPanelUrl')
+                ),
+                'controlPanelUrlMessage'             => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('controlPanelUrl')
+
+                ),
+                'ftpAddress'                         => Controller::htmlInputText(
+                    $dsRenContract->getValue('ftpAddress')
+                ),
+                'ftpAddressMessage'                  => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('ftpAddress')
+                ),
+                'ftpUsername'                        => Controller::htmlInputText(
+                    $dsRenContract->getValue('ftpUsername')
+                ),
+                'ftpUsernameMessage'                 => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('ftpUsername')
+                ),
+                'wwwAddress'                         => Controller::htmlInputText(
+                    $dsRenContract->getValue('wwwAddress')
+                ),
+                'wwwAddressMessage'                  => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('wwwAddress')
+                ),
+                'websiteDeveloper'                   => Controller::htmlInputText(
+                    $dsRenContract->getValue('websiteDeveloper')
+                ),
+                'websiteDeveloperMessage'            => Controller::htmlDisplayText(
                     $dsRenContract->getMessage('websiteDeveloper')
                 ),
-                'officialOrderNumber'        => Controller::htmlInputText(
-                    $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)),
-                'urlUpdate'               => $urlUpdate,
-                'urlDelete'               => $urlDelete,
-                'txtDelete'               => $txtDelete,
-                'urlDisplayList'          => $urlDisplayList,
+                'officialOrderNumber'                => Controller::htmlInputText(
+                    $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)
+                ),
+                'urlUpdate'                          => $urlUpdate,
+                'urlDelete'                          => $urlDelete,
+                'txtDelete'                          => $txtDelete,
+                'urlDisplayList'                     => $urlDisplayList,
                 //        'declined'          => $declined,
-                'disabled'                => $disabled,
-                'readonly'                => $readonly,
+                'disabled'                           => $disabled,
+                'readonly'                           => $readonly,
                 /* This is NOW used as the printed contract start date when you print a contract */
-                'customerItemNotes'       => Controller::htmlTextArea($dsRenContract->getValue('customerItemNotes')),
-                'internalNotes'           => Controller::htmlTextArea($dsRenContract->getValue('internalNotes')),
-                'despatchDate'            => Controller::dateYMDtoDMY($dsRenContract->getValue('despatchDate')),
-                'despatchDateMessage'     => Controller::htmlDisplayText($dsRenContract->getMessage('despatchDate')),
-                'expiryDate'              => Controller::dateYMDtoDMY($dsRenContract->getValue('expiryDate')),
-                'calculatedExpiryDate'    => getExpiryDate(
+                'customerItemNotes'                  => Controller::htmlTextArea(
+                    $dsRenContract->getValue('customerItemNotes')
+                ),
+                'internalNotes'                      => Controller::htmlTextArea(
+                    $dsRenContract->getValue('internalNotes')
+                ),
+                'despatchDate'                       => Controller::dateYMDtoDMY(
+                    $dsRenContract->getValue('despatchDate')
+                ),
+                'despatchDateMessage'                => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('despatchDate')
+                ),
+                'expiryDate'                         => Controller::dateYMDtoDMY(
+                    $dsRenContract->getValue('expiryDate')
+                ),
+                'calculatedExpiryDate'               => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
                         $dsRenContract->getValue(DBECustomerItem::installationDate)
                     ),
                     $dsRenContract->getValue(DBECustomerItem::initialContractLength)
                 )->format('d/m/Y'),
-                'expiryDateMessage'       => Controller::htmlDisplayText($dsRenContract->getMessage('expiryDate')),
-
+                'expiryDateMessage'                  => Controller::htmlDisplayText(
+                    $dsRenContract->getMessage('expiryDate')
+                ),
                 'autoGenerateContractInvoiceChecked' => Controller::htmlChecked(
                     $dsRenContract->getValue('autoGenerateContractInvoice')
                 ),
-
-                'urlItemPopup' => $urlItemPopup,
-                'urlItemEdit'  => $urlItemEdit,
+                'directDebitFlagChecked'             => Controller::htmlChecked(
+                    $dsRenContract->getValue(DBECustomerItem::directDebitFlag)
+                ),
+                'urlItemPopup'                       => $urlItemPopup,
+                'urlItemEdit'                        => $urlItemEdit,
+                'allowDirectDebit'                 => $dsRenContract->getValue(
+                    DBEJRenContract::allowDirectDebit
+                ) === 'Y' ? 'true' : 'false',
+                'clientCheckDirectDebit'               => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
 
@@ -560,6 +629,30 @@ class CTRenContract extends CTCNC
             $dsCustomerItem
         );
 
+        $this->template->set_block(
+            'RenContractEdit',
+            'TransactionTypesBlock',
+            'transactionTypesOptions'
+        );
+        $transactionTypes = [
+            "01",
+            "17",
+        ];
+        foreach ($transactionTypes as $transactionType) {
+            $this->template->set_var(
+                array(
+                    'transactionType' => $transactionType,
+                    'selected'        => $dsRenContract->getValue(
+                        DBECustomerItem::transactionType
+                    ) == $transactionType ? 'selected' : null,
+                )
+            );
+            $this->template->parse(
+                'transactionTypesOptions',
+                'TransactionTypesBlock',
+                true
+            );
+        }
         $this->template->set_block(
             'RenContractEdit',
             'coveredItemsBlock',

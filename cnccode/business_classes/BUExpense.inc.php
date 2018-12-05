@@ -124,7 +124,7 @@ class BUExpense extends Business
             $dsExpense->post();
         }
         $dbeExpense = new DBEExpense($this);
-        $this->updateDataaccessObject($dsExpense, $dbeExpense);
+        $this->updateDataAccessObject($dsExpense, $dbeExpense);
         return TRUE;
     }
 
@@ -818,6 +818,10 @@ class BUExpense extends Business
         $hdrs = $mime->headers($hdrs);
 
         $result = $mail->send(CONFIG_SALES_MANAGER_EMAIL, $hdrs, $body);
+    }
+
+    public function getTotalExpensesForSalesOrder($salesOrderID) {
+        return $this->dbeJExpense->getTotalExpensesForSalesOrder($salesOrderID);
     }
 
 }// End of class

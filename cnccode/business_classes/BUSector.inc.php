@@ -27,7 +27,7 @@ class BUSector extends Business
     function updateSector(&$dsData)
     {
         $this->setMethodName('updateSector');
-        $this->updateDataaccessObject($dsData, $this->dbeSector);
+        $this->updateDataAccessObject($dsData, $this->dbeSector);
         return TRUE;
     }
 

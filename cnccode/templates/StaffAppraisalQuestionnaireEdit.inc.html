@@ -1,0 +1,109 @@
+<!-- Template: questionnaireEdit.inc.html -->
+<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
+	<TR> 
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
+		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
+	</TR>
+</table>
+<FORM  method="post" action="{urlUpdate}" name="questionnaire" AUTOCOMPLETE="OFF">
+	<table width="700px" border="0">
+		<input
+			type="hidden"
+			name="questionnaire[1][id]"
+			value="{id}"
+		>
+		<tr> 
+			<td width="115" class="promptText">Description</td>
+			<td width="575" class="fieldText"> <input
+					name="questionnaire[1][description]"
+					type="text" value="{description}"
+					size="50"
+					maxlength="50"
+				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
+		</tr>
+        <!--<tr>-->
+            <!--<td width="115"-->
+                <!--class="promptText"-->
+                <!--valign="top"-->
+            <!--&gt;Introduction-->
+            <!--</td>-->
+            <!--<td width="575"-->
+                <!--class="fieldText"-->
+            <!--&gt;-->
+        <!--<textarea-->
+                <!--name="questionnaire[1][intro]"-->
+                <!--cols="60"-->
+                <!--rows="20"-->
+        <!--&gt;{intro}</textarea>-->
+                <!--<span class="formErrorMessage">{introMessage}</span>-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td width="115"-->
+                <!--class="promptText"-->
+                <!--valign="top"-->
+            <!--&gt;Thank You-->
+            <!--</td>-->
+            <!--<td width="575"-->
+                <!--class="fieldText"-->
+            <!--&gt;-->
+        <!--<textarea-->
+                <!--name="questionnaire[1][thankYou]"-->
+                <!--cols="60"-->
+                <!--rows="20"-->
+        <!--&gt;{thankYou}</textarea>-->
+                <!--<span class="formErrorMessage">{thankYouMessage}</span></td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td width="115"-->
+                <!--class="promptText"-->
+            <!--&gt;Rating 1 Description-->
+            <!--</td>-->
+            <!--<td width="575"-->
+                <!--class="fieldText"-->
+            <!--&gt;<input-->
+                    <!--name="questionnaire[1][rating1Desc]"-->
+                    <!--type="text"-->
+                    <!--value="{rating1Desc}"-->
+                    <!--size="50"-->
+                    <!--maxlength="50"-->
+            <!--&gt; <span class="formErrorMessage">{rating1DescMessage}</span>-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td width="115"-->
+                <!--class="promptText"-->
+            <!--&gt;Rating 2 Description-->
+            <!--</td>-->
+            <!--<td width="575"-->
+                <!--class="fieldText"-->
+            <!--&gt;<input-->
+                    <!--name="questionnaire[1][rating5Desc]"-->
+                    <!--type="text"-->
+                    <!--value="{rating5Desc}"-->
+                    <!--size="50"-->
+                    <!--maxlength="50"-->
+            <!--&gt; <span class="formErrorMessage">{rating5DescMessage}</span>-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td width="115"-->
+                <!--class="promptText"-->
+            <!--&gt;Name Required?-->
+            <!--</td>-->
+            <!--<td width="575"-->
+                <!--class="fieldText"-->
+            <!--&gt;<input-->
+                    <!--name="questionnaire[1][nameRequired]"-->
+                    <!--type="checkbox"-->
+                    <!--{nameRequiredChecked}-->
+            <!--&gt; <span class="formErrorMessage">{nameRequiredMessage}</span>-->
+            <!--</td>-->
+        <!--</tr>-->
+		<tr> 
+			<td>&nbsp;</td>
+			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
+		</tr>
+	</table>
+</form>
+<!-- End Template: questionnaireEdit.inc.html -->

@@ -50,6 +50,10 @@ class DBEJUser extends DBEUser
             DA_YN,
             DA_NOT_NULL
         );
+
+
+
+
         $this->setAddColumnsOff();
     }
 

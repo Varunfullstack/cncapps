@@ -5,6 +5,15 @@
         "setasign/fpdi-protection": "^2.0",
         "syonix/changelog-viewer": "^0.1.7",
         "signable/signable-php": "*@dev",
-        "tijsverkoyen/css-to-inline-styles": "^2.2"
+        "tijsverkoyen/css-to-inline-styles": "^2.2",
+        "phpoffice/phpword": "^0.15.0",
+        "ext-json": "*",
+        "ext-mysqli": "*",
+        "ext-openssl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "CNCLTD\\": "cnccode/customClasses"
+        }
     }
 }

@@ -27,7 +27,7 @@ class BUStandardText extends Business
     function updateStandardText(&$dsData)
     {
         $this->setMethodName('updateStandardText');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeStandardText
         );

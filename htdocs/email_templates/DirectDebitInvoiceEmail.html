@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8"
+    >
+    <TITLE>Email</TITLE>
+    <style type="text/css">
+        .arialFont {
+            font-family: Arial, sans-serif !important;
+        }
+
+        body, td, div, p, table {
+            font-family: Arial, sans-serif !important;
+            font-size: 10.5pt !important;
+        }
+
+        .datatable {
+            border-collapse: collapse;
+        }
+
+        .datatable td {
+            border: 1pt solid black;
+            border-bottom: medium none black;
+            padding: 4.5pt;
+            border-image: none;
+        }
+
+        .datatable tr:last-child td {
+            border-bottom: 1pt solid black;
+        }
+    </style>
+</head>
+
+<BODY lang="EN-GB"
+      class="arialFont"
+>
+<div style="font-family: Arial, sans-serif !important;">
+    <table width="100%"
+           border="0"
+           cellspacing="0"
+           cellpadding="0"
+           style="background: rgb(237, 237,237)"
+    >
+        <tbody>
+        <tr>
+            <td width="10%">
+                <br/>
+            </TD>
+            <td width="80%"
+                valign="top"
+                style="padding: 37.5pt 0;"
+            >
+                <div align="center">
+                    <table width="100%"
+                           class="MsoNormalTable"
+                           border="0"
+                           cellspacing="0"
+                           cellpadding="0"
+                           style="background: white"
+                    >
+                        <tbody>
+                        <tr>
+                            <td width="6%"
+                            >
+
+                            </TD>
+                            <td width="88%"
+                                style="padding: 22.5pt 15pt;"
+                            >
+                                <table width="100%"
+                                       class="MsoNormalTable"
+                                       border="0"
+                                       cellspacing="0"
+                                       cellpadding="0"
+                                >
+                                    <tbody>
+                                    <tr>
+                                        <td>
+
+                                            <table width="100%">
+                                                <tr>
+                                                    <td >
+                                                        {contactName}
+                                                    </td>
+                                                    <td style="text-align: right">
+                                                        Computer & Network Consultants Ltd
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td >
+                                                        {companyName}
+                                                    </td>
+                                                    <td style="text-align: right">
+                                                        Unit 9 Riverside Business Centre
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td >
+                                                        {addressLine1}
+                                                    </td>
+                                                    <td style="text-align: right">
+                                                        Brighton Road
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {town}
+                                                    </td>
+
+                                                    <td style="text-align: right">
+                                                        Shoreham-by-Sea
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {county}
+                                                    </td>
+                                                    <td style="text-align: right">
+                                                        BN43 6RE
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {postCode}
+                                                    </td>
+                                                    <td>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td >
+                                                        Date: {date}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <br>
+                                            <table width="100%"
+                                                   border="0"
+                                                   cellpadding="0"
+                                            >
+                                                <tbody>
+                                                <tr>
+                                                    <td style="text-align: center">
+                            <span style="font-weight: bold;">
+                                Important: Advance Notification of a Direct Debit Collection
+                            </span>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                            <p>
+                                                Dear {contactName},
+                                            </p>
+                                            <p>
+                                                We are writing to advise you that we will be collecting the following
+                                                payment by Direct Debit on or
+                                                just after the advised date.
+                                            </p>
+
+                                            <table width="100%"
+                                                   class="datatable"
+                                                   border="0"
+                                                   cellspacing="0"
+                                                   cellpadding="0"
+                                            >
+                                                <COLGROUP span="2">
+                                                </COLGROUP>
+                                                <tbody>
+                                                <tr>
+                                                    <td style="font-weight: bold;"> Service User Name:</TD>
+                                                    <td> Computer & Network Consultants Ltd</TD>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;"> Service User Number:</TD>
+                                                    <td> 446364</TD>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;"> Reference:</TD>
+                                                    <td> {invoiceNo}</TD>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;"> Payment Date:</TD>
+                                                    <td> {paymentDate}</TD>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;"> Amount:</TD>
+                                                    <td> £{totalAmount}</TD>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <p>
+                                                If any of the above details are incorrect, please call us as soon as
+                                                possible on 01273 384100 or e-mail us at
+                                                accounts@cnc-ltd.co.uk. However,
+                                                if your details are
+                                                correct you need do nothing and your Direct Debit
+                                                will be
+                                                processed as normal. For your information, the collections
+                                                will
+                                                be made using the reference above.
+                                            </p>
+                                            <p>
+                                                Should the amount, date or frequency of your Direct Debit change, we
+                                                will notify you at least 10 working days in advance.
+                                            </p>
+                                            <div>
+                                                Yours
+                                                sincerely,
+                                            </div>
+                                            <div>
+                                                Accounts
+                                                Team
+                                            </div>
+                                        </TD>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td width="6%"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+            <td width="10%"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</BODY>
+</html>

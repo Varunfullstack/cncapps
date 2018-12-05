@@ -2,7 +2,33 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
+<script src=".javascript/DirectDebitLogic.js"></script>
 <script language='JavaScript'>
+
+    const clientCheckDirectDebit = {clientCheckDirectDebit};
+    function checkDirectDebit() {
+        const directDebitCheckbox = $('#directDebit');
+        const parent = directDebitCheckbox.parent();
+        if (clientCheckDirectDebit && $('#allowDirectDebit').val() !== 'false') {
+            directDebitCheckbox.attr('disabled', false);
+            if (parent.children().length > 1) {
+                parent.find('span').remove();
+            }
+        } else {
+            if (!clientCheckDirectDebit) {
+                if (parent.children().length < 2) {
+                    parent.append('<span class="redText">This customer needs bank details before Direct Debit can be used.</span>')
+                }
+            }
+            directDebitCheckbox.attr('disabled', true);
+            directDebitCheckbox.prop('checked', false)
+        }
+    }
+
+    $(function () {
+        checkDirectDebit();
+    });
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {      // F9 - edit
             switch (field.id) {
@@ -42,50 +68,45 @@
     <table width="700px"
            border="0"
     >
-        <input
-                type="hidden"
-                name="renHosting[1][customerItemID]"
-                value="{customerItemID}"
+        <input type="hidden"
+               value="{allowDirectDebit}"
+               id="allowDirectDebit"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][customerID]"
-                value="{customerID}"
+        <input type="hidden"
+               name="renHosting[1][customerItemID]"
+               value="{customerItemID}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][customerName]"
-                value="{customerName}"
+        <input type="hidden"
+               name="renHosting[1][customerID]"
+               value="{customerID}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][siteName]"
-                value="{siteName}"
+        <input type="hidden"
+               name="renHosting[1][customerName]"
+               value="{customerName}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][siteNo]"
-                value="{siteNo}"
+        <input type="hidden"
+               name="renHosting[1][siteName]"
+               value="{siteName}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][curUnitSale]"
-                value="{curUnitSale}"
+        <input type="hidden"
+               name="renHosting[1][siteNo]"
+               value="{siteNo}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][curUnitCost]"
-                value="{curUnitCost}"
+        <input type="hidden"
+               name="renHosting[1][curUnitSale]"
+               value="{curUnitSale}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][invoiceFromDate]"
-                value="{invoiceFromDate}"
+        <input type="hidden"
+               name="renHosting[1][curUnitCost]"
+               value="{curUnitCost}"
         >
-        <input
-                type="hidden"
-                name="renHosting[1][invoiceToDate]"
-                value="{invoiceToDate}"
+        <input type="hidden"
+               name="renHosting[1][invoiceFromDate]"
+               value="{invoiceFromDate}"
+        >
+        <input type="hidden"
+               name="renHosting[1][invoiceToDate]"
+               value="{invoiceToDate}"
         >
         <tr>
             <td width="167"
@@ -107,33 +128,35 @@
         </tr>
         <tr>
             <td class="promptText">Item</td>
-            <td class="field"><input
-                    type="hidden"
-                    name="renHosting[1][itemID]"
-                    id="itemID"
-                    value="{itemID}"
-            > <input
-                    type="text"
-                    {readonly}
-                    name="renHosting[1][itemDescription]"
-                    id="itemDescription"
-                    value="{itemDescription}"
-                    onChange="javascript:validateItemDescription()"
-                    onKeydown="javascript:checkFunctionKey(itemDescription)"
-                    size="50"
-                    maxlength="50"
+            <td class="field"><input type="hidden"
+                                     name="renHosting[1][itemID]"
+                                     id="itemID"
+                                     value="{itemID}"
+            > <input type="text"
+                     {readonly}
+                     name="renHosting[1][itemDescription]"
+                     id="itemDescription"
+                     value="{itemDescription}"
+                     onChange="javascript:validateItemDescription()"
+                     onKeydown="javascript:checkFunctionKey(itemDescription)"
+                     size="50"
+                     maxlength="50"
             > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
         </tr>
         {prices}
         <tr>
             <td class="promptText">Installation Date</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][installationDate]"
-                    type="text"
-                    value="{installationDate}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renHosting[1][installationDate]"
+                                         type="text"
+                                         value="{installationDate}"
+                                         {readonly}
+                                         size="40"
+                                         maxlength="50"
+                                         class="jqueryCalendar"
+                                         data-jqueryCalendarBeforeShowDay="beforeShowDay"
+                                         required
+                                         readonly="readonly"
+                                         id="installationDate"
             >
                 <span class="formErrorMessage">{installationDateMessage}</span>
             </td>
@@ -163,18 +186,17 @@
                        size="10"
                        maxlength="10"
                 >
-                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span>
-            </td>
+                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Invoice Interval (months)</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][invoicePeriodMonths]"
-                    {readonly}
-                    type="text"
-                    value="{invoicePeriodMonths}"
-                    size="10"
-                    maxlength="10"
+            <td class="fieldText"><input name="renHosting[1][invoicePeriodMonths]"
+                                         {readonly}
+                                         type="text"
+                                         value="{invoicePeriodMonths}"
+                                         size="10"
+                                         maxlength="10"
+                                         id="invoiceInterval"
             >
                 <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
         </tr>
@@ -189,98 +211,90 @@
 
         <tr>
             <td class="promptText">Sales Order Comment</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][notes]"
-                    type="text"
-                    value="{notes}"
-                    title="Appears as a comment line on the generated sales order before the item line"
-                    {readonly}
-                    size="40"
-                    maxlength="45"
+            <td class="fieldText"><input name="renHosting[1][notes]"
+                                         type="text"
+                                         value="{notes}"
+                                         title="Appears as a comment line on the generated sales order before the item line"
+                                         {readonly}
+                                         size="40"
+                                         maxlength="45"
             >
                 <span class="formErrorMessage">{notesMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Provider</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][hostingCompany]"
-                    type="text"
-                    value="{hostingCompany}"
-                    title="Company providing web hosting services"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][hostingCompany]"
+                                         type="text"
+                                         value="{hostingCompany}"
+                                         title="Company providing web hosting services"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{hostingCompanyMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Username</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][hostingUserName]"
-                    type="text"
-                    value="{hostingUserName}"
-                    title="Username"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][hostingUserName]"
+                                         type="text"
+                                         value="{hostingUserName}"
+                                         title="Username"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{hostingUserNameMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Password</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][password]"
-                    type="text"
-                    value="{password}"
-                    title="Password"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][password]"
+                                         type="text"
+                                         value="{password}"
+                                         title="Password"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{passwordMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">OS Platform</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][osPlatform]"
-                    type="text"
-                    value="{osPlatform}"
-                    title="Operating system. e.g.Red Hat, Windows, FreeBSB"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][osPlatform]"
+                                         type="text"
+                                         value="{osPlatform}"
+                                         title="Operating system. e.g.Red Hat, Windows, FreeBSB"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{osPlatformMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Control Panel</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][controlPanelUrl]"
-                    type="text"
-                    value="{controlPanelUrl}"
-                    title="URL of control panel"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][controlPanelUrl]"
+                                         type="text"
+                                         value="{controlPanelUrl}"
+                                         title="URL of control panel"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{controlPanelUrlMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">FTP Address</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][ftpAddress]"
-                    type="text"
-                    value="{ftpAddress}"
-                    title="FTP server address. an IP or a URL"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][ftpAddress]"
+                                         type="text"
+                                         value="{ftpAddress}"
+                                         title="FTP server address. an IP or a URL"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{ftpAddressMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">FTP Username</td>
-            <td class="fieldText"><input
-                    name="renHosting[1][ftpUsername]"
-                    type="text"
-                    value="{ftpUsername}"
-                    title="FTP account username"
-                    size="40"
-                    maxlength="50"
+            <td class="fieldText"><input name="renHosting[1][ftpUsername]"
+                                         type="text"
+                                         value="{ftpUsername}"
+                                         title="FTP account username"
+                                         size="40"
+                                         maxlength="50"
             >
                 <span class="formErrorMessage">{ftpUsernameMessage}</span></td>
         </tr>
@@ -299,6 +313,55 @@
                           rows="10"
                           name="renHosting[1][internalNotes]"
                 >{internalNotes}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Auto-generate Sales Invoice
+            </td>
+            <td colspan="2">
+                <input type="checkbox"
+                       name="renHosting[1][autoGenerateContractInvoice]"
+                       value="Y"
+                       {autoGenerateContractInvoiceChecked}
+                       title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created"
+                       id="autoGenerateContractInvoice"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Direct Debit
+            </td>
+            <td colspan="2">
+                <input type="checkbox"
+                       name="renHosting[1][directDebitFlag]"
+                       value="Y"
+                       {directDebitFlagChecked}
+                       title="If checked then the system will automatically generate a sales invoice otherwise just a sales order will be created"
+                       id="directDebit"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >
+                Transaction Type
+            </td>
+            <td colspan="2">
+                <select name="renHosting[1][transactionType]"
+                >
+                    <!-- BEGIN TransactionTypesBlock   -->
+                    <option value="{transactionType}"
+                            {selected}
+                    >
+                        {transactionType}
+                    </option>
+                    <!-- END TransactionTypesBlock   -->
+                </select>
             </td>
         </tr>
         <tr>

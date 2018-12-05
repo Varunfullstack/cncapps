@@ -26,7 +26,7 @@ class BUManufacturer extends Business
     function updateManufacturer(&$dsData)
     {
         $this->setMethodName('updateManufacturer');
-        $this->updateDataaccessObject($dsData, $this->dbeManufacturer);
+        $this->updateDataAccessObject($dsData, $this->dbeManufacturer);
         return TRUE;
     }
 

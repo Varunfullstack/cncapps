@@ -1,0 +1,108 @@
+<!-- Template: QuestionnaireList.inc.html -->
+<style>
+    .container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .leftTable {
+        width: 700px;
+        padding-right: 20px;
+    }
+
+    .clickable {
+        cursor: pointer;
+    }
+
+    .clickable:hover {
+        background-color: #0e84b5;
+    }
+
+</style>
+<script>
+    function showData(type, questionnaireID) {
+        fetch('?action=getQuestionnaireManagerData&type=' + type + '&questionnaireID=' + questionnaireID)
+            .then(response => response.json())
+            .then(json => json.data)
+            .then(data => {
+
+
+                const html = data.reduce((acc, item) => {
+
+                    let staffMemberName = item.firstName + " " + item.lastName;
+                    if (type == 'managerPending') {
+                        staffMemberName = "<a href='?action=managerAnswer&questionnaireID=" + questionnaireID + "&staffID=" + item.staffMemberID + "' >" + staffMemberName + "</a>"
+                    }
+
+                    acc += "<tr><td>" + staffMemberName + "</td></tr>";
+                    return acc;
+                }, '');
+                console.log(html);
+                $('.rightTable tbody').html(html);
+            })
+    }
+</script>
+<div class="container">
+    <div class="leftTable">
+        <table class="singleBorder"
+               width="100%"
+               border="0"
+               cellspacing="1"
+               cellpadding="2"
+        >
+            <tr>
+                <td width="265"
+                    class="listHeadText"
+                >Description
+                </td>
+                <td width="141"
+                    class="listHeadText"
+                >&nbsp;
+                    Staff Pending
+                </td>
+                <td width="141"
+                    class="listHeadText"
+                >Manager Pending&nbsp;
+                </td>
+                <td width="141"
+                    class="listHeadText"
+                >Completed&nbsp;
+                </td>
+            </tr>
+            <!-- BEGIN QuestionnaireBlock -->
+            <tr valign="top"
+            >
+                <td>
+                    {description}
+                </td>
+                <td class="clickable"
+                    onclick="showData('staffPending',{questionnaireID})"
+                >{staffPending}
+                </td>
+                <td class="clickable"
+                    onclick="showData('managerPending',{questionnaireID})"
+                >{managerPending}
+                </td>
+                <td class="clickable"
+                    onclick="showData('completed',{questionnaireID})"
+                >{completed}
+                </td>
+            </tr>
+            <!-- END QuestionnaireBlock -->
+        </table>
+    </div>
+    <div class="rightTable">
+        <table>
+            <thead>
+            <tr>
+                <th>Staff</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- End Template: QuestionnaireList.inc.html -->

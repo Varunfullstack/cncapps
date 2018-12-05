@@ -16,6 +16,7 @@ require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 
 class BUCustomerItem extends Business
 {
+    /** @var DBEJCustomerItem */
     var $dbeJCustomerItem = '';
 
     /**
@@ -172,6 +173,10 @@ class BUCustomerItem extends Business
             $this->dbeJCustomerItem,
             $dsResults
         );
+    }
+
+    function clientHasDirectDebit($clientID){
+        return $this->dbeJCustomerItem->getCountCustomerDirectDebitItems($clientID) > 0;
     }
 
     function getContractsByCustomerID($customerID,
@@ -346,7 +351,7 @@ class BUCustomerItem extends Business
             );
             $dsCustomerItem->post();
         }
-        if ($success = $this->updateDataaccessObject(
+        if ($success = $this->updateDataAccessObject(
             $dsCustomerItem,
             $dbeCustomerItem
         )) {

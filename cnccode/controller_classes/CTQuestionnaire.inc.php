@@ -17,9 +17,20 @@ class CTQuestionnaire extends CTCNC
     var $dsQuestionnaire = '';
     var $buQuestionnaire = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "maintenance",
         ];
@@ -113,7 +124,7 @@ class CTQuestionnaire extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'displayQuestionList',
+                            'action'          => 'displayQuestionList',
                             'questionnaireID' => $questionnaireID
                         )
                     );
@@ -129,7 +140,7 @@ class CTQuestionnaire extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'edit',
+                            'action'          => 'edit',
                             'questionnaireID' => $questionnaireID
                         )
                     );
@@ -140,7 +151,7 @@ class CTQuestionnaire extends CTCNC
                         $this->buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action' => 'delete',
+                                'action'          => 'delete',
                                 'questionnaireID' => $questionnaireID
                             )
                         );
@@ -152,22 +163,32 @@ class CTQuestionnaire extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'questionnaireID' => $questionnaireID,
-                        'description' => Controller::htmlDisplayText($dsQuestionnaire->getValue('description')),
-                        'urlEdit' => $urlEdit,
+                        'questionnaireID'        => $questionnaireID,
+                        'description'            => Controller::htmlDisplayText(
+                            $dsQuestionnaire->getValue('description')
+                        ),
+                        'urlEdit'                => $urlEdit,
                         'urlDisplayQuestionList' => $urlDisplayQuestionList,
-                        'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit,
-                        'txtDelete' => $txtDelete,
-                        'urlView' => $urlView
+                        'urlDelete'              => $urlDelete,
+                        'txtEdit'                => $txtEdit,
+                        'txtDelete'              => $txtDelete,
+                        'urlView'                => $urlView
                     )
                 );
 
-                $this->template->parse('rows', 'QuestionnaireBlock', true);
+                $this->template->parse(
+                    'rows',
+                    'QuestionnaireBlock',
+                    true
+                );
 
             }//while $dsQuestionnaire->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'QuestionnaireList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionnaireList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -182,11 +203,17 @@ class CTQuestionnaire extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'edit') {
-                $this->buQuestionnaire->getQuestionnaireByID($_REQUEST['questionnaireID'], $dsQuestionnaire);
+                $this->buQuestionnaire->getQuestionnaireByID(
+                    $_REQUEST['questionnaireID'],
+                    $dsQuestionnaire
+                );
                 $questionnaireID = $_REQUEST['questionnaireID'];
             } else {                                                                    // creating new
                 $dsQuestionnaire->initialise();
-                $dsQuestionnaire->setValue('questionnaireID', '0');
+                $dsQuestionnaire->setValue(
+                    'questionnaireID',
+                    '0'
+                );
                 $questionnaireID = '0';
             }
         } else {                                                                        // form validation error
@@ -199,7 +226,7 @@ class CTQuestionnaire extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'delete',
+                        'action'          => 'delete',
                         'questionnaireID' => $questionnaireID
                     )
                 );
@@ -212,7 +239,7 @@ class CTQuestionnaire extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'update',
+                    'action'          => 'update',
                     'questionnaireID' => $questionnaireID
                 )
             );
@@ -229,26 +256,31 @@ class CTQuestionnaire extends CTCNC
         );
         $this->template->set_var(
             array(
-                'questionnaireID' => $questionnaireID,
-                'description' => Controller::htmlInputText($dsQuestionnaire->getValue('description')),
-                'descriptionMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('description')),
-                'intro' => Controller::htmlInputText($dsQuestionnaire->getValue('intro')),
-                'introMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('intro')),
-                'thankYou' => Controller::htmlInputText($dsQuestionnaire->getValue('thankYou')),
-                'thankYouMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('thankYou')),
-                'rating1Desc' => Controller::htmlInputText($dsQuestionnaire->getValue('rating1Desc')),
-                'rating1DescMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating1Desc')),
-                'rating5Desc' => Controller::htmlInputText($dsQuestionnaire->getValue('rating5Desc')),
-                'rating5DescMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating5Desc')),
+                'questionnaireID'     => $questionnaireID,
+                'description'         => Controller::htmlInputText($dsQuestionnaire->getValue('description')),
+                'descriptionMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('description')),
+                'intro'               => Controller::htmlInputText($dsQuestionnaire->getValue('intro')),
+                'introMessage'        => Controller::htmlDisplayText($dsQuestionnaire->getMessage('intro')),
+                'thankYou'            => Controller::htmlInputText($dsQuestionnaire->getValue('thankYou')),
+                'thankYouMessage'     => Controller::htmlDisplayText($dsQuestionnaire->getMessage('thankYou')),
+                'rating1Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue('rating1Desc')),
+                'rating1DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating1Desc')),
+                'rating5Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue('rating5Desc')),
+                'rating5DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage('rating5Desc')),
                 'nameRequiredChecked' => Controller::htmlChecked($dsQuestionnaire->getValue('nameRequired')),
                 'nameRequiredMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage('nameRequired')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'urlUpdate'           => $urlUpdate,
+                'urlDelete'           => $urlDelete,
+                'txtDelete'           => $txtDelete,
+                'urlDisplayList'      => $urlDisplayList,
+                'logo'                => $dsQuestionnaire->getValue(DBEQuestionnaire::logo)
             )
         );
-        $this->template->parse('CONTENTS', 'QuestionnaireEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionnaireEdit',
+            true
+        );
         $this->parsePage();
     }// end function editFurther Action()
 
@@ -274,11 +306,12 @@ class CTQuestionnaire extends CTCNC
         $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'questionnaireID' => $this->dsQuestionnaire->getValue('questionnaireID'),
-                                 'action' => 'view'
-                             )
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'questionnaireID' => $this->dsQuestionnaire->getValue('questionnaireID'),
+                    'action'          => 'view'
+                )
             );
         header('Location: ' . $urlNext);
     }
@@ -319,9 +352,15 @@ class CTQuestionnaire extends CTCNC
             array('QuestionList' => 'QuestionList.inc')
         );
 
-        $this->buQuestionnaire->getAllQuestions($_REQUEST['questionnaireID'], $dsQuestion);
+        $this->buQuestionnaire->getAllQuestions(
+            $_REQUEST['questionnaireID'],
+            $dsQuestion
+        );
 
-        $this->buQuestionnaire->getQuestionnaireByID($dsQuestion->getValue('questionnaireID'), $dsQuestionnaire);
+        $this->buQuestionnaire->getQuestionnaireByID(
+            $dsQuestion->getValue('questionnaireID'),
+            $dsQuestionnaire
+        );
 
         $this->setPageTitle($dsQuestionnaire->getValue('description'));
 
@@ -329,7 +368,7 @@ class CTQuestionnaire extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'createQuestion',
+                    'action'          => 'createQuestion',
                     'questionnaireID' => $_REQUEST['questionnaireID']
 
                 )
@@ -355,7 +394,7 @@ class CTQuestionnaire extends CTCNC
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'editQuestion',
+                            'action'     => 'editQuestion',
                             'questionID' => $questionID
                         )
                     );
@@ -366,7 +405,7 @@ class CTQuestionnaire extends CTCNC
                         $this->buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action' => 'delete',
+                                'action'     => 'delete',
                                 'questionID' => $questionID
                             )
                         );
@@ -378,24 +417,34 @@ class CTQuestionnaire extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'questionID' => $questionID,
-                        'description' => Controller::htmlDisplayText($dsQuestion->getValue('description')),
-                        'answerType' => Controller::htmlDisplayText($dsQuestion->getValue('answerType')),
-                        'weight' => Controller::htmlDisplayText($dsQuestion->getValue('weight')),
-                        'activeFlag' => Controller::htmlDisplayText($dsQuestion->getValue('activeFlag')),
-                        'questionnaireDescription' => Controller::htmlDisplayText($dsQuestionnaire->getValue('description')),
-                        'urlEdit' => $urlEdit,
-                        'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit,
-                        'txtDelete' => $txtDelete
+                        'questionID'               => $questionID,
+                        'description'              => Controller::htmlDisplayText($dsQuestion->getValue('description')),
+                        'answerType'               => Controller::htmlDisplayText($dsQuestion->getValue('answerType')),
+                        'weight'                   => Controller::htmlDisplayText($dsQuestion->getValue('weight')),
+                        'activeFlag'               => Controller::htmlDisplayText($dsQuestion->getValue('activeFlag')),
+                        'questionnaireDescription' => Controller::htmlDisplayText(
+                            $dsQuestionnaire->getValue('description')
+                        ),
+                        'urlEdit'                  => $urlEdit,
+                        'urlDelete'                => $urlDelete,
+                        'txtEdit'                  => $txtEdit,
+                        'txtDelete'                => $txtDelete
                     )
                 );
 
-                $this->template->parse('rows', 'QuestionBlock', true);
+                $this->template->parse(
+                    'rows',
+                    'QuestionBlock',
+                    true
+                );
 
             }//while $dsQuestion->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'QuestionList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionList',
+            true
+        );
         $this->parsePage();
     }
 
@@ -410,12 +459,21 @@ class CTQuestionnaire extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'editQuestion') {
-                $this->buQuestionnaire->getQuestionByID($_REQUEST['questionID'], $dsQuestion);
+                $this->buQuestionnaire->getQuestionByID(
+                    $_REQUEST['questionID'],
+                    $dsQuestion
+                );
                 $questionID = $_REQUEST['questionID'];
             } else {                                  // creating new
                 $dsQuestion->initialise();
-                $dsQuestion->setValue('questionID', '0');
-                $dsQuestion->setValue('questionnaireID', $_REQUEST['questionnaireID']);
+                $dsQuestion->setValue(
+                    'questionID',
+                    '0'
+                );
+                $dsQuestion->setValue(
+                    'questionnaireID',
+                    $_REQUEST['questionnaireID']
+                );
                 $questionID = '0';
             }
         } else {                                    // form validation error
@@ -431,7 +489,7 @@ class CTQuestionnaire extends CTCNC
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'deleteQuestion',
+                        'action'     => 'deleteQuestion',
                         'questionID' => $questionID
                     )
                 );
@@ -444,7 +502,7 @@ class CTQuestionnaire extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'updateQuestion',
+                    'action'     => 'updateQuestion',
                     'questionID' => $questionID
                 )
             );
@@ -452,7 +510,7 @@ class CTQuestionnaire extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'displayQuestionList',
+                    'action'          => 'displayQuestionList',
                     'questionnaireID' => $dsQuestion->getValue('questionnaireID')
                 )
             );
@@ -462,21 +520,21 @@ class CTQuestionnaire extends CTCNC
         );
         $this->template->set_var(
             array(
-                'questionID' => $questionID,
+                'questionID'      => $questionID,
                 'questionnaireID' => $dsQuestion->getValue('questionnaireID'),
 
-                'description' => Controller::htmlInputText($dsQuestion->getValue('description')),
-                'descriptionMessage' => Controller::htmlDisplayText($dsQuestion->getMessage('description')),
-                'activeFlagChecked' => $dsQuestion->getValue('activeFlag') == 'Y' ? 'CHECKED' : '',
-                'activeFlagMessage' => Controller::htmlDisplayText($dsQuestion->getMessage('activeFlag')),
+                'description'         => Controller::htmlInputText($dsQuestion->getValue('description')),
+                'descriptionMessage'  => Controller::htmlDisplayText($dsQuestion->getMessage('description')),
+                'activeFlagChecked'   => $dsQuestion->getValue('activeFlag') == 'Y' ? 'CHECKED' : '',
+                'activeFlagMessage'   => Controller::htmlDisplayText($dsQuestion->getMessage('activeFlag')),
                 'requiredFlagChecked' => $dsQuestion->getValue('requiredFlag') == 'Y' ? 'CHECKED' : '',
                 'requiredFlagMessage' => Controller::htmlDisplayText($dsQuestion->getMessage('requiredFlag')),
-                'weight' => Controller::htmlInputText($dsQuestion->getValue('weight')),
-                'weightMessage' => Controller::htmlDisplayText($dsQuestion->getMessage('weight')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'weight'              => Controller::htmlInputText($dsQuestion->getValue('weight')),
+                'weightMessage'       => Controller::htmlDisplayText($dsQuestion->getMessage('weight')),
+                'urlUpdate'           => $urlUpdate,
+                'urlDelete'           => $urlDelete,
+                'txtDelete'           => $txtDelete,
+                'urlDisplayList'      => $urlDisplayList
             )
         );
         /*
@@ -484,7 +542,11 @@ class CTQuestionnaire extends CTCNC
         */
         $this->answerTypeDropdown($dsQuestion->getValue('answerTypeID'));
 
-        $this->template->parse('CONTENTS', 'QuestionEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionEdit',
+            true
+        );
         $this->parsePage();
     }// end function editQuestion Action()
 
@@ -497,21 +559,31 @@ class CTQuestionnaire extends CTCNC
         // Display list of answerTypes that are current at given activity date
         $this->buQuestionnaire->dbeAnswerType->getRows();
 
-        $this->template->set_block($templateName, $blockName, 'answerTypes');
+        $this->template->set_block(
+            $templateName,
+            $blockName,
+            'answerTypes'
+        );
 
         while ($this->buQuestionnaire->dbeAnswerType->fetchNext()) {
 
-            $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue('answerTypeID') == $answerTypeID) ? CT_SELECTED : '';
+            $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
+                    'answerTypeID'
+                ) == $answerTypeID) ? CT_SELECTED : '';
 
             $this->template->set_var(
                 array(
-                    'answerTypeID' => $this->buQuestionnaire->dbeAnswerType->getValue("answerTypeID"),
+                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue("answerTypeID"),
                     'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue("description"),
-                    'answerTypeSelected' => $answerTypeSelected
+                    'answerTypeSelected'    => $answerTypeSelected
                 )
             );
 
-            $this->template->parse('answerTypes', $blockName, true);
+            $this->template->parse(
+                'answerTypes',
+                $blockName,
+                true
+            );
 
 
         }
@@ -540,11 +612,12 @@ class CTQuestionnaire extends CTCNC
         $this->buQuestionnaire->updateQuestion($this->dsQuestion);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'questionnaireID' => $this->dsQuestion->getValue('questionnaireID'),
-                                 'action' => 'displayQuestionList'
-                             )
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'questionnaireID' => $this->dsQuestion->getValue('questionnaireID'),
+                    'action'          => 'displayQuestionList'
+                )
             );
         header('Location: ' . $urlNext);
     }
