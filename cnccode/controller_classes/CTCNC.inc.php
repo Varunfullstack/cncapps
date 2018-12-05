@@ -435,11 +435,34 @@ class CTCNC extends Controller
         }
         if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
             $this->setTemplateFiles(array('ScreenMaintenance' => $screenMaintenanceTemplate));
+            if ($this->isAppraiser()) {
+
+                    $sdManagerTechnical = new Template (
+                        $GLOBALS ["cfg"] ["path_templates"],
+                        "remove"
+                    );
+                    $sdManagerTechnical->set_file(
+                        'appraisalScreen',
+                        'ScreenMaintenanceAppraiser.inc.html'
+                    );
+                    $sdManagerTechnical->parse(
+                        'output',
+                        'appraisalScreen'
+                    );
+                    $sdManagerTemplateText = $sdManagerTechnical->get('output');
+
+                    $this->template->setVar(
+                        'appraiserScreen',
+                        $sdManagerTemplateText
+                    );
+
+            }
             $this->template->parse(
                 'screenMaintenance',
                 'ScreenMaintenance',
                 true
             );
+
         }
         if ($this->hasPermissions(PHPLIB_PERM_REPORTS)) {
             $this->setTemplateFiles(array('ScreenReports' => $screenReportsTemplate));
@@ -563,6 +586,11 @@ class CTCNC extends Controller
     function getChecked($flag)
     {
         return ($flag == 'N' ? '' : CT_CHECKED);
+    }
+
+    protected function isAppraiser()
+    {
+        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
     }
 } // end of class
 ?>

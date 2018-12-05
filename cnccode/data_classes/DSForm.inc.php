@@ -33,7 +33,9 @@ class DSForm extends DataSet
     * @param variant $ixPassedColumn Column for which to set message
     * @param string $message Message
     */
-    function setMessage($ixPassedColumn, $message)
+    function setMessage($ixPassedColumn,
+                        $message
+    )
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {

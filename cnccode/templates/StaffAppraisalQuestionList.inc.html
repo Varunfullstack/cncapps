@@ -1,0 +1,62 @@
+<!-- Template: QuestionList.inc.html -->
+<A href="{urlCreate}">[create new question]</A>
+<table class="singleBorder"
+       width="330"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+>
+    <tr>
+        <td width="200"
+            class="listHeadText"
+        >Description
+        </td>
+        <td width="100"
+            class="listHeadText"
+        >Type
+        </td>
+        <td width="10"
+            class="listHeadText"
+        >Order
+        </td>
+        <td width="10"
+            class="listHeadText"
+        >Active
+        </td>
+        <td width="10"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+    </tr>
+    <!-- BEGIN QuestionBlock -->
+    <tr valign="top"
+        onMouseOver="this.bgColor='#ffffcc';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td class="orderLineItem">
+            <DIV align="left">{description}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{answerType}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{orderSequence}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{activeFlag}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left"></div>
+            <DIV align="left"><A href="{urlEdit}"
+                                 title="Edit details"
+            >{txtEdit}</a>
+                <A href="{urlDelete}"
+                   title="Delete"
+                   onClick="if(!confirm('Are you sure you want to remove this question?')) return(false)"
+                >{txtDelete}</A>
+            </DIV>
+        </td>
+    </tr>
+    <!-- END QuestionBlock -->
+</table>
+<!-- End Template: QuestionList.inc.html -->

@@ -2,13 +2,25 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Changed
-- Issue 215 - Contact Management within CNCAPPS
 ### Fixed
-- Issue 352 - CNCWEB contacts bugs
-### Added
-- Issue 347 - Customer Review Management documents
+- Issue 376 - Contact notes being copied to other contacts
+- Issue 359 - Management Review Summary shows blank To: field
+- Issue 372 - Email display header missing
+- Issue 360 - SD Dashboard Assignment display issue
+### Changed 
+- Issue 365 - Performance table formatting improvements
 
+## [v1.14.2] - 2018-12-05
+## Fixed
+Project management role is no longer present in the User edit page
+
+## [v1.14.1] - 2018-12-04
+### Fixed
+Staff Appraisal start date field value loads with the wrong format
+
+## [V1.14.0]- 2018-12-03
+### Added
+- Issue 373 - Staff Appraisal Process
 
 ## [v1.13.2] - 2018-11-23
 ## Fixed

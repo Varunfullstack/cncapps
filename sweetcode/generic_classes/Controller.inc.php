@@ -941,7 +941,6 @@ class Controller extends BaseObject
 
     public static function htmlChecked($flag)
     {
-//		return ($flag=='N' ? '' : CT_CHECKED);
         if ($flag == 'N' OR $flag == '') {
             $ret = '';
         } else {

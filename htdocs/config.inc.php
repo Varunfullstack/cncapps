@@ -68,6 +68,27 @@ define(
 );
 
 
+define(
+    'CUSTOMERS_ENCRYPTION_PRIVATE_KEY',
+    'c:\\keys\\privkey.pem'
+);
+
+define(
+    'CUSTOMERS_ENCRYPTION_PUBLIC_KEY',
+    'c:\\keys\\privkey.pub'
+);
+
+define(
+    'USER_ENCRYPTION_PRIVATE_KEY',
+    'c:\\keys\\user-private.pem'
+);
+
+define(
+    'USER_ENCRYPTION_PUBLIC_KEY',
+    'c:\\keys\\user-private.pub'
+);
+
+
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
@@ -138,7 +159,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
-//            error_reporting(E_ALL & ~E_STRICT)
+//            error_reporting(E_ALL);
         error_reporting(E_ALL & ~E_WARNING);
         ini_set(
             'display_errors',
@@ -612,6 +633,7 @@ define(
     'CONFIG_SERVICE_REQUEST_DESC',
     'Service Request'
 );  // Description used in system
+
 
 define(
     "PDF_DIR",
