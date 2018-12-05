@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+- Issue 374 - Customer Review Meeting - include date of P1
+
 ## [v1.14.1] - 2018-12-04
 ### Fixed
 Staff Appraisal start date field value loads with the wrong format
