@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 388 - Contact Title Database field length increase
+
 ## [v1.14.1] - 2018-12-04
 ### Fixed
 Staff Appraisal start date field value loads with the wrong format
