@@ -8509,6 +8509,7 @@ is currently a balance of ';
         /*
     Start with duplicate of last activity
     */
+
         $dbeLastActivity = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
@@ -8527,6 +8528,21 @@ is currently a balance of ';
 
         if (!$zeroTime) {
             $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->getRow($problemID);
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::imLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::imLimitMinutes) + 3
+            );
+            $dbeProblem->updateRow();
         }
 
         $dbeCallActivity->setValue(
