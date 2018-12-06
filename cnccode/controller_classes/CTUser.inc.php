@@ -413,6 +413,12 @@ class CTUser extends CTCNC
                 "startDate"                            => Controller::dateYMDtoDMY(
                     $this->dsUser->getValue(DBEUser::startDate)
                 ),
+                "companyHealthcareStartDate"           => Controller::dateYMDtoDMY(
+                    $this->dsUser->getValue(DBEUser::companyHealthcareStartDate)
+                ),
+                "enhancedCNC2YearPensionStartDate"     => Controller::dateYMDtoDMY(
+                    $this->dsUser->getValue(DBEUser::enhancedCNC2YearPensionStartDate)
+                ),
                 "pensionAdditionalPaymentsPencilColor" => $this->dsUser->getValue(
                     DBEUser::encryptedPensionAdditionalPayments
                 ) ? 'greenPencil' : 'redPencil',
@@ -568,7 +574,8 @@ class CTUser extends CTCNC
                 'urlUpdate'                           => $urlUpdate,
                 'urlDelete'                           => $urlDelete,
                 'txtDelete'                           => $txtDelete,
-                'urlDisplayList'                      => $urlDisplayList
+                'urlDisplayList'                      => $urlDisplayList,
+
             )
         );
         // manager selection
@@ -670,12 +677,12 @@ class CTUser extends CTCNC
 
 
         if (isset($_REQUEST['user'][1]["dateOfBirth"])) {
-
+            var_dump('date of birth does have a value');
             if ($_REQUEST['user'][1]["dateOfBirth"]) {
                 $_REQUEST['user'][1]["encryptedDateOfBirth"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("dateOfBirth")
+                        $_REQUEST['user'][1]["dateOfBirth"]
                     );
 
             } else {
@@ -689,7 +696,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("pensionAdditionalPayments")
+                        $_REQUEST['user'][1]["pensionAdditionalPayments"]
                     );
 
             } else {
@@ -703,7 +710,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedSalary"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("salary")
+                        $_REQUEST['user'][1]["salary"]
                     );
 
             } else {
@@ -717,7 +724,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedSalarySacrifice"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("salarySacrifice")
+                        $_REQUEST['user'][1]["salarySacrifice"]
                     );
 
             } else {
@@ -732,7 +739,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("nationalInsuranceNumber")
+                        $_REQUEST['user'][1]["nationalInsuranceNumber"]
                     );
 
             } else {
@@ -746,7 +753,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedAddress1"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("address1")
+                        $_REQUEST['user'][1]["address1"]
                     );
 
             } else {
@@ -760,7 +767,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedAddress2"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("address2")
+                        $_REQUEST['user'][1]["address2"]
                     );
 
             } else {
@@ -775,7 +782,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedAddress3"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("address3")
+                        $_REQUEST['user'][1]["address3"]
                     );
 
             } else {
@@ -788,7 +795,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedTown"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("town")
+                        $_REQUEST['user'][1]["town"]
                     );
 
             } else {
@@ -802,7 +809,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedCounty"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("county")
+                        $_REQUEST['user'][1]["county"]
                     );
 
             } else {
@@ -816,7 +823,7 @@ class CTUser extends CTCNC
                 $_REQUEST['user'][1]["encryptedPostcode"] =
                     \CNCLTD\Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->dsUser->getValue("postcode")
+                        $_REQUEST['user'][1]["postcode"]
                     );
 
             } else {
