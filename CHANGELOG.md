@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.14.3] - 2018-12-06
+## Fixed
+Staff details encrypted fields are not being saved / displayed!
+
 ## [v1.14.2] - 2018-12-05
 ## Fixed
 Project management role is no longer present in the User edit page
