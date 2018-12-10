@@ -1,10 +1,17 @@
-<link rel="stylesheet" type="text/css"
-      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
+<link rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+/>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
 <script type="text/javascript"
-        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+></script>
 
 <script>
     $(function () {
@@ -17,92 +24,6 @@
                 }
             ],
             paging: false,
-            footerCallback: function (tfoot, data, start, end, display) {
-                var api = this.api();
-                var intVal = function (i) {
-                    return typeof i === 'string' ?
-                        i.replace(/[£,]/g, '') * 1 :
-                        typeof i === 'number' ?
-                            i : 0;
-                };
-
-                // Total over all pages
-                var total = api
-                    .column(3)
-                    .data()
-                    .reduce(function (a, b) {
-                        return intVal(a) + intVal(b);
-                    }, 0);
-
-                // Update footer
-                $(api.column(3).footer()).html(
-                    'Total: £' + total
-                );
-
-                var serverCareTotal = api
-                    .column(8)
-                    .data()
-                    .reduce(function (acc, item) {
-                        return acc + intVal(item)
-                    }, 0);
-
-                $(api.column(8).footer()).html(
-                    'Total: £' + serverCareTotal
-                );
-
-                var avgTotal = 0;
-
-                var costPerUserPerMonthTotalAVG = api
-                    .column(4)
-                    .data()
-                    .reduce(function (a, b) {
-                        var val = intVal(b);
-
-                        if (val > 0) {
-                            avgTotal++;
-                        }
-
-                        return intVal(a) + intVal(b);
-                    }, 0) / avgTotal;
-
-                $(api.column(4).footer()).html(
-                    'AVG £' + costPerUserPerMonthTotalAVG.toFixed(2)
-                );
-
-                var totalServiceDeskUsers = api
-                    .column(2)
-                    .data()
-                    .reduce(function (acc, item) {
-                        return acc + intVal(item);
-                    }, 0);
-
-                $(api.column(2).footer()).html(
-                    'Total: ' + totalServiceDeskUsers
-                );
-
-                var totalPhysicalServers = api
-                    .column(6)
-                    .data()
-                    .reduce(function (acc, item) {
-                        return acc + intVal(item);
-                    }, 0);
-
-                $(api.column(6).footer()).html(
-                    'Total: ' + totalPhysicalServers
-                );
-
-                var totalVirtualServers = api
-                    .column(7)
-                    .data()
-                    .reduce(function (acc, item) {
-                        return acc + intVal(item);
-                    }, 0);
-
-                $(api.column(7).footer()).html(
-                    'Total: ' + totalVirtualServers
-                )
-
-            }
         });
     })
 </script>
@@ -114,83 +35,81 @@
 <div class="reportDescription">
     This report breakdowns down the support contracts to show details about the ratio of supported users and servers.
 </div>
-<table id="theTable">
+<TABLE id="theTable">
     <thead>
-    <tr>
+    <TR>
         <th>
-            Customer
+            Purchase order
         </th>
         <th>
-            ServiceDesk Product
+            Customer Name
         </th>
         <th>
-            ServiceDesk Users
+            Description
         </th>
         <th>
-            ServiceDesk Contract
+            Supplier
         </th>
         <th>
-            Cost per user per month
+            Delivered To
         </th>
         <th>
-            ServerCare Product
+            Ordered On
         </th>
         <th>
-            Physical Servers
+            Visit Booked For
         </th>
         <th>
-            Virtual Servers
+            Required By
         </th>
         <th>
-            ServerCare Contract
+            Supplier Ref
         </th>
-    </tr>
+        <th>
+            Project Name
+        </th>
+        <th>
+            Dispatched Date
+        </th>
+    </TR>
     </thead>
-    <tfoot>
-    <tr>
-        <th></th>
-        <th></th>
-        <th style="text-align: right"></th>
-        <th style="text-align:right">Total</th>
-        <th style="text-align:right">Average</th>
-        <th></th>
-        <th style="text-align:right"></th>
-        <th style="text-align:right"></th>
-        <th style="text-align:right">Total</th>
-    </tr>
-    </tfoot>
     <tbody>
-    <!-- BEGIN contractItemBlock -->
-    <tr valign="top">
+    <!-- BEGIN notYetReceivedItemBlock -->
+    <TR {style}>
+        <TD>
+            <A href="{purchaseOrderLink}">{purchaseOrderId}</A>
+        </TD>
         <td>
             {customerName}
         </td>
         <td>
-            {serviceDeskProduct}
-        </td>
-        <td style="text-align:right">
-            {serviceDeskUsers}
-        </td>
-        <td style="text-align:right">
-            £{serviceDeskContract}
-        </td>
-        <td style="text-align:right">
-            £{serviceDeskCostPerUserMonth}
+            {itemDescription}
         </td>
         <td>
-            {serverCareProduct}
+            {supplierName}
         </td>
-        <td style="text-align:right">
-            {physicalServers}
+        <td>
+            {direct}
         </td>
-        <td style="text-align:right">
-            {virtualServers}
+        <td>
+            {purchaseOrderDate}
         </td>
-        <td style="text-align:right">
-            £{serverCareContract}
+        <td>
+            {futureDate}
         </td>
-
-    </tr>
-    <!-- END contractItemBlock -->
+        <td>
+            {requiredByDate}
+        </td>
+        <td>
+            {supplierRef}
+        </td>
+        <td>
+            {projectName}
+        </td>
+        <td>
+            {dispatchedDate}
+        </td>
+    </TR>
+    <!-- END notYetReceivedItemBlock -->
     </tbody>
-</table>
+</TABLE>

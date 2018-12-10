@@ -1,3 +1,32 @@
 <!-- Template: SalesOrderDisplayCreatePO.inc.html -->
-<input type="button" name="createPO" value="Create POs" onclick="document.location='{urlCreatePO}';">
+<script>
+
+    function goToCreatePO() {
+
+        let url = '{urlCreatePO}';
+
+        const requiredByDate = $('#requiredByDate').val();
+
+        if (requiredByDate) {
+            url += ("&requiredByDate=" + requiredByDate);
+        }
+        console.log(url);
+        return;
+        document.location = url;
+    }
+</script>
+<input type="button"
+       name="createPO"
+       value="Create POs"
+       onclick="goToCreatePO()"
+>
+<label>
+    <span>Required By</span>
+    <input type="text"
+           name="requiredByDate"
+           class="jqueryCalendar"
+           id="requiredByDate"
+           value="{requiredByDateValue}"
+    >
+</label>
 <!-- End Template: SalesOrderDisplayCreatePO.inc.html -->

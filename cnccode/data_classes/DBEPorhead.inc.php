@@ -25,7 +25,7 @@ class DBEPorhead extends DBEntity
     const locationID = "locationID";
     const orderUserID = "orderUserID";
     const orderDate = "orderDate";
-    const requiredBY = "requiredBy";
+    const requiredBy = "requiredBy";
 
     /**
      * calls constructor()
@@ -142,7 +142,7 @@ class DBEPorhead extends DBEntity
         );
 
         $this->addColumn(
-            self::requiredBY,
+            self::requiredBy,
             DA_DATE,
             DA_ALLOW_NULL,
             "poh_required_by"

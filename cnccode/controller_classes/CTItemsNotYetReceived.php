@@ -6,6 +6,7 @@
  * Time: 12:43
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_bu'] . '/BUItemsNotYetReceived.php');
 
 class CTItemsNotYetReceived extends CTCNC
 {
@@ -16,6 +17,8 @@ class CTItemsNotYetReceived extends CTCNC
      * @access  private
      */
     var $dsItem = '';
+    /** @var BUItemsNotYetReceived */
+    private $buItemsNotYetReceived;
 
     function __construct($requestMethod,
                          $postVars,
@@ -39,6 +42,7 @@ class CTItemsNotYetReceived extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->buItemsNotYetReceived = new BUItemsNotYetReceived($this);
     }
 
     /**
@@ -64,36 +68,47 @@ class CTItemsNotYetReceived extends CTCNC
             'ItemsNotYetReceived'
         );
 
-
-        $db = $this->getContractAndNumberData();
+        $itemsNotYetReceived = $this->buItemsNotYetReceived->getItemsNotYetReceived();
 
 
         $this->template->set_block(
             'ItemsNotYetReceived',
-            'contractItemBlock',
-            'contracts'
+            'notYetReceivedItemBlock',
+            'notYetReceivedItems'
         );
 
-        while ($db->next_record()) {
-            $row = $db->Record;
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract']
+        foreach ($itemsNotYetReceived as $item) {
 
-                )
+            $purchaseOrderLink = "/PurchaseOrder.php?action=display&porheadID=" . $item->getPurchaseOrderId();
+            $style = "";
+            if ($requiredByDate = $item->getPurchaseOrderRequiredBy()) {
+                $startDate = new DateTime();
+                $diff = $startDate->diff($requiredByDate);
+                if ((int)$diff->format('%a') < 7) {
+                    $style = "style='color:red'";
+                }
+            }
+            $this->template->set_var(
+                [
+                    "style"             => $style,
+                    "purchaseOrderLink" => $purchaseOrderLink,
+                    "purchaseOrderId"   => $item->getPurchaseOrderId(),
+                    "customerName"      => $item->getCustomerName(),
+                    "itemDescription"   => $item->getItemDescription(),
+                    "supplierName"      => $item->getSupplierName(),
+                    "direct"            => $item->getDirect(),
+                    "purchaseOrderDate" => $this->getDateOrNA($item->getPurchaseOrderDate()),
+                    "futureDate"        => $this->getDateOrNA($item->getFutureDate()),
+                    "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
+                    "supplierRef"       => $item->getSupplierRef(),
+                    "projectName"       => $item->getProjectName(),
+                    "dispatchedDate"    => $this->getDateOrNA($item->getDispatchedDate())
+                ]
             );
 
             $this->template->parse(
-                'contracts',
-                'contractItemBlock',
+                'notYetReceivedItems',
+                'notYetReceivedItemBlock',
                 true
             );
         }
@@ -109,6 +124,14 @@ class CTItemsNotYetReceived extends CTCNC
         $this->parsePage();
     }
 
-
+    private function getDateOrNA($date)
+    {
+        if (!$date) {
+            return 'N/A';
+        }
+        return $date->format(
+            'd/m/Y'
+        );
+    }
 }// end of class
 ?>

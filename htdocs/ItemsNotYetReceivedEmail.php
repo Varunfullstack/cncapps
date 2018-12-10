@@ -9,19 +9,12 @@
 
 require_once("config.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg["path_bu"] . '/BUItemsNotYetReceived.php');
 
 
 $outputToScreen = isset($_GET['toScreen']);
-
-if (!$db1 = mysqli_connect(
-    DB_HOST,
-    DB_USER,
-    DB_PASSWORD
-)) {
-    echo 'Could not connect to mysql host ' . DB_HOST;
-    exit;
-}
-$db1->select_db(DB_NAME);
+$something = null;
+$buItemsNotYetReceived = new BUItemsNotYetReceived($something);
 
 
 $sender_name = "System";
@@ -30,54 +23,8 @@ $headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: text/html";
 
-/*
-Unprinted purchase orders email to Gary
-*/
-$query = "SELECT 
-  porhead.`poh_porno`,
-  customer.`cus_name`,
-  item.`itm_desc`,
-  supplier.`sup_name`,
-  IF(
-    poh_direct_del = 'N',
-    'CNC',
-    'Direct'
-  ) AS direct,
-  poh_ord_date,
-  (SELECT 
-    MIN(ca.caa_date) 
-  FROM
-    callactivity ca 
-    LEFT JOIN callacttype cat 
-      ON cat.cat_callacttypeno = ca.caa_callacttypeno 
-  WHERE ca.caa_problemno = problem.`pro_problemno` 
-    AND ca.caa_date >= NOW()) AS futureDate,
-    poh_required_by
-FROM
-  porline 
-  LEFT JOIN porhead 
-    ON porline.pol_porno = porhead.`poh_porno` 
-  LEFT JOIN item 
-    ON item.`itm_itemno` = porline.`pol_itemno` 
-  LEFT JOIN ordhead 
-    ON porhead.`poh_ordno` = ordhead.`odh_ordno` 
-  LEFT JOIN customer 
-    ON ordhead.`odh_custno` = customer.`cus_custno` 
-  LEFT JOIN supplier 
-    ON supplier.`sup_suppno` = porhead.`poh_suppno` 
-  LEFT JOIN problem 
-    ON problem.`pro_linked_ordno` = porhead.`poh_ordno` 
-WHERE pol_qty_ord <> pol_qty_rec 
-  AND (poh_type = 'I' 
-    OR poh_type = 'P') 
-  AND poh_ord_consno IS NOT NULL 
-  AND poh_ord_consno <> 0 
-  and poh_required_by is not null and poh_required_by <> '0000-00-00'
-  order by poh_required_by asc 
-";
 
-
-$result = $db1->query($query);
+$result = $buItemsNotYetReceived->getItemsNotYetReceived();
 
 if (!$outputToScreen) {
     ob_start();
@@ -130,18 +77,23 @@ if (!$outputToScreen) {
             <th>
                 Required By
             </th>
+            <th>
+                Supplier Ref
+            </th>
+            <th>
+                Project Name
+            </th>
+            <th>
+                Dispatched Date
+            </th>
         </TR>
         </thead>
         <tbody>
         <?php
-        while ($i = $result->fetch_row()) {
+        foreach ($result as $itemNotYetReceived) {
             $style = "";
-            if ($i[7]) {
+            if ($requiredByDate = $itemNotYetReceived->getPurchaseOrderRequiredBy()) {
                 $startDate = new DateTime();
-                $requiredByDate = DateTime::createFromFormat(
-                    'Y-m-d',
-                    $i[7]
-                );
                 $diff = $startDate->diff($requiredByDate);
                 if ((int)$diff->format('%a') < 7) {
                     $style = "style='color:red'";
@@ -150,28 +102,44 @@ if (!$outputToScreen) {
             ?>
             <TR <?= $style ?>>
                 <TD>
-                    <A href="http://cncapps/PurchaseOrder.php?action=display&porheadID=<?php print $i[0] ?>" ><?php print $i[0] ?></A>
+                    <A href="http://cncapps/PurchaseOrder.php?action=display&porheadID=<?= $itemNotYetReceived->getPurchaseOrderId(
+                    ); ?>"
+                    ><?= $itemNotYetReceived->getPurchaseOrderId() ?></A>
                 </TD>
                 <td>
-                    <?= $i[1] ?>
+                    <?= $itemNotYetReceived->getCustomerName() ?>
                 </td>
                 <td>
-                    <?= $i[2] ?>
+                    <?= $itemNotYetReceived->getItemDescription() ?>
                 </td>
                 <td>
-                    <?= $i[3] ?>
+                    <?= $itemNotYetReceived->getSupplierName() ?>
                 </td>
                 <td>
-                    <?= $i[4] ?>
+                    <?= $itemNotYetReceived->getDirect() ?>
                 </td>
                 <td>
-                    <?= (new DateTime($i[5]))->format('d/m/Y') ?>
+                    <?= $itemNotYetReceived->getPurchaseOrderDate() ? $itemNotYetReceived->getPurchaseOrderDate(
+                    )->format('d/m/Y') : '' ?>
                 </td>
                 <td>
-                    <?= $i[6] ? (new DateTime($i[6]))->format('d/m/Y') : 'N/A' ?>
+                    <?= $itemNotYetReceived->getFutureDate() ? $itemNotYetReceived->getFutureDate()->format(
+                        'd/m/Y'
+                    ) : 'N/A' ?>
                 </td>
                 <td>
                     <?= $requiredByDate ? $requiredByDate->format('d/m/Y') : 'N/A' ?>
+                </td>
+                <td>
+                    <?= $itemNotYetReceived->getSupplierRef() ?>
+                </td>
+                <td>
+                    <?= $itemNotYetReceived->getProjectName() ?>
+                </td>
+                <td>
+                    <?= $itemNotYetReceived->getDispatchedDate() ? $itemNotYetReceived->getDispatchedDate()->format(
+                        'd/m/Y'
+                    ) : '' ?>
                 </td>
             </TR>
             <?php
@@ -186,7 +154,6 @@ if (!$outputToScreen) {
 
     $body = ob_get_contents();
     ob_end_clean();
-    $result->free();
 
     $buMail = new BUMail($this);
 

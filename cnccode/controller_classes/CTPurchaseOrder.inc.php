@@ -208,9 +208,18 @@ class CTPurchaseOrder extends CTCNC
     function generateFromSO()
     {
         $this->setMethodName('generateFromSO');
+        $requiredByDate = null;
+        if (isset($_REQUEST['requiredByDate'])) {
+            $requiredByDate = DateTime::createFromFormat(
+                'd/m/Y',
+                $_REQUEST['requiredByDate']
+            );
+        }
+
         $this->buPurchaseOrder->createPOsFromSO(
             $_REQUEST['ordheadID'],
-            $this->userID
+            $this->userID,
+            $requiredByDate
         );
         $urlNext = $this->buildLink(
             $_SERVER['PHP_SELF'],
@@ -695,7 +704,7 @@ class CTPurchaseOrder extends CTCNC
                 'emailLink'                 => $emailLink,
                 'raisedByName'              => Controller::htmlDisplayText($dsPorhead->getValue('raisedByName')),
                 'orderedByName'             => Controller::htmlDisplayText($dsPorhead->getValue('orderedByName')),
-                'orderRequiredBy'           => Controller::dateYMDtoDMY($dsPorhead->getValue(DBEPorhead::requiredBY)),
+                'orderRequiredBy'           => Controller::dateYMDtoDMY($dsPorhead->getValue(DBEPorhead::requiredBy)),
                 'orderDate'                 => Controller::dateYMDtoDMY($dsPorhead->getValue('orderDate')),
                 'supplierName'              => Controller::htmlInputText($dsPorhead->getValue("supplierName")),
                 'supplierLink'              => $supplierLink,

@@ -408,6 +408,9 @@ class CTDespatch extends CTCNC
         if ($_REQUEST['deliveryMethodID'] == '') {
             $this->setFormErrorMessage('Please select a delivery method');
         }
+
+
+
         $this->setDeliveryMethodID($_REQUEST['deliveryMethodID']);
         $buDespatch->initialiseDespatchDataset($dsDespatch);
 

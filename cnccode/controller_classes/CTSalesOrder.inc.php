@@ -2111,8 +2111,7 @@ class CTSalesOrder extends CTCNC
                         )
                     );
                 $this->template->set_var(
-                    'urlCreatePO',
-                    $urlCreatePO
+                    ['urlCreatePO' => $urlCreatePO]
                 );
                 $this->template->parse(
                     'salesOrderDisplayCreatePO',
