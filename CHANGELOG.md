@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.14.4] - 2018-12-10
+## Changed
+Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
+
 ## [v1.14.3] - 2018-12-06
 ## Fixed
 Staff details encrypted fields are not being saved / displayed!
