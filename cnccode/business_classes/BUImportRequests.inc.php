@@ -8,6 +8,7 @@
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
+require_once $cfg['path_dbe'].'/DBEProblem.inc.php';
 
 class BUImportRequests extends Business
 {
@@ -30,6 +31,8 @@ class BUImportRequests extends Business
         echo "Start Import<BR/>";
 
         $processedMessages = 0;
+
+        //TODO: create a class that represents the automated_request row
         /*
         Putting a limit on this means that if the process gets behind it will process in batches
         instead of putting a big load on the server.
@@ -49,30 +52,30 @@ class BUImportRequests extends Business
         $db->query($sql);
 
         $toDelete = [];
+        /** @var \CNCLTD\AutomatedRequest $automatedRequest */
+        while ($automatedRequest = $db->nextObjectRecord(\CNCLTD\AutomatedRequest::class)) {
 
-        while ($db->next_record()) {
 
-            $automatedRequestID = $db->Record['automatedRequestID'];
-            echo 'Start processing ' . $db->Record['automatedRequestID'] . "<BR/>";
+            echo 'Start processing ' . $automatedRequest->getAutomatedRequestID() . "<BR/>";
 
             $errorString = '';
             if ($this->processMessage(
                 $db->Record,
                 $errorString
             )) {      // error string returned
-                echo $automatedRequestID . " processed successfully<BR/>";
+                echo $automatedRequest->getAutomatedRequestID() . " processed successfully<BR/>";
                 $processedMessages++;
             } else {
-                echo $db->Record['automatedRequestID'] . " failed<BR/>";
+                echo $automatedRequest->getAutomatedRequestID() . " failed<BR/>";
                 $this->sendFailureEmail(
-                    $db->Record['senderEmailAddress'],
-                    $db->Record['createDateTime'],
-                    $db->Record['subjectLine'],
-                    $db->Record['htmlBody'],
+                    $automatedRequest->getSenderEmailAddress(),
+                    $automatedRequest->getCreateDateTime(),
+                    $automatedRequest->getSubjectLine(),
+                    $automatedRequest->getHtmlBody(),
                     $errorString
                 );
             }
-            $toDelete[] = $db->Record['automatedRequestID'];
+            $toDelete[] = $automatedRequest->getAutomatedRequestID();
 
         } // end while
 

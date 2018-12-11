@@ -7262,151 +7262,158 @@ is currently a balance of ';
         return $nextid;
     }
 
-    function processAutomaticRequest($record,
+    function processAutomaticRequest(\CNCLTD\AutomatedRequest $automatedRequest,
                                      &$errorString
     )
     {
-
-        $details = $record['textBody'];
-
-        $db = new dbSweetcode(); // database connection for query
-
-        if ($record['serverGuardFlag'] == 'Y') {
-            return $this->processServerGuard($record);
-        }
-        /* All below is for non server-guard */
-
-        $contact = $this->getContactInfo($record);
-
-        if ($record['serviceRequestID']) {
-            /* find request */
-            $queryString = "
-        SELECT
-          pro_problemno,
-          pro_status
-        FROM
-          problem
-        WHERE
-          pro_problemno = '" . $record['serviceRequestID'] . "'";
-
-
-            $db->query($queryString);
-
-            if ($db->next_record()) {              // find
-                if ($db->Record['pro_status'] == 'C') {   // is request completed?
-
-                    $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-                    $details .= 'Reopened from SR ' . $record['serviceRequestID'];
-
-                    //
-
-                    return $this->processIsSenderAuthorised(
-                        $details,
-                        $contact,
-                        $record,
-                        $errorString
-                    );
-
-                } else {                               //not completed
-
-                    if ($contact) {
-                        $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-
-                        if (!$contact['isSupportContact']) {
-                            $details .= 'This email is from an unauthorised contact and needs to be confirmed' . "\n\n";
-                        }
-
-                        $details .= 'Update from email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-                                CONFIG_MYSQL_DATETIME
-                            );
-
-                        $dbeLastActivity = $this->getLastActivityInProblem($record['serviceRequestID']);
-                        $this->createFollowOnActivity(
-                            $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
-                            CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
-                            $contact['contactID'],
-                            $details,
-                            false,
-                            true,
-                            USER_SYSTEM,
-                            false,
-                            true
-                        );
-
-                        if ($record['attachment'] == 'Y') {
-                            $this->processAttachment(
-                                $record['serviceRequestID'],
-                                $record
-                            );
-                        }
-
-                        return true;
-
-                    } else {
-                        /*
-            Contact not resolved to customer domain OR contact
-
-            Still create an activity from the contact from the last activity
-            on the SR but with a notice
-            */
-                        $dbeLastActivity = $this->getLastActivityInProblem($record['serviceRequestID']);
-
-                        $details = 'THIS MESSAGE IS FROM UNRECOGNISED EMAIL ADDRESS ' . $record['senderEmailAddress'] . '. Confirm with the customer that you may deal with it' . "\n\n" . $details;
-
-                        $this->createFollowOnActivity(
-                            $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
-                            CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
-                            $dbeLastActivity->getValue(DBEJCallActivity::userID),
-                            $details,
-                            false,
-                            true,
-                            USER_SYSTEM
-                        );
-
-                        if ($record['attachment'] == 'Y') {
-                            $this->processAttachment(
-                                $record['serviceRequestID'],
-                                $record
-                            );
-                        }
-
-                        return true;
-                    }
-
-                }
-            } else {
-                $errorString = 'Can not find Service Request  ' . $record['serviceRequestID'] . '<BR/>';
-                echo $errorString;
-                return false;
-            }
-        } else { // no SR number
-            return $this->processIsSenderAuthorised(
-                $details,
-                $contact,
-                $record,
-                $errorString
+        if (!$automatedRequest->getCustomerID()) {
+            return $this->addCustomerRaisedRequest(
+                $automatedRequest
             );
         }
+
+
+        if ($automatedRequest->getServiceRequestID()) {
+            $dbeProblem = new DBEProblem($this);
+
+            $dbeProblem->getRow($automatedRequest->getServiceRequestID());
+
+            if (!$dbeProblem->rowCount()) {
+                // create a new service request
+                return $this->raiseNewRequestFromImport($automatedRequest);
+            }
+
+            $status = $dbeProblem->getValue(DBEProblem::status);
+
+            if ($status == 'C') {   // is request completed?
+                return $this->raiseNewRequestFromImport($automatedRequest);
+            }
+
+            $dbeContact = new DBEContact($this);
+
+            $dbeContact->setValue(
+                DBEContact::email,
+                $automatedRequest->getSenderEmailAddress()
+            );
+            $dbeContact->getRowsByColumn(DBEContact::email);
+            $details = $automatedRequest->getTextBody();
+            if (!$dbeContact->rowCount) {
+                $details .= 'Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                    ) . ' on ' . date(
+                        CONFIG_MYSQL_DATETIME
+                    );
+
+                $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
+                $this->createFollowOnActivity(
+                    $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
+                    CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+                    $dbeProblem->getValue(DBEProblem::contactID),
+                    $details,
+                    false,
+                    true,
+                    USER_SYSTEM,
+                    false,
+                    true
+                );
+
+                if ($automatedRequest->getAttachment() == 'Y') {
+                    $this->processAttachment(
+                        $automatedRequest->getServiceRequestID(),
+                        $automatedRequest
+                    );
+                }
+                return null;
+            }
+
+            if ($dbeContact->getValue(DBEContact::customerID) != $automatedRequest->getCustomerID()) {
+                $details .= 'Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                    ) . ' on ' . date(
+                        CONFIG_MYSQL_DATETIME
+                    );
+
+                $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
+                $this->createFollowOnActivity(
+                    $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
+                    CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+                    $dbeProblem->getValue(DBEProblem::contactID),
+                    $details,
+                    false,
+                    true,
+                    USER_SYSTEM,
+                    false,
+                    true
+                );
+
+                if ($automatedRequest->getAttachment() == 'Y') {
+                    $this->processAttachment(
+                        $automatedRequest->getServiceRequestID(),
+                        $automatedRequest
+                    );
+                }
+                return null;
+            }
+
+            $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
+            $this->createFollowOnActivity(
+                $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
+                CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+                $dbeContact->getValue(DBEContact::contactID),
+                $details,
+                false,
+                true,
+                USER_SYSTEM,
+                false,
+                true
+            );
+
+            if ($automatedRequest->getAttachment() == 'Y') {
+                $this->processAttachment(
+                    $automatedRequest->getServiceRequestID(),
+                    $automatedRequest
+                );
+            }
+
+            return null;
+        }
+
+
+        if ($automatedRequest->getServerGuardFlag() == 'Y') {
+            return $this->processServerGuard($automatedRequest);
+        }
+
+        return $this->raiseNewRequestFromImport($automatedRequest);
     }
 
-    function processServerGuard($record)
+    function processServerGuard(\CNCLTD\AutomatedRequest $automatedRequest)
     {
-        $details = $record['textBody'];
+        $details = $automatedRequest->getTextBody();
 
         $contact = $this->getAlertContact(
-            $record['customerID'],
-            $record['postcode']
+            $automatedRequest->getCustomerID(),
+            $automatedRequest->getPostcode()
         );
+
+
+        if (!$contact) {
+            return $this->addCustomerRaisedRequest(
+                $automatedRequest,
+                null,
+                false,
+                $details,
+                'C'
+            );
+        }
+
         /*
     No monitor status = create new request
     */
-        if ($record['monitorStatus'] == '') {
+        if ($automatedRequest->getMonitorStatus() == '') {
             /* Create new request */
-            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+            $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
             $details .= 'Raised from ServerGuard on ' . date(CONFIG_MYSQL_DATETIME);
 
             $this->raiseNewRequestFromImport(
-                $record,
+                $automatedRequest,
                 $details,
                 $contact
             );
@@ -7414,19 +7421,19 @@ is currently a balance of ';
             return true;       // nothing more to do
         }
 
-        if ($record['monitorStatus'] == 'S') { // success
+        if ($automatedRequest->getMonitorStatus() == 'S') { // success
 
             $request =
                 $this->getRequestByCustPostcodeMonitorNameAgentName(
-                    $record['customerID'],
-                    $record['postcode'],
-                    $record['monitorName'],
-                    $record['monitorAgentName']
+                    $automatedRequest->getCustomerID(),
+                    $automatedRequest->getPostcode(),
+                    $automatedRequest->getMonitorName(),
+                    $automatedRequest->getMonitorAgentName()
                 );
 
             if ($request) {
 
-                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+                $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
                 $details .= 'Issue resolved - from ServerGuard';
 
                 $dbeLastActivity = $this->getLastActivityInProblem($request['pro_problemno']);
@@ -7454,7 +7461,7 @@ is currently a balance of ';
                     $this->setProblemToFixed(
                         $request['pro_problemno'],
                         USER_SYSTEM,
-                        $record['contractCustomerItemID'],
+                        $automatedRequest->getContractCustomerItemID(),
                         CONFIG_NOTHING_FOUND_ROOT_CAUSE_ID,
                         'Automatically fixed'
                     );
@@ -7472,14 +7479,14 @@ is currently a balance of ';
         } else { // failed
             $request =
                 $this->getRequestByCustPostcodeMonitorNameAgentName(
-                    $record['customerID'],
-                    $record['postcode'],
-                    $record['monitorName'],
-                    $record['monitorAgentName']
+                    $automatedRequest->getCustomerID(),
+                    $automatedRequest->getPostcode(),
+                    $automatedRequest->getMonitorName(),
+                    $automatedRequest->getMonitorAgentName()
                 );
             if ($request && $request['pro_status'] != 'C') { // request exists that is not completed
 
-                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+                $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
                 $details .= 'Updated from ServerGuard';
 
                 $dbeLastActivity = $this->getLastActivityInProblem($request['pro_problemno']);
@@ -7495,21 +7502,21 @@ is currently a balance of ';
                     );
                 $this->setActivityAwaitingCNC($callActivityID);
 
-                if ($record['attachment'] == 'Y') {
+                if ($automatedRequest->getAttachment() == 'Y') {
                     $this->processAttachment(
                         $request['pro_problemno'],
-                        $record
+                        $automatedRequest
                     );
                 }
 
                 return true;
             } else {
                 /* Create new request */
-                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+                $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
                 $details .= 'Raised from ServerGuard on ' . date(CONFIG_MYSQL_DATETIME);
 
                 $this->raiseNewRequestFromImport(
-                    $record,
+                    $automatedRequest,
                     $details,
                     $contact
                 );
@@ -7539,6 +7546,10 @@ is currently a balance of ';
         if (!$ret['siteNo']) {
             $ret['siteNo'] = 0;
         }
+
+
+        //TODO: Change this to look at the customer table first and find if it has a Primary Main contact assigned
+
 
         /* use main support contact */
         $queryString = "
@@ -7589,26 +7600,53 @@ is currently a balance of ';
      * @param mixed $contact
      * @throws Exception
      */
-    function raiseNewRequestFromImport($record,
-                                       $details,
-                                       $contact
-    )
+    function raiseNewRequestFromImport(\CNCLTD\AutomatedRequest $record)
     {
 
         $dbeProblem = new DBEProblem($this);
 
         /* if customer-raised then we derive customer from email address */
-        if (!$record['customerID']) {
-            $customerID = $contact['customerID'];
-        } else {
-            $customerID = $record['customerID'];
+        $customerID = $record->getCustomerID();
+
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->setValue(
+            DBEContact::email,
+            $record->getSenderEmailAddress()
+        );
+        $dbeContact->getRowsByColumn(DBEContact::email);
+
+        if (!$dbeContact) {
+            $buCustomer = new BUCustomer($this);
+            $dbeContact = $buCustomer->getPrimaryContact($customerID);
         }
 
-        $slaResponseHours =
-            $this->getSlaResponseHours(
-                $record['priority'],
-                $customerID
+        if (!$dbeContact) {
+            return $this->addCustomerRaisedRequest($record);
+        }
+
+        $supportLevel = $dbeContact->getValue(DBEContact::supportLevel);
+
+        $allowedLevels = [
+            DBEContact::supportLevelMain,
+            DBEContact::supportLevelSupervisor,
+            DBEContact::supportLevelSupport
+        ];
+
+        if (!in_array(
+            $supportLevel,
+            $allowedLevels
+        )) {
+            return $this->contactNotAuthorized(
+                $record,
+                $dbeContact
             );
+        }
+
+        $slaResponseHours = $this->getSlaResponseHours(
+            $record->getPriority(),
+            $customerID
+        );
 
         /*
     Determine site to use.
@@ -7619,15 +7657,15 @@ is currently a balance of ';
     */
         $siteNo = false;
 
-        if ($record['postcode']) {
+        if ($record->getPostcode()) {
             $siteNo = $this->getSiteNoByCustomerPostcode(
                 $customerID,
-                $record['postcode']
+                $record->getPostcode()
             );
         }
 
         if (!$siteNo) {
-            $siteNo = $contact['siteNo'];
+            $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         }
 
         $dbeProblem->setValue(
@@ -7656,7 +7694,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::priority,
-            $record['priority']
+            $record->getPriority()
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
@@ -7664,11 +7702,11 @@ is currently a balance of ';
         ); // default
         $dbeProblem->setValue(
             DBEProblem::contactID,
-            $contact['contactID']
+            $dbeContact->getValue(DBEContact::contactID)
         );
 
         /* @todo confirm with GL */
-        if ($record['sendEmail'] == 'A') {
+        if ($record->getSenderEmailAddress() == 'A') {
             $dbeProblem->setValue(
                 DBEJProblem::hideFromCustomerFlag,
                 'N'
@@ -7680,10 +7718,10 @@ is currently a balance of ';
             );
         }
 
-        if (!$record['queueNo']) {
+        if (!$record->getQueueNo()) {
             $queueNo = 1;
         } else {
-            $queueNo = $record['queueNo'];
+            $queueNo = $record->getQueueNo();
         }
 
         $dbeProblem->setValue(
@@ -7692,19 +7730,19 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::monitorName,
-            $record['monitorName']
+            $record->getMonitorName()
         );
         $dbeProblem->setValue(
             DBEJProblem::monitorAgentName,
-            $record['monitorAgentName']
+            $record->getMonitorAgentName()
         );
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
-            $record['rootCauseID']
+            $record->getRootCauseID()
         );
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
-            $record['contractCustomerItemID']
+            $record->getContractCustomerItemID()
         );
         $dbeProblem->setValue(
             DBEJProblem::userID,
@@ -7725,7 +7763,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::contactID,
-            $contact['contactID']
+            $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
@@ -7752,11 +7790,11 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
-            $record['serverGuardFlag']
+            $record->getServerGuardFlag()
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
-            Controller::formatForHTML($details)
+            Controller::formatForHTML($record->getTextBody())
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
@@ -7769,7 +7807,7 @@ is currently a balance of ';
 
         $dbeCallActivity->insertRow();
 
-        if ($record['attachment'] == 'Y') {
+        if ($record->getAttachment() == 'Y') {
             $this->processAttachment(
                 $dbeProblem->getPKValue(),
                 $record
@@ -7783,7 +7821,7 @@ is currently a balance of ';
         $template = 'ServiceLoggedEmail';
 
 
-        $testTime = (new \DateTime($record['createDateTime']))->format('H:i');
+        $testTime = (new \DateTime($record->getCreateDateTime()))->format('H:i');
 
         $startTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hBegin);
         $endTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hEnd);
@@ -7849,13 +7887,13 @@ is currently a balance of ';
     }
 
     function processAttachment($problemID,
-                               $record
+                               \CNCLTD\AutomatedRequest $record
     )
     {
 
         $filePaths = explode(
             ',',
-            $record['attachmentFilename']
+            $record->getAttachmentFilename()
         );
 
         foreach ($filePaths as $filePath) {
@@ -8756,7 +8794,6 @@ is currently a balance of ';
         $emailDomain = strtolower(trim($pieces[1]));
 
 
-
         //try to find a specific contact by email
         $sql = "
             SELECT
@@ -8808,9 +8845,9 @@ is currently a balance of ';
               contact
             WHERE
               con_email = '" . mysqli_real_escape_string(
-                    $db->link_id(),
-                    $record['senderEmailAddress']
-                ) . "'
+                $db->link_id(),
+                $record['senderEmailAddress']
+            ) . "'
               AND con_custno <> 0 
               AND (supportLevel = 'main' or supportLevel = 'support')";
 
@@ -8901,8 +8938,8 @@ is currently a balance of ';
                     );
 
                 $this->addCustomerRaisedRequest(
-                    $contact,
                     $record,
+                    $contact,
                     false,
                     $details,
                     'C'
@@ -8915,8 +8952,8 @@ is currently a balance of ';
             $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
 
             $this->addCustomerRaisedRequest(
-                $contact,
                 $record,
+                $contact,
                 false,
                 $details,
                 'C'
@@ -8925,29 +8962,32 @@ is currently a balance of ';
         }
     }
 
-    function addCustomerRaisedRequest($contact,
-                                      $record,
-                                      $updateExistingRequest,
+
+    function addCustomerRaisedRequest(\CNCLTD\AutomatedRequest $record,
+                                      $contact = null,
+                                      $updateExistingRequest = false,
                                       $details = false,
                                       $source = 'S'
     )
     {
         $db = new dbSweetcode(); // database connection for query
 
+        $details = $details ? $details : $record->getTextBody();
+
         $queryString = "
       INSERT INTO
         customerproblem
       SET
         cpr_date =  NOW(),
-        cpr_custno = '" . $contact['customerID'] . "',
+        cpr_custno = '" . $record->getCustomerID() . "',
         cpr_contno = '" . $contact['contactID'] . "',
-        cpr_problemno = '" . $record['serviceRequestID'] . "',
+        cpr_problemno = '" . $record->getServiceRequestID() . "',
         cpr_update_existing_request = '" . $updateExistingRequest . "',
         cpr_source = '$source' " . ",
         cpr_siteno = '" . $contact['siteNo'] . "',
-        cpr_serverguard_flag = '" . $record['serverGuardFlag'] . "',
-        cpr_send_email = '" . $record['sendEmail'] . "',
-        cpr_priority = '" . $record['priority'] . "',
+        cpr_serverguard_flag = '" . $record->getServerGuardFlag() . "',
+        cpr_send_email = '" . $record->getSendEmail() . "',
+        cpr_priority = '" . $record->getPriority() . "',
         cpr_reason = ?";
 
         $parameters = [
@@ -10791,6 +10831,13 @@ is currently a balance of ';
         $dbejCallactivity->getRow($dbeCallActivity->getPKValue());
 
         return $dbejCallactivity;
+    }
+
+    private function contactNotAuthorized(\CNCLTD\AutomatedRequest $record,
+                                          ?DBEContact $dbeContact
+    )
+    {
+
     }
 
 
