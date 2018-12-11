@@ -1194,7 +1194,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     $header = "<table>
                                 <thead>
                                 <tr>
-                                    <th></th>
+                                    <th>Question</th>
                                     <th>Staff Answer</th>
                                     <th>Manager Answer</th>
                                 </tr>
@@ -1335,9 +1335,9 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 if ($isManager) {
                     $question = "
                     <tr>
-                        <td width='30%'>$questionDescription</td>
-                        <td>$value</td>
-                        <td><textarea rows='10' name='question[$questionID][managerAnswer]' $required>$managerAnswer</textarea></td>
+                        <td width='20%'>$questionDescription</td>
+                        <td width='40%'>$value</td>
+                        <td width='40%'><textarea rows='10' name='question[$questionID][managerAnswer]' $required>$managerAnswer</textarea></td>
                     </tr>
                     ";
                 }
@@ -1358,7 +1358,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                                                   $answerOptions = null
     )
     {
-        $question = "<tr><td width='30%'>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : '') . "</td>";
+        $question = "<tr><td width='15%'>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : '') . "</td>";
         $required = $isRequired ? "required='required'" : '';
 
         $whoAnswers = "staffMemberAnswer";
@@ -1394,7 +1394,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         if ($isManager) {
             $managerComment = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerComment);
-            $question .= "<td><textarea name='question[$questionID][managerComment]'  rows='5'>$managerComment</textarea></td>";
+            $question .= "<td width='20%'><textarea name='question[$questionID][managerComment]'  rows='5'>$managerComment</textarea></td>";
         }
 
         $question .= "</tr>";
