@@ -165,7 +165,10 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            $staffMember->getValue(\DBEUser::startDate)
+            \Controller::dateYMDtoDMY(
+                $staffMember->getValue(\DBEUser::startDate),
+                '-'
+            )
         );
         $this->setBold();
         $this->Cell(
@@ -893,8 +896,6 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $currentSalaryEncrypted = $this->staffMember->getValue(\DBEUser::encryptedSalary);
 
         if ($currentSalaryEncrypted) {
-
-
             $currentSalaryValue = Encryption::decrypt(
                 USER_ENCRYPTION_PRIVATE_KEY,
                 $this->passPhrase,
