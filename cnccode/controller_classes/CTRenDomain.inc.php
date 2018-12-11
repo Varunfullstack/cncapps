@@ -414,39 +414,54 @@ class CTRenDomain extends CTCNC
 
         $this->template->set_var(
             array(
-                'pricePerMonth'              => $pricePerMonth,
-                'costPrice'                  => $dsRenDomain->getValue('costPrice'),
-                'salePrice'                  => $dsRenDomain->getValue('salePrice'),
-                'customerItemID'             => $dsRenDomain->getValue('customerItemID'),
-                'customerName'               => Controller::htmlDisplayText($dsRenDomain->getValue('customerName')),
-                'customerID'                 => Controller::htmlDisplayText($dsRenDomain->getValue('customerID')),
-                'siteName'                   => Controller::htmlDisplayText($dsRenDomain->getValue('siteName')),
-                'siteNo'                     => $dsRenDomain->getValue('siteNo'),
-                'itemDescription'            => Controller::htmlDisplayText($dsRenDomain->getValue('itemDescription')),
-                'itemID'                     => Controller::htmlDisplayText($dsRenDomain->getValue('itemID')),
-                'invoiceFromDate'            => $dsRenDomain->getValue('invoiceFromDate'),
-                'installationDate'           => Controller::dateYMDtoDMY($dsRenDomain->getValue('installationDate')),
-                'invoiceToDate'              => $dsRenDomain->getValue('invoiceToDate'),
-                'invoicePeriodMonths'        => Controller::htmlInputText(
+                'pricePerMonth'                      => $pricePerMonth,
+                'costPrice'                          => $dsRenDomain->getValue('costPrice'),
+                'salePrice'                          => $dsRenDomain->getValue('salePrice'),
+                'customerItemID'                     => $dsRenDomain->getValue('customerItemID'),
+                'customerName'                       => Controller::htmlDisplayText(
+                    $dsRenDomain->getValue('customerName')
+                ),
+                'customerID'                         => Controller::htmlDisplayText(
+                    $dsRenDomain->getValue('customerID')
+                ),
+                'siteName'                           => Controller::htmlDisplayText($dsRenDomain->getValue('siteName')),
+                'siteNo'                             => $dsRenDomain->getValue('siteNo'),
+                'itemDescription'                    => Controller::htmlDisplayText(
+                    $dsRenDomain->getValue('itemDescription')
+                ),
+                'itemID'                             => Controller::htmlDisplayText($dsRenDomain->getValue('itemID')),
+                'invoiceFromDate'                    => $dsRenDomain->getValue('invoiceFromDate'),
+                'installationDate'                   => Controller::dateYMDtoDMY(
+                    $dsRenDomain->getValue('installationDate')
+                ),
+                'invoiceToDate'                      => $dsRenDomain->getValue('invoiceToDate'),
+                'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenDomain->getValue('invoicePeriodMonths')
                 ),
-                'invoicePeriodMonthsMessage' => Controller::htmlDisplayText(
+                'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
                     $dsRenDomain->getMessage('invoicePeriodMonths')
                 ),
-                'totalInvoiceMonths'         => Controller::htmlInputText($dsRenDomain->getValue('totalInvoiceMonths')),
-                'notes'                      => Controller::htmlInputText($dsRenDomain->getValue('notes')),
-                'notesMessage'               => Controller::htmlDisplayText($dsRenDomain->getMessage('notes')),
-                'urlUpdate'                  => $urlUpdate,
-                'urlDelete'                  => $urlDelete,
-                'urlItemEdit'                => $urlItemEdit,
-                'urlItemPopup'               => $urlItemPopup,
-                'txtDelete'                  => $txtDelete,
-                'urlDisplayList'             => $urlDisplayList,
-                'declined'                   => $declined,
-                'declinedFlag'               => $dsRenDomain->getValue('declinedFlag'),
-                'disabled'                   => $disabled,
-                'readonly'                   => $readonly,
-                'internalNotes'              => Controller::htmlTextArea($dsRenDomain->getValue('internalNotes')),
+                'totalInvoiceMonths'                 => Controller::htmlInputText(
+                    $dsRenDomain->getValue('totalInvoiceMonths')
+                ),
+                'autoGenerateContractInvoiceChecked' => Controller::htmlChecked(
+                    $dsRenDomain->getValue('autoGenerateContractInvoice')
+                ),
+                'notes'                              => Controller::htmlInputText($dsRenDomain->getValue('notes')),
+                'notesMessage'                       => Controller::htmlDisplayText($dsRenDomain->getMessage('notes')),
+                'urlUpdate'                          => $urlUpdate,
+                'urlDelete'                          => $urlDelete,
+                'urlItemEdit'                        => $urlItemEdit,
+                'urlItemPopup'                       => $urlItemPopup,
+                'txtDelete'                          => $txtDelete,
+                'urlDisplayList'                     => $urlDisplayList,
+                'declined'                           => $declined,
+                'declinedFlag'                       => $dsRenDomain->getValue('declinedFlag'),
+                'disabled'                           => $disabled,
+                'readonly'                           => $readonly,
+                'internalNotes'                      => Controller::htmlTextArea(
+                    $dsRenDomain->getValue('internalNotes')
+                ),
                 'calculatedExpiryDate'       => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
@@ -584,10 +599,7 @@ class CTRenDomain extends CTCNC
      */
     function createRenewalsSalesOrders()
     {
-
         $this->buRenDomain->createRenewalsSalesOrders();
-
-
     }
 
     function editArecord()

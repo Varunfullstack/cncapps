@@ -11,6 +11,10 @@ TD, INPUT, SELECT, TEXTAREA {
     padding: 2px;
 }
 
+.redText {
+    color: red;
+}
+
 P {
     margin-bottom: 0;
     margin-top: 0;
@@ -194,6 +198,10 @@ DIV.purchOrderSearchScroll {
     height: 250px;
     TOP: 0px;
     BACKGROUND-COLOR: #f4f2f2
+}
+
+.redText {
+    color: red;
 }
 
 /* Classes are specialised to modify attributes within a general tag definition above */
@@ -674,4 +682,28 @@ div.reportDescription {
         -o-transform: rotate(360deg);
         transform: rotate(360deg);
     }
+}
+
+.makeItColor td {
+    font-size: large;
+}
+
+.makeItColor td:nth-child(3n+1) {
+    background: red;
+}
+
+.makeItColor td:nth-child(3n+2) {
+    background: green;
+}
+
+.makeItColor td:nth-child(3n+3) {
+    background: yellow;
+}
+
+.redPencil {
+    color: red;
+}
+
+.greenPencil {
+    color: green;
 }

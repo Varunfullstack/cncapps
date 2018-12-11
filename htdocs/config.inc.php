@@ -68,6 +68,27 @@ define(
 );
 
 
+define(
+    'CUSTOMERS_ENCRYPTION_PRIVATE_KEY',
+    'c:\\keys\\privkey.pem'
+);
+
+define(
+    'CUSTOMERS_ENCRYPTION_PUBLIC_KEY',
+    'c:\\keys\\privkey.pub'
+);
+
+define(
+    'USER_ENCRYPTION_PRIVATE_KEY',
+    'c:\\keys\\user-private.pem'
+);
+
+define(
+    'USER_ENCRYPTION_PUBLIC_KEY',
+    'c:\\keys\\user-private.pub'
+);
+
+
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
@@ -138,7 +159,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
-//            error_reporting(E_ALL & ~E_STRICT)
+//            error_reporting(E_ALL);
         error_reporting(E_ALL & ~E_WARNING);
         ini_set(
             'display_errors',
@@ -613,6 +634,7 @@ define(
     'Service Request'
 );  // Description used in system
 
+
 define(
     "PDF_DIR",
     APPLICATION_DIR . '/fpdf'
@@ -791,13 +813,15 @@ define(
     'CONFIG_FIXED_ACTIVITY_TYPE_ID',
     57
 
-);define(
+);
+define(
     'CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID',
     60
 );
 define(
     'CONFIG_SALES_ACTIVITY_TYPE_ID',
-    43);
+    43
+);
 define(
     'CONFIG_SERVER_HEALTH_CHECK_ACTIVITY_TYPE_ID',
     12
@@ -806,19 +830,23 @@ define(
     'CONFIG_SERVER_HEALTH_CHECK_CHECKLIST_ACTIVITY_TYPE_ID',
     48
 
-);define(
+);
+define(
     'CONFIG_SERVER_HEALTH_CHECK_OFF_SITE_ACTIVITY_TYPE_ID',
     12
 
-);define(
+);
+define(
     'CONFIG_SERVER_HEALTH_CHECK_ON_SITE_ACTIVITY_TYPE_ID',
     50
 
-);define(
+);
+define(
     'CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID',
     55
 
-);define(
+);
+define(
     'CONFIG_2NDSITE_BACKUP_ACTIVITY_TYPE_ID',
     49
 );
@@ -901,6 +929,11 @@ define(
 define(
     'CONFIG_PAYMENT_TERMS_30_DAYS',
     9
+);
+
+define(
+    'CONFIG_PAYMENT_TERMS_DIRECT_DEBIT',
+    11
 );
 define(
     'CONFIG_PAYMENT_TERMS_NO_INVOICE',

@@ -425,6 +425,21 @@ class DataSet extends DataAccess
         return $ret;
     }
 
+    function getAllMessages()
+    {
+        $messages = [];
+
+        foreach ($this->colName as $index => $name) {
+            if (in_array(
+                'Message',
+                $name
+            )) {
+                $messages[] = $name;
+            }
+        }
+        return $messages;
+    }
+
     /*
     * Populate Dataset object from array
     * It uses the getNull method of the dataset to determine whether a "Field Required" message is needed
@@ -600,6 +615,7 @@ class DataSet extends DataAccess
                         $message
     )
     {
+
         $this->addColumn(
             $columnName . 'Message',
             DA_STRING,

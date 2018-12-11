@@ -122,6 +122,7 @@ define(
 class CTCustomer extends CTCNC
 {
     const GET_CUSTOMER_REVIEW_CONTACTS = "getCustomerReviewContacts";
+    const DECRYPT = "decrypt";
     var $customerID = '';
     var $customerString = '';                      // Used when searching for an entity by string
     var $contactString = '';                      // Used when searching for an entity by string
@@ -894,9 +895,57 @@ class CTCustomer extends CTCNC
                 DBECustomer::gscTopUpAmount,
                 $this->getYN($value['pcxFlag'])
             );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::sortCode,
+                $value['sortCode']
+            );
+
+            if (isset($value['newSortCode'])) {
+                $sortCode = null;
+                if ($value['newSortCode']) {
+                    $sortCode = \CNCLTD\Encryption::encrypt(
+                        CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
+                        $value['newSortCode']
+                    );
+                }
+                $this->dsCustomer->setValue(
+                    DBECustomer::sortCode,
+                    $sortCode
+                );
+            }
+
+
+            $this->dsCustomer->setValue(
+                DBECustomer::accountName,
+                $value['accountName']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::accountNumber,
+                $value['accountNumber']
+            );
+
+            if (isset($value['newAccountNumber'])) {
+                $accountNumber = null;
+
+                if ($value['newAccountNumber']) {
+                    $accountNumber = \CNCLTD\Encryption::encrypt(
+                        CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
+                        $value['newAccountNumber']
+                    );
+                }
+
+                $this->dsCustomer->setValue(
+                    DBECustomer::accountNumber,
+                    $accountNumber
+                );
+            }
+
             $this->dsCustomer->post();
         }
     }
+
 
     function setCustomerString($customerString)
     {
@@ -1156,6 +1205,21 @@ class CTCustomer extends CTCNC
                     $response["error"] = $exception->getMessage();
                 }
 
+                echo json_encode($response);
+                break;
+            case self::DECRYPT:
+                $response = ["status" => "ok"];
+                try {
+                    $response['decryptedData'] = \CNCLTD\Encryption::decrypt(
+                        CUSTOMERS_ENCRYPTION_PRIVATE_KEY,
+                        @$_REQUEST['passphrase'],
+                        @$_REQUEST['encryptedData']
+                    );
+                } catch (Exception $exception) {
+                    $response['status'] = "error";
+                    $response['error'] = $exception->getMessage();
+                    http_response_code(400);
+                }
                 echo json_encode($response);
                 break;
             default:
@@ -1995,6 +2059,11 @@ ORDER BY cus_name ASC  ";
                 )
             );
 
+        $buItem = new BUCustomerItem($this);
+
+        $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
+
+
         $this->template->set_var(
             array(
                 'lastContractSent'               => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
@@ -2093,7 +2162,18 @@ ORDER BY cus_name ASC  ";
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
-                'isShowingInactive'              => $_REQUEST['showInactiveContacts'] ? 'true' : 'false'
+                'isShowingInactive'              => $_REQUEST['showInactiveContacts'] ? 'true' : 'false',
+                'sortCode'                        => $this->dsCustomer->getValue(DBECustomer::sortCode),
+                'accountName'                     => $this->dsCustomer->getValue(DBECustomer::accountName),
+                'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),
+                'sortCodePencilColor'             => $this->dsCustomer->getValue(
+                    DBECustomer::sortCode
+                ) ? "greenPencil" : "redPencil",
+                'accountNumberPencilColor'        => $this->dsCustomer->getValue(
+                    DBECustomer::accountNumber
+                ) ? "greenPencil" : "redPencil",
+                'forceDirectDebit'                => $forceDirectDebit ? 'true' : 'false'
+
             )
         );
 
@@ -2360,11 +2440,11 @@ ORDER BY cus_name ASC  ";
                         ),
                         'startDate'         => strftime(
                             "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::startDate))
+                            strtotime($dsProject->getValue(DBEProject::openedDate))
                         ),
                         'expiryDate'        => strftime(
                             "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::expiryDate))
+                            strtotime($dsProject->getValue(DBEProject::completedDate))
                         ),
                         'editProjectLink'   => $editProjectLink,
                         'deleteProjectLink' => $deleteProjectLink,
@@ -3615,6 +3695,6 @@ ORDER BY cus_name ASC  ";
         }
 
         return $contacts;
-    } // end function documents
+    }
 }// end of class
 ?>

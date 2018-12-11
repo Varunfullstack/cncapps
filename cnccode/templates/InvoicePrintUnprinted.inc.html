@@ -1,51 +1,201 @@
 <!-- Template: InvoicePrintUnprinted.inc.html -->
-<form name="invoice" method="post" action="{urlSubmit}">
-<P>
-	Invoices and credit notes that have not been sent to customers yet. The date you enter will be used as the Invoice Date on all invoices.
-</P>
-<BR/>
-	<table class='singleBorder' width="500px" border="0" cellspacing="1" cellpadding="2">
-		<tr> 
-			<td class="tableHeader">&nbsp;</td>
-			<td class="tableHeader">Count</td>
-			<td class="tableHeader">Cost £</td>
-			<td class="tableHeader">Sale £</td>
-		</tr>
-		<tr> 
-			<td class="displayfield">Invoices</td>
-			<td class="displayfield">{invoiceCount}</td>
-			<td align="right">{invoiceCost}</td>
-			<td align="right">{invoiceSale}</td>
-		</tr>
-		<tr> 
-			<td class="displayfield">Credit Notes</td>
-			<td class="displayfield">{creditCount}</td>
-			<td align="right">{creditCost}</td>
-			<td align="right">{creditSale}</td>
-		</tr>
-	</table>
-	<br/>
-	<table width="400px" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td width="150px" class="promptText">Date (leave blank for today)</td>
-			<td class="field">
-				<input
-					type="text"
-					name="invoice[1][startDate]"
-					id="dateToUse"
-					value="{dateToUse}"
-					size="10"
-					maxlength="10"
-				>
-				<font class="formErrorMessage">{startDateMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-				<input type="submit" name="Print" value="Send" onClick="if(!confirm('Are you sure you want to send the invoices?')) return(false)">  <input type="submit" name="Trial" value="Trial">
-			</td>
-		</tr>
-	</table>
+<form name="invoice"
+      method="post"
+      action="{urlSubmit}"
+>
+    <P>
+        Invoices and credit notes that have not been sent to customers yet. The date you enter will be used as the
+        Invoice Date on all invoices.
+    </P>
+    <BR/>
+    <table class='singleBorder'
+           width="500px"
+           border="0"
+           cellspacing="1"
+           cellpadding="2"
+    >
+        <tr>
+            <td class="tableHeader">&nbsp;</td>
+            <td class="tableHeader">Count</td>
+            <td class="tableHeader">Cost £</td>
+            <td class="tableHeader">Sale £</td>
+        </tr>
+        <tr>
+            <td class="displayfield">Invoices</td>
+            <td class="displayfield">{invoiceCount}</td>
+            <td align="right">{invoiceCost}</td>
+            <td align="right">{invoiceSale}</td>
+        </tr>
+        <tr>
+            <td class="displayfield">Credit Notes</td>
+            <td class="displayfield">{creditCount}</td>
+            <td align="right">{creditCost}</td>
+            <td align="right">{creditSale}</td>
+        </tr>
+    </table>
+    <br/>
+    <table width="400px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="150px"
+                class="promptText"
+            >Date (leave blank for today)
+            </td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="invoice[1][startDate]"
+                        id="dateToUse"
+                        value="{dateToUse}"
+                        size="10"
+                        maxlength="10"
+                        {normalInvoiceDisabled}
+                >
+                <font class="formErrorMessage">{startDateMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Print"
+                       value="Send"
+                       {normalInvoiceDisabled}
+                       onClick="if(!confirm('Are you sure you want to send the invoices?')) return(false)"
+                > <input type="submit"
+                         name="Trial"
+                         value="Trial"
+                         {normalInvoiceDisabled}
+            >
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+    <table class='singleBorder'
+           width="500px"
+           border="0"
+           cellspacing="1"
+           cellpadding="2"
+    >
+        <tr>
+            <td class="tableHeader">&nbsp;</td>
+            <td class="tableHeader">Count</td>
+            <td class="tableHeader">Cost £</td>
+            <td class="tableHeader">Sale £</td>
+        </tr>
+        <tr>
+            <td class="displayfield">Invoices</td>
+            <td class="displayfield">{directDebitInvoiceCount}</td>
+            <td align="right">{directDebitInvoiceCost}</td>
+            <td align="right">{directDebitInvoiceSale}</td>
+        </tr>
+    </table>
+    <script>
+        function generatePreview() {
+            var object = {};
+
+            // Use XMLHttpRequest instead of Jquery $ajax
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                var a;
+                if (xhttp.readyState === 4) {
+
+                    if (xhttp.status === 200) {
+
+                        // Trick for making downloadable link
+                        a = document.createElement('a');
+                        a.href = window.URL.createObjectURL(xhttp.response);
+                        // Give filename you wish to download
+                        a.download = "invoices.pdf";
+                        a.style.display = 'none';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        document.getElementById('sendButton').removeAttribute('disabled');
+                    }
+
+                    if (xhttp.status === 400) {
+                        alert('There are no direct debit invoices unprinted');
+                    }
+                }
+            };
+// Post data to URL which handles post request
+            xhttp.open("POST", '?action=previewDirectDebit');
+            xhttp.setRequestHeader("Content-Type", "application/json");
+// You should set responseType as blob for binary responses
+            xhttp.responseType = 'blob';
+            xhttp.send(JSON.stringify({}));
+        }
+
+        function handlePassphrase() {
+            const passPhrase = prompt('To continue please provide the secure passphrase');
+
+            if (!passPhrase) {
+                return false;
+            }
+            // $('form').append("<input type='hidden' value='" + passPhrase + "' name='passphrase'>");
+
+            var formData = new FormData();
+            formData.append('passphrase', passPhrase);
+            var object = {};
+            formData.forEach(function (value, key) {
+                object[key] = value;
+            });
+            // var json = JSON.stringify(object);
+            $.ajax({
+                url: '?action=sendDirectDebitInvoices',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: object
+            }).then(function (result) {
+                alert(result.invoiceCount + " invoices sent");
+                window.location.reload();
+            }).catch(function (error) {
+
+                let message = 'Failed to send Invoices';
+
+                if (error.responseJSON) {
+                    message += ": " + error.responseJSON.error;
+                }
+                alert(message);
+            }).then(function () {
+                $.LoadingOverlay('hide');
+            });
+
+            return true;
+        }
+    </script>
+
+    <table width="400px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+           id="test"
+    >
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <button type="button"
+                        name="Trial"
+                        onclick="generatePreview()"
+                >
+                    Preview
+                </button>
+                <input type="button"
+
+                       disabled
+                       name="Print"
+                       value="Send"
+                       id="sendButton"
+                       onClick="return handlePassphrase();"
+                >
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: InvoicePrintUnprinted.inc.html -->

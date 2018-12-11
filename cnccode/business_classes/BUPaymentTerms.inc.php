@@ -27,7 +27,7 @@ class BUPaymentTerms extends Business
     function updatePaymentTerms(&$dsData)
     {
         $this->setMethodName('updatePaymentTerms');
-        $this->updateDataaccessObject($dsData, $this->dbePaymentTerms);
+        $this->updateDataAccessObject($dsData, $this->dbePaymentTerms);
         return TRUE;
     }
 

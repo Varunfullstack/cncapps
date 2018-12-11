@@ -28,7 +28,7 @@ class BUPassword extends Business
     function updatePassword(&$dsData)
     {
         $this->setMethodName('updatePassword');
-        $this->updateDataaccessObject($dsData, $this->dbePassword);
+        $this->updateDataAccessObject($dsData, $this->dbePassword);
 
         return TRUE;
     }

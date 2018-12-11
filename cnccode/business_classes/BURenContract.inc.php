@@ -38,7 +38,7 @@ class BURenContract extends Business
     function updateRenContract(&$dsData)
     {
         $this->setMethodName('updateRenContract');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeRenContract
         );
@@ -134,9 +134,13 @@ class BURenContract extends Business
         return;
     }
 
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
+    /**
+     * @param string $toEmail
+     */
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL
+    )
     {
-        $this->dbeJRenContract->getRenewalsDueRows(false);
+        $this->dbeJRenContract->getRenewalsDueRows();
 
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
@@ -192,42 +196,14 @@ class BURenContract extends Business
 
     }
 
-    function createRenewalsSalesOrders($customerItemIDs = false)
-    {
-
-        $this->createSalesOrders(
-            $customerItemIDs,
-            false
-        );    // sales orders only
-
-        $this->createSalesOrders(
-            $customerItemIDs,
-            true
-        );     // SOs plus invoices
-
-    }
-
-    function createSalesOrders($customerItemIDs = false,
-                               $automaticInvoices = false
-    )
+    function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
         $buActivity = new BUActivity ($this);
 
-        if ($customerItemIDs) {
-
-            $this->dbeJRenContract->getRenewalsRowsByID(
-                $customerItemIDs,
-                $automaticInvoices
-            );
-
-        } else {
-
-            $this->dbeJRenContract->getRenewalsDueRows($automaticInvoices);
-
-        }
+        $this->dbeJRenContract->getRenewalsDueRows();
 
         $dsRenContract = new DSForm($this);
         $dsRenContract->replicate($this->dbeJRenContract);
@@ -238,17 +214,22 @@ class BURenContract extends Business
 
         $dbeOrdline = new DBEOrdline ($this);
 
+        $dsOrdhead = null;
+        $dsOrdline = new DataSet($this);
+
         $previousCustomerID = 99999;
 
-        $dsOrdhead = false;
-
+        $generateInvoice = false;
+        $generatedOrder = false;
+        echo "<div> Contract Renewals - START </div>";
         while ($dsRenContract->fetchNext()) {
-            /* don't process prepay */
-            if ($dsRenContract->getValue('itemID') == CONFIG_DEF_PREPAY_ITEMID) {
-                continue;
-            }
-
-            if ($dbeJCustomerItem->getRow($dsRenContract->getValue('customerItemID'))) {
+            $generatedOrder = false;
+            ?>
+            <div>
+                contract number: <?= $dsRenContract->getValue(DBECustomerItem::customerItemID) ?>
+            </div>
+            <?php
+            if ($dbeJCustomerItem->getRow($dsRenContract->getValue(DBECustomerItem::customerItemID))) {
                 /*
                  * Group many contracts for same customer under one sales order
          * unless it is an SSL cert in which case it has it's own order
@@ -263,13 +244,17 @@ class BURenContract extends Business
                 }
 
                 if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') OR
-                    $isSslCertificate
+                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
+                    $isSslCertificate ||
+                    (
+                        !$generateInvoice &&
+                        $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
+                    )
                 ) {
                     /*
                     If generating invoices and an order has been started
                     */
-                    if ($automaticInvoices && $dsOrdhead) {
+                    if ($generateInvoice && $dsOrdhead) {
 
                         $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
@@ -283,6 +268,10 @@ class BURenContract extends Business
                             $dsOrdhead,
                             $dsOrdline
                         );
+
+                        ?>
+                        <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+                        <?php
                     }
                     /*
                      *  create order header
@@ -298,9 +287,14 @@ class BURenContract extends Business
                         $dsOrdline,
                         $dsCustomer
                     );
-
+                    $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
+
+                    ?>
+                    <div>Creating new Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+                    <?php
                 }
+                $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
 
                 if ($dsRenContract->getValue(DBECustomerItem::officialOrderNumber)) {
 
@@ -453,11 +447,13 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     'curUnitSale',
-                    ($dbeJCustomerItem->getValue('curUnitSale') / 12) * $dsRenContract->getValue('invoicePeriodMonths')
+                    ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12) *
+                    $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
                 $dbeOrdline->setValue(
                     'curUnitCost',
-                    ($dbeJCustomerItem->getValue('curUnitCost') / 12) * $dsRenContract->getValue('invoicePeriodMonths')
+                    ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitCost) / 12) *
+                    $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
 
                 $dbeOrdline->insertRow();
@@ -732,6 +728,12 @@ HEREDOC;
                     $dsRenContract->getValue('totalInvoiceMonths') +
                     $dsRenContract->getValue('invoicePeriodMonths')
                 );
+
+                $this->dbeRenContract->setValue(
+                    DBECustomerItem::transactionType,
+                    '17'
+                );
+
                 $this->dbeRenContract->updateRow();
 
                 $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
@@ -741,7 +743,7 @@ HEREDOC;
         /*
         Finish off last automatic invoice
         */
-        if ($automaticInvoices && $dsOrdhead) {
+        if ($generateInvoice && $generatedOrder) {
 
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
 
@@ -755,14 +757,13 @@ HEREDOC;
                 $dsOrdhead,
                 $dsOrdline
             );
+
+            ?>
+            <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+            <?php
         }
 
-        /* there will only be one order in this case */
-        if ($renewalIDs) {
-
-            return $dsOrdhead->getValue('ordheadID');
-        }
-
+        echo "<div> Contract Renewals - END </div>";
     }
 
 

@@ -2,13 +2,64 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Changed
+### Fixed
+- Issue 376 - Contact notes being copied to other contacts
+- Issue 359 - Management Review Summary shows blank To: field
+- Issue 372 - Email display header missing
+- Issue 360 - SD Dashboard Assignment display issue
+### Changed 
+- Issue 365 - Performance table formatting improvements
+## Changed
 - Issue 215 - Contact Management within CNCAPPS
 - Issue 358 - Review automatic email creation process so that it's compatible with the new contacts in 215
 ### Fixed
 - Issue 352 - CNCWEB contacts bugs
 ### Added
 - Issue 347 - Customer Review Management documents
+
+## [v1.14.5] - 2018-12-11
+## Changed
+Show employee's start date in DD-MM-YYYY format
+
+## [v1.14.4] - 2018-12-10
+## Changed
+Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
+
+## [v1.14.3] - 2018-12-06
+## Fixed
+Staff details encrypted fields are not being saved / displayed!
+
+## [v1.14.2] - 2018-12-05
+## Fixed
+Project management role is no longer present in the User edit page
+
+## [v1.14.1] - 2018-12-04
+### Fixed
+Staff Appraisal start date field value loads with the wrong format
+
+## [V1.14.0]- 2018-12-03
+### Added
+- Issue 373 - Staff Appraisal Process
+
+## [v1.13.2] - 2018-11-23
+## Fixed
+- Contract expiry dates incorrect
+- Remove debugging information
+
+## [v1.13.1] - 2018-11-20
+## Changed
+- Allow more than 50 characters in project updates
+## Fixed
+- Fix issue with banners not showing when project end date was not set
+- Fix issue with banners showing incorrect projects
+
+## [v1.13.0] - 2018-11-19
+### Added
+- Issue 119 - CNC012 - Option to display a custom logo to top of questionnaire page
+- Issue 211 - CNC040 - Direct Debit Specification
+### Changed
+- Issue 341 - Project lifecycle and management
+- Issue 321 - Permissions to edit Initial activity type
 
 ## [v1.12.0] - 2018-09-27
 ### Changed

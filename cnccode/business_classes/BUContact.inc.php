@@ -335,7 +335,7 @@ class BUContact extends Business
     function updateContact(&$dsContact)
     {
         $this->setMethodName('updateContact');
-        return ($this->updateDataaccessObject(
+        return ($this->updateDataAccessObject(
             $dsContact,
             $this->dbeContact
         ));

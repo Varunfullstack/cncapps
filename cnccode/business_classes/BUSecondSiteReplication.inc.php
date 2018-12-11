@@ -500,7 +500,7 @@ class BUSecondsiteReplication extends BUSecondsite
     function updateSecondsiteImage(&$dsData)
     {
         $this->setMethodName('updateSecondsiteImage');
-        $this->updateDataaccessObject(
+        $this->updateDataAccessObject(
             $dsData,
             $this->dbeSecondsiteImage
         );

@@ -1,177 +1,292 @@
 <!-- Template: ItemEdit.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
+<script src=".javascript/jquery-3.3.1.min.js"></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
-function checkFunctionKey(){
-	if (event.keyCode == 120){
-		if (document.getElementById("manufacturerID").value != "0"){
-			window.open(
-				'{urlManufacturerEdit}&manufacturerID=' +
-				escape(document.getElementById("manufacturerID").value) +
-				'&parentIDField=manufacturerID' +
-				'&parentDescField=manufacturerName',
-				'manufacturer',
-				'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
-			);
+    function checkAllowDirectDebit(el) {
+        const selectedOption = $(el).find('option:selected');
+        const allowDirectDebitCheckbox = $('#allowDirectDebit');
+        if (selectedOption.data().allowsDirectDebit) {
+            allowDirectDebitCheckbox.attr('disabled', false)
+        } else {
+            allowDirectDebitCheckbox.attr('disabled', true);
+            allowDirectDebitCheckbox.prop("checked", false);
 
-		}
-	}
- 	return;
-}		
-function validateManufacturerName(){
-	if (document.getElementById("manufacturerName").value != "" ){
-		window.open('{urlManufacturerPopup}&manufacturerName=' +
-		escape(encodeURIComponent(document.getElementById("manufacturerName").value)) +
-		'&parentIDField=manufacturerID' +
-		'&parentDescField=manufacturerName',
-		'manufacturers','scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
-	}
-}
+        }
+    }
+
+    function checkFunctionKey() {
+        if (event.keyCode == 120) {
+            if (document.getElementById("manufacturerID").value != "0") {
+                window.open(
+                    '{urlManufacturerEdit}&manufacturerID=' +
+                    escape(document.getElementById("manufacturerID").value) +
+                    '&parentIDField=manufacturerID' +
+                    '&parentDescField=manufacturerName',
+                    'manufacturer',
+                    'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
+                );
+
+            }
+        }
+        return;
+    }
+
+    function validateManufacturerName() {
+        if (document.getElementById("manufacturerName").value != "") {
+            window.open('{urlManufacturerPopup}&manufacturerName=' +
+                escape(encodeURIComponent(document.getElementById("manufacturerName").value)) +
+                '&parentIDField=manufacturerID' +
+                '&parentDescField=manufacturerName',
+                'manufacturers', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
+        }
+    }
 
 </SCRIPT>
-<form name="itemForm" method="post" action="{urlSubmit}" AUTOCOMPLETE = "off">
-	<input type="hidden" name="item[1][itemID]" value="{itemID}">
-	<input type="hidden" name="item[1][manufacturerID]" value="{manufacturerID}" id="manufacturerID">
-	<table width="100%" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td width="12%" class="promptText">ID</td>
-			<td class="displayfield">
-			{itemID}			</td>
-		</tr>
-		<tr> 
-			<td width="12%" class="promptText">Description</td>
-			<td class="field"> <input
-					type="text"
-					name="item[1][description]"
-					id="description"
-					value="{description}"
-					size="50"
-					maxlength="50"
-				> <font class="formErrorMessage">{descriptionMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Type</td>
-			<td class="field"> <select
-					type="text"
-					id="itemTypeID"
-					name="item[1][itemTypeID]"
-				>
-					<!-- BEGIN itemTypeBlock -->
-					<option {itemTypeSelected} value="{itemTypeID}">{itemTypeDescription}</option>
-					<!-- END itemTypeBlock -->
-				</select> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Manufacturer</td>
-			<td class="field">
-				<input
-					type="text"
-					name="manufacturerName"
-					id="manufacturerName"
-					value="{manufacturerName}"
-					onChange="javascript:validateManufacturerName()"
-					onKeydown="javascript:checkFunctionKey()"
-					size="50"
-					maxlength="50"
-				>
-				<font class="formErrorMessage">{manufacturerIDMessage}</font>
-			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Warranty</td>
-			<td class="field"> <select
-					type="text"
-					id="warrantyID"
-					name="item[1][warrantyID]"
-				>
-					<!-- BEGIN warrantyBlock -->
-					<option {warrantySelected} value="{warrantyID}">{warrantyDescription}</option>
-					<!-- END warrantyBlock -->
-				</select> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Unit Cost</td>
-			<td class="field"> <input
-					type="text"
-					name="item[1][curUnitCost]"
-					value="{curUnitCost}"
-					align="right"
-					size="10"
-					maxlength="10"
-				> <font class="formErrorMessage">{curUnitCostMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Unit Sale</td>
-			<td class="field"> <input
-					type="text"
-					name="item[1][curUnitSale]"
-					value="{curUnitSale}"
-					align="right"
-					size="10"
-					maxlength="10"
-				> <font class="formErrorMessage">{curUnitSaleMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Part Number</td>
-			<td class="field"> <input
-					type="text"
-					name="item[1][partNo]"
-					value="{partNo}"
-					align="left"
-					size="30"
-					maxlength="30"
-				> <font class="formErrorMessage">{partNoMessage}</font> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Serial No Required</td>
-			<td class="field"> <input type="checkbox" name="item[1][serialNoFlag]" value="Y" {serialNoFlagChecked}>			</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Discontinued</td>
-			<td class="field"> <input type="checkbox" name="item[1][discontinuedFlag]" value="Y" {discontinuedFlagChecked}>			</td>
-		</tr>
-		<tr>
-				<td class="promptText">Servercare</td>
-				<td class="field"><input type="checkbox" name="item[1][servercareFlag]" value="Y" {servercareFlagChecked} />				</td>
-		</tr>
-		<tr> 
-			<td class="promptText">Renewal Type</td>
-			<td class="field"> <select
-					type="text"
-					id="renewalTypeID"
-					name="item[1][renewalTypeID]"
-				>
-				<option {renewalTypeSelected} value="">Not a renewal</option>
-				<!-- BEGIN renewalTypeBlock -->
-					<option {renewalTypeSelected} value="{renewalTypeID}">{renewalTypeDescription}</option>
-					<!-- END renewalTypeBlock -->
-				</select> </td>
-		</tr>
-		<tr>
-				<td valign="top" class="promptText">Contract Response Time </td>
-				<td ><span class="field">
-						<input
-					type="text"
-					name="item[1][contractResponseTime]"
-					value="{contractResponseTime}"
-					align="right"
-					size="50"
-					maxlength="50">
-						<font class="formErrorMessage">{contractResponseTimeMessage}</font></span></td>
-		</tr>
-		<tr> 
-			<td valign="top" class="promptText">Notes</td>
-			<td >&nbsp;</td>
-		</tr>
-		<tr> 
-			<td colspan="2" valign="top">
-				<div align="left"> 
-					<textarea class="notepadField" name="item[1][notes]" rows="5" cols="76" align="left">{notes}</textarea>
-				</div></td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td> <input type="submit" name="Submit" value="Submit"> </td>
-		</tr>
-	</table>
+<form name="itemForm"
+      method="post"
+      action="{urlSubmit}"
+      AUTOCOMPLETE="off"
+>
+    <input type="hidden"
+           name="item[1][itemID]"
+           value="{itemID}"
+    >
+    <input type="hidden"
+           name="item[1][manufacturerID]"
+           value="{manufacturerID}"
+           id="manufacturerID"
+    >
+    <table width="100%"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="12%"
+                class="promptText"
+            >ID
+            </td>
+            <td class="displayfield">
+                {itemID}
+            </td>
+        </tr>
+        <tr>
+            <td width="12%"
+                class="promptText"
+            >Description
+            </td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="item[1][description]"
+                        id="description"
+                        value="{description}"
+                        size="50"
+                        maxlength="50"
+                > <font class="formErrorMessage">{descriptionMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Type</td>
+            <td class="field">
+                <select
+                        type="text"
+                        id="itemTypeID"
+                        name="item[1][itemTypeID]"
+                >
+                    <!-- BEGIN itemTypeBlock -->
+                    <option {itemTypeSelected}
+                            value="{itemTypeID}"
+                    >{itemTypeDescription}
+                    </option>
+                    <!-- END itemTypeBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Manufacturer</td>
+            <td class="field">
+                <input                        type="text"
+                        name="manufacturerName"
+                        id="manufacturerName"
+                        value="{manufacturerName}"
+                        onChange="javascript:validateManufacturerName()"
+                        onKeydown="javascript:checkFunctionKey()"
+                        size="50"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{manufacturerIDMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Warranty</td>
+            <td class="field">
+                <select
+                        type="text"
+                        id="warrantyID"
+                        name="item[1][warrantyID]"
+                >
+                    <!-- BEGIN warrantyBlock -->
+                    <option {warrantySelected}
+                            value="{warrantyID}"
+                    >{warrantyDescription}
+                    </option>
+                    <!-- END warrantyBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Unit Cost</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="item[1][curUnitCost]"
+                        value="{curUnitCost}"
+                        align="right"
+                        size="10"
+                        maxlength="10"
+                > <font class="formErrorMessage">{curUnitCostMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Unit Sale</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="item[1][curUnitSale]"
+                        value="{curUnitSale}"
+                        align="right"
+                        size="10"
+                        maxlength="10"
+                > <font class="formErrorMessage">{curUnitSaleMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Part Number</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="item[1][partNo]"
+                        value="{partNo}"
+                        align="left"
+                        size="30"
+                        maxlength="30"
+                > <font class="formErrorMessage">{partNoMessage}</font>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Serial No Required</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="item[1][serialNoFlag]"
+                       value="Y"
+                       {serialNoFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Discontinued</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="item[1][discontinuedFlag]"
+                       value="Y"
+                       {discontinuedFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Servercare</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="item[1][servercareFlag]"
+                       value="Y"
+                       {servercareFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Renewal Type</td>
+            <td class="field">
+                <select type="text"
+                        id="renewalTypeID"
+                        name="item[1][renewalTypeID]"
+                        onchange="checkAllowDirectDebit(this)"
+                >
+                    <option {renewalTypeSelected}
+                            value=""
+                    >Not a renewal
+                    </option>
+                    <!-- BEGIN renewalTypeBlock -->
+                    <option {renewalTypeSelected}
+                            {renewalAllowsDirectDebit}
+                            value="{renewalTypeID}"
+                    >{renewalTypeDescription}
+                    </option>
+                    <!-- END renewalTypeBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Allow Direct Debit</td>
+            <td class="field">
+                <input type="checkbox"
+                       name="item[1][allowDirectDebit]"
+                       value="Y"
+                       id="allowDirectDebit"
+                       {allowDirectDebitChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Contract Response Time
+            </td>
+            <td>
+                <span class="field">
+						<input type="text"
+                               name="item[1][contractResponseTime]"
+                               value="{contractResponseTime}"
+                               align="right"
+                               size="50"
+                               maxlength="50"
+                        >
+						<font class="formErrorMessage">{contractResponseTimeMessage}</font>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Notes
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2"
+                valign="top"
+            >
+                <div align="left">
+                    <textarea class="notepadField"
+                              name="item[1][notes]"
+                              rows="5"
+                              cols="76"
+                              align="left"
+                    >{notes}</textarea>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Submit"
+                       value="Submit"
+                >
+            </td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: ItemEdit.inc.html -->
