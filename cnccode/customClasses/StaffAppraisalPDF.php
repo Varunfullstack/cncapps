@@ -165,7 +165,10 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->Cell(
             50,
             10,
-            $staffMember->getValue(\DBEUser::startDate)
+            \Controller::dateYMDtoDMY(
+                $staffMember->getValue(\DBEUser::startDate),
+                '-'
+            )
         );
         $this->setBold();
         $this->Cell(

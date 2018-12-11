@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.14.5] - 2018-12-11
+## Changed
+Show employee's start date in DD-MM-YYYY format
+
 ## [v1.14.4] - 2018-12-10
 ## Changed
 Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
