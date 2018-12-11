@@ -846,7 +846,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 "managerName"              => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
                         DBEUser::lastName
                     ),
-                "employeeStartDate"        => $staffMember->getValue(DBEUser::startDate),
+                "employeeStartDate"        => Controller::dateYMDtoDMY(
+                    $staffMember->getValue(DBEUser::startDate),
+                    '-'
+                ),
                 "employeePosition"         => $staffMember->getValue(DBEUser::jobTitle),
                 "sickDaysThisYear"         => $dbeQuestionnaireAnswer->getValue(
                     DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear
