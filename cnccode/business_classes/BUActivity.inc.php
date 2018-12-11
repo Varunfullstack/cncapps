@@ -7298,6 +7298,8 @@ is currently a balance of ';
                     $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
                     $details .= 'Reopened from SR ' . $record['serviceRequestID'];
 
+                    //
+
                     return $this->processIsSenderAuthorised(
                         $details,
                         $contact,
@@ -7541,12 +7543,11 @@ is currently a balance of ';
         /* use main support contact */
         $queryString = "
       SELECT
-        con_contno
+        primaryMainContactID
       FROM
-        contact
+        customer    
       WHERE
-        con_custno = '" . $customerID . "'
-        AND supportLevel = 'main'";
+          cus_custno = $customerID";
 
         $db->query($queryString);
         $db->next_record();
@@ -7566,7 +7567,7 @@ is currently a balance of ';
           contact
         WHERE
           con_custno = '" . $customerID . "'
-          AND supportLevel = 'support'";
+          AND supportLevel = 'main'";
 
             $db->query($queryString);
             $db->next_record();
@@ -7584,7 +7585,9 @@ is currently a balance of ';
      * New request from import process
      *
      * @param mixed $record
+     * @param $details
      * @param mixed $contact
+     * @throws Exception
      */
     function raiseNewRequestFromImport($record,
                                        $details,
@@ -8711,17 +8714,31 @@ is currently a balance of ';
         );
     }
 
+    private function isSupportContact($value)
+    {
+
+    }
+
     function getContactInfo($record)
     {
-        $ret = false;
-        /*
-    try to find customer & support contact from email address
-    */
         global $db;
+        $sql = "select con_contno, con_custno, con_siteno, supportLevel, (SELECT customer.primaryMainContactID FROM customer WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain from contact where con_email = $record[senderEmailAddress] and con_custno <> 0";
 
-        /*
-    Extract just lower-case email address
-    */
+
+        $db->query($sql);
+
+        if ($db->next_record()) {
+            return [
+                "contactID"     => $db->Record[0],
+                "customerID"    => $db->Record[1],
+                "siteNo"        => $db->Record[2],
+                "supportLevel"  => $db->Record[3],
+                "isPrimaryMain" => $db->Record[4]
+            ];
+        }
+
+        //we haven't found a guy we need to extract the domain from email and try to find a matching customer
+
         $sender = trim(
             strtolower(
                 preg_replace(
@@ -8737,6 +8754,8 @@ is currently a balance of ';
             $sender
         );
         $emailDomain = strtolower(trim($pieces[1]));
+
+
 
         //try to find a specific contact by email
         $sql = "
@@ -8768,36 +8787,23 @@ is currently a balance of ';
     Try to match email domain against any customer
     */
         $sql = "
-          SELECT
+          SELECT 
             con_contno,
             con_custno,
-            con_siteno
+            con_siteno,
+            supportLevel,
+            (SELECT 
+              customer.primaryMainContactID 
+            FROM
+              customer 
+            WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain 
           FROM
-            contact
-          WHERE
-            con_email LIKE '%$emailDomain%'
-            AND con_custno <> 0";
-
-        $db->query($sql);
-
-        if ($db->next_record()) {
-            /*
-      This is the default. i.e. Found at least one contact with matching email domain
-      */
-            $ret['isSupportContact'] = false;
-            $ret['isMainContact'] = false;
-            $ret['contactID'] = $db->Record[0];
-            $ret['customerID'] = $db->Record[1];
-            $customerID = $db->Record[1]; // use this in sebsequent queries
-            $ret['siteNo'] = $db->Record[2];
-            /*
-      Try to find an exact support contact match
-      */
-            $sql = "
-            SELECT
-              con_contno,
-              con_custno,
-              con_siteno
+            contact 
+            LEFT JOIN customer ON customer.primaryMainContactID = con_contno
+          WHERE con_email LIKE '%$emailDomain%' 
+            AND con_custno <> 0
+            AND (SELECT 
+              customer.primaryMainContactID 
             FROM
               contact
             WHERE
@@ -8806,57 +8812,46 @@ is currently a balance of ';
                     $record['senderEmailAddress']
                 ) . "'
               AND con_custno <> 0 
-              AND (supportLevel = 'main' or supportLevel = 'support' or supportLevel = 'delegate' or supportLevel = 'supervisor')";
+              AND (supportLevel = 'main' or supportLevel = 'support')";
 
-            $db->query($sql);
-            if ($db->next_record()) {
-                $ret['isSupportContact'] = true;
-                $ret['isMainContact'] = false;
-                $ret['contactID'] = $db->Record[0];
-                $ret['customerID'] = $db->Record[1];
-                $ret['siteNo'] = $db->Record[2];
-            } /*
-      No support contact found so try to find a main support contact at this customer
-      unless it is in the list of excluded domains (e.g. gmail.com).
+        $db->query($sql);
 
-      This is a catchall in case the message is from a contact from a known customer who doesn't yet have an account.
-      */
-            elseif (
-                !in_array(
-                    $emailDomain,
-                    $GLOBALS['exclude_sr_email_domains']
-                ) &&
-                $customerID
-            ) {
+        if ($db->next_record()) {
+            return [
+                "contactID"     => $db->Record[0],
+                "customerID"    => $db->Record[1],
+                "siteNo"        => $db->Record[2],
+                "supportLevel"  => $db->Record[3],
+                "isPrimaryMain" => $db->Record[4]
+            ];
+        }
 
-                $sql = "
-              SELECT
-                con_contno,
-                con_custno,
-                con_siteno
-              FROM
-                contact
-              WHERE
-                con_custno = $customerID
-                and supportLevel = 'main'";
 
-                $db->query($sql);
+        //we could not identify a specific contact but we might be able to identify the customer
 
-                if ($db->next_record()) {
-                    $ret['isSupportContact'] = false;
-                    $ret['isMainContact'] = true;
-                    $ret['contactID'] = $db->Record[0];
-                    $ret['customerID'] = $db->Record[1];
-                    $ret['siteNo'] = $db->Record[2];
-                }
-            } else {
-                $ret = false;       // the email domain is in the excluded list or we
-                // don't have a customerID
-            }
-        } // if( $db->next_record() )
+        $sql = "
+          SELECT 
+            con_custno,
+            con_siteno
+          FROM
+            contact 
+          WHERE con_email LIKE '%$emailDomain%' 
+            AND con_custno <> 0";
 
-        return $ret;          // false if nothing matched
+        $db->query($sql);
 
+        if ($db->next_record()) {
+            return [
+                "contactID"     => null,
+                "customerID"    => $db->Record[0],
+                "siteNo"        => $db->Record[1],
+                "supportLevel"  => null,
+                "isPrimaryMain" => null
+            ];
+        }
+
+
+        return null;
     }
 
     function processIsSenderAuthorised($details,
@@ -8865,7 +8860,9 @@ is currently a balance of ';
                                        &$errorString
     )
     {
-        if ($contact && $contact['isSupportContact']) {
+
+
+        if ($contact && $contact['supportLevel']) {
 
             $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
             $details .= 'New request from email received from ' . $record['senderEmailAddress'] . ' on ' . date(

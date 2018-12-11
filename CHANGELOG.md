@@ -16,6 +16,8 @@ This project changes will be shown here.
 - Issue 352 - CNCWEB contacts bugs
 ### Added
 - Issue 347 - Customer Review Management documents
+- Issue 345 - Creation of Primary Main Contact 
+
 
 ## [v1.14.5] - 2018-12-11
 ## Changed
