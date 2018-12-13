@@ -590,6 +590,57 @@ class CTPurchaseOrder extends CTCNC
                 break;
             case 'P':
                 $title = 'Purchase Order - Part Receieved';
+                $disabled = ''; // only initial orders may be edited
+                $urlUpdateHeader =
+                    $this->buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'    => CTPURCHASEORDER_ACT_UPDATE_ORDHEAD,
+                            'porheadID' => $porheadID
+                        )
+                    );
+                $urlContactPopup =
+                    $this->buildLink(
+                        CTCNC_PAGE_CONTACT,
+                        array(
+                            'action'     => CTCNC_ACT_CONTACT_POPUP,
+                            'supplierID' => $dsPorhead->getValue('supplierID'),
+                            'htmlFmt'    => CT_HTML_FMT_POPUP
+                        )
+                    );
+                $urlContactEdit =
+                    $this->buildLink(
+                        CTCNC_PAGE_CONTACT,
+                        array(
+                            'action'  => CTCNC_ACT_CONTACT_EDIT,
+                            'htmlFmt' => CT_HTML_FMT_POPUP
+                        )
+                    );
+                $urlSupplierPopup =
+                    $this->buildLink(
+                        CTCNC_PAGE_SUPPLIER,
+                        array(
+                            'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                            'htmlFmt' => CT_HTML_FMT_POPUP
+                        )
+                    );
+                $urlSupplierEdit =
+                    $this->buildLink(
+                        CTCNC_PAGE_SUPPLIER,
+                        array(
+                            'action'  => CTCNC_ACT_SUPPLIER_EDIT,
+                            'htmlFmt' => CT_HTML_FMT_POPUP
+                        )
+                    );
+                $urlDeleteOrder =
+                    $this->buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'    => CTPURCHASEORDER_ACT_DELETE,
+                            'porheadID' => $porheadID
+                        )
+                    );
+                $txtDeleteOrder = 'Delete';
                 break;
             case 'A':
                 $title = 'Purchase Order - Authorised';

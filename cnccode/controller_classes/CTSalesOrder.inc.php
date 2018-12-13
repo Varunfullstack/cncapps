@@ -2110,8 +2110,24 @@ class CTSalesOrder extends CTCNC
                             'ordheadID' => $this->getOrdheadID()
                         )
                     );
+
+                $project = new DBEProject($this);
+
+                $project->setValue(
+                    DBEProject::ordHeadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+                );
+                $project->getRowsByColumn(DBEProject::ordHeadID);
+                $requiredByDateValue = "";
+                if ($project->fetchNext() && $project->getValue(DBEProject::commenceDate)) {
+                    $requiredByDateValue = Controller::dateYMDtoDMY($project->getValue(DBEProject::commenceDate));
+                }
+
                 $this->template->set_var(
-                    ['urlCreatePO' => $urlCreatePO]
+                    [
+                        'urlCreatePO'         => $urlCreatePO,
+                        "requiredByDateValue" => $requiredByDateValue
+                    ]
                 );
                 $this->template->parse(
                     'salesOrderDisplayCreatePO',

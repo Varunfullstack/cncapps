@@ -26,6 +26,7 @@ $headers .= "Content-Type: text/html";
 
 $result = $buItemsNotYetReceived->getItemsNotYetReceived();
 
+
 if (!$outputToScreen) {
     ob_start();
 }
@@ -40,6 +41,10 @@ if (!$outputToScreen) {
             BODY, P, TD, TH {
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 10pt;
+            }
+
+            table th {
+                text-align: left;
             }
 
         </style>
@@ -91,14 +96,7 @@ if (!$outputToScreen) {
         <tbody>
         <?php
         foreach ($result as $itemNotYetReceived) {
-            $style = "";
-            if ($requiredByDate = $itemNotYetReceived->getPurchaseOrderRequiredBy()) {
-                $startDate = new DateTime();
-                $diff = $startDate->diff($requiredByDate);
-                if ((int)$diff->format('%a') < 7) {
-                    $style = "style='color:red'";
-                }
-            }
+            $style = "style='color:" . $itemNotYetReceived->color() . "'";
             ?>
             <TR <?= $style ?>>
                 <TD>

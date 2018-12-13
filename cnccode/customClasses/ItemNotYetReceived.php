@@ -11,6 +11,8 @@ namespace CNCLTD;
 
 class ItemNotYetReceived
 {
+    public static $items = [];
+
     protected $purchaseOrderId;
     protected $customerName;
     protected $itemDescription;
@@ -25,6 +27,48 @@ class ItemNotYetReceived
     protected $orderedBy;
     protected $purchaseOrderType;
     protected $hasNotBeenReceivedYet;
+    protected $hasBeenOrdered;
+
+    /**
+     * @return array
+     */
+    public static function getItems(): array
+    {
+        return self::$items;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrderedBy()
+    {
+        return $this->orderedBy;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPurchaseOrderType()
+    {
+        return $this->purchaseOrderType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHasNotBeenReceivedYet()
+    {
+        return $this->hasNotBeenReceivedYet;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHasBeenOrdered()
+    {
+        return $this->hasBeenOrdered;
+    }
+
 
     /**
      * @return mixed
@@ -126,33 +170,37 @@ class ItemNotYetReceived
     }
 
 
-    public function lineColor()
+    public function isOrange()
     {
-        $greenForTypes = ['C', 'A'];
-        if (in_array(
-            $this->purchaseOrderType,
-            $greenForTypes
-        )) {
-            return 'green';
-        }
+        return !!$this->hasNotBeenReceivedYet;
+    }
 
-        if ($this->hasNotBeenReceivedYet) {
-            return 'orange';
-        }
-
-        if (!$this->orderedBy) {
-            return 'red';
-        }
-
+    public function isRed()
+    {
         $redForTypes = ['I', 'P'];
 
-        if (in_array(
+        return in_array(
             $this->purchaseOrderType,
             $redForTypes
-        )) {
-            return 'red';
+        );
+    }
+
+    public function isGreenType()
+    {
+        $greenForTypes = ['C', 'A'];
+
+        return in_array(
+            $this->purchaseOrderType,
+            $greenForTypes
+        );
+    }
+
+    public function color()
+    {
+        if (!isset(self::$items[$this->getPurchaseOrderId()]) || !self::$items[$this->getPurchaseOrderId()]) {
+            return !$this->hasBeenOrdered ? 'red' : ($this->hasNotBeenReceivedYet ? 'orange' : "black");
         }
-        return 'red';
+        return 'green';
     }
 
 }

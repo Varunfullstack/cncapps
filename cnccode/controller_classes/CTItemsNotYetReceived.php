@@ -80,14 +80,8 @@ class CTItemsNotYetReceived extends CTCNC
         foreach ($itemsNotYetReceived as $item) {
 
             $purchaseOrderLink = "/PurchaseOrder.php?action=display&porheadID=" . $item->getPurchaseOrderId();
-            $style = "";
-            if ($requiredByDate = $item->getPurchaseOrderRequiredBy()) {
-                $startDate = new DateTime();
-                $diff = $startDate->diff($requiredByDate);
-                if ((int)$diff->format('%a') < 7) {
-                    $style = "style='color:red'";
-                }
-            }
+            $style = "style='color:" . $item->color() . "'";
+
             $this->template->set_var(
                 [
                     "style"             => $style,

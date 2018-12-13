@@ -24,7 +24,7 @@ class BUItemsNotYetReceived extends Business
     'CNC',
     'Direct'
   ) AS direct,
-  poh_ord_date as purchaseOrderDate,
+  if(poh_ord_date = '0000-00-00', null, poh_ord_date) as purchaseOrderDate,
   (SELECT 
     MIN(ca.caa_date) 
   FROM
@@ -32,13 +32,16 @@ class BUItemsNotYetReceived extends Business
     LEFT JOIN callacttype cat 
       ON cat.cat_callacttypeno = ca.caa_callacttypeno 
   WHERE ca.caa_problemno = problem.`pro_problemno` 
-    AND ca.caa_date >= NOW()) AS futureDate,
+    AND ca.caa_date >= NOW()
+    ) AS futureDate,
     poh_required_by as purchaseOrderRequiredBy,
     project.description as projectName,
     (select max(deliverynote.dateTime) from deliverynote where ordheadID = ordhead.odh_ordno ) as dispatchedDate,
        poh_supp_ref as supplierRef,
        IF(poh_contno <> 0 OR poh_contno IS NOT NULL, poh_contno, NULL) AS orderedBy ,
-       poh_type as purchaseOrderType
+       poh_type as purchaseOrderType,
+       poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered ,
+       pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet
 FROM
   porline 
   LEFT JOIN porhead 
@@ -59,6 +62,7 @@ WHERE poh_required_by is not null and poh_required_by <> '0000-00-00' and poh_re
 AND item.itm_desc NOT LIKE '%labour%'
 AND customer.cus_name <> 'CNC Sales Stock'
 AND item.itm_desc NOT LIKE '%Office 365%'
+  AND item.itm_desc NOT LIKE '%carriage%'
 AND customer.cus_name <> 'CNC Operating Stock'
 and (porline.pol_cost > 0 or porline.pol_cost < 0)
   order by poh_required_by asc 
@@ -67,10 +71,21 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
 
         $db->query($query);
         $data = [];
+
+        /** @var \CNCLTD\ItemNotYetReceived $item */
         while ($item = $db->next_record_object(\CNCLTD\ItemNotYetReceived::class)) {
+            if (!isset(\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()])) {
+                \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
+            }
+
+            if (\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] && !$item->isGreenType()) {
+                \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
+            }
+
             $data[] = $item;
         };
 
         return $data;
     }
+
 }
