@@ -18,7 +18,7 @@ $error = false;
 if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
     $send_to_email = CONFIG_CATCHALL_EMAIL;
 } else {
-    $send_to_email = 'grahaml@cnc-ltd.co.uk,' . CONFIG_SALES_MANAGER_EMAIL;
+    $send_to_email = 'MailQueueAlert@cnc-ltd.co.uk';
 }
 
 $sql = "

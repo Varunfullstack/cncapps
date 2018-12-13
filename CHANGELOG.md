@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 360 - SD Dashboard Assignment display issue
 ### Changed 
 - Issue 365 - Performance table formatting improvements
+- Issue 391 - Change MailQueueAlert.php email destinations
 
 ## [v1.14.5] - 2018-12-11
 ## Changed
