@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 359 - Management Review Summary shows blank To: field
 - Issue 372 - Email display header missing
 - Issue 360 - SD Dashboard Assignment display issue
+- Issue 380 - Typo in Reports Menu
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 - Issue 391 - Change MailQueueAlert.php email destinations
@@ -14,23 +15,23 @@ This project changes will be shown here.
 
 ## [v1.14.5] - 2018-12-11
 ## Changed
-Show employee's start date in DD-MM-YYYY format
+- Show employee's start date in DD-MM-YYYY format
 
 ## [v1.14.4] - 2018-12-10
 ## Changed
-Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
+- Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
 
 ## [v1.14.3] - 2018-12-06
 ## Fixed
-Staff details encrypted fields are not being saved / displayed!
+- Staff details encrypted fields are not being saved / displayed!
 
 ## [v1.14.2] - 2018-12-05
 ## Fixed
-Project management role is no longer present in the User edit page
+- Project management role is no longer present in the User edit page
 
 ## [v1.14.1] - 2018-12-04
 ### Fixed
-Staff Appraisal start date field value loads with the wrong format
+- Staff Appraisal start date field value loads with the wrong format
 
 ## [V1.14.0]- 2018-12-03
 ### Added
