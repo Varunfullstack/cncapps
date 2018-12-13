@@ -7613,16 +7613,15 @@ is currently a balance of ';
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
         );
+        $startTime = date('H:i');
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
-            date('H:i')
+            $startTime
         );
-
-        $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            $endTime
+            $startTime
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
@@ -8437,7 +8436,8 @@ is currently a balance of ';
 
         $this->createFixedActivity(
             $problemID,
-            $resolutionSummary
+            $resolutionSummary,
+            $fixedUserID == USER_SYSTEM
         );
 
         $this->sendMonitoringEmails(
@@ -8502,12 +8502,14 @@ is currently a balance of ';
     }
 
     function createFixedActivity($problemID,
-                                 $resolutionSummary
+                                 $resolutionSummary,
+                                 $zeroTime = false
     )
     {
         /*
     Start with duplicate of last activity
     */
+
         $dbeLastActivity = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
@@ -8522,9 +8524,30 @@ is currently a balance of ';
             date('H:i')
         );
 
+        $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
+
+        if (!$zeroTime) {
+            $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->getRow($problemID);
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::imLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::imLimitMinutes) + 3
+            );
+            $dbeProblem->updateRow();
+        }
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID)
+            $endTime
         );
 
         $dbeCallActivity->setValue(
