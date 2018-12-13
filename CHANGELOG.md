@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 372 - Email display header missing
 - Issue 360 - SD Dashboard Assignment display issue
 - Issue 380 - Typo in Reports Menu
+- Issue 377 - Sales Requests status lost
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 - Issue 391 - Change MailQueueAlert.php email destinations
