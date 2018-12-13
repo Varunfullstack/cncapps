@@ -7322,7 +7322,7 @@ is currently a balance of ';
                         $automatedRequest
                     );
                 }
-                return null;
+                return true;
             }
 
             if ($dbeContact->getValue(DBEContact::customerID) != $automatedRequest->getCustomerID()) {
@@ -7350,7 +7350,7 @@ is currently a balance of ';
                         $automatedRequest
                     );
                 }
-                return null;
+                return true;
             }
 
             $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
@@ -7373,7 +7373,7 @@ is currently a balance of ';
                 );
             }
 
-            return null;
+            return true;
         }
 
 
