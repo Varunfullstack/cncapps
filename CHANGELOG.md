@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 391 - Change MailQueueAlert.php email destinations
 - Issue 388 - Contact Title Database field length increase
 - Issue 366 - Automatically raised SRs set to no Initial time
+- Issue 377 - Sales Requests status lost
 
 ## [v1.14.5] - 2018-12-11
 ## Changed
