@@ -7266,26 +7266,26 @@ is currently a balance of ';
                                      &$errorString
     )
     {
+
         if (!$automatedRequest->getCustomerID()) {
+            echo "<div>We couldn't find a customer ID, should log in to be logged</div>";
             return $this->addCustomerRaisedRequest(
                 $automatedRequest
             );
         }
-
+        echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
 
         if ($automatedRequest->getServiceRequestID()) {
+
+            echo "<div>We do have a Service Request ID: " . $automatedRequest->getServiceRequestID() . "</div>";
+
             $dbeProblem = new DBEProblem($this);
 
             $dbeProblem->getRow($automatedRequest->getServiceRequestID());
 
             if (!$dbeProblem->rowCount()) {
+                echo "<div>The service request doesn't exist </div>";
                 // create a new service request
-                return $this->raiseNewRequestFromImport($automatedRequest);
-            }
-
-            $status = $dbeProblem->getValue(DBEProblem::status);
-
-            if ($status == 'C') {   // is request completed?
                 return $this->raiseNewRequestFromImport($automatedRequest);
             }
 
@@ -7296,6 +7296,22 @@ is currently a balance of ';
                 $automatedRequest->getSenderEmailAddress()
             );
             $dbeContact->getRowsByColumn(DBEContact::email);
+
+            $status = $dbeProblem->getValue(DBEProblem::status);
+            if ($status == 'C') {   // is request completed?
+                echo "<div>The found service request is closed, raising a new service request</div>";
+
+                if (!$dbeContact->fetchNext() || $dbeContact->getValue(
+                        DBEContact::customerID
+                    ) != $automatedRequest->getCustomerID()) {
+                    echo "<div>The contact was not found or the contact doesn't belong to the same customer ID</div>";
+                    return $this->addCustomerRaisedRequest(
+                        $automatedRequest
+                    );
+                }
+                return $this->raiseNewRequestFromImport($automatedRequest);
+            }
+
             $details = $automatedRequest->getTextBody();
             if (!$dbeContact->rowCount) {
                 $details .= 'Update from email received from ' . $automatedRequest->getSenderEmailAddress(
@@ -7381,32 +7397,13 @@ is currently a balance of ';
             return $this->processServerGuard($automatedRequest);
         }
 
+
         return $this->raiseNewRequestFromImport($automatedRequest);
     }
 
     function processServerGuard(\CNCLTD\AutomatedRequest $automatedRequest)
     {
         $details = $automatedRequest->getTextBody();
-
-        $contact = $this->getAlertContact(
-            $automatedRequest->getCustomerID(),
-            $automatedRequest->getPostcode()
-        );
-
-
-        if (!$contact) {
-            return $this->addCustomerRaisedRequest(
-                $automatedRequest,
-                null,
-                false,
-                $details,
-                'C'
-            );
-        }
-
-        /*
-    No monitor status = create new request
-    */
         if ($automatedRequest->getMonitorStatus() == '') {
             /* Create new request */
             $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
@@ -7415,7 +7412,7 @@ is currently a balance of ';
             $this->raiseNewRequestFromImport(
                 $automatedRequest,
                 $details,
-                $contact
+                true
             );
 
             return true;       // nothing more to do
@@ -7441,7 +7438,7 @@ is currently a balance of ';
                 $this->createFollowOnActivity(
                     $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
                     CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID,
-                    $contact['contactID'],
+                    $request['pro_contno'],
                     $details,
                     false,
                     true,
@@ -7494,7 +7491,7 @@ is currently a balance of ';
                     $this->createFollowOnActivity(
                         $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
                         CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID,
-                        $contact['contactID'],
+                        $request['pro_contno'],
                         $details,
                         false,
                         true,
@@ -7518,7 +7515,7 @@ is currently a balance of ';
                 $this->raiseNewRequestFromImport(
                     $automatedRequest,
                     $details,
-                    $contact
+                    true
                 );
 
                 return true;       // nothing more to do
@@ -7538,7 +7535,7 @@ is currently a balance of ';
       FROM
         address
       WHERE
-        add_postcode = '" . $postcode . "'";
+        add_postcode = '" . $postcode . "' and add_custno ='" . $customerID . "' ";
         $db->query($queryString);
         $db->next_record();
         $ret['siteNo'] = $db->Record[0];
@@ -7546,11 +7543,6 @@ is currently a balance of ';
         if (!$ret['siteNo']) {
             $ret['siteNo'] = 0;
         }
-
-
-        //TODO: Change this to look at the customer table first and find if it has a Primary Main contact assigned
-
-
         /* use main support contact */
         $queryString = "
       SELECT
@@ -7565,29 +7557,7 @@ is currently a balance of ';
 
         $ret['contactID'] = $db->Record[0];
 
-        /*
-    if no main support contact set then use first support contact found
-
-    SHOULD NEVER BE THE CASE but have to do this in case!
-    */
-        if (!$ret['contactID']) {
-            $queryString = "
-        SELECT
-          con_contno
-        FROM
-          contact
-        WHERE
-          con_custno = '" . $customerID . "'
-          AND supportLevel = 'main'";
-
-            $db->query($queryString);
-            $db->next_record();
-
-            $ret['contactID'] = $db->Record[0];
-        }
-
         $ret['customerID'] = $customerID;
-
         return $ret;
 
     }
@@ -7596,34 +7566,40 @@ is currently a balance of ';
      * New request from import process
      *
      * @param mixed $record
-     * @param $details
-     * @param mixed $contact
+     * @param null $forcedDetails
+     * @param bool $serverGuard
+     * @return mixed
      * @throws Exception
      */
-    function raiseNewRequestFromImport(\CNCLTD\AutomatedRequest $record)
+    function raiseNewRequestFromImport(\CNCLTD\AutomatedRequest $record,
+                                       $forcedDetails = null,
+                                       $serverGuard = false
+    )
     {
-
-        $dbeProblem = new DBEProblem($this);
-
-        /* if customer-raised then we derive customer from email address */
+        echo "<div>We are trying to raise a new request</div>";
         $customerID = $record->getCustomerID();
-
-
+        $dbeProblem = new DBEProblem($this);
         $dbeContact = new DBEContact($this);
-        $dbeContact->setValue(
-            DBEContact::email,
-            $record->getSenderEmailAddress()
-        );
-        $dbeContact->getRowsByColumn(DBEContact::email);
 
-        if (!$dbeContact) {
+        if (!$dbeContact->rowCount || $serverGuard) {
+            echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
             $buCustomer = new BUCustomer($this);
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
+            if (!$dbeContact->rowCount) {
+                echo "<div>We couldn't find a primary contact, -> to be logged</div>";
+                return $this->addCustomerRaisedRequest($record);
+            }
+            echo "<div>we have found a primary contact</div>";
+
+        } else {
+            echo "<div>The sender contact does exist</div>";
+            $dbeContact->fetchNext();
+            if ($dbeContact->getValue(DBEContact::customerID) != $record->getCustomerID()) {
+                echo "<div>The sender contact does not belong to the same customer ID -> to be logged</div>";
+                return $this->addCustomerRaisedRequest($record);
+            }
         }
 
-        if (!$dbeContact) {
-            return $this->addCustomerRaisedRequest($record);
-        }
 
         $supportLevel = $dbeContact->getValue(DBEContact::supportLevel);
 
@@ -7642,6 +7618,7 @@ is currently a balance of ';
                 $dbeContact
             );
         }
+
 
         $slaResponseHours = $this->getSlaResponseHours(
             $record->getPriority(),
@@ -7794,7 +7771,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
-            Controller::formatForHTML($record->getTextBody())
+            Controller::formatForHTML($forcedDetails ? $forcedDetails : $record->getTextBody())
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
@@ -7855,7 +7832,7 @@ is currently a balance of ';
             $subCategory
         );
 
-
+        return true;
     }
 
     function getSiteNoByCustomerPostcode(
@@ -7949,7 +7926,8 @@ is currently a balance of ';
         $sql = "
       SELECT 
         pro_problemno,
-        pro_status
+        pro_status,
+        pro_contno
       FROM
         problem
         JOIN callactivity ON caa_problemno = pro_problemno
@@ -9001,6 +8979,7 @@ is currently a balance of ';
             $queryString,
             $parameters
         );
+        return true;
     } // end clearSystemSRQueue
 
     function getManagerComment($problemID)
@@ -10838,6 +10817,7 @@ is currently a balance of ';
     )
     {
         echo 'Contact not authorized';
+        return true;
     }
 
 

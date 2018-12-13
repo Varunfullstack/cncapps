@@ -8,7 +8,7 @@
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
-require_once $cfg['path_dbe'].'/DBEProblem.inc.php';
+require_once $cfg['path_dbe'] . '/DBEProblem.inc.php';
 
 class BUImportRequests extends Business
 {
@@ -58,12 +58,16 @@ class BUImportRequests extends Business
 
             echo 'Start processing ' . $automatedRequest->getAutomatedRequestID() . "<BR/>";
 
+            echo '<br>Description: ';
+            echo $automatedRequest->getTextBody();
+            echo '<br>';
             $errorString = '';
             if ($this->processMessage(
-                $db->Record,
+                $automatedRequest,
                 $errorString
             )) {      // error string returned
                 echo $automatedRequest->getAutomatedRequestID() . " processed successfully<BR/>";
+
                 $processedMessages++;
             } else {
                 echo $automatedRequest->getAutomatedRequestID() . " failed<BR/>";

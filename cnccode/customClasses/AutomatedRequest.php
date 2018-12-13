@@ -51,13 +51,16 @@ class AutomatedRequest
      */
     public function getCustomerID()
     {
+        echo "<div>Trying to pull customer ID, current value is : " . $this->customerID . " </div>";
         if (!$this->customerID) {
+            echo "<div>customer ID is not set</div>";
             if ($this->serviceRequestID) {
                 $dbeProblem = new \DBEProblem($this);
 
                 $dbeProblem->getRow($this->serviceRequestID);
                 if ($dbeProblem->rowCount()) {
                     $this->customerID = $dbeProblem->getValue(\DBEProblem::customerID);
+                    echo "<div>We have found customer ID from service Request: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
             }
@@ -72,6 +75,7 @@ class AutomatedRequest
                 if ($dbeContact->rowCount()) {
                     $dbeContact->fetchNext();
                     $this->customerID = $dbeContact->getValue(\DBEContact::customerID);
+                    echo "<div>We have found customer ID from contact's email: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
             }
@@ -82,6 +86,7 @@ class AutomatedRequest
                 $dbeItem->getRow($this->contractCustomerItemID);
                 if ($dbeItem->rowCount()) {
                     $this->customerID = $dbeItem->getValue(\DBECustomerItem::customerID);
+                    echo "<div>We have found customer ID from contractCustomerItemID: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
 
