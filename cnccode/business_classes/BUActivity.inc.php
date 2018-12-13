@@ -10834,10 +10834,10 @@ is currently a balance of ';
     }
 
     private function contactNotAuthorized(\CNCLTD\AutomatedRequest $record,
-                                          ?DBEContact $dbeContact
+                                          DBEContact $dbeContact
     )
     {
-
+        echo 'Contact not authorized';
     }
 
 
