@@ -2807,9 +2807,6 @@ class CTActivity extends CTCNC
             );
 
             while ($row = mysqli_fetch_assoc($result)) {
-
-                // only allow selection of support contacts
-
                 if ($row['con_mailflag5'] == 'Y') {
 
                     if ($row['openSrCount'] == 0) {
@@ -2854,12 +2851,11 @@ class CTActivity extends CTCNC
                 } else {
                     $cus_name = $row['cus_name'];
                     $contact_name = $row['con_first_name'] . ' ' . $row['con_last_name'];
-                    $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
+                    $site_name = $row['site_name'];
                     $contact_phone = '';
                     $contact_position = '';
                     $site_phone = '';
                 }
-
                 $this->template->set_var(
                     array(
                         'cus_name'         => $cus_name,
