@@ -23,7 +23,6 @@ class ItemNotYetReceived
     protected $purchaseOrderRequiredBy;
     protected $supplierRef;
     protected $projectName;
-    protected $dispatchedDate;
     protected $orderedBy;
     protected $purchaseOrderType;
     protected $hasNotBeenReceivedYet;
@@ -174,17 +173,6 @@ class ItemNotYetReceived
     public function getProjectName()
     {
         return $this->projectName;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDispatchedDate()
-    {
-        return $this->returnDateIfValue(
-            $this->dispatchedDate,
-            "Y-m-d H:i:s"
-        );
     }
 
 

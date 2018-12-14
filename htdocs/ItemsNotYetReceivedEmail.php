@@ -92,9 +92,6 @@ if (!$outputToScreen) {
             <th>
                 Project Name
             </th>
-            <th>
-                Dispatched Date
-            </th>
         </TR>
         </thead>
         <tbody>
@@ -170,7 +167,7 @@ if (!$outputToScreen) {
     $hdrs = array(
         'From'         => CONFIG_SALES_EMAIL,
         'To'           => $toEmail,
-        'Subject'      => 'Items not yet received',
+        'Subject'      => 'PO Status Report',
         'Date'         => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );

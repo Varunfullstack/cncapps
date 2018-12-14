@@ -61,7 +61,7 @@ class CTItemsNotYetReceived extends CTCNC
     function displayContractAndNumbersReport()
     {
 
-        $this->setPageTitle("Items Not Yet Received");
+        $this->setPageTitle("PO Status Report");
 
         $this->setTemplateFiles(
             'ItemsNotYetReceived',
