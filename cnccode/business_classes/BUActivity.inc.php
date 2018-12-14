@@ -7923,8 +7923,7 @@ is currently a balance of ';
         */
                 $teamLevel = $this->getLevelByUserID($userID);
 
-                if ($teamLevel < 3) {
-
+                if ($teamLevel <= 3) {
                     $queueNo = $teamLevel;
                 } else {
                     $queueNo = 5; // managers

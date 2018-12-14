@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+## Fixed
+- Issue 393 - Clicking Start Work with new SR puts it into the wrong queue
+
 ## [v1.14.5] - 2018-12-11
 ## Changed
 Show employee's start date in DD-MM-YYYY format
