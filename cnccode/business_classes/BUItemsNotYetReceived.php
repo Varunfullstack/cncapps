@@ -41,7 +41,8 @@ class BUItemsNotYetReceived extends Business
        IF(poh_contno <> 0 OR poh_contno IS NOT NULL, poh_contno, NULL) AS orderedBy ,
        poh_type as purchaseOrderType,
        poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered ,
-       pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet
+       pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
+       pol_qty_ord AS orderedQuantity
 FROM
   porline 
   LEFT JOIN porhead 
@@ -58,14 +59,13 @@ FROM
     ON problem.`pro_linked_ordno` = porhead.`poh_ordno`
   left join project 
     on project.ordHeadID = ordhead.odh_ordno
-WHERE poh_required_by is not null and poh_required_by <> '0000-00-00' and poh_required_by >= NOW()
+WHERE poh_required_by is not null and poh_required_by <> '0000-00-00'
 AND item.itm_desc NOT LIKE '%labour%'
-AND customer.cus_name <> 'CNC Sales Stock'
 AND item.itm_desc NOT LIKE '%Office 365%'
   AND item.itm_desc NOT LIKE '%carriage%'
 AND customer.cus_name <> 'CNC Operating Stock'
 and (porline.pol_cost > 0 or porline.pol_cost < 0)
-  order by poh_required_by asc 
+  ORDER BY poh_required_by ASC, ordhead.`odh_custno` DESC, pol_porno ASC, `pol_lineno` ASC
 ";
 
 
@@ -84,6 +84,16 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
 
             $data[] = $item;
         };
+
+        $data = array_filter(
+            $data,
+            function (\CNCLTD\ItemNotYetReceived $item) {
+                return !($item->getPurchaseOrderRequiredBy() && $item->getPurchaseOrderRequiredBy() < new DateTime(
+                    ) && isset(
+                        \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]
+                    ) && \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]);
+            }
+        );
 
         return $data;
     }

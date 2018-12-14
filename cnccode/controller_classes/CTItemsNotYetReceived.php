@@ -61,7 +61,7 @@ class CTItemsNotYetReceived extends CTCNC
     function displayContractAndNumbersReport()
     {
 
-        $this->setPageTitle("Service Contracts Ratio");
+        $this->setPageTitle("Items Not Yet Received");
 
         $this->setTemplateFiles(
             'ItemsNotYetReceived',
@@ -90,6 +90,7 @@ class CTItemsNotYetReceived extends CTCNC
                     "customerName"      => $item->getCustomerName(),
                     "itemDescription"   => $item->getItemDescription(),
                     "supplierName"      => $item->getSupplierName(),
+                    "orderedQty"        => $item->getOrderedQuantity(),
                     "direct"            => $item->getDirect(),
                     "purchaseOrderDate" => $this->getDateOrNA($item->getPurchaseOrderDate()),
                     "futureDate"        => $this->getDateOrNA($item->getFutureDate()),

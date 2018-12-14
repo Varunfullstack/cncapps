@@ -51,9 +51,10 @@ if (!$outputToScreen) {
     </head>
     <body>
     <P>
-        These items have been ordered but have not been received by CNC / the customer.
-        In the case of electronic licenses or renewals, these are likely to have gone direct to the customer but may
-        still show on the report below.
+        <span style="color:red;background-color: red">R</span> Not ordered yet.
+        <span style="color: orange;background-color: orange">A</span> Ordered but not
+        received. <span style="color: black;background-color: black">B</span> Ordered and
+        received. <span style="color: green;background-color: green">G</span> Entire purchase order received.
     </P>
     <TABLE>
         <thead>
@@ -63,6 +64,9 @@ if (!$outputToScreen) {
             </th>
             <th>
                 Customer Name
+            </th>
+            <th>
+                Qty
             </th>
             <th>
                 Description
@@ -108,6 +112,9 @@ if (!$outputToScreen) {
                     <?= $itemNotYetReceived->getCustomerName() ?>
                 </td>
                 <td>
+                    <?= $itemNotYetReceived->getOrderedQuantity() ?>
+                </td>
+                <td>
                     <?= $itemNotYetReceived->getItemDescription() ?>
                 </td>
                 <td>
@@ -126,7 +133,9 @@ if (!$outputToScreen) {
                     ) : 'N/A' ?>
                 </td>
                 <td>
-                    <?= $requiredByDate ? $requiredByDate->format('d/m/Y') : 'N/A' ?>
+                    <?= ($requiredByDate = $itemNotYetReceived->getPurchaseOrderRequiredBy()) ? $requiredByDate->format(
+                        'd/m/Y'
+                    ) : 'N/A' ?>
                 </td>
                 <td>
                     <?= $itemNotYetReceived->getSupplierRef() ?>
@@ -135,9 +144,10 @@ if (!$outputToScreen) {
                     <?= $itemNotYetReceived->getProjectName() ?>
                 </td>
                 <td>
+
                     <?= $itemNotYetReceived->getDispatchedDate() ? $itemNotYetReceived->getDispatchedDate()->format(
                         'd/m/Y'
-                    ) : '' ?>
+                    ) : 'N/A' ?>
                 </td>
             </TR>
             <?php

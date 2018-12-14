@@ -28,6 +28,19 @@ class ItemNotYetReceived
     protected $purchaseOrderType;
     protected $hasNotBeenReceivedYet;
     protected $hasBeenOrdered;
+    protected $orderedQuantity;
+
+    /**
+     * @return mixed
+     */
+    public function getOrderedQuantity()
+    {
+        return number_format(
+            $this->orderedQuantity,
+            0
+        );
+    }
+
 
     /**
      * @return array
@@ -134,13 +147,15 @@ class ItemNotYetReceived
         return $this->returnDateIfValue($this->purchaseOrderRequiredBy);
     }
 
-    private function returnDateIfValue($value)
+    private function returnDateIfValue($value,
+                                       $format = 'Y-m-d'
+    )
     {
         if (!$value) {
             return null;
         }
         return \DateTime::createFromFormat(
-            'Y-m-d',
+            $format,
             $value
         );
     }
@@ -166,7 +181,10 @@ class ItemNotYetReceived
      */
     public function getDispatchedDate()
     {
-        return $this->returnDateIfValue($this->dispatchedDate);
+        return $this->returnDateIfValue(
+            $this->dispatchedDate,
+            "Y-m-d H:i:s"
+        );
     }
 
 
