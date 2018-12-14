@@ -96,8 +96,7 @@ class CTItemsNotYetReceived extends CTCNC
                     "futureDate"        => $this->getDateOrNA($item->getFutureDate()),
                     "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
                     "supplierRef"       => $item->getSupplierRef(),
-                    "projectName"       => $item->getProjectName(),
-                    "dispatchedDate"    => $this->getDateOrNA($item->getDispatchedDate())
+                    "projectName"       => $item->getProjectName()
                 ]
             );
 
