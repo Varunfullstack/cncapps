@@ -17,6 +17,8 @@ This project changes will be shown here.
 - Issue 388 - Contact Title Database field length increase
 - Issue 366 - Automatically raised SRs set to no Initial time
 - Issue 377 - Sales Requests status lost
+### Added
+- Issue 392 - Customer Meeting Review Frequency Change
 
 ## [v1.14.5] - 2018-12-11
 ### Changed
