@@ -18,6 +18,7 @@ This project changes will be shown here.
 - Issue 366 - Automatically raised SRs set to no Initial time
 - Issue 377 - Sales Requests status lost
 - Issue 399 - Staff Appraisal formatting improvements
+- Issue 398 - Improve SR manager dashboard view
 ### Added
 - Issue 392 - Customer Meeting Review Frequency Change
 

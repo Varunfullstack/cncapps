@@ -406,8 +406,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
               FROM
                 problem 
               WHERE problem.`pro_custno` = customer.`cus_custno` 
-                AND problem.`pro_status` IN ("I", "P")
-          ';
+                AND problem.`pro_status` IN ("I", "P")';
 
         if (!$showHelpDesk) {
             $query .= ' and pro_queue_no <> 1 ';
@@ -446,7 +445,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 array(
                     'urlCustomer'  => $urlCustomer,
                     'customerName' => $row['cus_name'],
-                    'srCount'      => $row["openSRCount"]
+                    'srCount'      => "<A href='CurrentActivityReport.php?action=setFilter&selectedCustomerID=" . $row['cus_custno'] . "'>" . $row["openSRCount"] . "</A>"
                 )
 
             );
