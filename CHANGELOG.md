@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 360 - SD Dashboard Assignment display issue
 - Issue 380 - Typo in Reports Menu
 - Issue 377 - Sales Requests status lost
+- Issue 393 - Clicking Start Work with new SR puts it into the wrong queue
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 - Issue 391 - Change MailQueueAlert.php email destinations
