@@ -704,7 +704,7 @@ table.fixed_header {
     table-layout: fixed;
 }
 
-.fixed_header tbody, thead {
+.fixed_header tbody, .fixed_header thead {
     display: block;
 }
 
@@ -723,7 +723,7 @@ table.fixed_header {
     overflow: hidden;
 }
 
-.fixed_header td, th {
+.fixed_header td, .fixed_header th {
     word-wrap: break-word;
 }
 
