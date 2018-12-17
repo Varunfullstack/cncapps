@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 346 - Automate Asset List Export
+
 ## [v1.14.5] - 2018-12-11
 ## Changed
 Show employee's start date in DD-MM-YYYY format
