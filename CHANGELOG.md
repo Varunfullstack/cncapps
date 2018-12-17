@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 380 - Typo in Reports Menu
 - Issue 377 - Sales Requests status lost
 - Issue 393 - Clicking Start Work with new SR puts it into the wrong queue
+- Issue 389 - Prevent links for contacts that have no support flag enabled
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 - Issue 391 - Change MailQueueAlert.php email destinations
@@ -18,19 +19,19 @@ This project changes will be shown here.
 - Issue 377 - Sales Requests status lost
 
 ## [v1.14.5] - 2018-12-11
-## Changed
+### Changed
 - Show employee's start date in DD-MM-YYYY format
 
 ## [v1.14.4] - 2018-12-10
-## Changed
+### Changed
 - Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
 
 ## [v1.14.3] - 2018-12-06
-## Fixed
+### Fixed
 - Staff details encrypted fields are not being saved / displayed!
 
 ## [v1.14.2] - 2018-12-05
-## Fixed
+### Fixed
 - Project management role is no longer present in the User edit page
 
 ## [v1.14.1] - 2018-12-04
@@ -42,14 +43,14 @@ This project changes will be shown here.
 - Issue 373 - Staff Appraisal Process
 
 ## [v1.13.2] - 2018-11-23
-## Fixed
+### Fixed
 - Contract expiry dates incorrect
 - Remove debugging information
 
 ## [v1.13.1] - 2018-11-20
-## Changed
+### Changed
 - Allow more than 50 characters in project updates
-## Fixed
+### Fixed
 - Fix issue with banners not showing when project end date was not set
 - Fix issue with banners showing incorrect projects
 
