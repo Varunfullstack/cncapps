@@ -2,38 +2,38 @@
 This project changes will be shown here.
 
 ## [v1.14.5] - 2018-12-11
-## Changed
-Show employee's start date in DD-MM-YYYY format
+### Changed
+- Show employee's start date in DD-MM-YYYY format
 
 ## [v1.14.4] - 2018-12-10
-## Changed
-Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
+### Changed
+- Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
 
 ## [v1.14.3] - 2018-12-06
-## Fixed
-Staff details encrypted fields are not being saved / displayed!
+### Fixed
+- Staff details encrypted fields are not being saved / displayed!
 
 ## [v1.14.2] - 2018-12-05
-## Fixed
-Project management role is no longer present in the User edit page
+### Fixed
+- Project management role is no longer present in the User edit page
 
 ## [v1.14.1] - 2018-12-04
 ### Fixed
-Staff Appraisal start date field value loads with the wrong format
+- Staff Appraisal start date field value loads with the wrong format
 
 ## [V1.14.0]- 2018-12-03
 ### Added
 - Issue 373 - Staff Appraisal Process
 
 ## [v1.13.2] - 2018-11-23
-## Fixed
+### Fixed
 - Contract expiry dates incorrect
 - Remove debugging information
 
 ## [v1.13.1] - 2018-11-20
-## Changed
+### Changed
 - Allow more than 50 characters in project updates
-## Fixed
+### Fixed
 - Fix issue with banners not showing when project end date was not set
 - Fix issue with banners showing incorrect projects
 
