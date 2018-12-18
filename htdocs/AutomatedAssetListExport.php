@@ -36,9 +36,12 @@ while ($db->next_record(MYSQLI_ASSOC)) {
   locations.name AS \"Location\",
   computers.name AS \"Computer Name\",
   computers.localaddress AS \"IP Address\",
-  computers.lastcontact AS \"Last Contact\",
+   DATE_FORMAT(
+    STR_TO_DATE(computers.lastcontact, '%m/%d/%Y'),
+    '%d/%m/%Y'
+  ) AS \"Last Contact\",
   inv_chassis.productname AS \"Model\",
-  inv_chassis.serialnumber AS \"Serial No.\",
+  if(inv_chassis.serialnumber like '%VMware%', null,inv_chassis.serialnumber )        AS \"Serial No.\",
   DATE_FORMAT(
     STR_TO_DATE(inv_bios.biosdate, '%m/%d/%Y'),
     '%d/%m/%Y'
@@ -147,6 +150,7 @@ ORDER BY clients.name,
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
     if (count($data)) {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
         $sheet = $spreadsheet->getActiveSheet();
         $keys = array_keys($data[0]);
         $sheet->fromArray($keys);
@@ -161,7 +165,16 @@ ORDER BY clients.name,
         );
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = '\\\cncltd.local\cnc\Customer\\' . $db->Record['cus_name'] . "\Current Documentation\Asset List Extract.xlsx";
+        $folderName = '\\\cncltd.local\cnc\Customer\\' . $db->Record['cus_name'] . "\Review Meetings\\";
+        if (!file_exists($folderName)) {
+            mkdir(
+                $folderName,
+                0777,
+                true
+            );
+        }
+
+        $fileName = $folderName . "Current Asset List Extract.xlsx";
         $writer->save(
             $fileName
         );
