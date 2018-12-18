@@ -11097,6 +11097,20 @@ is currently a balance of ';
         return $dbejCallactivity;
     }
 
+    public function getProblemsByContact($contactID)
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getProblemsByContactID($contactID);
+
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+
+        return $dsResults;
+    }
+
 
 } // End of class
 ?>
