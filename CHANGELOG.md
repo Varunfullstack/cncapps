@@ -21,6 +21,7 @@ This project changes will be shown here.
 - Issue 398 - Improve SR manager dashboard view
 ### Added
 - Issue 392 - Customer Meeting Review Frequency Change
+- Issue 364 - Improve Items Not Received v3
 
 ## [v1.14.5] - 2018-12-11
 ### Changed
