@@ -10816,7 +10816,124 @@ is currently a balance of ';
                                           DBEContact $dbeContact
     )
     {
-        echo 'Contact not authorized';
+
+
+        $buCustomer = new BUCustomer($this);
+        $primaryMainContactDS = $buCustomer->getPrimaryContact($record->getCustomerID());
+        $buMail = new BUMail($this);
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $toEmail = $primaryMainContactDS->getValue(DBEContact::email);
+
+        $contactName = $dbeContact->getValue(
+                DBEContact::firstName
+            ) . " " . $dbeContact->getValue(DBEContact::lastName);
+
+        if ($primaryMainContactDS->rowCount) {
+            $template->set_file(
+                'page',
+                'NotAuthorisedPrimaryMainContactEmail.html'
+            );
+
+
+            $template->setVar(
+                [
+                    "primaryMainContactName" => $primaryMainContactDS->getValue(DBEContact::firstName),
+                    "contactName"            => $contactName,
+                    "contactSupportLevel"    => $dbeContact->getValue(DBEContact::supportLevel)
+                ]
+            );
+
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $template->get_var('output');
+
+            $hdrs = array(
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => $contactName . " is not authorised to initiate support calls",
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+
+        }
+
+        $template->set_file(
+            'page',
+            'NotAuthorisedContactEmail.html'
+        );
+        $toEmail = $dbeContact->getValue(DBEContact::email);
+
+        $template->setVar(
+            [
+                "contactFirstName" => $dbeContact->getValue(DBEContact::firstName)
+            ]
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => "Not authorised to initiate support",
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+
+
         return true;
     }
 
