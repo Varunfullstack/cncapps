@@ -4134,7 +4134,7 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue('linkedSalesOrderID')
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
-                'problemHistoryLink'           => '| ' . $this->getProblemHistoryLink(
+                'problemHistoryLink'           => $this->getProblemHistoryLink(
                         $dsCallActivity->getValue('problemID')
                     ),
                 'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
