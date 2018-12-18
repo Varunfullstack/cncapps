@@ -24,6 +24,7 @@ class CTHome extends CTCNC
     const GetDetailedChartsDataAction = "getDetailedChartsData";
     const getFirstTimeFixData = "getFirstTimeFixData";
     const getFixedAndReopenData = "getFixedAndReopenData";
+    const getUpcomingVisitsData = "getUpcomingVisitsData";
 
     private $dsHeader = '';
     private $buUser;
@@ -105,6 +106,10 @@ class CTHome extends CTCNC
             case self::getFixedAndReopenData:
                 echo $this->getFixedAndReopenData();
                 break;
+
+            case self::getUpcomingVisitsData:
+                echo $this->getUpcomingVisitsData();
+                break;
             default:
                 $this->display();
                 break;
@@ -136,10 +141,13 @@ class CTHome extends CTCNC
         /*
         Otherwise display other sections based upon group membership
         */
+        $this->displayUpcomingVisits();
+
 
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
             $this->displaySalesFigures();
         }
+
 
         $this->displayProjects();
 
@@ -432,8 +440,8 @@ class CTHome extends CTCNC
             $historyPopupURL = $this->buildLink(
                 'Project.php',
                 array(
-                    'action'    => 'historyPopup',
-                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                    'action'  => 'historyPopup',
+                    'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
 
@@ -1249,5 +1257,41 @@ class CTHome extends CTCNC
 
         return $db->Record['firstTimeFix'];
     }
+
+    private function getUpcomingVisitsData()
+    {
+        global $db;
+        $db->query("select upcomingVisitsData from homeData limit 1");
+
+        $db->next_record(MYSQLI_ASSOC);
+
+        return $db->Record['upcomingVisitsData'];
+    }
+
+    private function displayUpcomingVisits()
+    {
+        $this->setTemplateFiles(
+            'upcomingVisits',
+            'upcomingVisits'
+        );
+
+        $this->template->set_var(
+            [
+                "upcomingVisitsFetchDataURL" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action' => self::getUpcomingVisitsData
+                    ]
+                )
+            ]
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'upcomingVisits',
+            true
+        );
+    }
+
 }// end of class
 ?>

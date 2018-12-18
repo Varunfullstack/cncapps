@@ -22,6 +22,7 @@ This project changes will be shown here.
 ### Added
 - Issue 392 - Customer Meeting Review Frequency Change
 - Issue 364 - Improve Items Not Received v3
+- Issue 382 - Upcoming visits dashboard on the home page
 
 ## [v1.14.5] - 2018-12-11
 ### Changed
