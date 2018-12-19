@@ -4290,6 +4290,9 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue('customerID')
                 ),
+                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                    $dsCallActivity->getValue(DBECallActivity::contactID)
+                ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
                     $dsCallActivity->getValue('linkedSalesOrderID')
@@ -6971,7 +6974,7 @@ class CTActivity extends CTCNC
                     'htmlFmt'   => CT_HTML_FMT_POPUP
                 )
             );
-        return '| <a href="#" title="Contact History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact History</a>';
+        return '| <a href="#" title="Contact SR History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact SR History</a>';
     }
 }
 
