@@ -740,6 +740,7 @@ WHERE customer.`cus_referred` <> 'Y'
                     $file,
                     $header
                 );
+                $count = 0;
             }
             $data = [
                 $db->Record['firstName'],
