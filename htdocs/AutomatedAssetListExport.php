@@ -147,6 +147,11 @@ ORDER BY clients.name,
     echo '<div>Getting Labtech Data for Customer: ' . $db->Record['cus_custno'] . ' - ' . $db->Record['cus_name'] . '</div>';
     $statement = $labtechDB->prepare($query);
     $test = $statement->execute([$db->Record['cus_custno']]);
+    if (!$test) {
+        echo '<div>Something went wrong...' . $statement->errorInfo() . ' </div>';
+
+        return;
+    }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
     if (count($data)) {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
