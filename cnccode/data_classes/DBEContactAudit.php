@@ -26,6 +26,7 @@ class DBEContactAudit extends DBEContact
     {
         parent::__construct($owner);
         $this->setTableName("contactauditlog");
+        $this->setAddColumnsOn();
         $this->addColumn(
             self::action,
             DA_STRING,

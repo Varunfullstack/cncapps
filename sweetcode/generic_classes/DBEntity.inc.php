@@ -773,6 +773,16 @@ class DBEntity extends DataAccess
         return $arrayRow;
     }
 
+    function getRowAsAssocArray()
+    {
+        $this->setMethodName("getRowAsArrayAssoc");
+        $arrayRow = array();
+        for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
+            $arrayRow[$this->colName[$ixCol]] = $this->getValue($ixCol);
+        }
+        return $arrayRow;
+    }
+
     /**
      * Delete all rows in the dataset
      * @access private
