@@ -736,10 +736,15 @@ WHERE customer.`cus_referred` <> 'Y'
                     $files[count($files) - 1],
                     'w'
                 );
-                fputcsv(
+                $str = implode(
+                        ",",
+                        $header
+                    ) . "\n";
+                fwrite(
                     $file,
-                    $header
+                    $str
                 );
+
                 $count = 0;
             }
             $data = [
@@ -786,12 +791,13 @@ WHERE customer.`cus_referred` <> 'Y'
                 null,
                 null
             ];
-
-            fputcsv(
-                $file,
-                $data,
+            $str = implode(
                 ',',
-                ""
+                $data
+            );
+            fwrite(
+                $file,
+                $str
             );
             $count++;
         };
