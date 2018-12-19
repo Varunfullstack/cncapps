@@ -1475,17 +1475,26 @@ ORDER BY cus_name ASC  ";
         $this->setMethodName('displaySpecialAttentionCustomers');
 
         $this->setPageTitle("Special Attention Customers");
+        global $cfg;
+        $customerTemplate = new Template (
+            $cfg["path_templates"],
+            "remove"
+        );
 
+        $this->setTemplateFiles(
+            'SpecialAttention',
+            'SpecialAttention'
+        );
 
         if ($this->buCustomer->getSpecialAttentionCustomers($dsCustomer)) {
 
 
-            $this->setTemplateFiles(
+            $customerTemplate->setFile(
                 'CustomerSpecialAttention',
-                'CustomerSpecialAttention.inc'
+                'CustomerSpecialAttention.inc.html'
             );
 
-            $this->template->set_block(
+            $customerTemplate->set_block(
                 'CustomerSpecialAttention',
                 'customerBlock',
                 'customers'
@@ -1503,7 +1512,7 @@ ORDER BY cus_name ASC  ";
                     );
 
 
-                $this->template->set_var(
+                $customerTemplate->set_var(
                     array(
                         'customerName'            => $dsCustomer->getValue(DBECustomer::name),
                         'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
@@ -1511,7 +1520,7 @@ ORDER BY cus_name ASC  ";
                     )
                 );
 
-                $this->template->parse(
+                $customerTemplate->parse(
                     'customers',
                     'customerBlock',
                     true
@@ -1519,27 +1528,38 @@ ORDER BY cus_name ASC  ";
 
             }
 
-            $this->template->parse(
-                'CONTENTS',
+            $customerTemplate->parse(
+                'OUTPUT',
                 'CustomerSpecialAttention',
                 true
             );
 
         } else {
 
-            $this->setTemplateFiles(
+            $customerTemplate->setFile(
                 'SimpleMessage',
-                'SimpleMessage.inc'
+                'SimpleMessage.inc.html'
             );
 
-            $this->template->set_var(array('message' => 'There are no special attention customers'));
+            $customerTemplate->set_var(array('message' => 'There are no special attention customers'));
 
-            $this->template->parse(
-                'CONTENTS',
+            $customerTemplate->parse(
+                'OUTPUT',
                 'SimpleMessage',
                 true
             );
         }
+
+        $this->template->setVar(
+            [
+                "customerSpecialAttention" => $customerTemplate->getVar('OUTPUT')
+            ]
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'SpecialAttention'
+        );
 
         $this->parsePage();
 

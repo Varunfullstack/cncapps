@@ -1247,7 +1247,8 @@ class BUActivity extends Business
             $slaResponseHours =
                 $this->getSlaResponseHours(
                     $dbeProblem->getValue(DBEJProblem::priority),
-                    $dbeProblem->getValue(DBEJProblem::customerID)
+                    $dbeProblem->getValue(DBEJProblem::customerID),
+                    $dbeCallActivity->getValue(DBECallActivity::contactID)
                 );
 
             $dbeProblem->setValue(
@@ -1310,9 +1311,19 @@ class BUActivity extends Business
                 $dbeProblem->getValue(DBEJProblem::customerID),
                 $dsCustomer
             );
+            $dbeContact = null;
+            if ($dsCallActivity->getValue(DBEJCallActivity::contactID)) {
+                $dbeContact = new DBEContact($this);
+                $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
+            }
+
+
             if (
-                $dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
+                ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                    $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+                        'Y-m-d'
+                    )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')
+
             ) {
                 $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
             }
@@ -5143,7 +5154,8 @@ is currently a balance of ';
 
         $slaResponseHours = $this->getSlaResponseHours(
             $_SESSION [$sessionKey] ['priority'],
-            $_SESSION [$sessionKey] ['customerID']
+            $_SESSION [$sessionKey] ['customerID'],
+            $_SESSION [$sessionKey] ['contactID']
         );
 
         /*
@@ -5341,6 +5353,11 @@ is currently a balance of ';
 //            $this->sendServiceReAddedEmail($dbeProblem->getPKValue(), $record['caa_problemno']);
 //            $resultSet->close();
 //        }
+        $dbeContact = null;
+        if ($dsCallActivity->getValue(DBEJCallActivity::contactID)) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
+        }
 
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
@@ -5349,8 +5366,10 @@ is currently a balance of ';
             $dsCustomer
         );
 
-        if ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-            $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')) {
+        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+                    'Y-m-d'
+                )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
 
@@ -6265,9 +6284,21 @@ is currently a balance of ';
             $dbeProblem->getValue(DBEJProblem::customerID),
             $dsCustomer
         );
+
+
+        $dbeContact = null;
+        if ($dbeCallActivity->getValue(DBECallActivity::contactID)) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($dbeCallActivity->getValue(DBECallActivity::contactID));
+        }
+
         if (
-            $dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-            $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
+            ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d'))
+            ||
+            (
+                $dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y'
+            )
         ) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
@@ -6661,7 +6692,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $dsInput->getValue('serviceRequestPriority'),
-                $dsOrdhead->getValue(DBEOrdhead::customerID)
+                $dsOrdhead->getValue(DBEOrdhead::customerID),
+                $dsOrdhead->getValue(DBEOrdhead::delContactID)
             );
 
         $dbeProblem = new DBEProblem($this);
@@ -7485,7 +7517,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $record['priority'],
-                $customerID
+                $customerID,
+                $contact['contactID']
             );
 
         /*
@@ -8954,7 +8987,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $dbeJCallActivity->getValue(DBEJCallActivity::priority),
-                $dbeJCallActivity->getValue(DBEJCallActivity::customerID)
+                $dbeJCallActivity->getValue(DBEJCallActivity::customerID),
+                $dbeJCallActivity->getValue(DBEJCallActivity::contactID)
             );
 
         if ($slaResponseHours > 0) {
@@ -8974,7 +9008,8 @@ is currently a balance of ';
     }
 
     function getSlaResponseHours($priority,
-                                 $customerID
+                                 $customerID,
+                                 $contactID = null
     )
     {
         $dbeCustomer = new DBECustomer($this);
@@ -9001,12 +9036,20 @@ is currently a balance of ';
         }
 
         $slaHours = $dbeCustomer->getValue($priorityValue);
+
+        $dbeContact = null;
+        if ($contactID) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($contactID);
+        }
+
         /*
     Special attention customers get half of normal SLA
     */
         if (
-            $dbeCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-            $dbeCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
+            ($dbeCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dbeCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')) ||
+            ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')
         ) {
             $slaHours = $slaHours / 2;
         }
@@ -9616,7 +9659,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $priority,
-                $customerID
+                $customerID,
+                $dbeContact->getValue(DBEContact::contactID)
             );
 
         if (!$callActivityID) {
