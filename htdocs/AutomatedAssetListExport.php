@@ -37,8 +37,8 @@ while ($db->next_record(MYSQLI_ASSOC)) {
   computers.name AS \"Computer Name\",
   computers.localaddress AS \"IP Address\",
    DATE_FORMAT(
-    STR_TO_DATE(computers.lastcontact, '%m/%d/%Y'),
-    '%d/%m/%Y'
+    computers.lastContact,
+    '%d/%m/%Y %H:%i:%s'
   ) AS \"Last Contact\",
   inv_chassis.productname AS \"Model\",
   if(inv_chassis.serialnumber like '%VMware%', null,inv_chassis.serialnumber )        AS \"Serial No.\",
