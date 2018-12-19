@@ -24,6 +24,7 @@ This project changes will be shown here.
 - Issue 364 - Improve Items Not Received v3
 - Issue 382 - Upcoming visits dashboard on the home page
 - Issue 346 - Automate Asset List Export
+- Issue 402 - Show recent SRs for contact
 ### Removed
 - Issue 403 - Remove extra | in menu
 

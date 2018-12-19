@@ -397,6 +397,35 @@ class DBEJProblem extends DBEProblem
         return (parent::getRows());
     }
 
+    function getProblemsByContactID($contactID)
+    {
+        $sql =
+            "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
+            " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            ) 
+           LEFT JOIN consultant ON cns_consno = pro_consno
+        WHERE
+          initial.caa_contno = " . $contactID . " and pro_date_raised >= date(now() - interval 3 month) 
+         ";
+
+        $sql .= " ORDER BY pro_date_raised DESC";              // in progress
+        $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
     public function getP1byCustomerIdLast30Days($customerID)
     {
         $sql =
