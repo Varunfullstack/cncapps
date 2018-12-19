@@ -316,7 +316,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'customerNameDisplayClass'
                                                  => $this->getCustomerNameDisplayClass(
                         $problems->getValue('specialAttentionFlag'),
-                        $problems->getValue('specialAttentionEndDate')
+                        $problems->getValue('specialAttentionEndDate'),
+                        $problems->getValue(DBEJProblem::specialAttentionContactFlag)
                     ),
                     'urlViewActivity'            => $urlViewActivity,
                     'slaResponseHours'           => number_format(

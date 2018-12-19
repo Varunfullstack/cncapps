@@ -1164,6 +1164,7 @@ class CTCurrentActivityReport extends CTCNC
                 1
             );
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
+
             $this->template->set_var(
 
                 array(
@@ -1195,10 +1196,10 @@ class CTCurrentActivityReport extends CTCNC
                     ),
                     'engineerName'               => $dsResults->getValue('engineerName'),
                     'customerName'               => $dsResults->getValue('customerName'),
-                    'customerNameDisplayClass'
-                                                 => $this->getCustomerNameDisplayClass(
+                    'customerNameDisplayClass'   => $this->getCustomerNameDisplayClass(
                         $dsResults->getValue('specialAttentionFlag'),
-                        $dsResults->getValue('specialAttentionEndDate')
+                        $dsResults->getValue('specialAttentionEndDate'),
+                        $dsResults->getValue(DBEJProblem::specialAttentionContactFlag)
                     ),
                     'urlViewActivity'            => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
@@ -1390,7 +1391,8 @@ class CTCurrentActivityReport extends CTCNC
     }
 
     function getCustomerNameDisplayClass($specialAttentionFlag,
-                                         $specialAttentionEndDate
+                                         $specialAttentionEndDate,
+                                         $specialAttentionContactFlag
     )
     {
         if (
@@ -1399,6 +1401,11 @@ class CTCurrentActivityReport extends CTCNC
         ) {
             return 'class="specialAttentionCustomer"';
         }
+
+        if ($specialAttentionContactFlag == 'Y') {
+            return 'class="specialAttentionContact"';
+        }
+
         return null;
     }
 
