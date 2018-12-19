@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+## Added
+- Issue 369 - Allow a contact to be special attention
+
 ## [v1.14.5] - 2018-12-11
 ### Changed
 - Show employee's start date in DD-MM-YYYY format
