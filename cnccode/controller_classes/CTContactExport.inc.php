@@ -743,16 +743,44 @@ WHERE customer.`cus_referred` <> 'Y'
                 $count = 0;
             }
             $data = [
-                $db->Record['firstName'],
-                $db->Record['lastName'],
-                $db->Record['company'],
-                $db->Record['mobile'],
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['firstName']
+                ),
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['lastName']
+                ),
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['company']
+                ),
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['mobile']
+                ),
                 null,
                 null,
                 null,
-                $db->Record['business'],
-                $db->Record['business2'],
-                $db->Record['email'],
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['business']
+                ),
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['business2']
+                ),
+                str_replace(
+                    ',',
+                    '',
+                    $db->Record['email']
+                ),
                 null,
                 null,
                 null,
