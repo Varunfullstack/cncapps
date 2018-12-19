@@ -746,6 +746,21 @@ class DBEContact extends DBCNCEntity
 
         return parent::deleteRow($pkValue);
     }
+
+    public function getSpecialAttentionCustomers()
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where specialAttentionContactFlag = 'Y'
+      ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
 }
 
 ?>

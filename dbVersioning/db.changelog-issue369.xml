@@ -16,4 +16,14 @@
             <column name="specialAttentionContactFlag" type="char(1)" defaultValue="N"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue369-1531213570-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="specialAttentionContactFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="specialAttentionContactFlag" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
