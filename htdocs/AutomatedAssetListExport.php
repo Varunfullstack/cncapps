@@ -156,6 +156,7 @@ ORDER BY clients.name,
     if (count($data)) {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet();
         $keys = array_keys($data[0]);
         $sheet->fromArray($keys);
