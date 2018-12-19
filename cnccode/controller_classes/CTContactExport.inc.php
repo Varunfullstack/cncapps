@@ -750,22 +750,22 @@ WHERE customer.`cus_referred` <> 'Y'
             $data = [
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['firstName']
                 ),
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['lastName']
                 ),
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['company']
                 ),
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['mobile']
                 ),
                 null,
@@ -773,17 +773,17 @@ WHERE customer.`cus_referred` <> 'Y'
                 null,
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['business']
                 ),
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['business2']
                 ),
                 str_replace(
                     ',',
-                    '',
+                    ' ',
                     $db->Record['email']
                 ),
                 null,
@@ -794,7 +794,7 @@ WHERE customer.`cus_referred` <> 'Y'
             $str = implode(
                 ',',
                 $data
-            );
+            )."\n";
             fwrite(
                 $file,
                 $str
