@@ -181,10 +181,15 @@ ORDER BY clients.name,
         }
 
         $fileName = $folderName . "Current Asset List Extract.xlsx";
-        $writer->save(
-            $fileName
-        );
-        echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
+        try {
+            $writer->save(
+                $fileName
+            );
+
+            echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
+        } catch (\Exception $exception) {
+            echo '<div>Failed to save file, possibly file open</div>';
+        }
 
     } else {
         echo '<div>No Data was found</div>';
