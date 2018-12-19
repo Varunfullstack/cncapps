@@ -761,7 +761,9 @@ WHERE customer.`cus_referred` <> 'Y'
 
             fputcsv(
                 $file,
-                $data
+                $data,
+                ',',
+                ""
             );
             $count++;
         };
