@@ -635,7 +635,7 @@ class DBEJProblem extends DBEProblem
 
                     $sql .= ' and ' . $this->getDBColumnName(
                             self::status
-                        ) . ' = "I" order by hoursRemaining desc';
+                        ) . ' = "I" and initial.caa_date < date(NOW() + interval 1  day) order by hoursRemaining desc';
                     break;
                 }
 
