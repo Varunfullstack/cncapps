@@ -517,6 +517,8 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
+
+
     /**
      * all rows for given supplier
      */
