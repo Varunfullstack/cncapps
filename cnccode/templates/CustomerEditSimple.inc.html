@@ -1,7 +1,8 @@
 <!-- Template: CustomerEdit.inc.html -->
 <script language='JavaScript'
         src='.javascript/ajax.js'
-></script>
+>
+</script>
 <script type="text/JavaScript">
 
     $(function () {
@@ -42,13 +43,11 @@
                 var range = elem.createTextRange();
                 range.move('character', caretPos);
                 range.select();
-            }
-            else {
+            } else {
                 if (elem.selectionStart) {
                     elem.focus();
                     elem.setSelectionRange(caretPos, caretPos);
-                }
-                else
+                } else
                     elem.focus();
             }
         }
@@ -278,7 +277,8 @@
 />
 <script language='JavaScript'
         src='popcalendar/popcalendar.js'
-></script>
+>
+</script>
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}"
    onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)"
@@ -304,40 +304,34 @@
            size="10"
            maxlength="10"
     >
-    <input
-            name="form[customer][{customerID}][gscTopUpAmount]"
-            type="hidden"
-            value="{gscTopUpAmount}"
+    <input name="form[customer][{customerID}][gscTopUpAmount]"
+           type="hidden"
+           value="{gscTopUpAmount}"
     >
-    <input
-            name="customerNoteID"
-            id="customerNoteID"
-            type="hidden"
-            value="{customerNoteID}"
+    <input name="customerNoteID"
+           id="customerNoteID"
+           type="hidden"
+           value="{customerNoteID}"
     >
-    <input
-            name="customerNoteOrdheadID"
-            id="customerNoteOrdheadID"
-            type="hidden"
-            value="{customerNoteOrdheadID}"
+    <input name="customerNoteOrdheadID"
+           id="customerNoteOrdheadID"
+           type="hidden"
+           value="{customerNoteOrdheadID}"
     >
-    <input
-            name="customerNoteCreated"
-            id="customerNoteCreated"
-            type="hidden"
-            value="{customerNoteCreated}"
+    <input name="customerNoteCreated"
+           id="customerNoteCreated"
+           type="hidden"
+           value="{customerNoteCreated}"
     >
-    <input
-            name="customerNoteModified"
-            id="customerNoteModified"
-            type="hidden"
-            value="{customerNoteModified}"
+    <input name="customerNoteModified"
+           id="customerNoteModified"
+           type="hidden"
+           value="{customerNoteModified}"
     >
-    <input
-            name="form[customer][{customerID}][reviewMeetingEmailSentFlag]"
-            id="reviewMeetingEmailSentFlag"
-            type="hidden"
-            value="{reviewMeetingEmailSentFlag}"
+    <input name="form[customer][{customerID}][reviewMeetingEmailSentFlag]"
+           id="reviewMeetingEmailSentFlag"
+           type="hidden"
+           value="{reviewMeetingEmailSentFlag}"
     >
 
     <input {disabled}
@@ -391,13 +385,12 @@
                     >Customer {customerID}
                     </td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                name="form[customer][{customerID}][name]"
-                                type="text"
-                                value="{customerName}"
-                                size="50"
-                                maxlength="50"
+                        <input {disabled}
+                               name="form[customer][{customerID}][name]"
+                               type="text"
+                               value="{customerName}"
+                               size="50"
+                               maxlength="50"
                         >
                     </td>
 
@@ -410,7 +403,8 @@
                                name="form[customer][{customerID}][mailshotFlag]"
                                value="Y"
                                {mailshotFlagChecked}
-                        ></td>
+                        >
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Referred</td>
@@ -420,7 +414,8 @@
                                name="form[customer][{customerID}][referredFlag]"
                                value="Y"
                                {referredFlagChecked}
-                        /></td>
+                        />
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Special Attention</td>
@@ -432,16 +427,15 @@
                                {specialAttentionFlagChecked}
                         />
                         until
-                        <input
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][specialAttentionEndDate]"
-                                id="specialAttentionEndDate"
-                                value="{specialAttentionEndDate}"
-                                size="10"
-                                maxlength="10"
-                                autocomplete="off"
-                                class="jQueryCalendar"
+                        <input {disabled}
+                               type="text"
+                               name="form[customer][{customerID}][specialAttentionEndDate]"
+                               id="specialAttentionEndDate"
+                               value="{specialAttentionEndDate}"
+                               size="10"
+                               maxlength="10"
+                               autocomplete="off"
+                               class="jQueryCalendar"
                         >
                         <span class="formErrorMessage">{specialAttentionEndDateMessage}</span>
                     </td>
@@ -449,16 +443,15 @@
                 <tr>
                     <td class="content">Last Review Meeting</td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][lastReviewMeetingDate]"
-                                id="lastReviewMeetingDate"
-                                value="{lastReviewMeetingDate}"
-                                size="10"
-                                maxlength="10"
-                                autocomplete="off"
-                                class="jQueryCalendar"
+                        <input {disabled}
+                               type="text"
+                               name="form[customer][{customerID}][lastReviewMeetingDate]"
+                               id="lastReviewMeetingDate"
+                               value="{lastReviewMeetingDate}"
+                               size="10"
+                               maxlength="10"
+                               autocomplete="off"
+                               class="jQueryCalendar"
                         >
                         Frequency
                         <select {disabled}
@@ -528,7 +521,8 @@
                                name="form[customer][{customerID}][autoCloseEmailMainFlag]"
                                value="Y"
                                {autoCloseEmailMainFlagChecked}
-                        ></td>
+                        >
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">24 Hour Cover</td>
@@ -538,7 +532,8 @@
                                name="form[customer][{customerID}][support24HourFlag]"
                                value="Y"
                                {support24HourFlagChecked}
-                        ></td>
+                        >
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Type</td>
@@ -552,7 +547,8 @@
                             >{customerTypeDescription}
                             </option>
                             <!-- END customerTypeBlock -->
-                        </select></td>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Sector</td>
@@ -567,7 +563,9 @@
                             >{sectorDescription}
                             </option>
                             <!-- END sectorBlock -->
-                        </select><span class="formErrorMessage">{SectorMessage}</span></td>
+                        </select>
+                        <span class="formErrorMessage">{SectorMessage}</span>
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">PCs</td>
@@ -582,120 +580,118 @@
                             >{noOfPCsValue}
                             </option>
                             <!-- END noOfPCsBlock -->
-                        </select></td>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Servers</td>
                     <td class="content">
-                        <input
-                                name="form[customer][{customerID}][noOfServers]"
-                                type="text"
-                                value="{noOfServers}"
-                                size="10"
-                                maxlength="10"
-                                {disabled}
-                        ></td>
+                        <input name="form[customer][{customerID}][noOfServers]"
+                               type="text"
+                               value="{noOfServers}"
+                               size="10"
+                               maxlength="10"
+                               {disabled}
+                        >
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Reg</td>
-                    <td class="content"><input
-                            name="form[customer][{customerID}][regNo]"
-                            type="text"
-                            value="{regNo}"
-                            size="10"
-                            maxlength="10"
-                            {disabled}
-                    ></td>
+                    <td class="content">
+                        <input name="form[customer][{customerID}][regNo]"
+                               type="text"
+                               value="{regNo}"
+                               size="10"
+                               maxlength="10"
+                               {disabled}
+                        >
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Sites</td>
-                    <td class="content"><input
-                            {disabled}
-                            name="form[customer][{customerID}][noOfSites]"
-                            type="text"
-                            value="{noOfSites}"
-                            size="2"
-                            maxlength="2"
-                    ></td>
+                    <td class="content">
+                        <input {disabled}
+                               name="form[customer][{customerID}][noOfSites]"
+                               type="text"
+                               value="{noOfSites}"
+                               size="2"
+                               maxlength="2"
+                        >
+                    </td>
                 </tr>
                 <tr>
                     <td class='content'>Pre-pay Top Up</td>
-                    <td class='content'><input
-                            name="form[customer][{customerID}][gscTopUpAmount]"
-                            type="text"
-                            value="{gscTopUpAmount}"
-                            size="10"
-                            maxlength="10"
-                            {disabled}
-                    >
+                    <td class='content'>
+                        <input name="form[customer][{customerID}][gscTopUpAmount]"
+                               type="text"
+                               value="{gscTopUpAmount}"
+                               size="10"
+                               maxlength="10"
+                               {disabled}
+                        >
                     </td>
                 </tr>
                 <tr>
                     <td class='content'>Became Customer</td>
-                    <td class='content'><input
-                            name="form[customer][{customerID}][becameCustomerDate]"
-                            type="text"
-                            value="{becameCustomerDate}"
-                            size="10"
-                            maxlength="10"
-                            {disabled}
-                    >
+                    <td class='content'>
+                        <input name="form[customer][{customerID}][becameCustomerDate]"
+                               type="text"
+                               value="{becameCustomerDate}"
+                               size="10"
+                               maxlength="10"
+                               {disabled}
+                        >
                     </td>
                 </tr>
                 <tr>
                     <td class='content'>Dropped Date</td>
-                    <td class='content'><input
-                            name="form[customer][{customerID}][droppedCustomerDate]"
-                            type="text"
-                            value="{droppedCustomerDate}"
-                            size="10"
-                            maxlength="10"
-                            {disabled}
-                    >
+                    <td class='content'>
+                        <input name="form[customer][{customerID}][droppedCustomerDate]"
+                               type="text"
+                               value="{droppedCustomerDate}"
+                               size="10"
+                               maxlength="10"
+                               {disabled}
+                        >
                     </td>
                 </tr>
                 <tr>
                     <td class="content">SLA Response Hours</td>
                     <td class="content">
-                        1<input
-                            name="form[customer][{customerID}][slaP1]"
-                            type="text"
-                            value="{slaP1}"
-                            size="1"
-                            maxlength="3"
-                            {disabled}
+                        1<input name="form[customer][{customerID}][slaP1]"
+                                type="text"
+                                value="{slaP1}"
+                                size="1"
+                                maxlength="3"
+                                {disabled}
                     >
-                        2<input
-                            name="form[customer][{customerID}][slaP2]"
-                            type="text"
-                            value="{slaP2}"
-                            size="1"
-                            maxlength="3"
-                            {disabled}
+                        2<input name="form[customer][{customerID}][slaP2]"
+                                type="text"
+                                value="{slaP2}"
+                                size="1"
+                                maxlength="3"
+                                {disabled}
                     >
-                        3<input
-                            name="form[customer][{customerID}][slaP3]"
-                            type="text"
-                            value="{slaP3}"
-                            size="1"
-                            maxlength="3"
-                            {disabled}
+                        3<input name="form[customer][{customerID}][slaP3]"
+                                type="text"
+                                value="{slaP3}"
+                                size="1"
+                                maxlength="3"
+                                {disabled}
                     >
-                        4<input
-                            name="form[customer][{customerID}][slaP4]"
-                            type="text"
-                            value="{slaP4}"
-                            size="1"
-                            maxlength="3"
-                            {disabled}
+                        4<input name="form[customer][{customerID}][slaP4]"
+                                type="text"
+                                value="{slaP4}"
+                                size="1"
+                                maxlength="3"
+                                {disabled}
                     >
-                        5<input
-                            name="form[customer][{customerID}][slaP5]"
-                            type="text"
-                            value="{slaP5}"
-                            size="1"
-                            maxlength="3"
-                            {disabled}
+                        5<input name="form[customer][{customerID}][slaP5]"
+                                type="text"
+                                value="{slaP5}"
+                                size="1"
+                                maxlength="3"
+                                {disabled}
                     >
                     </td>
                 </tr>
@@ -713,14 +709,13 @@
                 <tr>
                     <td class="content">Technical Notes</td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][techNotes]"
-                                id="techNotes"
-                                value="{techNotes}"
-                                size="54"
-                                maxlength="100"
+                        <input {disabled}
+                               type="text"
+                               name="form[customer][{customerID}][techNotes]"
+                               id="techNotes"
+                               value="{techNotes}"
+                               size="54"
+                               maxlength="100"
                         >
                     </td>
                 </tr>
@@ -822,7 +817,9 @@
                     <td class="content">
                         <button type="button"
                                 onclick="editEncrypted('sortCode',this)"
-                        ><i class="fa fa-pencil {sortCodePencilColor}"></i>
+                        >
+                            <i class="fa fa-pencil {sortCodePencilColor}">
+                            </i>
                         </button>
                         <input type="hidden"
                                name="form[customer][{customerID}][sortCode]"
@@ -849,7 +846,9 @@
                     <td class="content">
                         <button type="button"
                                 onclick="editEncrypted('accountNumber',this)"
-                        ><i class="fa fa-pencil {accountNumberPencilColor}"></i>
+                        >
+                            <i class="fa fa-pencil {accountNumberPencilColor}">
+                            </i>
                         </button>
                         <input type="hidden"
                                name="form[customer][{customerID}][accountNumber]"
@@ -867,24 +866,22 @@
 
             <div class="customerReviewTime">
                 To be reviewed on
-                <input
-                        {disabled}
-                        type="text"
-                        name="form[customer][{customerID}][reviewDate]"
-                        id="reviewDate"
-                        value="{reviewDate}"
-                        size="10"
-                        maxlength="10"
-                        autocomplete="off"
-                        class="jQueryCalendar"
+                <input {disabled}
+                       type="text"
+                       name="form[customer][{customerID}][reviewDate]"
+                       id="reviewDate"
+                       value="{reviewDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                       class="jQueryCalendar"
                 >
                 Time
-                <input
-                        {disabled}
-                        name="form[customer][{customerID}][reviewTime]"
-                        value="{reviewTime}"
-                        size="5"
-                        maxlength="5"
+                <input {disabled}
+                       name="form[customer][{customerID}][reviewTime]"
+                       value="{reviewTime}"
+                       size="5"
+                       maxlength="5"
                 >
                 <span class="formErrorMessage">{reviewTimeMessage}</span>By
                 <select
@@ -918,7 +915,8 @@
                 readonly="readonly"
                 {disabled}
                 id="customerNoteHistory"
-        ></textarea>
+        >
+</textarea>
             </div>
 
             <div class="customerNoteNav">
@@ -928,7 +926,8 @@
                         aria-hidden="true"
                         onclick="loadNote('first')"
                 >
-                    <i class="fa fa-step-backward"></i> First
+                    <i class="fa fa-step-backward">
+                    </i> First
                 </button>
                 <button {disabled}
                         type="button"
@@ -937,7 +936,8 @@
                 >
                     <i class="fa fa-backward"
                        aria-hidden="true"
-                    ></i> Back
+                    >
+                    </i> Back
                 </button>
                 <button {disabled}
                         type="button"
@@ -946,7 +946,8 @@
                 >
                     Next <i class="fa fa-forward"
                             aria-hidden="true"
-                ></i>
+                >
+                </i>
                 </button>
                 <button {disabled}
                         type="button"
@@ -955,7 +956,8 @@
                 >
                     Last <i class="fa fa-step-forward"
                             aria-hidden="true"
-                ></i>
+                >
+                </i>
                 </button>
                 <button {disabled}
                         type="button"
@@ -964,7 +966,8 @@
                 >
                     <i class="fa fa-trash"
                        aria-hidden="true"
-                    ></i>
+                    >
+                    </i>
                     Delete
                 </button>
                 <button {disabled}
@@ -974,7 +977,8 @@
                 >
                     <i class="fa fa-plus-circle"
                        aria-hidden="true"
-                    ></i>
+                    >
+                    </i>
                     New
                 </button>
                 <button {disabled}
@@ -984,13 +988,15 @@
                 >
                     <i class="fa fa-floppy-o"
                        aria-hidden="true"
-                    ></i>
+                    >
+                    </i>
                     Save
                 </button>
                 {customerNotePopupLink}
             </div>
 
-            <div id="customerNoteModifiedText"></div>
+            <div id="customerNoteModifiedText">
+            </div>
 
             <div class="customerNoteDetails">
         <textarea
@@ -1039,7 +1045,8 @@
                 <td class="content">{expiryDate}</td>
                 <td width="68%"
                     class="content"
-                ><A href="{editProjectLink}">edit</A> <A href="{deleteProjectLink}">{deleteProjectText}</A>
+                >
+                    <A href="{editProjectLink}">edit</A> <A href="{deleteProjectLink}">{deleteProjectText}</A>
                 </td>
             </tr>
             <!-- END projectBlock -->
@@ -1070,14 +1077,18 @@
             >
                 <td class="content"
                     nowrap="nowrap"
-                ><A href="{urlViewFile}"
-                    title="View attached document"
-                >{description}</A></td>
+                >
+                    <A href="{urlViewFile}"
+                       title="View attached document"
+                    >{description}</A>
+                </td>
                 <td class="content"
                     nowrap="nowrap"
-                ><A href="{urlViewFile}"
-                    title="View attached document"
-                >{filename}</A></td>
+                >
+                    <A href="{urlViewFile}"
+                       title="View attached document"
+                    >{filename}</A>
+                </td>
                 <td class="content"
                     nowrap="nowrap"
                 >{startersFormFlag}
@@ -1090,7 +1101,9 @@
                     nowrap="nowrap"
                 >{mainContactOnlyFlag}
                 </td>
-                <td class="content"><A href="{urlEditDocument}">edit</A></td>
+                <td class="content">
+                    <A href="{urlEditDocument}">edit</A>
+                </td>
                 <td class="content">
                     <A href="{urlDeleteDocument}"
                        title="Delete attached document"
@@ -1107,12 +1120,11 @@
             </div>
             <!-- BEGIN siteBlock -->
             <DIV class="site">
-                <input
-                        type="hidden"
-                        name="form[site][{customerID}{siteNo}][sageRef]"
-                        value="{sageRef}"
-                        size="3"
-                        maxlength="6"
+                <input type="hidden"
+                       name="form[site][{customerID}{siteNo}][sageRef]"
+                       value="{sageRef}"
+                       size="3"
+                       maxlength="6"
                 >
                 <input type="hidden"
                        name="form[site][{customerID}{siteNo}][siteNo]"
@@ -1148,89 +1160,91 @@
                         <td class="content"
                             width="87%"
                         >
-                            <input
-                                    {disabled}
-                                    name="form[site][{customerID}{siteNo}][add1]"
-                                    value="{add1}"
-                                    size="35"
-                                    maxlength="35"
-                            ></td>
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][add1]"
+                                   value="{add1}"
+                                   size="35"
+                                   maxlength="35"
+                            >
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">&nbsp;</td>
                         <td class="content">
-                            <input
-                                    {disabled}
-                                    name="form[site][{customerID}{siteNo}][add2]"
-                                    value="{add2}"
-                                    size="35"
-                                    maxlength="35"
-                            ></td>
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][add2]"
+                                   value="{add2}"
+                                   size="35"
+                                   maxlength="35"
+                            >
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">&nbsp;</td>
-                        <td class="content"><input
-                                {disabled}
-                                name="form[site][{customerID}{siteNo}][add3]"
-                                value="{add3}"
-                                size="35"
-                                maxlength="35"
-                        /></td>
+                        <td class="content">
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][add3]"
+                                   value="{add3}"
+                                   size="35"
+                                   maxlength="35"
+                            />
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Town</td>
                         <td class="content">
-                            <input
-                                    {disabled}
-                                    name="form[site][{customerID}{siteNo}][town]"
-                                    value="{town}"
-                                    size="25"
-                                    maxlength="25"
-                            ></td>
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][town]"
+                                   value="{town}"
+                                   size="25"
+                                   maxlength="25"
+                            >
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">County</td>
                         <td class="content">
-                            <input
-                                    {disabled}
-                                    name="form[site][{customerID}{siteNo}][county]"
-                                    value="{county}"
-                                    size="25"
-                                    maxlength="25"
-                            ></td>
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][county]"
+                                   value="{county}"
+                                   size="25"
+                                   maxlength="25"
+                            >
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Postcode</td>
                         <td class="content">
-                            <input
-                                    {disabled}
-                                    name="form[site][{customerID}{siteNo}][postcode]"
-                                    value="{postcode}"
-                                    size="15"
-                                    maxlength="15"
-                            ></td>
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][postcode]"
+                                   value="{postcode}"
+                                   size="15"
+                                   maxlength="15"
+                            >
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Phone</td>
                         <td class="content">
-                            <input
-                                    {disabled}
-                                    name="form[site][{customerID}{siteNo}][phone]"
-                                    value="{sitePhone}"
-                                    size="20"
-                                    maxlength="20"
-                            ></td>
+                            <input {disabled}
+                                   name="form[site][{customerID}{siteNo}][phone]"
+                                   value="{sitePhone}"
+                                   size="20"
+                                   maxlength="20"
+                            >
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Max Travel Hours</td>
-                        <td class="content"><input
-                                name="form[site][{customerID}{siteNo}][maxTravelHours]"
-                                id="form[site][{customerID}{siteNo}][maxTravelHours]"
-                                value="{maxTravelHours}"
-                                size="5"
-                                maxlength="5"
-                                {disabled}
-                        /></td>
+                        <td class="content">
+                            <input name="form[site][{customerID}{siteNo}][maxTravelHours]"
+                                   id="form[site][{customerID}{siteNo}][maxTravelHours]"
+                                   value="{maxTravelHours}"
+                                   size="5"
+                                   maxlength="5"
+                                   {disabled}
+                            />
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Default Invoice</td>
@@ -1240,7 +1254,8 @@
                                    name="form[customer][{customerID}][invoiceSiteNo]"
                                    value="{siteNo}"
                                    {invoiceSiteFlagChecked}
-                            /></td>
+                            />
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Default Delivery</td>
@@ -1250,7 +1265,8 @@
                                    name="form[customer][{customerID}][deliverSiteNo]"
                                    value="{siteNo}"
                                    {deliverSiteFlagChecked}
-                            /></td>
+                            />
+                        </td>
                     </tr>
                     <tr>
                         <td class="content">Invoice Contact</td>
@@ -1362,6 +1378,7 @@
                     <td class="headerLightgrey">{mailshot11FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot10FlagDesc}</td>
+                    <td class="headerLightgrey">Special Attention</td>
                 </tr>
                 <!-- BEGIN contactBlock -->
                 <input type="hidden"
@@ -1384,10 +1401,9 @@
                        name="form[contact][{contactID}][discontinuedFlag]"
                        value="{discontinuedFlag}"
                 >
-                <input
-                        type="hidden"
-                        name="form[contact][{contactID}][mobilePhone]"
-                        value="{mobilePhone}"
+                <input type="hidden"
+                       name="form[contact][{contactID}][mobilePhone]"
+                       value="{mobilePhone}"
                 >
 
                 <tr>
@@ -1410,112 +1426,105 @@
                         </select>
                     </td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][title]"
-                                size="2"
-                                maxlength="10"
-                                value="{title}"
+                        <input {disabled}
+                               name="form[contact][{contactID}][title]"
+                               size="2"
+                               maxlength="10"
+                               value="{title}"
                         >
                     </td>
                     <td class="content"
                         class='{firstNameClass}'
                     >
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][firstName]"
-                                size="10"
-                                maxlength="50"
-                                value="{firstName}"
-                                required
+                        <input {disabled}
+                               name="form[contact][{contactID}][firstName]"
+                               size="10"
+                               maxlength="50"
+                               value="{firstName}"
+                               required
                         >
                     </td>
                     <td class="content"
                         class='{lastNameClass}'
                     >
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][lastName]"
-                                size="10"
-                                maxlength="50"
-                                value="{lastName}"
-                                required
-                        >
-                    </td>
-                    <td class="content"><input
-                            name="form[contact][{contactID}][position]"
-                            id="form[contact][{contactID}][position]"
-                            value="{position}"
-                            size="10"
-                            maxlength="20"
-                            {disabled}
-                    />
-                    </td>
-                    <td class="content">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][phone]"
-                                value="{phone}"
-                                size="10"
-                                maxlength="30"
+                        <input {disabled}
+                               name="form[contact][{contactID}][lastName]"
+                               size="10"
+                               maxlength="50"
+                               value="{lastName}"
+                               required
                         >
                     </td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][mobilePhone]"
-                                value="{mobilePhone}"
-                                size="10"
-                                maxlength="30"
+                        <input name="form[contact][{contactID}][position]"
+                               id="form[contact][{contactID}][position]"
+                               value="{position}"
+                               size="10"
+                               maxlength="20"
+                               {disabled}
+                        />
+                    </td>
+                    <td class="content">
+                        <input {disabled}
+                               name="form[contact][{contactID}][phone]"
+                               value="{phone}"
+                               size="10"
+                               maxlength="30"
                         >
                     </td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][email]"
-                                value="{email}"
-                                size="25"
-                                maxlength="50"
+                        <input {disabled}
+                               name="form[contact][{contactID}][mobilePhone]"
+                               value="{mobilePhone}"
+                               size="10"
+                               maxlength="30"
                         >
                     </td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][portalPassword]"
-                                value="{portalPassword}"
-                                size="4"
-                                maxlength="10"
+                        <input {disabled}
+                               name="form[contact][{contactID}][email]"
+                               value="{email}"
+                               size="25"
+                               maxlength="50"
                         >
                     </td>
                     <td class="content">
-                        <input
-                                {disabled}
-                                name="form[contact][{contactID}][failedLoginCount]"
-                                value="{failedLoginCount}"
-                                size="2"
-                                maxlength="5"
+                        <input {disabled}
+                               name="form[contact][{contactID}][portalPassword]"
+                               value="{portalPassword}"
+                               size="4"
+                               maxlength="10"
+                        >
+                    </td>
+                    <td class="content">
+                        <input {disabled}
+                               name="form[contact][{contactID}][failedLoginCount]"
+                               value="{failedLoginCount}"
+                               size="2"
+                               maxlength="5"
                         >
                     </td>
                     <td nowrap="nowrap"
                         class="content"
-                    ><select {disabled}
-                             name="letters_menu"
-                             onchange="MM_jumpMenu('_blank',this,0)"
                     >
-                        <option>Send Letter</option>
-                        <option value="{clientFormURL}">Appointment</option>
-                        <!-- BEGIN customLetterBlock -->
-                        <option value="{customLetterURL}">{customLetterName}</option>
-                        <!-- END customLetterBlock -->
-                    </select>
+                        <select {disabled}
+                                name="letters_menu"
+                                onchange="MM_jumpMenu('_blank',this,0)"
+                        >
+                            <option>Send Letter</option>
+                            <option value="{clientFormURL}">Appointment</option>
+                            <!-- BEGIN customLetterBlock -->
+                            <option value="{customLetterURL}">{customLetterName}</option>
+                            <!-- END customLetterBlock -->
+                        </select>
                     </td>
-                    <td class="content"><input
-                            {disabled}
-                            name="form[contact][{contactID}][notes]"
-                            size="5"
-                            maxlength="200"
-                            value="{notes}"
-                    />
+                    <td class="content">
+                        <input {disabled}
+                               name="form[contact][{contactID}][notes]"
+                               size="5"
+                               maxlength="200"
+                               value="{notes}"
+                        />
                     </td>
                     <td class="content">
                         <input {disabled}
@@ -1640,6 +1649,14 @@
                                class="contactMain"
                         />
                     </td>
+                    <td class="content">
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][specialAttentionContactFlag]"
+                               value="Y"
+                               {specialAttentionContactFlagChecked}
+                        >
+                    </td>
                 </tr>
                 <!-- END contactBlock -->
             </table>
@@ -1687,13 +1704,17 @@
         </tr>
         <!-- BEGIN orderBlock -->
         <tr>
-            <td class="listItemText"><a href="{orderURL}"
-                                        target="_blank"
-            >{ordheadID}</a></td>
+            <td class="listItemText">
+                <a href="{orderURL}"
+                   target="_blank"
+                >{ordheadID}</a>
+            </td>
             <td class="listItemText">{orderType}</td>
             <td class="listItemText">{orderDate}</td>
             <td class="listItemText">{custPORef}</td>
-            <td class="listItemText"><a href="{listContractURL}">{contract}</a></td>
+            <td class="listItemText">
+                <a href="{listContractURL}">{contract}</a>
+            </td>
         </tr>
         <!-- END orderBlock -->
     </table>

@@ -38,6 +38,7 @@ class DBEContact extends DBCNCEntity
     const workStartedEmailFlag = "workStartedEmailFlag";
     const autoCloseEmailFlag = "autoCloseEmailFlag";
     const failedLoginCount = "failedLoginCount";
+    const specialAttentionContactFlag = "specialAttentionContactFlag";
 
     /**
      * calls constructor()
@@ -236,6 +237,13 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
             "con_failed_login_count"
         );
+
+        $this->addColumn(
+            self::specialAttentionContactFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -737,6 +745,21 @@ class DBEContact extends DBCNCEntity
         $db->query($query);
 
         return parent::deleteRow($pkValue);
+    }
+
+    public function getSpecialAttentionCustomers()
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where specialAttentionContactFlag = 'Y'
+      ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
     }
 }
 

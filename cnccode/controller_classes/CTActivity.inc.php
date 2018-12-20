@@ -2709,6 +2709,7 @@ class CTActivity extends CTCNC
             con_mailflag5,
             con_mailflag10,
             con_position,
+            specialAttentionContactFlag,
             (
               SELECT
                 COUNT(*)
@@ -2788,7 +2789,7 @@ class CTActivity extends CTCNC
             );
 
         if ($reason) {
-            $reasonMarkup = '<div style="width: 500px; border: dotted; padding: 5; ">' . $reason . '</div>';
+            $reasonMarkup = '<div style="width: 500px; border: dotted; padding: 5px; ">' . $reason . '</div>';
         } else {
             $reasonMarkup = '';
         }
@@ -2816,6 +2817,10 @@ class CTActivity extends CTCNC
             );
 
             while ($row = mysqli_fetch_assoc($result)) {
+
+                // only allow selection of support contacts
+                $rowColor = '';
+
                 if ($row['con_mailflag5'] == 'Y') {
 
                     if ($row['openSrCount'] == 0) {
@@ -2865,6 +2870,11 @@ class CTActivity extends CTCNC
                     $contact_position = '';
                     $site_phone = '';
                 }
+
+                if ($row['specialAttentionContactFlag'] == 'Y') {
+                    $rowColor = "style='background-color:#ffe6e6 '";
+                }
+
                 $this->template->set_var(
                     array(
                         'cus_name'         => $cus_name,
@@ -2873,7 +2883,8 @@ class CTActivity extends CTCNC
                         'con_phone'        => $contact_phone,
                         'add_phone'        => $site_phone,
                         'site_name'        => $site_name,
-                        'contact_notes'    => $row['con_notes']
+                        'contact_notes'    => $row['con_notes'],
+                        'rowColor'         => $rowColor
                     )
                 );
                 $this->template->parse(

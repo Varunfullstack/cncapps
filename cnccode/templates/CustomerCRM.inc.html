@@ -561,6 +561,8 @@
                     <td class="headerLightgrey">{mailshot8FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot9FlagDesc}</td>
                     <td class="headerLightgrey">{mailshot10FlagDesc}</td>
+                    <td class="headerLightgrey">Special Attention</td>
+
                 </tr>
                 <!-- BEGIN contactBlock -->
                 <input type="hidden"
@@ -828,6 +830,14 @@
                                value="Y"
                                {mailshot10FlagChecked}
                         />
+                    </td>
+                    <td class="content">
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][specialAttentionContactFlag]"
+                               value="Y"
+                               {specialAttentionContactFlagChecked}
+                        >
                     </td>
                 </tr>
                 <!-- END contactBlock -->

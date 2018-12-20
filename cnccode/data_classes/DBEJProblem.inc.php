@@ -32,6 +32,7 @@ class DBEJProblem extends DBEProblem
     const lastAwaitingCustomerResponseFlag = "lastAwaitingCustomerResponseFlag";
     const dashboardSortColumn = "dashboardSortColumn";
     const hoursRemaining = 'hoursRemaining';
+    const specialAttentionContactFlag = "specialAttentionContactFlag";
 
 
     /**
@@ -203,6 +204,13 @@ class DBEJProblem extends DBEProblem
             'pro_working_hours - pro_sla_response_hours'
         );
 
+        $this->addColumn(
+            self::specialAttentionContactFlag,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL,
+            '(select contact.specialAttentionContactFlag from contact where con_contno = initial.caa_contno)'
+        );
+
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -228,7 +236,9 @@ class DBEJProblem extends DBEProblem
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
 
-            " JOIN callactivity `last`
+            " 
+          
+            JOIN callactivity `last`
             ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
               (
               SELECT

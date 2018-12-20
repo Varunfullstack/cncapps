@@ -25,6 +25,7 @@ This project changes will be shown here.
 - Issue 382 - Upcoming visits dashboard on the home page
 - Issue 346 - Automate Asset List Export
 - Issue 402 - Show recent SRs for contact
+- Issue 369 - Allow a contact to be special attention
 ### Removed
 - Issue 403 - Remove extra | in menu
 
