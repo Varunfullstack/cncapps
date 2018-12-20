@@ -2779,7 +2779,7 @@ class CTActivity extends CTCNC
             );
 
         if ($reason) {
-            $reasonMarkup = '<div style="width: 500px; border: dotted; padding: 5; ">' . $reason . '</div>';
+            $reasonMarkup = '<div style="width: 500px; border: dotted; padding: 5px; ">' . $reason . '</div>';
         } else {
             $reasonMarkup = '';
         }
@@ -2794,7 +2794,7 @@ class CTActivity extends CTCNC
                 'referred'         => $referred,
                 'submitURL'        => $submitURL,
                 'reasonMarkup'     => $reasonMarkup,
-                'reason'           => $reason
+                'reason'           => htmlentities($reason)
             )
         );
 
@@ -5026,7 +5026,7 @@ class CTActivity extends CTCNC
 
         $this->activityCreate1(false);
 
-        $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
+//        $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
 
     }
 
