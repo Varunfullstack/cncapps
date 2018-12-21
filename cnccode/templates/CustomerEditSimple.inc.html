@@ -1016,6 +1016,7 @@
         $.formUtils.addValidator({
             name: 'atLeastOne',
             validatorFunction: function (value, $el, config, language, $form) {
+                const startOfFunction = performance.now();
                 const elementData = $el.data();
                 const dataType = elementData.type;
                 var test = $('[data-type="' + dataType + '"]');
@@ -1032,21 +1033,25 @@
 
                 if (validatorData.hasOwnProperty(dataType)) {
                     // there's an initiator...we should return whatever the initiator says
+                    const case1 = performance.now();
+
+                    console.log('validating ' + dataType + " atLeastOne took " + (case1 - startOfFunction) + " milliseconds ");
                     return validatorData[dataType];
                 }
 
-                const t0 = performance.now();
                 var allElements = test.toArray();
 
                 var counter = 0;
-
+                const startFindIfValid = performance.now();
                 do {
                     var elm = $(allElements[counter]);
                     isValid = !!elm.prop('checked');
                     counter++;
                 } while (!isValid && counter < allElements.length);
-
+                console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startFindIfValid) + " milliseconds  while trying to find it it was valid");
                 validatorData[dataType] = isValid;
+
+                const startValidatingOthers = performance.now();
 
                 test.each(function () {
                     const elm = $(this);
@@ -1056,9 +1061,11 @@
                     }
                 });
 
+                console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startValidatingOthers) + " milliseconds  while trying call validation of others");
+
                 delete validatorData[dataType];
                 const t1 = performance.now();
-                console.log('validating ' + dataType + " atLeastOne took " + (t1 - t0) + " milliseconds ");
+                console.log('validating ' + dataType + " atLeastOne took " + (t1 - startOfFunction) + " milliseconds ");
                 return isValid;
             },
             errorMessage: 'at least one failed',
