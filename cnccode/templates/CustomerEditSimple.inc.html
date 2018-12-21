@@ -1057,7 +1057,9 @@
                     const elm = $(this);
                     const isMe = elm.get(0) === $el.get(0);
                     if (!isMe) {
+                        const startOtherValidation = performance.now();
                         elm.validate(null);
+                        console.log(" took " + (performance.now() - startOtherValidation) + " milliseconds  while calling validation of other");
                     }
                 });
 
