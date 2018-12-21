@@ -264,7 +264,7 @@
     }
 
 </style>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.79/jquery.form-validator.js"
+<script src=".javascript/jquery-form-validator-2.3.79.js"
 ></script>
 <div id="newPasswordDialog"
      title="New Password"
@@ -910,8 +910,19 @@
         }
 
         $('#contactsTable').on('validation', 'input', onValidation);
+        $('#contactsTable').on('beforeValidation', 'input', onBeforeValidation);
+
+        function onBeforeValidation(value, lang, config) {
+
+            if (window.isSubmitting) {
+                debugger;
+                // do stuff
+                $(this).data('validation-skipped', 1);
+            }
+        }
 
         function onValidation(evt, valid) {
+
             var $input = $(evt.target);
 
             if (!valid) {
@@ -933,10 +944,14 @@
 
         var config = {
             modules: 'security',
+            showHelpOnFocus: false,
+            addSuggestions: false,
+            ignoreSubmit: true,
             submitErrorMessageCallback: function ($form, errorMessages, config) {
-                console.log($form);
+                return;
             },
             inlineErrorMessageCallback: function ($input, errorMessage, config) {
+                return;
                 //check if the element already exists in the map
                 if (errorMessage) {
                     if (!erroredElements[$input[0].name]) {
@@ -1016,10 +1031,10 @@
         $.formUtils.addValidator({
             name: 'atLeastOne',
             validatorFunction: function (value, $el, config, language, $form) {
+
                 const startOfFunction = performance.now();
                 const elementData = $el.data();
                 const dataType = elementData.type;
-                var test = $('[data-type="' + dataType + '"]');
                 var isValid = false;
                 var except = elementData.except;
                 var exceptCondition = false;
@@ -1035,9 +1050,11 @@
                     // there's an initiator...we should return whatever the initiator says
                     const case1 = performance.now();
 
-                    console.log('validating ' + dataType + " atLeastOne took " + (case1 - startOfFunction) + " milliseconds ");
+                    // console.log('validating ' + dataType + " atLeastOne took " + (case1 - startOfFunction) + " milliseconds ");
                     return validatorData[dataType];
                 }
+
+                var test = $('[data-type="' + dataType + '"]');
 
                 var allElements = test.toArray();
 
@@ -1048,7 +1065,7 @@
                     isValid = !!elm.prop('checked');
                     counter++;
                 } while (!isValid && counter < allElements.length);
-                console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startFindIfValid) + " milliseconds  while trying to find it it was valid");
+                // console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startFindIfValid) + " milliseconds  while trying to find it it was valid");
                 validatorData[dataType] = isValid;
 
                 const startValidatingOthers = performance.now();
@@ -1059,15 +1076,15 @@
                     if (!isMe) {
                         const startOtherValidation = performance.now();
                         elm.validate(null);
-                        console.log(" took " + (performance.now() - startOtherValidation) + " milliseconds  while calling validation of other");
+                        // console.log(" took " + (performance.now() - startOtherValidation) + " milliseconds  while calling validation of other");
                     }
                 });
 
-                console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startValidatingOthers) + " milliseconds  while trying call validation of others");
+                // console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startValidatingOthers) + " milliseconds  while trying call validation of others");
 
                 delete validatorData[dataType];
                 const t1 = performance.now();
-                console.log('validating ' + dataType + " atLeastOne took " + (t1 - startOfFunction) + " milliseconds ");
+                // console.log('validating ' + dataType + " atLeastOne took " + (t1 - startOfFunction) + " milliseconds (INITIATOR) ");
                 return isValid;
             },
             errorMessage: 'at least one failed',
@@ -1120,7 +1137,7 @@
 
                 delete validatorData[dataType];
                 const t1 = performance.now();
-                console.log('validating ' + dataType + " atLeastOneAtMostOne took " + (t1 - t0) + " milliseconds ");
+                // console.log('validating ' + dataType + " atLeastOneAtMostOne took " + (t1 - t0) + " milliseconds ");
                 return isValid;
             },
             errorMessage: '',
@@ -1338,6 +1355,8 @@
 
 
     function checkMailShotOptions() {
+
+        window.isSubmitting = true;
 
         // var x = document.getElementsByClassName('stmCheckBox');
         // var count = 0;
