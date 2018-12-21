@@ -175,6 +175,10 @@ class Controller extends BaseObject
         $this->createTemplate();
         $this->requestMethod = $requestMethod;
         $this->setFormErrorOff();
+
+        global $db;
+
+        $db->query("insert into ")
     }
 
     public static function dateToISO($getValue)
