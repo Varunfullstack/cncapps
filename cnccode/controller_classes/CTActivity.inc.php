@@ -5026,7 +5026,7 @@ class CTActivity extends CTCNC
 
         $this->activityCreate1(false);
 
-//        $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
+        $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
 
     }
 
