@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 377 - Sales Requests status lost
 - Issue 393 - Clicking Start Work with new SR puts it into the wrong queue
 - Issue 389 - Prevent links for contacts that have no support flag enabled
+- Issue 405 - Creating SR from To Be Logged sometimes loses text
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 - Issue 391 - Change MailQueueAlert.php email destinations

@@ -2804,7 +2804,7 @@ class CTActivity extends CTCNC
                 'referred'         => $referred,
                 'submitURL'        => $submitURL,
                 'reasonMarkup'     => $reasonMarkup,
-                'reason'           => $reason
+                'reason'           => htmlentities($reason)
             )
         );
 
