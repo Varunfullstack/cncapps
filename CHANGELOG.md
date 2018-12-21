@@ -20,6 +20,7 @@ This project changes will be shown here.
 - Issue 377 - Sales Requests status lost
 - Issue 399 - Staff Appraisal formatting improvements
 - Issue 398 - Improve SR manager dashboard view
+- Issue 407 - Tweak SR manager Dashboard view
 ### Added
 - Issue 392 - Customer Meeting Review Frequency Change
 - Issue 364 - Improve Items Not Received v3
