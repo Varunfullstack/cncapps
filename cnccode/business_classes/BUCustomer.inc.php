@@ -1665,5 +1665,25 @@ class BUCustomer extends Business
         return !!count($array);
     }
 
+
+    /**
+     * @param $customerID
+     * @return DBEContact|null
+     */
+    public function getPrimaryContact($customerID)
+    {
+        $this->dbeCustomer->getRow($customerID);
+        $primaryMainContactID = $this->dbeCustomer->getValue(DBECustomer::primaryMainContactID);
+
+        if (!$primaryMainContactID) {
+            return null;
+        }
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($primaryMainContactID);
+        return $dbeContact;
+    }
+
 }// End of class
 ?>
