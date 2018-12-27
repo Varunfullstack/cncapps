@@ -70,12 +70,12 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
   ORDER BY poh_required_by ASC, ordhead.`odh_custno` DESC, pol_porno ASC, `pol_lineno` ASC
 ";
 
-
         $db->query($query);
         $data = [];
 
         /** @var \CNCLTD\ItemNotYetReceived $item */
         while ($item = $db->next_record_object(\CNCLTD\ItemNotYetReceived::class)) {
+
             if (!isset(\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()])) {
                 \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
             }
@@ -96,7 +96,6 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
                     ) && \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]);
             }
         );
-
         return $data;
     }
 
