@@ -414,7 +414,7 @@ function getUpcomingVisits()
   cus_name AS customerName,
   CONCAT(
     consultant.firstName,
-    \" \",
+    ' ',
     consultant.lastName
   ) AS engineerName,
   (SELECT 

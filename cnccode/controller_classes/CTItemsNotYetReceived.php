@@ -61,7 +61,7 @@ class CTItemsNotYetReceived extends CTCNC
     function displayContractAndNumbersReport()
     {
 
-        $this->setPageTitle("PO Status Report");
+        $this->setPageTitle("Purchase Order Status Report");
 
         $this->setTemplateFiles(
             'ItemsNotYetReceived',
@@ -82,6 +82,35 @@ class CTItemsNotYetReceived extends CTCNC
             $purchaseOrderLink = "/PurchaseOrder.php?action=display&porheadID=" . $item->getPurchaseOrderId();
             $style = "style='color:" . $item->color() . "'";
 
+            $salesOrderURL =
+                $this->buildLink(
+                    "SalesOrder.php",
+                    [
+                        "action"    => "displaySalesOrder",
+                        "ordheadID" => $item->getSalesOrderId()
+                    ]
+                );
+
+            $salesOrderLink = "<a href='" . $salesOrderURL . "'>" . $item->getSalesOrderId() . "</a>";
+
+            $projectLink = "";
+
+            if ($item->getProjectID()) {
+
+                $projectURL =
+                    $this->buildLink(
+                        "Project.php",
+                        [
+                            "projectID" => $item->getProjectID(),
+                            "action"    => "edit"
+                        ]
+
+                    );
+
+                $projectLink = "<a href='" . $projectURL . "'>" . $item->getProjectName() . "</a>";
+            }
+
+
             $this->template->set_var(
                 [
                     "style"             => $style,
@@ -96,7 +125,8 @@ class CTItemsNotYetReceived extends CTCNC
                     "futureDate"        => $this->getDateOrNA($item->getFutureDate()),
                     "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
                     "supplierRef"       => $item->getSupplierRef(),
-                    "projectName"       => $item->getProjectName()
+                    "projectLink"       => $projectLink,
+                    "salesOrderLink"    => $salesOrderLink
                 ]
             );
 

@@ -40,7 +40,7 @@ function getRatesAndHours(
     $otFlag = 'Y'
 )
 {
-    // get activity times as decimals
+    $that = null;// get activity times as decimals
     $activityStartTime = common_convertHHMMToDecimal($startTime);
     $activityEndTime = common_convertHHMMToDecimal($endTime);
 
@@ -49,7 +49,7 @@ function getRatesAndHours(
     $officeEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::billingEndTime));
 
     // in hours rate for activity type (from attached item row)
-    $dbeItem = new DBEItem($this);
+    $dbeItem = new DBEItem($that);
     $dbeItem->getRow($itemID);
 
     $normalRate = $dbeItem->getValue(DBEItem::curUnitSale);                // Normal, in office hours rate

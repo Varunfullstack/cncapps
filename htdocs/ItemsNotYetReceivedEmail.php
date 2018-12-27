@@ -167,7 +167,7 @@ if (!$outputToScreen) {
     $hdrs = array(
         'From'         => CONFIG_SALES_EMAIL,
         'To'           => $toEmail,
-        'Subject'      => 'PO Status Report',
+        'Subject'      => 'Purchase Order Status Report',
         'Date'         => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );

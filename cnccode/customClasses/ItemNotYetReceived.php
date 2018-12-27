@@ -28,6 +28,17 @@ class ItemNotYetReceived
     protected $hasNotBeenReceivedYet;
     protected $hasBeenOrdered;
     protected $orderedQuantity;
+    private $salesOrderID;
+    protected $projectID;
+
+    /**
+     * @return mixed
+     */
+    public function getProjectID()
+    {
+        return $this->projectID;
+    }
+
 
     /**
      * @return mixed
@@ -207,6 +218,11 @@ class ItemNotYetReceived
             return !$this->hasBeenOrdered ? 'red' : ($this->hasNotBeenReceivedYet ? 'orange' : "black");
         }
         return 'green';
+    }
+
+    public function getSalesOrderId()
+    {
+        return $this->salesOrderID;
     }
 
 }
