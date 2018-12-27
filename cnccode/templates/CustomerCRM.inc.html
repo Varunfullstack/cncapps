@@ -1815,7 +1815,7 @@
                             Pending Leaver Date
                         </div>
                     </td>
-
+<td class="headerLightgrey">Special Attention</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -2209,6 +2209,14 @@
                                class="jQueryCalendar"
                                autocomplete="off"
                         />
+                    </td>
+                    <td class="content">
+                        <input {disabled}
+                               type="checkbox"
+                               name="form[contact][{contactID}][specialAttentionContactFlag]"
+                               value="Y"
+                               {specialAttentionContactFlagChecked}
+                        >
                     </td>
                 </tr>
 

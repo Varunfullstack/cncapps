@@ -68,7 +68,18 @@ class CTContactExport extends CTCNC
      */
     function defaultAction()
     {
-        $this->export();
+        switch (@$_REQUEST['action']) {
+            case '3cxExport':
+                echo json_encode(
+                    [
+                        "base64Data" => $this->phone3CXExport()
+                    ]
+                );
+//                echo "<a href='data:application/x-zip-compressed;base64," . . "' download='export.zip' >Download Zip</a>";
+                exit;
+            default:
+                $this->export();
+        }
         exit;
     }
 
@@ -594,6 +605,181 @@ class CTContactExport extends CTCNC
             );
         }
 
+    }
+
+    private function phone3CXExport()
+    {
+        global $db;
+        $query = "SELECT 
+  contact.`con_first_name` AS firstName,
+  contact.`con_last_name` AS lastName,
+  customer.`cus_name` AS company,
+  REPLACE(address.`add_phone`, ' ', '') AS business,
+  REPLACE(contact.`con_phone`, ' ', '') AS business2,
+  REPLACE(
+    contact.`con_mobile_phone`,
+    ' ',
+    ''
+  ) AS mobile,
+  contact.`con_email` AS email 
+FROM
+  contact 
+  LEFT JOIN address 
+    ON contact.`con_siteno` = address.add_siteno 
+    AND address.add_custno = contact.`con_custno` 
+  LEFT JOIN customer 
+    ON contact.`con_custno` = customer.`cus_custno` 
+WHERE customer.`cus_referred` <> 'Y' 
+  AND (
+    address.`add_phone` 
+    OR contact.`con_phone` 
+    OR contact.`con_mobile_phone`
+  ) 
+  AND (
+    con_mailshot = 'Y' 
+    OR con_mailflag1 = 'Y' 
+    OR con_mailflag2 = 'Y' 
+    OR con_mailflag3 = 'Y' 
+    OR con_mailflag4 = 'Y' 
+    OR con_mailflag5 = 'Y' 
+    OR con_mailflag6 = 'Y' 
+    OR con_mailflag7 = 'Y' 
+    OR con_mailflag8 = 'Y' 
+    OR con_mailflag9 = 'Y' 
+    OR con_mailflag10 = 'Y' 
+    OR con_mailflag11 = 'Y'
+  )";
+
+        $db->query($query);
+
+        $count = 0;
+
+        $files = [];
+
+        $zip = new ZipArchive();
+        $zip->open(
+            '3cxExport.zip',
+            ZipArchive::CREATE | ZipArchive::OVERWRITE
+        );
+        $files[] = 'export0.csv';
+        $file = fopen(
+            'export0.csv',
+            "w"
+        );
+        $header = [
+            'FirstName',
+            "LastName",
+            "Company",
+            "Mobile",
+            "Mobile2",
+            "Home",
+            "Home2",
+            "Business",
+            "Business2",
+            "Email",
+            "Other",
+            "BusinessFax",
+            "HomeFax",
+            "Pager"
+        ];
+        fputcsv(
+            $file,
+            $header
+        );
+
+
+        while ($db->next_record(MYSQLI_ASSOC)) {
+            if ($count == 999) {
+                // we need to close the previous file
+                fclose($file);
+                $zip->addFile($files[count($files) - 1]);
+                $files[] = 'export' . count($files) . ".csv";
+                $files++;
+                $file = fopen(
+                    $files[count($files) - 1],
+                    'w'
+                );
+                $str = implode(
+                        ",",
+                        $header
+                    ) . "\n";
+                fwrite(
+                    $file,
+                    $str
+                );
+
+                $count = 0;
+            }
+            $data = [
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['firstName']
+                ),
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['lastName']
+                ),
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['company']
+                ),
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['mobile']
+                ),
+                null,
+                null,
+                null,
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['business']
+                ),
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['business2']
+                ),
+                str_replace(
+                    ',',
+                    ' ',
+                    $db->Record['email']
+                ),
+                null,
+                null,
+                null,
+                null
+            ];
+            $str = implode(
+                ',',
+                $data
+            )."\n";
+            fwrite(
+                $file,
+                $str
+            );
+            $count++;
+        };
+        // we need to close the previous file
+        fclose($file);
+        $zip->addFile($files[count($files) - 1]);
+
+
+        $zip->close();
+
+        foreach ($files as $file) {
+            unlink($file);
+        }
+
+        $fileData = file_get_contents('3cxExport.zip');
+
+        unlink('3cxExport.zip');
+
+        return base64_encode($fileData);
     }
 }// end of class
 ?>

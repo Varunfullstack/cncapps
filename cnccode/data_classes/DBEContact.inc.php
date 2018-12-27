@@ -57,6 +57,7 @@ class DBEContact extends DBCNCEntity
 
     const pendingLeaverFlag = 'pendingLeaverFlag';
     const pendingLeaverDate = 'pendingLeaverDate';
+    const specialAttentionContactFlag = "specialAttentionContactFlag";
 
     /**
      * calls constructor()
@@ -315,6 +316,13 @@ class DBEContact extends DBCNCEntity
             self::pendingLeaverDate,
             DA_DATE,
             DA_ALLOW_NULL
+        );
+
+
+        $this->addColumn(
+            self::specialAttentionContactFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL
         );
 
         $this->setPK(0);
@@ -596,6 +604,8 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
+
+
     /**
      * all rows for given supplier
      */
@@ -869,6 +879,21 @@ class DBEContact extends DBCNCEntity
 
         $this->getRows();
         return $this;
+    }
+
+    public function getSpecialAttentionCustomers()
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where specialAttentionContactFlag = 'Y'
+      ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
     }
 }
 

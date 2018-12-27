@@ -10,39 +10,70 @@ This project changes will be shown here.
 ### Changed 
 - Issue 365 - Performance table formatting improvements
 
+## [v1.15.0] - 2018-12-27
+### Fixed
+- Issue 376 - Contact notes being copied to other contacts
+- Issue 359 - Management Review Summary shows blank To: field
+- Issue 372 - Email display header missing
+- Issue 360 - SD Dashboard Assignment display issue
+- Issue 380 - Typo in Reports Menu
+- Issue 377 - Sales Requests status lost
+- Issue 393 - Clicking Start Work with new SR puts it into the wrong queue
+- Issue 389 - Prevent links for contacts that have no support flag enabled
+- Issue 405 - Creating SR from To Be Logged sometimes loses text
+### Changed 
+- Issue 365 - Performance table formatting improvements
+- Issue 391 - Change MailQueueAlert.php email destinations
+- Issue 388 - Contact Title Database field length increase
+- Issue 366 - Automatically raised SRs set to no Initial time
+- Issue 377 - Sales Requests status lost
+- Issue 399 - Staff Appraisal formatting improvements
+- Issue 398 - Improve SR manager dashboard view
+- Issue 407 - Tweak SR manager Dashboard view
+### Added
+- Issue 392 - Customer Meeting Review Frequency Change
+- Issue 364 - Improve Items Not Received v3
+- Issue 382 - Upcoming visits dashboard on the home page
+- Issue 346 - Automate Asset List Export
+- Issue 402 - Show recent SRs for contact
+- Issue 369 - Allow a contact to be special attention
+- Issue 363 - Contact export to CSV for 3CX phone system importing
+### Removed
+- Issue 403 - Remove extra | in menu
+
 ## [v1.14.5] - 2018-12-11
-## Changed
-Show employee's start date in DD-MM-YYYY format
+### Changed
+- Show employee's start date in DD-MM-YYYY format
 
 ## [v1.14.4] - 2018-12-10
-## Changed
-Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
+### Changed
+- Change Proposed salary and bonus to be number input to prevent users from typing non numeric characters
 
 ## [v1.14.3] - 2018-12-06
-## Fixed
-Staff details encrypted fields are not being saved / displayed!
+### Fixed
+- Staff details encrypted fields are not being saved / displayed!
 
 ## [v1.14.2] - 2018-12-05
-## Fixed
-Project management role is no longer present in the User edit page
+### Fixed
+- Project management role is no longer present in the User edit page
 
 ## [v1.14.1] - 2018-12-04
 ### Fixed
-Staff Appraisal start date field value loads with the wrong format
+- Staff Appraisal start date field value loads with the wrong format
 
 ## [V1.14.0]- 2018-12-03
 ### Added
 - Issue 373 - Staff Appraisal Process
 
 ## [v1.13.2] - 2018-11-23
-## Fixed
+### Fixed
 - Contract expiry dates incorrect
 - Remove debugging information
 
 ## [v1.13.1] - 2018-11-20
-## Changed
+### Changed
 - Allow more than 50 characters in project updates
-## Fixed
+### Fixed
 - Fix issue with banners not showing when project end date was not set
 - Fix issue with banners showing incorrect projects
 

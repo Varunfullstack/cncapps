@@ -95,6 +95,7 @@ class BUContact extends Business
         $dsResults->columnSort(
             'lastName',
             'firstName'
+
         );
         return $ret;
     }
@@ -440,6 +441,15 @@ class BUContact extends Business
                 true
             );
         }
+    }
+
+    public function getSpecialAttentionContacts(&$dsResults)
+    {
+        $this->dbeContact->getSpecialAttentionCustomers();
+        return $this->getData(
+            $this->dbeContact,
+            $dsResults
+        );
     }
 }// End of class
 ?>

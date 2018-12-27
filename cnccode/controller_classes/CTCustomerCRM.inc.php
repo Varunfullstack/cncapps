@@ -2132,6 +2132,9 @@ class CTCustomerCRM extends CTCustomer
                     'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
                         DBEContact::customerID
                     ) ? 'data-validation="atLeastOne"' : '',
+                    'specialAttentionContactFlagChecked' => $this->getChecked(
+                        $this->dsContact->getValue(DBEContact::specialAttentionContactFlag)
+                    ),
                     'clientFormURL'                        => $clientFormURL,
                     'dearJohnURL'                          => $dearJohnURL,
                     'dmLetterURL'                          => $dmLetterURL,

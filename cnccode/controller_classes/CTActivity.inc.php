@@ -261,6 +261,9 @@ class CTActivity extends CTCNC
                     }
                 }
                 break;
+            case 'displayServiceRequestForContactPopup':
+                $this->serviceRequestsForContactPopup();
+                break;
             case CTACTIVITY_ACT_DISPLAY_ACTIVITY:
                 $this->displayActivity();
                 break;
@@ -480,6 +483,9 @@ class CTActivity extends CTCNC
                 break;
             case 'salesRequestReview':
                 $this->salesRequestReview();
+                break;
+            case 'contactNotes':
+                echo json_encode(['data' => $this->getContactNotes()]);
                 break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
@@ -2154,6 +2160,9 @@ class CTActivity extends CTCNC
                 'contractListPopupLink'              => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
                 ),
+                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                    $dsCallActivity->getValue(DBECallActivity::contactID)
+                ),
                 'salesOrderLink'                     => $this->getSalesOrderLink(
                     $dsCallActivity->getValue('linkedSalesOrderID')
                 ),
@@ -2711,6 +2720,7 @@ class CTActivity extends CTCNC
             address.add_phone,
             supportLevel,
             con_position,
+            specialAttentionContactFlag,
             (
               SELECT
                 COUNT(*)
@@ -2776,7 +2786,7 @@ class CTActivity extends CTCNC
             );
 
         if ($reason) {
-            $reasonMarkup = '<div style="width: 500px; border: dotted; padding: 5; ">' . $reason . '</div>';
+            $reasonMarkup = '<div style="width: 500px; border: dotted; padding: 5px; ">' . $reason . '</div>';
         } else {
             $reasonMarkup = '';
         }
@@ -2791,7 +2801,7 @@ class CTActivity extends CTCNC
                 'referred'         => $referred,
                 'submitURL'        => $submitURL,
                 'reasonMarkup'     => $reasonMarkup,
-                'reason'           => $reason
+                'reason'           => htmlentities($reason)
             )
         );
 
@@ -2806,6 +2816,7 @@ class CTActivity extends CTCNC
             while ($row = mysqli_fetch_assoc($result)) {
 
                 // only allow selection of support contacts
+                $rowColor = '';
 
 
                 if ($row['openSrCount'] == 0) {
@@ -2850,11 +2861,14 @@ class CTActivity extends CTCNC
 
 //                    $cus_name = $row['cus_name'];
 //                    $contact_name = $row['con_first_name'] . ' ' . $row['con_last_name'];
-//                    $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
+//                    $site_name = $row['site_name'];
 //                    $contact_phone = '';
 //                    $contact_position = '';
 //                    $site_phone = '';
 
+                if ($row['specialAttentionContactFlag'] == 'Y') {
+                    $rowColor = "style='background-color:#ffe6e6 '";
+                }
 
                 $this->template->set_var(
                     array(
@@ -3057,7 +3071,8 @@ class CTActivity extends CTCNC
 
         $_SESSION[$this->sessionKey]['internalNotes'] = $_REQUEST['internalNotes'];
 
-        /* Loop here */
+
+        $dsContactSrs = $this->buActivity->getProblemsByContact($_REQUEST['contactID']);
 
         $dsActiveSrs = $this->buActivity->getActiveProblemsByCustomer($_REQUEST['customerID']);
 
@@ -3066,11 +3081,78 @@ class CTActivity extends CTCNC
             'ActivityExistingRequests.inc'
         );
 
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($_REQUEST['contactID']);
+
+
         $this->template->set_var(
             [
-                'techNotes' => $dsCustomer->getValue(DBECustomer::techNotes)
+                'techNotes'   => $dsCustomer->getValue(DBECustomer::techNotes),
+                'contactName' => $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                        DBEContact::lastName
+                    )
             ]
         );
+
+        $this->template->set_block(
+            'ActivityExistingRequests',
+            'contactProblemBlock',
+            'contactProblems'
+        );
+
+        while ($dsContactSrs->fetchNext()) {
+
+            $urlCreateFollowOn =
+                $this->buildLink(
+                    'Activity.php',
+                    array(
+                        'action'         => 'createFollowOnActivity',
+                        'callActivityID' => $dsContactSrs->getValue('lastCallActivityID'),
+                        'reason'         => $_REQUEST['reason']
+                    )
+                );
+
+            $urlProblemHistoryPopup =
+                $this->buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'problemHistoryPopup',
+                        'problemID' => $dsContactSrs->getValue('problemID'),
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
+                    )
+                );
+
+            $this->template->set_var(
+                array(
+                    'contactProblemID'              => $dsContactSrs->getValue("problemID"),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY($dsContactSrs->getValue('dateRaised')),
+                    'contactReason'                 => self::truncate(
+                        $dsContactSrs->getValue("reason"),
+                        100
+                    ),
+                    'contactLastReason'             => self::truncate(
+                        $dsContactSrs->getValue("lastReason"),
+                        100
+                    ),
+                    'contactEngineerName'           => $dsContactSrs->getValue("engineerName"),
+                    'createFollowOnLink'            => $dsContactSrs->getValue(
+                        DBEJProblem::status
+                    ) == 'C' ? '' : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
+                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
+                    'contactPriorityClass'          => $dsContactSrs->getValue(
+                        DBEJProblem::priority
+                    ) == 1 ? 'class="redRow"' : null
+                )
+            );
+
+            $this->template->parse(
+                'contactProblems',
+                'contactProblemBlock',
+                true
+            );
+
+        }
 
         $this->template->set_block(
             'ActivityExistingRequests',
@@ -3778,6 +3860,92 @@ class CTActivity extends CTCNC
         exit;
     }    // end allocateAdditionalTime
 
+    function serviceRequestsForContactPopup()
+    {
+        $this->setTemplateFiles(
+            'ServiceRequestsForContactPopup',
+            'ServiceRequestsForContactPopup'
+        );
+        $dsContactSrs = $this->buActivity->getProblemsByContact($_REQUEST['contactID']);
+
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($_REQUEST['contactID']);
+        $this->setPageTitle(
+            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                DBEContact::lastName
+            )
+        );
+
+        $this->template->set_block(
+            'ServiceRequestsForContactPopup',
+            'contactProblemBlock',
+            'contactProblems'
+        );
+
+        while ($dsContactSrs->fetchNext()) {
+
+            $urlCreateFollowOn =
+                $this->buildLink(
+                    'Activity.php',
+                    array(
+                        'action'         => 'createFollowOnActivity',
+                        'callActivityID' => $dsContactSrs->getValue('lastCallActivityID'),
+                        'reason'         => $_REQUEST['reason']
+                    )
+                );
+
+            $urlProblemHistoryPopup =
+                $this->buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'problemHistoryPopup',
+                        'problemID' => $dsContactSrs->getValue('problemID'),
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
+                    )
+                );
+
+            $this->template->set_var(
+                array(
+                    'contactProblemID'              => $dsContactSrs->getValue("problemID"),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY($dsContactSrs->getValue('dateRaised')),
+                    'contactReason'                 => self::truncate(
+                        $dsContactSrs->getValue("reason"),
+                        100
+                    ),
+                    'contactLastReason'             => self::truncate(
+                        $dsContactSrs->getValue("lastReason"),
+                        100
+                    ),
+                    'contactEngineerName'           => $dsContactSrs->getValue("engineerName"),
+                    'createFollowOnLink'            => $dsContactSrs->getValue(
+                        DBEJProblem::status
+                    ) == 'C' ? '' : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
+                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
+                    'contactPriorityClass'          => $dsContactSrs->getValue(
+                        DBEJProblem::priority
+                    ) == 1 ? 'class="redRow"' : null
+                )
+            );
+
+            $this->template->parse(
+                'contactProblems',
+                'contactProblemBlock',
+                true
+            );
+
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestsForContactPopup',
+            true
+        );
+        $this->parsePage();
+
+        exit;
+    }    // end allocateAddition
+
     function customerProblemPopup()
     {
         $this->setTemplateFiles(
@@ -4156,12 +4324,15 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue('customerID')
                 ),
+                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                    $dsCallActivity->getValue(DBECallActivity::contactID)
+                ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
                     $dsCallActivity->getValue('linkedSalesOrderID')
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
-                'problemHistoryLink'           => '| ' . $this->getProblemHistoryLink(
+                'problemHistoryLink'           => $this->getProblemHistoryLink(
                         $dsCallActivity->getValue('problemID')
                     ),
                 'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
@@ -4205,7 +4376,8 @@ class CTActivity extends CTCNC
                 'imUsedMinutes'             => $imUsedMinutes,
                 'userWarned'                => $this->userWarned,
                 'authoriseHide'             => $authorisedByName ? '' : 'hidden',
-                'authorisedByName'          => $authorisedByName
+                'authorisedByName'          => $authorisedByName,
+                'salesRequestStatus'        => $dsCallActivity->getValue(DBECallActivity::salesRequestStatus)
             )
         );
 
@@ -6923,6 +7095,34 @@ class CTActivity extends CTCNC
                 true
             );
         }
+    }
+
+    private function getContactNotes()
+    {
+        $contactId = @$_REQUEST['contactID'];
+
+        if (!$contactId) {
+            throw new Exception('Contact ID is missing');
+        }
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($contactId);
+
+        return $dbeContact->getValue(DBEContact::notes);
+    }
+
+    private function getServiceRequestForContactLink($contactID)
+    {
+        $contactHistory =
+            $this->buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'displayServiceRequestForContactPopup',
+                    'contactID' => $contactID,
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+        return '| <a href="#" title="Contact SR History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact SR History</a>';
     }
 }
 

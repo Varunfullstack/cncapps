@@ -421,6 +421,10 @@ TABLE.fieldChooser {
     background-color: #F8A5B6;
 }
 
+.specialAttentionContact {
+    background-color: #ffe6e6;
+}
+
 div.customerEditMain {
     /*  width: 55%; */
 }
