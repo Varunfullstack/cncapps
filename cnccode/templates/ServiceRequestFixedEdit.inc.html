@@ -11,8 +11,7 @@
     function proceedWithCancel(form) {
         if (formChanged == true) {
             return confirm('Are you sure that you want to cancel without saving your changes?');
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -28,7 +27,8 @@
 
 <table width="100%">
     <tr>
-        <td>{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {historyLink}</td>
+        <td>{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {historyLink} {contactHistoryLink}
+        </td>
         <td align="right"
             id="autoUpdateLabel"
         ></td>

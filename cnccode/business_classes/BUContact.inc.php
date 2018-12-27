@@ -7,11 +7,15 @@
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
-define('BUCONTACT_MATCH_STR_NT_PASD', 'No match string passed');
+define(
+    'BUCONTACT_MATCH_STR_NT_PASD',
+    'No match string passed'
+);
 
 class BUContact extends Business
 {
-    var $dbeContact = "";
+    /** @var DBEContact  */
+    public $dbeContact;
 
     /**
      * Constructor
@@ -30,7 +34,10 @@ class BUContact extends Business
      * @return bool : One or more rows
      * @access public
      */
-    function getSupplierContactsByNameMatch($supplierID, $matchString, &$dsResults)
+    function getSupplierContactsByNameMatch($supplierID,
+                                            $matchString,
+                                            &$dsResults
+    )
     {
         $this->setMethodName('getSupplierContactsByNameMatch');
         if ($matchString == '') {
@@ -42,17 +49,29 @@ class BUContact extends Business
         $matchString = trim($matchString);
         $ret = FALSE;
         if (is_numeric($matchString)) {
-            $ret = ($this->getContactByID($matchString, $dsResults));
+            $ret = ($this->getContactByID(
+                $matchString,
+                $dsResults
+            ));
         }
         if (!$ret) {
-            $this->dbeContact->setValue('supplierID', $supplierID);
+            $this->dbeContact->setValue(
+                'supplierID',
+                $supplierID
+            );
             if ($matchString{0} == '?') {  // get all contacts for supplier
                 $this->dbeContact->getSupplierRows();
             } else {                                                // try to match
                 $this->dbeContact->getSupplierContactRowsByNameMatch($matchString);
             }
-            $ret = ($this->getData($this->dbeContact, $dsResults));
-            $dsResults->columnSort('lastName', 'firstName');
+            $ret = ($this->getData(
+                $this->dbeContact,
+                $dsResults
+            ));
+            $dsResults->columnSort(
+                'lastName',
+                'firstName'
+            );
         }
         return $ret;
     }
@@ -62,12 +81,20 @@ class BUContact extends Business
      * @return bool : One or more rows
      * @access public
      */
-    function getSupportContacts(&$dsResults, $customerID = false)
+    function getSupportContacts(&$dsResults,
+                                $customerID = false
+    )
     {
         $this->setMethodName('getSupportContacts');
         $this->dbeContact->getSupportRows($customerID);
-        $ret = ($this->getData($this->dbeContact, $dsResults));
-        $dsResults->columnSort('lastName', 'firstName');
+        $ret = ($this->getData(
+            $this->dbeContact,
+            $dsResults
+        ));
+        $dsResults->columnSort(
+            'lastName',
+            'firstName'
+        );
         return $ret;
     }
 
@@ -75,8 +102,14 @@ class BUContact extends Business
     {
         $this->setMethodName('getTechnicalMailshotContacts');
         $this->dbeContact->getTechnicalMailshotRows();
-        $ret = ($this->getData($this->dbeContact, $dsResults));
-        $dsResults->columnSort('lastName', 'firstName');
+        $ret = ($this->getData(
+            $this->dbeContact,
+            $dsResults
+        ));
+        $dsResults->columnSort(
+            'lastName',
+            'firstName'
+        );
         return $ret;
     }
 
@@ -89,7 +122,11 @@ class BUContact extends Business
      * @return bool : One or more rows
      * @access public
      */
-    function getCustomerContactsByNameMatch($customerID, $siteNo = '', $matchString, &$dsResults)
+    function getCustomerContactsByNameMatch($customerID,
+                                            $siteNo = '',
+                                            $matchString,
+                                            &$dsResults
+    )
     {
         $this->setMethodName('getCustomerContactsByNameMatch');
         if ($matchString == '') {
@@ -106,7 +143,10 @@ class BUContact extends Business
         $matchString = trim($matchString);
         $ret = FALSE;
         if (is_numeric($matchString)) {
-            $ret = ($this->getContactByID($matchString, $dsResults));
+            $ret = ($this->getContactByID(
+                $matchString,
+                $dsResults
+            ));
             if ($ret) {
                 if ($dsResults->getValue('customerID') != $customerID) {
                     $ret = false;
@@ -117,15 +157,27 @@ class BUContact extends Business
 
             if ($matchString{0} == '?') {  // get all contacts for customer/site
                 if ($siteNo != '') {
-                    $this->dbeContact->getRowsByCustomerIDSiteNo($customerID, $siteNo);
+                    $this->dbeContact->getRowsByCustomerIDSiteNo(
+                        $customerID,
+                        $siteNo
+                    );
                 } else {
                     $this->dbeContact->getRowsByCustomerID($customerID);
                 }
             } else {                                                // try to match
-                $this->dbeContact->getCustomerRowsByNameMatch($customerID, $matchString);
+                $this->dbeContact->getCustomerRowsByNameMatch(
+                    $customerID,
+                    $matchString
+                );
             }
-            $ret = ($this->getData($this->dbeContact, $dsResults));
-            $dsResults->columnSort('lastName', 'firstName');
+            $ret = ($this->getData(
+                $this->dbeContact,
+                $dsResults
+            ));
+            $dsResults->columnSort(
+                'lastName',
+                'firstName'
+            );
         }
         return $ret;
     }
@@ -135,11 +187,16 @@ class BUContact extends Business
      * @param $customerID
      * @param DataSet $dsResults
      */
-    function getGSCContactByCustomerID($customerID, &$dsResults)
+    function getGSCContactByCustomerID($customerID,
+                                       &$dsResults
+    )
     {
         $this->setMethodName('getContactByCustomerID');
         $this->dbeContact->getGSCRowsByCustomerID($customerID);
-        $ret = ($this->getData($this->dbeContact, $dsResults));
+        $ret = ($this->getData(
+            $this->dbeContact,
+            $dsResults
+        ));
     }
 
     /**
@@ -149,10 +206,16 @@ class BUContact extends Business
      * @return bool : Success
      * @access public
      */
-    function getContactByID($ID, &$dsResults)
+    function getContactByID($ID,
+                            &$dsResults
+    )
     {
         $this->setMethodName('getContactByID');
-        return ($this->getDatasetByPK($ID, $this->dbeContact, $dsResults));
+        return ($this->getDatasetByPK(
+            $ID,
+            $this->dbeContact,
+            $dsResults
+        ));
     }
 
     /**
@@ -163,7 +226,11 @@ class BUContact extends Business
      * @return bool : Success
      * @access public
      */
-    function initialiseNewContact($supplierID, $customerID, $siteNo, &$dsResults)
+    function initialiseNewContact($supplierID,
+                                  $customerID,
+                                  $siteNo,
+                                  &$dsResults
+    )
     {
         $this->setMethodName('initialiseNewContact');
         // create/populate new dataset
@@ -177,23 +244,74 @@ class BUContact extends Business
         $buHeader->getHeader($dsHeader);
         $dsResults->copyColumnsFrom($this->dbeContact);
         $dsResults->setUpdateModeInsert();
-        $dsResults->setValue('contactID', 0);
-        $dsResults->setValue('siteNo', $siteNo);
-        $dsResults->setValue('supplierID', $supplierID);
-        $dsResults->setValue('customerID', $customerID);
-        $dsResults->setValue('discontinuedFlag', 'N');
-        $dsResults->setValue('notes', '');
-        $dsResults->setValue('mailshot1Flag', $dsHeader->getValue('mailshot1FlagDef'));
-        $dsResults->setValue('mailshot2Flag', $dsHeader->getValue('mailshot2FlagDef'));
-        $dsResults->setValue('mailshot3Flag', $dsHeader->getValue('mailshot3FlagDef'));
-        $dsResults->setValue('mailshot4Flag', $dsHeader->getValue('mailshot4FlagDef'));
-        $dsResults->setValue('mailshot5Flag', $dsHeader->getValue('mailshot5FlagDef'));
-        $dsResults->setValue('mailshot6Flag', $dsHeader->getValue('mailshot6FlagDef'));
-        $dsResults->setValue('mailshot7Flag', $dsHeader->getValue('mailshot7FlagDef'));
-        $dsResults->setValue('mailshot8Flag', $dsHeader->getValue('mailshot8FlagDef'));
-        $dsResults->setValue('mailshot9Flag', $dsHeader->getValue('mailshot9FlagDef'));
-        $dsResults->setValue('mailshot10Flag', $dsHeader->getValue('mailshot10FlagDef'));
-        $dsResults->setValue('mailshot11Flag', $dsHeader->getValue('mailshot11FlagDef'));
+        $dsResults->setValue(
+            'contactID',
+            0
+        );
+        $dsResults->setValue(
+            'siteNo',
+            $siteNo
+        );
+        $dsResults->setValue(
+            'supplierID',
+            $supplierID
+        );
+        $dsResults->setValue(
+            'customerID',
+            $customerID
+        );
+        $dsResults->setValue(
+            'discontinuedFlag',
+            'N'
+        );
+        $dsResults->setValue(
+            'notes',
+            ''
+        );
+        $dsResults->setValue(
+            'mailshot1Flag',
+            $dsHeader->getValue('mailshot1FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot2Flag',
+            $dsHeader->getValue('mailshot2FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot3Flag',
+            $dsHeader->getValue('mailshot3FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot4Flag',
+            $dsHeader->getValue('mailshot4FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot5Flag',
+            $dsHeader->getValue('mailshot5FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot6Flag',
+            $dsHeader->getValue('mailshot6FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot7Flag',
+            $dsHeader->getValue('mailshot7FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot8Flag',
+            $dsHeader->getValue('mailshot8FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot9Flag',
+            $dsHeader->getValue('mailshot9FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot10Flag',
+            $dsHeader->getValue('mailshot10FlagDef')
+        );
+        $dsResults->setValue(
+            'mailshot11Flag',
+            $dsHeader->getValue('mailshot11FlagDef')
+        );
         $dsResults->post();
         return TRUE;
     }
@@ -212,17 +330,50 @@ class BUContact extends Business
         $this->setMethodName('initialiseUpdateContact');
         // create/populate new dataset
         $dsResults->copyColumnsFrom($this->dbeContact);
-        $dsResults->setValue('discontinuedFlag', 'N');
-        $dsResults->setValue('mailshot1Flag', 'N');
-        $dsResults->setValue('mailshot2Flag', 'N');
-        $dsResults->setValue('mailshot3Flag', 'N');
-        $dsResults->setValue('mailshot4Flag', 'N');
-        $dsResults->setValue('mailshot5Flag', 'N');
-        $dsResults->setValue('mailshot6Flag', 'N');
-        $dsResults->setValue('mailshot7Flag', 'N');
-        $dsResults->setValue('mailshot8Flag', 'N');
-        $dsResults->setValue('mailshot9Flag', 'N');
-        $dsResults->setValue('mailshot10Flag', 'N');
+        $dsResults->setValue(
+            'discontinuedFlag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot1Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot2Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot3Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot4Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot5Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot6Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot7Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot8Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot9Flag',
+            'N'
+        );
+        $dsResults->setValue(
+            'mailshot10Flag',
+            'N'
+        );
         return TRUE;
     }
 
@@ -237,7 +388,19 @@ class BUContact extends Business
     function updateContact(&$dsContact)
     {
         $this->setMethodName('updateContact');
-        return ($this->updateDataAccessObject($dsContact, $this->dbeContact));
+        return ($this->updateDataAccessObject(
+            $dsContact,
+            $this->dbeContact
+        ));
+    }
+
+    public function getSpecialAttentionContacts(&$dsResults)
+    {
+        $this->dbeContact->getSpecialAttentionCustomers();
+        return $this->getData(
+            $this->dbeContact,
+            $dsResults
+        );
     }
 }// End of class
 ?>

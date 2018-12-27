@@ -33,7 +33,23 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     {
         switch ($_REQUEST['action']) {
             case 'allocateUser':
-                $this->allocateUser();
+                $options = [];
+
+
+                if ($_SESSION['HD']) {
+                    $options['HD'] = true;
+                }
+                if ($_SESSION['ES']) {
+                    $options['ES'] = true;
+                }
+                if ($_SESSION['IM']) {
+                    $options['IM'] = true;
+                }
+                if ($_SESSION['p5']) {
+                    $options['p5'] = true;
+                }
+
+                $this->allocateUser($options);
                 break;
             default:
                 $this->display();
@@ -49,6 +65,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $showHelpDesk = isset($_REQUEST['HD']);
         $showEscalation = isset($_REQUEST['ES']);
         $showImplementation = isset($_REQUEST['IM']);
+        $_SESSION['HD'] = $showHelpDesk;
+        $_SESSION['ES'] = $showEscalation;
+        $_SESSION['IM'] = $showImplementation;
+        $_SESSION['p5'] = $isP5;
 
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : ''));
 
@@ -316,7 +336,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'customerNameDisplayClass'
                                                  => $this->getCustomerNameDisplayClass(
                         $problems->getValue('specialAttentionFlag'),
-                        $problems->getValue('specialAttentionEndDate')
+                        $problems->getValue('specialAttentionEndDate'),
+                        $problems->getValue(DBEJProblem::specialAttentionContactFlag)
                     ),
                     'urlViewActivity'            => $urlViewActivity,
                     'slaResponseHours'           => number_format(
@@ -386,8 +407,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
               FROM
                 problem 
               WHERE problem.`pro_custno` = customer.`cus_custno` 
-                AND problem.`pro_status` IN ("I", "P")
-          ';
+                AND problem.`pro_status` IN ("I", "P")';
 
         if (!$showHelpDesk) {
             $query .= ' and pro_queue_no <> 1 ';
@@ -426,7 +446,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 array(
                     'urlCustomer'  => $urlCustomer,
                     'customerName' => $row['cus_name'],
-                    'srCount'      => $row["openSRCount"]
+                    'srCount'      => "<A href='CurrentActivityReport.php?action=setFilter&selectedCustomerID=" . $row['cus_custno'] . "'>" . $row["openSRCount"] . "</A>"
                 )
 
             );

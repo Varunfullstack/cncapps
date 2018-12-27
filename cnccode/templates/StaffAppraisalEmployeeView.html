@@ -101,7 +101,11 @@
     function saveAndExit() {
         saveQuestionnaire().then(function () {
             alert("Your answers have been saved");
-            window.location = '/';
+            let URL = '/';
+            if ($('input[name="completeFor"]').val() == 'manager') {
+                URL = '/StaffAppraisalQuestionnaire.php?action=managerQuestionnaireList';
+            }
+            window.location = URL;
         })
     }
 

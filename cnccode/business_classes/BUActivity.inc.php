@@ -1247,7 +1247,8 @@ class BUActivity extends Business
             $slaResponseHours =
                 $this->getSlaResponseHours(
                     $dbeProblem->getValue(DBEJProblem::priority),
-                    $dbeProblem->getValue(DBEJProblem::customerID)
+                    $dbeProblem->getValue(DBEJProblem::customerID),
+                    $dbeCallActivity->getValue(DBECallActivity::contactID)
                 );
 
             $dbeProblem->setValue(
@@ -1310,9 +1311,19 @@ class BUActivity extends Business
                 $dbeProblem->getValue(DBEJProblem::customerID),
                 $dsCustomer
             );
+            $dbeContact = null;
+            if ($dsCallActivity->getValue(DBEJCallActivity::contactID)) {
+                $dbeContact = new DBEContact($this);
+                $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
+            }
+
+
             if (
-                $dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
+                ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                    $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+                        'Y-m-d'
+                    )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')
+
             ) {
                 $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
             }
@@ -3391,7 +3402,7 @@ class BUActivity extends Business
         callactivity
         JOIN problem ON pro_problemno = caa_problemno
       WHERE
-        caa_problemno IN( $problemIDsAsString )
+        caa_problemno IN( $problemIDsAsString ) and caa_callacttypeno <> 43
         AND pro_contract_cuino = 0";
 
         $db->query($select);
@@ -5143,7 +5154,8 @@ is currently a balance of ';
 
         $slaResponseHours = $this->getSlaResponseHours(
             $_SESSION [$sessionKey] ['priority'],
-            $_SESSION [$sessionKey] ['customerID']
+            $_SESSION [$sessionKey] ['customerID'],
+            $_SESSION [$sessionKey] ['contactID']
         );
 
         /*
@@ -5341,6 +5353,11 @@ is currently a balance of ';
 //            $this->sendServiceReAddedEmail($dbeProblem->getPKValue(), $record['caa_problemno']);
 //            $resultSet->close();
 //        }
+        $dbeContact = null;
+        if ($dsCallActivity->getValue(DBEJCallActivity::contactID)) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($dsCallActivity->getValue(DBEJCallActivity::contactID));
+        }
 
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
@@ -5349,8 +5366,10 @@ is currently a balance of ';
             $dsCustomer
         );
 
-        if ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-            $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')) {
+        if (($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date(
+                    'Y-m-d'
+                )) || ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
 
@@ -6265,9 +6284,21 @@ is currently a balance of ';
             $dbeProblem->getValue(DBEJProblem::customerID),
             $dsCustomer
         );
+
+
+        $dbeContact = null;
+        if ($dbeCallActivity->getValue(DBECallActivity::contactID)) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($dbeCallActivity->getValue(DBECallActivity::contactID));
+        }
+
         if (
-            $dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-            $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
+            ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dsCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d'))
+            ||
+            (
+                $dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y'
+            )
         ) {
             $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
         }
@@ -6661,7 +6692,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $dsInput->getValue('serviceRequestPriority'),
-                $dsOrdhead->getValue(DBEOrdhead::customerID)
+                $dsOrdhead->getValue(DBEOrdhead::customerID),
+                $dsOrdhead->getValue(DBEOrdhead::delContactID)
             );
 
         $dbeProblem = new DBEProblem($this);
@@ -7485,7 +7517,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $record['priority'],
-                $customerID
+                $customerID,
+                $contact['contactID']
             );
 
         /*
@@ -7613,16 +7646,15 @@ is currently a balance of ';
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
         );
+        $startTime = date('H:i');
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
-            date('H:i')
+            $startTime
         );
-
-        $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            $endTime
+            $startTime
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
@@ -7923,8 +7955,7 @@ is currently a balance of ';
         */
                 $teamLevel = $this->getLevelByUserID($userID);
 
-                if ($teamLevel < 3) {
-
+                if ($teamLevel <= 3) {
                     $queueNo = $teamLevel;
                 } else {
                     $queueNo = 5; // managers
@@ -8437,7 +8468,8 @@ is currently a balance of ';
 
         $this->createFixedActivity(
             $problemID,
-            $resolutionSummary
+            $resolutionSummary,
+            $fixedUserID == USER_SYSTEM
         );
 
         $this->sendMonitoringEmails(
@@ -8502,12 +8534,14 @@ is currently a balance of ';
     }
 
     function createFixedActivity($problemID,
-                                 $resolutionSummary
+                                 $resolutionSummary,
+                                 $zeroTime = false
     )
     {
         /*
     Start with duplicate of last activity
     */
+
         $dbeLastActivity = $this->getLastActivityInProblem($problemID);
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
@@ -8522,9 +8556,30 @@ is currently a balance of ';
             date('H:i')
         );
 
+        $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
+
+        if (!$zeroTime) {
+            $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->getRow($problemID);
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::imLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::imLimitMinutes) + 3
+            );
+            $dbeProblem->updateRow();
+        }
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID)
+            $endTime
         );
 
         $dbeCallActivity->setValue(
@@ -8954,7 +9009,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $dbeJCallActivity->getValue(DBEJCallActivity::priority),
-                $dbeJCallActivity->getValue(DBEJCallActivity::customerID)
+                $dbeJCallActivity->getValue(DBEJCallActivity::customerID),
+                $dbeJCallActivity->getValue(DBEJCallActivity::contactID)
             );
 
         if ($slaResponseHours > 0) {
@@ -8974,7 +9030,8 @@ is currently a balance of ';
     }
 
     function getSlaResponseHours($priority,
-                                 $customerID
+                                 $customerID,
+                                 $contactID = null
     )
     {
         $dbeCustomer = new DBECustomer($this);
@@ -9001,12 +9058,20 @@ is currently a balance of ';
         }
 
         $slaHours = $dbeCustomer->getValue($priorityValue);
+
+        $dbeContact = null;
+        if ($contactID) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($contactID);
+        }
+
         /*
     Special attention customers get half of normal SLA
     */
         if (
-            $dbeCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-            $dbeCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')
+            ($dbeCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                $dbeCustomer->getValue(DBECustomer::specialAttentionEndDate) >= date('Y-m-d')) ||
+            ($dbeContact && $dbeContact->getValue(DBEContact::specialAttentionContactFlag) == 'Y')
         ) {
             $slaHours = $slaHours / 2;
         }
@@ -9616,7 +9681,8 @@ is currently a balance of ';
         $slaResponseHours =
             $this->getSlaResponseHours(
                 $priority,
-                $customerID
+                $customerID,
+                $dbeContact->getValue(DBEContact::contactID)
             );
 
         if (!$callActivityID) {
@@ -10426,9 +10492,11 @@ is currently a balance of ';
         );
 
         $body = $template->get_var('output');
+        $toEmail = 'managementreview@' . CONFIG_PUBLIC_DOMAIN;
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => 'Management Review Summary Added ' . $dbeJProblem->getValue(
                     DBEJProblem::customerName
                 ) . ' SR ' . $problemID,
@@ -10449,7 +10517,6 @@ is currently a balance of ';
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $toEmail = 'managementreview@' . CONFIG_PUBLIC_DOMAIN;
 
         $buMail->putInQueue(
             $senderEmail,
@@ -11095,6 +11162,20 @@ is currently a balance of ';
         $dbejCallactivity->getRow($dbeCallActivity->getPKValue());
 
         return $dbejCallactivity;
+    }
+
+    public function getProblemsByContact($contactID)
+    {
+        $dbeJProblem = new DBEJProblem($this);
+
+        $dbeJProblem->getProblemsByContactID($contactID);
+
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+
+        return $dsResults;
     }
 
 

@@ -1,0 +1,124 @@
+<link rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+/>
+
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+></script>
+
+<script>
+    $(function () {
+        $('#theTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            paging: false,
+        });
+    })
+</script>
+<style>
+    table.dataTable tfoot th {
+        padding-right: 0 !important;
+    }
+</style>
+<P>
+    <span style="color:red;background-color: red">R</span> Not ordered yet.
+    <span style="color: orange;background-color: orange">A</span> Ordered but not
+    received. <span style="color: black;background-color: black">B</span> Ordered and
+    received. <span style="color: green;background-color: green">G</span> Entire purchase order received.
+</P>
+<TABLE id="theTable">
+    <thead>
+    <TR>
+        <th>
+            PO
+        </th>
+        <th>
+            SO
+        </th>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Qty
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            Supplier
+        </th>
+        <th>
+            Delivered To
+        </th>
+        <th>
+            Ordered On
+        </th>
+        <th>
+            Visit Booked For
+        </th>
+        <th>
+            Required By
+        </th>
+        <th>
+            Supplier Ref
+        </th>
+        <th>
+            Project Name
+        </th>
+    </TR>
+    </thead>
+    <tbody>
+    <!-- BEGIN notYetReceivedItemBlock -->
+    <TR {style}>
+        <TD>
+            <A href="{purchaseOrderLink}">{purchaseOrderId}</A>
+        </TD>
+        <td>
+            {salesOrderLink}
+        </td>
+        <td>
+            {customerName}
+        </td>
+        <td>
+            {orderedQty}
+        </td>
+        <td>
+            {itemDescription}
+        </td>
+        <td>
+            {supplierName}
+        </td>
+        <td>
+            {direct}
+        </td>
+        <td>
+            {purchaseOrderDate}
+        </td>
+        <td>
+            {futureDate}
+        </td>
+        <td>
+            {requiredByDate}
+        </td>
+        <td>
+            {supplierRef}
+        </td>
+        <td>
+            {projectLink}
+        </td>
+    </TR>
+    <!-- END notYetReceivedItemBlock -->
+    </tbody>
+</TABLE>
