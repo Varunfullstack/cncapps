@@ -631,6 +631,12 @@ class CTCustomerCRM extends CTCustomer
                 DBECustomer::decisionMakerBackground,
                 $value[DBECustomer::decisionMakerBackground]
             );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::primaryMainContactID,
+                $value[DBECustomer::primaryMainContactID]
+            );
+
             $this->dsCustomer->setValue(
                 DBECustomer::opportunityDeal,
                 $value[DBECustomer::opportunityDeal]
@@ -1436,22 +1442,23 @@ class CTCustomerCRM extends CTCustomer
                 'add2' => $site->getValue(DBESite::add2),
                 'add3' => $site->getValue(DBESite::add3),
 
-                'town'              => $site->getValue(DBESite::town),
-                'county'            => $site->getValue(DBESite::county),
-                'postcode'          => $site->getValue(DBESite::postcode),
-                'sitePhone'         => $site->getValue(DBESite::phone),
-                'siteNo'            => $site->getValue(DBESite::siteNo),
-                'sageRef'           => $site->getValue(DBESite::sageRef),
-                'debtorCode'        => $site->getValue(DBESite::debtorCode),
-                'maxTravelHours'    => $site->getValue(DBESite::maxTravelHours),
-                'deliverContactID'  => $site->getValue(DBESite::deliverContactID),
-                'activeFlagChecked' => ($site->getValue(DBESite::activeFlag) == 'Y') ? CT_CHECKED : '',
-                'activeFlag'        => $site->getValue(DBESite::activeFlag),
-                'deliveryContactID' => $site->getValue(DBESite::deliverContactID),
-                'invoiceContactID'  => $site->getValue(DBESite::deliverContactID),
-                'nonUKFlag'         => $site->getValue(DBESite::nonUKFlag),
-                'deleteSiteText'    => null,
-                'deleteSiteURL'     => null
+                'town'                 => $site->getValue(DBESite::town),
+                'county'               => $site->getValue(DBESite::county),
+                'postcode'             => $site->getValue(DBESite::postcode),
+                'sitePhone'            => $site->getValue(DBESite::phone),
+                'siteNo'               => $site->getValue(DBESite::siteNo),
+                'sageRef'              => $site->getValue(DBESite::sageRef),
+                'debtorCode'           => $site->getValue(DBESite::debtorCode),
+                'maxTravelHours'       => $site->getValue(DBESite::maxTravelHours),
+                'deliverContactID'     => $site->getValue(DBESite::deliverContactID),
+                'activeFlagChecked'    => ($site->getValue(DBESite::activeFlag) == 'Y') ? CT_CHECKED : '',
+                'activeFlag'           => $site->getValue(DBESite::activeFlag),
+                'deliveryContactID'    => $site->getValue(DBESite::deliverContactID),
+                'invoiceContactID'     => $site->getValue(DBESite::deliverContactID),
+                'nonUKFlag'            => $site->getValue(DBESite::nonUKFlag),
+                'deleteSiteText'       => null,
+                'deleteSiteURL'        => null,
+                "primaryMainContactID" => $this->dsCustomer->getValue(DBECustomer::primaryMainContactID),
             )
         );
         if ((!$this->formError) & ($this->getAction(

@@ -63,6 +63,7 @@ class DBECustomer extends DBCNCEntity
     const opportunityDeal = 'opportunityDeal';
     const rating = 'rating';
     const lastContractSent = 'lastContractSent';
+    const primaryMainContactID = 'primaryMainContactID';
     const sortCode = 'sortCode';
     const accountName = 'accountName';
     const accountNumber = 'accountNumber';
@@ -392,6 +393,12 @@ class DBECustomer extends DBCNCEntity
             DA_TEXT,
             DA_ALLOW_NULL,
             "lastContractSent"
+        );
+
+        $this->addColumn(
+            self::primaryMainContactID,
+            DA_ID,
+            DA_ALLOW_NULL
         );
 
         $this->addColumn(

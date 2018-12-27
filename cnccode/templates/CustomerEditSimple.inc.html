@@ -70,44 +70,11 @@
         color: red !important;
     }
 
-    table.fixed_header {
-        table-layout: fixed;
-    }
-
-    .fixed_header tbody, thead {
-        display: block;
-    }
-
-    .fixed_header tbody {
-        overflow-y: scroll;
-        height: 851px;
-        direction: rtl;
-        /*width: 100%;*/
-    }
-
-    .fixed_header tbody tr{
-        direction: ltr;
-    }
-
-    .fixed_header tbody td {
-        overflow: hidden;
-    }
-
-    .fixed_header td, th {
-        word-wrap: break-word;
-    }
-
-    .fixed_header thead tr, .fixed_header tbody tr {
-        display: block;
-    }
 
     .highlight {
         background-color: lightgreen;
     }
 
-    .fixed_header thead {
-        margin-right: 12px;
-    }
 
     .contactClear {
         width: 26px;
@@ -1262,6 +1229,25 @@
         //     return false;
         // }
 
+        // check that the selected primaryMainContact is in fact also a "main"
+
+        const value = $('#primaryMainContactSelector').val();
+        const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
+
+        let foundMain = false;
+
+        mainContactsSelect.each(function () {
+            const foundMatch = $(this).attr('name').match(/\d+/);
+            if (foundMatch && foundMatch[0] == value) {
+                foundMain = true;
+            }
+        });
+
+        if (!foundMain) {
+            alert("The Primary Main contact is no longer flagged as Main, please flag it back or pick another Main Contact as Primary");
+            return false;
+        }
+
 
         if (forceDirectDebit) {
 
@@ -1445,6 +1431,25 @@
                         >
                     </td>
 
+                </tr>
+                <tr>
+                    <td class="content">Primary Main Contact</td>
+                    <td class="content">
+                        <select {disabled}
+                                id="primaryMainContactSelector"
+                                name="form[customer][{customerID}][primaryMainContactID]"
+                                {primaryMainMandatory}
+                        >
+                            <option value="">Select a contact to be the Primary Main</option>
+                            <!-- BEGIN primaryMainContactBlock -->
+                            <option {primaryMainContactSelected}
+                                    value="{primaryMainContactValue}"
+                            >
+                                {primaryMainContactDescription}
+                            </option>
+                            <!-- END primaryMainContactBlock -->
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td class="content">Mailshot</td>

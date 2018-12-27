@@ -775,6 +775,11 @@ class CTCustomer extends CTCNC
             }
 
             $this->dsCustomer->setValue(
+                DBECustomer::primaryMainContactID,
+                $value[DBECustomer::primaryMainContactID]
+            );
+
+            $this->dsCustomer->setValue(
                 DBECustomer::customerTypeID,
                 $value['customerTypeID']
             );
@@ -2161,6 +2166,31 @@ ORDER BY cus_name ASC  ";
                 )
             );
 
+        $mainContacts = $this->buCustomer->getMainSupportContacts($this->dsCustomer->getValue(DBECustomer::customerID));
+        $this->template->set_block(
+            'CustomerEdit',
+            'primaryMainContactBlock',
+            'primaryMainContacts'
+        );
+
+        foreach ($mainContacts as $mainContact) {
+            $this->template->set_var(
+                array(
+                    'primaryMainContactValue'       => $mainContact[DBEContact::contactID],
+                    'primaryMainContactDescription' => $mainContact[DBEContact::firstName] . " " . $mainContact[DBEContact::lastName],
+                    'primaryMainContactSelected'    => $mainContact[DBEContact::contactID] == $this->dsCustomer->getValue(
+                        DBECustomer::primaryMainContactID
+                    ) ? CT_SELECTED : ''
+                )
+            );
+            $this->template->parse(
+                'primaryMainContacts',
+                'primaryMainContactBlock',
+                true
+            );
+        }
+
+
         $buItem = new BUCustomerItem($this);
 
         $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
@@ -2265,6 +2295,7 @@ ORDER BY cus_name ASC  ";
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
                 'isShowingInactive'              => $_REQUEST['showInactiveContacts'] ? 'true' : 'false',
+                'primaryMainMandatory'           => count($mainContacts) ? 'required' : '',
                 'sortCode'                        => $this->dsCustomer->getValue(DBECustomer::sortCode),
                 'accountName'                     => $this->dsCustomer->getValue(DBECustomer::accountName),
                 'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),

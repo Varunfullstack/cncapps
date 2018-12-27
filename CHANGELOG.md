@@ -2,13 +2,13 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
 ### Fixed
-- Issue 376 - Contact notes being copied to other contacts
-- Issue 359 - Management Review Summary shows blank To: field
-- Issue 372 - Email display header missing
-- Issue 360 - SD Dashboard Assignment display issue
-### Changed 
-- Issue 365 - Performance table formatting improvements
+- Issue 352 - CNCWEB contacts bugs
+### Added
+- Issue 347 - Customer Review Management documents
+- Issue 345 - Creation of Primary Main Contact 
 
 ## [v1.15.0] - 2018-12-27
 ### Fixed
