@@ -41,7 +41,9 @@ class BUItemsNotYetReceived extends Business
     poh_type as purchaseOrderType,
     poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered ,
     pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
-    pol_qty_ord AS orderedQuantity
+    pol_qty_ord AS orderedQuantity,
+      ordhead.odh_ordno as salesOrderID,
+       project.projectID
 FROM
   porline 
   LEFT JOIN porhead 

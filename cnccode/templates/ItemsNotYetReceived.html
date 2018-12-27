@@ -42,7 +42,10 @@
     <thead>
     <TR>
         <th>
-            Purchase order
+            PO
+        </th>
+        <th>
+            SO
         </th>
         <th>
             Customer Name
@@ -83,6 +86,9 @@
             <A href="{purchaseOrderLink}">{purchaseOrderId}</A>
         </TD>
         <td>
+            {salesOrderLink}
+        </td>
+        <td>
             {customerName}
         </td>
         <td>
@@ -110,7 +116,7 @@
             {supplierRef}
         </td>
         <td>
-            {projectName}
+            {projectLink}
         </td>
     </TR>
     <!-- END notYetReceivedItemBlock -->

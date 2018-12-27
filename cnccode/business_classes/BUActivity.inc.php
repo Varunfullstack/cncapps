@@ -3402,7 +3402,7 @@ class BUActivity extends Business
         callactivity
         JOIN problem ON pro_problemno = caa_problemno
       WHERE
-        caa_problemno IN( $problemIDsAsString )
+        caa_problemno IN( $problemIDsAsString ) and caa_callacttypeno <> 43
         AND pro_contract_cuino = 0";
 
         $db->query($select);
