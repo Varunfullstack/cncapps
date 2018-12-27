@@ -5,6 +5,9 @@
 </script>
 <style>
 
+    .has-error table thead tr {
+        background-color: red;
+    }
 
     table.content tbody td {
         background-color: #F4f4f2;
@@ -70,6 +73,36 @@
         color: red !important;
     }
 
+    table.fixed_header {
+        table-layout: fixed;
+    }
+
+    .fixed_header tbody, thead {
+        display: block;
+    }
+
+    .fixed_header tbody {
+        overflow-y: scroll;
+        height: 851px;
+        direction: rtl;
+        /*width: 100%;*/
+    }
+
+    .fixed_header tbody tr {
+        direction: ltr;
+    }
+
+    .fixed_header tbody td {
+        overflow: hidden;
+    }
+
+    .fixed_header td, th {
+        word-wrap: break-word;
+    }
+
+    .fixed_header thead tr, .fixed_header tbody tr {
+        display: block;
+    }
 
     .highlight {
         background-color: lightgreen;
@@ -229,7 +262,7 @@
     }
 
 </style>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.js"
+<script src=".javascript/jquery-form-validator-2.3.79.js"
 ></script>
 <div id="newPasswordDialog"
      title="New Password"
@@ -293,6 +326,7 @@
             <div class="contactSite">
                 <select name="form[contact][0][siteNo]"
                         data-validation="required"
+                        data-type="site"
                 >
                     <!-- BEGIN templateSelectSiteBlock -->
                     <option value="{selectSiteNo}"
@@ -311,6 +345,7 @@
                        value=""
                        required
                        data-validation="required"
+                       data-type="title"
                 >
             </div>
         </td>
@@ -323,6 +358,7 @@
                        value=""
                        required
                        data-validation="required"
+                       data-type="firstName"
                 >
             </div>
         </td>
@@ -335,6 +371,7 @@
                        value=""
                        required
                        data-validation="required"
+                       data-type="lastName"
                 >
             </div>
         </td>
@@ -375,6 +412,7 @@
                        maxlength="50"
                        data-validation="emailOrEmpty server"
                        data-validation-url="/validateUniqueEmail.php"
+                       data-type="email"
                 >
             </div>
         </td>
@@ -849,13 +887,84 @@
             }
         }
 
+        var erroredElements = {};
+        var errorsShowing = {};
+
+        const contactsTableErrors = $('#contactsTableErrors');
+
+
+        function showError() {
+            const html = Object.keys(errorsShowing).reduce((acc, key) => {
+                acc += "<div>Validation for " + errorsShowing[key] + " " + key + " Failed</div>"
+                return acc;
+            }, "");
+            contactsTableErrors.find('.errors').html(html);
+            contactsTableErrors.show();
+        }
+
+        function hideErrors() {
+            errorsShowing = {};
+            contactsTableErrors.hide();
+        }
+
+        $('#contactsTable').on('validation', 'input', onValidation);
+        $('#contactsTable').on('beforeValidation', 'input', onBeforeValidation);
+
+        function onBeforeValidation(value, lang, config) {
+
+            if (window.isSubmitting) {
+                debugger;
+                // do stuff
+                $(this).data('validation-skipped', 1);
+            }
+        }
+
+        function onValidation(evt, valid) {
+
+            var $input = $(evt.target);
+
+            if (!valid) {
+                return showError();
+            }
+
+            delete erroredElements[$input[0].name];
+
+            var isValid = Object.keys(erroredElements).reduce((acc, key) => {
+                return acc && erroredElements[key]
+            }, true);
+
+            if (!isValid) {
+                showError();
+            } else {
+                hideErrors();
+            }
+        }
 
         var config = {
             modules: 'security',
-            inlineErrorMessageCallback: function (error, element) {
-
+            showHelpOnFocus: false,
+            addSuggestions: false,
+            ignoreSubmit: true,
+            submitErrorMessageCallback: function ($form, errorMessages, config) {
+                return;
             },
-            scrollToTopOnError: true
+            inlineErrorMessageCallback: function ($input, errorMessage, config) {
+                return;
+                //check if the element already exists in the map
+                if (errorMessage) {
+                    if (!erroredElements[$input[0].name]) {
+                        erroredElements[$input[0].name] = errorMessage;
+                    }
+                    //we know that we need to show an error
+                    // we check if the current data type is already showing an error..if that's the case ..we just return
+                    const data = $input.data();
+                    if (!errorsShowing[data.type]) {
+                        errorsShowing[data.type] = data.validation;
+                    }
+                }
+            },
+            scrollToTopOnError: true,
+            showErrorDialogs: true,
         };
         $.validate(config);
 
@@ -915,69 +1024,122 @@
             errorMessageKey: 'badEmail'
         });
 
+        const validatorData = {};
+
         $.formUtils.addValidator({
             name: 'atLeastOne',
             validatorFunction: function (value, $el, config, language, $form) {
-                var test = $('[data-type="' + $el.data().type + '"]');
+
+                const startOfFunction = performance.now();
+                const elementData = $el.data();
+                const dataType = elementData.type;
                 var isValid = false;
-                var except = test.data().except;
-                var exceptCondition = eval(except);
-                test.each(function () {
-                    var elm = $(this);
-                    var isMe = elm.get(0) === $el.get(0);
+                var except = elementData.except;
+                var exceptCondition = false;
+                if (except) {
+                    exceptCondition = eval(except);
+                }
 
-                    if (elm.prop('checked')) {
-                        isValid = true;
-                    }
-
-                    if (!$el.data().toBeValidated && !isMe) {
-                        elm.data("toBeValidated", true);
-                        elm.validate();
-                    }
-                });
-
-                $el.data("toBeValidated", false);
                 if (exceptCondition) {
                     return true;
                 }
+
+                if (validatorData.hasOwnProperty(dataType)) {
+                    // there's an initiator...we should return whatever the initiator says
+                    const case1 = performance.now();
+
+                    // console.log('validating ' + dataType + " atLeastOne took " + (case1 - startOfFunction) + " milliseconds ");
+                    return validatorData[dataType];
+                }
+
+                var test = $('[data-type="' + dataType + '"]');
+
+                var allElements = test.toArray();
+
+                var counter = 0;
+                const startFindIfValid = performance.now();
+                do {
+                    var elm = $(allElements[counter]);
+                    isValid = !!elm.prop('checked');
+                    counter++;
+                } while (!isValid && counter < allElements.length);
+                // console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startFindIfValid) + " milliseconds  while trying to find it it was valid");
+                validatorData[dataType] = isValid;
+
+                const startValidatingOthers = performance.now();
+
+                test.each(function () {
+                    const elm = $(this);
+                    const isMe = elm.get(0) === $el.get(0);
+                    if (!isMe) {
+                        const startOtherValidation = performance.now();
+                        elm.validate(null);
+                        // console.log(" took " + (performance.now() - startOtherValidation) + " milliseconds  while calling validation of other");
+                    }
+                });
+
+                // console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startValidatingOthers) + " milliseconds  while trying call validation of others");
+
+                delete validatorData[dataType];
+                const t1 = performance.now();
+                // console.log('validating ' + dataType + " atLeastOne took " + (t1 - startOfFunction) + " milliseconds (INITIATOR) ");
                 return isValid;
             },
-            errorMessage: '',
+            errorMessage: 'at least one failed',
             errorMessageKey: 'atLeastOne'
         });
 
         $.formUtils.addValidator({
             name: 'atLeastOneAtMostOne',
             validatorFunction: function (value, $el, config, language, $form) {
-                var test = $('[data-type="' + $el.data().type + '"]');
-
-                var checkedCount = 0;
-
-                test.each(function () {
-                    var elm = $(this);
-                    var isMe = elm.get(0) === $el.get(0);
-
-                    if (elm.prop('checked')) {
-                        checkedCount++;
-                    }
-
-                    if (!$el.data().toBeValidated && !isMe) {
-                        elm.data("toBeValidated", true);
-                        elm.validate();
-                    }
-                });
-                var except = test.data().except;
-                var exceptCondition = eval(except);
-                $el.data("toBeValidated", false);
+                const elementData = $el.data();
+                const dataType = elementData.type;
+                var test = $('[data-type="' + dataType + '"]');
+                var isValid = false;
+                var except = elementData.except;
+                var exceptCondition = false;
+                if (except) {
+                    exceptCondition = eval(except);
+                }
 
                 if (exceptCondition) {
                     return true;
                 }
 
-                return checkedCount === 1;
+                if (validatorData.hasOwnProperty(dataType)) {
+                    // there's an initiator...we should return whatever the initiator says
+                    return validatorData[dataType];
+                }
+                const t0 = performance.now();
+                var allElements = test.toArray();
+
+                var counter = 0;
+                var checkedCount = 0;
+                do {
+                    var elm = $(allElements[counter]);
+                    checkedCount += !!elm.prop('checked');
+                    counter++;
+                } while (checkedCount < 2 && counter < allElements.length);
+
+                isValid = checkedCount > 0 && checkedCount < 2;
+
+                validatorData[dataType] = isValid;
+
+                test.each(function () {
+                    const elm = $(this);
+                    const isMe = elm.get(0) === $el.get(0);
+                    if (!isMe) {
+                        elm.validate(null);
+                    }
+                });
+
+                delete validatorData[dataType];
+                const t1 = performance.now();
+                // console.log('validating ' + dataType + " atLeastOneAtMostOne took " + (t1 - t0) + " milliseconds ");
+                return isValid;
             },
             errorMessage: '',
-            errorMessageKey: 'atLeastOne'
+            errorMessageKey: 'atLeastOneAtMostOne'
         });
 
         $.formUtils.addValidator({
@@ -1191,6 +1353,8 @@
 
 
     function checkMailShotOptions() {
+
+        window.isSubmitting = true;
 
         // var x = document.getElementsByClassName('stmCheckBox');
         // var count = 0;
@@ -2366,6 +2530,16 @@
         <br/>
         <br/>
         <h3 style="clear: both;">Contacts</h3>
+        <div id="contactsTableErrors"
+             style="display: none"
+        >
+            <div>
+                There are some validation errors, please check before submitting
+            </div>
+            <div class="errors">
+
+            </div>
+        </div>
         <div class="contacts"
              id="contactsTable"
         >
@@ -2615,6 +2789,7 @@
 
                             <select name="form[contact][{contactID}][siteNo]"
                                     data-validation="required"
+                                    data-type="site"
                             >
                                 <!-- BEGIN selectSiteBlock -->
                                 <option {siteSelected}
@@ -2635,6 +2810,7 @@
                                    value="{title}"
                                    required
                                    data-validation="required"
+                                   data-type="title"
                             >
                         </div>
                     </td>
@@ -2648,6 +2824,7 @@
                                    value="{firstName}"
                                    required
                                    data-validation="required"
+                                   data-type="firstName"
                             >
                         </div>
                     </td>
@@ -2661,6 +2838,7 @@
                                    value="{lastName}"
                                    required
                                    data-validation="required"
+                                   data-type="lastName"
                             >
                         </div>
                     </td>
@@ -2709,6 +2887,7 @@
                                    maxlength="50"
                                    data-validation="emailOrEmpty server"
                                    data-validation-url="/validateUniqueEmail.php"
+                                   data-type="email"
                             >
                         </div>
                     </td>
