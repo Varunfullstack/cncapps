@@ -1366,7 +1366,7 @@ class BUActivity extends Business
 
         return $slaHours;
     }
-    
+
     function sendPriorityFiveFixedEmail($problemID)
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -7322,6 +7322,7 @@ is currently a balance of ';
     )
     {
 
+        echo '<div>The sender email is ' . $automatedRequest->getSenderEmailAddress() . ' </div>';
         if (!$automatedRequest->getCustomerID()) {
             echo "<div>We couldn't find a customer ID, should log in to be logged</div>";
             return $this->addCustomerRaisedRequest(
@@ -7446,9 +7447,10 @@ is currently a balance of ';
 
             return true;
         }
-
+        echo "<div>We do not have a service request ID</div>";
 
         if ($automatedRequest->getServerGuardFlag() == 'Y') {
+            echo '<div>This is SERVER GUARD request!</div>';
             return $this->processServerGuard($automatedRequest);
         }
 
@@ -7634,7 +7636,13 @@ is currently a balance of ';
         echo "<div>We are trying to raise a new request</div>";
         $customerID = $record->getCustomerID();
         $dbeProblem = new DBEProblem($this);
-        $dbeContact = new DBEContact($this);
+
+        $dbeContact = new \DBEContact($this);
+        $dbeContact->setValue(
+            \DBEContact::email,
+            $record->getSenderEmailAddress()
+        );
+        $dbeContact->getRowsByColumn(\DBEContact::email);
 
         if (!$dbeContact->rowCount || $serverGuard) {
             echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
@@ -7678,7 +7686,7 @@ is currently a balance of ';
         $slaResponseHours = $this->getSlaResponseHours(
             $record->getPriority(),
             $customerID,
-            $contact['contactID']
+            $dbeContact->getValue(DBEContact::contactID)
         );
 
         /*
@@ -7739,7 +7747,7 @@ is currently a balance of ';
         );
 
         /* @todo confirm with GL */
-        if ($record->getSenderEmailAddress() == 'A') {
+        if ($record->getSendEmail() == 'A') {
             $dbeProblem->setValue(
                 DBEJProblem::hideFromCustomerFlag,
                 'N'
@@ -7849,9 +7857,6 @@ is currently a balance of ';
 
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($customerID);
-
-        $template = 'ServiceLoggedEmail';
-
 
         $testTime = (new \DateTime($record->getCreateDateTime()))->format('H:i');
 
@@ -8948,76 +8953,76 @@ is currently a balance of ';
         return null;
     }
 
-    function processIsSenderAuthorised($details,
-                                       $contact,
-                                       $record,
-                                       &$errorString
-    )
-    {
-
-
-        if ($contact && $contact['supportLevel']) {
-
-            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-            $details .= 'New request from email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-                    CONFIG_MYSQL_DATETIME
-                );
-
-            $this->raiseNewRequestFromImport(
-                $record,
-                $details,
-                $contact
-            );
-
-            return true;
-        }
-
-        if ($contact) {
-            if ($contact['isMainContact']) {
-                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-                $details .= 'This email is from an unauthorised contact and needs to be confirmed' . "\n\n";
-                $details .= 'New request from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
-
-                $this->raiseNewRequestFromImport(
-                    $record,
-                    $details,
-                    $contact
-                );
-                return true;
-            } else {
-                $errorString = 'Domain for ' . $record['senderEmailAddress'] . ' matches customer ' . $contact['customerID'] . ' but no main contact assigned for customer<br/>';
-
-                echo $errorString;
-
-                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-                $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-                        CONFIG_MYSQL_DATETIME
-                    );
-
-                $this->addCustomerRaisedRequest(
-                    $record,
-                    $contact,
-                    false,
-                    $details,
-                    'C'
-                );
-                return false;
-            }
-        } else {
-            /* unknown domain */
-            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-            $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
-
-            $this->addCustomerRaisedRequest(
-                $record,
-                $contact,
-                false,
-                $details,
-                'C'
-            );
-            return true;
-        }
-    }
+//    function processIsSenderAuthorised($details,
+//                                       $contact,
+//                                       $record,
+//                                       &$errorString
+//    )
+//    {
+//
+//
+//        if ($contact && $contact['supportLevel']) {
+//
+//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//            $details .= 'New request from email received from ' . $record['senderEmailAddress'] . ' on ' . date(
+//                    CONFIG_MYSQL_DATETIME
+//                );
+//
+//            $this->raiseNewRequestFromImport(
+//                $record,
+//                $details,
+//                $contact
+//            );
+//
+//            return true;
+//        }
+//
+//        if ($contact) {
+//            if ($contact['isMainContact']) {
+//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//                $details .= 'This email is from an unauthorised contact and needs to be confirmed' . "\n\n";
+//                $details .= 'New request from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
+//
+//                $this->raiseNewRequestFromImport(
+//                    $record,
+//                    $details,
+//                    $contact
+//                );
+//                return true;
+//            } else {
+//                $errorString = 'Domain for ' . $record['senderEmailAddress'] . ' matches customer ' . $contact['customerID'] . ' but no main contact assigned for customer<br/>';
+//
+//                echo $errorString;
+//
+//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//                $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(
+//                        CONFIG_MYSQL_DATETIME
+//                    );
+//
+//                $this->addCustomerRaisedRequest(
+//                    $record,
+//                    $contact,
+//                    false,
+//                    $details,
+//                    'C'
+//                );
+//                return false;
+//            }
+//        } else {
+//            /* unknown domain */
+//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//            $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
+//
+//            $this->addCustomerRaisedRequest(
+//                $record,
+//                $contact,
+//                false,
+//                $details,
+//                'C'
+//            );
+//            return true;
+//        }
+//    }
 
 
     function addCustomerRaisedRequest(\CNCLTD\AutomatedRequest $record,

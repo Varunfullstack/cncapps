@@ -815,6 +815,10 @@
         $('#newPasswordDialog').dialog('open');
     }
 
+    function focusOn(elementName) {
+        $('[name="' + elementName + '"]').focus();
+    }
+
     var validPassword = false;
     var validRepeatPassword = false;
 
@@ -892,13 +896,8 @@
 
         const contactsTableErrors = $('#contactsTableErrors');
 
-
-        function showError() {
-            const html = Object.keys(errorsShowing).reduce((acc, key) => {
-                acc += "<div>Validation for " + errorsShowing[key] + " " + key + " Failed</div>"
-                return acc;
-            }, "");
-            contactsTableErrors.find('.errors').html(html);
+        function showErrors(data) {
+            contactsTableErrors.find('.errors').html(data.html);
             contactsTableErrors.show();
         }
 
@@ -919,25 +918,46 @@
             }
         }
 
+
+
         function onValidation(evt, valid) {
+            //we have to generate the list of errored elements
 
-            var $input = $(evt.target);
+            const erroredElements = $('input.error').toArray()
 
-            if (!valid) {
-                return showError();
-            }
-
-            delete erroredElements[$input[0].name];
-
-            var isValid = Object.keys(erroredElements).reduce((acc, key) => {
-                return acc && erroredElements[key]
-            }, true);
-
-            if (!isValid) {
-                showError();
-            } else {
+            if (!erroredElements.length) {
                 hideErrors();
+                return;
             }
+
+            // we have to generate the error messages
+
+            const data = erroredElements.reduce((acc, elm) => {
+
+                const elmData = $(elm).data();
+
+                if (elmData.type) {
+                    if (!acc.types[elmData.type]) {
+                        // this is the first errored element of this type
+                        acc.types[elmData.type] = true;
+
+                        acc.html += "<div>Validation for " + elmData.validation + " on " + elmData.type + ' Failed. <button type="button" onclick="focusOn(\'' + elm.name + '\')">click here to see it </div>';
+                    }
+                } else {
+                    // we don't have a type ..so we are going to use the validation as key
+                    if (!acc.types[elmData.validation]) {
+                        // this is the first errored element of this type
+                        acc.types[elmData.validation] = true;
+
+                        acc.html += "<div>Validation for " + elmData.validation + ' Failed. <button type="button" onclick="focusOn(\'' + elm.name + '\')">click here to see it </div>';
+                    }
+                }
+
+                // console.log(acc.html);
+                return acc;
+            }, {types: {}, html: ""});
+            showErrors(data);
+
         }
 
         var config = {
@@ -946,22 +966,10 @@
             addSuggestions: false,
             ignoreSubmit: true,
             submitErrorMessageCallback: function ($form, errorMessages, config) {
+                console.log(errorMessages);
                 return;
             },
             inlineErrorMessageCallback: function ($input, errorMessage, config) {
-                return;
-                //check if the element already exists in the map
-                if (errorMessage) {
-                    if (!erroredElements[$input[0].name]) {
-                        erroredElements[$input[0].name] = errorMessage;
-                    }
-                    //we know that we need to show an error
-                    // we check if the current data type is already showing an error..if that's the case ..we just return
-                    const data = $input.data();
-                    if (!errorsShowing[data.type]) {
-                        errorsShowing[data.type] = data.validation;
-                    }
-                }
             },
             scrollToTopOnError: true,
             showErrorDialogs: true,
@@ -1192,6 +1200,14 @@
         };
 
         $('body').on('change', '[data-type="mainSelector"]', assignClass);
+
+        $(window).bind('validatorsLoaded', () => {
+            $('[data-validation-url]').each(function (index) {
+                var $this = $(this);
+
+                $this.validate(null, config);
+            });
+        });
 
         $('[data-type="mainSelector"]').each(assignClass);
 

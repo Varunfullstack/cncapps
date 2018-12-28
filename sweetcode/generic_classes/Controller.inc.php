@@ -251,6 +251,12 @@ class Controller extends BaseObject
 
     function setFormErrorOn()
     {
+        echo "form error set ";
+        try {
+            throw new Exception();
+        } catch (\Exception $exception){
+            echo $exception->getTraceAsString();
+        }
         $this->formError = TRUE;
     }
 
