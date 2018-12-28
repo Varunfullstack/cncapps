@@ -5429,20 +5429,11 @@ is currently a balance of ';
                 $fields['submittedTo'] = 'Service Desk';
             }
             $this->sendEmailToCustomer(
-                array(
-                    'problemID'     => $dbeProblem->getPKValue(),
-                    'templateName'  => 'ServiceLoggedEmail',
-                    'subjectSuffix' => 'New Request Logged',
-                    'fields'        => $fields
-                )
+                $dbeProblem->getPKValue(),
+                self::InitialCustomerEmailCategory
             );
-
         }
 
-        $this->sendEmailToCustomer(
-            $dbeProblem->getValue(DBEProblem::problemID),
-            self::InitialCustomerEmailCategory
-        );
 
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
