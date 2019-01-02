@@ -100,6 +100,23 @@ class BUContact extends Business
         return $ret;
     }
 
+    function getAuthorisingContacts(&$dsResults,
+                                    $customerID
+    )
+    {
+        $this->setMethodName('getSupportContacts');
+        $this->dbeContact->getAuthorisingRows($customerID);
+        $ret = ($this->getData(
+            $this->dbeContact,
+            $dsResults
+        ));
+        $dsResults->columnSort(
+            'lastName',
+            'firstName'
+
+        );
+        return $ret;
+    }
 
     /**
      * Get Contact rows whose names match the search string or, if the string is numeric, try to select by customerID

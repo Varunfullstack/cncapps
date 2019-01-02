@@ -605,7 +605,6 @@ class DBEContact extends DBCNCEntity
     }
 
 
-
     /**
      * all rows for given supplier
      */
@@ -664,12 +663,24 @@ class DBEContact extends DBCNCEntity
         return (parent::getRows());
     }
 
+    function getAuthorisingRows($customerID)
+    {
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::supportLevel) .
+            " in ('main', 'supervisor')  AND con_custno = " . $customerID;
+
+        $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
     function getSupportRows($customerID = false)
     {
         $sql = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::supportLevel) .
-            " is no null AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+            " is not null AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
 
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;

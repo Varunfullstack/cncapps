@@ -10,6 +10,8 @@
 >
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script language='JavaScript'>
+
+    var authorisedByName = "{authorisedByName}";
     $(function () {
         window.alarmDate = $('#alarmDate').get(0);
 
@@ -41,6 +43,7 @@
             $('input[name="Escalate"]').show();
             $('input[name="Update"]').show();
         }
+
 
     })
     var formChanged = false;
@@ -101,6 +104,55 @@
             'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
         );
 
+    }
+
+    function checkChangedContact() {
+        if (!authorisedByName) {
+            // we need to check if the contact selected is a delegate
+            const optionSelected = event.target.options[event.target.selectedIndex];
+            const $optionSelected = $(optionSelected);
+
+            const data = $optionSelected.data();
+
+            if (data.delegate) {
+
+                const object = {customerID: {customerID}};
+                $.ajax({
+                    url: '?action=authorisingContacts',
+                    method: 'POST',
+                    type: 'post',
+                    dataType: 'json',
+                    data: object
+                }).then(function (result) {
+                    const options = result.data.reduce((acc, contact) => {
+
+                        const prefix = contact.supportLevel === 'supervisor' ? '- Supervisor ' : '* ';
+
+                        const suffix = contact.supportLevel === 'supervisor' ? ' - Supervisor ' : ' *';
+
+                        acc += "<option value='" + contact.id + "'>" + prefix + contact.firstName + " " + contact.lastName + suffix + "</option>";
+                        return acc;
+                    }, '');
+
+                    const selector = "<select name='problem[{problemID}][authorisedBy]' required><option value>Select the authoriser contact</option>" + options + "</select>";
+
+                    $optionSelected.closest('tr').before('<tr id="authorisedByRow"><td class="promptText">Authorised By</td><td class="mainHeadText">' + selector + '</td></tr>');
+
+                }).catch(function () {
+
+                }).then(function () {
+
+                });
+
+
+            } else {
+                $('#authorisedByRow').remove();
+            }
+
+
+        }
+
+        changeContactNotes();
     }
 
     function changeContactNotes() {
@@ -367,13 +419,14 @@
             >
                 <select name="callActivity[1][contactID]"
                         required
-                        onchange="changeContactNotes()"
+                        onchange="checkChangedContact()"
                 >
 
                     <option value="">Please Select</option>
                     <!-- BEGIN contactBlock -->
                     {optGroupOpen}
                     <option {contactSelected}
+                            {dataDelegate}
                             value="{contactID}"
                     >{startMainContactStyle} {contactName}
                         {endMainContactStyle}

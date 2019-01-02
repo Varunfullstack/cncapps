@@ -487,6 +487,9 @@ class CTActivity extends CTCNC
             case 'contactNotes':
                 echo json_encode(['data' => $this->getContactNotes()]);
                 break;
+            case 'authorisingContacts':
+                echo json_encode(['data' => $this->getAuthorisingContacts()]);
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -3583,6 +3586,7 @@ class CTActivity extends CTCNC
 
         while ($dbeContact->fetchNext()) {
 
+            $dataDelegate = "";
             $contactSelected = ($contactID == $dbeContact->getValue("contactID")) ? CT_SELECTED : '';
 
             if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
@@ -3591,6 +3595,7 @@ class CTActivity extends CTCNC
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate) {
                 $startMainContactStyle = '- Delegate';
                 $endMainContactStyle = '- Delegate';
+                $dataDelegate = "data-delegate='true'";
             } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
                 $startMainContactStyle = '- Supervisor';
                 $endMainContactStyle = '- Supervisor';
@@ -3650,7 +3655,8 @@ class CTActivity extends CTCNC
                     'startMainContactStyle' => $startMainContactStyle,
                     'endMainContactStyle'   => $endMainContactStyle,
                     'optGroupOpen'          => $optGroupOpen,
-                    'optGroupClose'         => $optGroupClose
+                    'optGroupClose'         => $optGroupClose,
+                    'dataDelegate'          => $dataDelegate
                 )
             );
             $this->template->parse(
@@ -4324,7 +4330,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue('customerID')
                 ),
-                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                'contactHistoryLink'           => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
@@ -4333,8 +4339,8 @@ class CTActivity extends CTCNC
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
-                        $dsCallActivity->getValue('problemID')
-                    ),
+                    $dsCallActivity->getValue('problemID')
+                ),
                 'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
                 'contractListPopupLink'        => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
@@ -4992,6 +4998,24 @@ class CTActivity extends CTCNC
 
                 }
             }
+
+            $problemID = $dsCallActivity->getValue('problemID');
+            if (isset($_REQUEST['problem']) && isset($_REQUEST['problem'][$problemID]) && isset($_REQUEST['problem'][$problemID]['authorisedBy'])) {
+                $dbeProblem = new DBEProblem($this);
+                $dbeProblem->setValue(
+                    DBEProblem::problemID,
+                    $problemID
+                );
+                $dbeProblem->getRow();
+
+                $dbeProblem->setValue(
+                    DBEProblem::authorisedBy,
+                    $_REQUEST['problem'][$problemID]['authorisedBy']
+                );
+                $dbeProblem->updateRow();
+            }
+
+
             if (isset($_REQUEST['Fixed'])) {
 
                 //try to close all the activities
@@ -7123,6 +7147,36 @@ class CTActivity extends CTCNC
                 )
             );
         return '| <a href="#" title="Contact SR History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact SR History</a>';
+    }
+
+    private function getAuthorisingContacts()
+    {
+
+        $customerID = @$_REQUEST['customerID'];
+
+        if (!$customerID) {
+            throw new Exception('Customer ID is missing');
+        }
+
+        $buContact = new BUContact($this);
+        $dsResults = new DataSet($this);
+        $buContact->getAuthorisingContacts(
+            $dsResults,
+            $customerID
+        );
+
+
+        $contacts = [];
+
+        while ($dsResults->fetchNext()) {
+            $contacts[] = [
+                'id'           => $dsResults->getValue(DBEContact::contactID),
+                'supportLevel' => $dsResults->getValue(DBEContact::supportLevel),
+                'firstName'    => $dsResults->getValue(DBEContact::firstName),
+                'lastName'     => $dsResults->getValue(DBEContact::lastName)
+            ];
+        }
+        return $contacts;
     }
 }
 
