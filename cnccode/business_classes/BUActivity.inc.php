@@ -7313,11 +7313,19 @@ is currently a balance of ';
     )
     {
 
+        $details = $automatedRequest->getTextBody();
         echo '<div>The sender email is ' . $automatedRequest->getSenderEmailAddress() . ' </div>';
         if (!$automatedRequest->getCustomerID()) {
             echo "<div>We couldn't find a customer ID, should log in to be logged</div>";
+            $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                ) . ' on ' . date(
+                    CONFIG_MYSQL_DATETIME
+                ) . "</div>" . $details;
             return $this->addCustomerRaisedRequest(
-                $automatedRequest
+                $automatedRequest,
+                null,
+                null,
+                $details
             );
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
@@ -7352,19 +7360,25 @@ is currently a balance of ';
                         DBEContact::customerID
                     ) != $automatedRequest->getCustomerID()) {
                     echo "<div>The contact was not found or the contact doesn't belong to the same customer ID</div>";
+                    $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                        ) . ' on ' . date(
+                            CONFIG_MYSQL_DATETIME
+                        ) . "</div>" . $details;
                     return $this->addCustomerRaisedRequest(
-                        $automatedRequest
+                        $automatedRequest,
+                        null,
+                        null,
+                        $details
                     );
                 }
                 return $this->raiseNewRequestFromImport($automatedRequest);
             }
 
-            $details = $automatedRequest->getTextBody();
             if (!$dbeContact->rowCount) {
-                $details .= 'Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         CONFIG_MYSQL_DATETIME
-                    );
+                    ) . " who was not the original service request initiator</div>" . $details;
 
                 $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
                 $this->createFollowOnActivity(
@@ -7389,10 +7403,10 @@ is currently a balance of ';
             }
 
             if ($dbeContact->getValue(DBEContact::customerID) != $automatedRequest->getCustomerID()) {
-                $details .= 'Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         CONFIG_MYSQL_DATETIME
-                    );
+                    ) . " who was not the original service request initiator</div>" . $details;
 
                 $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
                 $this->createFollowOnActivity(
@@ -7417,6 +7431,14 @@ is currently a balance of ';
             }
 
             $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
+
+            if ($dbeProblem->getValue(DBEProblem::contactID) != $dbeContact->getValue(DBEContact::contactID)) {
+                $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                    ) . ' on ' . date(
+                        CONFIG_MYSQL_DATETIME
+                    ) . " who was not the original service request initiator</div>" . $details;
+            }
+
             $this->createFollowOnActivity(
                 $dbeLastActivity->getValue(DBEJCallActivity::callActivityID),
                 CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
@@ -7634,6 +7656,7 @@ is currently a balance of ';
             $record->getSenderEmailAddress()
         );
         $dbeContact->getRowsByColumn(\DBEContact::email);
+        $details = $record->getHtmlBody();
 
         if (!$dbeContact->rowCount || $serverGuard) {
             echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
@@ -7641,7 +7664,13 @@ is currently a balance of ';
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
             if (!$dbeContact->rowCount) {
                 echo "<div>We couldn't find a primary contact, -> to be logged</div>";
-                return $this->addCustomerRaisedRequest($record);
+                $details = '<div style="color: red">Failed to find primary contact associated with customer</div>' . $details;
+                return $this->addCustomerRaisedRequest(
+                    $record,
+                    null,
+                    null,
+                    $details
+                );
             }
             echo "<div>we have found a primary contact</div>";
 
@@ -7650,7 +7679,17 @@ is currently a balance of ';
             $dbeContact->fetchNext();
             if ($dbeContact->getValue(DBEContact::customerID) != $record->getCustomerID()) {
                 echo "<div>The sender contact does not belong to the same customer ID -> to be logged</div>";
-                return $this->addCustomerRaisedRequest($record);
+                $details = '<div style="color: red">Update from email received from ' . $record->getSenderEmailAddress(
+                    ) . ' on ' . date(
+                        CONFIG_MYSQL_DATETIME
+                    ) . "</div>" . $details;
+
+                return $this->addCustomerRaisedRequest(
+                    $record,
+                    null,
+                    null,
+                    $details
+                );
             }
         }
 
@@ -10955,6 +10994,12 @@ is currently a balance of ';
             );
 
             $buMail->mime->setHTMLBody($body);
+
+            $buMail->mime->addAttachment(
+                $record->getHtmlBody(),
+                'application/octet-stream',
+                'originalEmail.html'
+            );
 
             $mime_params = array(
                 'text_encoding' => '7bit',
