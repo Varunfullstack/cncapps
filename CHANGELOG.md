@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.15.1] 
+### Fixed
+- Issue 417 - Despatching RenBroadband items incorrect outstanding quantity
+
 ## [v1.15.0] - 2018-12-27
 ### Fixed
 - Issue 376 - Contact notes being copied to other contacts
