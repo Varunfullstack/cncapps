@@ -253,7 +253,7 @@ WHERE problem.`pro_custno` <> 282
       ON cui_itemno = itm_itemno 
   WHERE custitem.`cui_custno` = pro_custno 
     AND itm_servercare_flag = 'Y' 
-    AND itm_desc LIKE '%ServiceDesk%' 
+    AND (itm_desc <> 'Pre-Pay Contract' OR  itm_desc <> 'T & M')
     AND cui_expiry_date >= NOW() 
     AND renewalStatus <> 'D' 
     AND declinedFlag <> 'Y') > 0 
