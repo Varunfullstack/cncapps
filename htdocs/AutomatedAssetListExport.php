@@ -148,9 +148,8 @@ ORDER BY clients.name,
     $statement = $labtechDB->prepare($query);
     $test = $statement->execute([$db->Record['cus_custno']]);
     if (!$test) {
-        echo '<div>Something went wrong...' . $statement->errorInfo() . ' </div>';
-
-        return;
+        echo '<div>Something went wrong...' . implode(',',$statement->errorInfo()) . ' </div>';
+        continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
     if (count($data)) {
