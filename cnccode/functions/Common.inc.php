@@ -648,4 +648,28 @@ function common_getUKBankHolidays($year)
 
 }
 
+
+function extractDomainFromEmail($email)
+{
+    return substr(
+        $email,
+        strrpos(
+            $email,
+            '@'
+        ) + 1
+    );
+}
+
+function extractMailboxNameFromEmail($email)
+{
+    return $prefix = substr(
+        $email,
+        0,
+        strrpos(
+            $email,
+            '@'
+        )
+    );
+}
+
 ?>

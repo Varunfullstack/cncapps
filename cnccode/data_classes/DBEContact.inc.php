@@ -906,6 +906,20 @@ class DBEContact extends DBCNCEntity
         $ret = (parent::getRows());
         return $ret;
     }
+
+    public function getRowsByDomain($prefix)
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where con_email like '%@$prefix' ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
 }
 
 ?>

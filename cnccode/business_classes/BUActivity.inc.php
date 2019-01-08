@@ -33,6 +33,7 @@ require_once($cfg ["path_func"] . "/activity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
+require_once($cfg ["path_dbe"] . "/DBEUtilityEmail.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 
@@ -7632,6 +7633,14 @@ is currently a balance of ';
 
     }
 
+    function isWhitelistedUtilityEmail($email){
+        $dbeUtilityEmail = new DBEUtilityEmail($this);
+
+        $dbeUtilityEmail->getRowsByEmail($email);
+
+        return $dbeUtilityEmail->rowCount;
+    }
+
     /**
      * New request from import process
      *
@@ -7657,12 +7666,34 @@ is currently a balance of ';
         );
         $dbeContact->getRowsByColumn(\DBEContact::email);
         $details = $record->getHtmlBody();
-
+        $forceHidden = false;
         if (!$dbeContact->rowCount || $serverGuard) {
             echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
             $buCustomer = new BUCustomer($this);
+
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
+
+            if (!$serverGuard) {
+                $details = '<div style="color: red">Utility alert sent from email ' . $record->getSenderEmailAddress(
+                    ) . ' on ' . date(
+                        CONFIG_MYSQL_DATETIME
+                    ) . "</div>" . $details;
+
+                if (isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
+                    $forceHidden = true;
+                } else {
+                    return $this->addCustomerRaisedRequest(
+                        $record,
+                        null,
+                        null,
+                        $details
+                    );
+                }
+            }
+
+
             if (!$dbeContact->rowCount) {
+
                 echo "<div>We couldn't find a primary contact, -> to be logged</div>";
                 $details = '<div style="color: red">Failed to find primary contact associated with customer</div>' . $details;
                 return $this->addCustomerRaisedRequest(
@@ -7783,6 +7814,13 @@ is currently a balance of ';
                 'N'
             );
         } else {
+            $dbeProblem->setValue(
+                DBEJProblem::hideFromCustomerFlag,
+                'Y'
+            );
+        }
+
+        if ($forceHidden) {
             $dbeProblem->setValue(
                 DBEJProblem::hideFromCustomerFlag,
                 'Y'

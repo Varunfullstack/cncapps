@@ -78,6 +78,21 @@ class AutomatedRequest
                     echo "<div>We have found customer ID from contact's email: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
+
+                // we weren't able to find the customer from the complete email address...lets try just the domain
+
+                $domain = extractDomainFromEmail($this->getSenderEmailAddress());
+
+                $dbeContact->getRowsByDomain($domain);
+
+                if (!$dbeContact->rowCount) {
+                    return null;
+                }
+                $dbeContact->fetchNext();
+                $this->customerID = $dbeContact->getValue(\DBEContact::customerID);
+                echo "<div>We have found customer ID from domain : " . $this->customerID . "</div>";
+                return $this->customerID;
+
             }
 
             if ($this->contractCustomerItemID) {
@@ -89,8 +104,10 @@ class AutomatedRequest
                     echo "<div>We have found customer ID from contractCustomerItemID: " . $this->customerID . "</div>";
                     return $this->customerID;
                 }
-
             }
+
+            //try to find the customer ID by looking at the last part of the email
+
 
         }
 
