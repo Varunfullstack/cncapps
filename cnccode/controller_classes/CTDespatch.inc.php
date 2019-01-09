@@ -462,7 +462,8 @@ class CTDespatch extends CTCNC
                             'orderLineClass'     => CTDESPATCH_CLS_ORDER_LINE_COMMENT
                         )
                     );
-                } else {                                                                                                // Item line
+                } else {
+                    // Item line
                     $this->template->set_var(
                         array(
                             'stockcat'           => $dsOrdline->getValue("stockcat"),

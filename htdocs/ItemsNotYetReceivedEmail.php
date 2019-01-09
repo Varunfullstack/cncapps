@@ -31,6 +31,7 @@ if (!$outputToScreen) {
     ob_start();
 }
 
+
 ?>
     <html>
     <head>
@@ -60,7 +61,10 @@ if (!$outputToScreen) {
         <thead>
         <TR>
             <th>
-                Purchase order
+                PO
+            </th>
+            <th>
+                SO
             </th>
             <th>
                 Customer Name
@@ -97,14 +101,37 @@ if (!$outputToScreen) {
         <tbody>
         <?php
         foreach ($result as $itemNotYetReceived) {
+
             $style = "style='color:" . $itemNotYetReceived->color() . "'";
+
+            $purchaseOrderURL = "http://cncapps/PurchaseOrder.php?action=display&porheadID=" . $itemNotYetReceived->getPurchaseOrderId(
+                );
+
+            $purchaseOrderLink = "<a href='$purchaseOrderURL'>" . $itemNotYetReceived->getPurchaseOrderId() . "</a>";
+
+            $salesOrderURL = "http://cncapps/SalesOrder.php?action=displaySalesOrder&ordheadID=" . $itemNotYetReceived->getSalesOrderId(
+                );
+
+            $salesOrderLink = "<a href='" . $salesOrderURL . "'>" . $itemNotYetReceived->getSalesOrderId() . "</a>";
+
+            $projectLink = "";
+
+            if ($itemNotYetReceived->getProjectID()) {
+
+                $projectURL = "http://cncapps/Project.php?projectID=" . $itemNotYetReceived->getProjectID(
+                    ) . "&action=edit";
+                $projectLink = "<a href='" . $projectURL . "'>" . $itemNotYetReceived->getProjectName() . "</a>";
+            }
+
+
             ?>
             <TR <?= $style ?>>
                 <TD>
-                    <A href="http://cncapps/PurchaseOrder.php?action=display&porheadID=<?= $itemNotYetReceived->getPurchaseOrderId(
-                    ); ?>"
-                    ><?= $itemNotYetReceived->getPurchaseOrderId() ?></A>
+                    <?= $purchaseOrderLink ?>
                 </TD>
+                <td>
+                    <?= $salesOrderLink ?>
+                </td>
                 <td>
                     <?= $itemNotYetReceived->getCustomerName() ?>
                 </td>
@@ -138,13 +165,7 @@ if (!$outputToScreen) {
                     <?= $itemNotYetReceived->getSupplierRef() ?>
                 </td>
                 <td>
-                    <?= $itemNotYetReceived->getProjectName() ?>
-                </td>
-                <td>
-
-                    <?= $itemNotYetReceived->getDispatchedDate() ? $itemNotYetReceived->getDispatchedDate()->format(
-                        'd/m/Y'
-                    ) : 'N/A' ?>
+                    <?= $projectLink ?>
                 </td>
             </TR>
             <?php
