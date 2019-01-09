@@ -782,7 +782,7 @@ class CTCustomer extends CTCNC
                 $value['slaP5']
             );
             $this->dsCustomer->setValue(
-                DBECustomer::gscTopUpAmount,
+                DBECustomer::pcxFlag,
                 $this->getYN($value['pcxFlag'])
             );
 

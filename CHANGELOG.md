@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.15.1] - 2019-01-09 
+### Fixed
+- Issue 417 - Despatching RenBroadband items incorrect outstanding quantity
+- Fix problem with TopUp value in customer page
+
 ## [v1.15.0] - 2018-12-27
 ### Fixed
 - Issue 376 - Contact notes being copied to other contacts

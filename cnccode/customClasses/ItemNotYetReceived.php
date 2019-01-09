@@ -28,7 +28,7 @@ class ItemNotYetReceived
     protected $hasNotBeenReceivedYet;
     protected $hasBeenOrdered;
     protected $orderedQuantity;
-    private $salesOrderID;
+    protected $salesOrderID;
     protected $projectID;
 
     /**
