@@ -80,7 +80,7 @@ class CTItemsNotYetReceived extends CTCNC
         foreach ($itemsNotYetReceived as $item) {
 
             $purchaseOrderLink = "/PurchaseOrder.php?action=display&porheadID=" . $item->getPurchaseOrderId();
-            $style = "style='color:" . $item->color() . "'";
+            $style = "class='" . $item->color() . "'";
 
             $salesOrderURL =
                 $this->buildLink(

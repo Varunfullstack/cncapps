@@ -379,7 +379,7 @@ class BUDirectDebitContracts extends Business
                     case CONFIG_BROADBAND_RENEWAL_TYPE_ID:
                         $dbeOrdline->setValue(
                             'qtyDespatched',
-                            1
+                            0
                         );
                         $dbeOrdline->setValue(
                             'qtyLastDespatched',
