@@ -32,7 +32,7 @@ class BUItemsNotYetReceived extends Business
     LEFT JOIN callacttype cat 
       ON cat.cat_callacttypeno = ca.caa_callacttypeno 
   WHERE ca.caa_problemno = problem.`pro_problemno` 
-    AND ca.caa_date >= NOW()
+    AND ca.caa_date >= date(NOW())
     ) AS futureDate,
     poh_required_by as purchaseOrderRequiredBy,
     project.description as projectName,
