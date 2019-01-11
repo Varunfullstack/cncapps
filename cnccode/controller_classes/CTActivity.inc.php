@@ -77,6 +77,11 @@ define(
     'CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW',
     'changeRequestReview'
 );
+
+define(
+    'CTACTIVITY_ACT_TIME_REQUEST_REVIEW',
+    'timeRequestReview'
+);
 define(
     'CTACTIVITY_ACT_UPLOAD_FILE',
     'uploadFile'
@@ -399,7 +404,9 @@ class CTActivity extends CTCNC
 
                 $this->changeRequestReview();
                 break;
-
+            case CTACTIVITY_ACT_TIME_REQUEST_REVIEW;
+                $this->timeRequestReview();
+                break;
             case 'contractListPopup':
                 $this->contractListPopup();
                 break;
@@ -4300,7 +4307,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue('customerID')
                 ),
-                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                'contactHistoryLink'           => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
@@ -4309,8 +4316,8 @@ class CTActivity extends CTCNC
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
-                        $dsCallActivity->getValue('problemID')
-                    ),
+                    $dsCallActivity->getValue('problemID')
+                ),
                 'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
                 'contractListPopupLink'        => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
@@ -6071,6 +6078,11 @@ class CTActivity extends CTCNC
                 $_REQUEST['comments']
             );
 
+            $this->buActivity->logOperationalActivity(
+                $_REQUEST['problemID'],
+                '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $_REQUEST['comments'] . '</p>'
+            );
+
             $nextURL =
                 $this->buildLink(
                     'CurrentActivityReport.php',
@@ -6413,6 +6425,163 @@ class CTActivity extends CTCNC
         $this->template->parse(
             'CONTENTS',
             'ServiceChangeRequestReview',
+            true
+        );
+
+        $this->parsePage();
+
+    }
+
+    function timeRequestReview()
+    {
+
+        $this->setMethodName('timeRequestReview');
+
+        $callActivityID = $_REQUEST['callActivityID'];
+
+        $this->buActivity->getActivityByID(
+            $callActivityID,
+            $dsCallActivity
+        );
+
+        $problemID = $dsCallActivity->getValue('problemID');
+
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+        $this->setTemplateFiles(
+            array(
+                'ServiceTimeRequestReview' => 'ServiceTimeRequestReview.inc'
+            )
+        );
+
+        $this->setPageTitle("Time Request");
+        $requestorID = $dsCallActivity->getValue(DBECallActivity::userID);
+        $this->dbeUser->getRow($requestorID);
+        $teamID = $this->dbeUser->getValue(DBEUser::teamID);
+        $teamName = '';
+        $usedMinutes = 0;
+        $assignedMinutes = 0;
+        switch ($teamID) {
+            case 1:
+                $usedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                $teamName = 'Help Desk';
+                break;
+            case 2:
+                $usedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                $teamName = 'Escalation';
+                break;
+            case 4:
+                $usedMinutes = $this->buActivity->getIMTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                $teamName = 'Implementation';
+        }
+
+        $leftOnBudget = $assignedMinutes - $usedMinutes;
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            switch ($_REQUEST['Submit']) {
+
+                case 'Approve':
+                    $option = 'A';
+                    break;
+
+                case 'Deny':
+                    $option = 'D';
+                    break;
+
+                case 'Delete':
+                default:
+                    $option = 'DEL';
+                    break;
+            }
+
+            $minutes = 0;
+
+            switch ($_REQUEST['allocatedTimeAmount']) {
+                case 'minutes':
+                    $minutes = $_REQUEST['allocatedTimeValue'];
+                    break;
+                case 'hours':
+                    $minutes = $_REQUEST['allocatedTimeValue'] * 60;
+                    break;
+                case 'days':
+                    $buHeader = new BUHeader($this);
+                    /** @var $dsHeader DataSet */
+                    $buHeader->getHeader($dsHeader);
+                    $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+                    $minutes = $minutesInADay * $_REQUEST['allocatedTimeValue'];
+            }
+
+            $this->buActivity->timeRequestProcess(
+                $callActivityID,
+                $this->userID,
+                $option,
+                $_REQUEST['comments'],
+                $minutes
+            );
+
+            $nextURL =
+                $this->buildLink(
+                    'CurrentActivityReport.php',
+                    array()
+                );
+
+            header('Location: ' . $nextURL);
+            exit;
+        }
+
+        $urlProblemHistoryPopup =
+            $this->buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'problemHistoryPopup',
+                    'problemID' => $problemID,
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+
+
+        $submitURL =
+            $this->buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
+                )
+            );
+
+        $this->template->set_var(
+            array(
+                'callActivityID' => $callActivityID,
+
+                'problemID' => $problemID,
+
+                'customerID' => $dbeFirstActivity->getValue('customerID'),
+
+                'customerName'           => $dbeFirstActivity->getValue('customerName'),
+                'requestDetails'         => $dsCallActivity->getValue('reason'),
+                'userName'               => $dsCallActivity->getValue('userName'),
+                'submitUrl'              => $submitURL,
+                'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                'requesterTeamName'      => $teamName,
+                'notes'                  => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'requestedDateTime'      => $dsCallActivity->getValue(
+                        DBEJCallActivity::date
+                    ) . ' ' . $dsCallActivity->getValue(DBEJCallActivity::startTime),
+                'chargeableHours'        => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
+                'timeSpentSoFar'         => $usedMinutes,
+                'timeLeftOnBudget'       => $leftOnBudget,
+                'requesterTeam'          => $teamName
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceTimeRequestReview',
             true
         );
 
