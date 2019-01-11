@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 409 - Time Request Dashboard
+
 ## [v1.15.2] - 2019-01-11
 ### Fixed
 - PoStatusReport doesn't show the right amount of results.
