@@ -29,9 +29,8 @@ class BUItemsNotYetReceived extends Business
     MIN(ca.caa_date) 
   FROM
     callactivity ca 
-    LEFT JOIN callacttype cat 
-      ON cat.cat_callacttypeno = ca.caa_callacttypeno 
-  WHERE ca.caa_problemno = problem.`pro_problemno` 
+  WHERE ca.caa_problemno = problem.`pro_problemno`
+    and ca.caa_callacttypeno in (4,7)
     AND ca.caa_date >= date(NOW())
     ) AS futureDate,
     poh_required_by as purchaseOrderRequiredBy,
@@ -87,15 +86,6 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
             $data[] = $item;
         };
 
-        $data = array_filter(
-            $data,
-            function (\CNCLTD\ItemNotYetReceived $item) {
-                return !($item->getPurchaseOrderRequiredBy() && $item->getPurchaseOrderRequiredBy() < new DateTime(
-                    ) && isset(
-                        \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]
-                    ) && \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]);
-            }
-        );
         return $data;
     }
 
