@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.15.2] - 2019-01-11
+### Fixed
+- PoStatusReport doesn't show the right amount of results.
+- PoStatusReport show visits when it shouldn't.
+
 ## [v1.15.1] - 2019-01-09 
 ### Fixed
 - Issue 417 - Despatching RenBroadband items incorrect outstanding quantity
