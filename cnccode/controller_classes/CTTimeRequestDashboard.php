@@ -92,7 +92,11 @@ class CTTimeRequestDashboard extends CTCNC
 
             $processCRLink = "<a href='$processCRLink'>Process Time Request</a>";
 
-            $teamID = $this->dbeUser->getValue(DBEUser::teamID);
+            $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
+            $requestingUser = new DBEUser($this);
+            $requestingUser->getRow($requestingUserID);
+
+            $teamID = $requestingUser->getValue(DBEUser::teamID);
 
             $leftOnBudget = null;
             $usedMinutes = 0;
@@ -125,7 +129,7 @@ class CTTimeRequestDashboard extends CTCNC
                     'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
                     'srLink'            => $srLink,
                     'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                    'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
+                    'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
                     'requestedDateTime' => $dbejCallActivity->getValue(
                             DBEJCallActivity::date
                         ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
