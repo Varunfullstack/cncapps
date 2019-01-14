@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 419 - Customer Review Meeting Frequency doesn't show in PDF export for Every 2 Months
+
 ## [v1.15.2] - 2019-01-11
 ### Fixed
 - PoStatusReport doesn't show the right amount of results.
