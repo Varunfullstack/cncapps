@@ -109,7 +109,7 @@ class CTTimeRequestDashboard extends CTCNC
                 case 1:
                     $usedMinutes = $buActivity->getHDTeamUsedTime($problemID);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                    $teamName = 'Help Desk';
+                    $teamName = 'Helpdesk';
                     break;
                 case 2:
                     $usedMinutes = $buActivity->getESTeamUsedTime($problemID);
@@ -135,7 +135,7 @@ class CTTimeRequestDashboard extends CTCNC
                         ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
                     'processCRLink'     => $processCRLink,
                     'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-                    'timeSpentSoFar'    => $usedMinutes,
+                    'timeSpentSoFar'    => round($usedMinutes),
                     'timeLeftOnBudget'  => $leftOnBudget,
                     'requesterTeam'     => $teamName
                 ]
