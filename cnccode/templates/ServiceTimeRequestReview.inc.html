@@ -1,6 +1,11 @@
 <!-- Template: ServiceChangeRequestReview.inc.html -->
 <script src="CommonJS.js"></script>
 <script src="ckeditor/ckeditor.js"></script>
+<script>
+    function makeTimeNotRequired() {
+        $('[name="allocatedTimeValue"]').attr('required', false);
+    }
+</script>
 <p><A
         href="#"
         onClick="window.open(
@@ -133,6 +138,7 @@
                 <input type="submit"
                        name="Submit"
                        value="Deny"
+                       onclick="makeTimeNotRequired()"
                 >
                 <input type="submit"
                        name="Submit"
