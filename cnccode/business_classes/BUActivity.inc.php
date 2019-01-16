@@ -2352,6 +2352,10 @@ class BUActivity extends Business
                     $minutes,
                     $comments
                 );
+                $this->logOperationalActivity(
+                    $dsCallActivity->getValue(DBECallActivity::problemID),
+                    '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>'
+                );
                 break;
             case 'D':
                 $this->sendTimeRequestDeniedEmail(
