@@ -763,6 +763,22 @@ class DBEContact extends DBCNCEntity
         $ret = (parent::getRows());
         return $ret;
     }
+
+    public function getReviewContacts($getValue)
+    {
+        $this->setMethodName("getReviewContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where specialAttentionContactFlag = 'Y'
+      ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+
+    }
 }
 
 ?>
