@@ -119,7 +119,7 @@ class CTHome extends CTCNC
     function display()
     {
         /**
-         * if user is only in the technical group then display the curent activity dash-board
+         * if user is only in the technical group then display the current activity dash-board
          */
         if (
             $this->hasPermissions(PHPLIB_PERM_TECHNICAL) &&
