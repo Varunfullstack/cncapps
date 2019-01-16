@@ -677,6 +677,14 @@ class DBEJProblem extends DBEProblem
                         ) . ' = "I" and initial.caa_date < date(NOW() + interval 1  day) order by hoursRemaining desc';
                     break;
                 }
+            case 'currentOpenP1Requests':
+
+                $sql .= ' and ' . $this->getDBColumnName(
+                        self::priority
+                    ) . ' = 1 ';
+
+                $sql .= ' order by pro_sla_response_hours - pro_working_hours asc';
+                break;
 
             case 'oldestUpdatedSR':
                 {
