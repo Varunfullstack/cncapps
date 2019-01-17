@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 429 - SD Manager Dashboard show P1 sections
 ### Changed
 - Issue 413 - Default home page graphs to your team
+### Fixed
+- Issue 420 - Email missing header information
 
 ## [v1.15.2] - 2019-01-11
 ### Fixed
