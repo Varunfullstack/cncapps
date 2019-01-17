@@ -1219,6 +1219,9 @@ class CTCustomerReviewMeeting extends CTCNC
             case 1:
                 $frequency = 'Monthly';
                 break;
+            case 2:
+                $frequency = 'Two-monthly';
+                break;
             case 3:
                 $frequency = 'Quarterly';
                 break;
@@ -1228,6 +1231,7 @@ class CTCustomerReviewMeeting extends CTCNC
             case 12:
                 $frequency = 'Annually';
                 break;
+
             default:
                 $frequency = 'N/A';
         }

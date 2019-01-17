@@ -10,6 +10,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 420 - Email missing header information
 - Issue 378 - Creating item defaults to first site
+- Issue 419 - Customer Review Meeting Frequency doesn't show in PDF export for Every 2 Months
 
 ## [v1.15.2] - 2019-01-11
 ### Fixed
