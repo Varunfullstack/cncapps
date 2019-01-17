@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 429 - SD Manager Dashboard show P1 sections
+### Changed
+- Issue 413 - Default home page graphs to your team
 
 ## [v1.15.2] - 2019-01-11
 ### Fixed
