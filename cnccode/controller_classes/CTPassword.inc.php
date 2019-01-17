@@ -17,9 +17,20 @@ class CTPassword extends CTCNC
 {
     var $buPassword = '';
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "sales",
             "technical",
@@ -40,8 +51,8 @@ class CTPassword extends CTCNC
             case 'edit':
                 $this->edit();
                 break;
-            case 'delete':
-                $this->delete();
+            case 'archive':
+                $this->archive();
                 break;
             case 'generate':
                 $this->generate();
@@ -86,14 +97,20 @@ class CTPassword extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $urlSubmit = $this->buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
 
 
         $this->setPageTitle('Passwords');
 
         if ($dsSearchForm->getValue('customerID')) {
             $buCustomer = new BUCustomer ($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue('customerID'),
+                $dsCustomer
+            );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
@@ -117,7 +134,11 @@ class CTPassword extends CTCNC
             )
         );
 
-        $this->template->parse('CONTENTS', 'PasswordSearch', true);
+        $this->template->parse(
+            'CONTENTS',
+            'PasswordSearch',
+            true
+        );
 
         $this->parsePage();
 
@@ -149,7 +170,13 @@ class CTPassword extends CTCNC
 
         $dbeCustomer->getRow($customerID);
 
-        $this->buPassword->getRowsByCustomerID($customerID, $dsPassword);
+
+
+        $this->buPassword->getRowsByCustomerIDAndPasswordLevel(
+            $customerID,
+            $this->dbeUser->getValue(DBEUser::passwordLevel),
+            $dsPassword
+        );
 
         if ($dsPassword) {
 
@@ -198,7 +225,11 @@ class CTPassword extends CTCNC
             );
 
 
-            $this->template->set_block('PasswordList', 'passwordBlock', 'passwords');
+            $this->template->set_block(
+                'PasswordList',
+                'passwordBlock',
+                'passwords'
+            );
             while ($dsPassword->fetchNext()) {
 
                 $urlEdit =
@@ -209,37 +240,57 @@ class CTPassword extends CTCNC
                             'passwordID' => $dsPassword->getValue('passwordID')
                         )
                     );
-                $urlDelete =
+                $urlArchive =
                     $this->buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action'     => 'delete',
+                            'action'     => 'archive',
                             'passwordID' => $dsPassword->getValue('passwordID')
                         )
                     );
 
-                if (strpos($dsPassword->getValue('notes'), 'http') !== false) {
-                    $notes = '<A href="' . $dsPassword->getValue('notes') . '" target="_blank">' . $dsPassword->getValue('notes') . '</a>';
+                $decryptedNotes = $this->decrypt($dsPassword->getValue('notes'));
+
+                if (strpos(
+                        $decryptedNotes,
+                        'http'
+                    ) !== false) {
+                    $notes = '<A href="' . $dsPassword->getValue(
+                            'notes'
+                        ) . '" target="_blank">' . $dsPassword->getValue('notes') . '</a>';
                 } else {
-                    $notes = $dsPassword->getValue('notes');
+                    $notes = $decryptedNotes;
                 }
 
                 $this->template->set_var(
                     array(
                         'passwordID' => $dsPassword->getValue('passwordID'),
                         'customerID' => $dsPassword->getValue('customerID'),
-                        'username'   => $dsPassword->getValue('username'),
-                        'service'    => $dsPassword->getValue('service'),
-                        'password'   => $dsPassword->getValue('password'),
+                        'username'   => $this->decrypt($dsPassword->getValue('username')),
+                        'service'    => $this->decrypt($dsPassword->getValue('service')),
+                        'password'   => $this->decrypt($dsPassword->getValue('password')),
                         'notes'      => $notes,
                         'urlEdit'    => $urlEdit,
-                        'urlDelete'  => $urlDelete
+                        'urlArchive'  => $urlArchive,
+                        'URL'        => strlen(
+                            $dsPassword->getValue(DBEPassword::URL)
+                        ) ? '<a href="' . $dsPassword->getValue(
+                                DBEPassword::URL
+                            ) . '" target="_blank">' . $dsPassword->getValue(DBEPassword::URL) . '</a>' : ''
 
                     )
                 );
-                $this->template->parse('passwords', 'passwordBlock', true);
+                $this->template->parse(
+                    'passwords',
+                    'passwordBlock',
+                    true
+                );
             }//while $dsPassword->fetchNext()
-            $this->template->parse('CONTENTS', 'PasswordList', true);
+            $this->template->parse(
+                'CONTENTS',
+                'PasswordList',
+                true
+            );
         }
         $this->parsePage();
     }
@@ -265,6 +316,24 @@ class CTPassword extends CTCNC
             $formError = (!$dsPassword->populateFromArray($_REQUEST['password']));
             if (!$formError) {
 
+                $dsPassword->setValue(
+                    DBEPassword::username,
+                    $this->encrypt($dsPassword->getValue(DBEPassword::username))
+                );
+                $dsPassword->setValue(
+                    DBEPassword::password,
+                    $this->encrypt($dsPassword->getValue(DBEPassword::password))
+                );
+                $dsPassword->setValue(
+                    DBEPassword::service,
+                    $this->encrypt($dsPassword->getValue(DBEPassword::service))
+                );
+                $dsPassword->setValue(
+                    DBEPassword::notes,
+                    $this->encrypt($dsPassword->getValue(DBEPassword::notes))
+                );
+
+
                 $this->buPassword->updatePassword($dsPassword);
 
                 $urlNext =
@@ -281,10 +350,19 @@ class CTPassword extends CTCNC
             }
         } else {
             if ($_REQUEST['passwordID']) {                      // editing
-                $this->buPassword->getPasswordByID($_REQUEST['passwordID'], $dsPassword);
+                $this->buPassword->getPasswordByID(
+                    $_REQUEST['passwordID'],
+                    $dsPassword
+                );
             } else {                                               // create new record
-                $dsPassword->setValue('passwordID', 0);
-                $dsPassword->setValue('customerID', $_REQUEST['customerID']);
+                $dsPassword->setValue(
+                    'passwordID',
+                    0
+                );
+                $dsPassword->setValue(
+                    'customerID',
+                    $_REQUEST['customerID']
+                );
             }
         }
 
@@ -301,25 +379,70 @@ class CTPassword extends CTCNC
 
         $this->setTemplateFiles(array('PasswordEdit' => 'PasswordEdit.inc'));
 
+        $this->template->set_block(
+            'PasswordEdit',
+            'levelBlock',
+            'levels'
+        );
+        foreach ([1, 2, 3, 4] as $level) {
+
+            $this->template->set_var(
+                array(
+                    'level'         => $level,
+                    'levelSelected' => $dsPassword->getValue(DBEPassword::level) == $level ? 'selected' : ''
+                )
+            );
+            $this->template->parse(
+                'levels',
+                'levelBlock',
+                true
+            );
+        }
+
+        $this->template->parse(
+            'CONTENTS',
+            'ActivityTypeList',
+            true
+        );
+
+
         $this->template->set_var(
             array(
                 'customerID'      => $dsPassword->getValue('customerID'),
                 'passwordID'      => $dsPassword->getValue('passwordID'),
-                'username'        => $dsPassword->getValue('username'),
+                'username'        => $this->decrypt($dsPassword->getValue('username')),
                 'usernameMessage' => $dsPassword->getMessage('username'),
-                'service'         => $dsPassword->getValue('service'),
+                'service'         => $this->decrypt($dsPassword->getValue('service')),
                 'serviceMessage'  => $dsPassword->getMessage('service'),
-                'password'        => $dsPassword->getValue('password'),
+                'password'        => $this->decrypt($dsPassword->getValue('password')),
                 'passwordMessage' => $dsPassword->getMessage('password'),
-                'notes'           => $dsPassword->getValue('notes'),
+                'notes'           => $this->decrypt($dsPassword->getValue('notes')),
                 'notesMessage'    => $dsPassword->getMessage('notes'),
-                'urlEdit'         => $urlEdit
+                'urlEdit'         => $urlEdit,
+                'URL'             => $dsPassword->getValue(DBEPassword::URL)
             )
         );
 
-        $this->template->parse('CONTENTS', 'PasswordEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'PasswordEdit',
+            true
+        );
         $this->parsePage();
 
+    }
+
+    private function decrypt($data)
+    {
+        if (!$data) {
+            return null;
+        }
+
+        \CNCLTD\Encryption::decrypt(
+            PASSWORD_ENCRYPTION_PRIVATE_KEY,
+            PASSWORD_PASSPHRASE,
+            $data
+        );
     }
 
     function loadFromCsv()
@@ -344,7 +467,10 @@ class CTPassword extends CTCNC
                 // todo rediect to listy page with error message
             } else {
 
-                if (!$handle = fopen($_FILES['csvFile']['tmp_name'], 'r')) {
+                if (!$handle = fopen(
+                    $_FILES['csvFile']['tmp_name'],
+                    'r'
+                )) {
 
                     $this->setFormErrorMessage('Problem reading CSV data');
                     // todo rediect to listy page with error message
@@ -352,11 +478,26 @@ class CTPassword extends CTCNC
                 } else {
                     while ($row = fgetcsv($handle)) {
                         $dsPassword->setUpdateModeInsert();
-                        $dsPassword->setValue('customerID', $customerID);
-                        $dsPassword->setValue('username', $row[0]);
-                        $dsPassword->setValue('service', $row[1]);
-                        $dsPassword->setValue('password', $row[2]);
-                        $dsPassword->setValue('notes', $row[3]);
+                        $dsPassword->setValue(
+                            'customerID',
+                            $customerID
+                        );
+                        $dsPassword->setValue(
+                            'username',
+                            $row[0]
+                        );
+                        $dsPassword->setValue(
+                            'service',
+                            $row[1]
+                        );
+                        $dsPassword->setValue(
+                            'password',
+                            $row[2]
+                        );
+                        $dsPassword->setValue(
+                            'notes',
+                            $row[3]
+                        );
                         $dsPassword->post();
                     }
                     $this->buPassword->updatePassword($dsPassword);
@@ -378,16 +519,19 @@ class CTPassword extends CTCNC
         $this->displayList();
     } // end LoadFromCSV
 
-    function delete()
+    function archive()
     {
-        $this->setMethodName('delete');
+        $this->setMethodName('archive');
 
-        if (!$this->buPassword->getPasswordByID($_REQUEST['passwordID'], $dsPassword)) {
+        if (!$this->buPassword->getPasswordByID(
+            $_REQUEST['passwordID'],
+            $dsPassword
+        )) {
             $this->raiseError('PasswordID ' . $_REQUEST['passwordID'] . ' not found');
             exit;
         }
 
-        $this->buPassword->delete($_REQUEST['passwordID']);
+        $this->buPassword->archive($_REQUEST['passwordID'], $this->dbeUser);
         $urlNext =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
@@ -421,9 +565,25 @@ class CTPassword extends CTCNC
             )
         );
 
-        $this->template->parse('CONTENTS', 'PasswordGenerate', true);
+        $this->template->parse(
+            'CONTENTS',
+            'PasswordGenerate',
+            true
+        );
         $this->parsePage();
 
+    }
+
+    private function encrypt($data)
+    {
+        if (!$data) {
+            return null;
+        }
+
+        \CNCLTD\Encryption::encrypt(
+            PASSWORD_ENCRYPTION_PRIVATE_KEY,
+            $data
+        );
     }
 
 }// end of class

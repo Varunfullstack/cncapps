@@ -656,6 +656,23 @@
                 > <span class="formErrorMessage">{signatureFilenameMessage}</span>
             </td>
         </tr>
+        <tr>
+            <td class="promptText">Password Level</td>
+            <td class="field">
+                <select name="password[1][level]"
+                        required
+                >
+                    <!-- BEGIN levelBlock -->
+                    <option {levelSelected}
+                            value="{level}"
+                    >
+                        {level}
+                    </option>
+                    <!-- END levelBlock -->
+                </select>
+                <span class="formErrorMessage">{passwordLevelMessage}</span>
+            </td>
+        </tr>
 
 
         <tr>
