@@ -485,7 +485,9 @@ class CTActivity extends CTCNC
                 $this->salesRequestReview();
                 break;
             case 'contactNotes':
-                echo json_encode(['data' => $this->getContactNotes()]);
+                $buCustomer = new BUCustomer($this);
+                $phoneHtml = $buCustomer->getContactPhoneForHtml(@$_REQUEST['contactID']);
+                echo json_encode(['data' => $this->getContactNotes(), 'phone' => $phoneHtml]);
                 break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
@@ -4300,7 +4302,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue('customerID')
                 ),
-                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                'contactHistoryLink'           => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
@@ -4309,8 +4311,8 @@ class CTActivity extends CTCNC
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
-                        $dsCallActivity->getValue('problemID')
-                    ),
+                    $dsCallActivity->getValue('problemID')
+                ),
                 'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
                 'contractListPopupLink'        => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')

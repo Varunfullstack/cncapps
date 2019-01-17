@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 432 - Contact changes in SR don't update phone details
+
 ## [v1.15.2] - 2019-01-11
 ### Fixed
 - PoStatusReport doesn't show the right amount of results.

@@ -982,8 +982,9 @@ class BUCustomer extends Business
         );
         $dsContact->fetchNext();
 
+        $contactPhone = '';
         if ($dsSite->getValue(DBESite::phone) != '') {
-            $contactPhone = '<a href="tel:' . str_replace(
+            $contactPhone .= '<a href="tel:' . str_replace(
                     ' ',
                     '',
                     $dsSite->getValue(DBESite::phone)
@@ -1003,6 +1004,7 @@ class BUCustomer extends Business
                     $dsContact->getValue('mobilePhone')
                 ) . '">' . $dsContact->getValue('mobilePhone') . '</a>';
         }
+
         return $contactPhone;
     }
 
