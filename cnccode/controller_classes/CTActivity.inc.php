@@ -3299,6 +3299,12 @@ class CTActivity extends CTCNC
                 $_SESSION[$this->sessionKey]['queueNo'] = 3;
                 $isAddToQueue = true;
             }
+
+            if (isset($_REQUEST['salesQ'])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 4;
+                $isAddToQueue = true;
+            }
+
             $_SESSION[$this->sessionKey]['date'] = date(CONFIG_MYSQL_DATE);
             $_SESSION[$this->sessionKey]['startTime'] = date('H:i');
 
@@ -4300,7 +4306,7 @@ class CTActivity extends CTCNC
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue('customerID')
                 ),
-                'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
+                'contactHistoryLink'           => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
@@ -4309,8 +4315,8 @@ class CTActivity extends CTCNC
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
-                        $dsCallActivity->getValue('problemID')
-                    ),
+                    $dsCallActivity->getValue('problemID')
+                ),
                 'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
                 'contractListPopupLink'        => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
