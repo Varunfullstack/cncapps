@@ -131,9 +131,21 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
             $locationString = $dbeSite->getValue(DBESite::town) . ', ' . $dbeSite->getValue(DBESite::postcode);
 
+            $customerURL = $this->buildLink(
+                'Customer.php',
+                [
+                    'action'     => 'dispEdit',
+                    'customerID' => $dbeCustomer->getValue(DBECustomer::customerID)
+                ]
+            );
+
+            $customerLink = "<a href='" . $customerURL . "' target='_blank'>" . $dbeCustomer->getValue(
+                    DBECustomer::name
+                ) . "</a>";
+
             $customerReviewMeetings[] = [
                 "style"             => $style,
-                "customerName"      => $dbeCustomer->getValue(DBECustomer::name),
+                "customerLink"      => $customerLink,
                 "mainLocation"      => $locationString,
                 "lastReviewMeeting" => $lastReviewMeetingDate->format('d/m/Y'),
                 "nextReviewMeeting" => $nextReviewMeetingDate->format('d/m/Y'),

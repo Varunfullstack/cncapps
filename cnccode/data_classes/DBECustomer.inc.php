@@ -748,7 +748,7 @@ class DBECustomer extends DBCNCEntity
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::lastReviewMeetingDate) . " <> '0000-00-00' and
              " . $this->getDBColumnName(self::lastReviewMeetingDate) . ' is not null and ' .
-            $this->getDBColumnName(self::referredFlag) . ' = "Y" ';
+            $this->getDBColumnName(self::referredFlag) . ' = "N" ';
 
         $this->setQueryString($queryString);
         $ret = (self::getRows());
