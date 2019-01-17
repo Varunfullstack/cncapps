@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 413 - Default home page graphs to your team
 ### Fixed
 - Issue 420 - Email missing header information
+- Issue 378 - Creating item defaults to first site
 
 ## [v1.15.2] - 2019-01-11
 ### Fixed
