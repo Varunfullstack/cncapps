@@ -80,7 +80,7 @@ class CTTimeRequestDashboard extends CTCNC
                 ]
             );
 
-            $srLink = "<a href='$srLink'>SR</a>";
+            $srLink = "<a href='$srLink' target='_blank'>" . $problemID . "</a>";
 
             $processCRLink = $this->buildLink(
                 'Activity.php',
