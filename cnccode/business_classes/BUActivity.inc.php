@@ -10914,6 +10914,7 @@ is currently a balance of ';
             $dbeJProblem,
             $problems
         );
+
     }
 
     public function getActivityCount($problemID,
