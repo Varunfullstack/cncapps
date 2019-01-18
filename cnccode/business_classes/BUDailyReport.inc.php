@@ -177,10 +177,12 @@ class BUDailyReport extends Business
      * @param mixed $daysAgo
      * @param bool $priorityFiveOnly
      * @param bool $onScreen
+     * @param bool $dashboard
      */
     function outstandingIncidents($daysAgo,
                                   $priorityFiveOnly = false,
-                                  $onScreen = false
+                                  $onScreen = false,
+                                  $dashboard = false
     )
     {
 
@@ -303,26 +305,21 @@ class BUDailyReport extends Business
                 $totalRequests++;
             } while ($row = $outstandingRequests->fetch_row());
 
-            $template->setVar(
-                array(
-                    'daysAgo'       => $daysAgo,
-                    'totalRequests' => $totalRequests
-                )
-            );
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-            $body = $template->get_var('output');
-
             $csvTemplate->parse(
                 'output',
                 'page',
                 true
             );
             $csvFile = $csvTemplate->get_var('output');
+
+            $template->setVar(
+                array(
+                    'daysAgo'       => $daysAgo,
+                    'totalRequests' => $totalRequests,
+
+                )
+            );
+
 
             if (!$onScreen) {
                 if ($priorityFiveOnly) {
@@ -333,6 +330,13 @@ class BUDailyReport extends Business
 
                 $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
 
+                $template->parse(
+                    'output',
+                    'page',
+                    true
+                );
+                $body = $template->get_var('output');
+
                 $this->sendByEmailTo(
                     'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
                     $subject,
@@ -340,18 +344,33 @@ class BUDailyReport extends Business
                     $csvFile
                 );
             } else {
-                ?>
-                <a href="data:text/csv;charset=utf-8;base64,<?= base64_encode($csvFile) ?>"
-                   download="outstanding.csv"
-                >
-                    Download CSV
-                </a>
+                $csvLink = '';
+                if (!$dashboard) {
+                    $csvLink = '<a href="data:text/csv;charset=utf-8;base64,' . base64_encode(
+                            $csvFile
+                        ) . '" download="outstanding.csv">Download CSV</a>';
+                }
 
-                <?php
+                $template->setVar(
+                    [
+                        'csvLink' => $csvLink
+                    ]
+
+                );
+
+                $template->parse(
+                    'output',
+                    'page',
+                    true
+                );
+                $body = $template->get_var('output');
             }
-            echo $body;
 
-
+            if ($dashboard) {
+                return $body;
+            } else {
+                echo $body;
+            }
         }
 
     } // end function outstandingIncidents
@@ -638,7 +657,7 @@ class BUDailyReport extends Business
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
         WHERE
-          DATE(pro_date_raised) <=DATE(
+          DATE(pro_date_raised) <= DATE(
           DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
           AND pro_status NOT IN ('F', 'C')";
 
@@ -663,11 +682,9 @@ class BUDailyReport extends Business
               AND caa_date > DATE( NOW() )
               AND caa_endtime = ''
           ) = 0
-        
-          
-        
       ORDER BY customer,
         pro_problemno";
+
         return $this->db->query($sql);
     }
 
