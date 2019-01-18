@@ -4141,11 +4141,11 @@ class CTActivity extends CTCNC
                 ', ' . $dsSite->getValue(DBESite::postcode) .
                 ', ' . $dsContact->getValue('firstName') . ' ' . $dsContact->getValue(
                     'lastName'
-                ) . ', ' . $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID'));
+                ) . ', <span class="contactPhone">' . $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID')).'</span>';
 
             if ($dsContact->getValue('email') != '') {
                 $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue(
+                    ' <A HREF="mailto:' . $dsContact->getValue(
                         'email'
                     ) . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') . '"' .
                     ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';

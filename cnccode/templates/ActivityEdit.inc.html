@@ -116,7 +116,7 @@
             $('#contactNotes').val(result.data);
             $('#contactNotesAlert').text(result.data);
             $('#moreContactNotes').text(result.data);
-            $('#contactPhone').html(result.phone);
+            $('.contactPhone').html(result.phone);
 
         }).catch(function () {
 
@@ -372,7 +372,7 @@
                     {optGroupClose}
                     <!-- END contactBlock -->
                 </select>
-                <span id="contactPhone">{contactPhone}</span>
+                <span class="contactPhone">{contactPhone}</span>
                 <span class="formErrorMessage">{contactIDMessage}</span>
             </td>
             <td colspan="2"
