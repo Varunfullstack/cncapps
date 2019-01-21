@@ -171,7 +171,6 @@ class CTPassword extends CTCNC
         $dbeCustomer->getRow($customerID);
 
 
-
         $this->buPassword->getRowsByCustomerIDAndPasswordLevel(
             $customerID,
             $this->dbeUser->getValue(DBEUser::passwordLevel),
@@ -271,7 +270,8 @@ class CTPassword extends CTCNC
                         'password'   => $this->decrypt($dsPassword->getValue('password')),
                         'notes'      => $notes,
                         'urlEdit'    => $urlEdit,
-                        'urlArchive'  => $urlArchive,
+                        'urlArchive' => $urlArchive,
+                        'level'      => $dsPassword->getValue(DBEPassword::level),
                         'URL'        => strlen(
                             $dsPassword->getValue(DBEPassword::URL)
                         ) ? '<a href="' . $dsPassword->getValue(
@@ -313,8 +313,33 @@ class CTPassword extends CTCNC
         $dsPassword->copyColumnsFrom($dbePassword);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
             $formError = (!$dsPassword->populateFromArray($_REQUEST['password']));
             if (!$formError) {
+                $passwordID = $_REQUEST['password'][1]['passwordID'];
+                if ($passwordID) {
+
+                    $dbePassword->getRow();
+
+                    $previousPassword = $dbePassword->getValue(DBEPassword::password);
+
+                    $previousPasswordDecrypted = $this->decrypt($previousPassword);
+
+                    $newPassword = $dsPassword->getValue(DBEPassword::password);
+
+                    if ($previousPasswordDecrypted != $newPassword) {
+                        $this->buPassword->archive(
+                            $passwordID,
+                            $this->dbeUser
+                        );
+                    }
+
+                    $dsPassword->setValue(
+                        DBEPassword::passwordID,
+                        0
+                    );
+                }
+
 
                 $dsPassword->setValue(
                     DBEPassword::username,
@@ -384,7 +409,14 @@ class CTPassword extends CTCNC
             'levelBlock',
             'levels'
         );
-        foreach ([1, 2, 3, 4] as $level) {
+
+        $maxLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
+
+        if ($maxLevel) {
+            echo 'You cannot edit this password';
+            exit;
+        }
+        for ($level = 1; $level <= $maxLevel; $level++) {
 
             $this->template->set_var(
                 array(
@@ -531,7 +563,10 @@ class CTPassword extends CTCNC
             exit;
         }
 
-        $this->buPassword->archive($_REQUEST['passwordID'], $this->dbeUser);
+        $this->buPassword->archive(
+            $_REQUEST['passwordID'],
+            $this->dbeUser
+        );
         $urlNext =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],

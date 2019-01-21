@@ -56,4 +56,19 @@
             <column name="archivedBy" type="varchar(100)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="1547722529-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="passwordService"/>
+            </not>
+        </preConditions>
+        <createTable tableName="passwordService">
+            <column name="passwordServiceID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="onePerCustomer" type="int(1)" defaultValue="0"/>
+            <column name="sortOrder" type="int(11)" defaultValue="0"/>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
