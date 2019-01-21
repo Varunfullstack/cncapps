@@ -46,8 +46,7 @@
                     }
                 }
             }
-        }
-        else {
+        } else {
             document.searchForm.customerID.value = "";
             $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
         }
@@ -75,6 +74,16 @@
         for (var i = 0; i < document.searchForm.elements.length; i++) {
             var e = document.searchForm.elements[i];
             e.checked = document.searchForm.checkAllBox.checked;
+        }
+    }
+
+    function tickBox() {
+        const elm = $(event.target);
+
+        if (elm.val()) {
+            elm.closest('tr').find('[type="checkbox"]').attr('checked', true);
+        } else {
+            elm.closest('tr').find('[type="checkbox"]').attr('checked', false);
         }
     }
 </script>

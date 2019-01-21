@@ -233,23 +233,19 @@ class CTActivity extends CTCNC
 
     private function assignContracts()
     {
-
         $activities = $_REQUEST['callActivityID'];
         $problems = $_REQUEST['problem'];
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeProblem = new DBEProblem($this);
         foreach ($activities as $activityID => $rubbish) {
-
             $dbeCallActivity->getRow($activityID);
             $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
-
             $dbeProblem->getRow($problemID);
             $dbeProblem->setValue(
                 DBEProblem::contractCustomerItemID,
-                $problems[$problemID]
+                $problems[$problemID]['contract']
             );
-            $dbeProblem->updateRow();
         }
     }
 
@@ -961,7 +957,7 @@ class CTActivity extends CTCNC
                 $contractField = $dsSearchResults->getValue($contractDescriptionCol);
 
                 if (
-                    $dsSearchForm->getValue('status') == 'CHECKED_T_AND_M' OR
+                    $dsSearchForm->getValue('status') == 'CHECKED_T_AND_M' ||
                     $dsSearchForm->getValue('status') == 'CHECKED_NON_T_AND_M'
                 ) {
                     $checkBox =
@@ -994,7 +990,7 @@ class CTActivity extends CTCNC
 
                     $contractCustomerItemID = $dbeProblem->getValue(DBEProblem::contractCustomerItemID);
 
-                    $contractField = "<select name='problem[" . $problemID . "][contract]'>";
+                    $contractField = "<select name='problem[" . $problemID . "][contract]' onchange='tickBox()'>";
 
 
                     $contractField .= "<option value " . ($contractCustomerItemID ? '' : 'selected') . ">T&M</option>";
