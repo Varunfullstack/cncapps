@@ -383,10 +383,8 @@ class CTPasswordServices extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buPasswordService->deletePasswordService($_REQUEST['passwordServiceID'])) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        } else {
+        try {
+            $this->buPasswordService->deletePasswordService($_REQUEST['passwordServiceID']);
             $urlNext =
                 $this->buildLink(
                     $_SERVER['PHP_SELF'],
@@ -395,6 +393,9 @@ class CTPasswordServices extends CTCNC
                     )
                 );
             header('Location: ' . $urlNext);
+            exit;
+        } catch (Exception $exception) {
+            $this->displayFatalError('Cannot delete this row');
             exit;
         }
     }

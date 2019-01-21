@@ -6,10 +6,11 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPasswordService.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPassword.inc.php");
 
 class BUPasswordService extends Business
 {
-    /** @var DBEPasswordService  */
+    /** @var DBEPasswordService */
     public $dbePasswordService;
 
     /**
@@ -34,7 +35,7 @@ class BUPasswordService extends Business
     }
 
     function getPasswordServiceByID($ID,
-                                 &$dsResults
+                                    &$dsResults
     )
     {
         $this->dbePasswordService->setPKValue($ID);
@@ -57,11 +58,21 @@ class BUPasswordService extends Business
     function deletePasswordService($ID)
     {
         $this->setMethodName('deletePasswordService');
+        $dbePassword = new DBEPassword($this);
+        $dbePassword->setValue(
+            DBEPassword::service,
+            $ID
+        );
+        $dbePassword->getRowsByColumn(DBEPassword::service);
+
+        if ($dbePassword->rowCount) {
+            throw new Exception('Cannot delete because this service is in use');
+        }
         return $this->dbePasswordService->deleteRow($ID);
     }
 
     public function getPasswordServiceByTypeID(int $passwordServiceTypeID,
-                                            &$dsResults
+                                               &$dsResults
     )
     {
         $this->dbePasswordService->getRowsByTypeID($passwordServiceTypeID);
