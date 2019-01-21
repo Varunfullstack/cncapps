@@ -210,7 +210,6 @@ class BUCustomerReviewMeeting extends Business
 
     } // end function
 
-
     public function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);

@@ -417,7 +417,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 )
             );
 
-        $this->setPageTitle('Customer Review Meeting');
+        $this->setPageTitle('Customer Review Meeting Agenda');
 
         if ($dsSearchForm->getValue('customerID') != 0) {
             $buCustomer = new BUCustomer ($this);
