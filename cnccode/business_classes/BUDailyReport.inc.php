@@ -311,12 +311,29 @@ class BUDailyReport extends Business
                 true
             );
             $csvFile = $csvTemplate->get_var('output');
+            $select = "";
+            if ($dashboard) {
+
+                $select = '<span>Select Days:</span><select onchange="changeDays()">';
+
+                foreach ([0, 1, 2, 3, 4, 5, 6, 7] as $day) {
+
+                    $selected = $daysAgo == $day ? 'selected' : '';
+
+                    $select .= '<option ' . $selected . ' value="' . $day . '">' . $day . '</option>';
+
+                }
+                $select .= '</select>';
+
+
+            }
 
             $template->setVar(
                 array(
-                    'daysAgo'       => $daysAgo,
-                    'totalRequests' => $totalRequests,
-
+                    'daysAgo'            => $daysAgo,
+                    'totalRequests'      => $totalRequests,
+                    'selectDaysSelector' => $select,
+                    'isDashboard'        => $dashboard ? 'true' : 'false'
                 )
             );
 

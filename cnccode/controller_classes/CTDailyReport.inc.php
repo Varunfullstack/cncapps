@@ -77,30 +77,6 @@ class CTDailyReport extends CTCNC
                         '7DayersDashboard'
                     );
 
-                    $this->template->setBlock(
-                        "7DayersDashboard",
-                        "daysOptionsBlock",
-                        'daysOptions'
-                    );
-
-
-                    foreach ([0, 1, 2, 3, 4, 5, 6, 7] as $day) {
-                        $this->template->setVar(
-                            [
-                                "selected" => $_REQUEST['daysAgo'] == $day ? 'selected' : '',
-                                "value"    => $day
-                            ]
-                        );
-
-                        $this->template->parse(
-                            'daysOptions',
-                            'daysOptionsBlock',
-                            true
-                        );
-
-                    }
-
-
                     $this->template->setVar(
                         [
                             "thing" => $html

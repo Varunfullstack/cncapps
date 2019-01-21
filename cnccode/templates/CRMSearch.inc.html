@@ -1,6 +1,10 @@
 <!-- Template: PasswordSearch.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<link rel="stylesheet" href="/font-awesome/css/font-awesome.css"/>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<link rel="stylesheet"
+      href="/font-awesome/css/font-awesome.css"
+/>
 <script type="text/javascript">
 
 
@@ -19,8 +23,7 @@
                     '&parentDescField=customerString',
                     'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
             }
-        }
-        else {
+        } else {
             document.searchForm.customerID.value = "";
         }
     }
@@ -44,11 +47,24 @@
 
 <H2>{customerName}</H2>
 
-<form name="search" id="search" method="post" action="{urlSubmit}">
-    <input type="hidden" name="action" value="search">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="search"
+      id="search"
+      method="post"
+      action="{urlSubmit}"
+>
+    <input type="hidden"
+           name="action"
+           value="search"
+    >
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="130" class="promptText">
+            <td width="130"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -59,11 +75,18 @@
                         value="{customerID}"
                         onchange="document.search.submit()"
                 > <input
-                    type="text" id="customerString" name="customerString"
-                    value="{customerString}" onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()" required
-                    maxlength="50">
-                <button>search <i class="fa fa-search" aria-hidden="true"></i></button>
+                    type="text"
+                    id="customerString"
+                    name="customerString"
+                    value="{customerString}"
+                    onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    required
+                    maxlength="50"
+            >
+                <button>search <i class="fa fa-search"
+                                  aria-hidden="true"
+                ></i></button>
             </td>
         </tr>
         <tr>
@@ -75,10 +98,19 @@
 </form>
 
 
-<input type="hidden" name="action" value="search">
-<table width="500px" border="0" cellspacing="0" cellpadding="1">
+<input type="hidden"
+       name="action"
+       value="search"
+>
+<table width="500px"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
     <tr>
-        <td width="130" class="promptText">
+        <td width="130"
+            class="promptText"
+        >
             <div align="right">Bluestone Lead Status</div>
         </td>
         <td>
@@ -86,24 +118,34 @@
                 <option value="">-- Search All --</option>
                 <!-- BEGIN customerLeadStatusBlock -->
                 <option {customerLeadStatusSelected}
-                        value="{customerLeadStatusID}">
+                        value="{customerLeadStatusID}"
+                >
                     {customerLeadStatusName}
                 </option>
                 <!-- END customerLeadStatusBlock -->
             </select>
-            <button onclick="searchCustomers()">search <i class="fa fa-search" aria-hidden="true"></i></button>
+            <button onclick="searchCustomers()">search <i class="fa fa-search"
+                                                          aria-hidden="true"
+            ></i></button>
         </td>
     </tr>
 </table>
 <hr/>
 
-<link rel="stylesheet" type="text/css"
-      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
+<link rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+/>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
 <script type="text/javascript"
-        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+></script>
 <script>
 
     var dataTableObject = {
@@ -160,7 +202,9 @@
         padding-right: 0px !important;
     }
 </style>
-<div style="display: none" id="tableWrapper">
+<div style="display: none"
+     id="tableWrapper"
+>
     <table id="theTable">
         <thead>
         <tr>

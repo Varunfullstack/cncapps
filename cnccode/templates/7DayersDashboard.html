@@ -1,18 +1,1 @@
-<script>
-    function changeDays() {
-        let URL = '/DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true';
-        const days = event.target.value;
-        URL += "&daysAgo=" + days;
-        window.location = URL;
-    }
-</script>
-<select onchange="changeDays()">
-    <!-- BEGIN daysOptionsBlock  -->
-    <option {selected}
-            value="{value}"
-    >{value}
-    </option>
-    <!-- END daysOptionsBlock  -->
-</select>
-
 {thing}
