@@ -6950,18 +6950,25 @@ is currently a balance of ';
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
+        $projectURL = 'http://' . $_SERVER ['HTTP_HOST'] . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
+                DBEJCallActivity::customerID
+            );
+
+        $createProjectLink = "<a href='" . $projectURL . "'>Click here to create a project for this request</a>";
+
         $template->setVar(
             array(
-                'activityRef'   => $activityRef,
-                'urlActivity'   => $urlActivity,
-                'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'internalNotes' =>
+                'activityRef'       => $activityRef,
+                'urlActivity'       => $urlActivity,
+                'customerName'      => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'reason'            => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'createProjectLink' => $createProjectLink,
+                'internalNotes'     =>
                     $dbeJCallActivity->getValue(
                         DBEJCallActivity::internalNotes
                     ),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                                => CONFIG_SERVICE_REQUEST_DESC
+                                    => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
