@@ -101,12 +101,12 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 echo json_encode($data);
                 break;
             case self::UPLOAD_DOCUMENTS:
+
                 $response = [];
                 try {
-
                     $this->uploadDocuments();
                     $response['status'] = "ok";
-                } catch (Exception $exception) {
+                } catch (\Exception $exception) {
                     http_response_code(400);
                     $response['status'] = "error";
                     $response['error'] = $exception->getMessage();
@@ -291,6 +291,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
 
         $buActivity = new BUActivity($this);
 
+
         if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
             throw new Exception('At least one file must be provided');
         }
@@ -306,7 +307,6 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
 
         foreach ($_FILES['files']['name'] as $fileName) {
-
             $dbeDocuments->setUpdateModeInsert();
 
             $dbeDocuments->setValue(
@@ -337,10 +337,9 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 DBECustomerReviewMeetingDocument::fileMIMEType,
                 $_FILES['files']['type'][$counter]
             );
-
-            $dbeDocuments->post();
-
+            $result = $dbeDocuments->post();
             $counter++;
+
         }
     }
 
