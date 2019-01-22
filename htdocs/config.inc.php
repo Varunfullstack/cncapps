@@ -795,6 +795,11 @@ define(
 );
 
 define(
+    'CONFIG_TIME_REQUEST_ACTIVITY_TYPE_ID',
+    61
+);
+
+define(
     'CONFIG_2NDSITE_BACKUP_ACTIVITY_CATEGORY_ID',
     55
 );

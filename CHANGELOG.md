@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 429 - SD Manager Dashboard show P1 sections
 - Issue 410 - 7 dayers on dashboard
+- Issue 409 - Time Request Dashboard
 ### Changed
 - Issue 413 - Default home page graphs to your team
 - Issue 421 - Increase Questionnaire field length

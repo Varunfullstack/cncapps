@@ -568,6 +568,17 @@ class DBEJCallActivity extends DBECallActivity
         return (parent::getRows());
     }
 
+    function getPendingTimeRequestRows()
+    {
+        $query =
+            "SELECT " .
+            $this->getDBColumnNamesAsString() .
+            " FROM " . $this->fromString .
+            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 61";
+        $this->setQueryString($query);
+        return (parent::getRows());
+    }
+
     public function getPendingSalesRequestRows()
     {
         $query =
