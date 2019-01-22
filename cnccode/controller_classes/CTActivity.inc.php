@@ -3308,6 +3308,12 @@ class CTActivity extends CTCNC
                 $_SESSION[$this->sessionKey]['queueNo'] = 3;
                 $isAddToQueue = true;
             }
+
+            if (isset($_REQUEST['salesQ'])) {
+                $_SESSION[$this->sessionKey]['queueNo'] = 4;
+                $isAddToQueue = true;
+            }
+
             $_SESSION[$this->sessionKey]['date'] = date(CONFIG_MYSQL_DATE);
             $_SESSION[$this->sessionKey]['startTime'] = date('H:i');
 
