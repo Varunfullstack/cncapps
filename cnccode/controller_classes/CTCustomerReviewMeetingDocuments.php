@@ -115,7 +115,6 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 break;
             case self::DELETE_DOCUMENT:
                 $response = [];
-
                 try {
                     $this->deleteDocument();
                     $response['status'] = "ok";
