@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 436 - Changing contracts in SR, permissions required
+
 ## [v1.15.2] - 2019-01-11
 ### Fixed
 - PoStatusReport doesn't show the right amount of results.
