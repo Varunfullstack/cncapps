@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 378 - Creating item defaults to first site
 - Issue 419 - Customer Review Meeting Frequency doesn't show in PDF export for Every 2 Months
 - Issue 415 - First Time Fix clarification
+- Issue 432 - Contact changes in SR don't update phone details
 
 ## [v1.15.2] - 2019-01-11
 ### Fixed
