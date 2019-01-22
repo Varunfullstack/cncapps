@@ -1126,6 +1126,8 @@ GROUP BY caa_callacttypeno,
                     "historyPopupURL" => $historyPopupURL,
                     "inHoursBudget"   => $inHoursBudget,
                     "inHoursUsed"     => $inHoursUsed,
+                    "inHoursRed"      => $inHoursUsed > $inHoursBudget ? 'class="redText"' : '',
+                    "outHoursRed"     => $outHoursUsed > $outHoursBudget ? 'class="redText"' : '',
                     "outHoursBudget"  => $outHoursBudget,
                     "outHoursUsed"    => $outHoursUsed,
                 ]

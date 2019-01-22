@@ -34,12 +34,27 @@
         <tr>
             <td>In Hours</td>
             <td>{% stats.inHoursAllocated | decimal %} days</td>
-            <td>{% getTotalInDays | decimal %} days</td>
+            <td {%
+                #inDaysRed
+                %}
+                class="redText"
+                {%
+            /inDaysRed %}
+            >
+            {% getTotalInDays | decimal %} days
+            </td>
         </tr>
         <tr>
             <td>Out of Hours</td>
             <td>{% stats.ooHoursAllocated | decimal %} days</td>
-            <td>{% getTotalOutDays | decimal %} days</td>
+            <td {%
+                #outDaysRed
+                %}
+                class="redText"
+                {%
+            /outDaysRed %}
+            >
+            {% getTotalOutDays | decimal %} days</td>
         </tr>
     </table>
     <br>
@@ -296,8 +311,15 @@
                     return ((this.totalInHours * 60) / this.minutesPerDay).toFixed(2);
                 };
 
+                context.inDaysRed = function () {
+                    return this.stats.inHoursAllocated < this.getTotalInDays();
+                };
+
                 context.getTotalOutDays = function () {
                     return ((this.totalOutHours * 60) / this.minutesPerDay).toFixed(2);
+                };
+                context.outDaysRed = function () {
+                    return this.stats.ooHoursAllocated < this.getTotalOutDays();
                 };
 
                 context.data.forEach(item => {
@@ -531,7 +553,7 @@
                        id="newUpdate"
                        name="newComment"
                        maxlength="255"
-                      size="140"
+                       size="140"
                 >
             </TD>
         </TR>

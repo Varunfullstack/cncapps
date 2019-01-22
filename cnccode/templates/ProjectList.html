@@ -33,9 +33,9 @@
         <td>{commenceDate}</td>
         <td>{projectPlanLink}</td>
         <td>{inHoursBudget}</td>
-        <td>{inHoursUsed}</td>
+        <td {inHoursRed}>{inHoursUsed}</td>
         <td>{outHoursBudget}</td>
-        <td>{outHoursUsed}</td>
+        <td {outHoursRed}>{outHoursUsed}</td>
         <td>{latestUpdate}</td>
         <td><a onclick="showHistoryPopup('{historyPopupURL}')">History</a></td>
     </tr>

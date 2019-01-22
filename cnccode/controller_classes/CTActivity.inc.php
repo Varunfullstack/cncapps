@@ -2400,9 +2400,8 @@ class CTActivity extends CTCNC
             $url = $this->buildLink(
                 'Project.php',
                 array(
-                    'action'    => 'popup',
+                    'action'    => 'edit',
                     'projectID' => $dsProject->getValue('projectID'),
-                    'htmlFmt'   => CT_HTML_FMT_POPUP
                 )
             );
             $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
