@@ -273,7 +273,6 @@ class CTActivity extends CTCNC
                     $this->createSalesOrder();
 //                    $this->assignContracts();
                 } elseif ($_REQUEST['Search'] == 'Complete SRs') {
-                    $this->assignContracts();
                     $this->completeSRs();
                 } else {
                     if ($_REQUEST['Search'] == 'Skip Sales Orders') {
