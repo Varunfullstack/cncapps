@@ -246,6 +246,7 @@ class CTActivity extends CTCNC
                 DBEProblem::contractCustomerItemID,
                 $problems[$problemID]['contract']
             );
+            $dbeProblem->updateRow();
         }
     }
 

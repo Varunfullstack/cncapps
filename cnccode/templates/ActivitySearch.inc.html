@@ -81,9 +81,9 @@
         const elm = $(event.target);
 
         if (elm.val()) {
-            elm.closest('tr').find('[type="checkbox"]').attr('checked', true);
+            elm.closest('tr').find('[type="checkbox"]').prop('checked', true);
         } else {
-            elm.closest('tr').find('[type="checkbox"]').attr('checked', false);
+            elm.closest('tr').find('[type="checkbox"]').prop('checked', false);
         }
     }
 </script>
