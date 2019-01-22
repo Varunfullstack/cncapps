@@ -1331,45 +1331,60 @@ class BUCustomer extends Business
 
         /* check to see if the folder exists */
         if (!is_dir($dir)) {
-
             mkdir($dir);
-            /*
-            Then sub/folders
-            */
-            $subfolders =
-                array(
-                    'Client Information Forms',
-                    'CNC Internet',
-                    'Current Documentation',
-                    'E-Support Packs',
-                    'PC Build Sheets',
-                    'Projects',
-                    'Review Meetings',
-                    'Software Licencing',
-                    'Vulnerability Scans'
-                );
+        }
+        /*
+        Then sub/folders
+        */
+        $subfolders =
+            array(
+                'Client Information Forms',
+                'CNC Internet',
+                'Current Documentation',
+                'E-Support Packs',
+                'PC Build Sheets',
+                'Projects',
+                'Review Meetings',
+                'Software Licencing',
+                'Vulnerability Scans',
+                'Disaster Recovery Process'
+            );
 
-            foreach ($subfolders as $folder) {
-                mkdir($dir . '/' . $folder);
-            }
-            /*
-            Then these under Current Documentation
-            */
-            $subfolders =
-                array(
-                    'Documents and Forms',
-                    'Old Documentation',
-                    'Photos'
-                );
+        foreach ($subfolders as $folder) {
+            mkdir(
+                $dir . '/' . $folder,
+                0777,
+                true
+            );
+        }
+        /*
+        Then these under Current Documentation
+        */
+        $subfolders =
+            array(
+                'Documents and Forms',
+                'Old Documentation',
+                'Photos'
+            );
 
-            foreach ($subfolders as $folder) {
-                mkdir($dir . '/Current Documentation/' . $folder);
-            }
-
-            mkdir($dir . '/Current Documentation/Documents and Forms/Starters & Leavers');
-
+        foreach ($subfolders as $folder) {
+            mkdir(
+                $dir . '/Current Documentation/' . $folder,
+                0777,
+                true
+            );
         }
 
+        mkdir(
+            $dir . '/Current Documentation/Documents and Forms/Starters & Leavers',
+            0777,
+            true
+        );
+        mkdir(
+            $dir . '/Review Meetings/Analysis & Reports',
+            0777,
+            true
+        );
     }
 
     function customerFolderExists($customerID)
@@ -1609,6 +1624,15 @@ class BUCustomer extends Business
         );
 
         return ($dbePortalCustomerDocument->insertRow());
+    }
+
+    public function getActiveCustomers(DataSet $dsCustomers)
+    {
+        $this->dbeCustomer->getActiveCustomers();
+        return $this->getData(
+            $this->dbeCustomer,
+            $dsCustomers
+        );
     }
 
 

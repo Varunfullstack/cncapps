@@ -1106,6 +1106,7 @@ class CTCustomer extends CTCNC
         }
 
         $this->buCustomer->createCustomerFolder($this->getCustomerID());
+
         $nextURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
