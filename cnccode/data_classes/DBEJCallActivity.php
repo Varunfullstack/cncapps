@@ -432,7 +432,6 @@ class DBEJCallActivity extends DBECallActivity
 
     function getRowsInIdArray($IDArray)
     {
-
         foreach ($IDArray as $val):
             $IDs .= "," . $val;
         endforeach;

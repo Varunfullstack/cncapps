@@ -270,8 +270,8 @@ class CTActivity extends CTCNC
             case CTCNC_ACT_SEARCH:
                 /* if user has clicked Generate Sales Orders or Skip Sales Orders */
                 if ($_REQUEST['Search'] == 'Generate Sales Orders') {
-                    $this->assignContracts();
                     $this->createSalesOrder();
+//                    $this->assignContracts();
                 } elseif ($_REQUEST['Search'] == 'Complete SRs') {
                     $this->assignContracts();
                     $this->completeSRs();
@@ -283,8 +283,6 @@ class CTActivity extends CTCNC
                         $this->search();
                     }
                 }
-
-
                 break;
             case 'displayServiceRequestForContactPopup':
                 $this->serviceRequestsForContactPopup();

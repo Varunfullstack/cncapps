@@ -3411,6 +3411,7 @@ class BUActivity extends Business
 
             $finalActivityIDArray[] = $db->Record['caa_callactivityno'];
         }
+
         /*
     Get full activity rows(these come back in customerID, date order)
     */
