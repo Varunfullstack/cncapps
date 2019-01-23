@@ -342,6 +342,25 @@
     </changeSet>
     <changeSet author="pavwebdev" id="issue215-1528799226-26">
         <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="reviewUser"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="reviewUser" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-27">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="reviewUser"/>
+        </preConditions>
+        <sql>
+            update contact set reviewUser = 'Y' where con_mailflag7 = 'Y'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-28">
+        <preConditions onFail="MARK_RAN">
             <columnExists tableName="contact" columnName="con_mailflag7"/>
         </preConditions>
         <dropColumn tableName="contact" columnName="con_mailflag7"/>
@@ -351,18 +370,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-27">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="contact" columnName="reviewUser"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="contact">
-            <column name="reviewUser" type="char(1)" defaultValue="N"/>
-        </addColumn>
-    </changeSet>
-
-    <changeSet author="pavwebdev" id="issue215-1528799226-28">
+    <changeSet author="pavwebdev" id="issue215-1528799226-29">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contact" columnName="con_mailflag5"/>
         </preConditions>
@@ -373,7 +381,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-29">
+    <changeSet author="pavwebdev" id="issue215-1528799226-30">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contact" columnName="con_mailflag10"/>
         </preConditions>
@@ -384,7 +392,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-30">
+    <changeSet author="pavwebdev" id="issue215-1528799226-31">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_mailflg5_def"/>
         </preConditions>
@@ -395,7 +403,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-31">
+    <changeSet author="pavwebdev" id="issue215-1528799226-32">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_mailflg5_desc"/>
         </preConditions>
@@ -406,7 +414,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-32">
+    <changeSet author="pavwebdev" id="issue215-1528799226-33">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_mailflg10_def"/>
         </preConditions>
@@ -417,7 +425,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-33">
+    <changeSet author="pavwebdev" id="issue215-1528799226-34">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_mailflg10_desc"/>
         </preConditions>
@@ -428,7 +436,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-34">
+    <changeSet author="pavwebdev" id="issue215-1528799226-35">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contact" columnName="hrUser"/>
@@ -438,7 +446,7 @@
             <column name="hrUser" defaultValue="N" type="char(1)"/>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-35">
+    <changeSet author="pavwebdev" id="issue215-1528799226-36">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contactauditlog" columnName="con_mailflag1"/>
         </preConditions>
@@ -449,7 +457,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-36">
+    <changeSet author="pavwebdev" id="issue215-1528799226-37">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contactauditlog" columnName="con_mailflag10"/>
         </preConditions>
@@ -460,7 +468,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-37">
+    <changeSet author="pavwebdev" id="issue215-1528799226-38">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contactauditlog" columnName="con_mailflag5"/>
         </preConditions>
@@ -471,7 +479,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-38">
+    <changeSet author="pavwebdev" id="issue215-1528799226-39">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contactauditlog" columnName="con_mailflag6"/>
         </preConditions>
@@ -482,7 +490,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-39">
+    <changeSet author="pavwebdev" id="issue215-1528799226-40">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contactauditlog" columnName="con_mailflag7"/>
         </preConditions>
@@ -493,7 +501,7 @@
             </addColumn>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-40">
+    <changeSet author="pavwebdev" id="issue215-1528799226-41">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactauditlog" columnName="hrUser"/>
@@ -503,7 +511,7 @@
             <column name="hrUser" type="char(1)"/>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-41">
+    <changeSet author="pavwebdev" id="issue215-1528799226-42">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactauditlog" columnName="reviewUser"/>
@@ -513,7 +521,7 @@
             <column name="reviewUser" type="char(1)"/>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue215-1528799226-42">
+    <changeSet author="pavwebdev" id="issue215-1528799226-43">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactauditlog" columnName="supportLevel"/>
@@ -523,7 +531,7 @@
             <column name="supportLevel" type="char(20)"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-43" author="pavwebdev">
+    <changeSet id="issue215-1528799226-44" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="initialLoggingEmailFlag"/>
@@ -533,7 +541,7 @@
             <column name="initialLoggingEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-44" author="pavwebdev">
+    <changeSet id="issue215-1528799226-45" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="workStartedEmailFlag"/>
@@ -543,7 +551,7 @@
             <column name="workStartedEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-45" author="pavwebdev">
+    <changeSet id="issue215-1528799226-46" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="workUpdatesEmailFlag"/>
@@ -553,7 +561,7 @@
             <column name="workUpdatesEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-46" author="pavwebdev">
+    <changeSet id="issue215-1528799226-47" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="fixedEmailFlag"/>
@@ -563,7 +571,7 @@
             <column name="fixedEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-47" author="pavwebdev">
+    <changeSet id="issue215-1528799226-48" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="pendingClosureEmailFlag"/>
@@ -573,7 +581,7 @@
             <column name="pendingClosureEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-48" author="pavwebdev">
+    <changeSet id="issue215-1528799226-49" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="closureEmailFlag"/>
@@ -583,7 +591,7 @@
             <column name="closureEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-49" author="pavwebdev">
+    <changeSet id="issue215-1528799226-50" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="othersInitialLoggingEmailFlag"/>
@@ -593,7 +601,7 @@
             <column name="othersInitialLoggingEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-50" author="pavwebdev">
+    <changeSet id="issue215-1528799226-51" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="othersWorkStartedEmailFlag"/>
@@ -603,7 +611,7 @@
             <column name="othersWorkStartedEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-51" author="pavwebdev">
+    <changeSet id="issue215-1528799226-52" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="othersWorkUpdatesEmailFlag"/>
@@ -613,7 +621,7 @@
             <column name="othersWorkUpdatesEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-52" author="pavwebdev">
+    <changeSet id="issue215-1528799226-53" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="othersFixedEmailFlag"/>
@@ -623,7 +631,7 @@
             <column name="othersFixedEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-53" author="pavwebdev">
+    <changeSet id="issue215-1528799226-54" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="othersPendingClosureEmailFlag"/>
@@ -633,7 +641,7 @@
             <column name="othersPendingClosureEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-54" author="pavwebdev">
+    <changeSet id="issue215-1528799226-55" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="othersClosureEmailFlag"/>
@@ -643,7 +651,7 @@
             <column name="othersClosureEmailFlag" type="char(1)" defaultValue="Y"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-55" author="pavwebdev">
+    <changeSet id="issue215-1528799226-56" author="pavwebdev">
         <modifyDataType tableName="contact" columnName="con_portal_password" newDataType="char(60)"/>
         <modifyDataType tableName="contactAuditLog" columnName="con_portal_password" newDataType="char(60)"/>
         <sql>
@@ -652,7 +660,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet id="issue215-1528799226-56" author="pavwebdev">
+    <changeSet id="issue215-1528799226-57" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contact" columnName="pendingLeaverFlag"/>
@@ -668,7 +676,7 @@
             <dropColumn tableName="contact" columnName="pendingLeaverFlag"/>
         </rollback>
     </changeSet>
-    <changeSet id="issue215-1528799226-57" author="pavwebdev">
+    <changeSet id="issue215-1528799226-58" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contact" columnName="pendingLeaverDate"/>
@@ -679,7 +687,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="issue215-1528799226-58" author="pavwebdev">
+    <changeSet id="issue215-1528799226-59" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="pendingLeaverFlag"/>
@@ -689,7 +697,7 @@
             <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-59" author="pavwebdev">
+    <changeSet id="issue215-1528799226-60" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="contactAuditLog" columnName="pendingLeaverDate"/>
@@ -699,14 +707,14 @@
             <column name="pendingLeaverDate" type="date"/>
         </addColumn>
     </changeSet>
-    <changeSet id="issue215-1528799226-60" author="pavwebdev">
+    <changeSet id="issue215-1528799226-61" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="problem" columnName="authorisedBy"/>
             </not>
         </preConditions>
         <addColumn tableName="problem">
-            <column name="authorisedBy" type="int(11)" />
+            <column name="authorisedBy" type="int(11)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
