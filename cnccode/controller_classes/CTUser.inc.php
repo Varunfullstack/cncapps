@@ -501,6 +501,9 @@ class CTUser extends CTCNC
                 'lastName'                             => Controller::htmlInputText($dsUser->getValue('lastName')),
                 'lastNameMessage'                      => Controller::htmlDisplayText($dsUser->getMessage('lastName')),
                 'activeFlagChecked'                    => Controller::htmlChecked($dsUser->getValue('activeFlag')),
+                'changeSRContractsFlagChecked'         => Controller::htmlChecked(
+                    $dsUser->getValue(DBEUser::changeSRContractsFlag)
+                ),
                 'staffAppraiserFlagChecked'            => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::staffAppraiserFlag)
                 ),
