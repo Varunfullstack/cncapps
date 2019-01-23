@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 423 - Upcoming Customer Review Meeting
 - Issue 414 - Contact table change defaults
 - Issue 390 - Project List Enhancements
+- Issue 438 - Edit Sales Invoice email to include reference to portal
 ### Fixed
 - Issue 420 - Email missing header information
 - Issue 378 - Creating item defaults to first site
