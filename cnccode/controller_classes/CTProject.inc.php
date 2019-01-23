@@ -298,6 +298,44 @@ class CTProject extends CTCNC
                 'htmlFmt'   => CT_HTML_FMT_POPUP
             )
         );
+        $linkServiceRequest = "";
+        if ($dsProject->getValue(DBEProject::ordHeadID)) {
+            $buSalesOrder = new BUSalesOrder($this);
+
+            $linkedServiceRequestCount = $buSalesOrder->countLinkedServiceRequests(
+                $dsProject->getValue(DBEProject::ordHeadID)
+            );
+
+            if ($linkedServiceRequestCount == 1) {
+
+                $problemID = $buSalesOrder->getLinkedServiceRequestID($dsProject->getValue(DBEProject::ordHeadID));
+
+                $urlServiceRequest =
+                    $this->buildLink(
+                        'Activity.php',
+                        array(
+                            'action'    => 'displayFirstActivity',
+                            'problemID' => $problemID
+                        )
+                    );
+
+                $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div>View SR</div></a>';
+
+            } else {     // many SRs so display search page
+                $urlServiceRequest =
+                    $this->buildLink(
+                        'Activity.php',
+                        array(
+                            'action'             => 'search',
+                            'linkedSalesOrderID' => $dsProject->getValue(DBEProject::ordHeadID)
+                        )
+                    );
+
+                $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div>View SRs</div></a>';
+
+            }
+        }
+
 
         $urlLinkedSalesOrder =
             $this->buildLink(
@@ -411,7 +449,8 @@ class CTProject extends CTCNC
                 'projectPlanDownloadURL'  => $projectPlanDownloadURL,
                 'calculateBudgetLink'     => $projectCalculateBudgetLink,
                 'getProjectBudgetDataURL' => $fetchProjectDataURL,
-                'projectManagementCheck'  => $isProjectManager ? '' : 'readonly disabled'
+                'projectManagementCheck'  => $isProjectManager ? '' : 'readonly disabled',
+                'viewSRLink'              => $linkServiceRequest
             )
         );
         $this->template->parse(
@@ -1126,6 +1165,8 @@ GROUP BY caa_callacttypeno,
                     "historyPopupURL" => $historyPopupURL,
                     "inHoursBudget"   => $inHoursBudget,
                     "inHoursUsed"     => $inHoursUsed,
+                    "inHoursRed"      => $inHoursUsed > $inHoursBudget ? 'class="redText"' : '',
+                    "outHoursRed"     => $outHoursUsed > $outHoursBudget ? 'class="redText"' : '',
                     "outHoursBudget"  => $outHoursBudget,
                     "outHoursUsed"    => $outHoursUsed,
                 ]

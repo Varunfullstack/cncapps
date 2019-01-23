@@ -148,9 +148,6 @@ class CTHome extends CTCNC
             $this->displaySalesFigures();
         }
 
-
-        $this->displayProjects();
-
         $this->setTemplateFiles(
             'dashboardTest',
             'DashboardStats'

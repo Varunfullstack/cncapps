@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 422 - Decimal places for fix times in System Header
 - Issue 423 - Upcoming Customer Review Meeting
 - Issue 414 - Contact table change defaults
+- Issue 390 - Project List Enhancements
 ### Fixed
 - Issue 420 - Email missing header information
 - Issue 378 - Creating item defaults to first site
