@@ -681,6 +681,26 @@ class DBECustomer extends DBCNCEntity
         return $ret;
     }
 
+    /**
+     * Returns list of customers with special attention set
+     *
+     * @access public
+     * @return bool Success
+     */
+    function getActiveCustomers()
+    {
+        $this->setMethodName("getSpecialAttentionCustomers");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " = 'N'";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
     function getReviewList($userID,
                            $sortColumn = false
     )
