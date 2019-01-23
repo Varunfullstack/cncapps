@@ -9,7 +9,11 @@
 GLOBAL $cfg;
 require_once("config.inc.php");
 require_once ($cfg['path_bu']) . '/BUHome.php';
+
+$thing = null;
+
 $buHome = new BUHome();
 
-$buHome->updateAll();
+$buHome->updateUpcomingVisits();
+
 ?>

@@ -18,6 +18,7 @@ This project changes will be shown here.
 - Issue 390 - Project List Enhancements
 - Issue 438 - Edit Sales Invoice email to include reference to portal
 - Issue 418 - SR Completion Contract Changing
+- Issue 437 - Split Upcoming Visits query into own function
 ### Fixed
 - Issue 420 - Email missing header information
 - Issue 378 - Creating item defaults to first site
