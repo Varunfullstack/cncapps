@@ -111,5 +111,43 @@ class BUPassword extends Business
         );
     }
 
+    public function getArchivedRowsByPasswordLevel($passwordLevel,
+                                                   $dsResults
+    )
+    {
+        $this->dbePassword->getArchivedRowsByPasswordLevel(
+            $passwordLevel
+        );
+        return ($this->getData(
+            $this->dbePassword,
+            $dsResults
+        ));
+    }
+
+    public function decrypt($data)
+    {
+        if (!$data) {
+            return null;
+        }
+
+        \CNCLTD\Encryption::decrypt(
+            PASSWORD_ENCRYPTION_PRIVATE_KEY,
+            PASSWORD_PASSPHRASE,
+            $data
+        );
+    }
+
+    public function encrypt($data)
+    {
+        if (!$data) {
+            return null;
+        }
+
+        \CNCLTD\Encryption::encrypt(
+            PASSWORD_ENCRYPTION_PRIVATE_KEY,
+            $data
+        );
+    }
+
 } // End of class
 ?>

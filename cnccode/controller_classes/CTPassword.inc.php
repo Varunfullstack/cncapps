@@ -15,7 +15,8 @@ require_once($cfg['path_dbe'] . '/DBEPassword.inc.php');
 
 class CTPassword extends CTCNC
 {
-    var $buPassword = '';
+    /** @var BUPassword */
+    public $buPassword;
 
     function __construct($requestMethod,
                          $postVars,
@@ -248,7 +249,7 @@ class CTPassword extends CTCNC
                         )
                     );
 
-                $decryptedNotes = $this->decrypt($dsPassword->getValue('notes'));
+                $decryptedNotes = $this->buPassword->decrypt($dsPassword->getValue('notes'));
 
                 if (strpos(
                         $decryptedNotes,
@@ -261,22 +262,25 @@ class CTPassword extends CTCNC
                     $notes = $decryptedNotes;
                 }
 
+
+                $decryptedURL = $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL));
+                $URL = strlen(
+                    $decryptedURL
+                ) ? '<a href="' . $decryptedURL . '" target="_blank">' . $decryptedURL . '</a>' : '';
+
+
                 $this->template->set_var(
                     array(
                         'passwordID' => $dsPassword->getValue('passwordID'),
                         'customerID' => $dsPassword->getValue('customerID'),
-                        'username'   => $this->decrypt($dsPassword->getValue('username')),
-                        'service'    => $this->decrypt($dsPassword->getValue('service')),
-                        'password'   => $this->decrypt($dsPassword->getValue('password')),
+                        'username'   => $this->buPassword->decrypt($dsPassword->getValue('username')),
+                        'service'    => $this->buPassword->decrypt($dsPassword->getValue('service')),
+                        'password'   => $this->buPassword->decrypt($dsPassword->getValue('password')),
                         'notes'      => $notes,
                         'urlEdit'    => $urlEdit,
                         'urlArchive' => $urlArchive,
                         'level'      => $dsPassword->getValue(DBEPassword::level),
-                        'URL'        => strlen(
-                            $dsPassword->getValue(DBEPassword::URL)
-                        ) ? '<a href="' . $dsPassword->getValue(
-                                DBEPassword::URL
-                            ) . '" target="_blank">' . $dsPassword->getValue(DBEPassword::URL) . '</a>' : ''
+                        'URL'        => $URL
 
                     )
                 );
@@ -323,7 +327,7 @@ class CTPassword extends CTCNC
 
                     $previousPassword = $dbePassword->getValue(DBEPassword::password);
 
-                    $previousPasswordDecrypted = $this->decrypt($previousPassword);
+                    $previousPasswordDecrypted = $this->buPassword->decrypt($previousPassword);
 
                     $newPassword = $dsPassword->getValue(DBEPassword::password);
 
@@ -343,19 +347,19 @@ class CTPassword extends CTCNC
 
                 $dsPassword->setValue(
                     DBEPassword::username,
-                    $this->encrypt($dsPassword->getValue(DBEPassword::username))
+                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::username))
                 );
                 $dsPassword->setValue(
                     DBEPassword::password,
-                    $this->encrypt($dsPassword->getValue(DBEPassword::password))
+                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::password))
                 );
                 $dsPassword->setValue(
                     DBEPassword::service,
-                    $this->encrypt($dsPassword->getValue(DBEPassword::service))
+                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::service))
                 );
                 $dsPassword->setValue(
                     DBEPassword::notes,
-                    $this->encrypt($dsPassword->getValue(DBEPassword::notes))
+                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::notes))
                 );
 
 
@@ -442,16 +446,14 @@ class CTPassword extends CTCNC
             array(
                 'customerID'      => $dsPassword->getValue('customerID'),
                 'passwordID'      => $dsPassword->getValue('passwordID'),
-                'username'        => $this->decrypt($dsPassword->getValue('username')),
+                'username'        => $this->buPassword->decrypt($dsPassword->getValue('username')),
                 'usernameMessage' => $dsPassword->getMessage('username'),
-                'service'         => $this->decrypt($dsPassword->getValue('service')),
-                'serviceMessage'  => $dsPassword->getMessage('service'),
-                'password'        => $this->decrypt($dsPassword->getValue('password')),
+                'password'        => $this->buPassword->decrypt($dsPassword->getValue('password')),
                 'passwordMessage' => $dsPassword->getMessage('password'),
-                'notes'           => $this->decrypt($dsPassword->getValue('notes')),
+                'notes'           => $this->buPassword->decrypt($dsPassword->getValue('notes')),
                 'notesMessage'    => $dsPassword->getMessage('notes'),
                 'urlEdit'         => $urlEdit,
-                'URL'             => $dsPassword->getValue(DBEPassword::URL)
+                'URL'             => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL))
             )
         );
 
@@ -462,19 +464,6 @@ class CTPassword extends CTCNC
         );
         $this->parsePage();
 
-    }
-
-    private function decrypt($data)
-    {
-        if (!$data) {
-            return null;
-        }
-
-        \CNCLTD\Encryption::decrypt(
-            PASSWORD_ENCRYPTION_PRIVATE_KEY,
-            PASSWORD_PASSPHRASE,
-            $data
-        );
     }
 
     function loadFromCsv()
@@ -608,18 +597,5 @@ class CTPassword extends CTCNC
         $this->parsePage();
 
     }
-
-    private function encrypt($data)
-    {
-        if (!$data) {
-            return null;
-        }
-
-        \CNCLTD\Encryption::encrypt(
-            PASSWORD_ENCRYPTION_PRIVATE_KEY,
-            $data
-        );
-    }
-
 }// end of class
 ?>

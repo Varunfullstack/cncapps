@@ -6,11 +6,12 @@
  * Time: 12:33
  */
 
-require_once($cfg['path_bu'] . '/BUContact.inc.php');
+require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once $cfg['path_dbe'] . '/DBEJContactAudit.php';
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
+require_once($cfg['path_dbe'] . '/DBEPasswordService.inc.php');
+
 
 class CTPasswordAudit extends CTCNC
 {
@@ -38,14 +39,12 @@ class CTPasswordAudit extends CTCNC
         );
         $roles = [
             "sales",
+            "technical"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->buContact = new BUContact($this);
-        $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
-        $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);
     }
 
     /**
@@ -54,17 +53,6 @@ class CTPasswordAudit extends CTCNC
     function defaultAction()
     {
         switch ($_REQUEST['action']) {
-            case 'doSearch':
-                echo json_encode(
-                    $this->searchContactAudit(
-                        $_REQUEST['customerId'],
-                        $_REQUEST['startDate'],
-                        $_REQUEST['endDate'],
-                        $_REQUEST['firstName'],
-                        $_REQUEST['lastName']
-                    )
-                );
-                break;
             default:
                 $this->displaySearchForm();
         }
@@ -78,88 +66,72 @@ class CTPasswordAudit extends CTCNC
     {
         $this->setMethodName('displaySearchForm');
         $this->setTemplateFiles(
-            'CustomerSearch',
-            'ContactAuditSearch'
+            'PasswordAudit',
+            'PasswordAudit'
         );
 // Parameters
-        $this->setPageTitle("Contact Audit Log");
-        $submitURL = $this->buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => CTCUSTOMER_ACT_SEARCH)
+        $this->setPageTitle("Password Audit Log");
+
+        $this->template->setBlock(
+            'PasswordAudit',
+            'PasswordsBlock',
+            'passwords'
         );
-        $customerPopupURL =
-            $this->buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
+
+
+        $buPassword = new BUPassword($this);
+        $passwords = new DataSet($this);
+        $buPassword->getArchivedRowsByPasswordLevel(
+            $this->dbeUser->getValue(DBEUser::passwordLevel),
+            $passwords
+        );
+
+
+        $customerCache = [];
+        $serviceNameCache = [];
+
+        $dbeCustomer = new DBECustomer($this);
+        $dbePasswordService = new DBEPasswordService($this);
+        while ($passwords->fetchNext()) {
+
+            if (!isset($customerCache[$passwords->getValue(DBEPassword::customerID)])) {
+                $dbeCustomer->getRow($passwords->getValue(DBEPassword::customerID));
+                $customerCache[$passwords->getValue(DBEPassword::customerID)] = $dbeCustomer->getValue(
+                    DBECustomer::name
+                );
+            }
+
+            if (!isset($serviceNameCache[$passwords->getValue(DBEPassword::serviceID)])) {
+
+                $dbePasswordService->getRow($passwords->getValue(DBEPassword::serviceID));
+                $serviceNameCache[$passwords->getValue(DBEPassword::serviceID)] = $dbePasswordService->getValue(
+                    DBEPasswordService::description
+                );
+            }
+
+            $this->template->setVar(
+                [
+                    "customer"    => $customerCache[$passwords->getValue(DBEPassword::customerID)],
+                    "username"    => $buPassword->decrypt($passwords->getValue(DBEPassword::username)),
+                    "password"    => $buPassword->decrypt($passwords->getValue(DBEPassword::password)),
+                    "notes"       => $buPassword->decrypt($passwords->getValue(DBEPassword::notes)),
+                    "URL"         => $buPassword->decrypt($passwords->getValue(DBEPassword::URL)),
+                    "serviceName" => $serviceNameCache[$passwords->getValue(DBEPassword::serviceID)],
+                ]
             );
-        $this->template->set_var(
-            array(
-                'contactString'           => "",
-                'phoneString'             => "",
-                'customerString'          => "",
-                'address'                 => "",
-                'customerStringMessage'   => "",
-                'newCustomerFromDate'     => "",
-                'newCustomerToDate'       => "",
-                'droppedCustomerFromDate' => "",
-                'droppedCustomerToDate'   => "",
-                'submitURL'               => $submitURL,
-                'customerPopupURL'        => $customerPopupURL,
-            )
-        );
+
+            $this->template->parse(
+                'passwords',
+                'PasswordsBlock',
+                true
+            );
+        }
+
         $this->template->parse(
             'CONTENTS',
-            'CustomerSearch',
+            'PasswordAudit',
             true
         );
         $this->parsePage();
-    }
-
-
-    private function searchContactAudit($customerID = null,
-                                        $startDate = null,
-                                        $endDate = null,
-                                        $firstName = null,
-                                        $lastName = null
-    )
-    {
-        $test = new DBEJContactAudit($this);
-
-        if ($startDate) {
-            $startDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $startDate
-            );
-        }
-
-        if ($endDate) {
-            $endDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $endDate
-            );
-        }
-
-        $test->search(
-            $customerID,
-            $startDate,
-            $endDate,
-            $firstName,
-            $lastName
-        );
-
-        $result = [];
-
-        while ($test->fetchNext()) {
-            $row = [];
-            foreach (DBEJContactAudit::getConstants() as $constant) {
-                $row[$constant] = $test->getValue($constant);
-            }
-            $result[] = $row;
-        }
-
-        return $result;
     }
 }// end of class

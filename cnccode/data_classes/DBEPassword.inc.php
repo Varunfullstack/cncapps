@@ -18,6 +18,7 @@ class DBEPassword extends DBEntity
     const URL = 'URL';
     const archivedAt = 'archivedAt';
     const archivedBy = 'archivedBy';
+    const serviceID = 'serviceID';
 
     /**
      * calls constructor()
@@ -91,6 +92,13 @@ class DBEPassword extends DBEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::serviceID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "pas_service"
+        );
+
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -112,6 +120,21 @@ class DBEPassword extends DBEntity
             " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
             " AND " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel .
             " and " . $this->getDBColumnName(self::archivedBy) . ' is null '
+        );
+        return (parent::getRows());
+    }
+
+    public function getArchivedRowsByPasswordLevel($passwordLevel)
+    {
+        $this->setMethodName('getRowsByCustomerIDAndPasswordLevel');
+        if ($passwordLevel == '') {
+            $this->raiseError('passwordLevel not set');
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel .
+            " and " . $this->getDBColumnName(self::archivedBy) . ' is not null '
         );
         return (parent::getRows());
     }
