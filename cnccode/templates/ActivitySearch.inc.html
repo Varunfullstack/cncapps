@@ -46,8 +46,7 @@
                     }
                 }
             }
-        }
-        else {
+        } else {
             document.searchForm.customerID.value = "";
             $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
         }
@@ -75,6 +74,16 @@
         for (var i = 0; i < document.searchForm.elements.length; i++) {
             var e = document.searchForm.elements[i];
             e.checked = document.searchForm.checkAllBox.checked;
+        }
+    }
+
+    function tickBox() {
+        const elm = $(event.target);
+
+        if (elm.val()) {
+            elm.closest('tr').find('[type="checkbox"]').prop('checked', true);
+        } else {
+            elm.closest('tr').find('[type="checkbox"]').prop('checked', false);
         }
     }
 </script>
@@ -387,7 +396,7 @@
            class="singleBorder"
     >
         <tr>
-            <td colspan="13"
+            <td colspan="{headerColSpan}"
                 class="listHeadText"
             >&nbsp;
             </td>
@@ -412,10 +421,7 @@
             <td class="listHeadText"><a href="{requestUri}&sortColumn=fixEngineer">Fixed By</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=contractDescription">Contract</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=rootCause">Root Cause</a></td>
-            <td class="listHeadText">Start</td>
-            <td class="listHeadText">End</td>
-            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=slaResponseHours">SLA</a></td>
-            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=respondedHours">Resp</a></td>
+            {weirdColumns}
             <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Fix</a></td>
             <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=activityDurationHours">Activity</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
@@ -462,22 +468,7 @@
                 nowrap
             >{listRootCause}
             </td>
-            <td align="top"
-                class="listItemText"
-            >{listStart}
-            </td>
-            <td align="top"
-                class="listItemText"
-            >{listEnd}
-            </td>
-            <td align="right"
-                nowrap
-            >{listSlaResponseHours}
-            </td>
-            <td align="right"
-                nowrap
-            >{listRespondedHours}
-            </td>
+            {weirdFields}
             <td align="right"
                 nowrap
             >{listWorkingHours}
