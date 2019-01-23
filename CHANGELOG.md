@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 410 - 7 dayers on dashboard
 - Issue 409 - Time Request Dashboard
 - Issue 428 - Allow Logging directly into the Sales queue
+- Issue 411 - Non referred customers with no contracts report
 ### Changed
 - Issue 413 - Default home page graphs to your team
 - Issue 421 - Increase Questionnaire field length
