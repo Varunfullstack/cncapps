@@ -319,7 +319,7 @@ class CTProject extends CTCNC
                         )
                     );
 
-                $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div class="navigateLinkCustomerNoteExists">View SR</div></a>';
+                $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div>View SR</div></a>';
 
             } else {     // many SRs so display search page
                 $urlServiceRequest =
@@ -331,7 +331,7 @@ class CTProject extends CTCNC
                         )
                     );
 
-                $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div class="navigateLinkCustomerNoteExists">View SRs</div></a>';
+                $linkServiceRequest = '<a href="' . $urlServiceRequest . '" target="_blank"><div>View SRs</div></a>';
 
             }
         }
