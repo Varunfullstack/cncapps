@@ -7633,7 +7633,8 @@ is currently a balance of ';
 
     }
 
-    function isWhitelistedUtilityEmail($email){
+    function isWhitelistedUtilityEmail($email)
+    {
         $dbeUtilityEmail = new DBEUtilityEmail($this);
 
         $dbeUtilityEmail->getRowsByEmail($email);
@@ -7726,6 +7727,8 @@ is currently a balance of ';
 
 
         $supportLevel = $dbeContact->getValue(DBEContact::supportLevel);
+
+        echo "<div>The sender contact support level is : $supportLevel</div>";
 
         $allowedLevels = [
             DBEContact::supportLevelMain,
@@ -10984,15 +10987,12 @@ is currently a balance of ';
                                           DBEContact $dbeContact
     )
     {
-
+        echo '<div>The sender was not authorized, send an email to the sender and to the primary contact</div>';
 
         $buCustomer = new BUCustomer($this);
         $primaryMainContactDS = $buCustomer->getPrimaryContact($record->getCustomerID());
-        $buMail = new BUMail($this);
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
+
+
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $toEmail = $primaryMainContactDS->getValue(DBEContact::email);
 
@@ -11001,6 +11001,11 @@ is currently a balance of ';
             ) . " " . $dbeContact->getValue(DBEContact::lastName);
 
         if ($primaryMainContactDS->rowCount) {
+            $buMail = new BUMail($this);
+            $template = new Template(
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
             $template->set_file(
                 'page',
                 'NotAuthorisedPrimaryMainContactEmail.html'
@@ -11033,10 +11038,14 @@ is currently a balance of ';
 
             $buMail->mime->setHTMLBody($body);
 
+            $fileName = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                    DBEContact::lastName
+                ) . " Request At " . (new DateTime())->format('d-m-Y H:i') . '.html';
             $buMail->mime->addAttachment(
                 $record->getHtmlBody(),
                 'application/octet-stream',
-                'originalEmail.html'
+                $fileName,
+                false
             );
 
             $mime_params = array(
@@ -11058,7 +11067,11 @@ is currently a balance of ';
             );
 
         }
-
+        $buMail = new BUMail($this);
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
         $template->set_file(
             'page',
             'NotAuthorisedContactEmail.html'
