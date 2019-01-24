@@ -52,19 +52,25 @@
     var isManager = {isManager};
     var defaultTeam = userLevel <= 3 ? userLevel : 1;
 
+
     $(function () {
         // Load the Visualization API and the corechart package.
         google.charts.load('current', {'packages': ['corechart']});
+        var googleLoadedDeferred = jQuery.Deferred();
+        var googleLoaded = googleLoadedDeferred.promise();
+
+        googleLoaded.then((test) => {
+            console.log('google has loaded!!')
+        });
 
         var teamSelector = $('#teamSelector');
+
 
         if (isManager) {
             teamSelector.show();
             teamSelector.val(userLevel <= 3 ? userLevel : 1);
-            drawIndividualCharts(userLevel <= 3 ? userLevel : 1);
-        } else {
-            defaultTeam = userLevel;
         }
+
 
         $('body').on('click', '.details', function () {
             var userId = $(this).data().userId;
@@ -72,7 +78,7 @@
             var sixtyDaysAgo = moment().subtract(60, 'days');
             document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
         });
-
+        drawIndividualCharts(teamSelector.val());
         teamSelector.change(function () {
             drawIndividualCharts($(this).val());
         });
@@ -81,12 +87,15 @@
 
         function drawIndividualCharts(teamId) {
             var that = this;
+
             this.ajaxOptions = {
                 url: '?action=lastWeekHelpDesk',
                 dataType: 'json',
-                data: {days: this.days, team: teamId}
+                data: {team: teamId}
             };
-            this.data = $.ajax(this.ajaxOptions);
+            this.data = googleLoaded.then(() => {
+                return $.ajax(this.ajaxOptions)
+            });
             this.container = $('#teamIndividualCharts');
             this.container.html('');
             this.source = document.getElementById("member-item-template").innerHTML;
@@ -136,7 +145,7 @@
 
 
         google.charts.setOnLoadCallback(function () {
-            drawIndividualCharts(teamSelector.val());
+            googleLoadedDeferred.resolve(true);
         });
     })
 
