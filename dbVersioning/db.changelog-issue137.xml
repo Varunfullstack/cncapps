@@ -33,7 +33,7 @@
             </not>
         </preConditions>
         <addColumn tableName="password">
-            <column name="URL" type="varchar(200)"/>
+            <column name="URL" type="mediumtext"/>
         </addColumn>
     </changeSet>
     <changeSet author="pavwebdev" id="1547722529-4">

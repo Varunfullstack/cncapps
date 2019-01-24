@@ -12,6 +12,7 @@ require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPassword.inc.php');
+require_once($cfg['path_dbe'] . '/DBEPasswordService.inc.php');
 
 class CTPassword extends CTCNC
 {
@@ -223,13 +224,15 @@ class CTPassword extends CTCNC
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
-
+            $dbePasswordService = new DBEPasswordService($this);
 
             $this->template->set_block(
                 'PasswordList',
                 'passwordBlock',
                 'passwords'
             );
+
+            $passwordServiceCache = [];
             while ($dsPassword->fetchNext()) {
 
                 $urlEdit =
@@ -255,7 +258,7 @@ class CTPassword extends CTCNC
                         $decryptedNotes,
                         'http'
                     ) !== false) {
-                    $notes = '<A href="' .$decryptedNotes. '" target="_blank">' . $decryptedNotes . '</a>';
+                    $notes = '<A href="' . $decryptedNotes . '" target="_blank">' . $decryptedNotes . '</a>';
                 } else {
                     $notes = $decryptedNotes;
                 }
@@ -266,6 +269,17 @@ class CTPassword extends CTCNC
                     $decryptedURL
                 ) ? '<a href="' . $decryptedURL . '" target="_blank">' . $decryptedURL . '</a>' : '';
 
+                $passwordServiceName = '';
+                $passwordServiceID = $dsPassword->getValue(DBEPassword::serviceID);
+                if ($passwordServiceID) {
+                    if (!isset($passwordServiceCache[$passwordServiceID])) {
+                        $dbePasswordService->getRow($passwordServiceID);
+                        $passwordServiceCache[$passwordServiceID] = $dbePasswordService->getValue(
+                            DBEPasswordService::description
+                        );
+                    }
+                    $passwordServiceName = $passwordServiceCache[$passwordServiceID];
+                }
 
                 $this->template->set_var(
                     array(
@@ -281,7 +295,8 @@ class CTPassword extends CTCNC
                         'urlEdit'             => $urlEdit,
                         'urlArchive'          => $urlArchive,
                         'level'               => $dsPassword->getValue(DBEPassword::level),
-                        'URL'                 => $URL
+                        'URL'                 => $URL,
+                        'service'             => $passwordServiceName
 
                     )
                 );
@@ -319,60 +334,52 @@ class CTPassword extends CTCNC
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $formError = (!$dsPassword->populateFromArray($_REQUEST['password']));
-            if (!$formError) {
-                $passwordID = $_REQUEST['password'][1]['passwordID'];
-                if ($passwordID) {
 
-                    $dbePassword->getRow($passwordID);
+            $_REQUEST['password'][1]['encrypted'] = 1;
+            $passwordID = $_REQUEST['password'][1]['passwordID'];
+            if ($passwordID) {
 
-                    $dsPassword->setValue(
-                        DBEPassword::encrypted,
-                        $dbePassword->getValue(DBEPassword::encrypted)
+                $dbePassword->getRow($passwordID);
+
+                $previousPassword = $dbePassword->getValue(DBEPassword::password);
+
+                $previousPasswordDecrypted = $this->buPassword->decrypt($previousPassword);
+
+                $newPassword = $_REQUEST['password'][1]['password'];
+
+                if ($previousPassword && $previousPasswordDecrypted != $newPassword) {
+                    $this->buPassword->archive(
+                        $passwordID,
+                        $this->dbeUser
                     );
 
-                    $previousPassword = $dbePassword->getValue(DBEPassword::password);
-
-                    $previousPasswordDecrypted = $this->buPassword->decrypt($previousPassword);
-
-                    $newPassword = $dsPassword->getValue(DBEPassword::password);
-
-                    if ($previousPasswordDecrypted != $newPassword) {
-                        $this->buPassword->archive(
-                            $passwordID,
-                            $this->dbeUser
-                        );
-
-                        $dsPassword->setValue(
-                            DBEPassword::passwordID,
-                            0
-                        );
-                    }
+                    $_REQUEST['password'][1]['passwordID'] = "0";
                 }
+            }
+
+            $_REQUEST['password'][1][DBEPassword::username] = $this->buPassword->encrypt(
+                $_REQUEST['password'][1][DBEPassword::username]
+            );
 
 
-                $dsPassword->setValue(
-                    DBEPassword::username,
-                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::username))
-                );
-                $dsPassword->setValue(
-                    DBEPassword::password,
-                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::password))
-                );
-                $dsPassword->setValue(
-                    DBEPassword::serviceID,
-                    $dsPassword->getValue(DBEPassword::serviceID)
-                );
-                $dsPassword->setValue(
-                    DBEPassword::notes,
-                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::notes))
-                );
-                $dsPassword->setValue(
-                    DBEPassword::URL,
-                    $this->buPassword->encrypt($dsPassword->getValue(DBEPassword::URL))
-                );
+            $_REQUEST['password'][1][DBEPassword::password] = $this->buPassword->encrypt(
+                $_REQUEST['password'][1][DBEPassword::password]
+            );
 
 
+            $_REQUEST['password'][1][DBEPassword::notes] = $this->buPassword->encrypt(
+                $_REQUEST['password'][1][DBEPassword::notes]
+            );
+
+
+            $_REQUEST['password'][1][DBEPassword::URL] = $this->buPassword->encrypt(
+                $_REQUEST['password'][1][DBEPassword::URL]
+            );
+
+
+            $formError = (!$dsPassword->populateFromArray($_REQUEST['password']));
+
+            if (!$formError) {
                 $this->buPassword->updatePassword($dsPassword);
 
                 $urlNext =
@@ -388,11 +395,14 @@ class CTPassword extends CTCNC
                 exit;
             }
         } else {
+            $passwordID = null;
             if ($_REQUEST['passwordID']) {                      // editing
+                $passwordID = $_REQUEST['passwordID'];
                 $this->buPassword->getPasswordByID(
                     $_REQUEST['passwordID'],
                     $dsPassword
                 );
+                $customerID = $dsPassword->getValue(DBEPassword::customerID);
             } else {                                               // create new record
                 $dsPassword->setValue(
                     DBEPassword::passwordID,
@@ -402,8 +412,10 @@ class CTPassword extends CTCNC
                     DBEPassword::customerID,
                     $_REQUEST['customerID']
                 );
+                $customerID = $_REQUEST['customerID'];
             }
         }
+
 
         $urlEdit =
             $this->buildLink(
@@ -424,9 +436,10 @@ class CTPassword extends CTCNC
             'levels'
         );
 
+
         $maxLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
 
-        if ($maxLevel) {
+        if (!$maxLevel) {
             echo 'You cannot edit this password';
             exit;
         }
@@ -451,30 +464,31 @@ class CTPassword extends CTCNC
             'passwordServices'
         );
 
+
         $dbePasswordServices = new DBEPasswordService($this);
+        $dbePasswordServices->getNotInUseServices(
+            $customerID,
+            $passwordID
+        );
 
-        $dbePasswordServices->getRows();
-        for ($level = 1; $level <= $maxLevel; $level++) {
-
-            $this->template->set_var(
-                array(
-                    'level'         => $level,
-                    'levelSelected' => $dsPassword->getValue(DBEPassword::level) == $level ? 'selected' : ''
-                )
+        while ($dbePasswordServices->fetchNext()) {
+            $passwordServiceID = $dbePasswordServices->getValue(DBEPasswordService::passwordServiceID);
+            $this->template->setVar(
+                [
+                    "passwordServiceID"          => $passwordServiceID,
+                    "selected"                   => $dsPassword->getValue(
+                        DBEPassword::serviceID
+                    ) == $passwordServiceID ? 'selected' : '',
+                    "passwordServiceDescription" => $dbePasswordServices->getValue(DBEPasswordService::description),
+                ]
             );
+
             $this->template->parse(
-                'levels',
-                'levelBlock',
+                'passwordServices',
+                'passwordServiceBlock',
                 true
             );
         }
-
-        $this->template->parse(
-            'CONTENTS',
-            'ActivityTypeList',
-            true
-        );
-
 
         $this->template->set_var(
             array(
@@ -499,80 +513,6 @@ class CTPassword extends CTCNC
         $this->parsePage();
 
     }
-
-    function loadFromCsv()
-    {
-        $this->setMethodName('loadFromCsv');
-
-        $dsPassword = new DSForm($this);
-        $dbePassword = new DBEPassword($this);
-        $dsPassword->copyColumnsFrom($dbePassword);
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $formError = false;
-
-            if (!$customerID = $_REQUEST['customerID']) {
-                $this->raiseError('No customerID');
-                exit;
-            }
-
-            if (!file_exists($_FILES['csvFile']['tmp_name'])) {
-
-                $this->setFormErrorMessage('Problem uploading file');
-                // todo rediect to listy page with error message
-            } else {
-
-                if (!$handle = fopen(
-                    $_FILES['csvFile']['tmp_name'],
-                    'r'
-                )) {
-
-                    $this->setFormErrorMessage('Problem reading CSV data');
-                    // todo rediect to listy page with error message
-
-                } else {
-                    while ($row = fgetcsv($handle)) {
-                        $dsPassword->setUpdateModeInsert();
-                        $dsPassword->setValue(
-                            'customerID',
-                            $customerID
-                        );
-                        $dsPassword->setValue(
-                            DBEPassword::username,
-                            $row[0]
-                        );
-                        $dsPassword->setValue(
-                            DBEPassword::serviceID,
-                            $row[1]
-                        );
-                        $dsPassword->setValue(
-                            'password',
-                            $row[2]
-                        );
-                        $dsPassword->setValue(
-                            DBEPassword::notes,
-                            $row[3]
-                        );
-                        $dsPassword->post();
-                    }
-                    $this->buPassword->updatePassword($dsPassword);
-
-                    $urlNext =
-                        $this->buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'     => 'list',
-                                'customerID' => $customerID
-                            )
-                        );
-
-                    header('Location: ' . $urlNext);
-                    exit;
-                }
-            }
-        }
-        $this->displayList();
-    } // end LoadFromCSV
 
     function archive()
     {

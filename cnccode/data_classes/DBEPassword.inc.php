@@ -136,7 +136,9 @@ class DBEPassword extends DBEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel .
-            " and " . $this->getDBColumnName(self::archivedBy) . ' is not null '
+            " and " . $this->getDBColumnName(self::archivedBy) . ' is not null and  ' . $this->getDBColumnName(
+                self::archivedBy
+            ) . ' <> "" '
         );
         return (parent::getRows());
     }

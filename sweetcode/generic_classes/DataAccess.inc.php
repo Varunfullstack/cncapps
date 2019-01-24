@@ -310,6 +310,7 @@ class DataAccess extends BaseObject
         for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
             $ixThisColumn = $this->columnExists($data->getName($ixCol));
             if ($ixThisColumn != -1) { // column exists
+
                 // add to cross-ref table for columns
                 $crossRef[$ixCol] = $ixThisColumn;
                 $thisName = $this->getName($ixThisColumn);

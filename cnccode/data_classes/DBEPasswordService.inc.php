@@ -167,6 +167,23 @@ SET sortOrder =
         $this->db->next_record(MYSQLI_ASSOC);
         return $this->db->Record['maxSortOrder'] + 1;
     }
+
+    public function getNotInUseServices($customerID,
+                                        $excludedPasswordID = null
+    )
+    {
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName(
+            ) . " LEFT JOIN PASSWORD ON passwordservice.passwordServiceID = password.`serviceID` AND password.`pas_custno` = $customerID " . ($excludedPasswordID ? " and password.pas_passwordno <> $excludedPasswordID" : '') .
+            " WHERE(passwordService . onePerCustomer = 0 OR password . `pas_passwordno` IS NULL) 
+ GROUP BY passwordServiceID
+";
+        $this->setQueryString($queryString);
+        return $this->getRows();
+    }
+
+
 }
 
 ?>

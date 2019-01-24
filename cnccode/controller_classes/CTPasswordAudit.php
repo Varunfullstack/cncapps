@@ -10,7 +10,7 @@ require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
-require_once($cfg['path_dbe'] . '/DBEPasswordService.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJArchivedPassword.php');
 
 
 class CTPasswordAudit extends CTCNC
@@ -78,45 +78,20 @@ class CTPasswordAudit extends CTCNC
             'passwords'
         );
 
-
         $buPassword = new BUPassword($this);
-        $passwords = new DataSet($this);
-        $buPassword->getArchivedRowsByPasswordLevel(
-            $this->dbeUser->getValue(DBEUser::passwordLevel),
-            $passwords
-        );
+        $passwords = new DBEJArchivedPassword($this);
+        $passwords->getRows($this->dbeUser->getValue(DBEUser::passwordLevel));
 
-
-        $customerCache = [];
-        $serviceNameCache = [];
-
-        $dbeCustomer = new DBECustomer($this);
-        $dbePasswordService = new DBEPasswordService($this);
         while ($passwords->fetchNext()) {
-
-            if (!isset($customerCache[$passwords->getValue(DBEPassword::customerID)])) {
-                $dbeCustomer->getRow($passwords->getValue(DBEPassword::customerID));
-                $customerCache[$passwords->getValue(DBEPassword::customerID)] = $dbeCustomer->getValue(
-                    DBECustomer::name
-                );
-            }
-
-            if (!isset($serviceNameCache[$passwords->getValue(DBEPassword::serviceID)])) {
-
-                $dbePasswordService->getRow($passwords->getValue(DBEPassword::serviceID));
-                $serviceNameCache[$passwords->getValue(DBEPassword::serviceID)] = $dbePasswordService->getValue(
-                    DBEPasswordService::description
-                );
-            }
 
             $this->template->setVar(
                 [
-                    "customer"    => $customerCache[$passwords->getValue(DBEPassword::customerID)],
-                    "username"    => $buPassword->decrypt($passwords->getValue(DBEPassword::username)),
-                    "password"    => $buPassword->decrypt($passwords->getValue(DBEPassword::password)),
-                    "notes"       => $buPassword->decrypt($passwords->getValue(DBEPassword::notes)),
-                    "URL"         => $buPassword->decrypt($passwords->getValue(DBEPassword::URL)),
-                    "serviceName" => $serviceNameCache[$passwords->getValue(DBEPassword::serviceID)],
+                    "customer"    => $passwords->getValue(DBEJArchivedPassword::customerName),
+                    "username"    => $buPassword->decrypt($passwords->getValue(DBEJArchivedPassword::username)),
+                    "password"    => $buPassword->decrypt($passwords->getValue(DBEJArchivedPassword::password)),
+                    "notes"       => $buPassword->decrypt($passwords->getValue(DBEJArchivedPassword::notes)),
+                    "URL"         => $buPassword->decrypt($passwords->getValue(DBEJArchivedPassword::URL)),
+                    "serviceName" => $passwords->getValue(DBEJArchivedPassword::serviceName),
                 ]
             );
 
