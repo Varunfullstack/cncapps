@@ -1157,18 +1157,19 @@ GROUP BY caa_callacttypeno,
 
             $this->template->setVar(
                 [
-                    "description"     => $projectLink,
-                    "commenceDate"    => $project['commenceDate'],
-                    'customerName'    => $project['customerName'],
-                    "projectPlanLink" => $projectPlanLink,
-                    "latestUpdate"    => $lastUpdated,
-                    "historyPopupURL" => $historyPopupURL,
-                    "inHoursBudget"   => $inHoursBudget,
-                    "inHoursUsed"     => $inHoursUsed,
-                    "inHoursRed"      => $inHoursUsed > $inHoursBudget ? 'class="redText"' : '',
-                    "outHoursRed"     => $outHoursUsed > $outHoursBudget ? 'class="redText"' : '',
-                    "outHoursBudget"  => $outHoursBudget,
-                    "outHoursUsed"    => $outHoursUsed,
+                    "description"      => $projectLink,
+                    "commenceDate"     => $project['commenceDate'],
+                    'customerName'     => $project['customerName'],
+                    "projectPlanLink"  => $projectPlanLink,
+                    "latestUpdate"     => $lastUpdated,
+                    "historyPopupURL"  => $historyPopupURL,
+                    "inHoursBudget"    => $inHoursBudget,
+                    "inHoursUsed"      => $inHoursUsed,
+                    "inHoursRed"       => $inHoursUsed > $inHoursBudget ? 'class="redText"' : '',
+                    "outHoursRed"      => $outHoursUsed > $outHoursBudget ? 'class="redText"' : '',
+                    "outHoursBudget"   => $outHoursBudget,
+                    "outHoursUsed"     => $outHoursUsed,
+                    'assignedEngineer' => $project['engineerName']
                 ]
             );
             $this->template->parse(

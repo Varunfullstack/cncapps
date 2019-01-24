@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v1.16.0] - to be determined :D
 ### Added
 - Issue 429 - SD Manager Dashboard show P1 sections
 - Issue 410 - 7 dayers on dashboard

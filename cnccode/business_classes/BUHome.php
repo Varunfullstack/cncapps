@@ -6,6 +6,8 @@
  * Time: 11:46
  */
 
+require_once ($cfg['path_gc']) . '/Controller.inc.php';
+
 class BUHome
 {
 
