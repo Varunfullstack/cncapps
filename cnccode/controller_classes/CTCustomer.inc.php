@@ -1029,36 +1029,6 @@ class CTCustomer extends CTCNC
         return $this->newCustomerToDate;
     }
 
-    function setReviewMeetingFrequencyMonths($reviewMeetingFrequencyMonths)
-    {
-        $this->reviewMeetingFrequencyMonths = $reviewMeetingFrequencyMonths;
-    }
-
-    function getReviewMeetingFrequencyMonths()
-    {
-        return $this->reviewMeetingFrequencyMonths;
-    }
-
-    function setLastReviewMeetingDate($lastReviewMeetingDate)
-    {
-        $this->lastReviewMeetingDate = $lastReviewMeetingDate;
-    }
-
-    function getLastReviewMeetingDate()
-    {
-        return $this->lastReviewMeetingDate;
-    }
-
-    function setReviewMeetingEmailSentFlag($value)
-    {
-        $this->reviewMeetingEmailSentFlag = $value;
-    }
-
-    function getReviewMeetingEmailSentFlag()
-    {
-        return $this->reviewMeetingEmailSentFlag;
-    }
-
     function setDroppedCustomerFromDate($droppedCustomerFromDate)
     {
         $this->droppedCustomerFromDate = $droppedCustomerFromDate;
@@ -1267,6 +1237,7 @@ class CTCustomer extends CTCNC
         }
 
         $this->buCustomer->createCustomerFolder($this->getCustomerID());
+
         $nextURL =
             $this->buildLink(
                 $_SERVER['PHP_SELF'],

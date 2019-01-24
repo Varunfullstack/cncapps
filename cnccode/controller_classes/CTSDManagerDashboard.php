@@ -89,9 +89,24 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $showImplementation
         );
 
-        $this->renderQueue(
+        $shortestSLARemaining = $this->renderQueue(
             $problems,
             'Shortest_SLA_Remaining'
+        );
+
+        $buProblem->getSDDashBoardData(
+            $problems,
+            $limit,
+            'currentOpenP1Requests',
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
+        );
+
+        $currentOpenP1Requests = $this->renderQueue(
+            $problems,
+            'Current_Open_P1_Requests'
         );
 
         $buProblem->getSDDashBoardData(
@@ -104,7 +119,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $showImplementation
         );
 
-        $this->renderQueue(
+        $oldestUpdatedSR = $this->renderQueue(
             $problems,
             'Oldest_Updated_SRs'
         );
@@ -119,7 +134,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $showImplementation
         );
 
-        $this->renderQueue(
+        $longestOpenSR = $this->renderQueue(
             $problems,
             'Longest_Open_SR'
         );
@@ -134,10 +149,11 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $showImplementation
         );
 
-        $this->renderQueue(
+        $mostHoursLogged = $this->renderQueue(
             $problems,
             'Most_Hours_Logged'
         );
+
 
         $dbeHeader = new DBEHeader($this);
 
@@ -158,7 +174,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         );
 
 
-        $this->renderQueue(
+        $activitiesByXXEngineersInXXHours = $this->renderQueue(
             $problems,
             'Activities_By_XX_Engineers_In_XX_Hours',
             "Activities By $engineersMaxCount or more engineers in $pastHours Hours"
@@ -172,9 +188,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
         $this->template->setVar(
             [
-                "helpDeskChecked"       => $showHelpDesk ? "checked" : null,
-                "escalationChecked"     => $showEscalation ? "checked" : null,
-                "implementationChecked" => $showImplementation ? "checked" : null,
+                "helpDeskChecked"                  => $showHelpDesk ? "checked" : null,
+                "escalationChecked"                => $showEscalation ? "checked" : null,
+                "implementationChecked"            => $showImplementation ? "checked" : null,
+                "shortestSLARemaining"             => $shortestSLARemaining,
+                "currentOpenP1Requests"            => $currentOpenP1Requests,
+                "oldestUpdatedSR"                  => $oldestUpdatedSR,
+                "longestOpenSR"                    => $longestOpenSR,
+                "mostHoursLogged"                  => $mostHoursLogged,
+                "activitiesByXXEngineersInXXHours" => $activitiesByXXEngineersInXXHours,
             ]
         );
 
@@ -187,24 +209,46 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     }
 
 
-    private function renderQueue($problems,
+    private function renderQueue(DataSet $problems,
                                  $name,
                                  $title = null
     )
     {
+
+        global $cfg;
         $rowCount = 0;
 
         if (!$title) {
             $title = $this->humanize($name);
         }
 
+        $templateName = 'SDManager' . str_replace(
+                '_',
+                '',
+                $name
+            ) . 'Section.html';
+        $template = new Template (
+            $cfg["path_templates"],
+            "remove"
+        );
+
+        $template->set_file(
+            'page',
+            $templateName
+        );
+
+
         $blockName = 'queue' . $name . 'Block';
 
-        $this->template->set_block(
-            'SDManagerDashboard',
+        $template->set_block(
+            'page',
             $blockName,
             'requests' . $name
         );
+
+        if (!$problems->rowCount()) {
+            return '';
+        }
 
         while ($problems->fetchNext()) {
 
@@ -307,8 +351,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $dbeProblem->getRow();
 
             $totalActivityDurationHours = $problems->getValue('totalActivityDurationHours');
-            $this->template->set_var(
-
+            $template->set_var(
                 array(
                     'hoursRemaining'             => number_format(
                         $problems->getValue(DBEJProblem::hoursRemaining),
@@ -354,7 +397,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
             );
 
-            $this->template->parse(
+            $template->parse(
                 'requests' . $name,
                 $blockName,
                 true
@@ -364,13 +407,21 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         } // end while
 
 
-        $this->template->set_var(
+        $template->set_var(
             array(
-                'queue' . $name . 'Count' => $rowCount,
-                'queue' . $name . 'Name'  => $title,
+                'queueCount' => $rowCount,
+                'queueName'  => $title,
 
             )
         );
+
+        $template->parse(
+            'OUTPUT',
+            'page'
+        );
+
+        return $template->getVar('OUTPUT');
+
     } // end render queue
 
     function humanize($string)

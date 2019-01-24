@@ -303,12 +303,6 @@ class DBECustomer extends DBCNCEntity
             'cus_review_meeting_frequency_months'
         );
         $this->addColumn(
-            self::lastReviewMeetingDate,
-            DA_DATE,
-            DA_ALLOW_NULL,
-            'cus_last_review_meeting_date'
-        );
-        $this->addColumn(
             self::reviewMeetingEmailSentFlag,
             DA_YN,
             DA_ALLOW_NULL,
@@ -676,6 +670,26 @@ class DBECustomer extends DBCNCEntity
         return $ret;
     }
 
+    /**
+     * Returns list of customers with special attention set
+     *
+     * @access public
+     * @return bool Success
+     */
+    function getActiveCustomers()
+    {
+        $this->setMethodName("getSpecialAttentionCustomers");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " = 'N'";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
     function getReviewList($userID,
                            $sortColumn = false
     )
@@ -733,6 +747,23 @@ class DBECustomer extends DBCNCEntity
         $this->setQueryString($queryString);
         $ret = (self::getRows());
         return $ret;
+    }
+
+    function getReviewMeetingCustomers()
+    {
+        $this->setMethodName('getReviewMeetingCustomers');
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::lastReviewMeetingDate) . " <> '0000-00-00' and
+             " . $this->getDBColumnName(self::lastReviewMeetingDate) . ' is not null and ' .
+            $this->getDBColumnName(self::referredFlag) . ' = "N" ';
+
+        $this->setQueryString($queryString);
+        $ret = (self::getRows());
+        return $ret;
+
+
     }
 }
 

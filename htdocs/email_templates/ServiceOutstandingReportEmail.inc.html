@@ -18,12 +18,67 @@
 
         -->
     </style>
+    <script>
+        const isDashboard = {isDashboard};
+
+        if (isDashboard) {
+            $(document).ready(function () {
+                dataTable = $('#myTable').DataTable({
+                    dom: 'Blfrtip',
+                    buttons: [
+                        // {
+                        //     extend: 'csv',
+                        //     bom: true,
+                        //     exportOptions: {
+                        //         orthogonal: 'data'
+                        //     }
+                        // },
+                        {
+                            extend: 'excel',
+                            filename: 'export'
+                        }
+                    ],
+                    paging: false,
+                    order: [
+                        [4, 'asc'],
+                        [5, 'desc']
+                    ]
+                });
+            });
+        }
+
+        function changeDays() {
+            let URL = '/DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true';
+            const days = event.target.value;
+            URL += "&daysAgo=" + days;
+            window.location = URL;
+        }
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+    />
+
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+    ></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+    ></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+    ></script>
 </head>
 <body>
 <h1>Service Requests Open For More Than {daysAgo} Days</h1>
+{selectDaysSelector}
 <h3> Total Requests: {totalRequests} </h3>
 
-<table>
+
+<table id="myTable">
+    <thead>
     <tr>
         <th>Customer</th>
         <th>Incident No</th>
@@ -36,6 +91,8 @@
         <th>Last Updated</th>
         <th>Awaiting</th>
     </tr>
+    </thead>
+    <tbody>
     <!-- BEGIN requestBlock -->
     <tr>
         <td align="center">{customer}</td>
@@ -50,6 +107,7 @@
         <td align="center">{awaiting}</td>
     </tr>
     <!-- END requestBlock -->
+    </tbody>
 </table>
 </body>
 </html>

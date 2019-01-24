@@ -175,7 +175,8 @@ class BUCustomerItem extends Business
         );
     }
 
-    function clientHasDirectDebit($clientID){
+    function clientHasDirectDebit($clientID)
+    {
         return $this->dbeJCustomerItem->getCountCustomerDirectDebitItems($clientID) > 0;
     }
 
@@ -266,15 +267,16 @@ class BUCustomerItem extends Business
     )
     {
         $this->setMethodName('update');
-
         $dsCustomerItem->fetchNext();
-
         $customerItemID = $dsCustomerItem->getValue('customerItemID');
         if ($customerItemID == '') {
             $this->raiseError('customerItemID not passed');
         }
+
         $dbeCustomerItem = new DBECustomerItem($this);
-        $dbeCustomerItem->getRow($customerItemID);
+        if ($dsCustomerItem->getValue('customerItemID') != 0) {
+            $dbeCustomerItem->getRow($customerItemID);
+        }
         $dsCustomerItem->setUpdateModeUpdate();
 
         /*
@@ -337,7 +339,9 @@ class BUCustomerItem extends Business
         $dsCustomerItem->post();
 
         // if customerID changed then get default siteno and contact
-        if ($dbeCustomerItem->getValue('customerID') != $dsCustomerItem->getValue('customerID')) {
+        if ($dbeCustomerItem->getValue('customerID') != $dsCustomerItem->getValue(
+                'customerID'
+            ) && $customerItemID != 0) {
             $buCustomer = new BUCustomer($this);
             $buCustomer->getDeliverSiteByCustomerID(
                 $dsCustomerItem->getValue('customerID'),
@@ -637,7 +641,7 @@ class BUCustomerItem extends Business
 
         while ($dbeJContract->fetchNext()) {
             if ($dbeJContract->getValue('itemTypeID') == CONFIG_2NDSITE_LOCAL_ITEMTYPEID) {
-               return true;
+                return true;
             }
         }// end while
 

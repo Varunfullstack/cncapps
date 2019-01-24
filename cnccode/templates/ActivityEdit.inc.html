@@ -168,6 +168,8 @@
             $('#contactNotes').val(result.data);
             $('#contactNotesAlert').text(result.data);
             $('#moreContactNotes').text(result.data);
+            $('.contactPhone').html(result.phone);
+
         }).catch(function () {
 
         }).then(function () {
@@ -414,9 +416,7 @@
         </tr>
         <tr>
             <td class="promptText">Contact</td>
-            <td class="mainHeadText"
-                colspan="2"
-            >
+            <td class="mainHeadText" id="contactSelectorContainer">
                 <select name="callActivity[1][contactID]"
                         required
                         onchange="checkChangedContact()"
@@ -434,7 +434,8 @@
                     {optGroupClose}
                     <!-- END contactBlock -->
                 </select>
-                {contactPhone}<span class="formErrorMessage">{contactIDMessage}</span>
+                <span class="contactPhone">{contactPhone}</span>
+                <span class="formErrorMessage">{contactIDMessage}</span>
             </td>
             <td colspan="2"
                 style="color: red;"
