@@ -15,6 +15,7 @@
     <tr>
         <th>Description</th>
         <th>Customer Name</th>
+        <th>Engineer</th>
         <th>Commencement</th>
         <th>Project Plan</th>
         <th title="In hours budget in days">IHB</th>
@@ -30,12 +31,13 @@
     <tr>
         <td>{description}</td>
         <td>{customerName}</td>
+        <td>{assignedEngineer}</td>
         <td>{commenceDate}</td>
         <td>{projectPlanLink}</td>
         <td>{inHoursBudget}</td>
-        <td>{inHoursUsed}</td>
+        <td {inHoursRed}>{inHoursUsed}</td>
         <td>{outHoursBudget}</td>
-        <td>{outHoursUsed}</td>
+        <td {outHoursRed}>{outHoursUsed}</td>
         <td>{latestUpdate}</td>
         <td><a onclick="showHistoryPopup('{historyPopupURL}')">History</a></td>
     </tr>

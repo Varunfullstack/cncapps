@@ -468,7 +468,7 @@ class DBEHeader extends DBEntity
         );
         $this->addColumn(
             self::hdTeamTargetFixHours,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL,
             "hed_hd_team_target_fix_hours"
         );

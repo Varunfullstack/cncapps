@@ -432,7 +432,6 @@ class DBEJCallActivity extends DBECallActivity
 
     function getRowsInIdArray($IDArray)
     {
-
         foreach ($IDArray as $val):
             $IDs .= "," . $val;
         endforeach;
@@ -564,6 +563,17 @@ class DBEJCallActivity extends DBECallActivity
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
             " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 59";
+        $this->setQueryString($query);
+        return (parent::getRows());
+    }
+
+    function getPendingTimeRequestRows()
+    {
+        $query =
+            "SELECT " .
+            $this->getDBColumnNamesAsString() .
+            " FROM " . $this->fromString .
+            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 61";
         $this->setQueryString($query);
         return (parent::getRows());
     }
