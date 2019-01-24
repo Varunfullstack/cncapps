@@ -130,7 +130,7 @@ class BUPassword extends Business
             return null;
         }
 
-        \CNCLTD\Encryption::decrypt(
+        return \CNCLTD\Encryption::decrypt(
             PASSWORD_ENCRYPTION_PRIVATE_KEY,
             PASSWORD_PASSPHRASE,
             $data
@@ -143,8 +143,8 @@ class BUPassword extends Business
             return null;
         }
 
-        \CNCLTD\Encryption::encrypt(
-            PASSWORD_ENCRYPTION_PRIVATE_KEY,
+        return \CNCLTD\Encryption::encrypt(
+            PASSWORD_ENCRYPTION_PUBLIC_KEY,
             $data
         );
     }

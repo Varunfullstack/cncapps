@@ -60,10 +60,10 @@ class BUPasswordService extends Business
         $this->setMethodName('deletePasswordService');
         $dbePassword = new DBEPassword($this);
         $dbePassword->setValue(
-            DBEPassword::service,
+            DBEPassword::serviceID,
             $ID
         );
-        $dbePassword->getRowsByColumn(DBEPassword::service);
+        $dbePassword->getRowsByColumn(DBEPassword::serviceID);
 
         if ($dbePassword->rowCount) {
             throw new Exception('Cannot delete because this service is in use');

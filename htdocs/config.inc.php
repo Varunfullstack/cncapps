@@ -84,12 +84,12 @@ define(
 
 define(
     'PASSWORD_ENCRYPTION_PRIVATE_KEY',
-    'c:\\keys\\password.pem'
+    'c:\\keys\\passwordPrivate.pem'
 );
 
 define(
     'PASSWORD_ENCRYPTION_PUBLIC_KEY',
-    'c:\\keys\\password.pub'
+    'c:\\keys\\passwordPublic.pub'
 );
 
 define(

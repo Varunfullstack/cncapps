@@ -11,7 +11,6 @@ class DBEPassword extends DBEntity
     const passwordID = "passwordID";
     const customerID = "customerID";
     const username = "username";
-    const service = "service";
     const password = "password";
     const notes = "notes";
     const level = "level";
@@ -19,6 +18,7 @@ class DBEPassword extends DBEntity
     const archivedAt = 'archivedAt';
     const archivedBy = 'archivedBy';
     const serviceID = 'serviceID';
+    const encrypted = 'encrypted';
 
     /**
      * calls constructor()
@@ -48,12 +48,6 @@ class DBEPassword extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL,
             "pas_username"
-        );
-        $this->addColumn(
-            self::service,
-            DA_STRING,
-            DA_ALLOW_NULL,
-            "pas_service"
         );
         $this->addColumn(
             self::password,
@@ -95,8 +89,13 @@ class DBEPassword extends DBEntity
         $this->addColumn(
             self::serviceID,
             DA_INTEGER,
-            DA_ALLOW_NULL,
-            "pas_service"
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::encrypted,
+            DA_INTEGER,
+            DA_ALLOW_NULL
         );
 
         $this->setAddColumnsOff();
@@ -114,12 +113,15 @@ class DBEPassword extends DBEntity
         if ($passwordLevel == '') {
             $this->raiseError('passwordLevel not set');
         }
+
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
             " AND " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel .
-            " and " . $this->getDBColumnName(self::archivedBy) . ' is null '
+            " and (" . $this->getDBColumnName(self::archivedBy) . ' is null or  ' . $this->getDBColumnName(
+                self::archivedBy
+            ) . ' = "" )'
         );
         return (parent::getRows());
     }
