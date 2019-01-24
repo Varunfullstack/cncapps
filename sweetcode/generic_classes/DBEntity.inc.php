@@ -720,19 +720,18 @@ class DBEntity extends DataAccess
         // descendent class.
 
         $this->setYNFlags();
-
         if ($this->getQueryString() == "") {
-
             if ($this->getPK() != DA_PK_NOT_SET) {
                 $this->setPKValue($this->getNextPKValue());
             }
-            $query = "INSERT INTO " . $this->getTableName() .
+            $this->setQueryString(
+                "INSERT INTO " . $this->getTableName() .
                 "(" .
                 $this->getDBColumnNamesAsString() .
                 ")VALUES(" .
                 $this->getColumnValuesAsString() .
-                ")";
-            $this->setQueryString($query);
+                ")"
+            );
         }
 
         $ret = $this->runQuery();
@@ -943,6 +942,7 @@ class DBEntity extends DataAccess
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
+
         if ($sortColumn != '') {
             $ixSortColumn = $this->columnExists($sortColumn);
             if ($ixSortColumn == DA_OUT_OF_RANGE) {
