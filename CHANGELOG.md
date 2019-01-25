@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v1.16.1]
+### Fixed
+- Search SRs take you to the Sales Order, not Service Request
+
 ## [v1.16.0] - 2019-01-24
 ### Added
 - Issue 429 - SD Manager Dashboard show P1 sections
