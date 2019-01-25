@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1547201797-0">
+        <tagDatabase tag="issue409"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1547201797-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) > 0 FROM callacttype WHERE callacttype.`cat_callacttypeno` = 61
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into
+            `callacttype`(`cat_callacttypeno`,`cat_desc`,`cat_ooh_multiplier`,`cat_itemno`,`cat_min_hours`,`cat_max_hours`,`cat_req_check_flag`,`cat_allow_exp_flag`,`cat_problem_flag`,`cat_action_flag`,`cat_resolve_flag`,`cat_r_problem_flag`,`cat_r_action_flag`,`cat_r_resolve_flag`,`allowSCRFlag`,`curValueFlag`,`customerEmailFlag`,`travelFlag`,`activeFlag`,`showNotChargeableFlag`,`engineerOvertimeFlag`,`cat_on_site_flag`,`cat_portal_display_flag`,`cat_visible_in_sr_flag`)
+            values (61,'Time Request','0.00',0,'0.00','0.00','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','N','N','N','N');
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,8 +1,16 @@
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript" src=".javascript/handlebars-v4.0.11.js"></script>
-<script type="text/javascript" src=".javascript/mustache.min.js"></script>
+<script type="text/javascript"
+        src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script type="text/javascript"
+        src=".javascript/handlebars-v4.0.11.js"
+></script>
+<script type="text/javascript"
+        src=".javascript/mustache.min.js"
+></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"
-        integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o=" crossorigin="anonymous"></script>
+        integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o="
+        crossorigin="anonymous"
+></script>
 <style>
     .chart {
         width: 100%;
@@ -21,11 +29,19 @@
 
 
 </style>
-<script id="member-item-template" type="text/template">
+<script id="member-item-template"
+        type="text/template"
+>
     <div class="item">
-        <button class="details" type="button" data-user-id="{% userID %}">Show Details</button>
+        <button class="details"
+                type="button"
+                data-user-id="{% userID %}"
+        >Show Details
+        </button>
         <br>
-        <div id="{% id %}" class="chart">
+        <div id="{% id %}"
+             class="chart"
+        >
 
         </div>
     </div>
@@ -36,17 +52,25 @@
     var isManager = {isManager};
     var defaultTeam = userLevel <= 3 ? userLevel : 1;
 
+
     $(function () {
         // Load the Visualization API and the corechart package.
         google.charts.load('current', {'packages': ['corechart']});
+        var googleLoadedDeferred = jQuery.Deferred();
+        var googleLoaded = googleLoadedDeferred.promise();
+
+        googleLoaded.then((test) => {
+            console.log('google has loaded!!')
+        });
 
         var teamSelector = $('#teamSelector');
 
+
         if (isManager) {
             teamSelector.show();
-        } else {
-            defaultTeam = userLevel;
+            teamSelector.val(userLevel <= 3 ? userLevel : 1);
         }
+
 
         $('body').on('click', '.details', function () {
             var userId = $(this).data().userId;
@@ -54,7 +78,7 @@
             var sixtyDaysAgo = moment().subtract(60, 'days');
             document.location = '?action=detailedCharts&engineerID=' + userId + '&startDate=' + sixtyDaysAgo.format('YYYY-MM-DD') + '&endDate=' + today.format('YYYY-MM-DD')
         });
-
+        drawIndividualCharts(teamSelector.val());
         teamSelector.change(function () {
             drawIndividualCharts($(this).val());
         });
@@ -63,12 +87,15 @@
 
         function drawIndividualCharts(teamId) {
             var that = this;
+
             this.ajaxOptions = {
                 url: '?action=lastWeekHelpDesk',
                 dataType: 'json',
-                data: {days: this.days, team: teamId}
+                data: {team: teamId}
             };
-            this.data = $.ajax(this.ajaxOptions);
+            this.data = googleLoaded.then(() => {
+                return $.ajax(this.ajaxOptions)
+            });
             this.container = $('#teamIndividualCharts');
             this.container.html('');
             this.source = document.getElementById("member-item-template").innerHTML;
@@ -118,7 +145,7 @@
 
 
         google.charts.setOnLoadCallback(function () {
-            drawIndividualCharts(teamSelector.val());
+            googleLoadedDeferred.resolve(true);
         });
     })
 
@@ -159,13 +186,22 @@
     }
 </style>
 <br>
-<select name="team" class="teamSelector" id="teamSelector" hidden>
-    <option value="1" selected>Help Desk Team</option>
+<select name="team"
+        class="teamSelector"
+        id="teamSelector"
+        hidden
+>
+    <option value="1"
+            selected
+    >Help Desk Team
+    </option>
     <option value="2">Escalations Team</option>
     <option value="3">Implementations Team</option>
 </select>
 <br>
 <br>
-<div id="teamIndividualCharts" class="container">
+<div id="teamIndividualCharts"
+     class="container"
+>
 
 </div>
