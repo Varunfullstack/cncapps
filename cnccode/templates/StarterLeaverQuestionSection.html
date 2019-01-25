@@ -1,0 +1,145 @@
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script>
+
+
+    function changeQuestionType() {
+        const $elm = $(event.target);
+
+        const multipleChoice = document.querySelector('.questionMultipleChoice');
+        const questionOptions = document.querySelector('.questionOptions');
+
+
+        switch ($elm.val()) {
+            case 'multi':
+                multipleChoice.style.display = 'table-row';
+                questionOptions.style.display = 'table-row';
+                break;
+            case 'free':
+            case 'y/n':
+            default:
+                multipleChoice.style.display = 'none';
+                questionOptions.style.display = 'none';
+
+
+        }
+    }
+
+    let savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('Customer.php?action=dispCustPopup&htmlFmt=popup&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        } else {
+            document.searchForm.customerID.value = "";
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+</script>
+<div>
+    <table width="700px"
+           border="0"
+    >
+        <tr>
+            <td class="promptText">Customer</td>
+            <td class="fieldText">
+                <input
+                        type="hidden"
+                        name="action"
+                        value="search"
+                >
+                <input
+                        type="hidden"
+                        name="searchForm[1][customerID]"
+                        id="customerID"
+                        value="{customerID}"
+                >
+                <input
+                        type="text"
+                        id="customerString"
+                        name="customerString"
+                        value="{customerString}"
+                        onFocus="saveCustomerString()"
+                        onBlur="validateCustomerString()"
+                        onKeypress="validateCustomerStringOnReturn()"
+                        size="50"
+                        maxlength="50"
+                >
+                <span class="formErrorMessage"> {customerStringMessage} </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Starter/Leaver</td>
+            <td class="fieldText">
+                <select required>
+                    <option value="starter">Starter</option>
+                    <option value="leaver">Leaver</option>
+                </select>
+                <span class="formErrorMessage"> {customerStringMessage} </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Name</td>
+            <td class="fieldText">
+                <input type="text"
+                       required
+                >
+                <span class="formErrorMessage"> {customerStringMessage} </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Question Type</td>
+            <td class="fieldText">
+                <select onchange="changeQuestionType()">
+                    <option value>Select an Option</option>
+                    <option value="y/n">Yes/No</option>
+                    <option value="multi">Multiple Choice</option>
+                    <option value="free">Free Type</option>
+                </select>
+                <span class="formErrorMessage"> {customerStringMessage} </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Question Label</td>
+            <td class="fieldText">
+                <input type="text">
+            </td>
+        </tr>
+        <tr class="questionOptions">
+            <td class="promptText">Question Options</td>
+            <td class="fieldText">
+                <input type="text">
+            </td>
+        </tr>
+        <tr class="questionMultipleChoice">
+            <td class="promptText">Multiple Answers?</td>
+            <td class="fieldText">
+                <input type="checkbox">
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Required?</td>
+            <td class="fieldText">
+                <input type="checkbox">
+            </td>
+        </tr>
+    </table>
+
+    <button>Add Question</button>
+</div>
