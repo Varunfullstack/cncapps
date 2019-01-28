@@ -6604,7 +6604,7 @@ class CTActivity extends CTCNC
 
             $nextURL =
                 $this->buildLink(
-                    'CurrentActivityReport.php',
+                    'TimeRequestDashboard.php',
                     array()
                 );
 
