@@ -1,6 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
 ### Changed
 - Issue 137 - CNC029 - Password archiving & security
 
