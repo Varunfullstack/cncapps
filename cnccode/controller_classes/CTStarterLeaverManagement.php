@@ -233,11 +233,25 @@ class CTStarterLeaverManagement extends CTCNC
 
         while ($dbeStarterLeaverQuestion->fetchNext()) {
 
+            $template = new Template (
+                $GLOBALS ["cfg"] ["path_templates"],
+                "remove"
+            );
+
+            $template->setFile(
+                'questionForm',
+                'StarterLeaverQuestionSection.html'
+            );
+
+            $template->parse(
+                'OUTPUT',
+                'questionForm'
+            );
+
+
             $this->template->setVar(
                 [
-                    "question"   => $dbeStarterLeaverQuestion->getValue(
-                        DBEStarterLeaverQuestion::label
-                    ),
+                    "question"   => $template->getVar('OUTPUT'),
                     "questionID" => $dbeStarterLeaverQuestion->getValue(DBEStarterLeaverQuestion::questionID)
                 ]
             );
