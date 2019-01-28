@@ -243,6 +243,13 @@ class CTStarterLeaverManagement extends CTCNC
                 'StarterLeaverQuestionSection.html'
             );
 
+            $template->setVar(
+                [
+                    "hideOnEdit" => "hidden",
+                    "questionID" => $dbeStarterLeaverQuestion->getValue(DBEStarterLeaverQuestion::questionID)
+                ]
+            );
+
             $template->parse(
                 'OUTPUT',
                 'questionForm'

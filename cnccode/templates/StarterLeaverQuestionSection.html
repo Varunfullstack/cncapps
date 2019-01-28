@@ -2,11 +2,17 @@
         src="CommonJS.js"
 ></script>
 <script>
-    let optionElm, optionsStringElm;
+
+    let optionElm, optionsStringElm, optionsHolder, multipleChoice, questionOptions;
     $(function () {
-        optionElm = document.getElementById('optionValue');
-        optionsStringElm = document.getElementById('optionsString');
-    })
+        const mainElement = document.getElementById({questionID});
+
+        optionElm = mainElement.querySelector('.optionValue');
+        optionsStringElm = mainElement.querySelector('.optionsString');
+        optionsHolder = mainElement.querySelector('.optionsHolder');
+        multipleChoice = mainElement.querySelector('.questionMultipleChoice');
+        questionOptions = mainElement.querySelector('.questionOptions');
+    });
 
     function getOptions() {
         const optionsString = optionsStringElm.value;
@@ -31,8 +37,6 @@
     }
 
     function redrawOptionsHolder(options) {
-        const optionsHolder = document.getElementById('optionsHolder');
-
         const optionsHolderHTML = options.reduce((acc, option, count) => {
             acc += "<div>" + option + " <button type='button' onclick='removeOption(" + count + ")'>X</button></div>";
             return acc;
@@ -49,11 +53,6 @@
 
     function changeQuestionType() {
         const $elm = $(event.target);
-
-        const multipleChoice = document.querySelector('.questionMultipleChoice');
-        const questionOptions = document.querySelector('.questionOptions');
-
-
         switch ($elm.val()) {
             case 'multi':
                 multipleChoice.style.display = 'table-row';
@@ -95,14 +94,14 @@
         }
     }
 </script>
-<div>
+<div id="{questionID}">
     <form action="StarterLeaverManagement.php?action=addQuestion"
           method="post"
     >
         <table width="700px"
                border="0"
         >
-            <tr>
+            <tr {hideOnEdit}>
                 <td class="promptText">Customer</td>
                 <td class="fieldText">
                     <input
@@ -173,17 +172,17 @@
                 <td class="fieldText">
                     <input type="hidden"
                            name="question[options]"
-                           id="optionsString"
+                           class="optionsString"
                     >
                     <input type="text"
                            placeholder="type an option and hit Enter to add it"
-                           id="optionValue"
+                           class="optionValue"
                     >
                     <button onclick="checkAddOption()"
                             type="button"
                     >Add
                     </button>
-                    <div id="optionsHolder">
+                    <div class="optionsHolder">
 
                     </div>
                 </td>
