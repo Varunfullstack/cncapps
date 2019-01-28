@@ -53,6 +53,11 @@ while ($dbePassword->fetchNext()) {
     }
 
     $updateDBEPassword->setValue(
+        DBEPassword::level,
+        1
+    );
+
+    $updateDBEPassword->setValue(
         DBEPassword::encrypted,
         1
     );
