@@ -198,10 +198,49 @@ SET sortOrder =
         $this->runQuery();
     }
 
-    public function getNextSortOrder()
+    public function getNextSortOrder($customerID)
     {
-        $this->db->query("select max(sortOrder) as maxSortOrder from starterLeaverQuestion");
+        $this->db->query(
+            "select max(sortOrder) as maxSortOrder from starterLeaverQuestion where customerID = $customerID"
+        );
         $this->db->next_record(MYSQLI_ASSOC);
         return $this->db->Record['maxSortOrder'] + 1;
+    }
+
+    public function getCustomers()
+    {
+        $this->db->query(
+            "SELECT customerID, customer.cus_name as customerName FROM starterLeaverQuestion LEFT JOIN customer ON starterLeaverQuestion.customerID = customer.`cus_custno` GROUP BY customerID"
+        );
+        $customers = [];
+
+        while ($this->db->next_record(MYSQLI_ASSOC)) {
+            $customers[] = $this->db->Record;
+        };
+        return $customers;
+    }
+
+    public function getRowsByCustomerID($customerID,
+                                        $sortColumn = ''
+    )
+    {
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName();
+
+        if (!$sortColumn) {
+            $sortColumn = self::sortOrder;
+        }
+
+        $queryString .= " where " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
+
+        $sortColumnNo = ($this->columnExists($sortColumn));
+        if ($sortColumnNo == DA_OUT_OF_RANGE) {
+            $this->raiseError($sortColumn . ' ' . DA_MSG_COLUMN_DOES_NOT_EXIST);
+        } else {
+            $queryString .= ' ORDER BY ' . $this->getDBColumnName($sortColumnNo);
+        }
+        $this->queryString = $queryString;
+        $this->getRows();
     }
 }
