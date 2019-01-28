@@ -293,10 +293,28 @@ class CTStarterLeaverManagement extends CTCNC
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
-        $dbeStarterLeaverQuestion->setValue(DBEStarterLeaverQuestion::customerID, $questionData[DBEStarterLeaverQuestion::customerID]);
-        $dbeStarterLeaverQuestion->setValue(DBEStarterLeaverQuestion::formType, $questionData[DBEStarterLeaverQuestion::formType]);
-        $dbeStarterLeaverQuestion->setValue(DBEStarterLeaverQuestion::name, $questionData[DBEStarterLeaverQuestion::name]);
-        $dbeStarterLeaverQuestion->setValue(DBEStarterLeaverQuestion::sortOrder, $dbeStarterLeaverQuestion->getNextSortOrder());
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::customerID,
+            $questionData[DBEStarterLeaverQuestion::customerID]
+        );
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::formType,
+            $questionData[DBEStarterLeaverQuestion::formType]
+        );
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::name,
+            $questionData[DBEStarterLeaverQuestion::name]
+        );
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::sortOrder,
+            $dbeStarterLeaverQuestion->getNextSortOrder()
+        );
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::required,
+            isset($questionData[DBEStarterLeaverQuestion::required])
+        );
+
+
 
 
     }
