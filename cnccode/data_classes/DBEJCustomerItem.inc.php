@@ -18,30 +18,88 @@ class DBEJCustomerItem extends DBECustomerItem
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("customerName", DA_STRING, DA_ALLOW_NULL, "cus_name");
-        $this->addColumn("siteDescription", DA_STRING, DA_ALLOW_NULL, "CONCAT_WS(', ', add_add1, add_town, add_postcode)");
-        $this->addColumn("contractItemTypeID", DA_ID, DA_ALLOW_NULL, "citem.itm_itemtypeno");
-        $this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "citem.itm_desc");
-        $this->addColumn("itemNotes", DA_STRING, DA_ALLOW_NULL, "citem.notes");
-        $this->addColumn("renewalTypeID", DA_ID, DA_ALLOW_NULL, "citem.renewalTypeID");
-        $this->addColumn("partNo", DA_STRING, DA_ALLOW_NULL, "citem.itm_unit_of_sale");
-        $this->addColumn("servercareFlag", DA_INTEGER, DA_ALLOW_NULL, "citem.itm_servercare_flag");
-        $this->addColumn("invoiceFromDate", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')");
-        $this->addColumn("invoiceToDate", DA_DATE, DA_NOT_NULL, "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')");
+        $this->addColumn(
+            "customerName",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            "siteDescription",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT_WS(', ', add_add1, add_town, add_postcode)"
+        );
+        $this->addColumn(
+            "contractItemTypeID",
+            DA_ID,
+            DA_ALLOW_NULL,
+            "citem.itm_itemtypeno"
+        );
+        $this->addColumn(
+            "itemDescription",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "citem.itm_desc"
+        );
+        $this->addColumn(
+            "itemNotes",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "citem.notes"
+        );
+        $this->addColumn(
+            "renewalTypeID",
+            DA_ID,
+            DA_ALLOW_NULL,
+            "citem.renewalTypeID"
+        );
+        $this->addColumn(
+            "partNo",
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "citem.itm_unit_of_sale"
+        );
+        $this->addColumn(
+            "servercareFlag",
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "citem.itm_servercare_flag"
+        );
+        $this->addColumn(
+            "invoiceFromDate",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')"
+        );
+        $this->addColumn(
+            "invoiceToDate",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')"
+        );
 
-        $this->addColumn("invoiceFromDateYMD", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
+        $this->addColumn(
+            "invoiceFromDateYMD",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
+        );
 
-        $this->addColumn("invoiceToDateYMD", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
+        $this->addColumn(
+            "invoiceToDateYMD",
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+        );
 
         $this->setAddColumnsOff();
     }
 
     function getRowsBySearchCriteria(
         $customerID,
-        $ordheadID,                    // sales order no
+        $ordheadID,
+        // sales order no
         $startDate,
         $endDate,
         $itemText,
@@ -69,19 +127,34 @@ class DBEJCustomerItem extends DBECustomerItem
             $queryString .= " AND " . $this->getDBColumnName('contractID') . "=" . $contractID;
         }
         if ($startDate != '') {
-            $queryString .= " AND " . $this->getDBColumnName('expiryDate') . ">= '" . mysqli_real_escape_string($this->db->link_id(), $startDate) . "'";
+            $queryString .= " AND " . $this->getDBColumnName('expiryDate') . ">= '" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $startDate
+                ) . "'";
         }
         if ($endDate != '') {
-            $queryString .= " AND " . $this->getDBColumnName('expiryDate') . "<= '" . mysqli_real_escape_string($this->db->link_id(), $endDate) . "'";
+            $queryString .= " AND " . $this->getDBColumnName('expiryDate') . "<= '" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $endDate
+                ) . "'";
         }
         if ($serialNo != '') {
-            $queryString .= " AND " . $this->getDBColumnName('serialNo') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $serialNo) . "%'";
+            $queryString .= " AND " . $this->getDBColumnName('serialNo') . " LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $serialNo
+                ) . "%'";
         }
         if ($renewalStatus != '') {
-            $queryString .= " AND " . $this->getDBColumnName('renewalStatus') . "='" . mysqli_real_escape_string($this->db->link_id(), $renewalStatus) . "'";
+            $queryString .= " AND " . $this->getDBColumnName('renewalStatus') . "='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $renewalStatus
+                ) . "'";
         }
         if ($itemText != '') {
-            $queryString .= " AND citem.itm_desc LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $itemText) . "%'";
+            $queryString .= " AND citem.itm_desc LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $itemText
+                ) . "%'";
         }
 
         /*
@@ -98,7 +171,10 @@ class DBEJCustomerItem extends DBECustomerItem
               JOIN custitem AS contract ON cic_contractcuino = contract.`cui_cuino`
               JOIN item ON contract.cui_itemno = itm_itemno
             WHERE
-              itm_desc LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $contractText) . "%'
+              itm_desc LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $contractText
+                ) . "%'
               AND cic_cuino = custitem.`cui_cuino`
             ) > 0";
         }
@@ -106,7 +182,6 @@ class DBEJCustomerItem extends DBECustomerItem
         if ($row_limit) {
             $queryString .= " LIMIT 0," . $row_limit;
         }
-
         $this->setQueryString($queryString);
 
         return (parent::getRows());
@@ -129,7 +204,9 @@ class DBEJCustomerItem extends DBECustomerItem
         return (parent::getRow());
     }
 
-    function getRowsByColumn($column, $sortColumn = '')
+    function getRowsByColumn($column,
+                             $sortColumn = ''
+    )
     {
         $this->setMethodName("getRowsByColumn");
         if ($column == '') {
@@ -238,7 +315,8 @@ class DBEJCustomerItem extends DBECustomerItem
         return $db->Record['contracts'];
     }
 
-    public function getCountCustomerDirectDebitItems($customerID) {
+    public function getCountCustomerDirectDebitItems($customerID)
+    {
         $db = new dbSweetcode();
         $select =
             "SELECT COUNT(custitem.`cui_cuino`) as directDebitCount FROM custitem WHERE directDebitFlag = 'Y' AND `cui_custno` = $customerID";

@@ -1,0 +1,113 @@
+<link rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+/>
+
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+></script>
+
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+></script>
+<script type="text/javascript"
+        src="//cdn.datatables.net/plug-ins/1.10.19/sorting/date-eu.js"
+></script>
+
+<script>
+    $(function () {
+        $('#theTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            paging: false,
+            columnDefs: [
+                {type: 'date-eu', targets: [2, 3]}
+            ],
+            order: [[3, 'asc']]
+        });
+    })
+</script>
+<style>
+    table.dataTable tfoot th {
+        padding-right: 0 !important;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .orange {
+        color: orange;
+    }
+
+    .green {
+        color: green;
+        font-weight: bold;
+    }
+
+    .black {
+        color: black;
+    }
+</style>
+<!--<P>-->
+<!--<span style="color:red;background-color: red">R</span> Not ordered yet.-->
+<!--<span style="color: orange;background-color: orange">A</span> Ordered but not-->
+<!--received. <span style="color: black;background-color: black">B</span> Ordered and-->
+<!--received. <span style="color: green;background-color: green">G</span> Entire purchase order received.-->
+<!--</P>-->
+<TABLE id="theTable">
+    <thead>
+    <TR>
+        <th style="width: 20%">
+            Customer
+        </th>
+        <th style="width: 18%;">
+            Main Location
+        </th>
+        <th style="text-align: center;">
+            Last Review Meeting
+        </th>
+        <th style="text-align: center;">
+            Next Review Meeting
+        </th>
+        <th style="text-align: center;">
+            Frequency
+        </th>
+        <th style="width: 20%">
+            Contact
+        </th>
+    </TR>
+    </thead>
+    <tbody>
+    <!-- BEGIN reviewMeetingsBlock -->
+    <TR {style}>
+        <TD>
+            {customerLink}
+        </TD>
+        <td>
+            {mainLocation}
+        </td>
+        <td style="text-align: center">
+            {lastReviewMeeting}
+        </td>
+        <td style="text-align: center">
+            {nextReviewMeeting}
+        </td>
+        <td style="text-align: center">
+            {frequency}
+        </td>
+        <td>
+            {contact}
+        </td>
+    </TR>
+    <!-- END reviewMeetingsBlock -->
+    </tbody>
+</TABLE>

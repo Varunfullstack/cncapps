@@ -119,7 +119,7 @@ class CTHome extends CTCNC
     function display()
     {
         /**
-         * if user is only in the technical group then display the curent activity dash-board
+         * if user is only in the technical group then display the current activity dash-board
          */
         if (
             $this->hasPermissions(PHPLIB_PERM_TECHNICAL) &&
@@ -147,9 +147,6 @@ class CTHome extends CTCNC
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
             $this->displaySalesFigures();
         }
-
-
-        $this->displayProjects();
 
         $this->setTemplateFiles(
             'dashboardTest',

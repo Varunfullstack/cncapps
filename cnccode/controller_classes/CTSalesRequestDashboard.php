@@ -85,7 +85,7 @@ class CTSalesRequestDashboard extends CTCNC
                 ]
             );
 
-            $srLink = "<a href='$srLink'>SR</a>";
+            $srLink = "<a href='$srLink' target='_blank'>SR</a>";
 
 //            http://cncdev7:85/Activity.php?action=salesRequestReview&callActivityID=1813051&fromEmail=true
 
@@ -97,7 +97,7 @@ class CTSalesRequestDashboard extends CTCNC
                 ]
             );
 
-            $processCRLink = "<a href='$processCRLink'>Process Sales Request</a>";
+            $processCRLink = "<a href='$processCRLink' target='_blank'>Process Sales Request</a>";
 
             $this->template->set_var(
                 [

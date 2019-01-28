@@ -1,9 +1,34 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
 ### Changed
 - Issue 137 - CNC029 - Password archiving & security
+
+## [v1.16.0] - 2019-01-24
+### Added
+- Issue 429 - SD Manager Dashboard show P1 sections
+- Issue 410 - 7 dayers on dashboard
+- Issue 409 - Time Request Dashboard
+- Issue 428 - Allow Logging directly into the Sales queue
+- Issue 411 - Non referred customers with no contracts report
+- Issue 435 - Additional folders for default customer creation
+### Changed
+- Issue 413 - Default home page graphs to your team
+- Issue 421 - Increase Questionnaire field length
+- Issue 422 - Decimal places for fix times in System Header
+- Issue 423 - Upcoming Customer Review Meeting
+- Issue 414 - Contact table change defaults
+- Issue 390 - Project List Enhancements
+- Issue 438 - Edit Sales Invoice email to include reference to portal
+- Issue 418 - SR Completion Contract Changing
+- Issue 437 - Split Upcoming Visits query into own function
+- Issue 439 - SalesRequestDashboard SR link in new tab
+### Fixed
+- Issue 420 - Email missing header information
+- Issue 378 - Creating item defaults to first site
+- Issue 419 - Customer Review Meeting Frequency doesn't show in PDF export for Every 2 Months
+- Issue 415 - First Time Fix clarification
+- Issue 432 - Contact changes in SR don't update phone details
 
 ## [v1.15.2] - 2019-01-11
 ### Fixed

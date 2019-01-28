@@ -16,9 +16,20 @@ class CTDailyReport extends CTCNC
     private $buDailyReport;
     private $daysAgo = 1;
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $permissions = [
             'technical'
         ];
@@ -51,10 +62,42 @@ class CTDailyReport extends CTCNC
                 break;
             case 'outstandingIncidents' :
                 $onScreen = isset($_GET['onScreen']);
-                $this->buDailyReport->outstandingIncidents($this->daysAgo, null, $onScreen);
+                $dashboard = isset($_GET['dashboard']);
+
+                $html = $this->buDailyReport->outstandingIncidents(
+                    $this->daysAgo,
+                    null,
+                    $onScreen,
+                    $dashboard
+                );
+
+                if ($dashboard) {
+                    $this->setTemplateFiles(
+                        '7DayersDashboard',
+                        '7DayersDashboard'
+                    );
+
+                    $this->template->setVar(
+                        [
+                            "thing" => $html
+                        ]
+                    );
+
+                    $this->template->parse(
+                        'CONTENTS',
+                        '7DayersDashboard',
+                        true
+                    );
+
+                    $this->parsePage();
+                }
+
                 break;
             case 'outstandingPriorityFiveIncidents' :
-                $this->buDailyReport->outstandingIncidents($this->daysAgo, true);
+                $this->buDailyReport->outstandingIncidents(
+                    $this->daysAgo,
+                    true
+                );
                 break;
             case 'p5SRWithoutSalesOrders':
                 $this->buDailyReport->p5IncidentsWithoutSalesOrders();
@@ -79,11 +122,21 @@ class CTDailyReport extends CTCNC
         $row = $fixedRequests->fetch_row();
         if ($row) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'ServiceFixedReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'ServiceFixedReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'requestBlock', 'requests');
+            $template->set_block(
+                'page',
+                'requestBlock',
+                'requests'
+            );
 
             do {
 
@@ -92,24 +145,32 @@ class CTDailyReport extends CTCNC
                         'Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'fixedBy' => $row[2],
-                        'urlRequest' => $urlRequest
+                        'fixedBy'          => $row[2],
+                        'urlRequest'       => $urlRequest
                     )
                 );
 
-                $template->parse('requests', 'requestBlock', true);
+                $template->parse(
+                    'requests',
+                    'requestBlock',
+                    true
+                );
 
             } while ($row = $fixedRequests->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $template->get_var('output');
 
@@ -136,11 +197,21 @@ class CTDailyReport extends CTCNC
 
         if ($row = $activities->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'ServiceFocReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'ServiceFocReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'activityBlock', 'activities');
+            $template->set_block(
+                'page',
+                'activityBlock',
+                'activities'
+            );
 
             do {
 
@@ -149,7 +220,7 @@ class CTDailyReport extends CTCNC
                         'Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
@@ -158,26 +229,37 @@ class CTDailyReport extends CTCNC
                         'Activity.php',
                         array(
                             'callActivityID' => $row[2],
-                            'action' => 'displayActivity'
+                            'action'         => 'displayActivity'
                         )
                     );
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'activityID' => $row[2],
-                        'technician' => $row[3],
-                        'hours' => number_format($row[4], 2),
-                        'urlRequest' => $urlRequest,
-                        'urlActivity' => $urlActivity
+                        'activityID'       => $row[2],
+                        'technician'       => $row[3],
+                        'hours'            => number_format(
+                            $row[4],
+                            2
+                        ),
+                        'urlRequest'       => $urlRequest,
+                        'urlActivity'      => $urlActivity
                     )
                 );
 
-                $template->parse('activities', 'activityBlock', true);
+                $template->parse(
+                    'activities',
+                    'activityBlock',
+                    true
+                );
 
             } while ($row = $activities->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $template->get_var('output');
 
@@ -204,11 +286,21 @@ class CTDailyReport extends CTCNC
 
         if ($row = $activities->fetch_row()) {
 
-            $template = new Template (EMAIL_TEMPLATE_DIR, "remove");
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
 
-            $template->set_file('page', 'ServicePrepayOverValueReportEmail.inc.html');
+            $template->set_file(
+                'page',
+                'ServicePrepayOverValueReportEmail.inc.html'
+            );
 
-            $template->set_block('page', 'activityBlock', 'activities');
+            $template->set_block(
+                'page',
+                'activityBlock',
+                'activities'
+            );
 
             do {
 
@@ -217,7 +309,7 @@ class CTDailyReport extends CTCNC
                         'Activity.php',
                         array(
                             'problemID' => $row[1],
-                            'action' => 'displayLastActivity'
+                            'action'    => 'displayLastActivity'
                         )
                     );
 
@@ -226,26 +318,37 @@ class CTDailyReport extends CTCNC
                         'Activity.php',
                         array(
                             'callActivityID' => $row[2],
-                            'action' => 'displayActivity'
+                            'action'         => 'displayActivity'
                         )
                     );
                 $template->setVar(
                     array(
-                        'customer' => $row[0],
+                        'customer'         => $row[0],
                         'serviceRequestID' => $row[1],
-                        'activityID' => $row[2],
-                        'value' => number_format($row[3], 2),
-                        'technician' => $row[4],
-                        'urlRequest' => $urlRequest,
-                        'urlActivity' => $urlActivity
+                        'activityID'       => $row[2],
+                        'value'            => number_format(
+                            $row[3],
+                            2
+                        ),
+                        'technician'       => $row[4],
+                        'urlRequest'       => $urlRequest,
+                        'urlActivity'      => $urlActivity
                     )
                 );
 
-                $template->parse('activities', 'activityBlock', true);
+                $template->parse(
+                    'activities',
+                    'activityBlock',
+                    true
+                );
 
             } while ($row = $activities->fetch_row());
 
-            $template->parse('output', 'page', true);
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
 
             $body = $template->get_var('output');
 

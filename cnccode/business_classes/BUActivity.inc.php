@@ -2322,6 +2322,63 @@ class BUActivity extends Business
         $dbeCallActivity->updateRow();
     }
 
+    public function timeRequestProcess($callActivityID,
+                                       $userID,
+                                       $response,
+                                       $comments,
+                                       $minutes
+    )
+    {
+        $dsCallActivity = new DataSet($this);
+        $this->getActivityByID(
+            $callActivityID,
+            $dsCallActivity
+        );
+
+        $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
+        $requestingUser = new DBEUser($this);
+        $requestingUser->getRow($requestingUserID);
+
+
+        $reviewingUser = new DBEUser($this);
+        $reviewingUser->getRow($userID);
+
+        $teamID = $requestingUser->getValue(DBEUser::teamID);
+        switch ($response) {
+            case 'A':
+                $this->allocateAdditionalTime(
+                    $dsCallActivity->getValue(DBECallActivity::problemID),
+                    $teamID,
+                    $minutes,
+                    $comments
+                );
+                $this->logOperationalActivity(
+                    $dsCallActivity->getValue(DBECallActivity::problemID),
+                    '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>'
+                );
+                break;
+            case 'D':
+                $this->sendTimeRequestDeniedEmail(
+                    $dsCallActivity,
+                    $requestingUser,
+                    $comments
+                );
+                break;
+            case 'DEL':
+                break;
+        }
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
+        $dbeCallActivity->setUpdateModeUpdate();
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+
+        $dbeCallActivity->post();
+    }
+
     public function changeRequestProcess($callActivityID,
                                          $userID,
                                          $response,
@@ -2425,6 +2482,52 @@ class BUActivity extends Business
             ''
         );
         return ($dbeProblem->updateRow());
+    }
+
+    private function createTimeRequestsActivity($problemID,
+                                                $reason,
+                                                $userID
+    )
+    {
+        $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
+
+        $dbeNewActivity = new DBECallActivity($this);
+        $dbeNewActivity->getRow($dbeJLastCallActivity->getValue(DBEJCallActivity::callActivityID));
+
+        $dbeNewActivity->setPKValue('');
+
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::date,
+            date('Y-m-d')
+        );         // today
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::endTime,
+            date('H:i')
+        );
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::userID,
+            $userID
+        );
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_TIME_REQUEST_ACTIVITY_TYPE_ID
+        );
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::status,
+            'O'
+        );
+        $dbeNewActivity->setValue(
+            DBEJCallActivity::reason,
+            $reason
+        );
+
+        $dbeNewActivity->insertRow();
+
+        return $dbeNewActivity->getPKValue();
     }
 
     function createChangeRequestActivity($callActivityID,
@@ -2548,6 +2651,90 @@ class BUActivity extends Business
             'From'         => $senderEmail,
             'To'           => $toEmail,
             'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
+
+    /**
+     * @param DataAccess $dbeCallActivity
+     * @param DBEUser $requestingUser
+     * @param $reason
+     */
+    private function sendTimeRequestDeniedEmail($dbeCallActivity,
+                                                $requestingUser,
+                                                $reason
+    )
+    {
+        $buMail = new BUMail($this);
+
+        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+
+        $template->set_file(
+            'page',
+            'TimeRequestDeniedEmail.inc.html'
+        );
+
+        $userName = $requestingUser->getValue(DBEUser::firstName) . ' ' . $requestingUser->getValue(DBEUser::lastName);
+
+        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
+
+        $template->setVar(
+            array(
+                'problemID' => $problemID,
+
+                'userName' => $userName,
+
+                'urlLastActivity' => $urlLastActivity,
+
+                'requestReason' => $reason
+            )
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $toEmail = $requestingUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => "Time Request Denied",
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
@@ -3411,6 +3598,7 @@ class BUActivity extends Business
 
             $finalActivityIDArray[] = $db->Record['caa_callactivityno'];
         }
+
         /*
     Get full activity rows(these come back in customerID, date order)
     */
@@ -6950,18 +7138,25 @@ is currently a balance of ';
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
+        $projectURL = 'http://' . $_SERVER ['HTTP_HOST'] . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
+                DBEJCallActivity::customerID
+            );
+
+        $createProjectLink = "<a href='" . $projectURL . "'>Click here to create a project for this request</a>";
+
         $template->setVar(
             array(
-                'activityRef'   => $activityRef,
-                'urlActivity'   => $urlActivity,
-                'customerName'  => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'reason'        => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'internalNotes' =>
+                'activityRef'       => $activityRef,
+                'urlActivity'       => $urlActivity,
+                'customerName'      => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'reason'            => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'createProjectLink' => $createProjectLink,
+                'internalNotes'     =>
                     $dbeJCallActivity->getValue(
                         DBEJCallActivity::internalNotes
                     ),
                 'CONFIG_SERVICE_REQUEST_DESC'
-                                => CONFIG_SERVICE_REQUEST_DESC
+                                    => CONFIG_SERVICE_REQUEST_DESC
 
             )
         );
@@ -10162,11 +10357,6 @@ is currently a balance of ';
 
         $this->dbeProblem->updateRow();
 
-        $this->logOperationalActivity(
-            $problemID,
-            '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>'
-        );
-
         $this->sendTimeAllocatedEmail(
             $minutes,
             $comments
@@ -10287,8 +10477,7 @@ is currently a balance of ';
         } else {
             $requesterID = $GLOBALS['auth']->is_authenticated();
         }
-
-        $this->sendRequestAdditionalTimeEmail(
+        $this->createTimeRequestsActivity(
             $problemID,
             $reason,
             $requesterID
@@ -10914,6 +11103,7 @@ is currently a balance of ';
             $dbeJProblem,
             $problems
         );
+
     }
 
     public function getActivityCount($problemID,
