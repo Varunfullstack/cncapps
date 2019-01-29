@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v1.16.1]
+## [v1.16.1] - 2019-01-29
 ### Fixed
 - Search SRs take you to the Sales Order, not Service Request
 
