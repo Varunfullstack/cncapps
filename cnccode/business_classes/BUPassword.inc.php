@@ -149,5 +149,18 @@ class BUPassword extends Business
         );
     }
 
+    public function getArchivedRowsByCustomer($customerID,
+                                              $dsResults
+    )
+    {
+        $this->dbePassword->getArchivedRowsByCustomerID(
+            $customerID
+        );
+        return ($this->getData(
+            $this->dbePassword,
+            $dsResults
+        ));
+    }
+
 } // End of class
 ?>

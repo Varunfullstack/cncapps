@@ -150,13 +150,15 @@ class CTPassword extends CTCNC
      * Display list of types
      * @access private
      */
-    function displayList($customerID = false)
+    function displayList()
     {
         $dbeCustomer = new DBECustomer($this);
 
         if ($_REQUEST['customerID']) {
             $customerID = $_REQUEST['customerID'];
         }
+        $showArchived = isset($_REQUEST['archived']);
+
         if (empty($customerID)) {
             $this->raiseError('Please search for a customer by typing and then pressing tab');
             exit;
@@ -171,59 +173,59 @@ class CTPassword extends CTCNC
         );
 
         $dbeCustomer->getRow($customerID);
+        $dsPassword = new DataSet($this);
+        if ($showArchived) {
+            $this->buPassword->getArchivedRowsByCustomer(
+                $customerID,
+                $dsPassword
+            );
+        } else {
 
+            $this->buPassword->getRowsByCustomerIDAndPasswordLevel(
+                $customerID,
+                $this->dbeUser->getValue(DBEUser::passwordLevel),
+                $dsPassword
+            );
+        }
 
-        $this->buPassword->getRowsByCustomerIDAndPasswordLevel(
-            $customerID,
-            $this->dbeUser->getValue(DBEUser::passwordLevel),
-            $dsPassword
-        );
 
         if ($dsPassword) {
 
 
-            $urlAdd =
-                $this->buildLink(
+            if (!$showArchived) {
+
+                $urlAdd =
+                    $this->buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'edit',
+                            'customerID' => $customerID
+                        )
+                    );
+
+                $urlSubmit = $this->buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action'     => 'edit',
-                        'customerID' => $customerID
-                    )
-                );
-            $urlLoadFromCsv =
-                $this->buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'loadFromCsv',
-                        'customerID' => $customerID
+                        'action' => 'displayList'
                     )
                 );
 
-            $urlSubmit = $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'displayList'
-                )
-            );
+
+            }
+
 
             $this->template->set_var(
                 array(
                     'urlSubmit'      => $urlSubmit,
                     'urlAdd'         => $urlAdd,
-                    'urlLoadFromCsv' => $urlLoadFromCsv,
                     'customerName'   => $dbeCustomer->getValue(DBECustomer::name),
                     'customerID'     => $customerID,
-                    'formError'      => $this->getFormErrorMessage()
+                    'formError'      => $this->getFormErrorMessage(),
+                    'hideOnArchived' => $showArchived ? "hidden" : '',
+                    'showOnArchived' => $showArchived ? '' : 'hidden'
                 )
             );
 
-            $urlCustomerPopup = $this->buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
             $dbePasswordService = new DBEPasswordService($this);
 
             $this->template->set_block(

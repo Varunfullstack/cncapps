@@ -126,16 +126,16 @@ class DBEPassword extends DBEntity
         return (parent::getRows());
     }
 
-    public function getArchivedRowsByPasswordLevel($passwordLevel)
+    public function getArchivedRowsByCustomerID($customerID)
     {
-        $this->setMethodName('getRowsByCustomerIDAndPasswordLevel');
-        if ($passwordLevel == '') {
-            $this->raiseError('passwordLevel not set');
+        $this->setMethodName('getArchivedRowsByCustomerID');
+        if ($customerID == '') {
+            $this->raiseError('customer ID not set');
         }
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel .
+            " WHERE " . $this->getDBColumnName(self::customerID) . " = " . $customerID .
             " and " . $this->getDBColumnName(self::archivedBy) . ' is not null and  ' . $this->getDBColumnName(
                 self::archivedBy
             ) . ' <> "" '
