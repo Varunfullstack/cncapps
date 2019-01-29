@@ -216,13 +216,14 @@ class CTPassword extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'urlSubmit'      => $urlSubmit,
-                    'urlAdd'         => $urlAdd,
-                    'customerName'   => $dbeCustomer->getValue(DBECustomer::name),
-                    'customerID'     => $customerID,
-                    'formError'      => $this->getFormErrorMessage(),
-                    'hideOnArchived' => $showArchived ? "hidden" : '',
-                    'showOnArchived' => $showArchived ? '' : 'hidden'
+                    'urlSubmit'          => $urlSubmit,
+                    'urlAdd'             => $urlAdd,
+                    'customerName'       => $dbeCustomer->getValue(DBECustomer::name),
+                    'customerID'         => $customerID,
+                    'formError'          => $this->getFormErrorMessage(),
+                    'hideOnArchived'     => $showArchived ? "hidden" : '',
+                    'showOnArchived'     => $showArchived ? '' : 'hidden',
+                    "weirdColumnHeaders" => $showArchived ? '<th>Archived By</th><th>Archived At</th>' : '<th colspan="2">&nbsp;</th>'
                 )
             );
 
@@ -283,6 +284,15 @@ class CTPassword extends CTCNC
                     $passwordServiceName = $passwordServiceCache[$passwordServiceID];
                 }
 
+                if ($showArchived) {
+                    $weirdFields = "<td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedBy) . "</td>
+        <td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedAt) . "</td>";
+                } else {
+                    $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\">edit</a></td>
+        <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\">archive</a></td>";
+                }
+
+
                 $this->template->set_var(
                     array(
                         'passwordID'          => $dsPassword->getValue(DBEPassword::passwordID),
@@ -298,7 +308,9 @@ class CTPassword extends CTCNC
                         'urlArchive'          => $urlArchive,
                         'level'               => $dsPassword->getValue(DBEPassword::level),
                         'URL'                 => $URL,
-                        'service'             => $passwordServiceName
+                        'service'             => $passwordServiceName,
+                        'weirdFields'         => $weirdFields
+
 
                     )
                 );
