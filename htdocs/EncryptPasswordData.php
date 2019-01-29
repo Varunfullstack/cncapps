@@ -39,13 +39,31 @@ while ($dbePassword->fetchNext()) {
             $buPassword->encrypt($dbePassword->getValue(DBEPassword::username))
         );
     }
-    if ($dbePassword->getValue(DBEPassword::URL) != '') {
-        $updateDBEPassword->setValue(
-            DBEPassword::URL,
-            $buPassword->encrypt($dbePassword->getValue(DBEPassword::URL))
-        );
-    }
+
     if ($dbePassword->getValue(DBEPassword::notes) != '') {
+
+        $re = '/\b(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/?#[\]@!\$&\'\(\)\*\+,;=.]+/i';
+        $notes = $dbePassword->getValue(DBEPassword::notes);
+
+        if (preg_match(
+            $re,
+            $notes,
+            $matches,
+            PREG_OFFSET_CAPTURE,
+            0
+        )) {
+            $notes = str_replace(
+                $matches[0][0],
+                "",
+                $notes
+            );
+
+            $updateDBEPassword->setValue(
+                DBEPassword::URL,
+                $buPassword->encrypt($matches[0][0])
+            );
+        };
+
         $updateDBEPassword->setValue(
             DBEPassword::notes,
             $buPassword->encrypt($dbePassword->getValue(DBEPassword::notes))
