@@ -92,7 +92,7 @@
             INSERT INTO passwordService VALUES (1, 'DOMAIN ADMIN',0,0),(2, 'Domain Admin Service Account',0,1),(3, 'CNC Domain Admin',0,2),(4, 'CNC service account',0,3),(5, 'APC NIC',0,4),(6, 'APC PowerChute',0,5),(7, 'DRAC',0,6),(8, 'Office 365 CNC Admin',0,7),(9, 'Netgear Switch',0,8),(10, 'Office 365 Admin Portal',0,9),(11, 'VMWare ESXi Host',0,10),(12, 'Exclaimer Cloud',0,11),(13, 'Local PC Administrator account',0,12);
             UPDATE PASSWORD SET serviceID = case pas_service when 'DOMAIN ADMIN' THEN 1 WHEN 'Domain Admin Service Account' THEN 2 when 'CNC Domain Admin' then 3 when 'CNC service account' then 4 when 'APC NIC' then 5 when 'APC PowerChute' then 6 when 'DRAC' then 7 when 'Office 365 CNC Admin' then 8 when 'Netgear Switch' then 9 when 'Office 365 Admin Portal' then 10 when 'VMWare ESXi Host' then 11 when 'Exclaimer Cloud' then 12 when 'Local PC Administrator account' then 13 else null end;
             UPDATE PASSWORD SET pas_service = null where serviceID is not null;
-            UPDATE PASSWORD SET pas_notes = concat(pas_notes,' #~', pas_service, '~#') where serviceID is null and pas_service is not null and pas_service <> '';
+            UPDATE PASSWORD SET pas_notes = concat(pas_notes, pas_service) where serviceID is null and pas_service is not null and pas_service <> '';
             ]]>
         </sql>
         <rollback/>
