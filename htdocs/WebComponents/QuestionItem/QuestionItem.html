@@ -1,0 +1,123 @@
+<template id="question-item-template">
+    <link rel="stylesheet"
+          href="/WebComponents/QuestionItem/QuestionItem.css"
+    >
+    <form action="StarterLeaverManagement.php?action=addQuestion"
+          method="post"
+    >
+        <table width="700px"
+               border="0"
+        >
+            <tr {hideOnEdit}>
+                <td class="promptText">Customer</td>
+                <td class="fieldText">
+                    <input
+                            type="hidden"
+                            name="question[customerID]"
+                            id="customerID"
+                            value="{customerID}"
+                    >
+                    <input type="text"
+                           id="customerString"
+                           value="{customerString}"
+                           onFocus="saveCustomerString()"
+                           onBlur="validateCustomerString()"
+                           onKeypress="validateCustomerStringOnReturn()"
+                           size="50"
+                           maxlength="50"
+
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td class="promptText">Starter/Leaver</td>
+                <td class="fieldText">
+                    <select required
+                            name="question[formType]"
+                    >
+                        <option value="starter">Starter</option>
+                        <option value="leaver">Leaver</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="promptText">Name(no space allowed)</td>
+                <td class="fieldText">
+                    <input type="text"
+                           required
+                           pattern="\S+"
+                           name="question[name]"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td class="promptText">Question Type</td>
+                <td class="fieldText">
+                    <select onchange="changeQuestionType()"
+                            name="question[type]"
+                            required
+                    >
+                        <option value="y/n">Yes/No</option>
+                        <option value="multi">Multiple Choice</option>
+                        <option value="free">Free Type</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="promptText">Question Label</td>
+                <td class="fieldText">
+                    <input type="text"
+                           name="question[label]"
+                           required
+                    >
+                </td>
+            </tr>
+            <tr class="questionOptions"
+                hidden
+            >
+                <td class="promptText">Question Options</td>
+                <td class="fieldText">
+                    <input type="hidden"
+                           name="question[options]"
+                           class="optionsString"
+                    >
+                    <input type="text"
+                           placeholder="type an option and hit Enter to add it"
+                           class="optionValue"
+                    >
+                    <button onclick="checkAddOption()"
+                            type="button"
+                    >Add
+                    </button>
+                    <div class="optionsHolder">
+
+                    </div>
+                </td>
+            </tr>
+            <tr class="questionMultipleChoice"
+                hidden
+            >
+                <td class="promptText">Multiple Answers?</td>
+                <td class="fieldText">
+                    <input type="checkbox"
+                           name="question[multi]"
+                           value="true"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td class="promptText">Required?</td>
+                <td class="fieldText">
+                    <input type="checkbox"
+                           name="question[required]"
+                           value="true"
+                    >
+                </td>
+            </tr>
+        </table>
+
+        <button>Add Question</button>
+    </form>
+</template>
+
+<script src="QuestionItem.js"></script>
