@@ -42,7 +42,7 @@ while ($dbePassword->fetchNext()) {
 
     if ($dbePassword->getValue(DBEPassword::notes) != '') {
 
-        $re = '/\b(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/?#[\]@!\$&\'\(\)\*\+,;=.]+/i';
+        $re = '/\b(?:http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/?#[\]@!\$&\'\(\)\*\+,;=.]+/i';
         $notes = $dbePassword->getValue(DBEPassword::notes);
 
         if (preg_match(
@@ -52,12 +52,12 @@ while ($dbePassword->fetchNext()) {
             PREG_OFFSET_CAPTURE,
             0
         )) {
+
             $notes = str_replace(
                 $matches[0][0],
                 "",
                 $notes
             );
-
             $updateDBEPassword->setValue(
                 DBEPassword::URL,
                 $buPassword->encrypt($matches[0][0])
@@ -66,7 +66,7 @@ while ($dbePassword->fetchNext()) {
 
         $updateDBEPassword->setValue(
             DBEPassword::notes,
-            $buPassword->encrypt($dbePassword->getValue(DBEPassword::notes))
+            $buPassword->encrypt($notes)
         );
     }
 

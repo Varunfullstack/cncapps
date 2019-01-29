@@ -122,7 +122,7 @@
         <modifyDataType tableName="password" columnName="pas_username" newDataType="mediumtext"/>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1547722529-12">
+    <changeSet author="pavwebdev" id="1547722529-13">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="consultant" columnName="passwordLevel"/>
         </preConditions>
