@@ -12,6 +12,10 @@ This project changes will be shown here.
 - Issue 347 - Customer Review Management documents
 - Issue 345 - Creation of Primary Main Contact 
 
+## [v1.16.1] - 2019-01-29
+### Fixed
+- Search SRs take you to the Sales Order, not Service Request
+
 ## [v1.16.0] - 2019-01-24
 ### Added
 - Issue 429 - SD Manager Dashboard show P1 sections

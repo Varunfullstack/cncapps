@@ -980,8 +980,7 @@ class CTActivity extends CTCNC
                     $salesOrderID = $dbeProblem->getValue(DBEProblem::linkedSalesOrderID);
                     $salesOrderLink = "";
                     if ($salesOrderID) {
-                        $salesOrderURL = $displayActivityURL =
-                        $linkURL =
+                        $salesOrderURL =
                             $this->buildLink(
                                 'SalesOrder.php',
                                 array(
@@ -4241,7 +4240,9 @@ class CTActivity extends CTCNC
                 ', ' . $dsSite->getValue(DBESite::postcode) .
                 ', ' . $dsContact->getValue('firstName') . ' ' . $dsContact->getValue(
                     'lastName'
-                ) . ', <span class="contactPhone">' . $buCustomer->getContactPhoneForHtml($dsCallActivity->getValue('contactID')).'</span>';
+                ) . ', <span class="contactPhone">' . $buCustomer->getContactPhoneForHtml(
+                    $dsCallActivity->getValue('contactID')
+                ) . '</span>';
 
             if ($dsContact->getValue('email') != '') {
                 $customerDetails .=
@@ -6654,7 +6655,7 @@ class CTActivity extends CTCNC
 
             $nextURL =
                 $this->buildLink(
-                    'CurrentActivityReport.php',
+                    'TimeRequestDashboard.php',
                     array()
                 );
 
