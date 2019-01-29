@@ -223,7 +223,8 @@ class CTPassword extends CTCNC
                     'formError'          => $this->getFormErrorMessage(),
                     'hideOnArchived'     => $showArchived ? "hidden" : '',
                     'showOnArchived'     => $showArchived ? '' : 'hidden',
-                    "weirdColumnHeaders" => $showArchived ? '<th>Archived By</th><th>Archived At</th>' : '<th colspan="2">&nbsp;</th>'
+                    "weirdColumnHeaders" => $showArchived ? '<th>Archived By</th><th>Archived At</th>' : '<th colspan="2">&nbsp;</th>',
+                    'archived'           => $showArchived ? '(Archived Passwords)' : ''
                 )
             );
 
