@@ -109,7 +109,7 @@
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="1547722529-11">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="password" columnName="encrypted"/>
             </not>
@@ -120,6 +120,15 @@
     </changeSet>
     <changeSet author="pavwebdev" id="1547722529-12">
         <modifyDataType tableName="password" columnName="pas_username" newDataType="mediumtext"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1547722529-12">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="passwordLevel"/>
+        </preConditions>
+        <sql>
+            update consultant set passwordLevel = 1
+        </sql>
         <rollback/>
     </changeSet>
 </databaseChangeLog>
