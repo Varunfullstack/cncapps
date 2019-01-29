@@ -63,12 +63,11 @@ class CTStarterLeaverManagement extends CTCNC
                 }
                 $this->displayCustomerQuestions();
                 break;
-//            case CTSTANDARDTEXT_ACT_DELETE:
-//                $this->delete();
-//                break;
-//            case CTSTANDARDTEXT_ACT_UPDATE:
-//                $this->update();
-//                break;
+            case 'updateQuestion':
+                $this->updateQuestion();
+
+                $this->displayCustomerQuestions();
+                break;
             case CTSTANDARDTEXT_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -209,24 +208,17 @@ class CTStarterLeaverManagement extends CTCNC
             throw new Exception('Question array is not set');
         }
 
-        if (!isset($_REQUEST['question']['customerID']) || !$_REQUEST['question']['customerID']) {
-            throw new Exception('Customer is not set');
+        if (!isset($_REQUEST['questionID']) || !$_REQUEST['questionID']) {
+            throw new Exception('Question ID is missing');
         }
-
+        $questionID = $_REQUEST['questionID'];
         $questionData = $_REQUEST['question'];
 
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
-        $dbeStarterLeaverQuestion->setValue(
-            DBEStarterLeaverQuestion::sortOrder,
-            $dbeStarterLeaverQuestion->getNextSortOrder($questionData[DBEStarterLeaverQuestion::customerID])
-        );
+        $dbeStarterLeaverQuestion->getRow($questionID);
 
-        $dbeStarterLeaverQuestion->setValue(
-            DBEStarterLeaverQuestion::customerID,
-            $questionData[DBEStarterLeaverQuestion::customerID]
-        );
         $dbeStarterLeaverQuestion->setValue(
             DBEStarterLeaverQuestion::formType,
             $questionData[DBEStarterLeaverQuestion::formType]
@@ -261,7 +253,9 @@ class CTStarterLeaverManagement extends CTCNC
             $questionData[DBEStarterLeaverQuestion::type]
         );
 
-        $dbeStarterLeaverQuestion->insertRow();
+        $dbeStarterLeaverQuestion->updateRow();
+
+
     }
 
     private function displayCustomerQuestions()
@@ -319,10 +313,10 @@ class CTStarterLeaverManagement extends CTCNC
                     DBEStarterLeaverQuestion::name       => $dbeStarterLeaverQuestion->getValue(
                         DBEStarterLeaverQuestion::name
                     ),
-                    DBEStarterLeaverQuestion::required   => $dbeStarterLeaverQuestion->getValue(
+                    DBEStarterLeaverQuestion::required   => +$dbeStarterLeaverQuestion->getValue(
                         DBEStarterLeaverQuestion::required
                     ),
-                    DBEStarterLeaverQuestion::multi      => $dbeStarterLeaverQuestion->getValue(
+                    DBEStarterLeaverQuestion::multi      => +$dbeStarterLeaverQuestion->getValue(
                         DBEStarterLeaverQuestion::multi
                     ),
                     DBEStarterLeaverQuestion::options    => json_decode(
@@ -344,7 +338,7 @@ class CTStarterLeaverManagement extends CTCNC
                     "hideOnEdit" => "hidden",
                     "questionID" => $questionID,
                     'addOrEdit'  => "Update",
-                    'action'     => "StarterLeaverManagement.php?action=updateQuestion&questionID=" . $questionID,
+                    'action'     => "StarterLeaverManagement.php?action=updateQuestion&questionID=$questionID&customerID=$customerID",
                     "toUpdate"   => $questionData
                 ]
             );
