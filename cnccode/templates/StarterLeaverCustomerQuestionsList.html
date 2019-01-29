@@ -1,6 +1,3 @@
-<link rel="import"
-      href="./WebComponents/QuestionItem/QuestionItem.html"
->
 <script>
     const customerID = {customerID};
 
@@ -17,11 +14,8 @@
     <ul>
         <!-- BEGIN questionsBlock -->
         <li>
-            <question-item questionID="{questionID}"
-                           customerID="{customerID}"
-                           on
-            ></question-item>
-            <!--{question}-->
+
+            {question}
             <button type="button"
                     onclick="deleteQuestion({questionID})"
             >X

@@ -120,7 +120,9 @@ class CTStarterLeaverManagement extends CTCNC
 
         $this->template->setVar(
             [
-                "thingy" => "test"
+                "questionID" => "0",
+                "addOrEdit"  => "Add",
+                'action'     => "StarterLeaverManagement.php?action=addQuestion",
             ]
         );
 
@@ -141,6 +143,67 @@ class CTStarterLeaverManagement extends CTCNC
 
 
     private function addQuestion()
+    {
+        if (!isset($_REQUEST['question'])) {
+            throw new Exception('Question array is not set');
+        }
+
+        if (!isset($_REQUEST['question']['customerID']) || !$_REQUEST['question']['customerID']) {
+            throw new Exception('Customer is not set');
+        }
+
+        $questionData = $_REQUEST['question'];
+
+
+        $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::sortOrder,
+            $dbeStarterLeaverQuestion->getNextSortOrder($questionData[DBEStarterLeaverQuestion::customerID])
+        );
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::customerID,
+            $questionData[DBEStarterLeaverQuestion::customerID]
+        );
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::formType,
+            $questionData[DBEStarterLeaverQuestion::formType]
+        );
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::name,
+            $questionData[DBEStarterLeaverQuestion::name]
+        );
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::required,
+            isset($questionData[DBEStarterLeaverQuestion::required])
+        );
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::multi,
+            isset($questionData[DBEStarterLeaverQuestion::multi])
+        );
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::options,
+            $questionData[DBEStarterLeaverQuestion::options]
+        );
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::label,
+            $questionData[DBEStarterLeaverQuestion::label]
+        );
+
+        $dbeStarterLeaverQuestion->setValue(
+            DBEStarterLeaverQuestion::type,
+            $questionData[DBEStarterLeaverQuestion::type]
+        );
+
+        $dbeStarterLeaverQuestion->insertRow();
+    }
+
+    private function updateQuestion()
     {
         if (!isset($_REQUEST['question'])) {
             throw new Exception('Question array is not set');
@@ -243,10 +306,46 @@ class CTStarterLeaverManagement extends CTCNC
                 'StarterLeaverQuestionSection.html'
             );
 
+            $questionID = $dbeStarterLeaverQuestion->getValue(DBEStarterLeaverQuestion::questionID);
+
+            $questionData = json_encode(
+                [
+                    DBEStarterLeaverQuestion::customerID => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::customerID
+                    ),
+                    DBEStarterLeaverQuestion::formType   => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::formType
+                    ),
+                    DBEStarterLeaverQuestion::name       => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::name
+                    ),
+                    DBEStarterLeaverQuestion::required   => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::required
+                    ),
+                    DBEStarterLeaverQuestion::multi      => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::multi
+                    ),
+                    DBEStarterLeaverQuestion::options    => json_decode(
+                        $dbeStarterLeaverQuestion->getValue(
+                            DBEStarterLeaverQuestion::options
+                        )
+                    ),
+                    DBEStarterLeaverQuestion::label      => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::label
+                    ),
+                    DBEStarterLeaverQuestion::type       => $dbeStarterLeaverQuestion->getValue(
+                        DBEStarterLeaverQuestion::type
+                    ),
+                ]
+            );
+
             $template->setVar(
                 [
                     "hideOnEdit" => "hidden",
-                    "questionID" => $dbeStarterLeaverQuestion->getValue(DBEStarterLeaverQuestion::questionID)
+                    "questionID" => $questionID,
+                    'addOrEdit'  => "Update",
+                    'action'     => "StarterLeaverManagement.php?action=updateQuestion&questionID=" . $questionID,
+                    "toUpdate"   => $questionData
                 ]
             );
 

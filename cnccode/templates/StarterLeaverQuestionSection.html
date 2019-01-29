@@ -1,101 +1,124 @@
-<script language='JavaScript'
-        src="CommonJS.js"
+<script src=".javascript/customerPicker.js"
+        type="module"
 ></script>
 <script>
+    (function () {
 
-    let optionElm, optionsStringElm, optionsHolder, multipleChoice, questionOptions;
-    $(function () {
-        const mainElement = document.getElementById({questionID});
-
-        optionElm = mainElement.querySelector('.optionValue');
-        optionsStringElm = mainElement.querySelector('.optionsString');
-        optionsHolder = mainElement.querySelector('.optionsHolder');
-        multipleChoice = mainElement.querySelector('.questionMultipleChoice');
-        questionOptions = mainElement.querySelector('.questionOptions');
-    });
-
-    function getOptions() {
-        const optionsString = optionsStringElm.value;
-        let options = [];
-        if (optionsString) {
-            options = JSON.parse(optionsString);
-        }
-        return options;
-    }
-
-    function storeOptions(options) {
-        optionsStringElm.value = JSON.stringify(options);
-    }
-
-    function checkAddOption() {
-        const option = optionElm.value;
-        let options = getOptions();
-        options.push(option);
-        optionElm.value = null;
-        storeOptions(options);
-        redrawOptionsHolder(options);
-    }
-
-    function redrawOptionsHolder(options) {
-        const optionsHolderHTML = options.reduce((acc, option, count) => {
-            acc += "<div>" + option + " <button type='button' onclick='removeOption(" + count + ")'>X</button></div>";
-            return acc;
-        }, '');
-        optionsHolder.innerHTML = optionsHolderHTML;
-    }
-
-    function removeOption(idx) {
-        const options = getOptions();
-        options.splice(idx, 1);
-        storeOptions(options);
-        redrawOptionsHolder(options);
-    }
-
-    function changeQuestionType() {
-        const $elm = $(event.target);
-        switch ($elm.val()) {
-            case 'multi':
-                multipleChoice.style.display = 'table-row';
-                questionOptions.style.display = 'table-row';
-                break;
-            case 'free':
-            case 'y/n':
-            default:
-                multipleChoice.style.display = 'none';
-                questionOptions.style.display = 'none';
+        const toUpdateJSON = '{toUpdate}';
 
 
-        }
-    }
+        let optionElm, optionsStringElm, optionsHolder, multipleChoice, questionOptions, addButton,
+            questionTypeSelector;
+        $(function () {
+            const mainElement = document.getElementById({questionID});
 
-    let savedCustomerString;
+            optionElm = mainElement.querySelector('.optionValue');
+            optionsStringElm = mainElement.querySelector('.optionsString');
+            optionsHolder = mainElement.querySelector('.optionsHolder');
+            multipleChoice = mainElement.querySelector('.questionMultipleChoice');
+            questionOptions = mainElement.querySelector('.questionOptions');
+            addButton = mainElement.querySelector('.addButton');
+            questionTypeSelector = mainElement.querySelector('.questionTypeSelector');
 
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
+            addButton.addEventListener('click', checkAddOption);
+            questionTypeSelector.addEventListener('change', onQuestionTypeSelectoChange);
 
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('Customer.php?action=dispCustPopup&htmlFmt=popup&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            if (toUpdateJSON) {
+                const toUpdate = JSON.parse(toUpdateJSON);
+                mainElement.querySelector('[name="question[formType]"]').value = toUpdate.formType;
+                mainElement.querySelector('[name="question[name]"]').value = toUpdate.name;
+                mainElement.querySelector('[name="question[type]"]').value = toUpdate.type;
+                changeQuestionType(toUpdate.type);
+                mainElement.querySelector('[name="question[label]"]').value = toUpdate.label;
+                mainElement.querySelector('[name="question[required]"]').checked = toUpdate.required;
+                mainElement.querySelector('[name="question[multi]"]').checked = toUpdate.multi;
+                optionsStringElm.value = JSON.stringify(toUpdate.options);
+                redrawOptionsHolder(getOptions());
+
+
             }
-        } else {
-            document.searchForm.customerID.value = "";
-        }
-    }
 
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
+        });
+
+        function getOptions() {
+            const optionsString = optionsStringElm.value;
+            let options = [];
+            if (optionsString) {
+                options = JSON.parse(optionsString);
+                if (!options) {
+                    options = [];
+                }
+            }
+            return options;
         }
-    }
+
+        function storeOptions(options) {
+            optionsStringElm.value = JSON.stringify(options);
+        }
+
+        function checkAddOption() {
+            debugger;
+            const option = optionElm.value;
+            let options = getOptions();
+            options.push(option);
+            optionElm.value = null;
+            storeOptions(options);
+            redrawOptionsHolder(options);
+        }
+
+        function redrawOptionsHolder(options) {
+            optionsHolder.innerHTML = "";
+            options.reduce((acc, option, count) => {
+                const div = document.createElement('div');
+                div.innerHTML = option;
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.addEventListener('click', testRemoveOptions(count));
+                removeButton.innerText = 'X';
+                div.appendChild(removeButton);
+
+                optionsHolder.appendChild(div);
+                return acc;
+            }, '');
+        }
+
+        function testRemoveOptions(value) {
+            return function () {
+                return removeOption(value);
+            };
+        }
+
+        function removeOption(idx) {
+            const options = getOptions();
+            options.splice(idx, 1);
+            storeOptions(options);
+            redrawOptionsHolder(options);
+        }
+
+        function onQuestionTypeSelectoChange() {
+            const $elm = $(event.target);
+            changeQuestionType($elm.val());
+        }
+
+        function changeQuestionType(value) {
+            switch (value) {
+                case 'multi':
+                    multipleChoice.style.display = 'table-row';
+                    questionOptions.style.display = 'table-row';
+                    break;
+                case 'free':
+                case 'y/n':
+                default:
+                    multipleChoice.style.display = 'none';
+                    questionOptions.style.display = 'none';
+            }
+        }
+    })();
+
+
 </script>
 <div id="{questionID}">
-    <form action="StarterLeaverManagement.php?action=addQuestion"
+    <form action="{action}"
           method="post"
     >
         <table width="700px"
@@ -113,9 +136,7 @@
                     <input type="text"
                            id="customerString"
                            value="{customerString}"
-                           onFocus="saveCustomerString()"
-                           onBlur="validateCustomerString()"
-                           onKeypress="validateCustomerStringOnReturn()"
+                           customer-picker="customerID"
                            size="50"
                            maxlength="50"
 
@@ -146,8 +167,8 @@
             <tr>
                 <td class="promptText">Question Type</td>
                 <td class="fieldText">
-                    <select onchange="changeQuestionType()"
-                            name="question[type]"
+                    <select name="question[type]"
+                            class="questionTypeSelector"
                             required
                     >
                         <option value="y/n">Yes/No</option>
@@ -178,8 +199,8 @@
                            placeholder="type an option and hit Enter to add it"
                            class="optionValue"
                     >
-                    <button onclick="checkAddOption()"
-                            type="button"
+                    <button type="button"
+                            class="addButton"
                     >Add
                     </button>
                     <div class="optionsHolder">
@@ -209,6 +230,6 @@
             </tr>
         </table>
 
-        <button>Add Question</button>
+        <button>{addOrEdit} Question</button>
     </form>
 </div>
