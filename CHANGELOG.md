@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 137 - CNC029 - Password archiving & security
+- Issue 436 - Changing contracts in SR, permissions required
 
 ## [v1.16.1] - 2019-01-29
 ### Fixed

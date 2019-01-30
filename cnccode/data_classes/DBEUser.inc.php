@@ -60,6 +60,7 @@ class DBEUser extends DBEntity
     const encryptedPostcode = "encryptedPostcode";
     const staffAppraiserFlag = 'staffAppraiserFlag';
     const passwordLevel = 'passwordLevel';
+    const changeSRContractsFlag = 'changeSRContractsFlag';
 
     /**
      * calls constructor()
@@ -338,6 +339,12 @@ class DBEUser extends DBEntity
         $this->addColumn(
             self::passwordLevel,
             DA_INTEGER,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::changeSRContractsFlag,
+            DA_YN,
             DA_NOT_NULL
         );
 
