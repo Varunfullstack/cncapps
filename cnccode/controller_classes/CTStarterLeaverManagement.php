@@ -38,7 +38,11 @@ class CTStarterLeaverManagement extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+
+        if ($this->dbeUser->getValue(DBEUser::starterLeaverQuestionManagementFlag) != 'Y') {
+            $this->displayFatalError('You do not have the permissions required for the requested operation');
+        }
+
 
         switch ($_REQUEST['action']) {
             case 'addQuestion':
