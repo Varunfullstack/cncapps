@@ -107,7 +107,7 @@ class DBEJPassword extends DBEPassword
 
         $passwordLevelQuery = "";
         if (isset($passwordLevel)) {
-            $passwordLevelQuery = " and " . $this->getDBColumnName(self::level) . " >= " . $passwordLevel;
+            $passwordLevelQuery = " and " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel;
         }
 
         $query .= $passwordLevelQuery;
