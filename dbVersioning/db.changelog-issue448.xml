@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1548845244-0">
+        <tagDatabase tag="issue448"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_standardtexttypeno = 5
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into standardtexttype values (5,"Sales Request", null)
+        </sql>
+        <rollback>
+            delete from standardtexttype where sty_standardtexttypeno = 5
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-2">
+        <preConditions>
+            <not>
+                <columnExists tableName="standardtext" columnName="salesRequestEmail"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="saleRequestStandardText">
+            <column name="salesRequestEmail" type="varchar(100)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="standardtext" columnName="salesRequestEmail"/>
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_standardtexttypeno = 5
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            insert into standardtext values ((select nextid from db_sequence where seq_name = "standardtext"),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5)
+            update db_sequence
+        ]]>
+        </sql>
+    </changeSet>
+</databaseChangeLog>

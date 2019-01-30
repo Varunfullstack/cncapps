@@ -664,6 +664,11 @@ define(
 );
 
 define(
+    'CONFIG_STANDARD_TEXT_TYPE_SALES_REQUEST',
+    5
+);
+
+define(
     'CONFIG_DEFAULT_MEETING_USERID',
     44
 ); // for use on the client information form (Graham)
