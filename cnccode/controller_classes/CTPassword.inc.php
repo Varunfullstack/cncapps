@@ -185,7 +185,7 @@ class CTPassword extends CTCNC
                 $this->dbeUser->getValue(DBEUser::passwordLevel)
             );
         }
-        var_dump($dsPassword->queryString);
+
         if (!$showArchived) {
 
             $urlAdd =
