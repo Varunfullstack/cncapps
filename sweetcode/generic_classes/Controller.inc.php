@@ -175,10 +175,6 @@ class Controller extends BaseObject
         $this->createTemplate();
         $this->requestMethod = $requestMethod;
         $this->setFormErrorOff();
-
-        global $db;
-
-        $db->query("insert into ")
     }
 
     public static function dateToISO($getValue)
@@ -541,6 +537,7 @@ class Controller extends BaseObject
     )
     {
 
+
         // We always include the page or report template
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
@@ -585,7 +582,12 @@ class Controller extends BaseObject
             $this->getPageTitle()
         );
 
+        global $owa;
 
+        $tag = $owa->placeHelperPageTags(false);
+        $this->template->setVar(
+            ['owa' => $tag]
+        );
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var(
                 "environmentTag",
