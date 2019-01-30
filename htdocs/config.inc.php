@@ -82,6 +82,21 @@ define(
     'c:\\keys\\user-private.pub'
 );
 
+define(
+    'PASSWORD_ENCRYPTION_PRIVATE_KEY',
+    'c:\\keys\\passwordPrivate.pem'
+);
+
+define(
+    'PASSWORD_ENCRYPTION_PUBLIC_KEY',
+    'c:\\keys\\passwordPublic.pub'
+);
+
+define(
+    'PASSWORD_PASSPHRASE',
+    "adductor scincoid glue aviation sought beaker"
+);
+
 
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;

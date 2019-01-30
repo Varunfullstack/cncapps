@@ -391,6 +391,28 @@ class CTUser extends CTCNC
         $this->setTemplateFiles(
             array('UserEdit' => 'UserEdit.inc')
         );
+
+        $this->template->set_block(
+            'UserEdit',
+            'levelBlock',
+            'levels'
+        );
+        foreach ([0, 1, 2, 3, 4] as $level) {
+
+            $this->template->set_var(
+                array(
+                    'level'         => $level,
+                    'levelSelected' => $dsUser->getValue(DBEUser::passwordLevel) == $level ? 'selected' : ''
+                )
+            );
+            $this->template->parse(
+                'levels',
+                'levelBlock',
+                true
+            );
+        }
+
+
         $this->template->setVar(
             array(
                 'userID'                               => $dsUser->getValue('userID'),

@@ -28,22 +28,57 @@ class BUPassword extends Business
     function updatePassword(&$dsData)
     {
         $this->setMethodName('updatePassword');
-        $this->updateDataAccessObject($dsData, $this->dbePassword);
+        $this->updateDataAccessObject(
+            $dsData,
+            $this->dbePassword
+        );
 
         return TRUE;
     }
 
-    function getPasswordByID($ID, &$dsResults)
+    function getPasswordByID($ID,
+                             &$dsResults
+    )
     {
         $this->dbePassword->getRow($ID);
-        return ($this->getData($this->dbePassword, $dsResults));
+        return ($this->getData(
+            $this->dbePassword,
+            $dsResults
+        ));
     }
 
-    function getRowsByCustomerID($customerID, &$dsResults, $orderBy = false)
+    function getRowsByCustomerIDAndPasswordLevel($customerID,
+                                                 $passwordLevel,
+                                                 &$dsResults,
+                                                 $orderBy = false
+    )
     {
-        $this->dbePassword->setValue('customerID', $customerID);
-        $this->dbePassword->getRowsByColumn('customerID', 'service');
-        return ($this->getData($this->dbePassword, $dsResults));
+        $this->dbePassword->getRowsByCustomerIDAndPasswordLevel(
+            $customerID,
+            $passwordLevel
+        );
+        return ($this->getData(
+            $this->dbePassword,
+            $dsResults
+        ));
+    }
+
+    function archive($passwordID,
+                     DBEUser $archivingUser
+    )
+    {
+        $passwordItem = new DBEPassword($this);
+
+        $passwordItem->getRow($passwordID);
+        $passwordItem->setValue(
+            DBEPassword::archivedAt,
+            (new DateTime())->format(COMMON_MYSQL_DATETIME)
+        );
+        $passwordItem->setValue(
+            DBEPassword::archivedBy,
+            $archivingUser->getValue(DBEUser::name)
+        );
+        $passwordItem->updateRow();
     }
 
     function delete($passwordID)
@@ -65,8 +100,66 @@ class BUPassword extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');
+        $dsData->addColumn(
+            'customerID',
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $dsData->setValue(
+            'customerID',
+            ''
+        );
+    }
+
+    public function getArchivedRowsByPasswordLevel($passwordLevel,
+                                                   $dsResults
+    )
+    {
+        $this->dbePassword->getArchivedRowsByPasswordLevel(
+            $passwordLevel
+        );
+        return ($this->getData(
+            $this->dbePassword,
+            $dsResults
+        ));
+    }
+
+    public function decrypt($data)
+    {
+        if (!$data) {
+            return null;
+        }
+
+        return \CNCLTD\Encryption::decrypt(
+            PASSWORD_ENCRYPTION_PRIVATE_KEY,
+            PASSWORD_PASSPHRASE,
+            $data
+        );
+    }
+
+    public function encrypt($data)
+    {
+        if (!$data) {
+            return null;
+        }
+
+        return \CNCLTD\Encryption::encrypt(
+            PASSWORD_ENCRYPTION_PUBLIC_KEY,
+            $data
+        );
+    }
+
+    public function getArchivedRowsByCustomer($customerID,
+                                              $dsResults
+    )
+    {
+        $this->dbePassword->getArchivedRowsByCustomerID(
+            $customerID
+        );
+        return ($this->getData(
+            $this->dbePassword,
+            $dsResults
+        ));
     }
 
 } // End of class

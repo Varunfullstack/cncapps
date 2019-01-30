@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 137 - CNC029 - Password archiving & security
+
 ## [v1.16.1] - 2019-01-29
 ### Fixed
 - Search SRs take you to the Sales Order, not Service Request
