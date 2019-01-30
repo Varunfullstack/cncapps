@@ -88,7 +88,7 @@ class CTPassword extends CTCNC
                 $this->setFormErrorOn();
             } else {
                 $customerID = $dsSearchForm->getValue(DBEPassword::customerID);
-                $report = $this->displayList($customerID);
+                header("Location: Password.php?action=list&customerID=$customerID");
                 exit;
             }
 
