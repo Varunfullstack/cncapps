@@ -103,7 +103,8 @@ class DBEPassword extends DBEntity
     }
 
     public function getRowsByCustomerIDAndPasswordLevel($customerID,
-                                                        $passwordLevel
+                                                        $passwordLevel,
+                                                        $archived = false
     )
     {
         $this->setMethodName('getRowsByCustomerIDAndPasswordLevel');
