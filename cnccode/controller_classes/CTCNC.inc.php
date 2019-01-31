@@ -418,6 +418,21 @@ class CTCNC extends Controller
                 );
             }
 
+            if ($this->dbeUser->getValue(DBEUser::starterLeaverQuestionManagementFlag) == 'Y') {
+
+                $this->template->setVar(
+                    'starterLeaverMenu',
+                    '<TR>
+    <TD align="left"
+        nowrap="nowrap"
+    >
+        <A href="StarterLeaverManagement.php"
+        >Starter Leaver Management</a>
+    </TD>
+</TR>'
+                );
+            }
+
             $this->template->parse(
                 'screenTechnical',
                 'ScreenTechnical',
@@ -437,24 +452,24 @@ class CTCNC extends Controller
             $this->setTemplateFiles(array('ScreenMaintenance' => $screenMaintenanceTemplate));
             if ($this->isAppraiser()) {
 
-                    $sdManagerTechnical = new Template (
-                        $GLOBALS ["cfg"] ["path_templates"],
-                        "remove"
-                    );
-                    $sdManagerTechnical->set_file(
-                        'appraisalScreen',
-                        'ScreenMaintenanceAppraiser.inc.html'
-                    );
-                    $sdManagerTechnical->parse(
-                        'output',
-                        'appraisalScreen'
-                    );
-                    $sdManagerTemplateText = $sdManagerTechnical->get('output');
+                $sdManagerTechnical = new Template (
+                    $GLOBALS ["cfg"] ["path_templates"],
+                    "remove"
+                );
+                $sdManagerTechnical->set_file(
+                    'appraisalScreen',
+                    'ScreenMaintenanceAppraiser.inc.html'
+                );
+                $sdManagerTechnical->parse(
+                    'output',
+                    'appraisalScreen'
+                );
+                $sdManagerTemplateText = $sdManagerTechnical->get('output');
 
-                    $this->template->setVar(
-                        'appraiserScreen',
-                        $sdManagerTemplateText
-                    );
+                $this->template->setVar(
+                    'appraiserScreen',
+                    $sdManagerTemplateText
+                );
 
             }
             $this->template->parse(

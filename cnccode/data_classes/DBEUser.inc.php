@@ -61,6 +61,7 @@ class DBEUser extends DBEntity
     const staffAppraiserFlag = 'staffAppraiserFlag';
     const passwordLevel = 'passwordLevel';
     const changeSRContractsFlag = 'changeSRContractsFlag';
+    const starterLeaverQuestionManagementFlag = 'starterLeaverQuestionManagementFlag';
 
     /**
      * calls constructor()
@@ -344,6 +345,12 @@ class DBEUser extends DBEntity
 
         $this->addColumn(
             self::changeSRContractsFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::starterLeaverQuestionManagementFlag,
             DA_YN,
             DA_NOT_NULL
         );

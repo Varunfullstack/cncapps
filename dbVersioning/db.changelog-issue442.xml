@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1548407236-0">
+        <tagDatabase tag="issue442"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548407236-1">
+        <preConditions>
+            <not>
+                <columnExists tableName="consultant" columnName="starterLeaverQuestionManagementFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="starterLeaverQuestionManagementFlag" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548407236-2">
+        <preConditions>
+            <not>
+                <tableExists tableName="starterLeaverQuestion"/>
+            </not>
+        </preConditions>
+        <createTable tableName="starterLeaverQuestion">
+            <column name="questionID" type="int(11)"/>
+            <column name="customerID" type="int(11)"/>
+            <column name="formType" type="char(7)" defaultValue="starter"/>
+            <column name="name" type="varchar(50)"/>
+            <column name="type" type="varchar(5)"/>
+            <column name="label" type="varchar(255)"/>
+            <column name="options" type="varchar(255)"/>
+            <column name="multi" type="tinyint(1)" defaultValue="0"/>
+            <column name="required" type="tinyint(1)" defaultValue="0"/>
+            <column name="sortOrder" type="int(8)" defaultValue="0"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

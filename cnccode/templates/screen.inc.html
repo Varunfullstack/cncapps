@@ -13,6 +13,7 @@
           rel="stylesheet"
           type="text/css"
     >
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.4/webcomponents-loader.js"></script>
     <script src="/moment/moment.min.js"></script>
     <script src=".javascript/jquery-3.3.1.min.js"></script>
     <script src=".javascript/jquery-ui-1.12.1/jquery-ui.min.js"></script>
@@ -444,7 +445,7 @@
         function popup(mylink, windowname) {
             if (!window.focus) return true;
             var href;
-            if (typeof(mylink) == 'string')
+            if (typeof (mylink) == 'string')
                 href = mylink;
             else
                 href = mylink.href;
