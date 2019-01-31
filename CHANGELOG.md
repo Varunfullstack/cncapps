@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v2.0.0] - 2019-01-31
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS
 - Issue 358 - Review automatic email creation process so that it's compatible with the new contacts in 215
