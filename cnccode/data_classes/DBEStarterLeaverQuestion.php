@@ -221,7 +221,8 @@ SET sortOrder =
     }
 
     public function getRowsByCustomerID($customerID,
-                                        $sortColumn = ''
+                                        $sortColumn = '',
+                                        $formType = null
     )
     {
         $queryString =
@@ -235,6 +236,11 @@ SET sortOrder =
         $queryString .= " where " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
 
         $sortColumnNo = ($this->columnExists($sortColumn));
+
+        if ($formType) {
+            $queryString .= " and " . $this->getDBColumnName(self::formType) . " = '" . $formType . "'";
+        }
+
         if ($sortColumnNo == DA_OUT_OF_RANGE) {
             $this->raiseError($sortColumn . ' ' . DA_MSG_COLUMN_DOES_NOT_EXIST);
         } else {

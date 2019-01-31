@@ -275,8 +275,15 @@ class CTStarterLeaverManagement extends CTCNC
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
 
-
-        $this->setPageTitle('Questions List: ' . $dbeCustomer->getValue(DBECustomer::name));
+        $type = null;
+        if (isset($_REQUEST['type'])) {
+            $type = $_REQUEST['type'];
+        }
+        $this->setPageTitle(
+            'Questions List: ' . $dbeCustomer->getValue(DBECustomer::name) . ($type ? " (" . ucwords(
+                    $type
+                ) . " Questions )" : '')
+        );
         $this->setTemplateFiles(
             [
                 'StarterLeaverCustomerQuestionsList' => 'StarterLeaverCustomerQuestionsList'
@@ -285,10 +292,6 @@ class CTStarterLeaverManagement extends CTCNC
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
-        $type = null;
-        if (isset($_REQUEST['type'])) {
-            $type = $_REQUEST['type'];
-        }
 
         $this->template->setBlock(
             "StarterLeaverCustomerQuestionsList",
@@ -296,7 +299,11 @@ class CTStarterLeaverManagement extends CTCNC
             "questions"
         );
 
-        $dbeStarterLeaverQuestion->getRowsByCustomerID($customerID);
+        $dbeStarterLeaverQuestion->getRowsByCustomerID(
+            $customerID,
+            null,
+            $type
+        );
 
         while ($dbeStarterLeaverQuestion->fetchNext()) {
 
