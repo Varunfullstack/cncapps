@@ -64,7 +64,7 @@ $query =
       LEFT JOIN address 
         ON address.`add_custno` = con_custno 
         AND address.`add_siteno` = con_siteno 
-    WHERE contact.`con_mailflag5` = 'Y' 
+    WHERE (supportLevel = 'support' or supportLevel = 'main')
       AND address.`add_active_flag` = 'Y'
       AND address.add_non_uk_flag = 'Y'";
 

@@ -1,6 +1,17 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+- Issue 358 - Review automatic email creation process so that it's compatible with the new contacts in 215
+- Issue 408 - Contact Validation Improvements
+### Fixed
+- Issue 352 - CNCWEB contacts bugs
+### Added
+- Issue 347 - Customer Review Management documents
+- Issue 345 - Creation of Primary Main Contact 
+
 ## [v1.16.1] - 2019-01-29
 ### Fixed
 - Search SRs take you to the Sales Order, not Service Request

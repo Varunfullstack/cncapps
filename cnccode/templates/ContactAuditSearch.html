@@ -39,8 +39,7 @@
                     '&parentDescField=customerString',
                     'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
             }
-        }
-        else {
+        } else {
             document.form.customerID.value = "";
         }
     }
@@ -132,9 +131,6 @@
                     data: "sendMailshotFlag"
                 },
                 {
-                    data: "mailshot1Flag"
-                },
-                {
                     data: "mailshot2Flag"
                 },
                 {
@@ -144,22 +140,10 @@
                     data: "mailshot4Flag"
                 },
                 {
-                    data: "mailshot5Flag"
-                },
-                {
-                    data: "mailshot6Flag"
-                },
-                {
-                    data: "mailshot7Flag"
-                },
-                {
                     data: "mailshot8Flag"
                 },
                 {
                     data: "mailshot9Flag"
-                },
-                {
-                    data: "mailshot10Flag"
                 },
                 {
                     data: "mailshot11Flag"
@@ -170,9 +154,19 @@
                 {
                     data: "workStartedEmailFlag"
                 },
-                {
-                    data: "autoCloseEmailFlag"
-                }
+                {data: "initialLoggingEmailFlag"},
+                {data: "workUpdatesEmailFlag"},
+                {data: "fixedEmailFlag"},
+                {data: "pendingClosureEmailFlag"},
+                {data: "closureEmailFlag"},
+                {data: "othersInitialLoggingEmailFlag"},
+                {data: "othersWorkStartedEmailFlag"},
+                {data: "othersWorkUpdatesEmailFlag"},
+                {data: "othersFixedEmailFlag"},
+                {data: "othersPendingClosureEmailFlag"},
+                {data: "othersClosureEmailFlag"},
+                {data: "pendingLeaverFlag"},
+                {data: "pendingLeaverDate"}
             ]
         });
     });
@@ -320,20 +314,27 @@
         <th>Phone</th>
         <th>Mobile</th>
         <th>Mailshot</th>
-        <th>Address Book</th>
         <th>Invoice</th>
         <th>Newsletter</th>
         <th>Statement</th>
-        <th>Support</th>
-        <th>Remove</th>
-        <th>Decision Maker</th>
         <th>Top Up</th>
         <th>Reports</th>
-        <th>Main</th>
         <th>SR Reports</th>
         <th>Notes</th>
         <th>Work Started</th>
-        <th>Auto Close</th>
+        <th>initialLoggingEmailFlag</th>
+        <th>workUpdatesEmailFlag</th>
+        <th>fixedEmailFlag</th>
+        <th>pendingClosureEmailFlag</th>
+        <th>closureEmailFlag</th>
+        <th>othersInitialLoggingEmailFlag</th>
+        <th>othersWorkStartedEmailFlag</th>
+        <th>othersWorkUpdatesEmailFlag</th>
+        <th>othersFixedEmailFlag</th>
+        <th>othersPendingClosureEmailFlag</th>
+        <th>othersClosureEmailFlag</th>
+        <th>pendingLeaverFlag</th>
+        <th>pendingLeaverDate</th>
     </tr>
     </thead>
     <tbody>

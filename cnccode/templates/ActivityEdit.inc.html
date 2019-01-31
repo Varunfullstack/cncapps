@@ -10,6 +10,8 @@
 >
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script language='JavaScript'>
+
+    var authorisedByName = "{authorisedByName}";
     $(function () {
         window.alarmDate = $('#alarmDate').get(0);
 
@@ -41,6 +43,7 @@
             $('input[name="Escalate"]').show();
             $('input[name="Update"]').show();
         }
+
 
     })
     var formChanged = false;
@@ -101,6 +104,55 @@
             'scrollbars=no,resizable=no,width=300,height=100,copyhistory=no, menubar=0'
         );
 
+    }
+
+    function checkChangedContact() {
+        if (!authorisedByName) {
+            // we need to check if the contact selected is a delegate
+            const optionSelected = event.target.options[event.target.selectedIndex];
+            const $optionSelected = $(optionSelected);
+
+            const data = $optionSelected.data();
+
+            if (data.delegate) {
+
+                const object = {customerID: {customerID}};
+                $.ajax({
+                    url: '?action=authorisingContacts',
+                    method: 'POST',
+                    type: 'post',
+                    dataType: 'json',
+                    data: object
+                }).then(function (result) {
+                    const options = result.data.reduce((acc, contact) => {
+
+                        const prefix = contact.supportLevel === 'supervisor' ? '- Supervisor ' : '* ';
+
+                        const suffix = contact.supportLevel === 'supervisor' ? ' - Supervisor ' : ' *';
+
+                        acc += "<option value='" + contact.id + "'>" + prefix + contact.firstName + " " + contact.lastName + suffix + "</option>";
+                        return acc;
+                    }, '');
+
+                    const selector = "<select name='problem[{problemID}][authorisedBy]' required><option value>Select the authoriser contact</option>" + options + "</select>";
+
+                    $optionSelected.closest('tr').before('<tr id="authorisedByRow"><td class="promptText">Authorised By</td><td class="mainHeadText">' + selector + '</td></tr>');
+
+                }).catch(function () {
+
+                }).then(function () {
+
+                });
+
+
+            } else {
+                $('#authorisedByRow').remove();
+            }
+
+
+        }
+
+        changeContactNotes();
     }
 
     function changeContactNotes() {
@@ -310,7 +362,16 @@
         <tr>
             <td class="promptText">ID</td>
             <td class="mainHeadText">{customerID}_{callActivityID}</td>
-            <td></td>
+            <td
+                    class="promptText"
+            >
+                <span {authoriseHide}>Authorised By</span>
+            </td>
+            <td class="mainHeadText"
+            > <span {authoriseHide}>
+                {authorisedByName}
+            </span>
+            </td>
             <td></td>
             <td class="promptText">Type</td>
             <td class="fieldText">
@@ -334,7 +395,10 @@
         </tr>
         <tr>
             <td class="promptText">Customer</td>
-            <td class="mainHeadText">{customerName}</td>
+            <td class="mainHeadText"
+                colspan="2"
+            >{customerName}
+            </td>
             <td></td>
             <td></td>
             <td class="promptText">Value</td>
@@ -352,19 +416,17 @@
         </tr>
         <tr>
             <td class="promptText">Contact</td>
-            <td class="mainHeadText"
-                id="contactSelectorContainer"
-            >
+            <td class="mainHeadText" id="contactSelectorContainer">
                 <select name="callActivity[1][contactID]"
                         required
-                        onchange="changeContactNotes()"
-
+                        onchange="checkChangedContact()"
                 >
 
                     <option value="">Please Select</option>
                     <!-- BEGIN contactBlock -->
                     {optGroupOpen}
                     <option {contactSelected}
+                            {dataDelegate}
                             value="{contactID}"
                     >{startMainContactStyle} {contactName}
                         {endMainContactStyle}
@@ -375,7 +437,7 @@
                 <span class="contactPhone">{contactPhone}</span>
                 <span class="formErrorMessage">{contactIDMessage}</span>
             </td>
-            <td colspan="2"
+            <td colspan="3"
                 style="color: red;"
             >
                 <span id="hdRemainMinutes">HD:{hdRemainMinutes}</span>
@@ -411,7 +473,9 @@
         </tr>
         <tr>
             <td class="promptText">Site</td>
-            <td class="fieldText">
+            <td class="fieldText"
+                colspan="2"
+            >
                 <select name="callActivity[1][siteNo]"
                         required
                 >
@@ -459,21 +523,21 @@
 
         <tr>
             <td class="promptText">Priority</td>
-            <td><select
-                    {DISABLED}
-                    {PRIORITY_DISABLED}
-                    id="priority"
-                    name="callActivity[1][priority]"
-                    required
-            >
-                <option value="">Please Select</option>
-                <!-- BEGIN priorityBlock -->
-                <option {prioritySelected}
-                        value="{priority}"
-                >{priorityDesc}
-                </option>
-                <!-- END priorityBlock -->
-            </select>
+            <td colspan="2">
+                <select {DISABLED}
+                        {PRIORITY_DISABLED}
+                        id="priority"
+                        name="callActivity[1][priority]"
+                        required
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN priorityBlock -->
+                    <option {prioritySelected}
+                            value="{priority}"
+                    >{priorityDesc}
+                    </option>
+                    <!-- END priorityBlock -->
+                </select>
             </td>
             <td colspan="2">
                 <input type="button"
@@ -503,7 +567,9 @@
 
         <tr>
             <td class="promptText">Contract</td>
-            <td class="mainHeadText">
+            <td class="mainHeadText"
+                colspan="2"
+            >
                 <select
                         {CONTRACT_DISABLED}
                         name="callActivity[1][contractCustomerItemID]"
@@ -551,7 +617,9 @@
 
         <tr>
             <td class="promptText">Contact Notes</td>
-            <td class="contactNotes">
+            <td class="contactNotes"
+                colspan="2"
+            >
                 <input
                         type="text"
                         title="Contact Notes"
@@ -588,7 +656,9 @@
         </tr>
         <tr>
             <td class="promptText">Customer Notes</td>
-            <td class="contactNotes">
+            <td class="contactNotes"
+                colspan="2"
+            >
                 <input type="text"
                        title="Customer Notes"
                        name="callActivity[1][techNotes]"

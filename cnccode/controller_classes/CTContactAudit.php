@@ -152,11 +152,14 @@ class CTContactAudit extends CTCNC
 
         $result = [];
 
+        $constants = DBEJContactAudit::getConstants();
+
         while ($test->fetchNext()) {
-            $row = [];
-            foreach (DBEJContactAudit::getConstants() as $constant) {
-                $row[$constant] = $test->getValue($constant);
-            }
+            $row = $test->getRowAsAssocArray();
+//            $row = [];
+//            foreach ($constants as $constant) {
+//                $row[$constant] = $test->getValue($constant);
+//            }
             $result[] = $row;
         }
 

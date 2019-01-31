@@ -1,0 +1,9 @@
+{
+    "methodCalls": [
+        {
+            "class": "DB_Sql",
+            "method": "nextObjectRecord",
+            "position": 0
+        }
+    ]
+}
