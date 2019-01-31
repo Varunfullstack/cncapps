@@ -36,10 +36,11 @@
                 SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_standardtexttypeno = 5
             </sqlCheck>
         </preConditions>
-        <sql>
+        <sql splitStatements="true">
             <![CDATA[
-            insert into standardtext values ((select nextid from db_sequence where seq_name = "standardtext"),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5)
-            update db_sequence
+            insert into standardtext values ((select nextid from db_sequence where seq_name = "standardtext"),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5);
+            insert into standardtext values ((select nextid + 1 from db_sequence where seq_name = "standardtext"),2,"Other Request","<table><tbody><tr><td>Reason for request</td><td></td></tr><tr><td>Software/hardware required</td><td></td></tr><tr><td>Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5);
+            update db_sequence set nextid = nextid + 2 where seq_name = "standardtext";
         ]]>
         </sql>
     </changeSet>
