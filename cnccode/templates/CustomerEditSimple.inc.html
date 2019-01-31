@@ -918,7 +918,6 @@
         function onBeforeValidation(value, lang, config) {
 
             if (window.isSubmitting) {
-                debugger;
                 // do stuff
                 $(this).data('validation-skipped', 1);
             }
@@ -1417,7 +1416,6 @@
         // check that the selected primaryMainContact is in fact also a "main"
         const primaryMainContactSelector = $('#primaryMainContactSelector');
         const value = $('#primaryMainContactSelector').val();
-        debugger;
 
         const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
         if (!value) {
@@ -2789,33 +2787,34 @@
                 </thead>
                 <tbody>
                 <!-- BEGIN contactBlock -->
-                <input type="hidden"
-                       name="form[contact][{contactID}][contactID]"
-                       value="{contactID}"
-                >
-                <input type="hidden"
-                       name="form[contact][{contactID}][customerID]"
-                       value="{customerID}"
-                >
-                <input type="hidden"
-                       name="form[contact][{contactID}][supplierID]"
-                       value="{supplierID}"
-                >
-                <input type="hidden"
-                       name="form[contact][{contactID}][fax]"
-                       value="{fax}"
-                >
-                <input type="hidden"
-                       name="form[contact][{contactID}][discontinuedFlag]"
-                       value="{discontinuedFlag}"
-                >
-                <input type="hidden"
-                       name="form[contact][{contactID}][mobilePhone]"
-                       value="{mobilePhone}"
-                >
+
 
                 <tr>
                     <td>
+                        <input type="hidden"
+                               name="form[contact][{contactID}][contactID]"
+                               value="{contactID}"
+                        >
+                        <input type="hidden"
+                               name="form[contact][{contactID}][customerID]"
+                               value="{customerID}"
+                        >
+                        <input type="hidden"
+                               name="form[contact][{contactID}][supplierID]"
+                               value="{supplierID}"
+                        >
+                        <input type="hidden"
+                               name="form[contact][{contactID}][fax]"
+                               value="{fax}"
+                        >
+                        <input type="hidden"
+                               name="form[contact][{contactID}][discontinuedFlag]"
+                               value="{discontinuedFlag}"
+                        >
+                        <input type="hidden"
+                               name="form[contact][{contactID}][mobilePhone]"
+                               value="{mobilePhone}"
+                        >
                         <div class="contactClear">
                             <button type="button"
                                     onclick="clearRow({contactID})"

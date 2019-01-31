@@ -725,6 +725,55 @@ class BUCustomer extends Business
             DBEContact::mailshot11Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef)
         );
+        $dsContact->setValue(
+            DBEContact::initialLoggingEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::workStartedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::workUpdatesEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::fixedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::pendingClosureEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::closureEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersInitialLoggingEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersWorkStartedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersWorkUpdatesEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersFixedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersPendingClosureEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersClosureEmailFlag,
+            'Y'
+        );
+
         $dsContact->post();
         $this->updateModify($dsContact->getValue(DBEContact::customerID));
         return TRUE;
@@ -1701,6 +1750,7 @@ class BUCustomer extends Business
         $dbeContact->getRow($primaryMainContactID);
         return $dbeContact;
     }
+
     public function getActiveCustomers(DataSet $dsCustomers)
     {
         $this->dbeCustomer->getActiveCustomers();
