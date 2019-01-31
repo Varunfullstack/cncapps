@@ -12,6 +12,13 @@
 
         const type = {type};
 
+        function deleteQuestion() {
+            if (!confirm('are you sure you want to delete this question?')) {
+                return;
+            }
+
+            window.location = "?action=deleteQuestion&questionID=" + {questionID} + "&customerID=" + customerID + (type ? "&type=" + type : '');
+        }
 
         let optionElm, optionsStringElm, optionsHolder, multipleChoice, questionOptions, addButton,
             questionTypeSelector;
@@ -24,15 +31,16 @@
             multipleChoice = mainElement.querySelector('.questionMultipleChoice');
             questionOptions = mainElement.querySelector('.questionOptions');
             addButton = mainElement.querySelector('.addButton');
+            const deleteButton = mainElement.querySelector('.deleteButton');
             questionTypeSelector = mainElement.querySelector('.questionTypeSelector');
 
             addButton.addEventListener('click', checkAddOption);
             questionTypeSelector.addEventListener('change', onQuestionTypeSelectoChange);
-
+            deleteButton.addEventListener('click', deleteQuestion);
 
             if (toUpdateJSON) {
                 const toUpdate = JSON.parse(toUpdateJSON);
-
+                deleteButton.hidden = false;
                 mainElement.querySelector('[name="question[formType]"]').value = toUpdate.formType;
                 if (type) {
                     mainElement.querySelector('.formTypeRow').hidden = true;
@@ -91,7 +99,7 @@
                 removeButton.addEventListener('click', testRemoveOptions(count));
                 removeButton.innerHTML = '<i class="fa fa-trash"></i>';
                 div.appendChild(removeButton);
-                div.innerHTML += ' ' +option;
+                div.innerHTML += ' ' + option;
 
                 optionsHolder.appendChild(div);
                 return acc;
@@ -246,5 +254,9 @@
         </table>
 
         <button>{addOrEdit} Question</button>
+        <button type="button"
+                class="deleteButton"
+                hidden
+        ><i class="fa fa-trash"></i></button>
     </form>
 </div>

@@ -1,25 +1,12 @@
 <script>
     const customerID = {customerID};
-
-    function deleteQuestion(questionID) {
-        if (!confirm('are you sure you want to delete this question?')) {
-            return;
-        }
-
-        window.location = "?action=deleteQuestion&questionID=" + questionID + "&customerID=" + customerID;
-    }
 </script>
 <div>
     List of questions
     <ul>
         <!-- BEGIN questionsBlock -->
         <li>
-
             {question}
-            <button type="button"
-                    onclick="deleteQuestion({questionID})"
-            >X
-            </button>
         </li>
         <!-- END questionsBlock -->
     </ul>

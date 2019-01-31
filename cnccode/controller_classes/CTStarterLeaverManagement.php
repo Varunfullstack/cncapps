@@ -59,13 +59,25 @@ class CTStarterLeaverManagement extends CTCNC
                 $this->displayCustomerQuestions();
                 break;
             case 'deleteQuestion':
+
+
+
                 try {
                     $this->deleteQuestion();
                 } catch (\Exception $exception) {
                     $this->formErrorMessage = $exception->getMessage();
                     $this->formError = true;
                 }
-                $this->displayCustomerQuestions();
+                $customerID = $_REQUEST['customerID'];
+
+                $type = null;
+                if (isset($_REQUEST['type'])) {
+                    $type = $_REQUEST['type'];
+                }
+
+                header(
+                    'Location: StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=' . $customerID . ($type ? "&type=" . $type : '')
+                );
                 break;
             case 'updateQuestion':
                 $this->updateQuestion();
