@@ -210,7 +210,7 @@ SET sortOrder =
     public function getCustomers()
     {
         $this->db->query(
-            "SELECT customerID, customer.cus_name as customerName FROM starterLeaverQuestion LEFT JOIN customer ON starterLeaverQuestion.customerID = customer.`cus_custno` GROUP BY customerID"
+            "SELECT customerID, customer.cus_name as customerName, sum(starterLeaverQuestion.formType = 'leaver') as leavers, sum(starterLeaverQuestion.formType = 'starter') as starters FROM starterLeaverQuestion LEFT JOIN customer ON starterLeaverQuestion.customerID = customer.`cus_custno` GROUP BY customerID"
         );
         $customers = [];
 

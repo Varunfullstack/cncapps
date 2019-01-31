@@ -69,8 +69,16 @@ class CTStarterLeaverManagement extends CTCNC
                 break;
             case 'updateQuestion':
                 $this->updateQuestion();
+                $customerID = $_REQUEST['customerID'];
+                $type = null;
+                if (isset($_REQUEST['type'])) {
+                    $type = $_REQUEST['type'];
+                }
 
-                $this->displayCustomerQuestions();
+                header(
+                    'Location: StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=' . $customerID . ($type ? "&type=" . $type : '')
+                );
+                exit;
                 break;
             case CTSTANDARDTEXT_ACT_DISPLAY_LIST:
             default:
@@ -109,7 +117,9 @@ class CTStarterLeaverManagement extends CTCNC
         foreach ($customers as $customer) {
             $this->template->setVar(
                 [
-                    "customerLink" => "<a href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "'>" . $customer['customerName'] . "</a>"
+                    "customerName" => $customer['customerName'],
+                    "starterLink"  => $customer['starters'] ? "<a  href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "&type=starter'>Starter Questions</a>" : '',
+                    "leaverLink"   => $customer['leavers'] ? "<a  href='StarterLeaverManagement.php?action=displayCustomerQuestions&customerID=" . $customer['customerID'] . "&type=leaver'>Leaver Questions</a>" : '',
                 ]
             );
 

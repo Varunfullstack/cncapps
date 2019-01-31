@@ -36,6 +36,11 @@
                 mainElement.querySelector('[name="question[formType]"]').value = toUpdate.formType;
                 if (type) {
                     mainElement.querySelector('.formTypeRow').hidden = true;
+                    const element = document.createElement('input');
+                    element.type = 'hidden';
+                    element.name = 'type';
+                    element.value = type;
+                    mainElement.querySelector('form').appendChild(element)
                 }
                 mainElement.querySelector('[name="question[name]"]').value = toUpdate.name;
                 mainElement.querySelector('[name="question[type]"]').value = toUpdate.type;
@@ -81,12 +86,12 @@
             optionsHolder.innerHTML = "";
             options.reduce((acc, option, count) => {
                 const div = document.createElement('div');
-                div.innerHTML = option;
                 const removeButton = document.createElement('button');
                 removeButton.type = 'button';
                 removeButton.addEventListener('click', testRemoveOptions(count));
-                removeButton.innerText = 'X';
+                removeButton.innerHTML = '<i class="fa fa-trash"></i>';
                 div.appendChild(removeButton);
+                div.innerHTML += ' ' +option;
 
                 optionsHolder.appendChild(div);
                 return acc;
