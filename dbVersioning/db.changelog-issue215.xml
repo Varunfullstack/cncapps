@@ -20,9 +20,31 @@
             <columnExists tableName="contact" columnName="supportLevel"/>
         </preConditions>
         <sql splitStatements="true">
+            <![CDATA[
+
             UPDATE contact SET supportLevel = IF(con_mailflag10 = 'Y', 'main', IF(con_mailflag5 = 'Y', 'support',
             NULL));
             update contact set con_mailflag11 = IF(con_mailflag10 = 'Y', 'Y', con_mailflag11);
+            UPDATE contact    SET
+            con_accounts_flag = 'Y'
+            WHERE contact.`con_custno` IN
+            (SELECT
+            cus_custno
+            FROM
+            (SELECT
+            (SELECT
+            COUNT(*)
+            FROM
+            contact
+            WHERE contact.`con_accounts_flag` = 'Y'
+            AND contact.`con_custno` = customer.`cus_custno`) AS accountsContacts,
+            customer.`cus_custno`
+            FROM
+            customer
+            WHERE customer.`cus_referred` <> 'Y') testAccountsContacts
+            WHERE accountsContacts = 0)
+            AND con_mailflag4 = 'Y';
+            ]]>
         </sql>
         <rollback>
             update contact set con_mailflag10 = if(supportLevel = 'main', 'Y','N'), con_mailflag5 = if(supportLevel =
