@@ -824,6 +824,12 @@
 
     $(function () {
 
+        $(".contactSupportLevel select").change(function () {
+
+            $('.contactSupportLevel select')
+            $('#primaryMainContactSelector')
+        });
+
         $("#contactsTable tbody tr").click(function () {
             var selected = $(this).hasClass("highlight");
             $("#contactsTable tbody tr").removeClass("highlight");
@@ -917,7 +923,6 @@
                 $(this).data('validation-skipped', 1);
             }
         }
-
 
 
         function onValidation(evt, valid) {
@@ -1410,22 +1415,45 @@
         // }
 
         // check that the selected primaryMainContact is in fact also a "main"
-
+        const primaryMainContactSelector = $('#primaryMainContactSelector');
         const value = $('#primaryMainContactSelector').val();
+        debugger;
+
         const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
-
-        let foundMain = false;
-
-        mainContactsSelect.each(function () {
-            const foundMatch = $(this).attr('name').match(/\d+/);
-            if (foundMatch && foundMatch[0] == value) {
-                foundMain = true;
+        if (!value) {
+            if (!mainContactsSelect.length) {
+                alert('Please set at least one Main contact, and it will be set as the Primary Main');
+                return false;
             }
-        });
+            const matches = $(mainContactsSelect[0]).attr('name').match(/\d+/);
+            if (!matches || !matches.length) {
+                alert('Please set at least one Main contact, and it will be set as the Primary Main');
+                return false;
+            }
 
-        if (!foundMain) {
-            alert("The Primary Main contact is no longer flagged as Main, please flag it back or pick another Main Contact as Primary");
-            return false;
+            //we need to make sure there's an option for this
+            if (!primaryMainContactSelector.find('option[value="' + matches[0] + '"]').length) {
+                primaryMainContactSelector.html('<option value="' + matches[0] + '"></option>');
+            }
+
+
+            $('#primaryMainContactSelector').val(matches[0]);
+
+
+        } else {
+            let foundMain = false;
+
+            mainContactsSelect.each(function () {
+                const foundMatch = $(this).attr('name').match(/\d+/);
+                if (foundMatch && foundMatch[0] == value) {
+                    foundMain = true;
+                }
+            });
+
+            if (!foundMain) {
+                alert("The Primary Main contact is no longer flagged as Main, please flag it back or pick another Main Contact as Primary");
+                return false;
+            }
         }
 
 
