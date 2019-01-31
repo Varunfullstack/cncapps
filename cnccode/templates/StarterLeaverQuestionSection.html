@@ -3,8 +3,14 @@
 ></script>
 <script>
     (function () {
+        debugger;
+        const toUpdateBase64 = {toUpdate};
+        let toUpdateJSON = null;
+        if (toUpdateBase64) {
+            toUpdateJSON = atob(toUpdateBase64);
+        }
 
-        const toUpdateJSON = '{toUpdate}';
+        const type = {type};
 
 
         let optionElm, optionsStringElm, optionsHolder, multipleChoice, questionOptions, addButton,
@@ -23,9 +29,14 @@
             addButton.addEventListener('click', checkAddOption);
             questionTypeSelector.addEventListener('change', onQuestionTypeSelectoChange);
 
+
             if (toUpdateJSON) {
                 const toUpdate = JSON.parse(toUpdateJSON);
+                debugger;
                 mainElement.querySelector('[name="question[formType]"]').value = toUpdate.formType;
+                if (type) {
+                    mainElement.querySelector('.formTypeRow').hidden = true;
+                }
                 mainElement.querySelector('[name="question[name]"]').value = toUpdate.name;
                 mainElement.querySelector('[name="question[type]"]').value = toUpdate.type;
                 changeQuestionType(toUpdate.type);
@@ -127,11 +138,10 @@
             <tr {hideOnEdit}>
                 <td class="promptText">Customer</td>
                 <td class="fieldText">
-                    <input
-                            type="hidden"
-                            name="question[customerID]"
-                            id="customerID"
-                            value="{customerID}"
+                    <input type="hidden"
+                           name="question[customerID]"
+                           id="customerID"
+                           value="{customerID}"
                     >
                     <input type="text"
                            id="customerString"
@@ -143,7 +153,7 @@
                     >
                 </td>
             </tr>
-            <tr>
+            <tr class="formTypeRow">
                 <td class="promptText">Starter/Leaver</td>
                 <td class="fieldText">
                     <select required

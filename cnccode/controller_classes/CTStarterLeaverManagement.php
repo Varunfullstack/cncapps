@@ -265,10 +265,12 @@ class CTStarterLeaverManagement extends CTCNC
     private function displayCustomerQuestions()
     {
         $this->setMethodName('displayCustomerQuestions');
+
         if (!isset($_REQUEST['customerID']) || !$_REQUEST['customerID']) {
             throw new Exception('Customer ID is missing');
         }
         $customerID = $_REQUEST['customerID'];
+
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
@@ -283,6 +285,10 @@ class CTStarterLeaverManagement extends CTCNC
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
+        $type = null;
+        if (isset($_REQUEST['type'])) {
+            $type = $_REQUEST['type'];
+        }
 
         $this->template->setBlock(
             "StarterLeaverCustomerQuestionsList",
@@ -337,13 +343,15 @@ class CTStarterLeaverManagement extends CTCNC
                 ]
             );
 
+
             $template->setVar(
                 [
                     "hideOnEdit" => "hidden",
                     "questionID" => $questionID,
                     'addOrEdit'  => "Update",
                     'action'     => "StarterLeaverManagement.php?action=updateQuestion&questionID=$questionID&customerID=$customerID",
-                    "toUpdate"   => $questionData
+                    "toUpdate"   => "'" . base64_encode($questionData) . "'",
+                    "type"       => $type ? '"' . $type . '"' : 'null'
                 ]
             );
 

@@ -718,7 +718,6 @@ class CTUser extends CTCNC
 
 
         if (isset($_REQUEST['user'][1]["dateOfBirth"])) {
-            var_dump('date of birth does have a value');
             if ($_REQUEST['user'][1]["dateOfBirth"]) {
                 $_REQUEST['user'][1]["encryptedDateOfBirth"] =
                     \CNCLTD\Encryption::encrypt(
