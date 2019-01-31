@@ -53,13 +53,17 @@ class CTStarterLeaverManagement extends CTCNC
                     $this->formError = true;
                     $this->displayList();
                 }
-                header('Location: StarterLeaverManagement.php');
+
+                $location = 'Location: StarterLeaverManagement.php';
+                if (isset($_REQUEST['type'])) {
+                    $location .= "?action=displayCustomerQuestions&customerID=" . $_REQUEST['question']['customerID'] . "&type=" . $_REQUEST['type'];
+                }
+                header($location);
                 break;
             case 'displayCustomerQuestions':
                 $this->displayCustomerQuestions();
                 break;
             case 'deleteQuestion':
-
 
 
                 try {
@@ -148,6 +152,8 @@ class CTStarterLeaverManagement extends CTCNC
                 "questionID" => "0",
                 "addOrEdit"  => "Add",
                 'action'     => "StarterLeaverManagement.php?action=addQuestion",
+                'toUpdate'   => 'null',
+                'type'       => 'null'
             ]
         );
 
@@ -308,12 +314,31 @@ class CTStarterLeaverManagement extends CTCNC
         );
         $this->setTemplateFiles(
             [
-                'StarterLeaverCustomerQuestionsList' => 'StarterLeaverCustomerQuestionsList'
+                'StarterLeaverCustomerQuestionsList' => 'StarterLeaverCustomerQuestionsList',
+                'StarterLeaverQuestionSection'       => 'StarterLeaverQuestionSection'
             ]
         );
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
 
+
+        $this->template->setVar(
+            [
+                "questionID" => "0",
+                "addOrEdit"  => "Add",
+                'action'     => "StarterLeaverManagement.php?action=addQuestion",
+                'toUpdate'   => 'null',
+                'type'       => $type ? "'" . $type . "'" : '',
+                'hideOnEdit' => 'hidden',
+                'customerID' => $customerID
+            ]
+        );
+
+        $this->template->parse(
+            'starterLeaverQuestionCreationSection',
+            "StarterLeaverQuestionSection",
+            true
+        );
 
         $this->template->setBlock(
             "StarterLeaverCustomerQuestionsList",

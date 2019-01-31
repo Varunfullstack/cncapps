@@ -60,6 +60,15 @@
                 redrawOptionsHolder(getOptions());
 
 
+            } else {
+                if (type) {
+                    mainElement.querySelector('.formTypeRow').hidden = true;
+                    const element = document.createElement('input');
+                    element.type = 'hidden';
+                    element.name = 'type';
+                    element.value = type;
+                    mainElement.querySelector('form').appendChild(element)
+                }
             }
 
         });
@@ -81,7 +90,6 @@
         }
 
         function checkAddOption() {
-            debugger;
             const option = optionElm.value;
             let options = getOptions();
             options.push(option);
@@ -96,24 +104,24 @@
                 const div = document.createElement('div');
                 const removeButton = document.createElement('button');
                 removeButton.type = 'button';
-                removeButton.addEventListener('click', testRemoveOptions(count));
+                removeButton.dataset.id = count;
+                removeButton.textContent = 'test';
                 removeButton.innerHTML = '<i class="fa fa-trash"></i>';
                 div.appendChild(removeButton);
-                div.innerHTML += ' ' + option;
+                const span = document.createElement('span');
+                span.innerText = ' ' + option;
+                div.appendChild(span);
 
+
+                removeButton.addEventListener('click', removeOption);
                 optionsHolder.appendChild(div);
                 return acc;
             }, '');
         }
 
-        function testRemoveOptions(value) {
-            return function () {
-                return removeOption(value);
-            };
-        }
-
-        function removeOption(idx) {
+        function removeOption() {
             const options = getOptions();
+            let idx = event.target.dataset.id;
             options.splice(idx, 1);
             storeOptions(options);
             redrawOptionsHolder(options);
