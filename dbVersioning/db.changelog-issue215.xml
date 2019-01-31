@@ -19,8 +19,10 @@
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="contact" columnName="supportLevel"/>
         </preConditions>
-        <sql>
-            UPDATE contact SET supportLevel = IF(con_mailflag10 = 'Y', 'main', IF(con_mailflag5 = 'Y', 'support', NULL))
+        <sql splitStatements="true">
+            UPDATE contact SET supportLevel = IF(con_mailflag10 = 'Y', 'main', IF(con_mailflag5 = 'Y', 'support',
+            NULL));
+            update contact set con_mailflag11 = IF(con_mailflag10 = 'Y', 'Y', con_mailflag11);
         </sql>
         <rollback>
             update contact set con_mailflag10 = if(supportLevel = 'main', 'Y','N'), con_mailflag5 = if(supportLevel =
