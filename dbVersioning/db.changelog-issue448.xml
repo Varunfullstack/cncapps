@@ -38,9 +38,10 @@
         </preConditions>
         <sql splitStatements="true">
             <![CDATA[
-            insert into standardtext values ((select nextid from db_sequence where seq_name = "standardtext"),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5);
-            insert into standardtext values ((select nextid + 1 from db_sequence where seq_name = "standardtext"),2,"Other Request","<table><tbody><tr><td>Reason for request</td><td></td></tr><tr><td>Software/hardware required</td><td></td></tr><tr><td>Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5);
+            insert into standardtext values ((select nextid from db_sequence where seq_name = "standardtext"),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5, "salesrequeststarter@cnc-ltd.co.uk");
+            insert into standardtext values ((select nextid + 1 from db_sequence where seq_name = "standardtext"),2,"Other Request","<table><tbody><tr><td>Reason for request</td><td></td></tr><tr><td>Software/hardware required</td><td></td></tr><tr><td>Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5,"salesrequestother@cnc-ltd.co.uk");
             update db_sequence set nextid = nextid + 2 where seq_name = "standardtext";
+            update standardtexttype set sty_desc = "Service Request from Sales Order" where sty_standardtexttypeno = 3;
         ]]>
         </sql>
     </changeSet>
