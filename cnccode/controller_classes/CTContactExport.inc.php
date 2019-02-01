@@ -103,11 +103,6 @@ class CTContactExport extends CTCNC
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            'mailshot1Flag',
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
             'mailshot2Flag',
             DA_YN,
             DA_ALLOW_NULL
@@ -123,32 +118,12 @@ class CTContactExport extends CTCNC
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            'mailshot5Flag',
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
-            'mailshot6Flag',
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
-            'mailshot7Flag',
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
             'mailshot8Flag',
             DA_YN,
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
             'mailshot9Flag',
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
-            'mailshot10Flag',
             DA_YN,
             DA_ALLOW_NULL
         );
@@ -368,28 +343,16 @@ class CTContactExport extends CTCNC
                 'exportEmailOnlyFlagChecked'   => Controller::htmlChecked(
                     $dsSearchForm->getValue('exportEmailOnlyFlag')
                 ),
-                'mailshot1FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot1Flag')),
                 'mailshot2FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot2Flag')),
                 'mailshot3FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot3Flag')),
                 'mailshot4FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot4Flag')),
-                'mailshot5FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot5Flag')),
-                'mailshot6FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot6Flag')),
-                'mailshot7FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot7Flag')),
                 'mailshot8FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot8Flag')),
                 'mailshot9FlagChecked'         => Controller::htmlChecked($dsSearchForm->getValue('mailshot9Flag')),
-                'mailshot10FlagChecked'        => Controller::htmlChecked($dsSearchForm->getValue('mailshot10Flag')),
-                'mailshot1FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot1FlagDesc')),
                 'mailshot2FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot2FlagDesc')),
                 'mailshot3FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot3FlagDesc')),
                 'mailshot4FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
-                'mailshot5FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot5FlagDesc')),
-                'mailshot6FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot6FlagDesc')),
-                'mailshot7FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot7FlagDesc')),
                 'mailshot8FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
                 'mailshot9FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
-                'mailshot10FlagDesc'           => Controller::htmlDisplayText(
-                    $dsHeader->getValue('mailshot10FlagDesc')
-                ),
                 'noOfPCs'                      => $dsSearchForm->getValue('noOfPCs'),
                 'noOfServers'                  => $dsSearchForm->getValue('noOfServers'),
                 'newCustomerFromDate'          => $dsSearchForm->getValue('newCustomerFromDate'),

@@ -70,9 +70,6 @@ class BUContactExport extends Business
             if ($dsSearchForm->getValue('sendMailshotFlag')) {
                 $query .= ", 'Y' AS `Mailshot`";
             }
-            if ($dsSearchForm->getValue('mailshot1Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot1FlagDesc') . "`";
-            }
             if ($dsSearchForm->getValue('mailshot2Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot2FlagDesc') . "`";
             }
@@ -82,23 +79,11 @@ class BUContactExport extends Business
             if ($dsSearchForm->getValue('mailshot4Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot4FlagDesc') . "`";
             }
-            if ($dsSearchForm->getValue('mailshot5Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot5FlagDesc') . "`";
-            }
-            if ($dsSearchForm->getValue('mailshot6Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot6FlagDesc') . "`";
-            }
-            if ($dsSearchForm->getValue('mailshot7Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot7FlagDesc') . "`";
-            }
             if ($dsSearchForm->getValue('mailshot8Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot8FlagDesc') . "`";
             }
             if ($dsSearchForm->getValue('mailshot9Flag')) {
                 $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot9FlagDesc') . "`";
-            }
-            if ($dsSearchForm->getValue('mailshot10Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot10FlagDesc') . "`";
             }
             if ($dsSearchForm->getValue('newCustomerFromDate')) {
                 $query .= ", '" . $dsSearchForm->getValue('newCustomerFromDate') . "' AS `New Customer From`";
@@ -171,9 +156,6 @@ class BUContactExport extends Business
         if ($dsSearchForm->getValue('sendMailshotFlag')) {
             $query .= " AND cus_mailshot =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot1Flag')) {
-            $query .= " AND con_mailflag1 =  'Y'";
-        }
         if ($dsSearchForm->getValue('mailshot2Flag')) {
             $query .= " AND con_mailflag2 =  'Y'";
         }
@@ -183,23 +165,14 @@ class BUContactExport extends Business
         if ($dsSearchForm->getValue('mailshot4Flag')) {
             $query .= " AND con_mailflag4 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot5Flag')) {
-            $query .= " AND con_mailflag5 =  'Y'";
-        }
-        if ($dsSearchForm->getValue('mailshot6Flag')) {
-            $query .= " AND con_mailflag6 =  'Y'";
-        }
-        if ($dsSearchForm->getValue('mailshot7Flag')) {
-            $query .= " AND con_mailflag7 =  'Y'";
-        }
         if ($dsSearchForm->getValue('mailshot8Flag')) {
             $query .= " AND con_mailflag8 =  'Y'";
         }
         if ($dsSearchForm->getValue('mailshot9Flag')) {
             $query .= " AND con_mailflag9 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot10Flag')) {
-            $query .= " AND con_mailflag10 =  'Y'";
+        if ($dsSearchForm->getValue('supportLevel')) {
+            $query .= " AND supportLevel =  'main'";
         }
         if ($dsSearchForm->getValue('broadbandRenewalFlag')) {
             $query .= " AND declinedFlag = 'N'";
@@ -279,10 +252,10 @@ class BUContactExport extends Business
             $toEmail = $row['EmailAddress'];
 
             $hdrs = array(
-                'From' => $senderEmail,
-                'To' => $toEmail,
-                'Subject' => $subject,
-                'Date' => date("r"),
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
@@ -293,9 +266,9 @@ class BUContactExport extends Business
 
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
 
             $thisBody = $buMail->mime->get($mime_params);

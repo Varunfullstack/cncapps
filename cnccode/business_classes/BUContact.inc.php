@@ -14,7 +14,8 @@ define(
 
 class BUContact extends Business
 {
-    /** @var DBEContact  */
+
+    /** @var DBEContact */
     public $dbeContact;
 
     /**
@@ -94,14 +95,17 @@ class BUContact extends Business
         $dsResults->columnSort(
             'lastName',
             'firstName'
+
         );
         return $ret;
     }
 
-    function getTechnicalMailshotContacts(&$dsResults)
+    function getAuthorisingContacts(&$dsResults,
+                                    $customerID
+    )
     {
-        $this->setMethodName('getTechnicalMailshotContacts');
-        $this->dbeContact->getTechnicalMailshotRows();
+        $this->setMethodName('getSupportContacts');
+        $this->dbeContact->getAuthorisingRows($customerID);
         $ret = ($this->getData(
             $this->dbeContact,
             $dsResults
@@ -109,6 +113,7 @@ class BUContact extends Business
         $dsResults->columnSort(
             'lastName',
             'firstName'
+
         );
         return $ret;
     }
@@ -269,10 +274,6 @@ class BUContact extends Business
             ''
         );
         $dsResults->setValue(
-            'mailshot1Flag',
-            $dsHeader->getValue('mailshot1FlagDef')
-        );
-        $dsResults->setValue(
             'mailshot2Flag',
             $dsHeader->getValue('mailshot2FlagDef')
         );
@@ -285,28 +286,12 @@ class BUContact extends Business
             $dsHeader->getValue('mailshot4FlagDef')
         );
         $dsResults->setValue(
-            'mailshot5Flag',
-            $dsHeader->getValue('mailshot5FlagDef')
-        );
-        $dsResults->setValue(
-            'mailshot6Flag',
-            $dsHeader->getValue('mailshot6FlagDef')
-        );
-        $dsResults->setValue(
-            'mailshot7Flag',
-            $dsHeader->getValue('mailshot7FlagDef')
-        );
-        $dsResults->setValue(
             'mailshot8Flag',
             $dsHeader->getValue('mailshot8FlagDef')
         );
         $dsResults->setValue(
             'mailshot9Flag',
             $dsHeader->getValue('mailshot9FlagDef')
-        );
-        $dsResults->setValue(
-            'mailshot10Flag',
-            $dsHeader->getValue('mailshot10FlagDef')
         );
         $dsResults->setValue(
             'mailshot11Flag',
@@ -335,10 +320,6 @@ class BUContact extends Business
             'N'
         );
         $dsResults->setValue(
-            'mailshot1Flag',
-            'N'
-        );
-        $dsResults->setValue(
             'mailshot2Flag',
             'N'
         );
@@ -351,27 +332,11 @@ class BUContact extends Business
             'N'
         );
         $dsResults->setValue(
-            'mailshot5Flag',
-            'N'
-        );
-        $dsResults->setValue(
-            'mailshot6Flag',
-            'N'
-        );
-        $dsResults->setValue(
-            'mailshot7Flag',
-            'N'
-        );
-        $dsResults->setValue(
             'mailshot8Flag',
             'N'
         );
         $dsResults->setValue(
             'mailshot9Flag',
-            'N'
-        );
-        $dsResults->setValue(
-            'mailshot10Flag',
             'N'
         );
         return TRUE;
@@ -392,6 +357,107 @@ class BUContact extends Business
             $dsContact,
             $this->dbeContact
         ));
+    }
+
+    public function validateContact(DataSet &$dsContact)
+    {
+        /**
+         *
+         * + First Name Required
+         * + Last Name Required
+         * + Title Required
+         * + Email optional, unique
+         * + Password at least 8 characters, at least 3 of 4 charsets ([a-z], [A-Z], [0-9], special characters)
+         * + Accounts at least one per customer, ignore if referred
+         * + Statement at least one, at most one, per customer, ignore if referred
+         * + Main at least one per customer, ignore if referred
+         * + Review at least one per customer, ignore if referred
+         * + topUp at lesat one per customer if prepay contract, ignore if referred
+         * + Reports at least one per customer, ignore if referred
+         */
+
+        if (empty($dsContact->getValue(DBEContact::firstName))) {
+            $dsContact->setMessage(
+                DBEContact::firstName,
+                'First Name is required'
+            );
+        }
+
+        if (empty($dsContact->getValue(DBEContact::lastName))) {
+            $dsContact->setMessage(
+                DBEContact::lastName,
+                'Last Name is required'
+            );
+        }
+        if (empty($dsContact->getValue(DBEContact::title))) {
+            $dsContact->setMessage(
+                DBEContact::title,
+                'Title is required'
+            );
+        }
+
+        if (!empty($dsContact->getValue(DBEContact::email))) {
+
+            $buCustomer = new BUCustomer($this);
+            if ($buCustomer->duplicatedEmail(
+                $dsContact->getValue(DBEContact::email),
+                $dsContact->getValue(DBEContact::contactID) ? $dsContact->getValue(DBEContact::contactID) : null
+            )) {
+                $this->setFormErrorOn();
+                $this->dsContact->setValue(
+                    'EmailClass',
+                    CTCUSTOMER_CLS_FORM_ERROR
+                );
+                $validEmail = false;
+            }
+
+
+        }
+
+    }
+
+    public function getTodayLeaverContacts(&$dsResults)
+    {
+        $this->setMethodName('getContactByCustomerID');
+        $this->dbeContact->getTodayLeavers();
+        $this->getData(
+            $this->dbeContact,
+            $dsResults
+        );
+    }
+
+    public static function supportLevelDropDown($supportLevelValue,
+                                                $template,
+                                                $selected = 'supportLevelSelected',
+                                                $value = 'supportLevelValue',
+                                                $description = 'supportLevelDescription',
+                                                $parent = 'selectSupportLevel',
+                                                $block = 'supportLevelBlock'
+    )
+    {
+        // Site selection
+        $supportLevels = [
+            ["value" => null, "description" => "None"],
+            ["value" => DBEContact::supportLevelMain, "description" => "Main"],
+            ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
+            ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
+            ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
+        ];
+        foreach ($supportLevels as $supportLevel) {
+            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : '';
+            $template->set_var(
+                [
+                    $selected    => $supportLevelSelected,
+                    $value       => $supportLevel['value'],
+                    $description => $supportLevel['description']
+                ]
+            );
+            $template->parse(
+                $parent,
+                $block,
+                true
+            );
+        }
     }
 
     public function getSpecialAttentionContacts(&$dsResults)

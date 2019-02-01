@@ -1,0 +1,39 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="website-1534777348-0">
+        <tagDatabase tag="website"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="website-1534777348-1">
+       <preConditions onFail="MARK_RAN">
+           <not>
+               <columnExists tableName="calldocument" columnName="createdContactID"/>
+           </not>
+       </preConditions>
+        <addColumn tableName="calldocument">
+            <column name="createdContactID" type="int(11)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="website-1534777348-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="resetToken"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="resetToken" type="char(60)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="website-1534777348-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="resetToken"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="resetToken" type="char(60)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

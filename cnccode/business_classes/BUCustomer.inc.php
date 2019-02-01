@@ -12,6 +12,7 @@ require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerLeadStatus.php");
 require_once($cfg["path_dbe"] . "/DBELeadStatus.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
 define(
     'BUCUSTOMER_NAME_STR_NT_PASD',
     'No name string passed'
@@ -312,6 +313,45 @@ class BUCustomer extends Business
             $this->dbeContact,
             $dsResults
         ));
+    }
+
+    function duplicatedEmail($email,
+                             $contactID = null
+    )
+    {
+        if ($email === '') {
+            return true;
+        }
+        $query = "select count(con_contno) as count from contact where con_email = ? ";
+
+        $paramTypes = 's';
+        $params = [
+            $email,
+        ];
+
+        if ($contactID) {
+            $query .= " and con_contno <> ? ";
+            $paramTypes .= "i";
+            $params[] = +$contactID;
+        }
+
+        $params = array_merge(
+            [$paramTypes],
+            $params
+        );
+        $refArray = [];
+        foreach ($params as $key => $value) $refArray[$key] = &$params[$key];
+
+        $statement = $this->db->prepare($query);
+        call_user_func_array(
+            [$statement, 'bind_param'],
+            $refArray
+        );
+        $result = $statement->execute() ? $statement->get_result() : false;
+
+        $statement->close();
+        $row = $result->fetch_assoc();
+        return $row['count'] > 0;
     }
 
     /**
@@ -662,10 +702,6 @@ class BUCustomer extends Business
             'N'
         );
         $dsContact->setValue(
-            DBEContact::mailshot1Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot1FlagDef)
-        );
-        $dsContact->setValue(
             DBEContact::mailshot2Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot2FlagDef)
         );
@@ -678,18 +714,6 @@ class BUCustomer extends Business
             $this->dsHeader->getValue(DBEHeader::mailshot4FlagDef)
         );
         $dsContact->setValue(
-            DBEContact::mailshot5Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot5FlagDef)
-        );
-        $dsContact->setValue(
-            DBEContact::mailshot6Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot6FlagDef)
-        );
-        $dsContact->setValue(
-            DBEContact::mailshot7Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot7FlagDef)
-        );
-        $dsContact->setValue(
             DBEContact::mailshot8Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot8FlagDef)
         );
@@ -698,13 +722,58 @@ class BUCustomer extends Business
             $this->dsHeader->getValue(DBEHeader::mailshot9FlagDef)
         );
         $dsContact->setValue(
-            DBEContact::mailshot10Flag,
-            $this->dsHeader->getValue(DBEHeader::mailshot10FlagDef)
-        );
-        $dsContact->setValue(
             DBEContact::mailshot11Flag,
             $this->dsHeader->getValue(DBEHeader::mailshot11FlagDef)
         );
+        $dsContact->setValue(
+            DBEContact::initialLoggingEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::workStartedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::workUpdatesEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::fixedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::pendingClosureEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::closureEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersInitialLoggingEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersWorkStartedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersWorkUpdatesEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersFixedEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersPendingClosureEmailFlag,
+            'Y'
+        );
+        $dsContact->setValue(
+            DBEContact::othersClosureEmailFlag,
+            'Y'
+        );
+
         $dsContact->post();
         $this->updateModify($dsContact->getValue(DBEContact::customerID));
         return TRUE;
@@ -787,18 +856,6 @@ class BUCustomer extends Business
             'Y'
         );
         $dsCustomer->setValue(
-            DBECustomer::othersEmailMainFlag,
-            'Y'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::workStartedEmailMainFlag,
-            'Y'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::autoCloseEmailMainFlag,
-            'Y'
-        );
-        $dsCustomer->setValue(
             DBECustomer::createDate,
             date('Y-m-d')
         );
@@ -814,7 +871,6 @@ class BUCustomer extends Business
             DBECustomer::customerTypeID,
             0
         );
-
         $dsCustomer->setValue(
             DBECustomer::pcxFlag,
             'N'
@@ -909,12 +965,7 @@ class BUCustomer extends Business
             $this->raiseError('contactID not passed');
         }
         $this->dbeContact->getRow($contactID);
-        if ($this->dbeContact->getValue('mailshot5Flag') == 'Y') {
-            $ret = true;
-        } else {
-            $ret = false;
-        }
-        return $ret;
+        return !empty($this->dbeContact->getValue(DBEContact::supportLevel));
     }
 
     function setProspectFlagOff($customerID)
@@ -1219,9 +1270,12 @@ class BUCustomer extends Business
     /**
      *    Delete sites and contacts
      * @param $customerID
+     * @param bool $includeSupervisors
      * @return array
      */
-    function getMainSupportContacts($customerID)
+    function getMainSupportContacts($customerID,
+                                    $includeSupervisors = false
+    )
     {
         $this->setMethodName('getMainSupportContacts');
 
@@ -1229,13 +1283,110 @@ class BUCustomer extends Business
             $this->raiseError('customerID not passed');
         }
 
-        $this->dbeContact->getMainSupportRowsByCustomerID($customerID);
+        $this->dbeContact->getMainSupportRowsByCustomerID(
+            $customerID,
+            $includeSupervisors
+        );
         $contacts = [];
         while ($this->dbeContact->fetchNext()) {
             $contacts[] = [
-                "firstName" => $this->dbeContact->getValue('firstName'),
-                "lastName"  => $this->dbeContact->getValue('lastName'),
-                "contactID" => $this->dbeContact->getValue(DBEContact::contactID)
+                DBEContact::contactID                     => $this->dbeContact->getValue(DBEContact::contactID),
+                DBEContact::firstName                     => $this->dbeContact->getValue(DBEContact::firstName),
+                DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
+                DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
+                DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
+                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
+                DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
+            ];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     *    Delete sites and contacts
+     * @param $customerID
+     * @param bool $includeSupervisors
+     * @return array
+     */
+    function getReviewContacts($customerID
+    )
+    {
+        $this->setMethodName('getMainSupportContacts');
+
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+
+        $this->dbeContact->getReviewContactsByCustomerID(
+            $customerID
+        );
+        $contacts = [];
+        while ($this->dbeContact->fetchNext()) {
+            $contacts[] = [
+                DBEContact::contactID                     => $this->dbeContact->getValue(DBEContact::contactID),
+                DBEContact::firstName                     => $this->dbeContact->getValue(DBEContact::firstName),
+                DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
+                DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
+                DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
+                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
+                DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
             ];
         }
 
@@ -1626,6 +1777,40 @@ class BUCustomer extends Business
         );
 
         return ($dbePortalCustomerDocument->insertRow());
+    }
+
+    /**
+     * @param $customerId
+     * @return bool
+     */
+    public function hasPrepayContract($customerId)
+    {
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getPrePayContracts($customerId);
+
+        $array = $dbeJContract->getRowAsArray();
+
+        return !!count($array);
+    }
+
+
+    /**
+     * @param $customerID
+     * @return DBEContact|null
+     */
+    public function getPrimaryContact($customerID)
+    {
+        $this->dbeCustomer->getRow($customerID);
+        $primaryMainContactID = $this->dbeCustomer->getValue(DBECustomer::primaryMainContactID);
+
+        if (!$primaryMainContactID) {
+            return null;
+        }
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($primaryMainContactID);
+        return $dbeContact;
     }
 
     public function getActiveCustomers(DataSet $dsCustomers)
