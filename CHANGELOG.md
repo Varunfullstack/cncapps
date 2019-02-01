@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.0.1]
+### Fixed
+- Can't create new users due to the Primary Main Contact being required
+
 ## [v2.0.0] - 2019-01-31
 ### Changed
 - Issue 215 - Contact Management within CNCAPPS

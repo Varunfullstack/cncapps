@@ -1414,43 +1414,45 @@
         // }
 
         // check that the selected primaryMainContact is in fact also a "main"
-        const primaryMainContactSelector = $('#primaryMainContactSelector');
-        const value = $('#primaryMainContactSelector').val();
 
-        const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
-        if (!value) {
-            if (!mainContactsSelect.length) {
-                alert('Please set at least one Main contact, and it will be set as the Primary Main');
-                return false;
-            }
-            const matches = $(mainContactsSelect[0]).attr('name').match(/\d+/);
-            if (!matches || !matches.length) {
-                alert('Please set at least one Main contact, and it will be set as the Primary Main');
-                return false;
-            }
+        if ({customerID} != 0) {
+            const primaryMainContactSelector = $('#primaryMainContactSelector');
+            const value = $('#primaryMainContactSelector').val();
 
-            //we need to make sure there's an option for this
-            if (!primaryMainContactSelector.find('option[value="' + matches[0] + '"]').length) {
-                primaryMainContactSelector.html('<option value="' + matches[0] + '"></option>');
-            }
-
-
-            $('#primaryMainContactSelector').val(matches[0]);
-
-
-        } else {
-            let foundMain = false;
-
-            mainContactsSelect.each(function () {
-                const foundMatch = $(this).attr('name').match(/\d+/);
-                if (foundMatch && foundMatch[0] == value) {
-                    foundMain = true;
+            const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
+            if (!value) {
+                if (!mainContactsSelect.length) {
+                    alert('Please set at least one Main contact, and it will be set as the Primary Main');
+                    return false;
                 }
-            });
+                const matches = $(mainContactsSelect[0]).attr('name').match(/\d+/);
+                if (!matches || !matches.length) {
+                    alert('Please set at least one Main contact, and it will be set as the Primary Main');
+                    return false;
+                }
 
-            if (!foundMain) {
-                alert("The Primary Main contact is no longer flagged as Main, please flag it back or pick another Main Contact as Primary");
-                return false;
+                //we need to make sure there's an option for this
+                if (!primaryMainContactSelector.find('option[value="' + matches[0] + '"]').length) {
+                    primaryMainContactSelector.html('<option value="' + matches[0] + '"></option>');
+                }
+
+                $('#primaryMainContactSelector').val(matches[0]);
+
+
+            } else {
+                let foundMain = false;
+
+                mainContactsSelect.each(function () {
+                    const foundMatch = $(this).attr('name').match(/\d+/);
+                    if (foundMatch && foundMatch[0] == value) {
+                        foundMain = true;
+                    }
+                });
+
+                if (!foundMain) {
+                    alert("The Primary Main contact is no longer flagged as Main, please flag it back or pick another Main Contact as Primary");
+                    return false;
+                }
             }
         }
 
@@ -1517,10 +1519,7 @@
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
 />
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
->
-</script>
+
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}"
    onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)"

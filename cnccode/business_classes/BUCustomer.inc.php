@@ -1334,6 +1334,68 @@ class BUCustomer extends Business
     /**
      *    Delete sites and contacts
      * @param $customerID
+     * @param bool $includeSupervisors
+     * @return array
+     */
+    function getReviewContacts($customerID
+    )
+    {
+        $this->setMethodName('getMainSupportContacts');
+
+        if ($customerID == '') {
+            $this->raiseError('customerID not passed');
+        }
+
+        $this->dbeContact->getReviewContactsByCustomerID(
+            $customerID
+        );
+        $contacts = [];
+        while ($this->dbeContact->fetchNext()) {
+            $contacts[] = [
+                DBEContact::contactID                     => $this->dbeContact->getValue(DBEContact::contactID),
+                DBEContact::firstName                     => $this->dbeContact->getValue(DBEContact::firstName),
+                DBEContact::lastName                      => $this->dbeContact->getValue(DBEContact::lastName),
+                DBEContact::email                         => $this->dbeContact->getValue(DBEContact::email),
+                DBEContact::supportLevel                  => $this->dbeContact->getValue(DBEContact::supportLevel),
+                DBEContact::initialLoggingEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::workStartedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::workUpdatesEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::pendingClosureEmailFlag       => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::fixedEmailFlag                => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
+                DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::initialLoggingEmailFlag
+                ),
+                DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workStartedEmailFlag
+                ),
+                DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
+                    DBEContact::workUpdatesEmailFlag
+                ),
+                DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
+                    DBEContact::pendingClosureEmailFlag
+                ),
+                DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
+                    DBEContact::fixedEmailFlag
+                ),
+            ];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     *    Delete sites and contacts
+     * @param $customerID
      * @param $siteNo
      */
     function deleteSite($customerID,

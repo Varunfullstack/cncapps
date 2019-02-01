@@ -7871,7 +7871,7 @@ is currently a balance of ';
                         CONFIG_MYSQL_DATETIME
                     ) . "</div>" . $details;
 
-                if (isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
+                if ($this->isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
                     $forceHidden = true;
                 } else {
                     return $this->addCustomerRaisedRequest(
