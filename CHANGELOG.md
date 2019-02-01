@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.0.2] - 2019-01-01
+## [v2.0.2] - 2019-01-31
 ### Fixed 
 - Fixed issue with sending emails to customers for Service Requests
 
