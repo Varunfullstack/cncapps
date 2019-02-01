@@ -1415,7 +1415,7 @@
 
         // check that the selected primaryMainContact is in fact also a "main"
 
-        if({customerID} != 0){
+        if ({customerID} != 0) {
             const primaryMainContactSelector = $('#primaryMainContactSelector');
             const value = $('#primaryMainContactSelector').val();
 
@@ -1436,7 +1436,6 @@
                     primaryMainContactSelector.html('<option value="' + matches[0] + '"></option>');
                 }
 
-
                 $('#primaryMainContactSelector').val(matches[0]);
 
 
@@ -1456,8 +1455,6 @@
                 }
             }
         }
-
-
 
 
         if (forceDirectDebit) {
