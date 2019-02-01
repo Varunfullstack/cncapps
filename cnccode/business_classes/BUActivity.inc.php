@@ -1033,7 +1033,7 @@ class BUActivity extends Business
         if (
             $dbeJProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'Y' ||
             $dbeFirstActivity->getValue(DBEJCallActivity::serverGuard) == 'Y' ||
-            $dbeLastActivity->getValue(DBECallActivity::hideFromCustomerFlag == 'Y')
+            $dbeLastActivity->getValue(DBECallActivity::hideFromCustomerFlag) == 'Y'
         ) {
             return; // no email to customer for this request
         }
@@ -1067,6 +1067,7 @@ class BUActivity extends Business
         }
         switch ($category) {
             case  self::InitialCustomerEmailCategory:
+
                 // the last activity should be an initial
                 if (
                     $dbeFirstActivity->getValue(DBECallActivity::callActTypeID) !=
@@ -1153,7 +1154,6 @@ class BUActivity extends Business
             $emails .= $supportContact[DBEContact::email];
         }
 
-
         switch ($subCategory) {
             case self::Initial24HSupport:
                 $templateName = 'ServiceLoggedEmail24h';
@@ -1207,8 +1207,6 @@ class BUActivity extends Business
 
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-
         if (empty($emails)) {
             return;                     // no email recipients so abort
         }
@@ -5605,7 +5603,6 @@ is currently a balance of ';
             $dsCallActivity,
             $dbeCallActivity
         ); // Update the DB
-
         if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N') {       // skip work commenced
 
             if ($dbeProblem->getValue(DBEJProblem::priority) == 5) {
