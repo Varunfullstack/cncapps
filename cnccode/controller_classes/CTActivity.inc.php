@@ -3398,7 +3398,7 @@ class CTActivity extends CTCNC
             if (count($error) == 0) {
                 /* Create initial activity */
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-
+                exit;
                 /*
           Upload file
           */

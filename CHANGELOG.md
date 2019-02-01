@@ -8,6 +8,10 @@ This project changes will be shown here.
 ### Added
 - Issue 442 - Customer Starter & Leaver questions
 
+## [v2.0.2] - 2019-01-01
+### Fixed 
+- Fixed issue with sending emails to customers for Service Requests
+
 ## [v2.0.1]
 ### Fixed
 - Can't create new users due to the Primary Main Contact being required
