@@ -103,7 +103,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             );
 
             $buCustomer = new BUCustomer($this);
-            $reviewContacts = $buCustomer->getMainSupportContacts($dbeCustomer->getValue(DBECustomer::customerID));
+            $reviewContacts = $buCustomer->getReviewContacts($dbeCustomer->getValue(DBECustomer::customerID));
 
             $reviewContactsString = array_reduce(
                 $reviewContacts,
