@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.0.3] - 2019-02-04
+### Fixed
+- Fixed Issues with to be logged requests not picking up the body of the email.
+- Fixed issue after logging a new request being sent to a blank page.
+
 ## [v2.0.2] - 2019-01-31
 ### Fixed 
 - Fixed issue with sending emails to customers for Service Requests
