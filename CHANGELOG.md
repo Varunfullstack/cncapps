@@ -8,6 +8,10 @@ This project changes will be shown here.
 ### Added
 - Issue 442 - Customer Starter & Leaver questions
 
+## [v2.0.5] - 2019-02-04
+### Fixed
+- Fix issue where OthersEmails flags where getting ignored
+
 ## [v2.0.4] - 2019-02-04
 ### Fixed
 - Fix Issue with logged requests showing html characters in the reason

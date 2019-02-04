@@ -1144,7 +1144,7 @@ class BUActivity extends Business
 
         foreach ($mainSupportContacts as $supportContact) {
             if ($supportContact[DBEContact::contactID] == $contactID ||
-                $supportContact[$othersFlagName] == 'N'
+                $supportContact[$othersFlagName] != 'Y'
             ) {
                 continue;
             }
@@ -1168,6 +1168,7 @@ class BUActivity extends Business
             case self::WorkUpdatesActivityLogged:
                 $templateName = 'ActivityLoggedCustomerEmail';
                 if ($dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) != 'Y') {
+                    var_dump('customer email flag is not YES');
                     return;
                 }
                 $fields['extra'] = 'The service request requires further action by CNC as detailed above. 
@@ -1219,7 +1220,7 @@ class BUActivity extends Business
             'page',
             $templateName . '.inc.html'
         );
-
+        
         $template->setVar(
             array(
                 'contactFirstName'   => $contact->getValue(DBEContact::firstName),
