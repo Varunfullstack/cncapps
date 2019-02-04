@@ -7563,7 +7563,8 @@ is currently a balance of ';
                 return $this->raiseNewRequestFromImport($automatedRequest);
             }
 
-            if (!$dbeContact->rowCount) {
+            if (!$dbeContact->fetchNext()) {
+                echo "<div>We have tried to pull a the contact from the sender email, but we couldn't find it</div>";
                 $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         CONFIG_MYSQL_DATETIME
@@ -8092,11 +8093,12 @@ is currently a balance of ';
             $record->getServerGuardFlag()
         );
 
+        $details = $record->getSubjectLine();
+
         if (!$forcedDetails) {
-            $details = '<div>' . $record->getSubjectLine() . '</div>' . ($record->getHtmlBody() ? $record->getHtmlBody(
-                ) : $record->getTextBody());
+            $details .= $record->getTextBody();
         } else {
-            $details = '<div>' . $record->getSubjectLine() . '</div>' . $forcedDetails;
+            $details .= $forcedDetails;
         }
 
         $dbeCallActivity->setValue(
