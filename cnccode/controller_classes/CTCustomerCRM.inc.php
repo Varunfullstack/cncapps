@@ -165,6 +165,7 @@ class CTCustomerCRM extends CTCustomer
         // in the post we should find the id of the status we are searching for
         /** @var DBEContact $results */
         $results = $this->buCustomer->getContactsByLeadStatus($customerLeadID);
+
         $data = [];
 
         $customers = [];

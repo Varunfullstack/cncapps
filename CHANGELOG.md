@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.0.4] - 2019-02-04
+### Fixed
+- Fix Issue with logged requests showing html characters in the reason
+
 ## [v2.0.3] - 2019-02-04
 ### Fixed
 - Fixed Issues with to be logged requests not picking up the body of the email.
