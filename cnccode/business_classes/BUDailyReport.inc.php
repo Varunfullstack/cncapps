@@ -1200,7 +1200,7 @@ WHERE pro_priority = 5
 
 
             foreach ($contactsDatum['serviceRequests'] as $SR) {
-                $urlRequest = "https://www.cnc-ltd.co.uk/portal/request/" . $SR['id'] . "/view";
+                $urlRequest = "https://www.cnc-ltd.co.uk/view/?serviceid=" . $SR['id'];
 
                 $template->setVar(
                     array(
