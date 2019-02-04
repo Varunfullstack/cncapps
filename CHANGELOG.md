@@ -8,12 +8,20 @@ This project changes will be shown here.
 ### Added
 - Issue 442 - Customer Starter & Leaver questions
 
+## [v2.0.5] - 2019-02-04
+### Fixed
+- Fix issue where OthersEmails flags where getting ignored
+
+## [v2.0.4] - 2019-02-04
+### Fixed
+- Fix Issue with logged requests showing html characters in the reason
+
 ## [v2.0.3] - 2019-02-04
 ### Fixed
 - Fixed Issues with to be logged requests not picking up the body of the email.
 - Fixed issue after logging a new request being sent to a blank page.
 
-## [v2.0.2] - 2019-01-01
+## [v2.0.2] - 2019-01-31
 ### Fixed 
 - Fixed issue with sending emails to customers for Service Requests
 

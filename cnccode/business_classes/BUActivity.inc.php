@@ -1144,7 +1144,7 @@ class BUActivity extends Business
 
         foreach ($mainSupportContacts as $supportContact) {
             if ($supportContact[DBEContact::contactID] == $contactID ||
-                $supportContact[$othersFlagName] == 'N'
+                $supportContact[$othersFlagName] != 'Y'
             ) {
                 continue;
             }
@@ -1168,6 +1168,7 @@ class BUActivity extends Business
             case self::WorkUpdatesActivityLogged:
                 $templateName = 'ActivityLoggedCustomerEmail';
                 if ($dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) != 'Y') {
+                    var_dump('customer email flag is not YES');
                     return;
                 }
                 $fields['extra'] = 'The service request requires further action by CNC as detailed above. 
@@ -1219,7 +1220,7 @@ class BUActivity extends Business
             'page',
             $templateName . '.inc.html'
         );
-
+        
         $template->setVar(
             array(
                 'contactFirstName'   => $contact->getValue(DBEContact::firstName),
@@ -7563,7 +7564,8 @@ is currently a balance of ';
                 return $this->raiseNewRequestFromImport($automatedRequest);
             }
 
-            if (!$dbeContact->rowCount) {
+            if (!$dbeContact->fetchNext()) {
+                echo "<div>We have tried to pull a the contact from the sender email, but we couldn't find it</div>";
                 $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
                         CONFIG_MYSQL_DATETIME
@@ -8092,11 +8094,12 @@ is currently a balance of ';
             $record->getServerGuardFlag()
         );
 
+        $details = $record->getSubjectLine();
+
         if (!$forcedDetails) {
-            $details = '<div>' . $record->getSubjectLine() . '</div>' . ($record->getHtmlBody() ? $record->getHtmlBody(
-                ) : $record->getTextBody());
+            $details .= $record->getTextBody();
         } else {
-            $details = '<div>' . $record->getSubjectLine() . '</div>' . $forcedDetails;
+            $details .= $forcedDetails;
         }
 
         $dbeCallActivity->setValue(

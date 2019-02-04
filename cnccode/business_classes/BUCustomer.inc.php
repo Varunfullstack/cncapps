@@ -1311,19 +1311,19 @@ class BUCustomer extends Business
                     DBEContact::fixedEmailFlag
                 ),
                 DBEContact::othersInitialLoggingEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::initialLoggingEmailFlag
+                    DBEContact::othersInitialLoggingEmailFlag
                 ),
                 DBEContact::othersWorkStartedEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::workStartedEmailFlag
+                    DBEContact::othersWorkStartedEmailFlag
                 ),
                 DBEContact::othersWorkUpdatesEmailFlag    => $this->dbeContact->getValue(
-                    DBEContact::workUpdatesEmailFlag
+                    DBEContact::othersWorkUpdatesEmailFlag
                 ),
                 DBEContact::othersPendingClosureEmailFlag => $this->dbeContact->getValue(
-                    DBEContact::pendingClosureEmailFlag
+                    DBEContact::othersPendingClosureEmailFlag
                 ),
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
-                    DBEContact::fixedEmailFlag
+                    DBEContact::othersFixedEmailFlag
                 ),
             ];
         }
