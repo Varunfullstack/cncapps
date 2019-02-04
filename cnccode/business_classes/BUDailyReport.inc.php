@@ -1281,42 +1281,49 @@ WHERE pro_priority = 5
 
     private function getContactOpenSRReportData()
     {
-        $sql = "SELECT 
-                  problem.`pro_problemno` AS id,
-                  CONCAT_WS(
-                    ' ',
-                    reporter.`con_first_name`,
-                    reporter.`con_last_name`
-                  ) AS raisedBy,
-                  pro_date_raised AS raisedOn,
-                  IF(
-                    problem.`pro_awaiting_customer_response_flag` = 'Y',
-                    'Awaiting Customer',
-                    'In Progress'
-                  ) AS status,
-                  callactivity.`reason` AS details,
-                  contact.`con_first_name` AS contactName,
-                  contact.con_email as contactEmail,
-                  contact.`con_contno` AS contactID,
-                  customer.cus_name as customerName
-                FROM
-                  problem 
-                  INNER JOIN contact 
-                    ON contact.`con_custno` = problem.`pro_custno` 
-                    AND contact.`con_mailflag11` = 'Y' 
-                  LEFT JOIN callactivity 
-                    ON callactivity.`caa_problemno` = problem.`pro_problemno` 
-                    AND callactivity.`caa_callacttypeno` = 51 
-                  LEFT JOIN contact AS reporter 
-                    ON problem.`pro_contno` = reporter.`con_contno`
-                    left join customer on problem.pro_custno = customer.cus_custno 
-                WHERE problem.`pro_status` <> 'C'
-                AND problem.`pro_status` <> 'F' 
-                and problem.`pro_hide_from_customer_flag` <> 'Y'
-                and problem.pro_priority >= 1 and problem.pro_priority <= 4
-                AND (contact.`con_mailflag10` = 'Y' OR  reporter.con_contno = contact.con_contno ) 
-                 ORDER BY pro_date_raised";
-        return $this->db->query($sql);
+        $sql = "SELECT
+problem.pro_problemno AS id,
+CONCAT_WS(
+' ',
+reporter.con_first_name,
+reporter.con_last_name
+) AS raisedBy,
+pro_date_raised AS raisedOn,
+IF(
+problem.pro_awaiting_customer_response_flag = 'Y',
+'Awaiting Customer',
+'In Progress'
+) AS STATUS,
+callactivity.reason AS details,
+contact.con_first_name AS contactName,
+contact.con_email AS contactEmail,
+contact.con_contno AS contactID,
+customer.cus_name AS customerName
+FROM
+problem
+INNER JOIN contact
+ON contact.con_custno = problem.pro_custno
+AND contact.con_mailflag11 = 'Y'
+LEFT JOIN callactivity
+ON callactivity.caa_problemno = problem.pro_problemno
+AND callactivity.caa_callacttypeno = 51
+LEFT JOIN contact AS reporter
+ON problem.pro_contno = reporter.con_contno
+LEFT JOIN customer ON problem.pro_custno = customer.cus_custno
+WHERE problem.pro_status <> 'C'
+AND problem.pro_status <> 'F'
+AND problem.pro_hide_from_customer_flag <> 'Y'
+AND problem.pro_priority >= 1 AND problem.pro_priority <= 4
+AND (contact.supportLevel = 'Main' OR reporter.con_contno = contact.con_contno )
+ORDER BY pro_date_raised";
+
+        $result = $this->db->query($sql);
+
+        if (!$result) {
+            throw  new Exception($this->db->error);
+        }
+
+        return $result;
 
     }
 }
