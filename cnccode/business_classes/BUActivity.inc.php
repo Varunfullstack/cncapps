@@ -7506,15 +7506,15 @@ is currently a balance of ';
         echo '<div>The sender email is ' . $automatedRequest->getSenderEmailAddress() . ' </div>';
         if (!$automatedRequest->getCustomerID()) {
             echo "<div>We couldn't find a customer ID, should log in to be logged</div>";
-            $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+            $prependMessage = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                 ) . ' on ' . date(
                     CONFIG_MYSQL_DATETIME
-                ) . "</div>" . $details;
+                ) . "</div>";
             return $this->addCustomerRaisedRequest(
                 $automatedRequest,
                 null,
                 null,
-                $details
+                $prependMessage
             );
         }
         echo "<div>We do have a customer ID, we can continue: " . $automatedRequest->getCustomerID() . "</div>";
@@ -7549,15 +7549,15 @@ is currently a balance of ';
                         DBEContact::customerID
                     ) != $automatedRequest->getCustomerID()) {
                     echo "<div>The contact was not found or the contact doesn't belong to the same customer ID</div>";
-                    $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
+                    $prependMessage = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                         ) . ' on ' . date(
                             CONFIG_MYSQL_DATETIME
-                        ) . "</div>" . $details;
+                        ) . "</div>";
                     return $this->addCustomerRaisedRequest(
                         $automatedRequest,
                         null,
                         null,
-                        $details
+                        $prependMessage
                     );
                 }
                 return $this->raiseNewRequestFromImport($automatedRequest);
@@ -7863,10 +7863,10 @@ is currently a balance of ';
             $dbeContact = $buCustomer->getPrimaryContact($customerID);
 
             if (!$serverGuard) {
-                $details = '<div style="color: red">Utility alert sent from email ' . $record->getSenderEmailAddress(
+                $prependMessage = '<div style="color: red">Utility alert sent from email ' . $record->getSenderEmailAddress(
                     ) . ' on ' . date(
                         CONFIG_MYSQL_DATETIME
-                    ) . "</div>" . $details;
+                    ) . "</div>";
 
                 if ($this->isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
                     $forceHidden = true;
@@ -7875,7 +7875,7 @@ is currently a balance of ';
                         $record,
                         null,
                         null,
-                        $details
+                        $prependMessage
                     );
                 }
             }
@@ -7884,12 +7884,12 @@ is currently a balance of ';
             if (!$dbeContact->rowCount) {
 
                 echo "<div>We couldn't find a primary contact, -> to be logged</div>";
-                $details = '<div style="color: red">Failed to find primary contact associated with customer</div>' . $details;
+                $prependMessage = '<div style="color: red">Failed to find primary contact associated with customer</div>';
                 return $this->addCustomerRaisedRequest(
                     $record,
                     null,
                     null,
-                    $details
+                    $prependMessage
                 );
             }
             echo "<div>we have found a primary contact</div>";
@@ -7899,16 +7899,16 @@ is currently a balance of ';
             $dbeContact->fetchNext();
             if ($dbeContact->getValue(DBEContact::customerID) != $record->getCustomerID()) {
                 echo "<div>The sender contact does not belong to the same customer ID -> to be logged</div>";
-                $details = '<div style="color: red">Update from email received from ' . $record->getSenderEmailAddress(
+                $prependMessage = '<div style="color: red">Update from email received from ' . $record->getSenderEmailAddress(
                     ) . ' on ' . date(
                         CONFIG_MYSQL_DATETIME
-                    ) . "</div>" . $details;
+                    ) . "</div>";
 
                 return $this->addCustomerRaisedRequest(
                     $record,
                     null,
                     null,
-                    $details
+                    $prependMessage
                 );
             }
         }
@@ -8091,9 +8091,17 @@ is currently a balance of ';
             DBEJCallActivity::serverGuard,
             $record->getServerGuardFlag()
         );
+
+        if (!$forcedDetails) {
+            $details = '<div>' . $record->getSubjectLine() . '</div>' . ($record->getHtmlBody() ? $record->getHtmlBody(
+                ) : $record->getTextBody());
+        } else {
+            $details = '<div>' . $record->getSubjectLine() . '</div>' . $forcedDetails;
+        }
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
-            Controller::formatForHTML($forcedDetails ? $forcedDetails : $record->getTextBody())
+            Controller::formatForHTML($details)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
@@ -9287,13 +9295,24 @@ is currently a balance of ';
     function addCustomerRaisedRequest(\CNCLTD\AutomatedRequest $record,
                                       $contact = null,
                                       $updateExistingRequest = false,
-                                      $details = false,
+                                      $prependMessage = false,
                                       $source = 'S'
     )
     {
         $db = new dbSweetcode(); // database connection for query
 
-        $details = $details ? $details : $record->getTextBody();
+        $reason = '<div>' . $record->getSubjectLine() . '</div>';
+
+        if ($record->getHtmlBody()) {
+            $reason .= $record->getHtmlBody();
+        } else {
+            $reason .= $record->getTextBody();
+        }
+
+        if ($prependMessage) {
+            $reason = $prependMessage . $reason;
+        }
+
 
         $queryString = "
       INSERT INTO
@@ -9314,7 +9333,7 @@ is currently a balance of ';
         $parameters = [
             [
                 'type'  => 's',
-                'value' => $details
+                'value' => $reason
             ]
         ];
 
