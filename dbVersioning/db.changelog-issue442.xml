@@ -7,7 +7,7 @@
         <tagDatabase tag="issue442"/>
     </changeSet>
     <changeSet author="pavwebdev" id="1548407236-1">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="consultant" columnName="starterLeaverQuestionManagementFlag"/>
             </not>
@@ -17,7 +17,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="pavwebdev" id="1548407236-2">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="starterLeaverQuestion"/>
             </not>

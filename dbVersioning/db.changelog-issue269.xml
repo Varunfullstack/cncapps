@@ -7,7 +7,7 @@
         <tagDatabase tag="issue269"/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue269-1527669157-1">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="problem" columnName="pro_reopened_date"/>
             </not>

@@ -17,7 +17,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="pavwebdev" id="issue324-1536574744-2">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <indexExists tableName="ordhead" indexName="ixodh_6"/>
         </preConditions>
         <sql>

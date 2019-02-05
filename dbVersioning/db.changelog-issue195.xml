@@ -31,7 +31,7 @@
         </rollback>
     </changeSet>
     <changeSet id="issue195-1524127856-4" author="pavwebdev">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="consultant" columnName="excludeFromStatsFlag"/>
             </not>
