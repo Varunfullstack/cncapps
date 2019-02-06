@@ -183,6 +183,10 @@ class CTStarterLeaverManagement extends CTCNC
             throw new Exception('Customer is not set');
         }
 
+        if (isset($_REQUEST['type'])) {
+            $_REQUEST['question']['formType'] = $_REQUEST['type'];
+        }
+
         $questionData = $_REQUEST['question'];
 
 
