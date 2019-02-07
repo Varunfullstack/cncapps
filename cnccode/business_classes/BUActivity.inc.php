@@ -1220,7 +1220,7 @@ class BUActivity extends Business
             'page',
             $templateName . '.inc.html'
         );
-        
+
         $template->setVar(
             array(
                 'contactFirstName'   => $contact->getValue(DBEContact::firstName),
@@ -1689,12 +1689,13 @@ class BUActivity extends Business
                 'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue(DBEJProblem::priority)
             );
         } else {
-            $this->sendEmailToCustomer(
-                $dsCallActivity->getValue(DBEJProblem::problemID),
-                self::WorkUpdatesCustomerEmailCategory,
-                self::WorkUpdatesActivityLogged
-            );
-
+            if ($enteredEndTime) {
+                $this->sendEmailToCustomer(
+                    $dsCallActivity->getValue(DBEJProblem::problemID),
+                    self::WorkUpdatesCustomerEmailCategory,
+                    self::WorkUpdatesActivityLogged
+                );
+            }
         }
 
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
