@@ -1015,7 +1015,7 @@ class BUActivity extends Business
         $problemID,
         $category,
         $subCategory = null,
-        $forcedUserID = null
+        $callActivityID = null
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -1224,11 +1224,13 @@ class BUActivity extends Business
         );
 
         $technicianResponsibleName = $dbeJProblem->getValue(DBEJProblem::engineerName);
+        $activityReason = $dbeLastActivity->getValue(DBEJCallActivity::reason);
 
-        if ($forcedUserID) {
-            $dbeResponsibleUser = new DBEUser($this);
-            $dbeResponsibleUser->getRow($forcedUserID);
-            $technicianResponsibleName = $dbeResponsibleUser->getValue(DBEUser::name);
+        if ($callActivityID) {
+            $dbeCallActivity = new DBEJCallActivity($this);
+            $dbeCallActivity->getRow($callActivityID);
+            $technicianResponsibleName = $dbeCallActivity->getValue(DBEJCallActivity::userName);
+            $activityReason = $dbeCallActivity->getValue(DBECallActivity::reason);
         }
 
         $template->setVar(
@@ -1239,7 +1241,7 @@ class BUActivity extends Business
                                         => CONFIG_SERVICE_REQUEST_DESC,
                 'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
                 'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
-                'lastActivityReason'    => $dbeLastActivity->getValue(DBEJCallActivity::reason),
+                'lastActivityReason'    => $activityReason,
                 'responseDetails'       => strtolower(
                     $this->getResponseDetails($dbeFirstActivity)
                 ),
@@ -1707,7 +1709,7 @@ class BUActivity extends Business
                     $dsCallActivity->getValue(DBEJProblem::problemID),
                     self::WorkUpdatesCustomerEmailCategory,
                     self::WorkUpdatesActivityLogged,
-                    $dsCallActivity->getValue(DBEJCallActivity::userID)
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 );
             }
         }
@@ -1998,12 +2000,17 @@ class BUActivity extends Business
                 ) != ''                  // exclude future scheduled activity
             )
         ) {
-            $this->sendUpdatedByAnotherUserEmail($dbeProblem->getValue(DBEJProblem::problemID));
+            $this->sendUpdatedByAnotherUserEmail(
+                $dbeProblem->getValue(DBEJProblem::problemID),
+                $dbeCallActivity
+            );
         }
 
     }
 
-    function sendUpdatedByAnotherUserEmail($problemID)
+    function sendUpdatedByAnotherUserEmail($problemID,
+                                           $callActivity
+    )
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
@@ -2032,19 +2039,22 @@ class BUActivity extends Business
             'NotifyUpdatedByAnotherUserEmail.inc.html'
         );
 
-        $dbeJCallActivity = $this->getLastActivityInProblem($problemID);
+
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivity->getValue(DBECallActivity::callActivityID));
+
 
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'urlActivity'  => $urlActivity,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'urlActivity'                 => $urlActivity,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName)
 
             )
         );
