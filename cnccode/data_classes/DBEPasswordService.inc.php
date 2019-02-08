@@ -176,7 +176,7 @@ SET sortOrder =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName(
             ) . " LEFT JOIN PASSWORD ON passwordservice.passwordServiceID = password.`serviceID` AND password.`pas_custno` = $customerID " . ($excludedPasswordID ? " and password.pas_passwordno <> $excludedPasswordID" : '') .
-            " WHERE(passwordService . onePerCustomer = 0 OR password . `pas_passwordno` IS NULL) 
+            "  AND(password.archivedBy = '' OR password.archivedBy IS NULL) WHERE(passwordService . onePerCustomer = 0 OR password . `pas_passwordno` IS NULL) 
  GROUP BY passwordServiceID
 ";
         $this->setQueryString($queryString);
