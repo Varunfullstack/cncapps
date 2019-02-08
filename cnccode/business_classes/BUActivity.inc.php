@@ -1008,12 +1008,14 @@ class BUActivity extends Business
      * @param $problemID
      * @param $category
      * @param $subCategory
+     * @param null $forcedUserID
      * @throws Exception
      */
     function sendEmailToCustomer(
         $problemID,
         $category,
-        $subCategory = null
+        $subCategory = null,
+        $callActivityID = null
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -1220,21 +1222,30 @@ class BUActivity extends Business
             'page',
             $templateName . '.inc.html'
         );
-        
+
+        $technicianResponsibleName = $dbeJProblem->getValue(DBEJProblem::engineerName);
+        $activityReason = $dbeLastActivity->getValue(DBEJCallActivity::reason);
+
+        if ($callActivityID) {
+            $dbeCallActivity = new DBEJCallActivity($this);
+            $dbeCallActivity->getRow($callActivityID);
+            $technicianResponsibleName = $dbeCallActivity->getValue(DBEJCallActivity::userName);
+            $activityReason = $dbeCallActivity->getValue(DBECallActivity::reason);
+        }
+
         $template->setVar(
             array(
-                'contactFirstName'   => $contact->getValue(DBEContact::firstName),
-                'activityRef'        => $problemID,
+                'contactFirstName'      => $contact->getValue(DBEContact::firstName),
+                'activityRef'           => $problemID,
                 'CONFIG_SERVICE_REQUEST_DESC'
-                                     => CONFIG_SERVICE_REQUEST_DESC,
-                'priority'           => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
-                'reason'             => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
-                'lastActivityReason' => $dbeLastActivity->getValue(DBEJCallActivity::reason),
-                'responseDetails'    => strtolower(
+                                        => CONFIG_SERVICE_REQUEST_DESC,
+                'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
+                'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
+                'lastActivityReason'    => $activityReason,
+                'responseDetails'       => strtolower(
                     $this->getResponseDetails($dbeFirstActivity)
                 ),
-                'technicianResponsible'
-                                     => $dbeJProblem->getValue(DBEJProblem::engineerName)
+                'technicianResponsible' => $technicianResponsibleName
             )
         );
 
@@ -1465,10 +1476,12 @@ class BUActivity extends Business
             $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
             $oldEndTime = $dbeCallActivity->getValue(DBEJCallActivity::endTime);
             $oldReason = $dbeCallActivity->getValue(DBEJCallActivity::reason);
+            $newReason = $dsCallActivity->getValue(DBEJCallActivity::reason);
         }
 
         $dbeCallActType = new DBECallActType($this);
         $dbeCallActType->getRow($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
+
 
         // if this activity will now have an end time and the type specifies that we do not need to check it, set status to checked
         if ($oldEndTime == '' && $dsCallActivity->getValue(DBEJCallActivity::endTime) != '') {
@@ -1689,12 +1702,16 @@ class BUActivity extends Business
                 'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue(DBEJProblem::priority)
             );
         } else {
-            $this->sendEmailToCustomer(
-                $dsCallActivity->getValue(DBEJProblem::problemID),
-                self::WorkUpdatesCustomerEmailCategory,
-                self::WorkUpdatesActivityLogged
-            );
-
+            if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(
+                    DBEJCallActivity::endTime
+                ) != '') {
+                $this->sendEmailToCustomer(
+                    $dsCallActivity->getValue(DBEJProblem::problemID),
+                    self::WorkUpdatesCustomerEmailCategory,
+                    self::WorkUpdatesActivityLogged,
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
+                );
+            }
         }
 
         $this->sendMonitoringEmails($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
@@ -1777,6 +1794,68 @@ class BUActivity extends Business
         }
 
         return $enteredEndTime;
+    }
+
+    function computeDiff($from,
+                         $to
+    )
+    {
+        $diffValues = array();
+        $diffMask = array();
+
+        $dm = array();
+        $n1 = count($from);
+        $n2 = count($to);
+
+        for ($j = -1; $j < $n2; $j++) $dm[-1][$j] = 0;
+        for ($i = -1; $i < $n1; $i++) $dm[$i][-1] = 0;
+        for ($i = 0; $i < $n1; $i++) {
+            for ($j = 0; $j < $n2; $j++) {
+                if ($from[$i] == $to[$j]) {
+                    $ad = $dm[$i - 1][$j - 1];
+                    $dm[$i][$j] = $ad + 1;
+                } else {
+                    $a1 = $dm[$i - 1][$j];
+                    $a2 = $dm[$i][$j - 1];
+                    $dm[$i][$j] = max(
+                        $a1,
+                        $a2
+                    );
+                }
+            }
+        }
+
+        $i = $n1 - 1;
+        $j = $n2 - 1;
+        while (($i > -1) || ($j > -1)) {
+            if ($j > -1) {
+                if ($dm[$i][$j - 1] == $dm[$i][$j]) {
+                    $diffValues[] = $to[$j];
+                    $diffMask[] = 1;
+                    $j--;
+                    continue;
+                }
+            }
+            if ($i > -1) {
+                if ($dm[$i - 1][$j] == $dm[$i][$j]) {
+                    $diffValues[] = $from[$i];
+                    $diffMask[] = -1;
+                    $i--;
+                    continue;
+                }
+            }
+            {
+                $diffValues[] = $from[$i];
+                $diffMask[] = 0;
+                $i--;
+                $j--;
+            }
+        }
+
+        $diffValues = array_reverse($diffValues);
+        $diffMask = array_reverse($diffMask);
+
+        return array('values' => $diffValues, 'mask' => $diffMask);
     }
 
     function highActivityAlertCheck($problemID)
@@ -1921,12 +2000,17 @@ class BUActivity extends Business
                 ) != ''                  // exclude future scheduled activity
             )
         ) {
-            $this->sendUpdatedByAnotherUserEmail($dbeProblem->getValue(DBEJProblem::problemID));
+            $this->sendUpdatedByAnotherUserEmail(
+                $dbeProblem->getValue(DBEJProblem::problemID),
+                $dbeCallActivity
+            );
         }
 
     }
 
-    function sendUpdatedByAnotherUserEmail($problemID)
+    function sendUpdatedByAnotherUserEmail($problemID,
+                                           $callActivity
+    )
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
@@ -1955,19 +2039,22 @@ class BUActivity extends Business
             'NotifyUpdatedByAnotherUserEmail.inc.html'
         );
 
-        $dbeJCallActivity = $this->getLastActivityInProblem($problemID);
+
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivity->getValue(DBECallActivity::callActivityID));
+
 
         $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
             array(
-                'activityRef'  => $activityRef,
-                'reason'       => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'customerName' => $dbeJProblem->getValue(DBEJProblem::customerName),
-                'urlActivity'  => $urlActivity,
-                'CONFIG_SERVICE_REQUEST_DESC'
-                               => CONFIG_SERVICE_REQUEST_DESC
+                'activityRef'                 => $activityRef,
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                'urlActivity'                 => $urlActivity,
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName)
 
             )
         );
@@ -8888,7 +8975,13 @@ is currently a balance of ';
             $sql .= " AND caa_callactivityno <> " . $exceptCallActivityID;
         }
 
-        return $this->db->query($sql)->fetch_object()->openActivityCount;
+        $result = $this->db->query($sql);
+
+        if (!$result) {
+            throw new Exception('Failed to retrieve data:' . $this->db->error);
+        }
+
+        return $result;
 
     }
 
