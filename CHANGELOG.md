@@ -8,6 +8,10 @@ This project changes will be shown here.
 ### Added
 - Issue 442 - Customer Starter & Leaver questions
 
+## [v2.0.7] - 2019-02-08
+### Fixed 
+- Fix issue with counting open activities
+
 ## [v2.0.6] - 2019-02-08
 ### Fixed
 - Unnecessary email sending on SR updates

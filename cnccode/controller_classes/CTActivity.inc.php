@@ -5104,7 +5104,6 @@ class CTActivity extends CTCNC
 
                 //try to close all the activities
                 $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue('problemID'));
-
                 if ($this->buActivity->countOpenActivitiesInRequest(
                         $dsCallActivity->getValue('problemID'),
                         $dsCallActivity->getValue('callActivityID')
@@ -5221,7 +5220,6 @@ class CTActivity extends CTCNC
 
             //try to close all the activities
             $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue('problemID'));
-
             if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID')) > 0) {
                 $this->dsCallActivity->setMessage(
                     'problemStatus',
