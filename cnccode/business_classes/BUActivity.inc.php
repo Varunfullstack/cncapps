@@ -8976,12 +8976,11 @@ is currently a balance of ';
         }
 
         $result = $this->db->query($sql);
-
         if (!$result) {
             throw new Exception('Failed to retrieve data:' . $this->db->error);
         }
-
-        return $result;
+        $count = +$result->fetch_assoc()['openActivityCount'];
+        return $count;
 
     }
 
