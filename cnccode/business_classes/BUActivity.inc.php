@@ -8889,7 +8889,13 @@ is currently a balance of ';
             $sql .= " AND caa_callactivityno <> " . $exceptCallActivityID;
         }
 
-        return $this->db->query($sql)->fetch_object()->openActivityCount;
+        $result = $this->db->query($sql);
+
+        if (!$result) {
+            throw new Exception('Failed to retrieve data:'.$this->db->error);
+        }
+
+        return $result;
 
     }
 
