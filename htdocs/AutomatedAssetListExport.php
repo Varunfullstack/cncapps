@@ -16,16 +16,14 @@ $db->query('select * from customer where cus_referred <> "Y"');
 $customerIDs = [];
 
 //we are going to use this to add to the monitoring db
-$dsn = 'mysql:host=192.168.33.64;dbname=labtech';
-$DB_USER = "cnccrmuser";
-$DB_PASSWORD = "kj389fj29fjh";
+$dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
 $options = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
 $labtechDB = new PDO(
     $dsn,
-    $DB_USER,
-    $DB_PASSWORD,
+    LABTECH_DB_USERNAME,
+    LABTECH_DB_PASSWORD,
     $options
 );
 
@@ -148,7 +146,10 @@ ORDER BY clients.name,
     $statement = $labtechDB->prepare($query);
     $test = $statement->execute([$db->Record['cus_custno']]);
     if (!$test) {
-        echo '<div>Something went wrong...' . implode(',',$statement->errorInfo()) . ' </div>';
+        echo '<div>Something went wrong...' . implode(
+                ',',
+                $statement->errorInfo()
+            ) . ' </div>';
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);

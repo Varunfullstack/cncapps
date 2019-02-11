@@ -12,16 +12,14 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 
 //we are going to use this to add to the monitoring db
-$dsn = 'mysql:host=192.168.33.64;dbname=labtech';
-$DB_USER = "root";
-$DB_PASSWORD = "kj389fj29fjh";
+$dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
 $options = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
 $localDB = new PDO(
     $dsn,
-    $DB_USER,
-    $DB_PASSWORD,
+    LABTECH_DB_USERNAME,
+    LABTECH_DB_PASSWORD,
     $options
 );
 

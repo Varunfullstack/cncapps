@@ -104,6 +104,26 @@ define(
 );
 
 
+define(
+    'LABTECH_DB_HOST',
+    '192.168.33.64'
+);
+
+define(
+    'LABTECH_DB_NAME',
+    'labtech'
+);
+
+define(
+    'LABTECH_DB_USERNAME',
+    'cnccrmuser'
+);
+
+define(
+    'LABTECH_DB_PASSWORD',
+    'kj389fj29fjh'
+);
+
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
@@ -973,7 +993,10 @@ define(
     'mailshot8Flag'
 );    // GSC statement contact flag column
 
-define('CONFIG_HEADER_INVOICE_CONTACT', 'mailshot2Flag');     // Customer contact to send invoices to
+define(
+    'CONFIG_HEADER_INVOICE_CONTACT',
+    'mailshot2Flag'
+);     // Customer contact to send invoices to
 
 define(
     'CONFIG_HEADER_DAILY_OPEN_SR_REPORT',
