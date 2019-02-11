@@ -16,16 +16,14 @@ $db->query('select * from customer where cus_referred <> "Y"');
 $customerIDs = [];
 
 //we are going to use this to add to the monitoring db
-$dsn = 'mysql:host=192.168.33.64;dbname=labtech';
-$DB_USER = "root";
-$DB_PASSWORD = "kj389fj29fjh";
+$dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
 $options = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 ];
 $labtechDB = new PDO(
     $dsn,
-    $DB_USER,
-    $DB_PASSWORD,
+    LABTECH_DB_USERNAME,
+    LABTECH_DB_PASSWORD,
     $options
 );
 
@@ -35,6 +33,7 @@ while ($db->next_record(MYSQLI_ASSOC)) {
         "SELECT 
   locations.name AS \"Location\",
   computers.name AS \"Computer Name\",
+  SUBSTRING_INDEX(lastusername, '\\\', - 1) AS \"Last User\",
   computers.localaddress AS \"IP Address\",
    DATE_FORMAT(
     computers.lastContact,
@@ -57,7 +56,6 @@ while ($db->next_record(MYSQLI_ASSOC)) {
   ) AS \"Operating System\",
   computers.version AS \"Version\",
   computers.domain AS 'Domain',
-  SUBSTRING_INDEX(lastusername, '\\\', - 1) AS \"Last User\",
   SUBSTRING_INDEX(
     software.name,
     'Microsoft Office ',
@@ -148,7 +146,10 @@ ORDER BY clients.name,
     $statement = $labtechDB->prepare($query);
     $test = $statement->execute([$db->Record['cus_custno']]);
     if (!$test) {
-        echo '<div>Something went wrong...' . implode(',',$statement->errorInfo()) . ' </div>';
+        echo '<div>Something went wrong...' . implode(
+                ',',
+                $statement->errorInfo()
+            ) . ' </div>';
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);

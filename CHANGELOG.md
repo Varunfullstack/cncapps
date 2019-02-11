@@ -1,6 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.1.0]
+### Changed
+- Issue 137 - CNC029 - Password archiving & security
+- Issue 436 - Changing contracts in SR, permissions required
+### Added
+- Issue 442 - Customer Starter & Leaver questions
+
 ## [v2.0.7] - 2019-02-08
 ### Fixed 
 - Fix issue with counting open activities

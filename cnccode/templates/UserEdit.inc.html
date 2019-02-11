@@ -656,6 +656,23 @@
                 > <span class="formErrorMessage">{signatureFilenameMessage}</span>
             </td>
         </tr>
+        <tr>
+            <td class="promptText">Password Level</td>
+            <td class="field">
+                <select name="user[1][passwordLevel]"
+                        required
+                >
+                    <!-- BEGIN levelBlock -->
+                    <option {levelSelected}
+                            value="{level}"
+                    >
+                        {level}
+                    </option>
+                    <!-- END levelBlock -->
+                </select>
+                <span class="formErrorMessage">{passwordLevelMessage}</span>
+            </td>
+        </tr>
 
 
         <tr>
@@ -723,14 +740,39 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Change SR contracts</td>
+            <td class="fieldText">
+                <input name="user[1][changeSRContractsFlag]"
+                       type="checkbox"
+                       id="user[1][changeSRContractsFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {changeSRContractsFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Starter & Leaver question management</td>
+            <td class="fieldText">
+                <input name="user[1][starterLeaverQuestionManagementFlag]"
+                       type="checkbox"
+                       id="user[1][starterLeaverQuestionManagementFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {starterLeaverQuestionManagementFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Exclude from Stats</td>
-            <td class="fieldText"><input name="user[1][excludeFromStatsFlag]"
-                                         type="checkbox"
-                                         id="user[1][excludeFromStatsFlag]"
-                                         value="Y"
-                                         {DISABLED}
-                                         {excludeFromStatsFlagChecked}
-            />
+            <td class="fieldText">
+                <input name="user[1][excludeFromStatsFlag]"
+                       type="checkbox"
+                       id="user[1][excludeFromStatsFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {excludeFromStatsFlagChecked}
+                />
             </td>
         </tr>
         <tr>

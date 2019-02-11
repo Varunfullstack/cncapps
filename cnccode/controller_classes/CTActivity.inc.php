@@ -4151,7 +4151,7 @@ class CTActivity extends CTCNC
         /*
       Contract can only be changed by member of Accounts group
       */
-        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+        if ($this->dbeUser->getValue(DBEUser::changeSRContractsFlag) == 'Y') {
             $contract_disabled = '';
         } else {
             $contract_disabled = CTCNC_HTML_DISABLED;

@@ -3,17 +3,18 @@
                    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-    <changeSet author="pavwebdev" id="issue269-1527669157-0">
-        <tagDatabase tag="issue269"/>
+    <changeSet author="pavwebdev" id="release2.1.0-0">
+        <tagDatabase tag="Release-2.1.0"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue269-1527669157-1">
+    <include file="db.changelog-issue137.xml"/>
+    <include file="db.changelog-issue436.xml"/>
+    <include file="db.changelog-issue442.xml"/>
+    <changeSet id="release2.1.0-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="problem" columnName="pro_reopened_date"/>
-            </not>
+            <tableExists tableName="starterLeaverQuestion"/>
         </preConditions>
-        <addColumn tableName="problem">
-            <column name="pro_reopened_date" type="date"/>
-        </addColumn>
+        <addUniqueConstraint tableName="starterLeaverQuestion" columnNames="questionID"/>
     </changeSet>
 </databaseChangeLog>
+
+

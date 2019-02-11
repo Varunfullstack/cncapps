@@ -80,6 +80,8 @@ function Trim(str)
  */ {
     return RTrim(LTrim(str));
 }
+
+
 /*
  Workaround for problem javascript seems to have with one array element length!
  */
