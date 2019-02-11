@@ -17,7 +17,7 @@ $customerIDs = [];
 
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=192.168.33.64;dbname=labtech';
-$DB_USER = "root";
+$DB_USER = "cnccrmuser";
 $DB_PASSWORD = "kj389fj29fjh";
 $options = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
@@ -35,6 +35,7 @@ while ($db->next_record(MYSQLI_ASSOC)) {
         "SELECT 
   locations.name AS \"Location\",
   computers.name AS \"Computer Name\",
+  SUBSTRING_INDEX(lastusername, '\\\', - 1) AS \"Last User\",
   computers.localaddress AS \"IP Address\",
    DATE_FORMAT(
     computers.lastContact,
@@ -57,7 +58,6 @@ while ($db->next_record(MYSQLI_ASSOC)) {
   ) AS \"Operating System\",
   computers.version AS \"Version\",
   computers.domain AS 'Domain',
-  SUBSTRING_INDEX(lastusername, '\\\', - 1) AS \"Last User\",
   SUBSTRING_INDEX(
     software.name,
     'Microsoft Office ',
