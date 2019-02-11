@@ -91,6 +91,9 @@
 
         function checkAddOption() {
             const option = optionElm.value;
+            if (!optionElm.value) {
+                return;
+            }
             let options = getOptions();
             options.push(option);
             optionElm.value = null;
@@ -120,8 +123,13 @@
         }
 
         function removeOption() {
+            debugger;
+            let target = event.target;
+            if (target.tagName === "I") {
+                target = target.parentElement;
+            }
             const options = getOptions();
-            let idx = event.target.dataset.id;
+            let idx = target.dataset.id;
             options.splice(idx, 1);
             storeOptions(options);
             redrawOptionsHolder(options);
