@@ -37,12 +37,6 @@ class DSForm extends DataSet
                         $message
     )
     {
-        var_dump('here');
-        try {
-            throw new Exception('test');
-        } catch (\Exception $exception) {
-            var_dump($exception->getTraceAsString());
-        }
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $this->message[$ixColumn] = $message;
