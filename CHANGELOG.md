@@ -5,6 +5,57 @@ This project changes will be shown here.
 ### Changed
 - Issue 448 - Allow Sales Requests to be editable
 
+## [v2.1.1] - 2019-02-12
+### Removed
+- Remove debug log shown when editing an activity and showing a form error.
+
+## [v2.1.0]
+### Changed
+- Issue 137 - CNC029 - Password archiving & security
+- Issue 436 - Changing contracts in SR, permissions required
+### Added
+- Issue 442 - Customer Starter & Leaver questions
+
+## [v2.0.7] - 2019-02-08
+### Fixed 
+- Fix issue with counting open activities
+
+## [v2.0.6] - 2019-02-08
+### Fixed
+- Unnecessary email sending on SR updates
+
+## [v2.0.5] - 2019-02-04
+### Fixed
+- Fix issue where OthersEmails flags where getting ignored
+
+## [v2.0.4] - 2019-02-04
+### Fixed
+- Fix Issue with logged requests showing html characters in the reason
+
+## [v2.0.3] - 2019-02-04
+### Fixed
+- Fixed Issues with to be logged requests not picking up the body of the email.
+- Fixed issue after logging a new request being sent to a blank page.
+
+## [v2.0.2] - 2019-01-31
+### Fixed 
+- Fixed issue with sending emails to customers for Service Requests
+
+## [v2.0.1]
+### Fixed
+- Can't create new users due to the Primary Main Contact being required
+
+## [v2.0.0] - 2019-01-31
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+- Issue 358 - Review automatic email creation process so that it's compatible with the new contacts in 215
+- Issue 408 - Contact Validation Improvements
+### Fixed
+- Issue 352 - CNCWEB contacts bugs
+### Added
+- Issue 347 - Customer Review Management documents
+- Issue 345 - Creation of Primary Main Contact 
+
 ## [v1.16.1] - 2019-01-29
 ### Fixed
 - Search SRs take you to the Sales Order, not Service Request

@@ -1117,7 +1117,8 @@ GROUP BY caa_callacttypeno,
                 'Project.php',
                 array(
                     'action'  => 'historyPopup',
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'htmlFmt' => CT_HTML_FMT_POPUP,
+                    'projectID' => $project['projectID']
                 )
             );
 

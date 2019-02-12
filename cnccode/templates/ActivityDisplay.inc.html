@@ -2,9 +2,6 @@
 <script type="text/javascript"
         src="ckeditor/ckeditor.js"
 ></script>
-<link rel="stylesheet"
-      href="/font-awesome/css/font-awesome.css"
-/>
 <style>
 
     a.button {
@@ -281,36 +278,48 @@
     <tr>
         <td class="promptText">ID</td>
         <td class="mainHeadText">{problemID}_{callActivityID}</td>
-        <td class="mainHeadText">{priority}</td>
+        <td class="mainHeadText"
+            colspan="2"
+        >{priority}
+        </td>
         <td class="mainHeadText">{problemStatus}</td>
     </tr>
     <tr>
         <td class="promptText">Type</td>
         <td class="fieldText">{activityType}</td>
+        <td>
+            <span {authorisedByHide}>Authorised by {authorisedByName}</span>
+        </td>
         <td class="promptText">User</td>
         <td class="fieldText">{engineerName}</td>
     </tr>
     <tr>
         <td class="promptText">Contract</td>
         <td class="mainHeadText">{contractDescription}</td>
+        <td></td>
         <td class="promptText">Value</td>
         <td class="fieldText">{curValue}</td>
     </tr>
     <tr>
         <td class="promptText">&nbsp;</td>
         <td class="mainHeadText">{serverGuard}</td>
+        <td></td>
         <td class="promptText">Date</td>
         <td class="fieldText">{date}</td>
     </tr>
     <tr>
         <td class="promptText">Project</td>
         <td class="mainHeadText">{projectDescription}</td>
+        <td></td>
         <td class="promptText">Start Time</td>
         <td class="fieldText">{startTime}</td>
     </tr>
     <tr>
         <td colspan="2"></td>
-        <td class="promptText">End Time</td>
+        <td class="promptText"
+            colspan="2"
+        >End Time
+        </td>
         <td>{endTime}</td>
     </tr>
     <tr>
@@ -319,6 +328,7 @@
             valign="top"
         >{rootCauseDescription}
         </td>
+        <td></td>
         <td class="promptText"
             valign="top"
         >Complete Date

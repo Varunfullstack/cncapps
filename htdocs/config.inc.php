@@ -63,6 +63,12 @@ define(
 ); // replicated server
 
 define(
+    'MAIN_CONFIG_SERVER_TYPE_WEBSITE',
+    'website'
+);
+
+
+define(
     'CUSTOMERS_ENCRYPTION_PRIVATE_KEY',
     'c:\\keys\\privkey.pem'
 );
@@ -82,6 +88,41 @@ define(
     'c:\\keys\\user-private.pub'
 );
 
+define(
+    'PASSWORD_ENCRYPTION_PRIVATE_KEY',
+    'c:\\keys\\passwordPrivate.pem'
+);
+
+define(
+    'PASSWORD_ENCRYPTION_PUBLIC_KEY',
+    'c:\\keys\\passwordPublic.pub'
+);
+
+define(
+    'PASSWORD_PASSPHRASE',
+    "adductor scincoid glue aviation sought beaker"
+);
+
+
+define(
+    'LABTECH_DB_HOST',
+    '192.168.33.64'
+);
+
+define(
+    'LABTECH_DB_NAME',
+    'labtech'
+);
+
+define(
+    'LABTECH_DB_USERNAME',
+    'cnccrmuser'
+);
+
+define(
+    'LABTECH_DB_PASSWORD',
+    'kj389fj29fjh'
+);
 
 $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
@@ -100,6 +141,9 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cnctest:86':
             $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
+            break;
+        case 'cncweb:88':
+            $server_type = MAIN_CONFIG_SERVER_TYPE_WEBSITE;
 
     }
 
@@ -328,6 +372,92 @@ switch ($server_type) {
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 //            error_reporting(E_ALL & ~E_STRICT)
+        error_reporting(E_ALL & ~E_WARNING);
+        ini_set(
+            'display_errors',
+            'on'
+        );
+
+        $GLOBALS['mail_options'] =
+            array(
+                'driver' => 'smtp',
+                'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                'port'   => 25,
+                'auth'   => false
+            );
+
+        define(
+            'CONFIG_TEST_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SALES_EMAIL',
+            'sales@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_SALES_MANAGER_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SUPPORT_EMAIL',
+            'support@cnc-ltd.co.uk'
+        );
+        define(
+            'CONFIG_CUSTOMER_SERVICE_EMAIL',
+            ' customerservice@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_SUPPORT_MANAGER_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SUPPORT_ADMINISTRATOR_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_HELP_DESK_EMAIL',
+            'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_PREPAY_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+
+        $GLOBALS['request_mail_options'] =
+            array(
+                'host'     => 'cncmx01',
+                'port'     => 143,
+                'user'     => 'devasr',
+                'password' => 'Unread01$'
+            );
+        break;
+
+    case MAIN_CONFIG_SERVER_TYPE_WEBSITE:
+
+        define(
+            "DB_NAME",
+            "cncweb"
+        );
+        define(
+            "BASE_DRIVE",
+            dirname(__DIR__)
+        );
+        define(
+            "SCR_DIR",
+            "\\\\cncltd\\cnc\\Company\\scr\\dev"
+        );
+        define(
+            "CUSTOMER_DIR_FROM_BROWSER",
+            "//cncltd/cnc/customer/dev"
+        );
+        define(
+            "CUSTOMER_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev"
+        );
+        define(
+            'CONFIG_CATCHALL_EMAIL',
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
+        );
         error_reporting(E_ALL & ~E_WARNING);
         ini_set(
             'display_errors',
@@ -867,21 +997,6 @@ define(
     'CONFIG_HEADER_GSC_STATEMENT_FLAG',
     'mailshot8Flag'
 );    // GSC statement contact flag column
-
-define(
-    'CONFIG_HEADER_MAIN_CONTACT_FLAG',
-    'mailshot10Flag'
-);    // Main contact flag column
-
-define(
-    'CONFIG_HEADER_SUPPORT_CONTACT_FLAG',
-    'mailshot5Flag'
-);
-
-define(
-    'CONFIG_HEADER_TECHNICAL_MAILSHOT_CONTACT_FLAG',
-    'mailshot6Flag'
-);
 
 define(
     'CONFIG_HEADER_INVOICE_CONTACT',

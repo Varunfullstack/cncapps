@@ -594,6 +594,12 @@ class Controller extends BaseObject
                 'bgcolor=#f1f9d1'
             );
         }
+        if ($GLOBALS['server_type'] == MAIN_CONFIG_SERVER_TYPE_WEBSITE) {
+            $this->template->set_var(
+                "environmentTag",
+                'bgcolor=#f0f9ff'
+            );
+        }
 
         if ($this->getFormError()) {
             if ($this->getFormErrorMessage() != '') {
