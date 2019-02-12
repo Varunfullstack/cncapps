@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.1.1] - 2019-02-12
+### Removed
+- Remove debug log shown when editing an activity and showing a form error.
+
 ## [v2.1.0]
 ### Changed
 - Issue 137 - CNC029 - Password archiving & security
