@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] 
+### Changed
+- Issue 459 - Time Request page auto refresh
+
 ## [v2.1.1] - 2019-02-12
 ### Removed
 - Remove debug log shown when editing an activity and showing a form error.
