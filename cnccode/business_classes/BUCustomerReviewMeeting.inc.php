@@ -733,6 +733,8 @@ class BUCustomerReviewMeeting extends Business
             'RenewalOwner2018',
             'CNCShoreham2018'
         );
+
+        return $htmlPage;
     }
 
     function pdfEncrypt($origFile,
