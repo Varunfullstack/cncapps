@@ -139,7 +139,7 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
                         'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
                         'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
-                        'waterMark'    => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+                        "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
                     )
                 );
 
@@ -585,14 +585,13 @@ class CTCustomerReviewMeeting extends CTCNC
 
 
         $html = $agendaTemplate->get_var('output');
-
-        $result = $this->buCustomerReviewMeeting->generateAgendaPdf(
-            $_REQUEST['customerID'],
-            $html,
-            $_REQUEST['meetingDateYmd']
-        );
-
-        if (!$result) {
+        try {
+            $this->buCustomerReviewMeeting->generateAgendaPdf(
+                $_REQUEST['customerID'],
+                $html,
+                $_REQUEST['meetingDateYmd']
+            );
+        } catch (\Exception $exception) {
             return ["status" => "error", "description" => "Failed to generate files"];
         }
 

@@ -371,7 +371,7 @@ class BUCustomerReviewMeeting extends Business
         }
         if ($_error) {
             unlink($tempFilePath);
-            return false;
+            throw new Exception(json_encode($_error));
         } else {
             return true;
         }
