@@ -9,14 +9,15 @@
     <changeSet author="pavwebdev" id="1548845244-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_standardtexttypeno = 5
+                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_desc = "Sales Request"
             </sqlCheck>
         </preConditions>
         <sql>
-            insert into standardtexttype values (5,"Sales Request", null)
+            insert into standardtexttype values ((select max(sty_standardtexttypeno) + 1 from standardtexttype
+            alias),"Sales Request", null)
         </sql>
         <rollback>
-            delete from standardtexttype where sty_standardtexttypeno = 5
+            delete from standardtexttype where sty_desc = "Sales Request"
         </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="1548845244-2">
@@ -25,24 +26,34 @@
                 <columnExists tableName="standardtext" columnName="salesRequestEmail"/>
             </not>
         </preConditions>
-        <addColumn tableName="saleRequestStandardText">
+        <addColumn tableName="standardtext">
             <column name="salesRequestEmail" type="varchar(100)"/>
         </addColumn>
     </changeSet>
     <changeSet author="pavwebdev" id="1548845244-3">
-        <preConditions onFail="MARK_RAN">
+        <preConditions onFail="WARN">
             <columnExists tableName="standardtext" columnName="salesRequestEmail"/>
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_standardtexttypeno = 5
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_desc = "Sales Request"
             </sqlCheck>
         </preConditions>
         <sql splitStatements="true">
             <![CDATA[
-            insert into standardtext values ((select nextid from db_sequence where seq_name = "standardtext"),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5, "salesrequeststarter@cnc-ltd.co.uk");
-            insert into standardtext values ((select nextid + 1 from db_sequence where seq_name = "standardtext"),2,"Other Request","<table><tbody><tr><td>Reason for request</td><td></td></tr><tr><td>Software/hardware required</td><td></td></tr><tr><td>Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",5,"salesrequestother@cnc-ltd.co.uk");
-            update db_sequence set nextid = nextid + 2 where seq_name = "standardtext";
+            insert into standardtext values ((select max(stt_standardtextno) + 1 from standardtext alias),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>", (SELECT sty_standardtexttypeno FROM standardtexttype WHERE sty_desc = "Sales Request"), "salesrequeststarter@cnc-ltd.co.uk");
+            insert into standardtext values ((select max(stt_standardtextno) + 1 from standardtext alias),2,"Other Request","<table><tbody><tr><td>Reason for request</td><td></td></tr><tr><td>Software/hardware required</td><td></td></tr><tr><td>Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",(SELECT sty_standardtexttypeno FROM standardtexttype WHERE sty_desc = "Sales Request"),"salesrequestother@cnc-ltd.co.uk");
+            update db_sequence set nextid = (select  max(stt_standardtextno) from standardtext) where seq_name = "standardtext";
             update standardtexttype set sty_desc = "Service Request from Sales Order" where sty_standardtexttypeno = 3;
         ]]>
         </sql>
+        <rollback>
+            <sql splitStatements="true">
+                <![CDATA[
+            delete from standardtexttype where sty_desc = "Sales Request";
+            delete from standardtext where stt_desc in ("New Starter/Office 365 License", "Other Request");
+            update db_sequence set nextid = (select  max(stt_standardtextno) from standardtext) where seq_name = "standardtext";
+            update standardtexttype set sty_desc = "Sales Order Request" where sty_standardtexttypeno = 3;
+        ]]>
+            </sql>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

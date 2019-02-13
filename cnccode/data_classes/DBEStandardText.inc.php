@@ -15,6 +15,7 @@ class DBEStandardText extends DBEntity
     const stt_desc = "stt_desc";
     const stt_text = "stt_text";
     const stt_standardtexttypeno = "stt_standardtexttypeno";
+    const salesRequestEmail = 'salesRequestEmail';
 
     /**
      * calls constructor()
@@ -57,6 +58,13 @@ class DBEStandardText extends DBEntity
             DA_NOT_NULL,
             'stt_standardtexttypeno'
         );
+
+        $this->addColumn(
+            self::salesRequestEmail,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -73,6 +81,7 @@ class DBEStandardText extends DBEntity
 
         return (parent::getRows());
     }
+
 }
 
 ?>

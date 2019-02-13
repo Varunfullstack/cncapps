@@ -35,6 +35,7 @@ require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUtilityEmail.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 
 define(
@@ -11082,9 +11083,18 @@ is currently a balance of ';
             "O"
         );
 
-        if ($type == "newStarter") {
-            $destEmail = "salesrequeststarter@cnc-ltd.co.uk";
-        } else if ($type == "otherRequest") {
+
+        $buStandardText = new BUStandardText($this);
+
+        $dbeStandardText = new DataSet($this);
+        $buStandardText->getStandardTextByID(
+            $type,
+            $dbeStandardText
+        );
+        $destEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
+
+        if ($type != "New Starter/Office 365 License") {
+
             $problem = new DBEProblem($this);
             $problem->getRow($problemID);
 
@@ -11103,9 +11113,6 @@ is currently a balance of ';
                 $alarmDate->format('h:i')
             );
             $problem->updateRow();
-            $destEmail = "salesrequestother@cnc-ltd.co.uk";
-        } else {
-            throw new Exception('The type is not valid');
         }
 
         $this->sendSalesRequestEmail(
