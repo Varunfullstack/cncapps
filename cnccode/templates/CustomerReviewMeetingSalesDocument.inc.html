@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style media="screen" type="text/css">
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8"
+    />
+    <style media="screen"
+           type="text/css"
+    >
         body {
             font-family: sans-serif;
             font-size: 10pt;
@@ -37,14 +41,35 @@
             border: none;
         }
 
+        #watermark {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            /** The width and height may change
+                according to the dimensions of your letterhead
+            **/
+            /*width: 210cm;*/
+            /*height: 297cm;*/
+
+            /** Your watermark should be behind every content**/
+            z-index: -1000;
+        }
+
     </style>
 </head>
 
 <body>
-<table class="invisible" style="width: 100%;">
+<div id="watermark">
+    <img src="{waterMarkURL}"/>
+</div>
+<table class="invisible"
+       style="width: 100%;"
+>
     <tr>
         <td style="width: 90%">&nbsp;</td>
-        <td><img src="http://cncapps/images/cnclogo.jpg" style="width:100px"></td>
+        <td><img src="http://cncapps/images/cnclogo.jpg"
+                 style="width:100px"
+        ></td>
     </tr>
 </table>
 
@@ -108,7 +133,10 @@
     <!-- BEGIN itemBlock -->
     {itemTypeHeader}
     <tr class="{itemClass}">
-        <td colspan="2" class="content">{description}</td>
+        <td colspan="2"
+            class="content"
+        >{description}
+        </td>
         <td class="content">{notes}{coveredItemsString}</td>
         <td class="content">{expiryDate}</td>
         <td class="contentRightAlign">1</td>
@@ -120,7 +148,10 @@
         <td colspan="7">Total</td>
     </tr>
     <tr>
-        <td colspan="5" class="contentRightAlign">&nbsp;</td>
+        <td colspan="5"
+            class="contentRightAlign"
+        >&nbsp;
+        </td>
         <td class="contentRightAlign">{totalCostPrice}</td>
         <td class="contentRightAlign">{totalSalePrice}</td>
     </tr>

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 446 - Add new CNC graphic to quick quotes
+
 ## [v2.1.1] - 2019-02-12
 ### Removed
 - Remove debug log shown when editing an activity and showing a form error.
