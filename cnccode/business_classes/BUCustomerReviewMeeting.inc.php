@@ -537,6 +537,13 @@ class BUCustomerReviewMeeting extends Business
         $pdf->Output($destFile, 'F'); // F write, D download
         return $destFile;
     }
+
+    public function generateMeetingNotes($customerID,
+                                         $meetingDateYmd
+    )
+    {
+
+    }
 }
 
 ?>
