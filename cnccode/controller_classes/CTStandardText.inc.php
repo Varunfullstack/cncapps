@@ -290,19 +290,17 @@ class CTSTANDARDTEXT extends CTCNC
 
         $this->template->set_var(
             array(
-                'stt_standardtextno'    => $stt_standardtextno,
-                'stt_sort_order'        => Controller::htmlInputText($dsStandardText->getValue('stt_sort_order')),
-                'stt_sort_orderMessage' => Controller::htmlDisplayText($dsStandardText->getMessage('stt_sort_order')),
-                'stt_desc'              => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
-                'stt_descMessage'       => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
-                'stt_text'              => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
-                'stt_textMessage'       => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
-                'urlUpdate'             => $urlUpdate,
-                'urlDelete'             => $urlDelete,
-                'txtDelete'             => $txtDelete,
-                'urlDisplayList'        => $urlDisplayList,
-                'salesRequestTypeID'    => $salesRequestTypeID,
-                'salesRequestEmail'     => $dsStandardText->getValue(DBEStandardText::salesRequestEmail)
+                'stt_standardtextno' => $stt_standardtextno,
+                'stt_desc'           => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
+                'stt_descMessage'    => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
+                'stt_text'           => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
+                'stt_textMessage'    => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList,
+                'salesRequestTypeID' => $salesRequestTypeID,
+                'salesRequestEmail'  => $dsStandardText->getValue(DBEStandardText::salesRequestEmail)
             )
         );
 

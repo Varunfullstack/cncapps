@@ -11,7 +11,6 @@ class DBEStandardText extends DBEntity
 {
 
     const stt_standardtextno = "stt_standardtextno";
-    const stt_sort_order = "stt_sort_order";
     const stt_desc = "stt_desc";
     const stt_text = "stt_text";
     const stt_standardtexttypeno = "stt_standardtexttypeno";
@@ -33,12 +32,6 @@ class DBEStandardText extends DBEntity
             DA_ID,
             DA_NOT_NULL,
             'stt_standardtextno'
-        );
-        $this->addColumn(
-            "stt_sort_order",
-            DA_INTEGER,
-            DA_NOT_NULL,
-            'stt_sort_order'
         );
         $this->addColumn(
             "stt_desc",
@@ -69,15 +62,45 @@ class DBEStandardText extends DBEntity
         $this->setAddColumnsOff();
     }
 
+    private function defaultOrdering()
+    {
+        return " order by " . $this->getDBColumnName(self::stt_standardtexttypeno) . " asc , " . $this->getDBColumnName(
+                self::stt_desc
+            );
+    }
+
+    function getRows($sortColumn = '')
+    {
+        $this->setMethodName("getRows");
+        if ($this->getQueryString() == "") {
+            $queryString =
+                "SELECT " . $this->getDBColumnNamesAsString() .
+                " FROM " . $this->getTableName();
+            if ($sortColumn != '') {
+                $sortColumnNo = ($this->columnExists($sortColumn));
+                if ($sortColumnNo == DA_OUT_OF_RANGE) {
+                    $this->raiseError($sortColumn . ' ' . DA_MSG_COLUMN_DOES_NOT_EXIST);
+                } else {
+                    $queryString .= ' ORDER BY ' . $this->getDBColumnName($sortColumnNo);
+                }
+            } else {
+                $queryString .= $this->defaultOrdering();
+            }
+            $this->setQueryString($queryString);
+        }
+        return ($this->runQuery());
+    }
+
     function getRowsByTypeID($standardTextTypeID)
     {
         $this->setMethodName("getRowsInGroup");
 
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE stt_standardtexttypeno = " . $standardTextTypeID
-        );
+            " WHERE stt_standardtexttypeno = " . $standardTextTypeID;
+
+        $query .= $this->defaultOrdering();
+        $this->setQueryString($query);
 
         return (parent::getRows());
     }

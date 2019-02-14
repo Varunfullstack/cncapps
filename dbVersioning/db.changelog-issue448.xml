@@ -56,4 +56,15 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="standardtext" columnName="stt_sort_order"/>
+        </preConditions>
+        <dropColumn tableName="standardtext" columnName="stt_sort_order"/>
+        <rollback>
+            <addColumn tableName="standardtext">
+                <column name="stt_sort_order" type="int(1) unsigned"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

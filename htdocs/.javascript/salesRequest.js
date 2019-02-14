@@ -68,9 +68,10 @@ function cancelSalesRequest() {
 }
 
 function startSalesRequest(problemID) {
-    window.salesRequest = {
-        problemID: problemID,
-    };
+    if (!window.salesRequest) {
+        window.salesRequest = {};
+    }
+    window.salesRequest.problemID = problemID;
 
     if (!window.salesRequest.dialogTemplate) {
         window.salesRequest.dialogTemplate = $(salesRequestDialogTemplate).dialog({autoOpen: true, width: 910});

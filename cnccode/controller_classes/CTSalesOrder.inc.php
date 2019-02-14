@@ -4539,15 +4539,10 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $block
     )
     {
+
         $dbeStandardText = new DBEStandardText($this);
-        $dbeStandardText->setValue(
-            'stt_standardtexttypeno',
-            3
-        );
-        $dbeStandardText->getRowsByColumn(
-            'stt_standardtexttypeno',
-            'stt_sort_order'
-        );
+
+        $dbeStandardText->getRowsByTypeID(3);
 
         $this->template->set_block(
             $template,
