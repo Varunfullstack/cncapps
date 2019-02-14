@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 470 - Automated schedule to 'delete' pending user contacts
+
 ## [v2.1.1] - 2019-02-12
 ### Removed
 - Remove debug log shown when editing an activity and showing a form error.
