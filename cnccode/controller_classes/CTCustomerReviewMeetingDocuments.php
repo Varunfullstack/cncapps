@@ -402,7 +402,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             $toEmail = $dbeContact->getValue(DBEContact::email);
 
             $hdrs = array(
-                'From'         => $fromEmail,
+                'From'         => $this->dbeUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk',
                 'To'           => $toEmail,
                 'Subject'      => "CNC Review Meeting Documents",
                 'Date'         => date("r"),
