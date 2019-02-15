@@ -539,9 +539,42 @@ class BUCustomerReviewMeeting extends Business
     }
 
     public function generateMeetingNotes($customerID,
-                                         $meetingDateYmd
+                                         $meetingDate
     )
     {
+        $buCustomer = new BUCustomer($this);
+
+        $buCustomer->getCustomerByID($customerID, $dsCustomer);
+
+
+        \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
+        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor(
+            PDF_RESOURCE_DIR . '/Client Meeting Notes Template.docx'
+        );
+
+        $templateProcessor->setValue(
+            'clientName',
+            'Manolo nuevo!'
+        );
+            $meetingDate = new \DateTime($meetingDate);
+        $templateProcessor->setValue(
+            'reviewMeetingDate',
+        );
+
+        $templateProcessor->saveAs('temp.docx');
+        $output = shell_exec('"c:\Program Files\LibreOffice\program\soffice.exe" --headless --convert-to pdf temp.docx');
+
+        echo $output;
+        exit;
+        $rendererName = \PhpOffice\PhpWord\Settings::PDF_RENDERER_DOMPDF;
+        $rendererLibraryPath = realpath(__DIR__ . '/../vendor/dompdf/dompdf');
+        \PhpOffice\PhpWord\Settings::setPdfRenderer(
+            $rendererName,
+            $rendererLibraryPath
+        );
+        $writer = new \PhpOffice\PhpWord\Writer\PDF($phpWord);
+        $writer->save('test.pdf');
+
 
     }
 }
