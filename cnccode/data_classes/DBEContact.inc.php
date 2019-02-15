@@ -656,7 +656,7 @@ class DBEContact extends DBCNCEntity
         } else {
             $sql .= " AND " . $this->getDBColumnName(
                     self::supportLevel
-                ) . " in ('" . self::supportLevelMain . "','" . self::supportLevelSupervisor . "'";
+                ) . " in ('" . self::supportLevelMain . "','" . self::supportLevelSupervisor . "')";
         }
 
         $this->setQueryString($sql);
