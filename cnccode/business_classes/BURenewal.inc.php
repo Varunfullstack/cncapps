@@ -162,10 +162,6 @@ class BURenewal extends Business
         }
 
         if ($renewalCount > 0) {
-            $this->addCustomerAcceptedDocumentsToEmail(
-                $dsCustomer->getValue(DBECustomer::customerID),
-                $buMail
-            );
 
             $template->parse(
                 'output',
@@ -283,11 +279,6 @@ class BURenewal extends Business
         $template->set_file(
             'page',
             'TermsAndConditionsEmail.inc.html'
-        );
-
-        $this->addCustomerAcceptedDocumentsToEmail(
-            $dsCustomer->getValue(DBECustomer::customerID),
-            $buMail
         );
 
         $template->parse(
