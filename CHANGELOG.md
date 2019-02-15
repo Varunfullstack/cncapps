@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.1.2]
+### Changed
+- Change Customer Review Meeting sending email address
+
 ## [v2.1.1] - 2019-02-12
 ### Removed
 - Remove debug log shown when editing an activity and showing a form error.
