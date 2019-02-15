@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 450 - Sales Meeting Booking Request
+
 ## [v2.1.3] - 2019-02-15
 ### Fixed
 - Fixed Error when logging SRs for a delegate
