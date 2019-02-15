@@ -8,6 +8,8 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEStandardTextType extends DBEntity
 {
+    const standardTextTypeID = "standardTextTypeID";
+    const description = "description";
     const variables = "variables";
 
     /**
@@ -22,13 +24,13 @@ class DBEStandardTextType extends DBEntity
         parent::__construct($owner);
         $this->setTableName("standardtexttype");
         $this->addColumn(
-            "standardTextTypeID",
+            self::standardTextTypeID,
             DA_ID,
             DA_NOT_NULL,
             'sty_standardtexttypeno'
         );
         $this->addColumn(
-            "description",
+            self::description,
             DA_STRING,
             DA_NOT_NULL,
             'sty_desc'

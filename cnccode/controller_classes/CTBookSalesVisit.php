@@ -172,7 +172,6 @@ class CTBookSalesVisit extends CTCNC
             );
         }
 
-        $something = new DataSet($this);
 
         $this->template->set_block(
             'BookSalesVisit',
@@ -180,17 +179,30 @@ class CTBookSalesVisit extends CTCNC
             'typeOfMeetings'
         );
 
-        while ($something->fetchNext()){
+        $dbeStandardTextType = new DBEStandardTextType($this);
+
+        $dbeStandardTextType->setValue(
+            DBEStandardTextType::description,
+            'Sales Meeting Type'
+        );
+        $dbeStandardTextType->getRowsByColumn(DBEStandardTextType::description);
+
+        $standardTextTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
+
+        $DBEStandardText = new DBEStandardText($this);
+        $DBEStandardText->getRowsByTypeID($standardTextTypeID);
+
+        while ($DBEStandardText->fetchNext()) {
             $this->template->setVar(
                 [
-                    'typeOfMeetingID'   => $dbeUser->getValue(DBEUser::name),
+                    'typeOfMeetingID'          => $dbeUser->getValue(DBEUser::name),
                     'typeOfMeetingDescription' => $dbeUser->getValue(DBEUser::name),
                 ]
             );
 
             $this->template->parse(
-                'attendees',
-                'attendeesBlock',
+                'typeOfMeetings',
+                'typeOfMeetingBlock',
                 true
             );
         }
