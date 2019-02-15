@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v2.1.3] - 2019-02-15
 ### Fixed
 - Fixed Error when logging SRs for a delegate
+- Issue 472 - PortalProcessRequests.php - documents that are being sent out
 
 ## [v2.1.2] - 2019-02-15
 ### Changed
