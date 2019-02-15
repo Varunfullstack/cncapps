@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] 
+### Fixed
+- Issue 472 - PortalProcessRequests.php - documents that are being sent out
+
 ## [v2.1.2] - 2019-02-15
 ### Changed
 - Change Customer Review Meeting sending email address
