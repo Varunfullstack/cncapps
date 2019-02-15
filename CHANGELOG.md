@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.1.2]
+## [v2.1.2] - 2019-02-15
 ### Changed
 - Change Customer Review Meeting sending email address
 
