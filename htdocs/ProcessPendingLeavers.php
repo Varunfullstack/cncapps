@@ -131,6 +131,11 @@ while ($dsResults->fetchNext()) {
     );
 
     $dbeContact->setValue(
+        DBEContact::email,
+        null
+    );
+
+    $dbeContact->setValue(
         DBEContact::supportLevel,
         null
     );
