@@ -3032,17 +3032,20 @@ class CTSalesOrder extends CTCNC
         //$this->buildQuote($quoteFile, $versionNo);
 
         $buPDFSalesQuote = new BUPDFSalesQuote($this);
-
-        $quoteID = $buPDFSalesQuote->generate(
-            $this->getOrdheadID(),
-            $this->getSalutation(),
-            $this->getIntroduction(),
-            $this->getEmailSubject(),
-            $this->dsSelectedOrderLine
-        );
-
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
+        try {
+            $buPDFSalesQuote->generate(
+                $this->getOrdheadID(),
+                $this->getSalutation(),
+                $this->getIntroduction(),
+                $this->getEmailSubject(),
+                $this->dsSelectedOrderLine
+            );
+            header('Location: ' . $this->getDisplayOrderURL());
+        } catch (\Exception $exception) {
+            $this->setUserMessage($exception->getMessage());
+            $this->displayOrder();
+            return FALSE;
+        }
     }
 
     /**
@@ -4317,15 +4320,14 @@ now that the notes are in a text field we need to split the lines up for the PDF
      */
     function getDisplayOrderURL()
     {
-        return (
-        $this->buildLink(
+        return $this->buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'    => CTCNC_ACT_DISP_SALESORDER,
                 'ordheadID' => $this->getOrdheadID()
             )
-        )
         );
+
     }
 
     function updateItemPrice()
