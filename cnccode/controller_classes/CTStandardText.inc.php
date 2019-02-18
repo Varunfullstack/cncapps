@@ -35,7 +35,8 @@ define(
 class CTSTANDARDTEXT extends CTCNC
 {
     var $dsStandardText = '';
-    var $buStandardText = '';
+    /** @var BUStandardText */
+    public $buStandardText;
 
     function __construct($requestMethod,
                          $postVars,
@@ -72,6 +73,22 @@ class CTSTANDARDTEXT extends CTCNC
                 break;
             case CTSTANDARDTEXT_ACT_UPDATE:
                 $this->update();
+                break;
+            case "getSalesRequestOptions":
+                try {
+
+                    $data = $this->getStandardTextOptions();
+                } catch (\Exception $exception) {
+                    $data = [
+                        "error" => $exception->getMessage()
+                    ];
+                }
+
+                echo json_encode(
+                    $data,
+                    JSON_NUMERIC_CHECK
+                );
+
                 break;
             case CTSTANDARDTEXT_ACT_DISPLAY_LIST:
             default:
@@ -230,21 +247,7 @@ class CTSTANDARDTEXT extends CTCNC
         $this->setTemplateFiles(
             array('StandardTextEdit' => 'StandardTextEdit.inc')
         );
-        $this->template->set_var(
-            array(
-                'stt_standardtextno'    => $stt_standardtextno,
-                'stt_sort_order'        => Controller::htmlInputText($dsStandardText->getValue('stt_sort_order')),
-                'stt_sort_orderMessage' => Controller::htmlDisplayText($dsStandardText->getMessage('stt_sort_order')),
-                'stt_desc'              => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
-                'stt_descMessage'       => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
-                'stt_text'              => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
-                'stt_textMessage'       => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
-                'urlUpdate'             => $urlUpdate,
-                'urlDelete'             => $urlDelete,
-                'txtDelete'             => $txtDelete,
-                'urlDisplayList'        => $urlDisplayList
-            )
-        );
+
 
         /* type selector */
         // activity status selector
@@ -266,11 +269,15 @@ class CTSTANDARDTEXT extends CTCNC
         while ($dbeStandardTextType->fetchNext()) {
             $selected = ($dsStandardText->getValue('stt_standardtexttypeno') == $dbeStandardTextType->getPKValue(
                 )) ? CT_SELECTED : '';
+
+            if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Request') {
+                $salesRequestTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
+            }
             $this->template->set_var(
                 array(
                     'typeSelected'           => $selected,
-                    'stt_standardtexttypeno' => $dbeStandardTextType->getValue('standardTextTypeID'),
-                    'typeDescription'        => $dbeStandardTextType->getValue('description'),
+                    'stt_standardtexttypeno' => $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID),
+                    'typeDescription'        => $dbeStandardTextType->getValue(DBEStandardTextType::description),
                     'variables'              => $dbeStandardTextType->getValue(DBEStandardTextType::variables)
                 )
             );
@@ -280,6 +287,22 @@ class CTSTANDARDTEXT extends CTCNC
                 true
             );
         }
+
+        $this->template->set_var(
+            array(
+                'stt_standardtextno' => $stt_standardtextno,
+                'stt_desc'           => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
+                'stt_descMessage'    => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
+                'stt_text'           => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
+                'stt_textMessage'    => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList,
+                'salesRequestTypeID' => $salesRequestTypeID,
+                'salesRequestEmail'  => $dsStandardText->getValue(DBEStandardText::salesRequestEmail)
+            )
+        );
 
 
         $this->template->parse(
@@ -347,6 +370,34 @@ class CTSTANDARDTEXT extends CTCNC
             header('Location: ' . $urlNext);
             exit;
         }
+    }
+
+    private function getStandardTextOptions()
+    {
+        $DBEStandardTextType = new DBEStandardTextType($this);
+        $DBEStandardTextType->setValue(
+            DBEStandardTextType::description,
+            'Sales Request'
+        );
+        $DBEStandardTextType->getRowsByColumn(DBEStandardTextType::description);
+        $DBEStandardTextType->fetchNext();
+        $dsOptions = new DataSet($this);
+        $this->buStandardText->getStandardTextByTypeID(
+            $DBEStandardTextType->getValue(DBEStandardTextType::standardTextTypeID),
+            $dsOptions
+        );
+
+        $options = [];
+
+        while ($dsOptions->fetchNext()) {
+            $options[] = [
+                "id"       => $dsOptions->getValue(DBEStandardText::stt_standardtextno),
+                "template" => $dsOptions->getValue(DBEStandardText::stt_text),
+                'name'     => $dsOptions->getValue(DBEStandardText::stt_desc)
+            ];
+        }
+
+        return $options;
     }
 }// end of class
 ?>

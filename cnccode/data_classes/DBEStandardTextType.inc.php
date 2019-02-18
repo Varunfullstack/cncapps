@@ -9,8 +9,8 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 class DBEStandardTextType extends DBEntity
 {
     const standardTextTypeID = "standardTextTypeID";
-    const description = "description";
     const variables = "variables";
+    const description = "description";
 
     /**
      * calls constructor()
