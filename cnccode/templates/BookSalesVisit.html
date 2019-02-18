@@ -1,0 +1,248 @@
+<!-- Template: ActivitySearch.inc.html -->
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script src=".javascript/fromDateToDate.js"></script>
+<script language='JavaScript'>
+
+    const bookedActivityURL = '{bookedActivityURL}';
+
+    if (bookedActivityURL) {
+        window.open(
+            bookedActivityURL,
+            '_blank'
+        )
+    }
+
+    let customerStringElm = null;
+    let contactIDElm = null;
+    let contactStringElm = null;
+    let customerIDElm = null;
+
+    function changeCustomer() {
+        console.log(event.target);
+    }
+
+    $(function () {
+        customerStringElm = document.getElementById("customerString");
+        contactIDElm = document.getElementById('contactID');
+        contactStringElm = document.getElementById('contactString');
+        customerIDElm = document.getElementById('customerID');
+
+        checkContactID();
+    });
+
+    var state = 'none'; // display status
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function validateCustomerString() {
+
+        if (!customerStringElm.value || !customerStringElm.value.trim() || customerStringElm.value === savedCustomerString) {
+            document.searchForm.customerID.value = "";
+            return;
+        }
+
+        var newWindow = window.open('{urlCustomerPopup}&customerString=' +
+            escape(document.getElementById("customerString").value) +
+            '&parentIDField=customerID' +
+            '&parentDescField=customerString',
+            'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0');
+        newWindow.doNotSubmit = true;
+        newWindow.onbeforeunload = checkContactID;
+
+    }
+
+    function checkContactID() {
+
+        if (customerIDElm.value) {
+            $(contactStringElm).data().customerID = customerIDElm.value;
+            $(contactStringElm).attr('disabled', false);
+        } else {
+            $(contactStringElm).attr('disabled', true);
+        }
+
+    }
+
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            // document.searchForm.submit();
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+
+
+</script>
+<style type="text/css">
+    <!--
+    .style2 {
+        span-size: x-small
+    }
+
+    -->
+</style>
+
+<!--<P class="formErrorMessage">{formError} test</P>-->
+
+<form name="searchForm"
+      id="searchForm"
+      method="get"
+>
+    <input hidden
+           name="action"
+           value="bookSalesVisit"
+    >
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="100"
+                class="promptText"
+            >
+                <div align="right">Customer</div>
+            </td>
+            <td>
+                <input type="hidden"
+                       name="form[0][customerID]"
+                       id="customerID"
+                       value="{customerID}"
+                       onchange="changeCustomer()"
+                > <input
+                    type="text"
+                    id="customerString"
+                    name="customerString"
+                    value="{customerString}"
+                    onFocus="javascript:saveCustomerString()"
+                    onBlur="javascript:validateCustomerString()"
+                    onKeypress="javascript:validateCustomerStringOnReturn()"
+                    size="50"
+                    maxlength="50"
+            >
+                <p class="formErrorMessage">{customerIDMessage}</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Attendees</div>
+            </td>
+            <td>
+                <select multiple="multiple"
+                        name="form[0][attendees][]"
+                        style="height: 150px;"
+                        required
+                >
+                    <!-- BEGIN attendeesBlock -->
+                    <option value="{attendeeID}"
+                            {attendeeSelected}
+                    >
+                        {attendeeName}
+                    </option>
+                    <!-- END attendeesBlock -->
+                </select>
+                <span class="formErrorMessage">{attendeesMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Type of Meeting</div>
+            </td>
+            <td>
+                <select name="form[0][typeOfMeetingID]"
+                        required
+                        data-name="typeOfMeetingID"
+                >
+                    <option value>-- Select Type Of Meeting --</option>
+                    <!-- BEGIN typeOfMeetingBlock -->
+                    <option value="{typeOfMeetingID}"
+                            {typeOfMeetingSelected}
+                    >
+                        {typeOfMeetingDescription}
+                    </option>
+                    <!-- END typeOfMeetingBlock -->
+                </select>
+                <span class="formErrorMessage">{typeOfMeetingIDMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Contact</td>
+            <td>
+                <input type="hidden"
+                       name="form[0][contactID]"
+                       id="contactID"
+                       value="{contactID}"
+                >
+                <input type="text"
+                       class="contactLookup"
+                       data-result="contactID"
+                       id="contactString"
+                       name="contactString"
+                       value="{contactString}"
+                       disabled
+                >
+                <span class="formErrorMessage">{contactIDMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Meeting Date</div>
+            </td>
+            <td><input type="text"
+                       name="form[0][meetingDate]"
+                       value="{meetingDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       class="jqueryCalendar"
+                       autocomplete="off"
+                       required
+            > <span
+                    class="formErrorMessage"
+            >{meetingDateMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Meeting Time</div>
+            </td>
+            <td>
+                <input type="text"
+                       name="form[0][meetingTime]"
+                       value="{meetingTime}"
+                       size="10"
+                       maxlength="10"
+                       class="timePicker"
+                       required
+                       autocomplete="off"
+                       data-timepicker-min-time="08:00"
+                       data-timepicker-max-time="18:00"
+                       data-timepicker-format="H:i"
+                >
+                <span class="formErrorMessage">{meetingTimeMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Book Meeting"
+                       value="Book Meeting"
+                >
+                <input type="button"
+                       name="Clear"
+                       value="Clear"
+                       onClick="document.location = '/BookSalesVisit.php'"
+                />
+            </td>
+        </tr>
+    </table>
+</form>
+<!-- End Template: ActivitySearch.inc.html -->

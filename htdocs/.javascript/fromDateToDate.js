@@ -12,7 +12,6 @@ $(function () {
                 beforeShowDayFunction = $(this).data().jquerycalendarbeforeshowday;
             }
 
-
             $(this).datepicker({
                     dateFormat: 'dd/mm/yy',
                     changeMonth: true,

@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 474 - Request Dashboards visual enhancements
 ### Fixed
 - Issue 471 - Sales quote signature error validation
+### Added
+- Issue 450 - Sales Meeting Booking Request
 
 ## [v2.1.3] - 2019-02-15
 ### Fixed
