@@ -808,7 +808,7 @@ class BUCustomerReviewMeeting extends Business
 
         $templateProcessor->setValue(
             'clientName',
-            $reviewContactsString
+            $clientName
         );
         $meetingDate = new \DateTime($meetingDate);
         $templateProcessor->setValue(
