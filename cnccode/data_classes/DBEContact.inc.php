@@ -920,14 +920,16 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
-    public function getReviewContacts($getValue)
+    public function getReviewContacts($customerID)
     {
         $this->setMethodName("getReviewContacts");
 
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where specialAttentionContactFlag = 'Y'
+            " where " . $this->getDBColumnName(DBEContact::reviewUser) . " = 'Y' and " . $this->getDBColumnName(
+                DBEContact::customerID
+            ) . " = $customerID
       ORDER BY con_custno, con_contno";
 
         $this->setQueryString($queryString);

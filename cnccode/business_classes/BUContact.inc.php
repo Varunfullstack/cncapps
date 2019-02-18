@@ -468,5 +468,14 @@ class BUContact extends Business
             $dsResults
         );
     }
+
+    public function getReviewContacts($customerID,DataSet  $dsResults)
+    {
+        $this->dbeContact->getReviewContacts($customerID);
+        return $this->getData(
+            $this->dbeContact,
+            $dsResults
+        );
+    }
 }// End of class
 ?>

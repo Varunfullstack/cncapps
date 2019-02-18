@@ -19,6 +19,9 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 class CTCustomerReviewMeeting extends CTCNC
 {
 
+    /** @var BUCustomerReviewMeeting  */
+    private $buCustomerReviewMeeting;
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -607,6 +610,12 @@ class CTCustomerReviewMeeting extends CTCNC
             $endDate,
             $_REQUEST['meetingDateYmd']
         );
+
+        $this->buCustomerReviewMeeting->generateMeetingNotes(
+            $_REQUEST['customerID'],
+            $_REQUEST['meetingDateYmd']
+        );
+
         return ["status" => "ok"];
 
 //        $this->search();  // redisplays text
