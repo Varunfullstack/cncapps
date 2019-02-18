@@ -141,7 +141,8 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP2'        => $dsCustomer->getValue(DBECustomer::slaP2),
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
                         'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
-                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5)
+                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
+                        "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
                     )
                 );
 
@@ -571,9 +572,12 @@ class CTCustomerReviewMeeting extends CTCNC
             'CustomerReviewMeetingAgendaDocument.inc.html'
         );
 
+
         $agendaTemplate->set_var(
-            'htmlBody',
-            $text
+            [
+                'htmlBody' => $text,
+                'URL'      => "http://" . $_SERVER['HTTP_HOST'] . '/images/test.png'
+            ]
         );
 
         $agendaTemplate->parse(
@@ -584,14 +588,13 @@ class CTCustomerReviewMeeting extends CTCNC
 
 
         $html = $agendaTemplate->get_var('output');
-
-        $result = $this->buCustomerReviewMeeting->generateAgendaPdf(
-            $_REQUEST['customerID'],
-            $html,
-            $_REQUEST['meetingDateYmd']
-        );
-
-        if (!$result) {
+        try {
+            $this->buCustomerReviewMeeting->generateAgendaPdf(
+                $_REQUEST['customerID'],
+                $html,
+                $_REQUEST['meetingDateYmd']
+            );
+        } catch (\Exception $exception) {
             return ["status" => "error", "description" => "Failed to generate files"];
         }
 

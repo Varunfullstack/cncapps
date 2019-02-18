@@ -11,7 +11,7 @@ This project changes will be shown here.
 ### Added
 - Issue 450 - Sales Meeting Booking Request
 - Issue 470 - Automated schedule to 'delete' pending user contacts
-
+- Issue 446 - Add new CNC graphic to quick quotes
 
 ## [v2.1.3] - 2019-02-15
 ### Fixed

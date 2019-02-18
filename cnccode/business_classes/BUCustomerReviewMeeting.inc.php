@@ -371,7 +371,7 @@ class BUCustomerReviewMeeting extends Business
         }
         if ($_error) {
             unlink($tempFilePath);
-            return false;
+            throw new Exception(json_encode($_error));
         } else {
             return true;
         }
@@ -502,8 +502,8 @@ class BUCustomerReviewMeeting extends Business
                 'totalLabour'        => number_format(
                     $totalLabour,
                     2
-                ),
-                'totalProfit'        => number_format(
+
+                ),'totalProfit'        => number_format(
                     $totalSales - $totalCost - $totalLabour,
                     2
                 ),
@@ -515,6 +515,7 @@ class BUCustomerReviewMeeting extends Business
                     $totalLabourHours,
                     2
                 ),
+                "waterMarkURL"       => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
             )
         );
         /*
@@ -732,6 +733,8 @@ class BUCustomerReviewMeeting extends Business
             'RenewalOwner2018',
             'CNCShoreham2018'
         );
+
+        return $htmlPage;
     }
 
     function pdfEncrypt($origFile,

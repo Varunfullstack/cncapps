@@ -1036,6 +1036,7 @@ $cfg["txt_chevron"] = "&gt;";
 // System paths and URLs
 $cfg["cnclogo_path"] = IMAGES_DIR . '/cnc_logo.png';
 $cfg["cncaddress_path"] = IMAGES_DIR . '/cncaddress.gif';
+$cfg["cncwatermark_path"] = IMAGES_DIR . '/CNC_watermarkActualSize.png';
 
 $cfg["php_extension"] = ".php";
 $cfg["html_extension"] = ".html";
