@@ -495,6 +495,11 @@ class CTBookSalesVisit extends CTCNC
             );
 
             $dbeCallActivity->setValue(
+                DBEJCallActivity::endTime,
+                null
+            );
+
+            $dbeCallActivity->setValue(
                 DBEJCallActivity::status,
                 'O'
             );
