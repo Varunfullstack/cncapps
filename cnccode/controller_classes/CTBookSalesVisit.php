@@ -387,7 +387,7 @@ class CTBookSalesVisit extends CTCNC
 
         $dbeProblem->setValue(
             DBEJProblem::queueNo,
-            7
+            4
         );
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
