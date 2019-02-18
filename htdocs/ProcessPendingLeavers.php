@@ -131,6 +131,21 @@ while ($dsResults->fetchNext()) {
     );
 
     $dbeContact->setValue(
+        DBEContact::hrUser,
+        'N'
+    );
+
+    $dbeContact->setValue(
+        DBEContact::reviewUser,
+        'N'
+    );
+
+    $dbeContact->setValue(
+        DBEContact::email,
+        null
+    );
+
+    $dbeContact->setValue(
         DBEContact::supportLevel,
         null
     );
