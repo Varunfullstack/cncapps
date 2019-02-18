@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 474 - Request Dashboards visual enhancements
 - Issue 464 - Contact Validation Change
 - Issue 448 - Allow Sales Requests to be editable
+- Issue 459 - Time Request page auto refresh
 ### Fixed
 - Issue 471 - Sales quote signature error validation
 ### Added
