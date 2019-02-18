@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 459 - Time Request page auto refresh
 ### Fixed
 - Issue 471 - Sales quote signature error validation
+- Issue 458 - Customer Analysis Report SQL query
 ### Added
 - Issue 450 - Sales Meeting Booking Request
 - Issue 470 - Automated schedule to 'delete' pending user contacts
