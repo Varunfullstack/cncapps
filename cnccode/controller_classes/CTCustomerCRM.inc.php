@@ -1359,6 +1359,9 @@ class CTCustomerCRM extends CTCustomer
                 'referredFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
+                'prospectFlag'                       => $this->dsCustomer->getValue(
+                    DBECustomer::prospectFlag
+                ) == 'Y' ? 1 : 0,
                 'specialAttentionFlagChecked'        => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
@@ -2140,7 +2143,7 @@ class CTCustomerCRM extends CTCustomer
                     'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
                         DBEContact::customerID
                     ) ? 'data-validation="atLeastOne"' : '',
-                    'specialAttentionContactFlagChecked' => $this->getChecked(
+                    'specialAttentionContactFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(DBEContact::specialAttentionContactFlag)
                     ),
                     'clientFormURL'                        => $clientFormURL,
