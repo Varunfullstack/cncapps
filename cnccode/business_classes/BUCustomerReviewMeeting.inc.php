@@ -780,9 +780,35 @@ class BUCustomerReviewMeeting extends Business
             PDF_RESOURCE_DIR . '/Client Meeting Notes Template.docx'
         );
 
+
+        $buContact = new BUContact($this);
+        $reviewContactsDS = new DataSet($this);
+        $buContact->getReviewContacts(
+            $customerID,
+            $reviewContactsDS
+        );
+
+        $reviewContactsString = "";
+
+        while ($reviewContactsDS->fetchNext()) {
+            if ($reviewContactsString) {
+                $reviewContactsString .= "/ ";
+            }
+
+            $reviewContactsString .= $reviewContactsDS->getValue(
+                    DBEContact::firstName
+                ) . " " . $reviewContactsDS->getValue(DBEContact::lastName);
+        }
+
+        $clientName = $dsCustomer->getValue(DBECustomer::name);
+
+        if ($reviewContactsString) {
+            $clientName .= ' - ' . $reviewContactsString;
+        }
+
         $templateProcessor->setValue(
             'clientName',
-            $dsCustomer->getValue(DBECustomer::name)
+            $reviewContactsString
         );
         $meetingDate = new \DateTime($meetingDate);
         $templateProcessor->setValue(
