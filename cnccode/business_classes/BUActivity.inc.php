@@ -123,7 +123,7 @@ class BUActivity extends Business
      */
     private $dbeCallActivitySearch = '';
     /** @var DataSet */
-    private $dsHeader;
+    public $dsHeader;
 
     /**
      * Constructor
