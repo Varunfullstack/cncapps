@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 482 - Starter / Leaver database fields
+
 ## [v2.1.3] - 2019-02-15
 ### Fixed
 - Fixed Error when logging SRs for a delegate
