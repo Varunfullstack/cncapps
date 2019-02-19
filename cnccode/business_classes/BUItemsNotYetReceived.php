@@ -30,7 +30,7 @@ class BUItemsNotYetReceived extends Business
     MIN(ca.caa_date) 
   FROM
     callactivity ca 
-  WHERE ca.caa_problemno = problem.`pro_problemno`
+  WHERE ca.caa_problemno = minServiceRequest.`pro_problemno`
     and ca.caa_callacttypeno in (4,7)
     AND ca.caa_date >= date(NOW())
     ) AS futureDate,
@@ -56,9 +56,8 @@ FROM
   LEFT JOIN customer 
     ON ordhead.`odh_custno` = customer.`cus_custno` 
   LEFT JOIN supplier 
-    ON supplier.`sup_suppno` = porhead.`poh_suppno` 
-  LEFT JOIN problem 
-    ON problem.`pro_linked_ordno` = porhead.`poh_ordno`
+    ON supplier.`sup_suppno` = porhead.`poh_suppno`
+    left join (select problem.pro_linked_ordno, min(problem.pro_problemno) as pro_problemno from problem group by problem.pro_linked_ordno) minServiceRequest on minServiceRequest.pro_linked_ordno = porhead.poh_ordno
   left join project 
     on project.ordHeadID = ordhead.odh_ordno
 WHERE poh_required_by is not null and poh_required_by <> '0000-00-00'
