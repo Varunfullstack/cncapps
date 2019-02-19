@@ -8,13 +8,18 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 class DBEJRenBroadband extends DBECustomerItem
 {
     const allowDirectDebit = "allowDirectDebit";
+    const contractExpiryDate = "contractExpiryDate";
+    const itemDescription = "itemDescription";
+    const customerName = "customerName";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
 
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "customerName",
+            self::customerName,
             DA_STRING,
             DA_NOT_NULL,
             "cus_name"
@@ -32,7 +37,7 @@ class DBEJRenBroadband extends DBECustomerItem
             "itm_itemno"
         );
         $this->addColumn(
-            "itemDescription",
+            self::itemDescription,
             DA_STRING,
             DA_NOT_NULL,
             "itm_desc"
@@ -44,13 +49,13 @@ class DBEJRenBroadband extends DBECustomerItem
             "ity_desc"
         );
         $this->addColumn(
-            "invoiceFromDate",
+            self::invoiceFromDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceToDate",
+            self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')"
@@ -66,6 +71,13 @@ class DBEJRenBroadband extends DBECustomerItem
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+        );
+
+        $this->addColumn(
+            self::contractExpiryDate,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_ADD(installationDate, INTERVAL initialContractLength MONTH) AS contractExpiryDate"
         );
 
         $this->addColumn(
@@ -107,13 +119,31 @@ class DBEJRenBroadband extends DBECustomerItem
 			WHERE declinedFlag = 'N'
         AND renewalTypeID = 1";
 
-
         if ($orderBy) {
             $statement .= " ORDER BY $orderBy";
         } else {
             $statement .= " ORDER BY cus_name";
         }
 
+        $this->setQueryString($statement);
+        $ret = (parent::getRows());
+    }
+
+    function getLeasedLinesToExpire($lowerBoundDays = 59,
+                                    $upperBoundDays = 67
+    )
+    {
+        $statement =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " JOIN item ON  itm_itemno = cui_itemno
+      JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
+			JOIN customer ON  cus_custno = cui_custno
+      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
+			WHERE declinedFlag = 'N'
+        AND renewalTypeID = 1 AND itm_desc NOT LIKE '%Broadband%'
+  AND DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) > $lowerBoundDays AND 
+  DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) < $upperBoundDays order by contractExpiryDate ";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
