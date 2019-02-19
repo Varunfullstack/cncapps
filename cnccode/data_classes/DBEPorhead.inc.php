@@ -26,6 +26,8 @@ class DBEPorhead extends DBEntity
     const orderUserID = "orderUserID";
     const orderDate = "orderDate";
     const requiredBy = "requiredBy";
+    const deliveryConfirmedFlag = 'deliveryConfirmedFlag';
+    const completionNotifiedFlag = 'completionNotifiedFlag';
 
     /**
      * calls constructor()
@@ -147,6 +149,19 @@ class DBEPorhead extends DBEntity
             DA_ALLOW_NULL,
             "poh_required_by"
         );
+
+        $this->addColumn(
+            self::deliveryConfirmedFlag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::completionNotifiedFlag,
+            DA_YN,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
