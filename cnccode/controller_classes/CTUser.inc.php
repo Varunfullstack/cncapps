@@ -397,12 +397,21 @@ class CTUser extends CTCNC
             'levelBlock',
             'levels'
         );
-        foreach ([0, 1, 2, 3, 4] as $level) {
+        $passwordLevels = [
+            ["level" => 0, "description" => "No Access"],
+            ["level" => 1, "description" => "Standard Access"],
+            ["level" => 2, "description" => "Elevated Access"],
+            ["level" => 3, "description" => "Team Lead Access"],
+            ["level" => 4, "description" => "Management Access"]
+        ];
+
+        foreach ($passwordLevels as $level) {
 
             $this->template->set_var(
                 array(
-                    'level'         => $level,
-                    'levelSelected' => $dsUser->getValue(DBEUser::passwordLevel) == $level ? 'selected' : ''
+                    'level'            => $level['level'],
+                    'levelDescription' => $level['description'],
+                    'levelSelected'    => $dsUser->getValue(DBEUser::passwordLevel) == $level['level'] ? 'selected' : ''
                 )
             );
             $this->template->parse(
@@ -564,7 +573,7 @@ class CTUser extends CTCNC
                 'starterLeaverQuestionManagementFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::starterLeaverQuestionManagementFlag)
                 ),
-                'changeSRContractsFlagChecked'         => Controller::htmlChecked(
+                'changeSRContractsFlagChecked'               => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeSRContractsFlag)
                 ),
                 'staffAppraiserFlagChecked'                  => Controller::htmlChecked(
