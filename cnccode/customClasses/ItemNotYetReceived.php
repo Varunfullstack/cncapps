@@ -31,6 +31,15 @@ class ItemNotYetReceived
     protected $salesOrderID;
     protected $projectID;
     protected $requiredAtLeastAWeekAgo;
+    protected $serviceRequestID;
+
+    /**
+     * @return mixed
+     */
+    public function getServiceRequestID()
+    {
+        return $this->serviceRequestID;
+    }
 
     /**
      * @return mixed

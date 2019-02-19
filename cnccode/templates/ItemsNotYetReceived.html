@@ -94,13 +94,18 @@
         <th>
             Project Name
         </th>
+        <th>
+            SR
+        </th>
     </TR>
     </thead>
     <tbody>
     <!-- BEGIN notYetReceivedItemBlock -->
     <TR {style}>
         <TD>
-            <A href="{purchaseOrderLink}">{purchaseOrderId}</A>
+            <A href="{purchaseOrderLink}"
+               target="_blank"
+            >{purchaseOrderId}</A>
         </TD>
         <td>
             {salesOrderLink}
@@ -134,6 +139,9 @@
         </td>
         <td>
             {projectLink}
+        </td>
+        <td>
+            {SRLink}
         </td>
     </TR>
     <!-- END notYetReceivedItemBlock -->

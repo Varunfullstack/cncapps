@@ -37,14 +37,15 @@ class BUItemsNotYetReceived extends Business
     poh_required_by as purchaseOrderRequiredBy,
     project.description as projectName,
     poh_supp_ref as supplierRef,
-    IF(poh_contno <> 0 OR poh_contno IS NOT NULL, poh_contno, NULL) AS orderedBy ,
+    IF(poh_contno <> 0 OR poh_contno IS NOT NULL, poh_contno, NULL) AS orderedBy,
     poh_type as purchaseOrderType,
-    poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered ,
+    poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered,
     pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
     pol_qty_ord AS orderedQuantity,
     ordhead.odh_ordno as salesOrderID,
     project.projectID,
-    poh_required_by > (now() - INTERVAL 1 week ) as isRequiredAtLeastAWeekAgo
+    poh_required_by > (now() - INTERVAL 1 week ) as isRequiredAtLeastAWeekAgo,
+    minServiceRequest.`pro_problemno` as serviceRequestID
 FROM
   porline 
   LEFT JOIN porhead 
