@@ -30,6 +30,16 @@ class ItemNotYetReceived
     protected $orderedQuantity;
     protected $salesOrderID;
     protected $projectID;
+    protected $requiredAtLeastAWeekAgo;
+
+    /**
+     * @return mixed
+     */
+    public function isRequiredAtLeastAWeekAgo()
+    {
+        return $this->requiredAtLeastAWeekAgo;
+    }
+
 
     /**
      * @return mixed

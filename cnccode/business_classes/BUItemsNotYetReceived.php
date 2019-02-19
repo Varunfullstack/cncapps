@@ -25,6 +25,7 @@ class BUItemsNotYetReceived extends Business
     'Direct'
   ) AS direct,
   if(poh_ord_date = '0000-00-00', null, poh_ord_date) as purchaseOrderDate,
+  poh_required_by > (now() - INTERVAL 1 week ) as oneWeekFromNow,
   (SELECT 
     MIN(ca.caa_date) 
   FROM
@@ -41,8 +42,9 @@ class BUItemsNotYetReceived extends Business
     poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered ,
     pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
     pol_qty_ord AS orderedQuantity,
-      ordhead.odh_ordno as salesOrderID,
-       project.projectID
+    ordhead.odh_ordno as salesOrderID,
+    project.projectID,
+    poh_required_by > (now() - INTERVAL 1 week ) as isRequiredAtLeastAWeekAgo
 FROM
   porline 
   LEFT JOIN porhead 
@@ -60,7 +62,6 @@ FROM
   left join project 
     on project.ordHeadID = ordhead.odh_ordno
 WHERE poh_required_by is not null and poh_required_by <> '0000-00-00'
-  and poh_required_by > (now() - INTERVAL 1 week )
 AND item.itm_desc NOT LIKE '%labour%'
 AND item.itm_desc NOT LIKE '%Office 365%'
   AND item.itm_desc NOT LIKE '%carriage%'
@@ -86,7 +87,20 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
             $data[] = $item;
         };
 
-        return $data;
+        $toReturn = [];
+
+        foreach ($data as $item) {
+            if (!\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]) {
+                $toReturn[] = $item;
+                continue;
+            }
+
+            if ($item->isRequiredAtLeastAWeekAgo()) {
+                $toReturn[] = $item;
+            }
+        }
+
+        return $toReturn;
     }
 
 }
