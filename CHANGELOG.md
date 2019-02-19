@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 483 - Add Password level descriptions
+
 ## [v2.1.3] - 2019-02-15
 ### Fixed
 - Fixed Error when logging SRs for a delegate
