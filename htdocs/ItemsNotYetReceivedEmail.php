@@ -27,6 +27,32 @@ $headers .= "Content-Type: text/html";
 $result = $buItemsNotYetReceived->getItemsNotYetReceived();
 
 
+usort(
+    $result,
+    function (\CNCLTD\ItemNotYetReceived $a,
+              \CNCLTD\ItemNotYetReceived $b
+    ) {
+
+        if ($a->getCustomerName() > $b->getCustomerName()) {
+            return 1;
+        }
+
+        if ($a->getCustomerName() < $b->getCustomerName()) {
+            return -1;
+        }
+
+        if ($a->getPurchaseOrderRequiredBy() > $b->getPurchaseOrderRequiredBy()) {
+            return -1;
+        }
+
+        if ($a->getPurchaseOrderRequiredBy() < $b->getPurchaseOrderRequiredBy()) {
+            return 1;
+        }
+
+        return 0;
+    }
+);
+
 if (!$outputToScreen) {
     ob_start();
 }
