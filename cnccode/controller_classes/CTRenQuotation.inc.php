@@ -192,6 +192,43 @@ class CTRenQuotation extends CTCNC
 
                 $txtDelete = '[delete]';
 
+                $salesOrderLink = null;
+                $sent = false;
+                if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
+                    $salesOrderURL = $this->buildLink(
+                        CTCNC_PAGE_SALESORDER,
+                        array(
+                            'action'    => 'displaySalesOrder',
+                            'ordheadID' => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
+                        )
+                    );
+
+                    $salesOrderLink = "<a href='$salesOrderURL' target='_blank'>" . $dsRenQuotation->getValue(
+                            DBEJRenQuotation::ordheadID
+                        ) . "</a>";
+                    $buSalesOrder = new BUSalesOrder($this);
+                    $dsQuotations = new DataSet($this);
+                    $buSalesOrder->getQuotationsByOrdheadID(
+                        $dsRenQuotation->getValue(
+                            DBEJRenQuotation::ordheadID
+                        ),
+                        $dsQuotations
+                    );
+
+                    if ($dsQuotations->rowCount()) {
+                        while ($dsQuotations->fetchNext()) {
+                            if ($dsQuotations->getValue(DBEQuotation::sentDateTime) && $dsQuotations->getValue(
+                                    DBEQuotation::sentDateTime
+                                ) != '0000-00-00 00:00:00') {
+                                $sent = true;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+
+
                 $this->template->set_var(
                     array(
                         'customerName'                => $dsRenQuotation->getValue('customerName'),
@@ -209,7 +246,9 @@ class CTRenQuotation extends CTCNC
                         'urlEdit'                     => $urlEdit,
                         'urlList'                     => $urlList,
                         'urlCreateRenewalsQuotations' => $urlCreateRenewalsQuotations,
-                        'txtEdit'                     => $txtEdit
+                        'txtEdit'                     => $txtEdit,
+                        'salesOrderLink'              => $salesOrderLink,
+                        'sentQuotationColor'          => $sent ? "green" : "red"
                     )
                 );
                 $this->template->parse(
@@ -388,31 +427,65 @@ class CTRenQuotation extends CTCNC
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
+        $salesOrderLink = '';
+        if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
+            $salesOrderURL = $this->buildLink(
+                CTCNC_PAGE_SALESORDER,
+                array(
+                    'action'    => 'displaySalesOrder',
+                    'ordheadID' => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
+                )
+            );
+
+            $salesOrderLink = "<a href='$salesOrderURL' target='_blank'>" . $dsRenQuotation->getValue(
+                    DBEJRenQuotation::ordheadID
+                ) . "</a>";
+        }
 
 
         $this->template->set_var(
             array(
-                'customerID'           => Controller::htmlDisplayText($dsRenQuotation->getValue('customerID')),
-                'siteName'             => Controller::htmlDisplayText($dsRenQuotation->getValue('siteName')),
-                'siteNo'               => $dsRenQuotation->getValue('siteNo'),
-                'itemID'               => Controller::htmlDisplayText($dsRenQuotation->getValue('itemID')),
-                'customerItemID'       => $dsRenQuotation->getValue('customerItemID'),
-                'customerName'         => Controller::htmlDisplayText($dsRenQuotation->getValue('customerName')),
-                'itemDescription'      => Controller::htmlDisplayText($dsRenQuotation->getValue('itemDescription')),
-                'startDate'            => Controller::dateYMDtoDMY($dsRenQuotation->getValue('startDate')),
+                'customerID'           => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerID)
+                ),
+                'siteName'             => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::siteName)
+                ),
+                'siteNo'               => $dsRenQuotation->getValue(DBEJRenQuotation::siteNo),
+                'itemID'               => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::itemID)
+                ),
+                'customerItemID'       => $dsRenQuotation->getValue(DBEJRenQuotation::customerItemID),
+                'customerName'         => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerName)
+                ),
+                'itemDescription'      => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription)
+                ),
+                'startDate'            => Controller::dateYMDtoDMY(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
+                ),
                 'calculatedExpiryDate' =>
                     DateTime::createFromFormat(
                         'Y-m-d',
-                        $dsRenQuotation->getValue('startDate')
+                        $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
                     )->add(
                         new DateInterval('P1Y')
                     )->format('d/m/Y'),
-                'dateGenerated'        => Controller::dateYMDtoDMY($dsRenQuotation->getValue('dateGenerated')),
-                'dateGeneratedMessage' => $dsRenQuotation->getMessage('dateGenerated'),
-                'grantNumber'          => Controller::htmlDisplayText($dsRenQuotation->getValue('grantNumber')),
-                'serialNo'             => Controller::htmlDisplayText($dsRenQuotation->getValue('serialNo')),
-                'qty'                  => Controller::htmlDisplayText($dsRenQuotation->getValue('qty')),
-                'declinedFlagChecked'  => Controller::htmlChecked($dsRenQuotation->getValue('declinedFlag')),
+                'dateGenerated'        => Controller::dateYMDtoDMY(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::dateGenerated)
+                ),
+                'dateGeneratedMessage' => $dsRenQuotation->getMessage(DBEJRenQuotation::dateGenerated),
+                'grantNumber'          => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::grantNumber)
+                ),
+                'serialNo'             => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::serialNo)
+                ),
+                'qty'                  => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::qty)),
+                'declinedFlagChecked'  => Controller::htmlChecked(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::declinedFlag)
+                ),
                 'urlUpdate'            => $urlUpdate,
                 'urlDelete'            => $urlDelete,
                 'txtDelete'            => $txtDelete,
@@ -420,8 +493,14 @@ class CTRenQuotation extends CTCNC
                 'urlItemPopup'         => $urlItemPopup,
                 'urlDisplayList'       => $urlDisplayList,
                 'disabled'             => $disabled,
-                'internalNotes'        => Controller::htmlTextArea($dsRenQuotation->getValue('internalNotes')),
-                'readonly'             => $readonly
+                'internalNotes'        => Controller::htmlTextArea(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::internalNotes)
+                ),
+                'comments'             => Controller::htmlTextArea(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes)
+                ),
+                'readonly'             => $readonly,
+                'salesOrderLink'       => $salesOrderLink
             )
         );
         $dbeRenQuotationType = new DBERenQuotationType($this);

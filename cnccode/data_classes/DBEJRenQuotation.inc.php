@@ -7,29 +7,91 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenQuotation extends DBECustomerItem
 {
+    const customerName = "customerName";
+    const siteName = "siteName";
+    const itemDescription = "itemDescription";
+    const itemTypeDescription = "itemTypeDescription";
+    const itemID = "itemID";
+    const type = "type";
+    const addInstallationCharge = "addInstallationCharge";
+    const nextPeriodStartDateYMD = "nextPeriodStartDateYMD";
+    const nextPeriodStartDate = "nextPeriodStartDate";
+    const nextPeriodEndDateYMD = "nextPeriodEndDateYMD";
+    const nextPeriodEndDate = "nextPeriodEndDate";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("customerName", DA_STRING, DA_NOT_NULL, "cus_name");
-        $this->addColumn("siteName", DA_STRING, DA_NOT_NULL, "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)");
-        $this->addColumn("itemDescription", DA_STRING, DA_NOT_NULL, "itm_desc");
-        $this->addColumn("itemTypeDescription", DA_STRING, DA_NOT_NULL, "ity_desc");
-        $this->addColumn("itemID", DA_ID, DA_NOT_NULL, "itm_itemno");
-        $this->addColumn("type", DA_STRING, DA_NOT_NULL, "renQuotationType.description");
-        $this->addColumn("addInstallationCharge", DA_YN, DA_NOT_NULL);
-        $this->addColumn("nextPeriodStartDateYMD", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`startDate`, INTERVAL 1 YEAR ), '%Y-%m-%d') as nextPeriodStartDateYMD");
-        $this->addColumn("nextPeriodStartDate", DA_DATE, DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`startDate`, INTERVAL 1 YEAR ), '%d/%m/%Y')");
-        $this->addColumn("nextPeriodEndDateYMD", DA_DATE, DA_NOT_NULL,
+        $this->addColumn(
+            self::customerName,
+            DA_STRING,
+            DA_NOT_NULL,
+            "cus_name"
+        );
+        $this->addColumn(
+            self::siteName,
+            DA_STRING,
+            DA_NOT_NULL,
+            "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)"
+        );
+        $this->addColumn(
+            self::itemDescription,
+            DA_STRING,
+            DA_NOT_NULL,
+            "itm_desc"
+        );
+        $this->addColumn(
+            self::itemTypeDescription,
+            DA_STRING,
+            DA_NOT_NULL,
+            "ity_desc"
+        );
+        $this->addColumn(
+            self::itemID,
+            DA_ID,
+            DA_NOT_NULL,
+            "itm_itemno"
+        );
+        $this->addColumn(
+            self::type,
+            DA_STRING,
+            DA_NOT_NULL,
+            "renQuotationType.description"
+        );
+        $this->addColumn(
+            self::addInstallationCharge,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::nextPeriodStartDateYMD,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(`startDate`, INTERVAL 1 YEAR ), '%Y-%m-%d') as nextPeriodStartDateYMD"
+        );
+        $this->addColumn(
+            self::nextPeriodStartDate,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(`startDate`, INTERVAL 1 YEAR ), '%d/%m/%Y')"
+        );
+        $this->addColumn(
+            self::nextPeriodEndDateYMD,
+            DA_DATE,
+            DA_NOT_NULL,
             "DATE_FORMAT(         
            DATE_ADD(`startDate`, INTERVAL 2 YEAR )
-           , '%Y-%m-%d') as nextPeriodEndDateYMD");
-        $this->addColumn("nextPeriodEndDate", DA_DATE, DA_NOT_NULL,
+           , '%Y-%m-%d') as nextPeriodEndDateYMD"
+        );
+        $this->addColumn(
+            self::nextPeriodEndDate,
+            DA_DATE,
+            DA_NOT_NULL,
             "DATE_FORMAT( 				
  					DATE_ADD(`startDate`, INTERVAL 2 YEAR )
- 					, '%d/%m/%Y')");
+ 					, '%d/%m/%Y')"
+        );
 
         $this->setAddColumnsOff();
     }
@@ -147,7 +209,10 @@ class DBEJRenQuotation extends DBECustomerItem
     function getRenewalsByIDList($customerItemIDs)
     {
 
-        $commaListOfIDs = implode(',', $customerItemIDs);
+        $commaListOfIDs = implode(
+            ',',
+            $customerItemIDs
+        );
 
         $statement =
             "

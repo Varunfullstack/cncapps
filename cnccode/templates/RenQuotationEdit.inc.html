@@ -211,19 +211,19 @@
                 >{internalNotes}</textarea>
             </td>
         </tr>
-        <!--
-            <tr>
-                    <td class="promptText">Quantity</td>
-                    <td class="fieldText"><input
-                        name="renQuotation[1][qty]"
-                        type="text" value="{qty}"
-                        {readonly}
-                        size="10"
-                        maxlength="10">
-                        <span class="formErrorMessage">{qtyMessage}</span>
-                    </td>
-            </tr>
-        -->
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >
+                Comments
+            </td>
+            <td colspan="2">
+                <textarea cols="80"
+                          rows="10"
+                          name="renQuotation[1][customerItemNotes]"
+                >{comments}</textarea>
+            </td>
+        </tr>
         <tr>
             <td class="promptText">Serial No</td>
             <td class="fieldText"><input
@@ -273,6 +273,12 @@
                        class="jQueryCalendar"
                 >
                 <span class="formErrorMessage">{dateGeneratedMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Sales Order Link</td>
+            <td class="fieldText">
+                {salesOrderLink}
             </td>
         </tr>
         <tr>

@@ -293,9 +293,7 @@ class BURenQuotation extends Business
         $dbeOrdline = new DBEOrdline ($this);
 
         $dbeOrdhead = new DBEOrdhead($this);
-
-        $dbeRenQuotationType = new DBERenQuotationType($this);
-
+        
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;
