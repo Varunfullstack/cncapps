@@ -9175,6 +9175,76 @@ is currently a balance of ';
         );
     }
 
+    /**
+     * @param $problemID
+     */
+    public function createPurchaseOrderCompletedSalesActivity($problemID)
+    {
+
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+
+        $firstActivity = $this->getFirstActivityInProblem($problemID);
+
+        $contactID = $firstActivity->getValue(DBECallActivity::contactID);
+
+        $dbeContact = new DBEContact($this);
+        $siteNo = $dbeContact->getValue(DBEContact::siteNo);
+
+
+        $dbeCallActivity = new DBECallActivity($this);
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $siteNo
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $contactID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_SALES_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(CONFIG_MYSQL_DATE)
+        );
+        $time = date('H:i');
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            $time
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $time
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            "The entire purchase order for this service request has been received"
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            USER_SYSTEM
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getValue(DBEProblem::problemID)
+        );
+
+        $dbeCallActivity->insertRow();
+        
+        $this->updatedByAnotherUser(
+            $dbeProblem,
+            $dbeCallActivity
+        );
+    }
+
 
     private function isSupportContact($value)
     {

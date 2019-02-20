@@ -7,6 +7,9 @@ require_once($cfg["path_dbe"] . "/DBEPorline.inc.php");
 
 class DBEJPorline extends DBEPorline
 {
+    const itemDescription = "itemDescription";
+    const partNo = "partNo";
+
     /**
      * calls constructor()
      * @access public
@@ -18,8 +21,18 @@ class DBEJPorline extends DBEPorline
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "itm_desc");
-        $this->addColumn("partNo", DA_STRING, DA_ALLOW_NULL, "itm_unit_of_sale");
+        $this->addColumn(
+            self::itemDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "itm_desc"
+        );
+        $this->addColumn(
+            self::partNo,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "itm_unit_of_sale"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

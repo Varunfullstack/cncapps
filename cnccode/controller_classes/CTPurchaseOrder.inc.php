@@ -744,44 +744,69 @@ class CTPurchaseOrder extends CTCNC
 
         $this->template->set_var(
             array(
-                'supplierID'                => $dsPorhead->getValue('supplierID'),
-                'type'                      => $dsPorhead->getValue('type'),
-                'porheadID'                 => $porheadID,
-                'userID'                    => $dsPorhead->getValue('userID'),
-                'orderUserID'               => $dsPorhead->getValue('orderUserID'),
-                'contactID'                 => $dsPorhead->getValue('contactID'),
-                'contactName'               => Controller::htmlInputText($dsPorhead->getValue('contactName')),
-                'contactPhone'              => Controller::htmlDisplayText($dsPorhead->getValue('contactPhone')),
-                'emailLink'                 => $emailLink,
-                'raisedByName'              => Controller::htmlDisplayText($dsPorhead->getValue('raisedByName')),
-                'orderedByName'             => Controller::htmlDisplayText($dsPorhead->getValue('orderedByName')),
-                'orderRequiredBy'           => Controller::dateYMDtoDMY($dsPorhead->getValue(DBEPorhead::requiredBy)),
-                'orderDate'                 => Controller::dateYMDtoDMY($dsPorhead->getValue('orderDate')),
-                'supplierName'              => Controller::htmlInputText($dsPorhead->getValue("supplierName")),
-                'supplierLink'              => $supplierLink,
-                'date'                      => Controller::dateYMDtoDMY($dsPorhead->getValue('date')),
-                'vatCode'                   => Controller::htmlDisplayText($dsPorhead->getValue('vatCode')),
-                'vatRate'                   => Controller::htmlDisplayText($dsPorhead->getValue('vatRate')),
-                'directDeliveryFlagChecked' => $this->getChecked($dsPorhead->getValue('directDeliveryFlag')),
-                'supplierRef'               => Controller::htmlInputText($dsPorhead->getValue('supplierRef')),
-                'ordheadID'                 => $ordheadID,
-                'salesOrderContact'         => Controller::htmlDisplayText(
-                    $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
+                'supplierID'                   => $dsPorhead->getValue('supplierID'),
+                'type'                         => $dsPorhead->getValue('type'),
+                'porheadID'                    => $porheadID,
+                'userID'                       => $dsPorhead->getValue('userID'),
+                'orderUserID'                  => $dsPorhead->getValue('orderUserID'),
+                'contactID'                    => $dsPorhead->getValue('contactID'),
+                'contactName'                  => Controller::htmlInputText(
+                    $dsPorhead->getValue(DBEJPorhead::contactName)
                 ),
-                'DISABLED'                  => $disabled,
-                'urlContactPopup'           => $urlContactPopup,
-                'urlContactEdit'            => $urlContactEdit,
-                'urlSupplierPopup'          => $urlSupplierPopup,
-                'urlSupplierEdit'           => $urlSupplierEdit,
-                'urlUpdateHeader'           => $urlUpdateHeader,
-                'urlDeleteOrder'            => $urlDeleteOrder,
-                'txtDeleteOrder'            => $txtDeleteOrder,
-                'urlSalesOrder'             => $urlSalesOrder,
-                'txtSalesOrder'             => $txtSalesOrder,
-                'urlGoodsIn'                => $urlGoodsIn,
-                'txtGoodsIn'                => $txtGoodsIn,
-                'urlGeneratePDF'            => $urlGeneratePDF,
-                'txtGeneratePDF'            => $txtGeneratePDF
+                'contactPhone'                 => Controller::htmlDisplayText(
+                    $dsPorhead->getValue(DBEJPorhead::contactPhone)
+                ),
+                'emailLink'                    => $emailLink,
+                'raisedByName'                 => Controller::htmlDisplayText(
+                    $dsPorhead->getValue(DBEJPorhead::raisedByName)
+                ),
+                'orderedByName'                => Controller::htmlDisplayText(
+                    $dsPorhead->getValue(DBEJPorhead::orderedByName)
+                ),
+                'orderRequiredBy'              => Controller::dateYMDtoDMY(
+                    $dsPorhead->getValue(DBEPorhead::requiredBy)
+                ),
+                'orderDate'                    => Controller::dateYMDtoDMY(
+                    $dsPorhead->getValue(DBEJPorhead::orderDate)
+                ),
+                'supplierName'                 => Controller::htmlInputText(
+                    $dsPorhead->getValue(DBEJPorhead::supplierName)
+                ),
+                'supplierLink'                 => $supplierLink,
+                'date'                         => Controller::dateYMDtoDMY($dsPorhead->getValue(DBEJPorhead::date)),
+                'vatCode'                      => Controller::htmlDisplayText(
+                    $dsPorhead->getValue(DBEJPorhead::vatCode)
+                ),
+                'vatRate'                      => Controller::htmlDisplayText(
+                    $dsPorhead->getValue(DBEJPorhead::vatRate)
+                ),
+                'directDeliveryFlagChecked'    => $this->getChecked(
+                    $dsPorhead->getValue(DBEJPorhead::directDeliveryFlag)
+                ),
+                'deliveryConfirmedFlagChecked' => $this->getChecked(
+                    $dsPorhead->getValue(DBEPorhead::deliveryConfirmedFlag)
+                ),
+                'supplierRef'                  => Controller::htmlInputText(
+                    $dsPorhead->getValue(DBEJPorhead::supplierRef)
+                ),
+                'ordheadID'                    => $ordheadID,
+                'salesOrderContact'            => Controller::htmlDisplayText(
+                    $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName)
+                ),
+                'DISABLED'                     => $disabled,
+                'urlContactPopup'              => $urlContactPopup,
+                'urlContactEdit'               => $urlContactEdit,
+                'urlSupplierPopup'             => $urlSupplierPopup,
+                'urlSupplierEdit'              => $urlSupplierEdit,
+                'urlUpdateHeader'              => $urlUpdateHeader,
+                'urlDeleteOrder'               => $urlDeleteOrder,
+                'txtDeleteOrder'               => $txtDeleteOrder,
+                'urlSalesOrder'                => $urlSalesOrder,
+                'txtSalesOrder'                => $txtSalesOrder,
+                'urlGoodsIn'                   => $urlGoodsIn,
+                'txtGoodsIn'                   => $txtGoodsIn,
+                'urlGeneratePDF'               => $urlGeneratePDF,
+                'txtGeneratePDF'               => $txtGeneratePDF
             )
         );
         // payment method
@@ -797,7 +822,7 @@ class CTPurchaseOrder extends CTCNC
                 array(
                     'payMethodDescription' => $dsPayMethod->getValue('description'),
                     'payMethodID'          => $dsPayMethod->getValue('payMethodID'),
-                    'payMethodSelected'    => ($dsPorhead->getValue('payMethodID') == $dsPayMethod->getValue(
+                    'payMethodSelected'    => ($dsPorhead->getValue(DBEJPorhead::payMethodID) == $dsPayMethod->getValue(
                             'payMethodID'
                         )) ? CT_SELECTED : ''
                 )
@@ -836,33 +861,35 @@ class CTPurchaseOrder extends CTCNC
                 'orderLines'
             );
             while ($dsPorline->fetchNext()) {
-                $sequenceNo = $dsPorline->getValue("sequenceNo");
-                $itemDescription = $dsPorline->getValue('itemDescription');
+                $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
+                $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
                 if ($dsPorline->getValue('expectedDate') != '0000-00-00') {
-                    $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue('expectedDate'));
+                    $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue(DBEJPorline::expectedDate));
                 } else {
                     $expectedDate = '';
                 }
-                $curTotalCost = $dsPorline->getValue('curUnitCost') * $dsPorline->getValue('qtyOrdered');
+                $curTotalCost = $dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(
+                        DBEJPorline::qtyOrdered
+                    );
                 $curGrandTotalCost += $curTotalCost;
                 $this->template->set_var(
                     array(
-                        'itemID'       => $dsPorline->getValue('itemID'),
-                        'partNo'       => Controller::htmlDisplayText($dsPorline->getValue('partNo')),
+                        'itemID'       => $dsPorline->getValue(DBEJPorline::itemID),
+                        'partNo'       => Controller::htmlDisplayText($dsPorline->getValue(DBEJPorline::partNo)),
                         'qtyOrdered'   => number_format(
-                            $dsPorline->getValue('qtyOrdered'),
+                            $dsPorline->getValue(DBEJPorline::qtyOrdered),
                             2,
                             '.',
                             ''
                         ),
                         'qtyReceived'  => number_format(
-                            $dsPorline->getValue('qtyReceived'),
+                            $dsPorline->getValue(DBEJPorline::qtyReceived),
                             2,
                             '.',
                             ''
                         ),
                         'curUnitCost'  => number_format(
-                            $dsPorline->getValue('curUnitCost'),
+                            $dsPorline->getValue(DBEJPorline::curUnitCost),
                             2,
                             '.',
                             ''
@@ -1065,19 +1092,21 @@ class CTPurchaseOrder extends CTCNC
         // Lines
         $this->template->set_var(
             array(
-                'stockcat'               => $this->dsPorline->getValue("stockcat"),
-                'supplierName'           => $this->dsPorhead->getValue("supplierName"),
-                'itemID'                 => $this->dsPorline->getValue("itemID"),
-                'itemDescription'        => htmlspecialchars($this->dsPorline->getValue("itemDescription")),
-                'itemDescriptionMessage' => $this->dsPorline->getMessage("itemDescription"),
-                'qtyOrdered'             => $this->dsPorline->getValue("qtyOrdered"),
-                'qtyOrderedMessage'      => $this->dsPorline->getMessage("qtyOrdered"),
-                'qtyReceived'            => $this->dsPorline->getValue("qtyReceived"),
-                'qtyInvoiced'            => $this->dsPorline->getValue("qtyInvoiced"),
-                'curUnitCost'            => $this->dsPorline->getValue("curUnitCost"),
-                'curUnitCostMessage'     => $this->dsPorline->getMessage("curUnitCost"),
-                'expectedDate'           => Controller::dateYMDtoDMY($this->dsPorline->getValue("expectedDate")),
-                'expectedDateMessage'    => $this->dsPorline->getMessage("expectedDate")
+                'stockcat'               => $this->dsPorline->getValue(DBEJPorline::stockcat),
+                'supplierName'           => $this->dsPorhead->getValue(DBEJPorhead::supplierName),
+                'itemID'                 => $this->dsPorline->getValue(DBEJPorline::itemID),
+                'itemDescription'        => htmlspecialchars($this->dsPorline->getValue(DBEJPorline::itemDescription)),
+                'itemDescriptionMessage' => $this->dsPorline->getMessage(DBEJPorline::itemDescription),
+                'qtyOrdered'             => $this->dsPorline->getValue(DBEJPorline::qtyOrdered),
+                'qtyOrderedMessage'      => $this->dsPorline->getMessage(DBEJPorline::qtyOrdered),
+                'qtyReceived'            => $this->dsPorline->getValue(DBEJPorline::qtyReceived),
+                'qtyInvoiced'            => $this->dsPorline->getValue(DBEJPorline::qtyInvoiced),
+                'curUnitCost'            => $this->dsPorline->getValue(DBEJPorline::curUnitCost),
+                'curUnitCostMessage'     => $this->dsPorline->getMessage(DBEJPorline::curUnitCost),
+                'expectedDate'           => Controller::dateYMDtoDMY(
+                    $this->dsPorline->getValue(DBEJPorline::expectedDate)
+                ),
+                'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate)
             )
         );
         if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
@@ -1101,7 +1130,7 @@ class CTPurchaseOrder extends CTCNC
             $this->buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'porheadID' => $this->dsPorhead->getValue('porheadID'),
+                    'porheadID' => $this->dsPorhead->getValue(DBEJPorhead::porheadID),
                     'action'    => CTCNC_ACT_DISPLAY_PO
                 )
             );
@@ -1123,8 +1152,8 @@ class CTPurchaseOrder extends CTCNC
             );
         $this->template->set_var(
             array(
-                'sequenceNo'   => $this->dsPorline->getValue("sequenceNo"),
-                'porheadID'    => $this->dsPorline->getValue("porheadID"),
+                'sequenceNo'   => $this->dsPorline->getValue(DBEJPorline::sequenceNo),
+                'porheadID'    => $this->dsPorline->getValue(DBEJPorline::porheadID),
                 'urlSubmit'    => $urlSubmit,
                 'urlItemPopup' => $urlItemPopup,
                 'urlItemEdit'  => $urlItemEdit,
@@ -1299,18 +1328,20 @@ class CTPurchaseOrder extends CTCNC
     function updateHeader()
     {
         $this->setMethodName('updateHeader');
+
         $dsPorhead = &$this->dsPorhead;
         $this->formError = (!$dsPorhead->populateFromArray($_REQUEST['porhead']));
-        if ($dsPorhead->getValue('ordheadID') != 0) {
+        if ($dsPorhead->getValue(DBEJPorhead::ordheadID) != 0) {
             $buSalesOrder = new BUSalesOrder($this);
             if (!$buSalesOrder->getOrdheadByID(
-                $dsPorhead->getValue('ordheadID'),
+                $dsPorhead->getValue(DBEJPorhead::ordheadID),
                 $dsOrdhead
             )) {
                 $this->setFormErrorMessage('Not a valid Sales Order Number');
                 $this->formError = TRUE;
             }
         }
+
         if ($this->formError) {
             $this->displayOrder();
             exit;

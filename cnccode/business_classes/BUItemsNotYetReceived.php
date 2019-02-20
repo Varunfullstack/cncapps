@@ -15,6 +15,7 @@ class BUItemsNotYetReceived extends Business
     {
         global $db;
         $query = "SELECT 
+       porhead.deliveryConfirmedFlag,
   porhead.`poh_porno` as purchaseOrderId,
   customer.`cus_name` as customerName,
   item.`itm_desc` as itemDescription,
@@ -80,7 +81,8 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
                 \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
             }
 
-            if (\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] && !$item->isGreenType()) {
+            if (\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] && !$item->isGreenType(
+                ) && !$item->isDeliveryConfirmed()) {
                 \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
             }
 
