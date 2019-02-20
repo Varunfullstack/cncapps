@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 485 - Move Passwords from Sales to Technical menu
+
 ## [v2.1.4] - 2019-02-20
 ### Fixed
 - Fixed Invalid character in customer email
