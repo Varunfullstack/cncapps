@@ -2038,15 +2038,16 @@ WHERE odl_ordno = $ordheadID
 
         // we need to now find the associated SR, if there's more than one we only care about the one with the smallest ID
         $problemID = $this->getLinkedServiceRequestID($salesOrderID);
-        $buActivity = new BUActivity($this);
 
-        $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
+        if ($problemID) {
+            $buActivity = new BUActivity($this);
+            $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
+        }
         $dbePurchaseOrderHeader->setValue(
             DBEPorhead::completionNotifiedFlag,
             'Y'
         );
         $dbePurchaseOrderHeader->updateRow();
-
     }
 
 }// End of class

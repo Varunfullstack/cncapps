@@ -96,6 +96,9 @@ if (!$outputToScreen) {
             <th>
                 Project Name
             </th>
+            <th>
+                SR
+            </th>
         </TR>
         </thead>
         <tbody>
@@ -121,6 +124,14 @@ if (!$outputToScreen) {
                 $projectURL = "http://cncapps/Project.php?projectID=" . $itemNotYetReceived->getProjectID(
                     ) . "&action=edit";
                 $projectLink = "<a href='" . $projectURL . "'>" . $itemNotYetReceived->getProjectName() . "</a>";
+            }
+
+            $serviceRequestLink = "";
+            if ($itemNotYetReceived->getServiceRequestID()) {
+                $serviceRequestURL = "http://cncapps/Activity.php?problemID=" . $itemNotYetReceived->getServiceRequestID(
+                    ) . "&action=displayLastActivity";
+                $serviceRequestLink = "<a href='" . $serviceRequestURL . "'>" . $itemNotYetReceived->getServiceRequestID(
+                    ) . "</a>";
             }
 
 
@@ -166,6 +177,9 @@ if (!$outputToScreen) {
                 </td>
                 <td>
                     <?= $projectLink ?>
+                </td>
+                <td>
+                    <?= $serviceRequestLink ?>
                 </td>
             </TR>
             <?php
