@@ -248,7 +248,7 @@ class CTRenQuotation extends CTCNC
                         'urlCreateRenewalsQuotations' => $urlCreateRenewalsQuotations,
                         'txtEdit'                     => $txtEdit,
                         'salesOrderLink'              => $salesOrderLink,
-                        'sentQuotationColor'          => $sent ? "green" : "red"
+                        'sentQuotationColor'          => $sent ? "#B2FFB2" : "#F5AEBD"
                     )
                 );
                 $this->template->parse(
