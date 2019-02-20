@@ -134,7 +134,7 @@ class DBEJRenQuotation extends DBECustomerItem
 			  AND dateGenerated = '0000-00-00' AND dateGenerated IS NOT NULL
 		    AND declinedFlag = 'N'
         AND renewalTypeID = 3 and directDebitFlag <> 'Y'
-		 ORDER BY cui_custno";
+		 ORDER BY cui_custno,  custitem.renQuotationTypeID";
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());
@@ -160,7 +160,7 @@ class DBEJRenQuotation extends DBECustomerItem
       JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
       WHERE cui_cuino IN ( " . $commaListOfIDs . " )
         AND renewalTypeID = 3 and directDebitFlag <> 'Y'
-      ORDER BY cui_custno
+      ORDER BY cui_custno,  custitem.renQuotationTypeID
      ";
 
         $this->setQueryString($statement);
