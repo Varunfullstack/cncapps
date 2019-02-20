@@ -532,7 +532,7 @@ class CTActivity extends CTCNC
     )
     {
 
-        $url = parent::buildLink(
+        $url = Controller::buildLink(
             $page,
             $params
         );
@@ -542,7 +542,7 @@ class CTActivity extends CTCNC
                 $params
             ))) {
 
-            $url = $this->addParametersToLink(
+            $url = Controller::addParametersToLink(
                 $url,
                 array(
                     'contactID' => $this->contactID
@@ -2229,7 +2229,7 @@ class CTActivity extends CTCNC
                 'problemHistoryLink'                 => $this->getProblemHistoryLink(
                     $dsCallActivity->getValue('problemID')
                 ),
-                'projectLink'                        => $this->getCurrentProjectLink(
+                'projectLink'                        => BUProject::getCurrentProjectLink(
                     $dsCallActivity->getValue('customerID')
                 ),
                 'passwordLink'                       => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
@@ -2472,43 +2472,6 @@ class CTActivity extends CTCNC
         return $link;
 
     }// end create6
-
-    function getCurrentProjectLink($customerID)
-    {
-        $buProject = new BUProject($this);
-        $dsProject = new DataSet($this);
-        $buProject->getProjectsByCustomerID(
-            $customerID,
-            $dsProject,
-            date(CONFIG_MYSQL_DATE)
-        );
-        $link = '';
-
-        while ($dsProject->fetchNext()) {
-
-            if (!$link) {
-                $link = "<table><tr class='makeItColor'><td style='color: black'>SEE CURRENT PROJECTS</td>";
-            }
-            $url = $this->buildLink(
-                'Project.php',
-                array(
-                    'action'    => 'edit',
-                    'projectID' => $dsProject->getValue('projectID'),
-                )
-            );
-            $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
-                    'description'
-                ) . '</A></td>';
-
-        }
-
-        if ($link) {
-            $link .= "</tr></table>";
-        }
-
-        return $link;
-
-    }
 
     function getPasswordLink($customerID)
     {
@@ -3538,7 +3501,7 @@ class CTActivity extends CTCNC
                     $buCustomer
                 ),
                 'renewalsLink'                => $this->getRenewalsLink($_SESSION[$this->sessionKey]['customerID']),
-                'projectLink'                 => $this->getCurrentProjectLink(
+                'projectLink'                 => BUProject::getCurrentProjectLink(
                     $_SESSION[$this->sessionKey]['customerID']
                 ),
                 'contractListPopupLink'       => $this->getContractListPopupLink(
@@ -4425,7 +4388,9 @@ class CTActivity extends CTCNC
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
                     $dsCallActivity->getValue('problemID')
                 ),
-                'projectLink'                  => $this->getCurrentProjectLink($dsCallActivity->getValue('customerID')),
+                'projectLink'                  => BUProject::getCurrentProjectLink(
+                    $dsCallActivity->getValue('customerID')
+                ),
                 'contractListPopupLink'        => $this->getContractListPopupLink(
                     $dsCallActivity->getValue('customerID')
                 ),

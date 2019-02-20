@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrderDocument.inc.php');
@@ -1171,6 +1172,10 @@ class CTSalesOrder extends CTCNC
             $this->setOrdheadID($dsOrdhead->getValue('ordheadID'));
         }
         $orderType = $dsOrdhead->getValue('type');
+        $projectLink = '';
+        if ($dsOrdhead->getValue(DBEOrdhead::customerID)) {
+            $projectLink = BUProject::getCurrentProjectLink($dsOrdhead->getValue(DBEOrdhead::customerID));
+        }
 
         $this->setTemplateFiles(
             array(
@@ -1680,6 +1685,7 @@ class CTSalesOrder extends CTCNC
                     $dsOrdhead->getValue('customerID'),
                     $this->buCustomer
                 ),
+                'projectLink'                  => $projectLink
             )
         );
 
