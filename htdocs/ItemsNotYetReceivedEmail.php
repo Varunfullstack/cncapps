@@ -33,8 +33,9 @@ if (!$outputToScreen) {
 
 
 ?>
-    <html>
+    <html lang="uk">
     <head>
+        <title>Items not yet received</title>
         <meta http-equiv="Content-Type"
               content="text/html; charset=utf-8"
         />
