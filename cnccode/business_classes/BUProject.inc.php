@@ -33,6 +33,44 @@ class BUProject extends Business
         return TRUE;
     }
 
+    public static function getCurrentProjectLink($customerID)
+    {
+        $thing = null;
+        $buProject = new BUProject($thing);
+        $dsProject = new DataSet($thing);
+        $buProject->getProjectsByCustomerID(
+            $customerID,
+            $dsProject,
+            date(CONFIG_MYSQL_DATE)
+        );
+        $link = '';
+
+        while ($dsProject->fetchNext()) {
+
+            if (!$link) {
+                $link = "<table><tr class='makeItColor'><td style='color: black'>SEE CURRENT PROJECTS</td>";
+            }
+            $url = Controller::buildLink(
+                'Project.php',
+                array(
+                    'action'    => 'edit',
+                    'projectID' => $dsProject->getValue('projectID'),
+                )
+            );
+            $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
+                    'description'
+                ) . '</A></td>';
+
+        }
+
+        if ($link) {
+            $link .= "</tr></table>";
+        }
+
+        return $link;
+
+    }
+
     function getProjectByID($ID,
                             &$dsResults
     )

@@ -4,15 +4,13 @@
         if ($("#action").val() == "insertFromOrder") {
 
             $("input#fromOrdheadID").show();
-        }
-        else {
+        } else {
             $("input#fromOrdheadID").hide();
         }
 
         if ($("#action").val() == "changeSupplier") {
             $("input#updateSupplierName").show();
-        }
-        else {
+        } else {
             $("input#updateSupplierName").hide();
         }
     }
@@ -152,14 +150,14 @@
             var e = document.all("orderLine", i);
             if (sa && !e.readOnly) {
                 $(e).attr('checked', 'checked')
-            }
-            else {
+            } else {
                 $(e).removeAttr('checked')
             }
 
         }
     }
 </script>
+{projectLink}
 <TABLE width="1000px"
        border="0"
        cellpadding="2"

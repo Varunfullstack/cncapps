@@ -19,6 +19,7 @@ This project changes will be shown here.
 - Issue 446 - Add new CNC graphic to quick quotes
 - Issue 467 - Leased line contract expiry notification
 - Issue 483 - Add Password level descriptions
+- Issue 480 - Current Projects shown on Sales Order page
 
 ## [v2.1.4] - 2019-02-20
 ### Fixed
