@@ -12,6 +12,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 471 - Sales quote signature error validation
 - Issue 458 - Customer Analysis Report SQL query
+- Issue 482 - Starter / Leaver database fields
 ### Added
 - Issue 450 - Sales Meeting Booking Request
 - Issue 470 - Automated schedule to 'delete' pending user contacts
