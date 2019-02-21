@@ -375,7 +375,6 @@ class DataSet extends DataAccess
                       $value
     )
     {
-//		return(parent::setValue($ixPassedColumn, stripslashes($value)));
         return (parent::setValue(
             $ixPassedColumn,
             (string)$value
@@ -478,6 +477,10 @@ class DataSet extends DataAccess
                     $columnType = $this->getType($fieldName);
                     // Because blank is returned from HTML form if not checked
                     if ($columnType == DA_YN) {
+                        var_dump(
+                            $fieldName,
+                            $value
+                        );
                         $this->setValue(
                             $fieldName,
                             ($value == 'Y' ? 'Y' : 'N')

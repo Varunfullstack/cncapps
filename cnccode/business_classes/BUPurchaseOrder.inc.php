@@ -637,42 +637,57 @@ class BUPurchaseOrder extends Business
         $dbePorline->shuffleRowsUp();
     }
 
-    function updateHeader($dsPorhead)
+    function updateHeader(DataSet $dsPorhead)
     {
         $this->setMethodName(' updateHeader');
         // it is VERY annoying that empty checkboxes pass no value
-        if ($dsPorhead->getValue('directDeliveryFlag') == '') {
+        if ($dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == '') {
             $dsPorhead->setUpdateModeUpdate();
             $dsPorhead->setValue(
-                'directDeliveryFlag',
+                DBEJPorhead::directDeliveryFlag,
                 'N'
             );
             $dsPorhead->post();
         }
-        $this->dbePorhead->getRow($dsPorhead->getValue('porheadID')); //existing values
+
+        if ($dsPorhead->getValue(DBEJPorhead::deliveryConfirmedFlag) == '') {
+            $dsPorhead->setUpdateModeUpdate();
+            $dsPorhead->setValue(
+                DBEJPorhead::deliveryConfirmedFlag,
+                'N'
+            );
+            $dsPorhead->post();
+        }
+
+
+        $this->dbePorhead->getRow($dsPorhead->getValue(DBEJPorhead::porheadID)); //existing values
         $this->dbePorhead->setValue(
-            'supplierID',
-            $dsPorhead->getValue('supplierID')
+            DBEPorhead::supplierID,
+            $dsPorhead->getValue(DBEJPorhead::supplierID)
         );
         $this->dbePorhead->setValue(
-            'contactID',
-            $dsPorhead->getValue('contactID')
+            DBEPorhead::contactID,
+            $dsPorhead->getValue(DBEJPorhead::contactID)
         );
         $this->dbePorhead->setValue(
-            'supplierRef',
-            $dsPorhead->getValue('supplierRef')
+            DBEPorhead::supplierRef,
+            $dsPorhead->getValue(DBEJPorhead::supplierRef)
         );
         $this->dbePorhead->setValue(
-            'ordheadID',
-            $dsPorhead->getValue('ordheadID')
+            DBEPorhead::ordheadID,
+            $dsPorhead->getValue(DBEJPorhead::ordheadID)
         );
         $this->dbePorhead->setValue(
-            'payMethodID',
-            $dsPorhead->getValue('payMethodID')
+            DBEPorhead::payMethodID,
+            $dsPorhead->getValue(DBEJPorhead::payMethodID)
         );
         $this->dbePorhead->setValue(
-            'directDeliveryFlag',
-            $dsPorhead->getValue('directDeliveryFlag')
+            DBEPorhead::directDeliveryFlag,
+            $dsPorhead->getValue(DBEJPorhead::directDeliveryFlag)
+        );
+        $this->dbePorhead->setValue(
+            DBEPorhead::deliveryConfirmedFlag,
+            $dsPorhead->getValue(DBEJPorhead::deliveryConfirmedFlag)
         );
         $this->dbePorhead->setValue(
             DBEPorhead::requiredBy,

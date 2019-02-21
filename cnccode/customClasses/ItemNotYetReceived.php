@@ -30,6 +30,35 @@ class ItemNotYetReceived
     protected $orderedQuantity;
     protected $salesOrderID;
     protected $projectID;
+    protected $isRequiredAtLeastAWeekAgo;
+    protected $serviceRequestID;
+    protected $deliveryConfirmedFlag;
+
+    /**
+     * @return mixed
+     */
+    public function isDeliveryConfirmed()
+    {
+        return $this->deliveryConfirmedFlag == 'Y';
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getServiceRequestID()
+    {
+        return $this->serviceRequestID;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isRequiredAtLeastAWeekAgo()
+    {
+        return (int)$this->isRequiredAtLeastAWeekAgo;
+    }
+
 
     /**
      * @return mixed
