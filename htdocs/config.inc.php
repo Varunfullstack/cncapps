@@ -1,6 +1,6 @@
 <?php
 date_default_timezone_set('Europe/London');
-require_once('C:\Sites\openWebAnalytics\owa_php.php');
+require_once(__DIR__ . '/../../openWebStatistics/owa_php.php');
 
 $owa = new owa_php();
 // Set the site id you want to track
