@@ -101,6 +101,8 @@ class BUContactExport extends Business
                 $query .= ", 'Y' AS `Broadband Renewal`";
 
             }
+
+
             if ($dsSearchForm->getValue('broadbandIsp')) {
                 $query .= ", '" . $dsSearchForm->getValue('broadbandIsp') . "' AS `BroadbandIsp`";
 
@@ -171,12 +173,51 @@ class BUContactExport extends Business
         if ($dsSearchForm->getValue('mailshot9Flag')) {
             $query .= " AND con_mailflag9 =  'Y'";
         }
-        if ($dsSearchForm->getValue('supportLevel')) {
-            $query .= " AND supportLevel =  'main'";
-        }
         if ($dsSearchForm->getValue('broadbandRenewalFlag')) {
             $query .= " AND declinedFlag = 'N'";
         }
+
+        if ($dsSearchForm->getValue('supportLevel')) {
+            $selectedOptions = json_decode($dsSearchForm->getValue('supportLevel'));
+
+            $hasNone = false;
+            if (in_array(
+                "",
+                $selectedOptions
+            )) {
+                $selectedOptions = array_slice(
+                    $selectedOptions,
+                    1
+                );
+                $hasNone = true;
+            }
+
+
+            if ($hasNone) {
+                if (count($selectedOptions)) {
+                    $query .= " and ( supportLevel is null or supportLevel in (" . implode(
+                            ",",
+                            $selectedOptions
+                        ) . ")) ";
+                } else {
+                    $query .= " and supportLevel is null";
+                }
+            } else {
+                $query .= " and supportLevel in (" . implode(
+                        ",",
+                        array_map(
+                            function ($str) {
+                                return sprintf(
+                                    "'%s'",
+                                    $str
+                                );
+                            },
+                            $selectedOptions
+                        )
+                    ) . ")";
+            }
+        }
+
         if (
             $dsSearchForm->getValue('broadbandRenewalFlag') &&
             $dsSearchForm->getValue('broadbandIsp')
@@ -192,12 +233,22 @@ class BUContactExport extends Business
 
         if ($dsSearchForm->getValue('contractRenewalFlag') && $contractItemIDs) {
             $query .=
-                " AND cui_itemno IN (" . implode(',', $contractItemIDs) . ")";
+                " AND cui_itemno IN(
+                        " . implode(
+                    ',',
+                    $contractItemIDs
+                ) . "
+                    )";
         }
 
         if ($dsSearchForm->getValue('quotationRenewalFlag') && $quotationItemIDs) {
             $query .=
-                " AND cui_itemno IN (" . implode(',', $quotationItemIDs) . ")";
+                " AND cui_itemno IN(
+                        " . implode(
+                    ',',
+                    $quotationItemIDs
+                ) . "
+                    )";
         }
 
         if ($dsSearchForm->getValue('newCustomerFromDate')) {
@@ -222,7 +273,12 @@ class BUContactExport extends Business
 
         if ($sectorIDs) {
             $query .=
-                " AND cus_sectorno IN (" . implode(',', $sectorIDs) . ")";
+                " AND cus_sectorno IN(
+                        " . implode(
+                    ',',
+                    $sectorIDs
+                ) . "
+                    )";
         }
 
         return $this->db->query($query);
@@ -235,7 +291,9 @@ class BUContactExport extends Business
      * @param mixed $dsForm
      * @param mixed $results
      */
-    function sendEmail($dsForm, $results)
+    function sendEmail($dsForm,
+                       $results
+    )
     {
         $senderEmail = $dsForm->getValue('fromEmailAddress');
         $senderName = 'CNC';
@@ -260,7 +318,7 @@ class BUContactExport extends Business
             );
 
             // add name to top of email
-            $thisBody = '<P>' . $row['FirstName'] . ",</P>" . $body;
+            $thisBody = '<P>' . $row['FirstName'] . ",</P > " . $body;
 
             $buMail->mime->setHTMLBody($thisBody);
 
