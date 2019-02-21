@@ -537,6 +537,7 @@ class Controller extends BaseObject
     )
     {
 
+
         // We always include the page or report template
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
@@ -580,7 +581,6 @@ class Controller extends BaseObject
             "pageTitle",
             $this->getPageTitle()
         );
-
 
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var(

@@ -21,6 +21,7 @@ This project changes will be shown here.
 - Issue 483 - Add Password level descriptions
 - Issue 480 - Current Projects shown on Sales Order page
 - Issue 489 - Contract Extraction
+- Issue 404 - Error Log Handling Improvements
 
 ## [v2.1.4] - 2019-02-20
 ### Fixed
