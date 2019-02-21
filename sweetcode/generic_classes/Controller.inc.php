@@ -582,12 +582,6 @@ class Controller extends BaseObject
             $this->getPageTitle()
         );
 
-        global $owa;
-
-        $tag = $owa->placeHelperPageTags(false);
-        $this->template->setVar(
-            ['owa' => $tag]
-        );
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var(
                 "environmentTag",

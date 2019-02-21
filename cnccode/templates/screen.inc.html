@@ -13,26 +13,25 @@
           rel="stylesheet"
           type="text/css"
     >
+    <script type="text/javascript">
+        var owa_baseUrl = 'http://webanalytics:89/';
+        var owa_cmds = owa_cmds || [];
+        owa_cmds.push(['setSiteId', 'b39a0f923d7f45bec2ccb7fa0435f82c']);
+        owa_cmds.push(['trackPageView']);
+        owa_cmds.push(['trackClicks']);
+        owa_cmds.push(['trackDomStream']);
 
-    <!--&lt;!&ndash; Start Open Web Analytics Tracker &ndash;&gt;-->
-    <!--<script type="text/javascript">-->
-        <!--//<![CDATA[-->
-        <!--var owa_baseUrl = 'http://webanalytics:89/';-->
-        <!--var owa_cmds = owa_cmds || [];-->
-        <!--owa_cmds.push(['setSiteId', 'b39a0f923d7f45bec2ccb7fa0435f82c']);-->
-        <!--owa_cmds.push(['trackPageView']);-->
-        <!--owa_cmds.push(['trackClicks']);-->
+        (function () {
+            var _owa = document.createElement('script');
+            _owa.type = 'text/javascript';
+            _owa.async = true;
+            owa_baseUrl = ('https:' == document.location.protocol ? window.owa_baseSecUrl || owa_baseUrl.replace(/http:/, 'https:') : owa_baseUrl);
+            _owa.src = owa_baseUrl + 'modules/base/js/owa.tracker-combined-min.js';
+            var _owa_s = document.getElementsByTagName('script')[0];
+            _owa_s.parentNode.insertBefore(_owa, _owa_s);
+        }());
 
-        <!--(function() {-->
-            <!--var _owa = document.createElement('script'); _owa.type = 'text/javascript'; _owa.async = true;-->
-            <!--owa_baseUrl = ('https:' == document.location.protocol ? window.owa_baseSecUrl || owa_baseUrl.replace(/http:/, 'https:') : owa_baseUrl );-->
-            <!--_owa.src = owa_baseUrl + 'modules/base/js/owa.tracker-combined-min.js';-->
-            <!--var _owa_s = document.getElementsByTagName('script')[0]; _owa_s.parentNode.insertBefore(_owa, _owa_s);-->
-        <!--}());-->
-        <!--//]]>-->
-    <!--</script>-->
-    <!-- End Open Web Analytics Code -->
-
+    </script>
     <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.4/webcomponents-loader.js"></script>
     <script src="/moment/moment.min.js"></script>
     <script src=".javascript/jquery-3.3.1.min.js"></script>
@@ -41,7 +40,7 @@
           href=".javascript/jquery-ui-1.12.1/jquery-ui.min.css"
     >
     <!--<link rel="stylesheet"-->
-          <!--href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"-->
+    <!--href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"-->
     <!--&gt;-->
     <link rel="stylesheet"
           href="font-awesome/css/font-awesome.min.css"
