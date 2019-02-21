@@ -666,7 +666,7 @@ class BUPDFSalesQuote extends Business
         );
         $template->set_file(
             'page',
-            'QuoteReminder.html'
+            'QuoteReminderEmail.html'
         );
 
         $DBEJRenQuotation = new DBEJRenQuotation($this);

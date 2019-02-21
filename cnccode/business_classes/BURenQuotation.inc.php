@@ -274,23 +274,14 @@ class BURenQuotation extends Business
 
     }
 
-    function createRenewalsQuotations($customerItemIDs = false)
+    function createRenewalsQuotations()
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $dbeRenQuotationUpdate = new DBECustomerItem($this);
 
-        $buInvoice = new BUInvoice ($this);
+        $this->dbeJRenQuotation->getRenewalsDueRows();
 
-        if (!$customerItemIDs) {
-
-            $this->dbeJRenQuotation->getRenewalsDueRows();
-
-        } else {
-            // we have been passed an explicit list of renewal IDs
-            $this->dbeJRenQuotation->getRenewalsByIDList($customerItemIDs);
-
-        }
 
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
 
@@ -304,6 +295,7 @@ class BURenQuotation extends Business
         $previousRenQuotationType = null;
 
         $custItemsSharingSalesOrder = [];
+        $previousOrdHeadID = null;
         while ($this->dbeJRenQuotation->fetchNext()) {
             ?>
             quotation
@@ -320,6 +312,20 @@ class BURenQuotation extends Business
                     ) || $previousRenQuotationType != $dbeJCustomerItem->getValue(
                         DBEJCustomerItem::renQuotationTypeID
                     )) {
+
+                    if ($previousCustomerID != $dbeJCustomerItem->getValue(
+                            'customerID'
+                        )) {
+                        echo "<div>The customer has changed - previous was $previousCustomerID, new is " . $dbeJCustomerItem->getValue(
+                                'customerID'
+                            ) . "</div>";
+                    } else {
+                        echo "<div>The renQuotationType has changed - previous was $previousRenQuotationType, new is " . $dbeJCustomerItem->getValue(
+                                DBEJCustomerItem::renQuotationTypeID
+                            ) . "</div>";
+                    }
+
+                    echo "<div>Creating a new Sales Order</div>";
                     /*
                      *  create order header
                      */
@@ -341,7 +347,9 @@ class BURenQuotation extends Business
                             'type'
                         ) . ' renewal.';
 
-                    $dbeOrdhead->getRow($dsOrdhead->getValue('ordheadID'));
+                    $dbeOrdhead->getRow($dsOrdhead->getValue(DBEOrdhead::ordheadID));
+
+                    echo '<div>The new order id is: ' . $dsOrdhead->getValue(DBEOrdhead::ordheadID) . "</div>";
 
                     $dbeOrdhead->setValue(
                         'quotationIntroduction',
@@ -358,19 +366,30 @@ class BURenQuotation extends Business
                     );
 
                     $dbeOrdhead->updateRow();
-                    foreach ($custItemsSharingSalesOrder as $custItemID) {
-                        $dbeRenQuotationUpdate->setValue(
-                            'customerItemID',
-                            $custItemID
-                        );
-                        $dbeRenQuotationUpdate->getRow();
-                        $dbeRenQuotationUpdate->setValue(
-                            DBECustomerItem::ordheadID,
-                            $dbeOrdhead->getValue(DBEOrdhead::ordheadID)
-                        );
+
+                    if ($previousOrdHeadID) {
+                        echo '<div>These are the item that are going to be sharing this sales order:</div>';
+
+                        echo '<ul>';
+                        foreach ($custItemsSharingSalesOrder as $custItemID) {
+                            echo "<li>$custItemID</li>";
+                            $dbeRenQuotationUpdate->setValue(
+                                DBECustomerItem::customerItemID,
+                                $custItemID
+                            );
+                            $dbeRenQuotationUpdate->getRow();
+                            $dbeRenQuotationUpdate->setValue(
+                                DBECustomerItem::ordheadID,
+                                $previousOrdHeadID
+                            );
+                            $dbeRenQuotationUpdate->updateRow();
+                        }
+                        echo '</ul>';
+
+                        $custItemsSharingSalesOrder = [];
                     }
 
-                    $custItemsSharingSalesOrder = [];
+                    $previousOrdHeadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
                 }
                 $custItemsSharingSalesOrder[] = $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerItemID);
 
@@ -666,22 +685,23 @@ class BURenQuotation extends Business
             }
         }
 
+        echo '<div>These are the item that are going to be sharing this sales order:</div>';
+
+        echo '<ul>';
         foreach ($custItemsSharingSalesOrder as $custItemID) {
+            echo "<li>$custItemID</li>";
             $dbeRenQuotationUpdate->setValue(
-                'customerItemID',
+                DBECustomerItem::customerItemID,
                 $custItemID
             );
             $dbeRenQuotationUpdate->getRow();
             $dbeRenQuotationUpdate->setValue(
                 DBECustomerItem::ordheadID,
-                $dbeOrdhead->getValue(DBEOrdhead::ordheadID)
+                $dsOrdhead->getValue(DBEOrdhead::ordheadID)
             );
+            $dbeRenQuotationUpdate->updateRow();
         }
-
-
-        if ($customerItemIDs) {
-            return $dsOrdhead->getValue('ordheadID');
-        }
+        echo '</ul>';
     }
 
     function processQuotationRenewal($customerItemID)

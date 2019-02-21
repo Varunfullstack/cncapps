@@ -2062,7 +2062,10 @@ class CTSalesOrder extends CTCNC
                         $quoteSentDateTime = 'Not sent';
                     } else {
 
-                        if ($this->dsQuotation->getValue(DBEQuotation::fileExtension) == 'pdf') {
+
+                        if ($this->dsQuotation->getValue(
+                                DBEQuotation::fileExtension
+                            ) == 'pdf' && $this->dsQuotation->getValue(DBEQuotation::documentType == 'quotation')) {
                             $txtReminder = "Send Reminder";
                         }
                         $quoteSentDateTime = date(
@@ -3458,15 +3461,26 @@ class CTSalesOrder extends CTCNC
                 $this->getQuotationID(),
                 $this->emailSubject
             );
-
+            $ordHeadID = $this->dsQuotation->getValue(DBEQuotation::ordheadID);
             $dbeQuotation = new DBEQuotation($this);
             $dbeQuotation->setValue(
                 DBEQuotation::ordheadID,
-                $this->dsQuotation->getValue(DBEQuotation::ordheadID)
+                $ordHeadID
             );
+
+            $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
+            $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
+            $previousFile = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
+            $newFile = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
+
+            copy(
+                $previousFile,
+                $newFile
+            );
+
             $dbeQuotation->setValue(
                 DBEQuotation::versionNo,
-                $this->dsQuotation->getValue(DBEQuotation::versionNo)
+                $versionNo
             );
             $dbeQuotation->setValue(
                 DBEQuotation::salutation,
@@ -3490,7 +3504,7 @@ class CTSalesOrder extends CTCNC
             );
             $dbeQuotation->setValue(
                 DBEQuotation::documentType,
-                $this->dsQuotation->getValue(DBEQuotation::documentType)
+                'reminder'
             );
             $dbeQuotation->insertRow();
 

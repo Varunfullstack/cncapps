@@ -115,10 +115,6 @@ class CTRenQuotation extends CTCNC
             case 'update':
                 $this->update();
                 break;
-            case 'createRenewalsQuotations':
-                $this->createRenewalsQuotations();
-                break;
-
             case 'list':
             default:
                 $this->displayList();
@@ -182,13 +178,6 @@ class CTRenQuotation extends CTCNC
                         )
                     );
 
-                $urlCreateRenewalsQuotations =
-                    $this->buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'createRenewalsQuotations'
-                        )
-                    );
 
                 $txtDelete = '[delete]';
 
@@ -215,26 +204,25 @@ class CTRenQuotation extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName'                => $dsRenQuotation->getValue(DBEJRenQuotation::customerName),
-                        'itemDescription'             => $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription),
-                        'type'                        => $dsRenQuotation->getValue(DBEJRenQuotation::type),
-                        'startDate'                   => Controller::dateYMDtoDMY(
+                        'customerName'        => $dsRenQuotation->getValue(DBEJRenQuotation::customerName),
+                        'itemDescription'     => $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription),
+                        'type'                => $dsRenQuotation->getValue(DBEJRenQuotation::type),
+                        'startDate'           => Controller::dateYMDtoDMY(
                             $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
                         ),
-                        'nextPeriodStartDate'         => Controller::dateYMDtoDMY(
+                        'nextPeriodStartDate' => Controller::dateYMDtoDMY(
                             $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate)
                         ),
-                        'nextPeriodEndDate'           => Controller::dateYMDtoDMY(
+                        'nextPeriodEndDate'   => Controller::dateYMDtoDMY(
                             $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodEndDate)
                         ),
-                        'urlEdit'                     => $urlEdit,
-                        'urlList'                     => $urlList,
-                        'urlCreateRenewalsQuotations' => $urlCreateRenewalsQuotations,
-                        'txtEdit'                     => $txtEdit,
-                        'salesOrderLink'              => $salesOrderLink,
-                        'sentQuotationColor'          => $sent ? "#B2FFB2" : "#F5AEBD",
-                        'latestQuoteSent'             => $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent),
-                        'comments'                    => substr(
+                        'urlEdit'             => $urlEdit,
+                        'urlList'             => $urlList,
+                        'txtEdit'             => $txtEdit,
+                        'salesOrderLink'      => $salesOrderLink,
+                        'sentQuotationColor'  => $sent ? "#B2FFB2" : "#F5AEBD",
+                        'latestQuoteSent'     => $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent),
+                        'comments'            => substr(
                             $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes),
                             0,
                             30
@@ -490,7 +478,8 @@ class CTRenQuotation extends CTCNC
                     $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes)
                 ),
                 'readonly'             => $readonly,
-                'salesOrderLink'       => $salesOrderLink
+                'salesOrderLink'       => $salesOrderLink,
+                'ordheadID'            => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
             )
         );
         $dbeRenQuotationType = new DBERenQuotationType($this);
@@ -606,39 +595,6 @@ class CTRenQuotation extends CTCNC
             header('Location: ' . $urlNext);
             exit;
         }
-    }
-
-    /**
-     * This function creates sales orders for the quotation renewals that are due
-     *
-     */
-    function createRenewalsQuotations()
-    {
-        if (
-            ($_SERVER['REQUEST_METHOD'] == 'POST') &&
-            isset($_REQUEST['customerItemIDs'])
-        ) {
-            $this->buRenQuotation->createRenewalsQuotations(
-                $_REQUEST['customerItemIDs']
-            );
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-
-            $this->buRenQuotation->createRenewalsQuotations();
-
-        }
-
-        $urlNext =
-            $this->buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'list'
-                )
-            );
-        header('Location: ' . $urlNext);
-        exit;
-
     }
 }// end of class
 ?>

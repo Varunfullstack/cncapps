@@ -3,96 +3,93 @@
         src="CommonJS.js"
 >
 </script>
-<form name="regenerate"
-      method="post"
-      action="{urlCreateRenewalsQuotations}"
->
 
-    <table class="singleBorder"
-           width="600"
-           border="0"
-           cellspacing="1"
-           cellpadding="2"
-    >
-        <tr>
-            <td width="300"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=cus_name">Customer</a>
-            </td>
-            <td width="200"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=itm_desc">Item</a>
-            </td>
-            <td width="50"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=ordheadID">Sales Order</a>
-            </td>
-            <td width="50"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a>
-            </td>
-            <td width="50"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=nextPeriodEndDateYMD">Expiry Date</a>
-            </td>
-            <td width="50"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=custitem.itemNotes">Comments</a>
-            </td>
-            <td width="50"
-                class="listHeadText"
-            >
-                <a href="{urlList}&orderBy=latestQuoteSent">Latest Quote Sent</a>
-            </td>
-            <td width="50"
-                class="listHeadText"
-            >&nbsp;
-            </td>
-        </tr>
-        <!-- BEGIN rowBlock -->
-        <tr valign="top"
-            onMouseOver="this.style.backgroundColor ='#ffffcc';"
-            onMouseOut="this.style.backgroundColor='{sentQuotationColor}';"
-            style="background-color: {sentQuotationColor};"
+
+<table class="singleBorder"
+       width="600"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+>
+    <tr>
+        <td width="300"
+            class="listHeadText"
         >
-            <td class="orderLineItem">
-                <DIV align="left">{customerName}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">{itemDescription}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">{salesOrderLink}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">{startDate}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">{nextPeriodStartDate}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">{comments}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">{latestQuoteSent}</div>
-            </td>
-            <td class="orderLineItem">
-                <DIV align="left">
-                </div>
-                <DIV align="left">
-                    <A href="{urlEdit}"
-                       title="Edit renewal details"
-                    >{txtEdit}</a>
-                </DIV>
-            </td>
-        </tr>
-        <!-- END rowBlock -->
-    </table>
-</form>
+            <a href="{urlList}&orderBy=cus_name">Customer</a>
+        </td>
+        <td width="200"
+            class="listHeadText"
+        >
+            <a href="{urlList}&orderBy=itm_desc">Item</a>
+        </td>
+        <td width="50"
+            class="listHeadText"
+        >
+            <a href="{urlList}&orderBy=ordheadID">Sales Order</a>
+        </td>
+        <td width="50"
+            class="listHeadText"
+        >
+            <a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a>
+        </td>
+        <td width="50"
+            class="listHeadText"
+        >
+            <a href="{urlList}&orderBy=nextPeriodEndDateYMD">Expiry Date</a>
+        </td>
+        <td width="50"
+            class="listHeadText"
+        >
+            <a href="{urlList}&orderBy=custitem.itemNotes">Comments</a>
+        </td>
+        <td width="50"
+            class="listHeadText"
+        >
+            <a href="{urlList}&orderBy=latestQuoteSent">Latest Quote Sent</a>
+        </td>
+        <td width="50"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+    </tr>
+    <!-- BEGIN rowBlock -->
+    <tr valign="top"
+        onMouseOver="this.style.backgroundColor ='#ffffcc';"
+        onMouseOut="this.style.backgroundColor='{sentQuotationColor}';"
+        style="background-color: {sentQuotationColor};"
+    >
+        <td class="orderLineItem">
+            <DIV align="left">{customerName}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{itemDescription}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{salesOrderLink}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{startDate}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{nextPeriodStartDate}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{comments}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{latestQuoteSent}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">
+            </div>
+            <DIV align="left">
+                <A href="{urlEdit}"
+                   title="Edit renewal details"
+                   target="_blank"
+                >{txtEdit}</a>
+            </DIV>
+        </td>
+    </tr>
+    <!-- END rowBlock -->
+</table>
 <!-- End Template: RenQuotationList.inc.html -->
