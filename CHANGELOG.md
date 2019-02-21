@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Added
-- Issue 404 - Usage Stats
+- Issue 404 - Error Log Handling Improvements
 
 ## [v2.1.4] - 2019-02-20
 ### Fixed
