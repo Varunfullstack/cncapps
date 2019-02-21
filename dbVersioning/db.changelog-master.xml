@@ -30,8 +30,5 @@
     <include file="db.changelog-1.16.0.xml"/>
     <include file="db.changelog-2.0.0.xml"/>
     <include file="db.changelog-2.1.0.xml"/>
-    <include file="db.changelog-issue450.xml"/>
-    <include file="db.changelog-issue448.xml"/>
-    <include file="db.changelog-issue430.xml"/>
-    <include file="db.changelog-issue482.xml"/>
+    <include file="db.changelog-2.2.0.xml"/>
 </databaseChangeLog>

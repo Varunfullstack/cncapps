@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v2.2.0]
 ### Changed
 - Issue 474 - Request Dashboards visual enhancements
 - Issue 464 - Contact Validation Change
