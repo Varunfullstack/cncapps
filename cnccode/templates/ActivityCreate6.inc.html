@@ -1,12 +1,27 @@
 <!-- Template: ActivityCreate6.inc.html -->
-{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink}
+{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {contactHistoryLink}
 <BR/><BR/>
 <script src="CommonJS.js"></script>
 <script src="ckeditor/ckeditor.js"></script>
 <script language='JavaScript'
         src='popcalendar/popcalendar.js'
 ></script>
+<script>
+    $(function () {
+        checkauthorisedBy();
+    })
 
+    function checkauthorisedBy() {
+        if ($('#contactID').find(':selected').text().indexOf('- Delegate') > -1) {
+            $("#authorisedRow").show();
+            $("#authorisedBy").prop('required', true);
+        } else {
+            $("#authorisedBy").prop('required', false);
+            $("#authorisedRow").hide();
+        }
+    }
+
+</script>
 <P id="autoUpdateLabel"></P>
 <form name="detailsForm"
       method="post"
@@ -40,18 +55,19 @@
             >
                 <input name="hdQ"
                        type="submit"
-                       id="AddToHDQueue"
                        value="HD Q"
                 >
-                 <input name="escQ"
+                <input name="escQ"
                        type="submit"
-                       id="AddToESCQueue"
                        value="ESC Q"
                 >
-                 <input name="imtQ"
+                <input name="imtQ"
                        type="submit"
-                       id="AddToIMTQueue"
                        value="IMT Q"
+                >
+                <input name="salesQ"
+                       type="submit"
+                       value="Sales Q"
                 >
                 <input name="StartWork"
                        type="submit"
@@ -69,22 +85,47 @@
         <tr>
             <td colspan="4">&nbsp;</td>
         </tr>
+        <tr id="authorisedRow"
+        >
+            <td class="promptText"
+            >
+                Authorised By
+            </td>
+            <td class="mainHeadText">
+                <select name="authorisedBy"
+                        id="authorisedBy"
+                        required
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN contactOnlyMainAndSupervisorsBlock -->
+                    {optGroupOpen}
+                    <option {contactSelected}
+                            value="{contactID}"
+                    >{contactName} {startMainContactStyle}
+                    </option>
+                    {optGroupClose}
+                    <!-- END contactOnlyMainAndSupervisorsBlock -->
+                </select>
+            </td>
+        </tr>
         <tr class="content">
             <td class="promptText">Contact</td>
-            <td class="mainHeadText"><select
-                    name="contactID"
-                    id="contactID"
-            >
-                <option value="">Please Select</option>
-                <!-- BEGIN contactBlock -->
-                {optGroupOpen}
-                <option {contactSelected}
-                        value="{contactID}"
-                >{contactName} {startMainContactStyle}
-                </option>
-                {optGroupClose}
-                <!-- END contactBlock -->
-            </select>
+            <td class="mainHeadText">
+                <select
+                        name="contactID"
+                        id="contactID"
+                        onchange="checkauthorisedBy()"
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN contactBlock -->
+                    {optGroupOpen}
+                    <option {contactSelected}
+                            value="{contactID}"
+                    >{contactName} {startMainContactStyle}
+                    </option>
+                    {optGroupClose}
+                    <!-- END contactBlock -->
+                </select>
                 <a href="tel:{contactPhone}">{contactPhone}</a><span class="formErrorMessage">{contactIDMessage}</span>
             </td>
 
@@ -189,7 +230,6 @@
                 <textarea name="reason">{reason}</textarea>
                 <script type="text/javascript">
                     reason = CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
-                    reason.addCss('body { font-size: 10pt; }');
                 </script>
             </td>
         </tr>
@@ -211,7 +251,6 @@
                             customConfig: '/ckeditor_config.js'
                         }
                     );
-                    internalNotes.addCss('body { font-size: 10pt; }');
                 </script>
             </td>
         </tr>
@@ -261,22 +300,22 @@
             >
                 <input name="hdQ"
                        type="submit"
-                       id="AddToHDQueue"
                        value="HD Q"
                 >
                 <input name="escQ"
                        type="submit"
-                       id="AddToESCQueue"
                        value="ESC Q"
                 >
                 <input name="imtQ"
                        type="submit"
-                       id="AddToIMTQueue"
                        value="IMT Q"
+                >
+                <input name="salesQ"
+                       type="submit"
+                       value="Sales Q"
                 >
                 <input name="StartWork"
                        type="submit"
-                       id="StartWork"
                        value="Start Work"
                 >
                 <input name="Back"

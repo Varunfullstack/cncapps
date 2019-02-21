@@ -23,21 +23,41 @@ class DBEContact extends DBCNCEntity
     const sendMailshotFlag = "sendMailshotFlag";
     const discontinuedFlag = "discontinuedFlag";
     const accountsFlag = "accountsFlag";
-    const mailshot1Flag = "mailshot1Flag";
     const mailshot2Flag = "mailshot2Flag";
     const mailshot3Flag = "mailshot3Flag";
     const mailshot4Flag = "mailshot4Flag";
-    const mailshot5Flag = "mailshot5Flag";
-    const mailshot6Flag = "mailshot6Flag";
-    const mailshot7Flag = "mailshot7Flag";
     const mailshot8Flag = "mailshot8Flag";
     const mailshot9Flag = "mailshot9Flag";
-    const mailshot10Flag = "mailshot10Flag";
     const mailshot11Flag = "mailshot11Flag";
     const notes = "notes";
-    const workStartedEmailFlag = "workStartedEmailFlag";
-    const autoCloseEmailFlag = "autoCloseEmailFlag";
     const failedLoginCount = "failedLoginCount";
+    const reviewUser = "reviewUser";
+    const hrUser = "hrUser";
+
+    const supportLevel = "supportLevel";
+
+    const supportLevelMain = 'main';
+    const supportLevelSupervisor = 'supervisor';
+    const supportLevelSupport = 'support';
+    const supportLevelDelegate = 'delegate';
+
+    const initialLoggingEmailFlag = 'initialLoggingEmailFlag';
+    const workStartedEmailFlag = "workStartedEmailFlag";
+    const workUpdatesEmailFlag = 'workUpdatesEmailFlag';
+    const fixedEmailFlag = 'fixedEmailFlag';
+    const pendingClosureEmailFlag = "pendingClosureEmailFlag";
+    const closureEmailFlag = 'closureEmailFlag';
+
+    const othersInitialLoggingEmailFlag = 'othersInitialLoggingEmailFlag';
+    const othersWorkStartedEmailFlag = "othersWorkStartedEmailFlag";
+    const othersWorkUpdatesEmailFlag = 'othersWorkUpdatesEmailFlag';
+    const othersFixedEmailFlag = 'othersFixedEmailFlag';
+    const othersPendingClosureEmailFlag = "othersPendingClosureEmailFlag";
+    const othersClosureEmailFlag = 'othersClosureEmailFlag';
+
+    const pendingLeaverFlag = 'pendingLeaverFlag';
+    const pendingLeaverDate = 'pendingLeaverDate';
+    const specialAttentionContactFlag = "specialAttentionContactFlag";
 
     /**
      * calls constructor()
@@ -147,12 +167,6 @@ class DBEContact extends DBCNCEntity
             "con_accounts_flag"
         );
         $this->addColumn(
-            self::mailshot1Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag1"
-        );
-        $this->addColumn(
             self::mailshot2Flag,
             DA_YN,
             DA_NOT_NULL,
@@ -171,24 +185,6 @@ class DBEContact extends DBCNCEntity
             "con_mailflag4"
         );
         $this->addColumn(
-            self::mailshot5Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag5"
-        );
-        $this->addColumn(
-            self::mailshot6Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag6"
-        );
-        $this->addColumn(
-            self::mailshot7Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag7"
-        );
-        $this->addColumn(
             self::mailshot8Flag,
             DA_YN,
             DA_NOT_NULL,
@@ -199,12 +195,6 @@ class DBEContact extends DBCNCEntity
             DA_YN,
             DA_NOT_NULL,
             "con_mailflag9"
-        );
-        $this->addColumn(
-            self::mailshot10Flag,
-            DA_YN,
-            DA_NOT_NULL,
-            "con_mailflag10"
         );
         $this->addColumn(
             self::mailshot11Flag,
@@ -218,24 +208,123 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL,
             "con_notes"
         );
-        $this->addColumn(
-            self::workStartedEmailFlag,
-            DA_YN,
-            DA_ALLOW_NULL,
-            "con_work_started_email_flag"
-        );
-        $this->addColumn(
-            self::autoCloseEmailFlag,
-            DA_YN,
-            DA_ALLOW_NULL,
-            "con_auto_close_email_flag"
-        );
+
         $this->addColumn(
             self::failedLoginCount,
             DA_INTEGER,
             DA_ALLOW_NULL,
             "con_failed_login_count"
         );
+        $this->addColumn(
+            self::reviewUser,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "reviewUser"
+        );
+        $this->addColumn(
+            self::supportLevel,
+            DA_SUPPORT_LEVEL,
+            DA_ALLOW_NULL,
+            'supportLevel'
+        );
+
+        $this->addColumn(
+            self::hrUser,
+            DA_YN,
+            DA_NOT_NULL,
+            "hrUser"
+        );
+
+        $this->addColumn(
+            self::initialLoggingEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::workStartedEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::workUpdatesEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::fixedEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::pendingClosureEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::closureEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::othersInitialLoggingEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::othersWorkStartedEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::othersWorkUpdatesEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::othersFixedEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::othersPendingClosureEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::othersClosureEmailFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::pendingLeaverFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::pendingLeaverDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+
+
+        $this->addColumn(
+            self::specialAttentionContactFlag,
+            DA_YN_FLAG,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -259,6 +348,11 @@ class DBEContact extends DBCNCEntity
         );
         $query =
             "SELECT " . $this->getDBColumnNamesAsString() .
+            ", case when supportLevel = 'main' then 0
+              when supportLevel = 'supervisor' then 1
+              when supportLevel = 'support' then 2
+              else 3
+              end as orderSupport " .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
 
@@ -266,28 +360,39 @@ class DBEContact extends DBCNCEntity
             $query .=
                 " AND (
 					con_mailshot = 'Y' OR
-					con_mailflag1 = 'Y' OR
 					con_mailflag2 = 'Y' OR
 					con_mailflag3 = 'Y' OR
 					con_mailflag4 = 'Y' OR
-					con_mailflag5 = 'Y' OR
-					con_mailflag6 = 'Y' OR
-					con_mailflag7 = 'Y' OR
 					con_mailflag8 = 'Y' OR
 					con_mailflag9 = 'Y' OR
-					con_mailflag10 = 'Y' or
-                    con_mailflag11 = 'Y'
+					con_mailflag11 = 'Y' or
+					(supportLevel is not null and supportLevel <> '')  or
+					hrUser = 'Y' or
+                    initialLoggingEmailFlag = 'Y' or
+                    workStartedEmailFlag = 'Y' or
+                    workUpdatesEmailFlag = 'Y' or
+                    fixedEmailFlag = 'Y' or
+                    pendingClosureEmailFlag = 'Y' or
+                    closureEmailFlag = 'Y' or
+                    othersInitialLoggingEmailFlag = 'Y' or
+                    othersWorkStartedEmailFlag = 'Y' or
+                    othersWorkUpdatesEmailFlag = 'Y' or
+                    othersFixedEmailFlag = 'Y' or
+                    othersPendingClosureEmailFlag = 'Y' or
+                    othersClosureEmailFlag = 'Y' 
 					)
 					";
         }
 
         if ($supportOnly) {
             $query .= " AND " . $this->getDBColumnName(
-                    self::mailshot5Flag
-                ) . " = 'Y'";    // only nominated support contacts
+                    self::supportLevel
+                ) . " is not null and " . $this->getDBColumnName(
+                    self::supportLevel
+                ) . ' <> ""';
         }
+        $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
 
-        $query .= " ORDER BY con_siteno, con_mailflag10 DESC, con_first_name, con_last_name";
         $this->setQueryString($query);
 
         return (parent::getRows());
@@ -399,11 +504,8 @@ class DBEContact extends DBCNCEntity
             " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
 
         if ($supportOnly) {
-            $sql .= " AND " . $this->getDBColumnName(
-                    self::mailshot5Flag
-                ) . " = 'Y'";        // only nominated support contacts
+            $sql .= " AND " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
         }
-
         $sql .=
             " ORDER BY " . $this->getDBColumnName(self::lastName);
 
@@ -421,7 +523,6 @@ class DBEContact extends DBCNCEntity
     function getSupplierContactRowsByNameMatch($match)
     {
         $this->setMethodName("getSupplierContactRowsByNameMatch");
-        $ret = FALSE;
         if ($this->getValue(self::supplierID) == '') {
             $this->raiseError('supplierID not set');
         }
@@ -459,7 +560,6 @@ class DBEContact extends DBCNCEntity
     )
     {
         $this->setMethodName("getCustomerRowsByNameMatch");
-        $ret = FALSE;
         $this->setValue(
             self::customerID,
             $customerId
@@ -488,16 +588,11 @@ class DBEContact extends DBCNCEntity
         $queryString .=
             " AND (
         con_mailshot = 'Y' OR
-        con_mailflag1 = 'Y' OR
         con_mailflag2 = 'Y' OR
         con_mailflag3 = 'Y' OR
-        con_mailflag4 = 'Y' OR
-        con_mailflag5 = 'Y' OR
-        con_mailflag6 = 'Y' OR
-        con_mailflag7 = 'Y' OR
+        con_mailflag4 = 'Y' Or
         con_mailflag8 = 'Y' OR
         con_mailflag9 = 'Y' OR
-        con_mailflag10 = 'Y' or
         con_mailflag11 = 'Y'
         )
         ";
@@ -508,6 +603,7 @@ class DBEContact extends DBCNCEntity
         $ret = (parent::getRows());
         return $ret;
     }
+
 
     /**
      * all rows for given supplier
@@ -543,7 +639,9 @@ class DBEContact extends DBCNCEntity
         return (parent::getRows());
     }
 
-    function getMainSupportRowsByCustomerID($customerID)
+    function getMainSupportRowsByCustomerID($customerID,
+                                            $includeSupervisors = false
+    )
     {
         if ($customerID == '') {
             $this->raiseError('customerID not set');
@@ -551,9 +649,29 @@ class DBEContact extends DBCNCEntity
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_MAIN_CONTACT_FLAG) . " = 'Y'" .
-            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
+            " WHERE " . $this->getDBColumnName(self::customerID) . " = " . $customerID;
+
+        if (!$includeSupervisors) {
+            $sql .= " AND " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
+        } else {
+            $sql .= " AND " . $this->getDBColumnName(
+                    self::supportLevel
+                ) . " in ('" . self::supportLevelMain . "','" . self::supportLevelSupervisor . "')";
+        }
+
         $this->setQueryString($sql);
+        return (parent::getRows());
+    }
+
+    function getAuthorisingRows($customerID)
+    {
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::supportLevel) .
+            " in ('main', 'supervisor')  AND con_custno = " . $customerID;
+
+        $this->setQueryString($sql);
+
         return (parent::getRows());
     }
 
@@ -561,8 +679,8 @@ class DBEContact extends DBCNCEntity
     {
         $sql = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(CONFIG_HEADER_SUPPORT_CONTACT_FLAG) . " = 'Y'
-        AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+            " WHERE " . $this->getDBColumnName(self::supportLevel) .
+            " is not null AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
 
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;
@@ -611,7 +729,7 @@ class DBEContact extends DBCNCEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::mailshot10Flag) . " = 'Y'" .
+            " WHERE " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'" .
             " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
 
         );
@@ -627,12 +745,12 @@ class DBEContact extends DBCNCEntity
         $sqlQuery =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " left join customer on con_custno = cus_custno";
+            " left join customer on con_custno = cus_custno ";
 
         if ($leadStatusID) {
-            $sqlQuery .= " where customer_lead_status_id = $leadStatusID";
+            $sqlQuery .= " WHERE  customer_lead_status_id = $leadStatusID";
         } else {
-            $sqlQuery .= " where customer_lead_status_id is not null and customer_lead_status_id <> 0";
+            $sqlQuery .= " WHERE  customer_lead_status_id is not null and customer_lead_status_id <> 0";
         }
         $this->setQueryString($sqlQuery);
 
@@ -697,14 +815,19 @@ class DBEContact extends DBCNCEntity
         }
 
         $updated = parent::updateRow();
-        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+
+        if ($GLOBALS['auth']) {
+            $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        } else {
+            $currentLoggedInUserID = USER_SYSTEM;
+        }
 
 
         if ($updated && $hasChanged) {
             $query = "insert into contactauditlog select
                               'update'                  as action,
                               current_timestamp         as createdAt,
-                              $currentLoggedInUserID as userId,
+                              $currentLoggedInUserID    as userId,
                               null                      as contactId,
                               contact.*
                             from contact
@@ -737,6 +860,80 @@ class DBEContact extends DBCNCEntity
         $db->query($query);
 
         return parent::deleteRow($pkValue);
+    }
+
+    public function getTodayLeavers()
+    {
+        $sqlQuery =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " left join customer on con_custno = cus_custno 
+             WHERE " .
+            $this->getDBColumnName(self::pendingLeaverFlag) . " = 'Y' and " .
+            $this->getDBColumnName(self::pendingLeaverDate) . " = curdate() ";
+        $this->setQueryString($sqlQuery);
+        $this->getRows();
+        return $this;
+    }
+
+    public function getReviewContactsByCustomerID($customerID)
+    {
+        $sqlQuery =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::reviewUser) . " = 'Y' and "
+            . $this->getDBColumnName(self::customerID) . " = " . $customerID;
+
+
+        $this->setQueryString($sqlQuery);
+
+        $this->getRows();
+        return $this;
+    }
+
+    public function getSpecialAttentionCustomers()
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where specialAttentionContactFlag = 'Y'
+      ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    public function getRowsByDomain($prefix)
+    {
+        $this->setMethodName("getSpecialAttentionContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where con_email like '%@$prefix' ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    public function getReviewContacts($getValue)
+    {
+        $this->setMethodName("getReviewContacts");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where specialAttentionContactFlag = 'Y'
+      ORDER BY con_custno, con_contno";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+
     }
 }
 

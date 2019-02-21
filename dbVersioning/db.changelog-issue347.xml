@@ -1,0 +1,58 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue347-1537958911-0">
+        <tagDatabase tag="issue347"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue347-1537958911-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerReviewMeetingDocument"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerReviewMeetingDocument">
+            <column name="customerReviewMeetingDocumentID" type="int(11)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customerID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="meetingDate" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" remarks="File contents (binary)" type="LONGBLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileName" remarks="The name of the file" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileMIMEType" remarks="File Mime type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="uploadedAt" remarks="Date/time of upload"
+                    type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploadedBy" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue347-1537958911-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(sty_standardtexttypeno) from standardtexttype where sty_standardtexttypeno = 5
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO `standardtexttype` VALUES (5, 'Review Meeting Email', '["contactFirstName",
+            "reviewMeetingDate"]');
+        </sql>
+        <rollback>
+            delete from standardtexttype where sty_standardtexttypeno = 5
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

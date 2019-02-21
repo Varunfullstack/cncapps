@@ -40,19 +40,17 @@ class Encryption
 
     }
 
-    public static function encrypt($privateKeyPath,
+    public static function encrypt($publicKeyPath,
                                    $data
     )
     {
-        $publicKey = file_get_contents($privateKeyPath);
-
+        $publicKey = file_get_contents($publicKeyPath);
         openssl_public_encrypt(
             $data,
             $cryptedData,
             $publicKey,
             OPENSSL_PKCS1_OAEP_PADDING
         );
-
         return base64_encode($cryptedData);
     }
 }

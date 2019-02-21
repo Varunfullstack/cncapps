@@ -12,6 +12,21 @@
         src='jquery/jquery.min.js'
 ></script>
 <script type="text/javascript">
+    function download3CXExport() {
+        fetch('?action=3cxExport')
+            .then(data => {
+                return data.json();
+            }).then(data => {
+            var link = document.createElement("a");
+            link.download = 'export.zip';
+            link.href = "data:application/x-zip-compressed;base64," + data.base64Data;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            delete link;
+        })
+    }
+
 
     $(function () {
         window.newCustomerFromDate = $('#newCustomerFromDate').get(0);
@@ -63,8 +78,7 @@
                     '&parentDescField=customerString',
                     'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
             }
-        }
-        else {
+        } else {
             document.searchForm.customerID.value = "";
         }
     }
@@ -184,18 +198,6 @@
                     </tr>
                     <tr>
                         <td class="promptText">
-                            {mailshot1FlagDesc}
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="searchForm[1][mailshot1Flag]"
-                                   value="Y"
-                                   {mailshot1FlagChecked}
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
                             {mailshot2FlagDesc}
                         </td>
                         <td>
@@ -232,42 +234,6 @@
                     </tr>
                     <tr>
                         <td class="promptText">
-                            {mailshot5FlagDesc}
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="searchForm[1][mailshot5Flag]"
-                                   value="Y"
-                                   {mailshot5FlagChecked}
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
-                            <div align="right">{mailshot6FlagDesc}</div>
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="searchForm[1][mailshot2Flag]"
-                                   value="Y"
-                                   {mailshot6FlagChecked}
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
-                            <div align="right">{mailshot7FlagDesc}</div>
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="searchForm[1][mailshot7Flag]"
-                                   value="Y"
-                                   {mailshot7FlagChecked}
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
                             <div align="right">{mailshot8FlagDesc}</div>
                         </td>
                         <td>
@@ -287,18 +253,6 @@
                                    name="searchForm[1][mailshot9Flag]"
                                    value="Y"
                                    {mailshot9FlagChecked}
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
-                            <div align="right">{mailshot10FlagDesc}</div>
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="searchForm[1][mailshot10Flag]"
-                                   value="Y"
-                                   {mailshot10FlagChecked}
                             >
                         </td>
                     </tr>
@@ -463,6 +417,10 @@
                                    name="Export"
                                    value="Export CSV"
                             >
+                            <button type="button"
+                                    onclick="download3CXExport()"
+                            >3CX Address Book Export
+                            </button>
                         </td>
                     </tr>
                 </table>

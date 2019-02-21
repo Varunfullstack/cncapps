@@ -1,0 +1,104 @@
+<table class="table-bordered oddRows"
+       width="100%"
+>
+    <thead>
+    <tr valign="center">
+        <th class="listHeadText"
+            colspan="2"
+            width="34%"
+        >
+            <div align="left">{queueName} ({queueCount})</div>
+        </th>
+        <th class="listHeadText"
+            width="1%"
+        >
+            <div align="left">Priority</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Open Hours</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Time Spent</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Number Of Activities</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Description</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Assigned To</div>
+        </th>
+        <th class="listHeadText">
+            <div align="left">Updated</div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN queueLongest_Open_SRBlock -->
+    <tr valign="center">
+        <td width="2%"
+            bgcolor="{bgColour}"
+            class="problemId"
+        >
+            <A href="{urlViewActivity}"
+               target="_blank"
+            >{problemID}</A>
+        </td>
+
+        <td width="20%"
+            {customerNameDisplayClass}
+        >
+            <A href={urlCustomer}
+               target="_blank"
+            >{customerName}</a>
+        </td>
+
+        <td width="3%"
+            bgcolor="{priorityBgColor}"
+        >
+            <div align="center">{priority}</div>
+        </td>
+        <td width="5%"
+            bgcolor="{hoursRemainingBgColor}"
+            title="Green = Awaiting Customer Blue = CNC Yellow = Not Started"
+        >
+            <div align="center">{hoursRemaining}</div>
+        </td>
+
+        <td width="5%"
+            align="center"
+        >{totalActivityDurationHours}
+        </td>
+        <td width="5%">
+            <div align="center">{activityCount}</div>
+        </td>
+        <td width="37%">
+            <A
+                    href="#"
+                    onClick="window.open(
+          '{urlProblemHistoryPopup}',
+          'reason',
+          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
+            >{reason}
+            </A>
+        </td>
+
+        <td width="10%"
+            valign="center"
+        >
+            <select class="userAllocation">{engineerDropDown}</select>
+        </td>
+
+        <td width="10%"
+            nowrap="nowrap"
+            bgcolor="{updatedBgColor}"
+            title="Purple = Updated by another user OR has an alarm date in past"
+        >{date} {time}
+        </td>
+
+    </tr>
+    <!-- END queueLongest_Open_SRBlock -->
+    </tbody>
+</table>
+<br>

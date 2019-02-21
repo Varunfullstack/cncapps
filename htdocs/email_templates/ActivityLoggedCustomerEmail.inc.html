@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Activity Logged</title>
+    <style type="text/css">
+        <!--
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+        }
+
+        h2 {
+            font-size: 11pt;
+            font-weight: bold;
+
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+
+        -->
+    </style>
+</head>
+<body>
+<p>{contactFirstName},</p>
+<p>We have carried out work on your service request reference
+    <a href="https://www.cnc-ltd.co.uk/view/?serviceid={activityRef}">{activityRef}</a>
+    as detailed below.
+</p>
+<h2>Details</h2>
+<p class="singleBorder">{lastActivityReason}</p>
+<P>The technician responsible for this was {technicianResponsible}. {extra}</P>
+</body>
+</html>

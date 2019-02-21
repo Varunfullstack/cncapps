@@ -9,7 +9,10 @@
         "phpoffice/phpword": "^0.15.0",
         "ext-json": "*",
         "ext-mysqli": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-zip": "*",
+        "phpoffice/phpspreadsheet": "^1.5",
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {

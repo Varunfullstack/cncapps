@@ -733,6 +733,7 @@ class DBEntity extends DataAccess
                 ")"
             );
         }
+
         $ret = $this->runQuery();
         $this->resetQueryString();
         return $ret;
@@ -769,6 +770,16 @@ class DBEntity extends DataAccess
         $arrayRow = array();
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             $arrayRow[] = $this->getValue($ixCol);
+        }
+        return $arrayRow;
+    }
+
+    function getRowAsAssocArray()
+    {
+        $this->setMethodName("getRowAsArrayAssoc");
+        $arrayRow = array();
+        for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
+            $arrayRow[$this->colName[$ixCol]] = $this->getValue($ixCol);
         }
         return $arrayRow;
     }

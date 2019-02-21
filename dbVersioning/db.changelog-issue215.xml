@@ -1,0 +1,744 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue215-1528799226-0">
+        <tagDatabase tag="issue215"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="supportLevel"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="supportLevel" type="char(20)" defaultValue="support"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="supportLevel"/>
+        </preConditions>
+        <sql splitStatements="true">
+            <![CDATA[
+
+            UPDATE contact SET supportLevel = IF(con_mailflag10 = 'Y', 'main', IF(con_mailflag5 = 'Y', 'support',
+            NULL));
+            update contact set con_mailflag11 = IF(con_mailflag10 = 'Y', 'Y', con_mailflag11);
+            UPDATE contact    SET
+            con_accounts_flag = 'Y'
+            WHERE contact.`con_custno` IN
+            (SELECT
+            cus_custno
+            FROM
+            (SELECT
+            (SELECT
+            COUNT(*)
+            FROM
+            contact
+            WHERE contact.`con_accounts_flag` = 'Y'
+            AND contact.`con_custno` = customer.`cus_custno`) AS accountsContacts,
+            customer.`cus_custno`
+            FROM
+            customer
+            WHERE customer.`cus_referred` <> 'Y') testAccountsContacts
+            WHERE accountsContacts = 0)
+            AND con_mailflag4 = 'Y';
+            ]]>
+        </sql>
+        <rollback>
+            update contact set con_mailflag10 = if(supportLevel = 'main', 'Y','N'), con_mailflag5 = if(supportLevel =
+            'support', 'Y', 'N')
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="initialLoggingEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="initialLoggingEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set initialLoggingEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="initialLoggingEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="workStartedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="workStartedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set workStartedEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="workStartedEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="workUpdatesEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="workUpdatesEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set workUpdatesEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="workUpdatesEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="fixedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="fixedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set fixedEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="fixedEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingClosureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingClosureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set pendingClosureEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="pendingClosureEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="closureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="closureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set closureEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="closureEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersInitialLoggingEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersInitialLoggingEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set othersInitialLoggingEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="othersInitialLoggingEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersWorkStartedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersWorkStartedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set othersWorkStartedEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="othersWorkStartedEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersWorkUpdatesEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersWorkUpdatesEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set othersWorkUpdatesEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="othersWorkUpdatesEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersFixedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersFixedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set othersFixedEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="othersFixedEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersPendingClosureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersPendingClosureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set othersPendingClosureEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="othersPendingClosureEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="othersClosureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="othersClosureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+        <sql>
+            update contact set othersClosureEmailFlag = 'Y'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="othersClosureEmailFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-15">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="customer" columnName="cus_others_email_main_flag"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_others_email_main_flag"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_others_email_main_flag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-16">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="customer" columnName="cus_work_started_email_main_flag"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_work_started_email_main_flag"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_work_started_email_main_flag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-17">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="customer" columnName="cus_auto_close_email_main_flag"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_auto_close_email_main_flag"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_auto_close_email_main_flag" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-18">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg1_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg1_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg1_def" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-19">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg1_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg1_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg1_desc" type="char(30)" defaultValue="Add"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-20">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg6_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg6_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg6_def" type="char(1)" defaultValue="N"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-21">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg6_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg6_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg6_desc" type="char(30)" defaultValue="TM"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-22">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg7_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg7_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg7_def" type="char(1)" defaultValue="N"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-23">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg7_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg7_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg7_desc" type="char(30)" defaultValue="DM"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-24">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag1"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag1"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag1" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-25">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag6"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag6"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag6" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-26">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="reviewUser"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="reviewUser" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-27">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="reviewUser"/>
+        </preConditions>
+        <sql>
+            update contact set reviewUser = 'Y' where con_mailflag7 = 'Y'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-28">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag7"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag7"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag7" type="char(1)" defaultValue="Y"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-29">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag5"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag5"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag5" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-30">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contact" columnName="con_mailflag10"/>
+        </preConditions>
+        <dropColumn tableName="contact" columnName="con_mailflag10"/>
+        <rollback>
+            <addColumn tableName="contact">
+                <column name="con_mailflag10" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-31">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg5_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg5_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg5_def" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-32">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg5_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg5_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg5_desc" type="char(30)" value="Sup"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-33">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg10_def"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg10_def"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg10_def" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-34">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_mailflg10_desc"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_mailflg10_desc"/>
+        <rollback>
+            <addColumn tableName="headert">
+                <column name="hed_mailflg10_desc" type="char(30)" value="Main"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-35">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="hrUser"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="hrUser" defaultValue="N" type="char(1)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-36">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactauditlog" columnName="con_mailflag1"/>
+        </preConditions>
+        <dropColumn tableName="contactauditlog" columnName="con_mailflag1"/>
+        <rollback>
+            <addColumn tableName="contactauditlog">
+                <column name="con_mailflag1" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-37">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactauditlog" columnName="con_mailflag10"/>
+        </preConditions>
+        <dropColumn tableName="contactauditlog" columnName="con_mailflag10"/>
+        <rollback>
+            <addColumn tableName="contactauditlog">
+                <column name="con_mailflag10" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-38">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactauditlog" columnName="con_mailflag5"/>
+        </preConditions>
+        <dropColumn tableName="contactauditlog" columnName="con_mailflag5"/>
+        <rollback>
+            <addColumn tableName="contactauditlog">
+                <column name="con_mailflag5" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-39">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactauditlog" columnName="con_mailflag6"/>
+        </preConditions>
+        <dropColumn tableName="contactauditlog" columnName="con_mailflag6"/>
+        <rollback>
+            <addColumn tableName="contactauditlog">
+                <column name="con_mailflag6" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-40">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contactauditlog" columnName="con_mailflag7"/>
+        </preConditions>
+        <dropColumn tableName="contactauditlog" columnName="con_mailflag7"/>
+        <rollback>
+            <addColumn tableName="contactauditlog">
+                <column name="con_mailflag7" type="char(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-41">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactauditlog" columnName="hrUser"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactauditlog">
+            <column name="hrUser" type="char(1)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-42">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactauditlog" columnName="reviewUser"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactauditlog">
+            <column name="reviewUser" type="char(1)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue215-1528799226-43">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactauditlog" columnName="supportLevel"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactauditlog">
+            <column name="supportLevel" type="char(20)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-44" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="initialLoggingEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="initialLoggingEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-45" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="workStartedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="workStartedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-46" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="workUpdatesEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="workUpdatesEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-47" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="fixedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="fixedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-48" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingClosureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingClosureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-49" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="closureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="closureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-50" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="othersInitialLoggingEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="othersInitialLoggingEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-51" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="othersWorkStartedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="othersWorkStartedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-52" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="othersWorkUpdatesEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="othersWorkUpdatesEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-53" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="othersFixedEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="othersFixedEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-54" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="othersPendingClosureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="othersPendingClosureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-55" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="othersClosureEmailFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="othersClosureEmailFlag" type="char(1)" defaultValue="Y"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-56" author="pavwebdev">
+        <modifyDataType tableName="contact" columnName="con_portal_password" newDataType="char(60)"/>
+        <modifyDataType tableName="contactAuditLog" columnName="con_portal_password" newDataType="char(60)"/>
+        <sql>
+            update contact set con_portal_password = null;
+            update contactAuditLog set con_portal_password = null
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue215-1528799226-57" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingLeaverFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
+        </addColumn>
+        <sql>
+            update contact set pendingLeaverFlag = 'N'
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="pendingLeaverFlag"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue215-1528799226-58" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="pendingLeaverDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="pendingLeaverDate" type="date"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue215-1528799226-59" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingLeaverFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingLeaverFlag" defaultValue="N" type="char(1)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-60" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="pendingLeaverDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="pendingLeaverDate" type="date"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue215-1528799226-61" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="authorisedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="authorisedBy" type="int(11)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

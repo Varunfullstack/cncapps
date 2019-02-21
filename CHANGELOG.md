@@ -5,6 +5,141 @@ This project changes will be shown here.
 ### Added
 - Issue 404 - Usage Stats
 
+## [v2.1.4] - 2019-02-20
+### Fixed
+- Fixed Invalid character in customer email
+
+## [v2.1.3] - 2019-02-15
+### Fixed
+- Fixed Error when logging SRs for a delegate
+- Issue 472 - PortalProcessRequests.php - documents that are being sent out
+
+## [v2.1.2] - 2019-02-15
+### Changed
+- Change Customer Review Meeting sending email address
+
+## [v2.1.1] - 2019-02-12
+### Removed
+- Remove debug log shown when editing an activity and showing a form error.
+
+## [v2.1.0]
+### Changed
+- Issue 137 - CNC029 - Password archiving & security
+- Issue 436 - Changing contracts in SR, permissions required
+### Added
+- Issue 442 - Customer Starter & Leaver questions
+
+## [v2.0.7] - 2019-02-08
+### Fixed 
+- Fix issue with counting open activities
+
+## [v2.0.6] - 2019-02-08
+### Fixed
+- Unnecessary email sending on SR updates
+
+## [v2.0.5] - 2019-02-04
+### Fixed
+- Fix issue where OthersEmails flags where getting ignored
+
+## [v2.0.4] - 2019-02-04
+### Fixed
+- Fix Issue with logged requests showing html characters in the reason
+
+## [v2.0.3] - 2019-02-04
+### Fixed
+- Fixed Issues with to be logged requests not picking up the body of the email.
+- Fixed issue after logging a new request being sent to a blank page.
+
+## [v2.0.2] - 2019-01-31
+### Fixed 
+- Fixed issue with sending emails to customers for Service Requests
+
+## [v2.0.1]
+### Fixed
+- Can't create new users due to the Primary Main Contact being required
+
+## [v2.0.0] - 2019-01-31
+### Changed
+- Issue 215 - Contact Management within CNCAPPS
+- Issue 358 - Review automatic email creation process so that it's compatible with the new contacts in 215
+- Issue 408 - Contact Validation Improvements
+### Fixed
+- Issue 352 - CNCWEB contacts bugs
+### Added
+- Issue 347 - Customer Review Management documents
+- Issue 345 - Creation of Primary Main Contact 
+
+## [v1.16.1] - 2019-01-29
+### Fixed
+- Search SRs take you to the Sales Order, not Service Request
+
+## [v1.16.0] - 2019-01-24
+### Added
+- Issue 429 - SD Manager Dashboard show P1 sections
+- Issue 410 - 7 dayers on dashboard
+- Issue 409 - Time Request Dashboard
+- Issue 428 - Allow Logging directly into the Sales queue
+- Issue 411 - Non referred customers with no contracts report
+- Issue 435 - Additional folders for default customer creation
+### Changed
+- Issue 413 - Default home page graphs to your team
+- Issue 421 - Increase Questionnaire field length
+- Issue 422 - Decimal places for fix times in System Header
+- Issue 423 - Upcoming Customer Review Meeting
+- Issue 414 - Contact table change defaults
+- Issue 390 - Project List Enhancements
+- Issue 438 - Edit Sales Invoice email to include reference to portal
+- Issue 418 - SR Completion Contract Changing
+- Issue 437 - Split Upcoming Visits query into own function
+- Issue 439 - SalesRequestDashboard SR link in new tab
+### Fixed
+- Issue 420 - Email missing header information
+- Issue 378 - Creating item defaults to first site
+- Issue 419 - Customer Review Meeting Frequency doesn't show in PDF export for Every 2 Months
+- Issue 415 - First Time Fix clarification
+- Issue 432 - Contact changes in SR don't update phone details
+
+## [v1.15.2] - 2019-01-11
+### Fixed
+- PoStatusReport doesn't show the right amount of results.
+- PoStatusReport show visits when it shouldn't.
+
+## [v1.15.1] - 2019-01-09 
+### Fixed
+- Issue 417 - Despatching RenBroadband items incorrect outstanding quantity
+- Fix problem with TopUp value in customer page
+
+## [v1.15.0] - 2018-12-27
+### Fixed
+- Issue 376 - Contact notes being copied to other contacts
+- Issue 359 - Management Review Summary shows blank To: field
+- Issue 372 - Email display header missing
+- Issue 360 - SD Dashboard Assignment display issue
+- Issue 380 - Typo in Reports Menu
+- Issue 377 - Sales Requests status lost
+- Issue 393 - Clicking Start Work with new SR puts it into the wrong queue
+- Issue 389 - Prevent links for contacts that have no support flag enabled
+- Issue 405 - Creating SR from To Be Logged sometimes loses text
+### Changed 
+- Issue 365 - Performance table formatting improvements
+- Issue 391 - Change MailQueueAlert.php email destinations
+- Issue 388 - Contact Title Database field length increase
+- Issue 366 - Automatically raised SRs set to no Initial time
+- Issue 377 - Sales Requests status lost
+- Issue 399 - Staff Appraisal formatting improvements
+- Issue 398 - Improve SR manager dashboard view
+- Issue 407 - Tweak SR manager Dashboard view
+### Added
+- Issue 392 - Customer Meeting Review Frequency Change
+- Issue 364 - Improve Items Not Received v3
+- Issue 382 - Upcoming visits dashboard on the home page
+- Issue 346 - Automate Asset List Export
+- Issue 402 - Show recent SRs for contact
+- Issue 369 - Allow a contact to be special attention
+- Issue 363 - Contact export to CSV for 3CX phone system importing
+### Removed
+- Issue 403 - Remove extra | in menu
+
 ## [v1.14.5] - 2018-12-11
 ### Changed
 - Show employee's start date in DD-MM-YYYY format

@@ -10,7 +10,10 @@ require_once("config.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
-define('EMAIL_SUBJECT', 'Email Queue Problem');
+define(
+    'EMAIL_SUBJECT',
+    'Email Queue Problem'
+);
 
 $error = false;
 
@@ -18,7 +21,7 @@ $error = false;
 if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
     $send_to_email = CONFIG_CATCHALL_EMAIL;
 } else {
-    $send_to_email = 'grahaml@cnc-ltd.co.uk,' . CONFIG_SALES_MANAGER_EMAIL;
+    $send_to_email = 'MailQueueAlert@cnc-ltd.co.uk';
 }
 
 $sql = "
@@ -37,29 +40,23 @@ $count = $db->Record[0];
 if ($count > 0) {
 
     $body = "$count emails have been in the mail queue for longer than 30 minutes.\n";
-
-    $hdrs_array = array(
-        'From' => CONFIG_SALES_MANAGER_EMAIL,
-        'Subject' => EMAIL_SUBJECT,
-        'Content-Type' => 'text/html; charset=UTF-8'
-    );
-
     $buMail = new BUMail($this);
 
     $buMail->mime->setHTMLBody($body);
 
     $mime_params = array(
         'text_encoding' => '7bit',
-        'text_charset' => 'UTF-8',
-        'html_charset' => 'UTF-8',
-        'head_charset' => 'UTF-8'
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
     );
     $body = $buMail->mime->get($mime_params);
 
     $hdrs = array(
-        'From' => CONFIG_SALES_MANAGER_EMAIL,
-        'Subject' => EMAIL_SUBJECT,
-        'Content-Type' => 'text/html; charset=UTF-8'
+        'From'         => CONFIG_SALES_MANAGER_EMAIL,
+        'Subject'      => EMAIL_SUBJECT,
+        'Content-Type' => 'text/html; charset=UTF-8',
+        'To'           => $send_to_email
     );
 
     $hdrs = $buMail->mime->headers($hdrs);

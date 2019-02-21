@@ -1,0 +1,15 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1547465072-0">
+        <tagDatabase tag="issue422"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1547465072-1">
+        <modifyDataType tableName="headert" columnName="hed_hd_team_target_fix_hours" newDataType="decimal(5,2)"/>
+        <modifyDataType tableName="headert" columnName="hed_es_team_target_fix_hours" newDataType="decimal(5,2)"/>
+        <modifyDataType tableName="headert" columnName="hed_im_team_target_fix_hours" newDataType="decimal(5,2)"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

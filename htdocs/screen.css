@@ -421,6 +421,10 @@ TABLE.fieldChooser {
     background-color: #F8A5B6;
 }
 
+.specialAttentionContact {
+    background-color: #ffe6e6;
+}
+
 div.customerEditMain {
     /*  width: 55%; */
 }
@@ -700,6 +704,40 @@ div.reportDescription {
     background: yellow;
 }
 
+table.fixed_header {
+    table-layout: fixed;
+}
+
+.fixed_header tbody, .fixed_header thead {
+    display: block;
+}
+
+.fixed_header tbody {
+    overflow-y: scroll;
+    max-height: 851px;
+    direction: rtl;
+    /*width: 100%;*/
+}
+
+.fixed_header tbody tr {
+    direction: ltr;
+}
+
+.fixed_header tbody td {
+    overflow: hidden;
+}
+
+.fixed_header td, .fixed_header th {
+    word-wrap: break-word;
+}
+
+.fixed_header thead tr, .fixed_header tbody tr {
+    display: block;
+}
+
+.fixed_header thead {
+    margin-right: 12px;
+}
 .redPencil {
     color: red;
 }

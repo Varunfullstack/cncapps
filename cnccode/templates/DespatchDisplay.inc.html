@@ -1,6 +1,36 @@
 <!-- Template: DespatchDisplay.inc.html -->
-<script language='JavaScript' src='CommonJS.js'></script>
+<script language='JavaScript'
+        src='CommonJS.js'
+></script>
 <SCRIPT language="JavaScript">
+    function checkForcedCreation() {
+        if (event.target.checked) {
+            //we have to create the field
+
+            var newElement = document.createElement('tr');
+            newElement.id = 'forcedCreation';
+
+
+            newElement.innerHTML = ("<td width=\"60px\"" +
+                "                            class=\"promptText\"\n" +
+                "                        >Forcibly create Note (ignoring renewals)" +
+                "                        </td>" +
+                "                        <td class=\"field\">\n" +
+                "                            <input\n" +
+                "                                    type=\"checkbox\"\n" +
+                "                                    name=\"forciblyCreateNote\"\n" +
+                "                                    value=\"1\"\n" +
+                "                            >" +
+                "                        </td>"
+            );
+
+            $(event.target).closest('table')[0].appendChild(newElement);
+
+        } else {
+            $('#forcedCreation').remove();
+        }
+    }
+
     var qtySetZero = true; // initialise flag to indicate current toggle state
     $(function () {
         document.onkeydown = function (event) {
@@ -16,8 +46,7 @@
                     var qtyOS = qtyOSElements[index];
                     if (qtySetZero && !qtyToDespatch.disabled) {
                         qtyToDespatch.value = qtyOS.value;
-                    }
-                    else {
+                    } else {
                         qtyToDespatch.value = 0;
                     }
                 });
@@ -28,26 +57,48 @@
     })
 
 </SCRIPT>
-<TABLE width="100px" border="0" cellpadding="2" cellspacing="1">
+<TABLE width="100px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
     <TR>
-        <TD width="100px" class="navigateLink" valign="top"><a href="{urlSalesOrder}">Sales Order</a>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlSalesOrder}">Sales Order</a>
         </TD>
     </TR>
 </TABLE>
 <br/>
 <P class="formErrorMessage">{poNotRecd}</P>
-<form name="despatchForm" method="POST" enctype="multipart/form-data" action="{urlDespatch}">
+<form name="despatchForm"
+      method="POST"
+      enctype="multipart/form-data"
+      action="{urlDespatch}"
+>
     <TABLE border="0">
         <TR>
             <TD>
-                <table width="200px" border="0" cellspacing="0" cellpadding="1">
+                <table width="200px"
+                       border="0"
+                       cellspacing="0"
+                       cellpadding="1"
+                >
                     <tr>
-                        <td width="60px" class="promptText">Deliver By</td>
+                        <td width="60px"
+                            class="promptText"
+                        >Deliver By
+                        </td>
                         <td class="field">
-                            <select id="deliveryMethodID" name="deliveryMethodID">
+                            <select id="deliveryMethodID"
+                                    name="deliveryMethodID"
+                            >
                                 <option value="">Please Select</option>
                                 <!-- BEGIN deliveryMethodBlock -->
-                                <option {deliveryMethodSelected} value="{deliveryMethodID}">
+                                <option {deliveryMethodSelected}
+                                        value="{deliveryMethodID}"
+                                >
                                     {deliveryMethodDescription}
                                 </option>
                                 <!-- END deliveryMethodBlock -->
@@ -55,13 +106,17 @@
                         </td>
                     </tr>
                     <tr>
-                        <td width="60px" class="promptText">Only Create Delivery Note</td>
+                        <td width="60px"
+                            class="promptText"
+                        >Only Create Delivery Note
+                        </td>
                         <td class="field">
                             <input
                                     type="checkbox"
                                     id="onlyCreateDespatchNote"
                                     name="onlyCreateDespatchNote"
                                     value="1"
+                                    onchange="checkForcedCreation()"
                             >
                         </td>
                     </tr>
@@ -74,21 +129,45 @@
         </TR>
         <TR>
             <TD>
-                <table class="singleBorder" width="740px" border="0" cellspacing="2" cellpadding="1">
+                <table class="singleBorder"
+                       width="740px"
+                       border="0"
+                       cellspacing="2"
+                       cellpadding="1"
+                >
                     <tr>
-                        <td width="350px" class="listHeadText">Description</td>
-                        <td width="57px" class="listHeadText">Part No</td>
-                        <td width="50px" class="listHeadText">Ordered</td>
-                        <td width="50px" class="listHeadText">Outstanding aaa</td>
-                        <td width="140px" class="listHeadText">Despatch (F5 toggle)</td>
-                        <td width="10px" class="listHeadText">
+                        <td width="350px"
+                            class="listHeadText"
+                        >Description
+                        </td>
+                        <td width="57px"
+                            class="listHeadText"
+                        >Part No
+                        </td>
+                        <td width="50px"
+                            class="listHeadText"
+                        >Ordered
+                        </td>
+                        <td width="50px"
+                            class="listHeadText"
+                        >Outstanding
+                        </td>
+                        <td width="140px"
+                            class="listHeadText"
+                        >Despatch (F5 toggle)
+                        </td>
+                        <td width="10px"
+                            class="listHeadText"
+                        >
                             &nbsp;
                         </td>
 
                     </tr>
                     <!-- BEGIN orderLineBlock -->
 
-                    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
+                    <tr onMouseOver="this.bgColor='#FFFFCC';"
+                        onMouseOut="this.bgColor='';"
+                    >
                         <td class="{orderLineClass}">
                             <DIV align="left">{description}</DIV>
                         </td>
@@ -99,13 +178,22 @@
                         <td class="{orderLineClass}">{qtyOutstanding}</td>
                         <td class="{orderLineClass}">
                             <DIV align="right">
-                                <input type="text" class="qtyToDespatch"
+                                <input type="text"
+                                       class="qtyToDespatch"
                                        name="despatch[{sequenceNo}][qtyToDespatch]"
-                                       value="{qtyToDespatch}" maxlength="10">
+                                       value="{qtyToDespatch}"
+                                       maxlength="10"
+                                >
                             </DIV>
-                            <input type="hidden" id="sequenceNo" name="despatch[{sequenceNo}][sequenceNo]"
-                                   value={sequenceNo}>
-                            <input type="hidden" class="qtyOutstandingHide" value="{qtyOutstandingHide}">
+                            <input type="hidden"
+                                   id="sequenceNo"
+                                   name="despatch[{sequenceNo}][sequenceNo]"
+                                   value={sequenceNo}
+                            >
+                            <input type="hidden"
+                                   class="qtyOutstandingHide"
+                                   value="{qtyOutstandingHide}"
+                            >
                         </td>
                         <td class="{orderLineClass}">
                             <DIV align="right">{renewalLink}
@@ -114,7 +202,11 @@
                     </tr>
                     <!-- END orderLineBlock -->
                     <tr>
-                        <td colspan="5"><input type="submit" name="Submit" value="Despatch">{renewalsButton}</td>
+                        <td colspan="5"><input type="submit"
+                                               name="Submit"
+                                               value="Despatch"
+                        >{renewalsButton}
+                        </td>
                     </tr>
                 </table>
             </TD>

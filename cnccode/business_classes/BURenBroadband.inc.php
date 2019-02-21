@@ -424,7 +424,7 @@ class BURenBroadband extends Business
                 ); // default 1
                 $dbeOrdline->setValue(
                     'qtyDespatched',
-                    1
+                    0
                 );
                 $dbeOrdline->setValue(
                     'qtyLastDespatched',

@@ -64,7 +64,11 @@ class DB_Sql
     }
 
     /* public: connection management */
-    function connect($Database = "", $Host = "", $User = "", $Password = "")
+    function connect($Database = "",
+                     $Host = "",
+                     $User = "",
+                     $Password = ""
+    )
     {
         /* Handle defaults */
         if ("" == $Database)
@@ -78,10 +82,18 @@ class DB_Sql
 
         /* establish connection, select database */
         if (!isset(self::$Link_ID)) {
-            self::$Link_ID = mysqli_connect($Host, $User, $Password, $Database);
+            self::$Link_ID = mysqli_connect(
+                $Host,
+                $User,
+                $Password,
+                $Database
+            );
 
             if (!self::$Link_ID->set_charset("utf8")) {
-                printf("Error loading utf8 charset: %s\n", self::$Link_ID->error);
+                printf(
+                    "Error loading utf8 charset: %s\n",
+                    self::$Link_ID->error
+                );
                 exit();
             }
 
@@ -90,7 +102,10 @@ class DB_Sql
                 return 0;
             }
 
-            if (!@mysqli_select_db(self::$Link_ID, $Database)) {
+            if (!@mysqli_select_db(
+                self::$Link_ID,
+                $Database
+            )) {
                 $this->halt("cannot use database " . $Database);
                 return 0;
             }
@@ -111,7 +126,9 @@ class DB_Sql
      * @param $parameters
      * @return bool|int|mysqli_result
      */
-    function preparedQuery($queryString, $parameters)
+    function preparedQuery($queryString,
+                           $parameters
+    )
     {
         /* No empty queries, please, since PHP4 chokes on them. */
         if ($queryString == "")
@@ -131,12 +148,18 @@ class DB_Sql
         }
 
         if ($this->Debug)
-            printf("Debug: query = %s<br>\n", $queryString);
+            printf(
+                "Debug: query = %s<br>\n",
+                $queryString
+            );
 
         if (!$parameters) {
             return null;
         }
-        $statement = mysqli_prepare(self::$Link_ID, $queryString);
+        $statement = mysqli_prepare(
+            self::$Link_ID,
+            $queryString
+        );
 
         $a_params = array();
 
@@ -152,7 +175,10 @@ class DB_Sql
         for ($i = 0; $i < $n; $i++) {
             $a_params[] = &$parameters[$i]['value'];
         }
-        call_user_func_array(array($statement, 'bind_param'), $a_params);
+        call_user_func_array(
+            array($statement, 'bind_param'),
+            $a_params
+        );
 
         mysqli_stmt_execute($statement);
 
@@ -191,9 +217,15 @@ class DB_Sql
         }
 
         if ($this->Debug)
-            printf("Debug: query = %s<br>\n", $Query_String);
+            printf(
+                "Debug: query = %s<br>\n",
+                $Query_String
+            );
 
-        $this->Query_ID = mysqli_query(self::$Link_ID, $Query_String);
+        $this->Query_ID = mysqli_query(
+            self::$Link_ID,
+            $Query_String
+        );
         $this->Row = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
@@ -206,6 +238,38 @@ class DB_Sql
         return $this->Query_ID;
     }
 
+    function next_record_object($className)
+    {
+        if (!$this->Query_ID) {
+            $this->halt("next_record called with no query pending.");
+            return 0;
+        }
+        $object = @mysqli_fetch_object(
+            $this->Query_ID,
+            $className
+        );
+        $this->Row += 1;
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
+
+        return $object;
+    }
+
+    function nextObjectRecord($className)
+    {
+        if (!$this->Query_ID) {
+            $this->halt("next_record called with no query pending.");
+            return 0;
+        }
+        $object = @mysqli_fetch_object($this->Query_ID, $className);
+        $this->Row += 1;
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
+
+        return $object;
+    }
+
+
     /* public: walk result set */
     function next_record($fetchMode = MYSQLI_BOTH)
     {
@@ -213,7 +277,10 @@ class DB_Sql
             $this->halt("next_record called with no query pending.");
             return 0;
         }
-        $this->Record = @mysqli_fetch_array($this->Query_ID, $fetchMode);
+        $this->Record = @mysqli_fetch_array(
+            $this->Query_ID,
+            $fetchMode
+        );
         $this->Row += 1;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
@@ -228,7 +295,10 @@ class DB_Sql
     /* public: position in result set */
     function seek($pos = 0)
     {
-        $status = @mysqli_data_seek($this->Query_ID, $pos);
+        $status = @mysqli_data_seek(
+            $this->Query_ID,
+            $pos
+        );
         if ($status)
             $this->Row = $pos;
         else {
@@ -238,7 +308,10 @@ class DB_Sql
              * but do not consider this documented or even
              * desireable behaviour.
              */
-            @mysqli_data_seek($this->Query_ID, $this->num_rows());
+            @mysqli_data_seek(
+                $this->Query_ID,
+                $this->num_rows()
+            );
             $this->Row = $this->num_rows();
             return 0;
         }
@@ -247,22 +320,42 @@ class DB_Sql
     }
 
     /* public: table locking */
-    function lock($table, $mode = "write")
+    function lock($table,
+                  $mode = "write"
+    )
     {
         $query = "lock tables ";
         if (is_array($table)) {
             foreach ($table as $key => $value) {
                 // text keys are "read", "read local", "write", "low priority write"
                 if (is_int($key)) $key = $mode;
-                if (strpos($value, ",")) {
-                    $query .= str_replace(",", " $key, ", $value) . " $key, ";
+                if (strpos(
+                    $value,
+                    ","
+                )) {
+                    $query .= str_replace(
+                            ",",
+                            " $key, ",
+                            $value
+                        ) . " $key, ";
                 } else {
                     $query .= "$value $key, ";
                 }
             }
-            $query = substr($query, 0, -2);
-        } elseif (strpos($table, ",")) {
-            $query .= str_replace(",", " $mode, ", $table) . " $mode";
+            $query = substr(
+                $query,
+                0,
+                -2
+            );
+        } elseif (strpos(
+            $table,
+            ","
+        )) {
+            $query .= str_replace(
+                    ",",
+                    " $mode, ",
+                    $table
+                ) . " $mode";
         } else {
             $query .= "$table $mode";
         }
@@ -348,7 +441,8 @@ class DB_Sql
         /** @lang text */
             "SELECT nextid FROM %s WHERE seq_name = '%s'",
             $this->Seq_Table,
-            $seq_name);
+            $seq_name
+        );
         if (!$this->query($q)) {
             $this->halt('query failed in nextid: ' . $q);
             return 0;
@@ -357,11 +451,13 @@ class DB_Sql
         /* No current value, make one */
         if (!$this->next_record()) {
             $currentid = 0;
-            $q = sprintf(/** @lang text */
+            $q = sprintf(
+            /** @lang text */
                 "INSERT INTO %s VALUES('%s', %s)",
                 $this->Seq_Table,
                 $seq_name,
-                $currentid);
+                $currentid
+            );
             if (!$this->query($q)) {
                 $this->halt('query failed in nextid: ' . $q);
                 return 0;
@@ -370,11 +466,13 @@ class DB_Sql
             $currentid = $this->f("nextid");
         }
         $nextid = $currentid + 1;
-        $q = sprintf(/** @lang text */
+        $q = sprintf(
+        /** @lang text */
             "UPDATE %s SET nextid = '%s' WHERE seq_name = '%s'",
             $this->Seq_Table,
             $nextid,
-            $seq_name);
+            $seq_name
+        );
         if (!$this->query($q)) {
             $this->halt('query failed in nextid: ' . $q);
             return 0;
@@ -389,7 +487,9 @@ class DB_Sql
     }
 
     /* public: return table metadata */
-    function metadata($table = "", $full = false)
+    function metadata($table = "",
+                      $full = false
+    )
     {
         $res = array();
 
@@ -481,7 +581,10 @@ class DB_Sql
     function table_names()
     {
         $this->connect();
-        $h = @mysqli_query(self::$Link_ID, "show tables");
+        $h = @mysqli_query(
+            self::$Link_ID,
+            "show tables"
+        );
         $i = 0;
         $return = array();
         while ($info = @mysqli_fetch_row($h)) {
@@ -516,10 +619,15 @@ class DB_Sql
 
     function haltmsg($msg)
     {
-        printf("</td></tr></table><b>Database error:</b> %s<br>\n", $msg);
-        printf("<b>MySQL Error</b>: %s (%s)<br>\n",
-               $this->Errno,
-               $this->Error);
+        printf(
+            "</td></tr></table><b>Database error:</b> %s<br>\n",
+            $msg
+        );
+        printf(
+            "<b>MySQL Error</b>: %s (%s)<br>\n",
+            $this->Errno,
+            $this->Error
+        );
     }
 
 }

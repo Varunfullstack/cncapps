@@ -177,10 +177,12 @@ class BUDailyReport extends Business
      * @param mixed $daysAgo
      * @param bool $priorityFiveOnly
      * @param bool $onScreen
+     * @param bool $dashboard
      */
     function outstandingIncidents($daysAgo,
                                   $priorityFiveOnly = false,
-                                  $onScreen = false
+                                  $onScreen = false,
+                                  $dashboard = false
     )
     {
 
@@ -303,26 +305,38 @@ class BUDailyReport extends Business
                 $totalRequests++;
             } while ($row = $outstandingRequests->fetch_row());
 
-            $template->setVar(
-                array(
-                    'daysAgo'       => $daysAgo,
-                    'totalRequests' => $totalRequests
-                )
-            );
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-            $body = $template->get_var('output');
-
             $csvTemplate->parse(
                 'output',
                 'page',
                 true
             );
             $csvFile = $csvTemplate->get_var('output');
+            $select = "";
+            if ($dashboard) {
+
+                $select = '<span>Select Days:</span><select onchange="changeDays()">';
+
+                foreach ([0, 1, 2, 3, 4, 5, 6, 7] as $day) {
+
+                    $selected = $daysAgo == $day ? 'selected' : '';
+
+                    $select .= '<option ' . $selected . ' value="' . $day . '">' . $day . '</option>';
+
+                }
+                $select .= '</select>';
+
+
+            }
+
+            $template->setVar(
+                array(
+                    'daysAgo'            => $daysAgo,
+                    'totalRequests'      => $totalRequests,
+                    'selectDaysSelector' => $select,
+                    'isDashboard'        => $dashboard ? 'true' : 'false'
+                )
+            );
+
 
             if (!$onScreen) {
                 if ($priorityFiveOnly) {
@@ -333,6 +347,13 @@ class BUDailyReport extends Business
 
                 $subject .= ' SRs Outstanding For ' . $daysAgo . ' Days';
 
+                $template->parse(
+                    'output',
+                    'page',
+                    true
+                );
+                $body = $template->get_var('output');
+
                 $this->sendByEmailTo(
                     'sropenfordays@' . CONFIG_PUBLIC_DOMAIN,
                     $subject,
@@ -340,18 +361,33 @@ class BUDailyReport extends Business
                     $csvFile
                 );
             } else {
-                ?>
-                <a href="data:text/csv;charset=utf-8;base64,<?= base64_encode($csvFile) ?>"
-                   download="outstanding.csv"
-                >
-                    Download CSV
-                </a>
+                $csvLink = '';
+                if (!$dashboard) {
+                    $csvLink = '<a href="data:text/csv;charset=utf-8;base64,' . base64_encode(
+                            $csvFile
+                        ) . '" download="outstanding.csv">Download CSV</a>';
+                }
 
-                <?php
+                $template->setVar(
+                    [
+                        'csvLink' => $csvLink
+                    ]
+
+                );
+
+                $template->parse(
+                    'output',
+                    'page',
+                    true
+                );
+                $body = $template->get_var('output');
             }
-            echo $body;
 
-
+            if ($dashboard) {
+                return $body;
+            } else {
+                echo $body;
+            }
         }
 
     } // end function outstandingIncidents
@@ -638,7 +674,7 @@ class BUDailyReport extends Business
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
         WHERE
-          DATE(pro_date_raised) <=DATE(
+          DATE(pro_date_raised) <= DATE(
           DATE_SUB(NOW(), INTERVAL $daysAgo DAY)) 
           AND pro_status NOT IN ('F', 'C')";
 
@@ -663,11 +699,9 @@ class BUDailyReport extends Business
               AND caa_date > DATE( NOW() )
               AND caa_endtime = ''
           ) = 0
-        
-          
-        
       ORDER BY customer,
         pro_problemno";
+
         return $this->db->query($sql);
     }
 
@@ -750,6 +784,7 @@ class BUDailyReport extends Business
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
@@ -1165,7 +1200,7 @@ WHERE pro_priority = 5
 
 
             foreach ($contactsDatum['serviceRequests'] as $SR) {
-                $urlRequest = "https://www.cnc-ltd.co.uk/portal/request/" . $SR['id'] . "/view";
+                $urlRequest = "https://www.cnc-ltd.co.uk/view/?serviceid=" . $SR['id'];
 
                 $template->setVar(
                     array(
@@ -1246,42 +1281,49 @@ WHERE pro_priority = 5
 
     private function getContactOpenSRReportData()
     {
-        $sql = "SELECT 
-                  problem.`pro_problemno` AS id,
-                  CONCAT_WS(
-                    ' ',
-                    reporter.`con_first_name`,
-                    reporter.`con_last_name`
-                  ) AS raisedBy,
-                  pro_date_raised AS raisedOn,
-                  IF(
-                    problem.`pro_awaiting_customer_response_flag` = 'Y',
-                    'Awaiting Customer',
-                    'In Progress'
-                  ) AS status,
-                  callactivity.`reason` AS details,
-                  contact.`con_first_name` AS contactName,
-                  contact.con_email as contactEmail,
-                  contact.`con_contno` AS contactID,
-                  customer.cus_name as customerName
-                FROM
-                  problem 
-                  INNER JOIN contact 
-                    ON contact.`con_custno` = problem.`pro_custno` 
-                    AND contact.`con_mailflag11` = 'Y' 
-                  LEFT JOIN callactivity 
-                    ON callactivity.`caa_problemno` = problem.`pro_problemno` 
-                    AND callactivity.`caa_callacttypeno` = 51 
-                  LEFT JOIN contact AS reporter 
-                    ON problem.`pro_contno` = reporter.`con_contno`
-                    left join customer on problem.pro_custno = customer.cus_custno 
-                WHERE problem.`pro_status` <> 'C'
-                AND problem.`pro_status` <> 'F' 
-                and problem.`pro_hide_from_customer_flag` <> 'Y'
-                and problem.pro_priority >= 1 and problem.pro_priority <= 4
-                AND (contact.`con_mailflag10` = 'Y' OR  reporter.con_contno = contact.con_contno ) 
-                 ORDER BY pro_date_raised";
-        return $this->db->query($sql);
+        $sql = "SELECT
+problem.pro_problemno AS id,
+CONCAT_WS(
+' ',
+reporter.con_first_name,
+reporter.con_last_name
+) AS raisedBy,
+pro_date_raised AS raisedOn,
+IF(
+problem.pro_awaiting_customer_response_flag = 'Y',
+'Awaiting Customer',
+'In Progress'
+) AS STATUS,
+callactivity.reason AS details,
+contact.con_first_name AS contactName,
+contact.con_email AS contactEmail,
+contact.con_contno AS contactID,
+customer.cus_name AS customerName
+FROM
+problem
+INNER JOIN contact
+ON contact.con_custno = problem.pro_custno
+AND contact.con_mailflag11 = 'Y'
+LEFT JOIN callactivity
+ON callactivity.caa_problemno = problem.pro_problemno
+AND callactivity.caa_callacttypeno = 51
+LEFT JOIN contact AS reporter
+ON problem.pro_contno = reporter.con_contno
+LEFT JOIN customer ON problem.pro_custno = customer.cus_custno
+WHERE problem.pro_status <> 'C'
+AND problem.pro_status <> 'F'
+AND problem.pro_hide_from_customer_flag <> 'Y'
+AND problem.pro_priority >= 1 AND problem.pro_priority <= 4
+AND (contact.supportLevel = 'Main' OR reporter.con_contno = contact.con_contno )
+ORDER BY pro_date_raised";
+
+        $result = $this->db->query($sql);
+
+        if (!$result) {
+            throw  new Exception($this->db->error);
+        }
+
+        return $result;
 
     }
 }

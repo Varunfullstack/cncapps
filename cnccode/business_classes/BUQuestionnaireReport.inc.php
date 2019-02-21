@@ -242,8 +242,6 @@ class BUQuestionnaireReport extends Business
            ans_date BETWEEN '$this->startDate' AND '$this->endDate'
            AND que_questionnaireno = $this->questionnaireID
            AND cus_mailshot = 'Y'
-           AND con_mailflag6 = 'Y'
-          
           GROUP BY
             ans_name           ";
 

@@ -24,6 +24,7 @@ class CTHome extends CTCNC
     const GetDetailedChartsDataAction = "getDetailedChartsData";
     const getFirstTimeFixData = "getFirstTimeFixData";
     const getFixedAndReopenData = "getFixedAndReopenData";
+    const getUpcomingVisitsData = "getUpcomingVisitsData";
 
     private $dsHeader = '';
     private $buUser;
@@ -105,6 +106,10 @@ class CTHome extends CTCNC
             case self::getFixedAndReopenData:
                 echo $this->getFixedAndReopenData();
                 break;
+
+            case self::getUpcomingVisitsData:
+                echo $this->getUpcomingVisitsData();
+                break;
             default:
                 $this->display();
                 break;
@@ -114,7 +119,7 @@ class CTHome extends CTCNC
     function display()
     {
         /**
-         * if user is only in the technical group then display the curent activity dash-board
+         * if user is only in the technical group then display the current activity dash-board
          */
         if (
             $this->hasPermissions(PHPLIB_PERM_TECHNICAL) &&
@@ -136,12 +141,12 @@ class CTHome extends CTCNC
         /*
         Otherwise display other sections based upon group membership
         */
+        $this->displayUpcomingVisits();
+
 
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
             $this->displaySalesFigures();
         }
-
-        $this->displayProjects();
 
         $this->setTemplateFiles(
             'dashboardTest',
@@ -432,8 +437,8 @@ class CTHome extends CTCNC
             $historyPopupURL = $this->buildLink(
                 'Project.php',
                 array(
-                    'action'    => 'historyPopup',
-                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                    'action'  => 'historyPopup',
+                    'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
 
@@ -510,11 +515,25 @@ class CTHome extends CTCNC
                 );
             }
 
+            if (round($result['esTeamActualSlaPercentage']) == 100) {
+                $this->template->setVar(
+                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                    'performance-green'
+                );
+            }
+
             if (round($result['hdTeamActualSlaPercentage']) < $result['hdTeamTargetSlaPercentage']) {
 
                 $this->template->set_var(
                     'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
                     'performance-warn'
+                );
+            }
+
+            if (round($result['hdTeamActualSlaPercentage']) == 100) {
+                $this->template->setVar(
+                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                    'performance-green'
                 );
             }
 
@@ -525,6 +544,15 @@ class CTHome extends CTCNC
                     'performance-warn'
                 );
             }
+
+
+            if (round($result['imTeamActualSlaPercentage']) == 100) {
+                $this->template->setVar(
+                    'imTeamActualSlaPercentage' . $result['quarter'] . 'Class',
+                    'performance-green'
+                );
+            }
+
 
             if ($result['esTeamActualFixQty'] < $result['esTeamTargetFixQty']) {
 
@@ -558,14 +586,27 @@ class CTHome extends CTCNC
                 );
             }
 
-            if ($result['hdTeamActualFixHours'] > round(
-                    $result['hdTeamTargetFixHours'],
-                    0
-                )) {
+            if ($result['esTeamTargetFixHours'] - $result['esTeamActualFixHours'] > 1) {
+
+                $this->template->set_var(
+                    'esTeamActualFixHours' . $result['quarter'] . 'Class',
+                    'performance-green'
+                );
+            }
+
+            if ($result['hdTeamActualFixHours'] > $result['hdTeamTargetFixHours']) {
 
                 $this->template->set_var(
                     'hdTeamActualFixHours' . $result['quarter'] . 'Class',
                     'performance-warn'
+                );
+            }
+
+            if ($result['hdTeamTargetFixHours'] - $result['hdTeamActualFixHours'] > 1) {
+
+                $this->template->set_var(
+                    'hdTeamActualFixHours' . $result['quarter'] . 'Class',
+                    'performance-green'
                 );
             }
 
@@ -574,6 +615,14 @@ class CTHome extends CTCNC
                 $this->template->set_var(
                     'imTeamActualFixHours' . $result['quarter'] . 'Class',
                     'performance-warn'
+                );
+            }
+
+            if ($result['imTeamTargetFixHours'] - $result['imTeamActualFixHours'] > 1) {
+
+                $this->template->set_var(
+                    'imTeamActualFixHours' . $result['quarter'] . 'Class',
+                    'performance-green'
                 );
             }
 
@@ -746,18 +795,23 @@ class CTHome extends CTCNC
                 30
             );
 
-            if ($weekly['performancePercentage'] < $hdTeamTargetLogPercentage) {
+            $weeklyPercentageClass = '';
 
+            if ($weekly['performancePercentage'] < $hdTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
-            } else {
-                $weeklyPercentageClass = '';
             }
 
-            if ($monthly['performancePercentage'] < $hdTeamTargetLogPercentage) {
+            if ($weekly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
 
+            $monthlyPercentageClass = '';
+
+            if ($monthly['performancePercentage'] < $hdTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
-            } else {
-                $monthlyPercentageClass = '';
+            }
+            if ($monthly['performancePercentage'] >= $hdTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
             }
 
             $this->template->set_var(
@@ -817,18 +871,24 @@ class CTHome extends CTCNC
                 30
             );
 
+            $weeklyPercentageClass = '';
             if ($weekly['performancePercentage'] < $esTeamTargetLogPercentage) {
 
                 $weeklyPercentageClass = 'performance-warn';
-            } else {
-                $weeklyPercentageClass = '';
             }
+
+            if ($weekly['performancePercentage'] >= $esTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+
+            $monthlyPercentageClass = '';
 
             if ($monthly['performancePercentage'] < $esTeamTargetLogPercentage) {
 
                 $monthlyPercentageClass = 'performance-warn';
-            } else {
-                $monthlyPercentageClass = '';
+            }
+            if ($monthly['performancePercentage'] >= $esTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
             }
 
             $this->template->set_var(
@@ -890,18 +950,23 @@ class CTHome extends CTCNC
                 30
             );
 
-            if ($weekly['performancePercentage'] < $imTeamTargetLogPercentage) {
 
+            $weeklyPercentageClass = '';
+
+            if ($weekly['performancePercentage'] < $imTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
-            } else {
-                $weeklyPercentageClass = '';
             }
 
-            if ($monthly['performancePercentage'] < $imTeamTargetLogPercentage) {
+            if ($weekly['performancePercentage'] >= $imTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
 
+            $monthlyPercentageClass = '';
+            if ($monthly['performancePercentage'] < $imTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
-            } else {
-                $monthlyPercentageClass = '';
+            }
+            if ($monthly['performancePercentage'] >= $imTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
             }
 
             $this->template->set_var(
@@ -1189,5 +1254,41 @@ class CTHome extends CTCNC
 
         return $db->Record['firstTimeFix'];
     }
+
+    private function getUpcomingVisitsData()
+    {
+        global $db;
+        $db->query("select upcomingVisitsData from homeData limit 1");
+
+        $db->next_record(MYSQLI_ASSOC);
+
+        return $db->Record['upcomingVisitsData'];
+    }
+
+    private function displayUpcomingVisits()
+    {
+        $this->setTemplateFiles(
+            'upcomingVisits',
+            'upcomingVisits'
+        );
+
+        $this->template->set_var(
+            [
+                "upcomingVisitsFetchDataURL" => $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action' => self::getUpcomingVisitsData
+                    ]
+                )
+            ]
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'upcomingVisits',
+            true
+        );
+    }
+
 }// end of class
 ?>

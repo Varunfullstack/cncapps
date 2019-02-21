@@ -40,7 +40,8 @@ class BUPurchaseOrder extends Business
     }
 
     function createPOsFromSO($ordheadID,
-                             $userID
+                             $userID,
+                             DateTime $requiredByDate = null
     )
     {
         $dsOrdhead = &$this->dsOrdhead;
@@ -81,7 +82,10 @@ class BUPurchaseOrder extends Business
                     $dsSupplier
                 );
                 $this->counter = 1;
-                $this->insertPOHeader($userID);
+                $this->insertPOHeader(
+                    $userID,
+                    $requiredByDate
+                );
             }
             $this->insertPOLine();
             $lastSupplierID = $dsOrdline->getValue('supplierID');
@@ -125,7 +129,9 @@ class BUPurchaseOrder extends Business
         return ($this->insertPOHeader($userID));
     }
 
-    function insertPOHeader($userID)
+    function insertPOHeader($userID,
+                            DateTime $requiredByDate = null
+    )
     {
         $dsOrdhead = &$this->dsOrdhead;
         $dsOrdline = &$this->dsOrdline;
@@ -164,6 +170,14 @@ class BUPurchaseOrder extends Business
             'printedFlag',
             'N'
         );
+
+        if ($requiredByDate) {
+            $dbePorhead->setValue(
+                DBEPorhead::requiredBy,
+                $requiredByDate->format('Y-m-d')
+            );
+        }
+
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
         $vatCode = $dsHeader->getValue('stdVATCode');
@@ -202,7 +216,7 @@ class BUPurchaseOrder extends Business
         return ($dbePorhead->getPKValue());
     }
 
-    function insertPOLine()
+    function insertPOLine($requiredByDate = null)
     {
         $dsOrdhead = &$this->dsOrdhead;
         $dsOrdline = &$this->dsOrdline;
@@ -661,8 +675,8 @@ class BUPurchaseOrder extends Business
             $dsPorhead->getValue('directDeliveryFlag')
         );
         $this->dbePorhead->setValue(
-            DBEPorhead::requiredBY,
-            $dsPorhead->getValue(DBEPorhead::requiredBY)
+            DBEPorhead::requiredBy,
+            $dsPorhead->getValue(DBEPorhead::requiredBy)
         );
         $this->dbePorhead->updateRow();
         return TRUE;

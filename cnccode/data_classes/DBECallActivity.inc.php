@@ -223,7 +223,7 @@ class DBECallActivity extends DBEntity
         $this->addColumn(
             self::salesRequestStatus,
             DA_TEXT,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);
