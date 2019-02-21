@@ -876,6 +876,9 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(PHPLIB_PERM_SALES);
                 $this->serviceRequestFromLines();
                 break;
+            case 'sendReminder':
+                $this->sendReminderQuote();
+                break;
             default:
                 $this->displaySearchForm();
                 break;
@@ -2038,6 +2041,11 @@ class CTSalesOrder extends CTCNC
                             )
                         );
                     $quoteSent = ($this->dsQuotation->getValue("sentDateTime") != '0000-00-00 00:00:00');
+                    $sendQuoteDocURL = '';
+                    $deleteQuoteDocURL = '';
+                    $txtDelete = '';
+                    $txtSendQuote = '';
+                    $txtReminder = null;
                     if (!$quoteSent) {
                         $sendQuoteDocURL =
                             $this->buildLink(
@@ -2059,10 +2067,13 @@ class CTSalesOrder extends CTCNC
                         $txtSendQuote = CTSALESORDER_TXT_SEND;
                         $quoteSentDateTime = 'Not sent';
                     } else {
-                        $sendQuoteDocURL = '';
-                        $deleteQuoteDocURL = '';
-                        $txtDelete = '';
-                        $txtSendQuote = '';
+
+
+                        if ($this->dsQuotation->getValue(
+                                DBEQuotation::fileExtension
+                            ) == 'pdf' && $this->dsQuotation->getValue(DBEQuotation::documentType == 'quotation')) {
+                            $txtReminder = "Send Reminder";
+                        }
                         $quoteSentDateTime = date(
                             "j/n/Y H:i:s",
                             strtotime($this->dsQuotation->getValue("sentDateTime"))
@@ -2078,7 +2089,9 @@ class CTSalesOrder extends CTCNC
                             'quoteVersionNo'     => $this->dsQuotation->getValue("versionNo"),
                             'quoteSentDateTime'  => $quoteSentDateTime,
                             'quoteUserName'      => $this->dsQuotation->getValue("userName"),
-                            'documentType'       => $this->dsQuotation->getValue("documentType")
+                            'documentType'       => $this->dsQuotation->getValue("documentType"),
+                            "txtReminder"        => $txtReminder,
+                            'quotationID'        => $this->dsQuotation->getValue("quotationID")
                         )
                     );
                     $this->template->parse(
@@ -3431,6 +3444,86 @@ class CTSalesOrder extends CTCNC
         $this->buSalesOrder->insertQuotation($this->dsQuotation);
     }
 
+    function sendReminderQuote()
+    {
+        $this->setMethodName('sendReminderQuote');
+        if ($this->getQuotationID() == '') {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
+            return;
+        }
+        if (!$this->buSalesOrder->getQuoteByID(
+            $this->getQuotationID(),
+            $this->dsQuotation
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
+            return;
+        }
+        $this->dsQuotation->fetchNext();
+        if ($this->emailSubject == '') {
+            $this->displayFatalError('Email Subject Missing');
+            return;
+        }
+
+        if ($this->dsQuotation->getValue(DBEJQuotation::fileExtension) == 'pdf') {
+            $buPDFSalesQuote = new BUPDFSalesQuote($this);
+            $buPDFSalesQuote->sendReminderPDFEmailQuote(
+                $this->getQuotationID(),
+                $this->emailSubject
+            );
+            $ordHeadID = $this->dsQuotation->getValue(DBEQuotation::ordheadID);
+            $dbeQuotation = new DBEQuotation($this);
+            $dbeQuotation->setValue(
+                DBEQuotation::ordheadID,
+                $ordHeadID
+            );
+
+            $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
+            $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
+            $previousFile = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
+            $newFile = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
+
+            copy(
+                $previousFile,
+                $newFile
+            );
+
+            $dbeQuotation->setValue(
+                DBEQuotation::versionNo,
+                $versionNo
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::salutation,
+                $this->dsQuotation->getValue(DBEQuotation::salutation)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::emailSubject,
+                $this->dsQuotation->getValue(DBEQuotation::emailSubject)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::sentDateTime,
+                date('Y-m-d H:i:s')
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::userID,
+                $this->dsQuotation->getValue(DBEQuotation::userID)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::fileExtension,
+                $this->dsQuotation->getValue(DBEQuotation::fileExtension)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::documentType,
+                'reminder'
+            );
+            $dbeQuotation->insertRow();
+
+        }
+
+        $this->setOrdheadID($this->dsQuotation->getValue(DBEJQuotation::ordheadID));
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
     /**
      * send quote.
      * @access private
@@ -3453,10 +3546,8 @@ class CTSalesOrder extends CTCNC
         $updateDB = TRUE;
         // if this is a PDF file then send an email to the customer else simply st the sent date.
         if ($this->dsQuotation->getValue('fileExtension') == 'pdf') {
-
             $buPDFSalesQuote = new BUPDFSalesQuote($this);
             $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
-
         }
         if ($updateDB) {
             $this->dsQuotation->setUpdateModeUpdate();
@@ -4769,7 +4860,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                     'createdDate'       => $createdDate,
                     'urlViewFile'       => $urlViewFile,
                     'urlEditDocument'   => $urlEditDocument,
-                    'urlDeleteDocument' => $urlDeleteDocument
+                    'urlDeleteDocument' => $urlDeleteDocument,
                 )
             );
             $this->template->parse(

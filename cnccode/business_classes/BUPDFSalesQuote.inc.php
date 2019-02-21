@@ -620,6 +620,133 @@ class BUPDFSalesQuote extends Business
 
     } // end function
 
+
+    /**
+     * Send a reminder email about pdf quote
+     * @access private
+     * @param $quotationID
+     * @param $emailSubject
+     * @return mixed
+     */
+    function sendReminderPDFEmailQuote($quotationID,
+                                       $emailSubject
+    )
+    {
+        $buMail = new BUMail($this);
+
+        $dbeQuotation = new DBEQuotation($this);
+
+        if (!$dbeQuotation->getRow($quotationID)) {
+            $this->displayFatalError('Quotation Not Found');
+
+        }
+
+        if (!$this->buSalesOrder->getOrderWithCustomerName(
+            $dbeQuotation->getValue('ordheadID'),
+            $dsOrdhead,
+            $dsOrdline,
+            $dsDeliveryContact
+        )
+        ) {
+            $this->displayFatalError('Sales Order Not Found');
+        }
+
+        $userID = $GLOBALS ['auth']->is_authenticated();
+
+        $this->buSalesOrder->getUserByID(
+            $userID,
+            $dsUser
+        );
+
+        $quoteFile = 'quotes/' . $dbeQuotation->getValue(DBEOrdhead::ordheadID) . '_' . $dbeQuotation->getValue(
+                DBEQuotation::versionNo
+            ) . '.pdf';
+
+        $subject = $emailSubject;
+
+        $template = new Template (
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'QuoteReminderEmail.html'
+        );
+
+        $DBEJRenQuotation = new DBEJRenQuotation($this);
+
+        $DBEJRenQuotation->setValue(
+            DBEJRenQuotation::ordheadID,
+            $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+        );
+        $DBEJRenQuotation->getRowsByColumn(DBEJRenQuotation::ordheadID);
+
+        if (!$DBEJRenQuotation->rowCount()) {
+            return false;
+        }
+
+        $DBEJRenQuotation->fetchNext();
+
+        $sentDateValue = $dbeQuotation->getValue(DBEQuotation::sentDateTime);
+        $sentDate = DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            $sentDateValue
+        );
+
+        $template->set_var(
+            [
+                'contactFirstName' => $dsDeliveryContact->getValue(DBEContact::firstName),
+                'renewalType'      => $DBEJRenQuotation->getValue($DBEJRenQuotation::type),
+                'sentDate'         => $sentDate->format('d/m/Y')
+            ]
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+        $toEmail = $dsOrdhead->getValue(DBEOrdhead::delContactEmail);
+        $senderEmail = "sales@cnc-ltd-co.uk";
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $buMail->mime->addAttachment(
+            $quoteFile,
+            'application/pdf'
+        );
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $toEmail .= ',' . CONFIG_SALES_EMAIL;
+
+        return $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+
+    }
+
     /**
      * send a PDF quote.
      * @access private

@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 459 - Time Request page auto refresh
 - Issue 485 - Move Passwords from Sales to Technical menu
 - Issue 430 - PO Status Report enhancements v5
+- Issue 468 - Sales Renewal enhancements
 ### Fixed
 - Issue 471 - Sales quote signature error validation
 - Issue 458 - Customer Analysis Report SQL query
