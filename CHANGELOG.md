@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 489 - Contract Extraction
+
 ## [v2.1.4] - 2019-02-20
 ### Fixed
 - Fixed Invalid character in customer email

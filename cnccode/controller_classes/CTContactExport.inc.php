@@ -6,6 +6,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_bu'] . '/BUContactExport.inc.php');
+require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -218,6 +219,12 @@ class CTContactExport extends CTCNC
             DA_ALLOW_NULL
         );
 
+        $dsSearchForm->addColumn(
+            'supportLevel',
+            DA_ARRAY,
+            DA_ALLOW_NULL
+        );
+
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
 
@@ -227,33 +234,26 @@ class CTContactExport extends CTCNC
 
         if ($_REQUEST['Export'] || $_REQUEST['SendEmail']) {
 
+            $_REQUEST['searchForm'][1]['supportLevel'] = json_encode($_REQUEST['searchForm'][1]['supportLevel']);
             $dsSearchForm->populateFromArray($_REQUEST['searchForm']);
 
             if ($_REQUEST['quotationItemIDs']) {
-
                 $quotationItemIDs = $_REQUEST['quotationItemIDs'];
-
             }
 
             if ($_REQUEST['contractItemIDs']) {
-
                 $contractItemIDs = $_REQUEST['contractItemIDs'];
-
             }
 
             if ($_REQUEST['sectorIDs']) {
-
                 $sectorIDs = $_REQUEST['sectorIDs'];
-
             }
 
             if ($_REQUEST['SendEmail']) {
-
                 $dsSearchForm->setValue(
                     'exportEmailOnlyFlag',
                     0
                 );
-
             }
 
             $results =
@@ -329,6 +329,23 @@ class CTContactExport extends CTCNC
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
+
+        $this->template->set_block(
+            'ContactExport',
+            'supportLevelBlock',
+            'selectSupportLevel'
+        );
+
+        $buContact = new BUContact($this);
+        $buContact->supportLevelDropDown(
+            '--',
+            $this->template,
+            'supportLevelSelected',
+            'supportLevelValue',
+            'supportLevelDescription',
+            'selectSupportLevel',
+            'supportLevelBlock'
+        );
 
         $this->setPageTitle('Export Contacts');
 
@@ -755,9 +772,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 null
             ];
             $str = implode(
-                ',',
-                $data
-            )."\n";
+                    ',',
+                    $data
+                ) . "\n";
             fwrite(
                 $file,
                 $str
