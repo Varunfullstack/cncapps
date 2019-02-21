@@ -94,6 +94,9 @@ if (!$outputToScreen) {
                 SO
             </th>
             <th>
+                SR
+            </th>
+            <th>
                 Customer Name
             </th>
             <th>
@@ -122,9 +125,6 @@ if (!$outputToScreen) {
             </th>
             <th>
                 Project Name
-            </th>
-            <th>
-                SR
             </th>
         </TR>
         </thead>
@@ -171,6 +171,9 @@ if (!$outputToScreen) {
                     <?= $salesOrderLink ?>
                 </td>
                 <td>
+                    <?= $serviceRequestLink ?>
+                </td>
+                <td>
                     <?= $itemNotYetReceived->getCustomerName() ?>
                 </td>
                 <td>
@@ -205,9 +208,7 @@ if (!$outputToScreen) {
                 <td>
                     <?= $projectLink ?>
                 </td>
-                <td>
-                    <?= $serviceRequestLink ?>
-                </td>
+
             </TR>
             <?php
         }
