@@ -194,6 +194,11 @@ class CTRenQuotation extends CTCNC
 
                 $salesOrderLink = null;
                 $sent = false;
+                if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent) && $dsRenQuotation->getValue(
+                        DBEJRenQuotation::latestQuoteSent
+                    ) != '0000-00-00 00:00:00') {
+                    $sent = true;
+                }
                 if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
                     $salesOrderURL = $this->buildLink(
                         CTCNC_PAGE_SALESORDER,
@@ -206,49 +211,34 @@ class CTRenQuotation extends CTCNC
                     $salesOrderLink = "<a href='$salesOrderURL' target='_blank'>" . $dsRenQuotation->getValue(
                             DBEJRenQuotation::ordheadID
                         ) . "</a>";
-                    $buSalesOrder = new BUSalesOrder($this);
-                    $dsQuotations = new DataSet($this);
-                    $buSalesOrder->getQuotationsByOrdheadID(
-                        $dsRenQuotation->getValue(
-                            DBEJRenQuotation::ordheadID
-                        ),
-                        $dsQuotations
-                    );
-
-                    if ($dsQuotations->rowCount()) {
-                        while ($dsQuotations->fetchNext()) {
-                            if ($dsQuotations->getValue(DBEQuotation::sentDateTime) && $dsQuotations->getValue(
-                                    DBEQuotation::sentDateTime
-                                ) != '0000-00-00 00:00:00') {
-                                $sent = true;
-                                break;
-                            }
-                        }
-                    }
-
                 }
-
 
                 $this->template->set_var(
                     array(
-                        'customerName'                => $dsRenQuotation->getValue('customerName'),
-                        'itemDescription'             => $dsRenQuotation->getValue('itemDescription'),
-                        'type'                        => $dsRenQuotation->getValue('type'),
+                        'customerName'                => $dsRenQuotation->getValue(DBEJRenQuotation::customerName),
+                        'itemDescription'             => $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription),
+                        'type'                        => $dsRenQuotation->getValue(DBEJRenQuotation::type),
                         'startDate'                   => Controller::dateYMDtoDMY(
-                            $dsRenQuotation->getValue('startDate')
+                            $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
                         ),
                         'nextPeriodStartDate'         => Controller::dateYMDtoDMY(
-                            $dsRenQuotation->getValue('nextPeriodStartDate')
+                            $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate)
                         ),
                         'nextPeriodEndDate'           => Controller::dateYMDtoDMY(
-                            $dsRenQuotation->getValue('nextPeriodEndDate')
+                            $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodEndDate)
                         ),
                         'urlEdit'                     => $urlEdit,
                         'urlList'                     => $urlList,
                         'urlCreateRenewalsQuotations' => $urlCreateRenewalsQuotations,
                         'txtEdit'                     => $txtEdit,
                         'salesOrderLink'              => $salesOrderLink,
-                        'sentQuotationColor'          => $sent ? "#B2FFB2" : "#F5AEBD"
+                        'sentQuotationColor'          => $sent ? "#B2FFB2" : "#F5AEBD",
+                        'latestQuoteSent'             => $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent),
+                        'comments'                    => substr(
+                            $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes),
+                            0,
+                            30
+                        )
                     )
                 );
                 $this->template->parse(

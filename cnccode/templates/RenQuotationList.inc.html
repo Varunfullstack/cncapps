@@ -27,10 +27,6 @@
             </td>
             <td width="50"
                 class="listHeadText"
-            >Type
-            </td>
-            <td width="50"
-                class="listHeadText"
             >
                 <a href="{urlList}&orderBy=ordheadID">Sales Order</a>
             </td>
@@ -42,12 +38,17 @@
             <td width="50"
                 class="listHeadText"
             >
-                <a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a>
+                <a href="{urlList}&orderBy=nextPeriodEndDateYMD">Expiry Date</a>
             </td>
             <td width="50"
                 class="listHeadText"
             >
-                <a href="{urlList}&orderBy=nextPeriodEndDateYMD">To</a>
+                <a href="{urlList}&orderBy=custitem.itemNotes">Comments</a>
+            </td>
+            <td width="50"
+                class="listHeadText"
+            >
+                <a href="{urlList}&orderBy=latestQuoteSent">Latest Quote Sent</a>
             </td>
             <td width="50"
                 class="listHeadText"
@@ -67,9 +68,6 @@
                 <DIV align="left">{itemDescription}</div>
             </td>
             <td class="orderLineItem">
-                <DIV align="left">{type}</div>
-            </td>
-            <td class="orderLineItem">
                 <DIV align="left">{salesOrderLink}</div>
             </td>
             <td class="orderLineItem">
@@ -77,6 +75,12 @@
             </td>
             <td class="orderLineItem">
                 <DIV align="left">{nextPeriodStartDate}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left">{comments}</div>
+            </td>
+            <td class="orderLineItem">
+                <DIV align="left">{latestQuoteSent}</div>
             </td>
             <td class="orderLineItem">
                 <DIV align="left">

@@ -15,7 +15,11 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenQuotation extends Business
 {
-    var $dbeRenQuotation = "";
+    /** @var DBECustomerItem */
+    public $dbeRenQuotation;
+    /** @var  DBEJRenQuotation */
+    public $dbeJRenQuotation;
+
 
     /**
      * Constructor
@@ -293,7 +297,7 @@ class BURenQuotation extends Business
         $dbeOrdline = new DBEOrdline ($this);
 
         $dbeOrdhead = new DBEOrdhead($this);
-        
+
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;

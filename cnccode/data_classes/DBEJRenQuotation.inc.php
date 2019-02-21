@@ -18,6 +18,7 @@ class DBEJRenQuotation extends DBECustomerItem
     const nextPeriodStartDate = "nextPeriodStartDate";
     const nextPeriodEndDateYMD = "nextPeriodEndDateYMD";
     const nextPeriodEndDate = "nextPeriodEndDate";
+    const latestQuoteSent = "latestQuoteSent";
 
     function __construct(&$owner)
     {
@@ -91,6 +92,13 @@ class DBEJRenQuotation extends DBECustomerItem
             "DATE_FORMAT( 				
  					DATE_ADD(`startDate`, INTERVAL 2 YEAR )
  					, '%d/%m/%Y')"
+        );
+
+        $this->addColumn(
+            self::latestQuoteSent,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "(select max(sentDateTime) from quotation where ordheadID = cui_ordno group by ordheadID) as latestQuoteSent"
         );
 
         $this->setAddColumnsOff();
