@@ -30,7 +30,7 @@ class ItemNotYetReceived
     protected $orderedQuantity;
     protected $salesOrderID;
     protected $projectID;
-    protected $requiredAtLeastAWeekAgo;
+    protected $isRequiredAtLeastAWeekAgo;
     protected $serviceRequestID;
     protected $deliveryConfirmedFlag;
 
@@ -56,7 +56,7 @@ class ItemNotYetReceived
      */
     public function isRequiredAtLeastAWeekAgo()
     {
-        return $this->requiredAtLeastAWeekAgo;
+        return (int)$this->isRequiredAtLeastAWeekAgo;
     }
 
 

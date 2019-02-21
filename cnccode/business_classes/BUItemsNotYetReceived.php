@@ -81,14 +81,15 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
                 \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
             }
 
-            if (\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] && !$item->isGreenType(
-                ) && !$item->isDeliveryConfirmed()) {
+            if (!$item->isDeliveryConfirmed() && \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId(
+                )] && !$item->isGreenType()) {
                 \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
             }
 
             $data[] = $item;
         };
-
+//        echo '<pre>';
+//        var_dump($data);
         $toReturn = [];
 
         foreach ($data as $item) {
@@ -98,6 +99,7 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
             }
 
             if ($item->isRequiredAtLeastAWeekAgo()) {
+
                 $toReturn[] = $item;
             }
         }
