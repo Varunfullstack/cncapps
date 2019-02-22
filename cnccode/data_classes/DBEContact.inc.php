@@ -680,7 +680,8 @@ class DBEContact extends DBCNCEntity
         $sql = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::supportLevel) .
-            " is not null AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+            " is not null  and " . $this->getDBColumnName(self::supportLevel) . " <> ''      
+            AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
 
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;

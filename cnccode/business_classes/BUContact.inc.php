@@ -79,6 +79,8 @@ class BUContact extends Business
 
     /**
      * Get Support Contact rows at all customers
+     * @param $dsResults
+     * @param bool $customerID
      * @return bool : One or more rows
      * @access public
      */
