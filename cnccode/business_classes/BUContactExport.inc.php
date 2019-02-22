@@ -179,7 +179,6 @@ class BUContactExport extends Business
 
         if ($dsSearchForm->getValue('supportLevel')) {
             $selectedOptions = json_decode($dsSearchForm->getValue('supportLevel'));
-
             $hasNone = false;
             if (in_array(
                 "",

@@ -88,8 +88,6 @@ and (porline.pol_cost > 0 or porline.pol_cost < 0)
 
             $data[] = $item;
         };
-//        echo '<pre>';
-//        var_dump($data);
         $toReturn = [];
 
         foreach ($data as $item) {

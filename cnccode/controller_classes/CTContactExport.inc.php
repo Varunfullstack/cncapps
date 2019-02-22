@@ -234,7 +234,9 @@ class CTContactExport extends CTCNC
 
         if ($_REQUEST['Export'] || $_REQUEST['SendEmail']) {
 
-            $_REQUEST['searchForm'][1]['supportLevel'] = json_encode($_REQUEST['searchForm'][1]['supportLevel']);
+            if (isset($_REQUEST['searchForm'][1]['supportLevel'])) {
+                $_REQUEST['searchForm'][1]['supportLevel'] = json_encode($_REQUEST['searchForm'][1]['supportLevel']);
+            }
             $dsSearchForm->populateFromArray($_REQUEST['searchForm']);
 
             if ($_REQUEST['quotationItemIDs']) {

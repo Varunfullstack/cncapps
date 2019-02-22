@@ -181,11 +181,17 @@ class CTRenQuotation extends CTCNC
 
                 $txtDelete = '[delete]';
 
-                $salesOrderLink = null;
-                $sent = false;
+                $latestQuoteSent = null;
+
                 if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent) && $dsRenQuotation->getValue(
                         DBEJRenQuotation::latestQuoteSent
                     ) != '0000-00-00 00:00:00') {
+                    $latestQuoteSent = $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent);
+                }
+
+                $salesOrderLink = null;
+                $sent = false;
+                if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent) && $latestQuoteSent) {
                     $sent = true;
                 }
                 if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
@@ -201,6 +207,7 @@ class CTRenQuotation extends CTCNC
                             DBEJRenQuotation::ordheadID
                         ) . "</a>";
                 }
+
 
                 $this->template->set_var(
                     array(
@@ -221,7 +228,7 @@ class CTRenQuotation extends CTCNC
                         'txtEdit'             => $txtEdit,
                         'salesOrderLink'      => $salesOrderLink,
                         'sentQuotationColor'  => $sent ? "#B2FFB2" : "#F5AEBD",
-                        'latestQuoteSent'     => $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent),
+                        'latestQuoteSent'     => $latestQuoteSent,
                         'comments'            => substr(
                             $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes),
                             0,
