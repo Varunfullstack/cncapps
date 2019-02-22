@@ -12,7 +12,8 @@
         "ext-openssl": "*",
         "ext-zip": "*",
         "phpoffice/phpspreadsheet": "^1.5",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "ext-pdo": "*"
     },
     "autoload": {
         "psr-4": {
