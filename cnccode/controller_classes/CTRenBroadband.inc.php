@@ -159,7 +159,7 @@ class CTRenBroadband extends CTCNC
                 $customerItemID = $dsRenBroadband->getValue('customerItemID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -168,7 +168,7 @@ class CTRenBroadband extends CTCNC
                     );
 
                 $urlList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'list'
@@ -178,7 +178,7 @@ class CTRenBroadband extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'delete',
@@ -282,7 +282,7 @@ class CTRenBroadband extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
@@ -325,7 +325,7 @@ class CTRenBroadband extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
@@ -334,7 +334,7 @@ class CTRenBroadband extends CTCNC
                 )
             );
         $urlEmailTo =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'emailTo',
@@ -342,7 +342,7 @@ class CTRenBroadband extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'list'
@@ -381,7 +381,7 @@ class CTRenBroadband extends CTCNC
         </tr>';
 
             $urlSiteEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_SITE,
                     array(
                         'action'  => CTCNC_ACT_SITE_EDIT,
@@ -389,7 +389,7 @@ class CTRenBroadband extends CTCNC
                     )
                 );
             $urlSitePopup =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_SITE,
                     array(
                         'action'  => CTCNC_ACT_SITE_POPUP,
@@ -418,7 +418,7 @@ class CTRenBroadband extends CTCNC
         $this->parseInitialContractLength($dsRenBroadband->getValue(DBECustomerItem::initialContractLength));
 
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -427,7 +427,7 @@ class CTRenBroadband extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -436,7 +436,7 @@ class CTRenBroadband extends CTCNC
             );
 
         $urlPrintContract =
-            $this->buildLink(
+            Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'action'         => 'printContract',
@@ -782,7 +782,7 @@ class CTRenBroadband extends CTCNC
         if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
@@ -792,7 +792,7 @@ class CTRenBroadband extends CTCNC
 
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
@@ -819,7 +819,7 @@ class CTRenBroadband extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'list'
@@ -855,7 +855,7 @@ class CTRenBroadband extends CTCNC
         );
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',

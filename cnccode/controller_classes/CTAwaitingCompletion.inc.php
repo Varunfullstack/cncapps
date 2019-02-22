@@ -93,7 +93,7 @@ class CTAwaitingCompletion extends CTCNC
                 $count++;
 
                 $urlViewActivity =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'action'         => 'displayActivity',
@@ -149,7 +149,7 @@ class CTAwaitingCompletion extends CTCNC
 
     function getProblemHistoryLink($problemID)
     {
-        $url = $this->buildLink(
+        $url = Controller::buildLink(
             'Activity.php',
             array(
                 'action'    => 'problemHistoryPopup',

@@ -152,7 +152,7 @@ class CTRenQuotation extends CTCNC
                 $customerItemID = $dsRenQuotation->getValue('customerItemID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -162,7 +162,7 @@ class CTRenQuotation extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => 'delete',
@@ -171,7 +171,7 @@ class CTRenQuotation extends CTCNC
                     );
 
                 $urlList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'list'
@@ -189,7 +189,7 @@ class CTRenQuotation extends CTCNC
                     $sent = true;
                 }
                 if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
-                    $salesOrderURL = $this->buildLink(
+                    $salesOrderURL = Controller::buildLink(
                         CTCNC_PAGE_SALESORDER,
                         array(
                             'action'    => 'displaySalesOrder',
@@ -311,7 +311,7 @@ class CTRenQuotation extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
@@ -354,7 +354,7 @@ class CTRenQuotation extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
@@ -363,7 +363,7 @@ class CTRenQuotation extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'list'
@@ -389,7 +389,7 @@ class CTRenQuotation extends CTCNC
             $urlEditCustomerItem = '#';
         }
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -398,7 +398,7 @@ class CTRenQuotation extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -407,7 +407,7 @@ class CTRenQuotation extends CTCNC
             );
         $salesOrderLink = '';
         if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
-            $salesOrderURL = $this->buildLink(
+            $salesOrderURL = Controller::buildLink(
                 CTCNC_PAGE_SALESORDER,
                 array(
                     'action'    => 'displaySalesOrder',
@@ -549,7 +549,7 @@ class CTRenQuotation extends CTCNC
         if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
@@ -559,7 +559,7 @@ class CTRenQuotation extends CTCNC
 
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
@@ -586,7 +586,7 @@ class CTRenQuotation extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'list'

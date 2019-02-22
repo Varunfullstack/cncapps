@@ -83,7 +83,7 @@ class CTSECTOR extends CTCNC
         $this->buSector->getAll($dsSector);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSECTOR_ACT_CREATE
@@ -107,7 +107,7 @@ class CTSECTOR extends CTCNC
                 $sectorID = $dsSector->getValue('sectorID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTSECTOR_ACT_EDIT,
@@ -118,7 +118,7 @@ class CTSECTOR extends CTCNC
 
                 if ($this->buSector->canDelete($sectorID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action' => CTSECTOR_ACT_DELETE,
@@ -175,7 +175,7 @@ class CTSECTOR extends CTCNC
         }
         if ($_REQUEST['action'] == CTSECTOR_ACT_EDIT && $this->buSector->canDelete($_REQUEST['sectorID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSECTOR_ACT_DELETE,
@@ -188,7 +188,7 @@ class CTSECTOR extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSECTOR_ACT_UPDATE,
@@ -196,7 +196,7 @@ class CTSECTOR extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSECTOR_ACT_DISPLAY_LIST
@@ -243,7 +243,7 @@ class CTSECTOR extends CTCNC
         $this->buSector->updateSector($this->dsSector);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'sectorID' => $this->dsSector->getValue('sectorID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -266,7 +266,7 @@ class CTSECTOR extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSECTOR_ACT_DISPLAY_LIST
@@ -290,7 +290,7 @@ class CTSECTOR extends CTCNC
 
         if ($customerID = $this->buSector->getCustomerWithoutSector()) {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'action' => 'dispEdit',

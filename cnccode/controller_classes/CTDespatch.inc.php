@@ -165,7 +165,7 @@ class CTDespatch extends CTCNC
         if ($this->dsOrdhead->rowCount() == 1) {
             $this->dsOrdhead->fetchNext();
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
@@ -193,16 +193,16 @@ class CTDespatch extends CTCNC
         );
 // Parameters
         $this->setPageTitle("Sales Order Despatch");
-        $submitURL = $this->buildLink(
+        $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-        $clearURL = $this->buildLink(
+        $clearURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array()
         );
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -224,7 +224,7 @@ class CTDespatch extends CTCNC
             $dateCol = $this->dsOrdhead->columnExists('date');
             while ($this->dsOrdhead->fetchNext()) {
                 $orderURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
@@ -318,7 +318,7 @@ class CTDespatch extends CTCNC
         // this is for handling F5 Toggle
         //$this->template->set_var('onKeyPress', 'onKeyPress="keyPressHandler();"');
         $urlDespatch =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTDESPATCH_ACT_DESPATCH,
@@ -326,14 +326,14 @@ class CTDespatch extends CTCNC
                 )
             );
         $urlHome =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTDESPATCH_ACT_DISP_SEARCH
                 )                                                                                                                    // remaining POs for SO
             );
         $urlSalesOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SALESORDER,
                 array(
                     'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -428,7 +428,7 @@ class CTDespatch extends CTCNC
 
 
                     $urlEditRenewal =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $page,
                             array(
                                 'action'     => 'editFromSalesOrder',
@@ -599,7 +599,7 @@ class CTDespatch extends CTCNC
                 $_REQUEST['onlyCreateDespatchNote']
             );
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTCNC_ACT_DISPLAY_DESPATCH,

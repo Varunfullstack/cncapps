@@ -75,7 +75,7 @@ class CTROOTCAUSE extends CTCNC
         $this->buRootCause->getAll($dsRootCause);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTROOTCAUSE_ACT_CREATE
@@ -99,7 +99,7 @@ class CTROOTCAUSE extends CTCNC
                 $rootCauseID = $dsRootCause->getValue('rootCauseID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTROOTCAUSE_ACT_EDIT,
@@ -110,7 +110,7 @@ class CTROOTCAUSE extends CTCNC
 
                 if ($this->buRootCause->canDelete($rootCauseID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action' => CTROOTCAUSE_ACT_DELETE,
@@ -167,7 +167,7 @@ class CTROOTCAUSE extends CTCNC
         }
         if ($_REQUEST['action'] == CTROOTCAUSE_ACT_EDIT && $this->buRootCause->canDelete($_REQUEST['rootCauseID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTROOTCAUSE_ACT_DELETE,
@@ -180,7 +180,7 @@ class CTROOTCAUSE extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTROOTCAUSE_ACT_UPDATE,
@@ -188,7 +188,7 @@ class CTROOTCAUSE extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTROOTCAUSE_ACT_DISPLAY_LIST
@@ -237,7 +237,7 @@ class CTROOTCAUSE extends CTCNC
         $this->buRootCause->updateRootCause($this->dsRootCause);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'rootCauseID' => $this->dsRootCause->getValue('rootCauseID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -260,7 +260,7 @@ class CTROOTCAUSE extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTROOTCAUSE_ACT_DISPLAY_LIST

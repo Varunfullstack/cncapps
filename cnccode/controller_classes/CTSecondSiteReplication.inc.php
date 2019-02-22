@@ -101,7 +101,7 @@ class CTSecondSiteReplication extends CTSecondSite
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'            => 'update',
@@ -109,7 +109,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 )
             );
         $urlDisplayCustomerItem =
-            $this->buildLink(
+            Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'customerItemID' => $this->dsSecondsiteImage->getValue('customerItemID'),
@@ -410,7 +410,7 @@ class CTSecondSiteReplication extends CTSecondSite
         $this->buSecondsite->validateBackups($_REQUEST['customerItemID']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'SecondSiteReplication.php',
                 array()
             );
@@ -421,7 +421,7 @@ class CTSecondSiteReplication extends CTSecondSite
     function getRunUrl($server_cuino)
     {
         $ret =
-            $this->buildLink(
+            Controller::buildLink(
                 'SecondSiteReplication.php',
                 array(
                     'action'         => 'run',
@@ -435,7 +435,7 @@ class CTSecondSiteReplication extends CTSecondSite
     function getEditUrl($server_cuino)
     {
         $ret =
-            $this->buildLink(
+            Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'action'         => 'displayCI',
@@ -546,7 +546,7 @@ class CTSecondSiteReplication extends CTSecondSite
                         foreach ($results as $key => $row) {
 
                             $reportUrl =
-                                $this->buildLink(
+                                Controller::buildLink(
                                     'SecondSite.php',
                                     array(
                                         'action'                        => 'failureAnalysis',
@@ -579,12 +579,12 @@ class CTSecondSiteReplication extends CTSecondSite
             }
 
         }
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => 'failureAnalysis')
         );

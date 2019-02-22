@@ -82,7 +82,7 @@ class CTItemsNotYetReceived extends CTCNC
             $purchaseOrderLink = "/PurchaseOrder.php?action=display&porheadID=" . $item->getPurchaseOrderId();
             $style = "class='" . $item->color() . "'";
 
-            $serviceRequestURL = $this->buildLink(
+            $serviceRequestURL = Controller::buildLink(
                 'Activity.php',
                 [
                     'action'    => 'displayLastActivity',
@@ -94,7 +94,7 @@ class CTItemsNotYetReceived extends CTCNC
                 ) . "</a>";
 
             $salesOrderURL =
-                $this->buildLink(
+                Controller::buildLink(
                     "SalesOrder.php",
                     [
                         "action"    => "displaySalesOrder",
@@ -109,7 +109,7 @@ class CTItemsNotYetReceived extends CTCNC
             if ($item->getProjectID()) {
 
                 $projectURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         "Project.php",
                         [
                             "projectID" => $item->getProjectID(),

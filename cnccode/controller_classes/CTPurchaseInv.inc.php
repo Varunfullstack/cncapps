@@ -106,7 +106,7 @@ class CTPurchaseInv extends CTCNC
         if ($found & $this->dsPorhead->rowCount() == 1) {
             $this->dsPorhead->fetchNext();
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
+                Controller::buildLink($_SERVER['PHP_SELF'],
                                  array(
                                      'action' => CTPURCHASEINV_ACT_DISPLAY,
                                      'porheadID' => $this->dsPorhead->getValue('porheadID')
@@ -130,9 +130,9 @@ class CTPurchaseInv extends CTCNC
         $this->setTemplateFiles('PurchaseInvSearch', 'PurchaseInvSearch.inc');
 // Parameters
         $this->setPageTitle("Purchase Invoice Authorisation");
-        $submitURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $submitURL = Controller::buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
         $urlSupplierPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
                     'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
@@ -152,7 +152,7 @@ class CTPurchaseInv extends CTCNC
             $ordheadIDCol = $this->dsPorhead->columnExists('ordheadID');
             while ($this->dsPorhead->fetchNext()) {
                 $purchaseInvURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTPURCHASEINV_ACT_DISPLAY,
@@ -243,7 +243,7 @@ class CTPurchaseInv extends CTCNC
         $this->setTemplateFiles(array('PurchaseInvDisplay' => 'PurchaseInvDisplay.inc'));
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPURCHASEINV_ACT_UPDATE,
@@ -252,7 +252,7 @@ class CTPurchaseInv extends CTCNC
             );
 
         $urlPurchaseOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
                     'action' => CTCNC_ACT_DISPLAY_PO,
@@ -261,7 +261,7 @@ class CTPurchaseInv extends CTCNC
             );
 
         $urlSalesOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SALESORDER,
                 array(
                     'action' => CTCNC_ACT_DISP_SALESORDER,
@@ -434,14 +434,14 @@ class CTPurchaseInv extends CTCNC
         $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
         if ($dsPorhead->getValue('type') == 'A') {
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
+                Controller::buildLink($_SERVER['PHP_SELF'],
                                  array(
                                      'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
                                  )
                 );
         } else {
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
+                Controller::buildLink($_SERVER['PHP_SELF'],
                                  array(
                                      'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
                                      'porheadID' => $_REQUEST['porheadID']

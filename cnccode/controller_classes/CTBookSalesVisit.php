@@ -99,7 +99,7 @@ class CTBookSalesVisit extends CTCNC
         }
 
         if (!$this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $urlCustomerPopup = $this->buildLink(
+            $urlCustomerPopup = Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -114,7 +114,7 @@ class CTBookSalesVisit extends CTCNC
             'BookSalesVisit'
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => self::ACTION_BOOK_SALES_VISIT
@@ -139,7 +139,7 @@ class CTBookSalesVisit extends CTCNC
         }
         $bookedActivityURL = '';
         if ($bookedActivity) {
-            $bookedActivityURL = $this->buildLink(
+            $bookedActivityURL = Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'         => 'displayActivity',

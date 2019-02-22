@@ -94,7 +94,7 @@ class CTMonthlyReport extends CTCNC
         if (!$this->buMonthlyReport->reportExistsByPeriod($lastYearMonth)) {
 
             $urlEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
@@ -118,7 +118,7 @@ class CTMonthlyReport extends CTCNC
         while ($row = $results->fetch_object()) {
 
             $urlEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
@@ -173,7 +173,7 @@ class CTMonthlyReport extends CTCNC
         $yearMonth = $dsServiceDeskReport->getValue('yearMonth');
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'update'
@@ -431,7 +431,7 @@ class CTMonthlyReport extends CTCNC
         $serviceDeskReportID = $this->buMonthlyReport->updateMonthlyReport($this->dsServiceDeskReport);
 
         $urlEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
@@ -442,7 +442,7 @@ class CTMonthlyReport extends CTCNC
         $this->buMonthlyReport->emailLink($urlEdit);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'serviceDeskReportID' => $this->dsServiceDeskReport->getValue('serviceDeskReportID'),
                                  'action' => 'view'

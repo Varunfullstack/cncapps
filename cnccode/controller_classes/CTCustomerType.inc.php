@@ -75,7 +75,7 @@ class CTCUSTOMERTYPE extends CTCNC
         $this->buCustomerType->getAll($dsCustomerType);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMERTYPE_ACT_CREATE
@@ -99,7 +99,7 @@ class CTCUSTOMERTYPE extends CTCNC
                 $customerTypeID = $dsCustomerType->getValue('customerTypeID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTCUSTOMERTYPE_ACT_EDIT,
@@ -110,7 +110,7 @@ class CTCUSTOMERTYPE extends CTCNC
 
                 if ($this->buCustomerType->canDelete($customerTypeID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action' => CTCUSTOMERTYPE_ACT_DELETE,
@@ -167,7 +167,7 @@ class CTCUSTOMERTYPE extends CTCNC
         }
         if ($_REQUEST['action'] == CTCUSTOMERTYPE_ACT_EDIT && $this->buCustomerType->canDelete($_REQUEST['customerTypeID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCUSTOMERTYPE_ACT_DELETE,
@@ -180,7 +180,7 @@ class CTCUSTOMERTYPE extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMERTYPE_ACT_UPDATE,
@@ -188,7 +188,7 @@ class CTCUSTOMERTYPE extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST
@@ -235,7 +235,7 @@ class CTCUSTOMERTYPE extends CTCNC
         $this->buCustomerType->updateCustomerType($this->dsCustomerType);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'customerTypeID' => $this->dsCustomerType->getValue('customerTypeID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -258,7 +258,7 @@ class CTCUSTOMERTYPE extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST

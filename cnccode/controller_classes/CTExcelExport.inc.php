@@ -56,7 +56,7 @@ class CTExcelExport extends CTCNC
     function select()
     {
         $this->setMethodName('select');
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTEXCEL_EXPORT_ACT_GENERATE

@@ -175,7 +175,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             'CustomerReviewMeetingDocuments.html'
         );
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -183,13 +183,13 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             )
         );
 
-        $fetchDataURL = $this->buildLink(
+        $fetchDataURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => self::FETCH_CUSTOMER_DOCUMENTS
             ]
         );
-        $uploadFilesURL = $this->buildLink(
+        $uploadFilesURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => self::UPLOAD_DOCUMENTS
@@ -197,7 +197,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         );
 
         $deleteDocumentURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 [
                     'action' => self::DELETE_DOCUMENT
@@ -205,7 +205,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             );
 
         $fetchReviewContactsDataURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 [
                     'action' => CTCustomer::GET_CUSTOMER_REVIEW_CONTACTS
@@ -213,7 +213,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             );
 
         $sendReviewEmails =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 [
                     'action' => self::SEND_DOCUMENTS

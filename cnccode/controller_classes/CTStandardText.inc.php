@@ -112,7 +112,7 @@ class CTSTANDARDTEXT extends CTCNC
         $this->buStandardText->getAllTypes($dsStandardText);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSTANDARDTEXT_ACT_CREATE
@@ -138,7 +138,7 @@ class CTSTANDARDTEXT extends CTCNC
                 $stt_standardtextno = $dsStandardText->getValue('stt_standardtextno');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'             => CTSTANDARDTEXT_ACT_EDIT,
@@ -148,7 +148,7 @@ class CTSTANDARDTEXT extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'             => CTSTANDARDTEXT_ACT_DELETE,
@@ -216,7 +216,7 @@ class CTSTANDARDTEXT extends CTCNC
         }
         if ($_REQUEST['action'] == CTSTANDARDTEXT_ACT_EDIT) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'             => CTSTANDARDTEXT_ACT_DELETE,
@@ -229,7 +229,7 @@ class CTSTANDARDTEXT extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'             => CTSTANDARDTEXT_ACT_UPDATE,
@@ -237,7 +237,7 @@ class CTSTANDARDTEXT extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSTANDARDTEXT_ACT_DISPLAY_LIST
@@ -337,7 +337,7 @@ class CTSTANDARDTEXT extends CTCNC
         $this->buStandardText->updateStandardText($this->dsStandardText);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'stt_standardtextno' => $this->dsStandardText->getValue('stt_standardtextno'),
@@ -361,7 +361,7 @@ class CTSTANDARDTEXT extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSTANDARDTEXT_ACT_DISPLAY_LIST

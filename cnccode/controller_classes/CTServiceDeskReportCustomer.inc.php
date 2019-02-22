@@ -124,7 +124,7 @@ class CTServiceDeskReportCustomer extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
         $this->setPageTitle('Customer Service Desk Report');
 
@@ -133,7 +133,7 @@ class CTServiceDeskReportCustomer extends CTCNC
             $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+        $urlCustomerPopup = Controller::buildLink(CTCNC_PAGE_CUSTOMER,
                                              array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
         $this->template->set_var(

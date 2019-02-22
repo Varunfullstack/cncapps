@@ -75,7 +75,7 @@ class CTPaymentTerms extends CTCNC
         $this->buPaymentTerms->getAllTerms($dsPaymentTerms);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPAYMENTTERMS_ACT_CREATE
@@ -91,7 +91,7 @@ class CTPaymentTerms extends CTCNC
             while ($dsPaymentTerms->fetchNext()) {
                 $paymentTermsID = $dsPaymentTerms->getValue('paymentTermsID');
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTPAYMENTTERMS_ACT_EDIT,
@@ -139,7 +139,7 @@ class CTPaymentTerms extends CTCNC
         }
         if ($_REQUEST['action'] == CTPAYMENTTERMS_ACT_EDIT && $this->buPaymentTerms->canDeletePaymentTerms($_REQUEST['paymentTermsID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTPAYMENTTERMS_ACT_DELETE,
@@ -152,7 +152,7 @@ class CTPaymentTerms extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPAYMENTTERMS_ACT_UPDATE,
@@ -160,7 +160,7 @@ class CTPaymentTerms extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPAYMENTTERMS_ACT_DISPLAY_LIST
@@ -211,7 +211,7 @@ class CTPaymentTerms extends CTCNC
         $this->buPaymentTerms->updatePaymentTerms($this->dsPaymentTerms);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'paymentTermsID' => $this->dsPaymentTerms->getValue('paymentTermsID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -234,7 +234,7 @@ class CTPaymentTerms extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTPAYMENTTERMS_ACT_DISPLAY_LIST

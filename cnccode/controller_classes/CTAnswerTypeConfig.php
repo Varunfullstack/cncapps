@@ -73,7 +73,7 @@ class CTAnswerTypeConfig extends CTCNC
             );
             while ($answerType->fetchNext()) {
 
-                $URL = $this->buildLink(
+                $URL = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'       => 'configure',
@@ -149,7 +149,7 @@ class CTAnswerTypeConfig extends CTCNC
 
                 $this->template->setVar(
                     [
-                        "saveURL" => $this->buildLink(
+                        "saveURL" => Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'       => 'saveConfig',

@@ -118,7 +118,7 @@ class CTCustomerAnalysisReport extends CTCNC
                     $this->template->set_block('CustomerAnalysisReport', 'contractsBlock', 'contracts');
 
                     $reportUrl =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'CustomerAnalysisReport.php',
                             array(
                                 'searchForm[1][customerID]' => $_REQUEST ['searchForm'][1]['customerID'],
@@ -201,10 +201,10 @@ class CTCustomerAnalysisReport extends CTCNC
 
         }
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+        $urlCustomerPopup = Controller::buildLink(CTCNC_PAGE_CUSTOMER,
                                              array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
-        $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
         $this->setPageTitle('CustomerAnalysis Report');
 

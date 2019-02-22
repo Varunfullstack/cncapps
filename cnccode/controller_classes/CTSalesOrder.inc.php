@@ -901,16 +901,16 @@ class CTSalesOrder extends CTCNC
         );
 // Parameters
         $this->setPageTitle("Sales Orders");
-        $submitURL = $this->buildLink(
+        $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTSALESORDER_ACT_SEARCH)
         );
-        $clearURL = $this->buildLink(
+        $clearURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array()
         );
         $customerPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -918,14 +918,14 @@ class CTSalesOrder extends CTCNC
                 )
             );
         $createQuoteURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSALESORDER_ACT_CREATE_QUOTE
                 )
             );
         $createOrderURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSALESORDER_ACT_CREATE_ORDER
@@ -957,7 +957,7 @@ class CTSalesOrder extends CTCNC
         );
 
         $_SESSION['urlReferer'] =                    // so called functions know where to come back to
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => CTSALESORDER_ACT_SEARCH,
@@ -988,7 +988,7 @@ class CTSalesOrder extends CTCNC
             while ($this->dsOrdhead->fetchNext()) {
                 if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
                     $customerURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             CTCNC_PAGE_CUSTOMER,
                             array(
                                 'action'     => CTCNC_ACT_DISP_EDIT,
@@ -1294,14 +1294,14 @@ class CTSalesOrder extends CTCNC
                 ($orderType == 'I' && $purchaseOrderCount == 0)
             ) {
                 $urlCallback =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTSALESORDER_ACT_DISP_SEARCH
                         )
                     );
                 $urlDeleteOrder =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'      => CTSALESORDER_ACT_DELETE_ORDER,
@@ -1317,12 +1317,12 @@ class CTSalesOrder extends CTCNC
 
 
             $urlSubmitOrderLines =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array()
                 );
             $uploadQuoteDocURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPLOAD_QUOTE_DOC
@@ -1335,7 +1335,7 @@ class CTSalesOrder extends CTCNC
                     "quotationOrdheadID"
                 ) != $this->getOrdheadID()) {
                 $urlOriginalQuote =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => $this->getAction(),
@@ -1350,35 +1350,35 @@ class CTSalesOrder extends CTCNC
             }
 
             $urlUpdateInvAddress =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPDATE_INV_ADDRESS
                     )
                 );
             $urlUpdateDelAddress =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPDATE_DEL_ADDRESS
                     )
                 );
             $urlUpdateInvContact =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPDATE_INV_CONTACT
                     )
                 );
             $urlUpdateDelContact =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPDATE_DEL_CONTACT
                     )
                 );
             $urlSiteEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_SITE,
                     array(
                         'action'  => CTCNC_ACT_SITE_EDIT,
@@ -1386,14 +1386,14 @@ class CTSalesOrder extends CTCNC
                     )
                 );
             $urlUpdateHeader =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPDATE_HEADER
                     )
                 );
             $urlSitePopup =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_SITE,
                     array(
                         'action'  => CTCNC_ACT_SITE_POPUP,
@@ -1402,7 +1402,7 @@ class CTSalesOrder extends CTCNC
                 );
 
             $urlCustomerDisplay =
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'action'     => 'dispEdit',
@@ -1411,7 +1411,7 @@ class CTSalesOrder extends CTCNC
                 );
 
             $urlContactEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_CONTACT,
                     array(
                         'action'  => CTCNC_ACT_CONTACT_EDIT,
@@ -1419,7 +1419,7 @@ class CTSalesOrder extends CTCNC
                     )
                 );
             $urlContactPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_CONTACT,
                     array(
                         'action'     => CTCNC_ACT_CONTACT_POPUP,
@@ -1444,7 +1444,7 @@ class CTSalesOrder extends CTCNC
                 // Show navigate Purchase Orders if they exist
                 if ($purchaseOrderCount > 0) {
                     $urlPurchaseOrders =
-                        $this->buildLink(
+                        Controller::buildLink(
                             CTCNC_PAGE_PURCHASEORDER,
                             array(
                                 'action'    => CTCNC_ACT_SEARCH,
@@ -1467,7 +1467,7 @@ class CTSalesOrder extends CTCNC
                 if ($linkedServiceRequestCount == 0) {
                     /* create new */
                     $urlServiceRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'    => 'serviceRequest',
@@ -1483,7 +1483,7 @@ class CTSalesOrder extends CTCNC
                     $problemID = $this->buSalesOrder->getLinkedServiceRequestID($dsOrdhead->getValue('ordheadID'));
 
                     $urlServiceRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'    => 'displayFirstActivity',
@@ -1495,7 +1495,7 @@ class CTSalesOrder extends CTCNC
 
                 } else {     // many SRs so display search page
                     $urlServiceRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'             => 'search',
@@ -1517,7 +1517,7 @@ class CTSalesOrder extends CTCNC
             }
 
             $urlRenewalReport =
-                $this->buildLink(
+                Controller::buildLink(
                     'RenewalReport.php',
                     array(
                         'action'     => 'produceReport',
@@ -1529,7 +1529,7 @@ class CTSalesOrder extends CTCNC
             $txtRenewalReport = 'Renewal Report';
 
             $urlCustomerNote =
-                $this->buildLink(
+                Controller::buildLink(
                     'CustomerNote.php',
                     array(
                         'action'     => 'customerNotePopup',
@@ -1564,7 +1564,7 @@ class CTSalesOrder extends CTCNC
                 $invoiceCount = $buInvoice->countInvoicesByOrdheadID($dsOrdhead->getValue('ordheadID'));
                 if ($invoiceCount > 0) {
                     $urlInvoices =
-                        $this->buildLink(
+                        Controller::buildLink(
                             CTCNC_PAGE_INVOICE,
                             array(
                                 'action'    => CTCNC_ACT_SEARCH,
@@ -1587,7 +1587,7 @@ class CTSalesOrder extends CTCNC
                 (!common_isAnInternalStockLocation($dsOrdhead->getValue('customerID')))
             ) {
                 $urlDespatch =
-                    $this->buildLink(
+                    Controller::buildLink(
                         CTCNC_PAGE_DESPATCH,
                         array(
                             'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
@@ -1720,7 +1720,7 @@ class CTSalesOrder extends CTCNC
                         );
 
                     $urlEditRenewal =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $page,
                             array(
                                 'action'     => 'editFromSalesOrder',
@@ -1749,7 +1749,7 @@ class CTSalesOrder extends CTCNC
                 if (!$readOnly && !$restrictedView) {
 
                     $urlEditLine =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
@@ -1760,7 +1760,7 @@ class CTSalesOrder extends CTCNC
                         );
                     // common to comment and item lines
                     $urlAddLine =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_ADD_ORDLINE,
@@ -1770,7 +1770,7 @@ class CTSalesOrder extends CTCNC
                             )
                         );
                     $urlMoveLineUp =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_UP,
@@ -1780,7 +1780,7 @@ class CTSalesOrder extends CTCNC
                             )
                         );
                     $urlMoveLineDown =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_DOWN,
@@ -1790,7 +1790,7 @@ class CTSalesOrder extends CTCNC
                             )
                         );
                     $urlDeleteLine =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_DELETE_ORDLINE,
@@ -1884,7 +1884,7 @@ class CTSalesOrder extends CTCNC
                         if (!$readOnly) {
 
                             $urlUpdateItemPrice =
-                                $this->buildLink(
+                                Controller::buildLink(
                                     $_SERVER['PHP_SELF'],
                                     array(
                                         'action'      => 'updateItemPrice',
@@ -2033,7 +2033,7 @@ class CTSalesOrder extends CTCNC
                 );
                 while ($this->dsQuotation->fetchNext()) {
                     $displayQuoteDocURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_DISPLAY_QUOTE_DOC,
@@ -2048,7 +2048,7 @@ class CTSalesOrder extends CTCNC
                     $txtReminder = null;
                     if (!$quoteSent) {
                         $sendQuoteDocURL =
-                            $this->buildLink(
+                            Controller::buildLink(
                                 $_SERVER['PHP_SELF'],
                                 array(
                                     'action'      => CTSALESORDER_ACT_SEND_QUOTE_DOC,
@@ -2056,7 +2056,7 @@ class CTSalesOrder extends CTCNC
                                 )
                             );
                         $deleteQuoteDocURL =
-                            $this->buildLink(
+                            Controller::buildLink(
                                 $_SERVER['PHP_SELF'],
                                 array(
                                     'action'      => CTSALESORDER_ACT_DELETE_QUOTE_DOC,
@@ -2122,7 +2122,7 @@ class CTSalesOrder extends CTCNC
                 ($purchaseOrderCount == 0)
             ) {
                 $urlCreatePO =
-                    $this->buildLink(
+                    Controller::buildLink(
                         CTCNC_PAGE_PURCHASEORDER,
                         array(
                             'action'    => CTCNC_ACT_GENERATE_POS_FROM_SO,
@@ -2171,7 +2171,7 @@ class CTSalesOrder extends CTCNC
                 $this->dsOrdline
             );
             $_SESSION['urlReferer'] =                    // so called functions know where to come back to
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => $this->getAction(),
@@ -2265,7 +2265,7 @@ class CTSalesOrder extends CTCNC
         }
         $this->setPageTitle($title);
         $originalQuoteURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -2274,7 +2274,7 @@ class CTSalesOrder extends CTCNC
             );
 
         $customerDisplayURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Customer.php',
                 array(
                     'action'     => 'dispEdit',
@@ -2484,7 +2484,7 @@ class CTSalesOrder extends CTCNC
         }
         if ($this->getAction() == CTSALESORDER_ACT_EDIT_ORDLINE) {
             $urlSubmit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_UPDATE_ORDLINE
@@ -2492,7 +2492,7 @@ class CTSalesOrder extends CTCNC
                 );
         } else {
             $urlSubmit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDER_ACT_INSERT_ORDLINE
@@ -2501,7 +2501,7 @@ class CTSalesOrder extends CTCNC
         }
         $urlCancel = $this->getDisplayOrderURL();
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -2509,7 +2509,7 @@ class CTSalesOrder extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -2517,7 +2517,7 @@ class CTSalesOrder extends CTCNC
                 )
             );
         $urlSupplierPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
                     'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
@@ -2525,7 +2525,7 @@ class CTSalesOrder extends CTCNC
                 )
             );
         $urlSupplierEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
                     'action'  => CTCNC_ACT_SUPPLIER_EDIT,
@@ -2833,7 +2833,7 @@ class CTSalesOrder extends CTCNC
     }
     /*
 		$url =
-			$this->buildLink(
+			Controller::buildLink(
 				$_SERVER['PHP_SELF'],
 				array(
 					'action'=>CTCNC_ACT_DISP_SALESORDER,
@@ -3769,7 +3769,7 @@ class CTSalesOrder extends CTCNC
                 $_SESSION['urlReferer'] = '';
             } else {
                 $url =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTSALESORDER_ACT_DISP_SEARCH
@@ -4417,7 +4417,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
      */
     function getDisplayOrderURL()
     {
-        return $this->buildLink(
+        return Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -4459,7 +4459,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         } else {
             $_SESSION['selectedOrderLine'] = $this->postVars['selectedOrderLine'];
             $redirectUrl =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => 'serviceRequest',
@@ -4582,7 +4582,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $urlSubmit =
 
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => 'serviceRequest',
@@ -4798,7 +4798,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         );
 
         $urlAddDocument =
-            $this->buildLink(
+            Controller::buildLink(
                 'SalesOrderDocument.php',
                 array(
                     'action'    => 'add',
@@ -4817,7 +4817,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         while ($dsSalesOrderDocument->fetchNext()) {
 
             $urlEditDocument =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrderDocument.php',
                     array(
                         'action'               => 'edit',
@@ -4826,7 +4826,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 );
 
             $urlViewFile =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrderDocument.php',
                     array(
                         'action'               => 'viewFile',
@@ -4835,7 +4835,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 );
 
             $urlDeleteDocument =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrderDocument.php',
                     array(
                         'action'               => 'delete',

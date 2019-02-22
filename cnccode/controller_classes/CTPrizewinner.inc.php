@@ -72,7 +72,7 @@ class CTPrizewinner extends CTCNC
         $this->buPrizewinner->getAll($dsPrizewinner);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'create'
@@ -96,7 +96,7 @@ class CTPrizewinner extends CTCNC
                 $prizewinnerID = $dsPrizewinner->getValue('prizewinnerID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -105,7 +105,7 @@ class CTPrizewinner extends CTCNC
                     );
                 $txtEdit = '[edit]';
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'delete',
@@ -162,7 +162,7 @@ class CTPrizewinner extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'update',
@@ -170,7 +170,7 @@ class CTPrizewinner extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'displayList'
@@ -248,7 +248,7 @@ class CTPrizewinner extends CTCNC
         $this->buPrizewinner->updatePrizewinner($this->dsPrizewinner);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'prizewinnerID' => $this->dsPrizewinner->getValue('prizewinnerID'),
                                  'action' => 'view'
@@ -271,7 +271,7 @@ class CTPrizewinner extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'displayList'

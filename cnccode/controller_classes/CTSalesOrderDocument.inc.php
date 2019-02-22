@@ -83,7 +83,7 @@ class CTSalesOrderDocument extends CTCNC
         }
         if ($_REQUEST['action'] == CTSALESORDERDOCUMENT_ACT_EDIT && $this->buSalesOrderDocument->canDelete($_REQUEST['salesOrderDocumentID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSALESORDERDOCUMENT_ACT_DELETE,
@@ -96,7 +96,7 @@ class CTSalesOrderDocument extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSALESORDERDOCUMENT_ACT_UPDATE,
@@ -104,7 +104,7 @@ class CTSalesOrderDocument extends CTCNC
                 )
             );
         $urlDisplayOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 'SalesOrder.php',
                 array(
                     'ordheadID' => $dsSalesOrderDocument->getValue('ordheadID'),
@@ -184,7 +184,7 @@ class CTSalesOrderDocument extends CTCNC
         $this->buSalesOrderDocument->updateDocument($this->dsSalesOrderDocument, $_FILES['userfile']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'SalesOrder.php',
                 array
                 (
@@ -212,7 +212,7 @@ class CTSalesOrderDocument extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array
                     (

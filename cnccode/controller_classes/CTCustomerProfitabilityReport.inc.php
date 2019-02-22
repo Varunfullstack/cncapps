@@ -96,10 +96,10 @@ class CTCustomerProfitabilityReport extends CTCNC
 
         $this->setTemplateFiles(array('CustomerProfitabilityReport' => 'CustomerProfitabilityReport.inc'));
 
-        $urlCustomerPopup = $this->buildLink(CTCNC_PAGE_CUSTOMER,
+        $urlCustomerPopup = Controller::buildLink(CTCNC_PAGE_CUSTOMER,
                                              array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
 
-        $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
         $this->setPageTitle('Customer Profitability Report');
 

@@ -219,7 +219,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
         $respondedWithinSlaMtdPerc = $respondedWithinSlaMtd->count / $incidentCountSlaMtd->count * 100;
 
         $urlPriority1WithinSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -228,7 +228,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority2WithinSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -237,7 +237,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority3WithinSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -246,7 +246,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority1ExceededSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -255,7 +255,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority2ExceededSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -264,7 +264,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority3ExceededSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -273,7 +273,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority1ApproachingSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -282,7 +282,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority2ApproachingSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -291,7 +291,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority3ApproachingSla =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -300,7 +300,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlPriority4 =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',
@@ -309,7 +309,7 @@ class CTHelpdeskManagerDashboard extends CTCNC
                 )
             );
         $urlTAndM =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'search',

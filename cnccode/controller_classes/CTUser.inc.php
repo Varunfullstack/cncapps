@@ -241,7 +241,7 @@ class CTUser extends CTCNC
 
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
             $urlCreate =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTUSER_ACT_CREATE
@@ -272,7 +272,7 @@ class CTUser extends CTCNC
                 if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
 
                     $urlEdit =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action' => CTUSER_ACT_EDIT,
@@ -287,7 +287,7 @@ class CTUser extends CTCNC
                 }
 
                 $urlReportAbsent =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTUSER_ACT_ABSENCE_EDIT,
@@ -360,7 +360,7 @@ class CTUser extends CTCNC
         }
         if ($_REQUEST['action'] == CTUSER_ACT_EDIT && $this->buUser->canDeleteUser($_REQUEST['userID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTUSER_ACT_DELETE,
@@ -373,7 +373,7 @@ class CTUser extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTUSER_ACT_UPDATE,
@@ -381,7 +381,7 @@ class CTUser extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTUSER_ACT_DISPLAY_LIST
@@ -933,7 +933,7 @@ class CTUser extends CTCNC
         $this->buUser->updateUser($this->dsUser);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'userID' => $this->dsUser->getValue('userID'),
@@ -957,7 +957,7 @@ class CTUser extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTUSER_ACT_DISPLAY_LIST
@@ -986,7 +986,7 @@ class CTUser extends CTCNC
                 );
 
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTUSER_ACT_DISPLAY_LIST
@@ -1070,7 +1070,7 @@ class CTUser extends CTCNC
         $this->buUser->setUserAbsent($_REQUEST['userID']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTUSER_ACT_DISPLAY_LIST

@@ -147,7 +147,7 @@ class CTItem extends CTCNC
 
         $this->setMethodName('displayItemSelectPopup');
         // this may be required in a number of situations
-        $urlCreate = $this->buildLink(
+        $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'        => CTCNC_ACT_ITEM_ADD,
@@ -226,7 +226,7 @@ class CTItem extends CTCNC
             $returnTo = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
 
             $urlDiscontinue =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'   => 'discontinue',
@@ -315,7 +315,7 @@ class CTItem extends CTCNC
         }
 
         $urlManufacturerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 'Manufacturer.php',
                 array(
                     'action'  => 'displayPopup',
@@ -324,7 +324,7 @@ class CTItem extends CTCNC
             );
 
         $urlManufacturerEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 'Manufacturer.php',
                 array(
                     'action'  => 'editManufacturer',
@@ -407,7 +407,7 @@ class CTItem extends CTCNC
             );
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTITEM_ACT_ITEM_INSERT,
@@ -439,7 +439,7 @@ class CTItem extends CTCNC
             }
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTITEM_ACT_ITEM_UPDATE,
@@ -590,7 +590,7 @@ class CTItem extends CTCNC
         $itemID = $this->dsItem->getPKValue();
 
         // this forces update of itemID back through Javascript to parent HTML window
-        $urlNext = $this->buildLink(
+        $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'          => CTCNC_ACT_DISP_ITEM_POPUP,

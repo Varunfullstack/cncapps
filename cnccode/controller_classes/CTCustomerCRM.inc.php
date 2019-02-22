@@ -54,7 +54,7 @@ class CTCustomerCRM extends CTCustomer
                 $this->setFormErrorOn();
             } else {
                 $this->setCustomerID($dsSearchForm->getValue('customerID'));
-                $link = $this->buildLink(
+                $link = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'displayEditForm',
@@ -74,7 +74,7 @@ class CTCustomerCRM extends CTCustomer
                 )
             );
 
-            $urlSubmit = $this->buildLink(
+            $urlSubmit = Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array('action' => CTCNC_ACT_SEARCH)
             );
@@ -92,7 +92,7 @@ class CTCustomerCRM extends CTCustomer
             }
 
             $urlCustomerPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_CUSTOMER,
                     array(
                         'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -128,7 +128,7 @@ class CTCustomerCRM extends CTCustomer
             }
 
             $linkURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'searchLead'
@@ -185,7 +185,7 @@ class CTCustomerCRM extends CTCustomer
                 $dbeCustomer = new DBECustomer($this);
                 $dbeCustomer->getRow($results->getValue(DBEContact::customerID));
 
-                $link = $this->buildLink(
+                $link = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'displayEditForm',
@@ -960,7 +960,7 @@ class CTCustomerCRM extends CTCustomer
 
         $this->buCustomer->createCustomerFolder($this->getCustomerID());
         $nextURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCNC_ACT_DISP_EDIT,
@@ -983,7 +983,7 @@ class CTCustomerCRM extends CTCustomer
         if ($this->buCustomer->getNextReviewProspect($dsCustomer)) {
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCNC_ACT_DISP_EDIT,
@@ -1030,7 +1030,7 @@ class CTCustomerCRM extends CTCustomer
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'displayEditForm',
@@ -1110,7 +1110,7 @@ class CTCustomerCRM extends CTCustomer
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'dispEdit',
@@ -1181,7 +1181,7 @@ class CTCustomerCRM extends CTCustomer
                 $this->getCustomerID(),
                 $this->userID
             )) {
-                $deleteCustomerURL = $this->buildLink(
+                $deleteCustomerURL = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_DELETECUSTOMER,
@@ -1210,7 +1210,7 @@ class CTCustomerCRM extends CTCustomer
             $_SESSION['save_page'] = false;
         }
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMER_ACT_UPDATE
@@ -1220,13 +1220,13 @@ class CTCustomerCRM extends CTCustomer
         if ($_SESSION['save_page']) {
             $cancelURL = $_SESSION['save_page'];
         } else {
-            $cancelURL = $this->buildLink(
+            $cancelURL = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => CTCUSTOMER_ACT_DISP_SEARCH)
             );
         }
         $addSiteURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCUSTOMER_ACT_ADDSITE,
@@ -1281,7 +1281,7 @@ class CTCustomerCRM extends CTCustomer
                 '<a href="file:' . $customerFolderPath . '" target="_blank" title="Open Folder">Open Folder</a>';
         } else {
             $urlCreateCustomerFolder =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'createCustomerFolder',
@@ -1292,7 +1292,7 @@ class CTCustomerCRM extends CTCustomer
                 '<a href="http:' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
         $renewalLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'RenewalReport.php',
                 array(
                     'action'     => 'produceReport',
@@ -1304,7 +1304,7 @@ class CTCustomerCRM extends CTCustomer
         $renewalLink = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         $passwordLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Password.php',
                 array(
                     'action'     => 'list',
@@ -1318,7 +1318,7 @@ class CTCustomerCRM extends CTCustomer
         $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
 
         $urlContactPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
 //          'action' => CTCNC_ACT_CONTACT_EDIT,
@@ -1689,7 +1689,7 @@ class CTCustomerCRM extends CTCustomer
         Projects
         */
         $addProjectURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Project.php',
                 array(
                     'action'     => 'add',
@@ -1721,7 +1721,7 @@ class CTCustomerCRM extends CTCustomer
             while ($dsProject->fetchNext()) {
                 if ($buProject->canDelete($dsProject->getValue('projectID'))) {
                     $deleteProjectLink =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Project.php',
                             array(
                                 'action'    => 'delete',
@@ -1735,7 +1735,7 @@ class CTCustomerCRM extends CTCustomer
                 }
 
                 $editProjectLink =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Project.php',
                         array(
                             'action'    => 'edit',
@@ -1863,7 +1863,7 @@ class CTCustomerCRM extends CTCustomer
 
         //      $this->template->set_block('CustomerEdit','contacts', '');
         $addContactURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCUSTOMER_ACT_ADDCONTACT,
@@ -1876,7 +1876,7 @@ class CTCustomerCRM extends CTCustomer
             $site->getValue(DBESite::customerID),
             $site->getValue(DBESite::siteNo)
         )) {
-            $deleteSiteURL = $this->buildLink(
+            $deleteSiteURL = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCUSTOMER_ACT_DELETESITE,
@@ -1998,7 +1998,7 @@ class CTCustomerCRM extends CTCustomer
                 $clientFormURL = '';
             } else {
                 $deleteContactURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCUSTOMER_ACT_DELETECONTACT,
@@ -2008,7 +2008,7 @@ class CTCustomerCRM extends CTCustomer
                 $deleteContactLink =
                     '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
                 $clientFormURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'ClientInformationForm.php',
                         array(
                             'contactID'   => $this->dsContact->getValue(DBEContact::contactID),
@@ -2018,14 +2018,14 @@ class CTCustomerCRM extends CTCustomer
                         )
                     );
                 $dearJohnURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'DearJohnForm.php',
                         array(
                             'contactID' => $this->dsContact->getValue(DBEContact::contactID)
                         )
                     );
                 $dmLetterURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'DMLetterForm.php',
                         array(
                             'contactID' => $this->dsContact->getValue(DBEContact::contactID)//,
@@ -2172,7 +2172,7 @@ class CTCustomerCRM extends CTCustomer
             foreach ($customLetterTemplates as $index => $filename) {
 
                 $customLetterURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'LetterForm.php',
                         array(
                             'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
@@ -2233,7 +2233,7 @@ class CTCustomerCRM extends CTCustomer
                 $ordheadID = $dbeJOrdhead->getPKValue();
 
                 $orderURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'SalesOrder.php',
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -2304,7 +2304,7 @@ class CTCustomerCRM extends CTCustomer
             $this->setFormError('Cannot delete this site - dependencies exist');
         }
         $nextURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCNC_ACT_DISP_EDIT,
@@ -2332,7 +2332,7 @@ class CTCustomerCRM extends CTCustomer
         $this->setCustomerID($dsContact->getValue(DBEContact::customerID));
 
         $nextURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCNC_ACT_DISP_EDIT,
@@ -2394,7 +2394,7 @@ class CTCustomerCRM extends CTCustomer
                 exit;
             } else {
                 $nextURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTCNC_ACT_DISP_EDIT,
@@ -2492,7 +2492,7 @@ class CTCustomerCRM extends CTCustomer
     {
         if ($customerID) {
             $url =
-                $this->buildLink(
+                Controller::buildLink(
                     'CustomerNote.php',
                     array(
                         'action'     => 'customerNoteHistoryPopup',
@@ -2594,7 +2594,7 @@ class CTCustomerCRM extends CTCustomer
             );
 
             $urlAddDocument =
-                $this->buildLink(
+                Controller::buildLink(
                     'PortalCustomerDocument.php',
                     array(
                         'action'     => 'add',
@@ -2613,7 +2613,7 @@ class CTCustomerCRM extends CTCustomer
             while ($dsPortalCustomerDocument->fetchNext()) {
 
                 $urlEditDocument =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalCustomerDocument.php',
                         array(
                             'action'                   => 'edit',
@@ -2624,7 +2624,7 @@ class CTCustomerCRM extends CTCustomer
                     );
 
                 $urlViewFile =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalCustomerDocument.php',
                         array(
                             'action'                   => 'viewFile',
@@ -2635,7 +2635,7 @@ class CTCustomerCRM extends CTCustomer
                     );
 
                 $urlDeleteDocument =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalCustomerDocument.php',
                         array(
                             'action'                   => 'delete',

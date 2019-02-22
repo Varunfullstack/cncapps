@@ -129,7 +129,7 @@ class CTHome extends CTCNC
         ) {
 
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'CurrentActivityReport.php',
                     array()
                 );
@@ -197,7 +197,7 @@ class CTHome extends CTCNC
 
         $template->set_var(
             [
-                "fetchDataURL" => $this->buildLink(
+                "fetchDataURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
                         'action' => self::getFixedAndReopenData
@@ -319,7 +319,7 @@ class CTHome extends CTCNC
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'displayEditForm',
@@ -388,7 +388,7 @@ class CTHome extends CTCNC
             $hasProjectPlan = !!$project['planFileName'];
 
             $projectPlanDownloadURL =
-                $this->buildLink(
+                Controller::buildLink(
                     '/Project.php',
                     [
                         'action'    => CTProject::DOWNLOAD_PROJECT_PLAN,
@@ -401,7 +401,7 @@ class CTHome extends CTCNC
             $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
 
             $editProjectLink =
-                $this->buildLink(
+                Controller::buildLink(
                     'Project.php',
                     array(
                         'action'     => 'edit',
@@ -413,7 +413,7 @@ class CTHome extends CTCNC
             $lastUpdated = 'No updates';
 
             $lastUpdatedURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'Project.php',
                     [
                         'action'  => 'lastUpdate',
@@ -423,7 +423,7 @@ class CTHome extends CTCNC
 
             if ($project['createdBy']) {
                 $editProjectLink =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Project.php',
                         array(
                             'action'     => 'edit',
@@ -434,7 +434,7 @@ class CTHome extends CTCNC
                 $lastUpdated = '<a href="#" onclick="showLastUpdatedPopup(' . $project['projectID'] . ')" >Status</a>';
             }
 
-            $historyPopupURL = $this->buildLink(
+            $historyPopupURL = Controller::buildLink(
                 'Project.php',
                 array(
                     'action'  => 'historyPopup',
@@ -1172,7 +1172,7 @@ class CTHome extends CTCNC
 
         $this->template->set_var(
             [
-                "dataFetchUrl" => $this->buildLink(
+                "dataFetchUrl" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => self::GetDetailedChartsDataAction
@@ -1227,7 +1227,7 @@ class CTHome extends CTCNC
 
         $this->template->set_var(
             [
-                "fetchDataURL" => $this->buildLink(
+                "fetchDataURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
                         'action' => self::getFirstTimeFixData
@@ -1274,7 +1274,7 @@ class CTHome extends CTCNC
 
         $this->template->set_var(
             [
-                "upcomingVisitsFetchDataURL" => $this->buildLink(
+                "upcomingVisitsFetchDataURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
                         'action' => self::getUpcomingVisitsData

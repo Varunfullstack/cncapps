@@ -305,7 +305,7 @@ class CTContactExport extends CTCNC
             'ContactExport.inc'
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_SEARCH
@@ -313,7 +313,7 @@ class CTContactExport extends CTCNC
         );
 
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,

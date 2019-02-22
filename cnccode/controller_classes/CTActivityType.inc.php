@@ -76,7 +76,7 @@ class CTActivityType extends CTCNC
         $this->buActivityType->getAllTypes($dsCallActType);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITYTYPE_ACT_CREATE
@@ -92,7 +92,7 @@ class CTActivityType extends CTCNC
             while ($dsCallActType->fetchNext()) {
                 $callActTypeID = $dsCallActType->getValue('callActTypeID');
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTACTIVITYTYPE_ACT_EDIT,
@@ -102,7 +102,7 @@ class CTActivityType extends CTCNC
                 $txtEdit = '[edit]';
                 /*
                                 $urlDelete =
-                                    $this->buildLink(
+                                    Controller::buildLink(
                                         $_SERVER['PHP_SELF'],
                                         array(
                                             'action'				=>	CTACTIVITYTYPE_ACT_DELETE,
@@ -172,7 +172,7 @@ class CTActivityType extends CTCNC
         }
         if ($_REQUEST['action'] == CTACTIVITYTYPE_ACT_EDIT && $this->buActivityType->canDeleteActivityType($_REQUEST['callActTypeID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTACTIVITYTYPE_ACT_DELETE,
@@ -185,7 +185,7 @@ class CTActivityType extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITYTYPE_ACT_UPDATE,
@@ -193,7 +193,7 @@ class CTActivityType extends CTCNC
                 )
             );
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action' => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -201,7 +201,7 @@ class CTActivityType extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action' => CTCNC_ACT_ITEM_EDIT,
@@ -209,7 +209,7 @@ class CTActivityType extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITYTYPE_ACT_DISPLAY_LIST
@@ -284,7 +284,7 @@ class CTActivityType extends CTCNC
         $this->buActivityType->updateActivityType($this->dsCallActType);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'callActTypeID' => $this->dsCallActType->getValue('callActTypeID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -307,7 +307,7 @@ class CTActivityType extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTACTIVITYTYPE_ACT_DISPLAY_LIST

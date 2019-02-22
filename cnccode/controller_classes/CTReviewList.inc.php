@@ -64,7 +64,7 @@ class CTReviewList extends CTCNC
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'CustomerCRM.php',
                         array(
                             'action'     => 'displayEditForm',
@@ -80,7 +80,7 @@ class CTReviewList extends CTCNC
                 }
 
                 $reportUrl =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'ReviewList.php',
                         array()
                     );
