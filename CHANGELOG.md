@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 477 - Asset list export & upload exported file to website
+
 ## [v2.1.4] - 2019-02-20
 ### Fixed
 - Fixed Invalid character in customer email

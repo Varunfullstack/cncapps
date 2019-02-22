@@ -7,6 +7,7 @@
  */
 
 require_once("config.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require './../vendor/autoload.php';
 global $db;
 
@@ -185,6 +186,47 @@ ORDER BY clients.name,
             $writer->save(
                 $fileName
             );
+            $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
+            $dbeCustomerDocument->getCurrentAssetList($db->Record['cus_custno']);
+            if (!$dbeCustomerDocument->rowCount) {
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::customerID,
+                    $db->Record['cus_custno']
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::description,
+                    'Current Asset List'
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::filename,
+                    "Current Asset List Extract.xlsx"
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::fileMimeType,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::startersFormFlag,
+                    'N'
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::leaversFormFlag,
+                    'N'
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::mainContactOnlyFlag,
+                    'Y'
+                );
+
+                $dbeCustomerDocument->insertRow();
+
+            }
+
+            $dbeCustomerDocument->setValue(
+                DBEPortalCustomerDocument::file,
+                file_get_contents($fileName)
+            );
+            $dbeCustomerDocument->updateRow();
 
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (\Exception $exception) {

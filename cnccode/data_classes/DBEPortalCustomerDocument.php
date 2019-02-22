@@ -23,10 +23,37 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn(self::filename, DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn(self::file, DA_BLOB, DA_ALLOW_NULL);
-        $this->addColumn(self::fileMimeType, DA_STRING, DA_NOT_NULL);
+        $this->addColumn(
+            self::filename,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::file,
+            DA_BLOB,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::fileMimeType,
+            DA_STRING,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    public function getCurrentAssetList($customerID)
+    {
+        $queryString = "select " . $this->getDBColumnNamesAsString(
+            ) . " from " . $this->tableName . " where " . $this->getDBColumnName(
+                self::customerID
+            ) . " = $customerID and " . $this->getDBColumnName(
+                self::filename
+            ) . " = 'Current Asset List Extract.xlsx' limit 1";
+        $this->queryString = $queryString;
+
+        $this->getRows();
+        $this->fetchFirst();
+        $this->resetQueryString();
     }
 }
