@@ -678,16 +678,21 @@ class DBECustomer extends DBCNCEntity
      * Returns list of customers with special attention set
      *
      * @access public
+     * @param bool $ignoreProspects
      * @return bool Success
      */
-    function getActiveCustomers()
+    function getActiveCustomers($ignoreProspects = false)
     {
         $this->setMethodName("getSpecialAttentionCustomers");
 
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " = 'N'";
+            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " <> 'Y'";
+
+        if ($ignoreProspects) {
+            $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
+        }
 
         $this->setQueryString($queryString);
         $ret = (parent::getRows());

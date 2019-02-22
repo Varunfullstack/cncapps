@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"
+    >
+    <title></title>
+    <style type="text/css">
+        <!--
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+        }
+
+        .singleBorder {
+            border: #e1e1f0 2px solid;
+        }
+
+        TABLE {
+            border-spacing: 1px;
+        }
+
+        -->
+    </style>
+</head>
+<body>
+<p>These computer have a different domain compared to the one expected from the customer</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Computer Name
+        </th>
+        <th>
+            Reported Domain
+        </th>
+        <th>
+            Expected Domain
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN computerBlock -->
+    <tr>
+        <td>{customerName}</td>
+        <td>{computerName}</td>
+        <td>{reportedDomain}</td>
+        <td>{expectedDomain}</td>
+    </tr>
+    <!-- END computerBlock -->
+    </tbody>
+</table>
+</body>
+</html>

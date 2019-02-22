@@ -866,6 +866,11 @@ class CTCustomer extends CTCNC
                 DBECustomer::noOfServers,
                 $value['noOfServers']
             );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::activeDirectoryName,
+                $value['activeDirectoryName']
+            );
             $this->dsCustomer->setValue(
                 DBECustomer::noOfPCs,
                 $value['noOfPCs']
@@ -2243,6 +2248,7 @@ ORDER BY cus_name ASC  ";
                 ) ? '' : CTCNC_HTML_DISABLED,
                 'gscTopUpAmount'                 => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
                 'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
+                'activeDirectoryName'            => $this->dsCustomer->getValue(DBECustomer::activeDirectoryName),
                 'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
                 'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
                 'reviewDate'                     => Controller::dateYMDtoDMY(
@@ -2267,16 +2273,16 @@ ORDER BY cus_name ASC  ";
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
                 'isShowingInactive'              => $_REQUEST['showInactiveContacts'] ? 'true' : 'false',
                 'primaryMainMandatory'           => count($mainContacts) ? 'required' : '',
-                'sortCode'                        => $this->dsCustomer->getValue(DBECustomer::sortCode),
-                'accountName'                     => $this->dsCustomer->getValue(DBECustomer::accountName),
-                'accountNumber'                   => $this->dsCustomer->getValue(DBECustomer::accountNumber),
-                'sortCodePencilColor'             => $this->dsCustomer->getValue(
+                'sortCode'                       => $this->dsCustomer->getValue(DBECustomer::sortCode),
+                'accountName'                    => $this->dsCustomer->getValue(DBECustomer::accountName),
+                'accountNumber'                  => $this->dsCustomer->getValue(DBECustomer::accountNumber),
+                'sortCodePencilColor'            => $this->dsCustomer->getValue(
                     DBECustomer::sortCode
                 ) ? "greenPencil" : "redPencil",
-                'accountNumberPencilColor'        => $this->dsCustomer->getValue(
+                'accountNumberPencilColor'       => $this->dsCustomer->getValue(
                     DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil",
-                'forceDirectDebit'                => $forceDirectDebit ? 'true' : 'false'
+                'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false'
 
             )
         );
@@ -2959,7 +2965,7 @@ ORDER BY cus_name ASC  ";
                     'emailClass'                           => $this->dsContact->getValue("EmailClass"),
                     'notes'                                => $this->dsContact->getValue(DBEContact::notes),
                     'discontinuedFlag'                     => $this->dsContact->getValue(DBEContact::discontinuedFlag),
-                    'specialAttentionContactFlagChecked' => $this->getChecked(
+                    'specialAttentionContactFlagChecked'   => $this->getChecked(
                         $this->dsContact->getValue(
                             DBEContact::specialAttentionContactFlag
                         )
