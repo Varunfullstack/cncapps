@@ -18,9 +18,6 @@ class DBECustomer extends DBCNCEntity
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
     const prospectFlag = "prospectFlag";
-//    const othersEmailMainFlag = "othersEmailMainFlag";
-//    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
-//    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -67,6 +64,7 @@ class DBECustomer extends DBCNCEntity
     const sortCode = 'sortCode';
     const accountName = 'accountName';
     const accountNumber = 'accountNumber';
+    const activeDirectoryName = "activeDirectoryName";
 
     /**
      * calls constructor()
@@ -411,6 +409,12 @@ class DBECustomer extends DBCNCEntity
             self::accountNumber,
             DA_TEXT,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::activeDirectoryName,
+            DA_STRING,
+            DA_NOT_NULL
         );
 
         $this->setPK(0);
