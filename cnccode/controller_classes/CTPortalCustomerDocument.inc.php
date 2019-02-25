@@ -86,7 +86,7 @@ class CTPortalCustomerDocument extends CTCNC
         }
         if ($_REQUEST['action'] == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT && $this->buPortalCustomerDocument->canDelete($_REQUEST['portalCustomerDocumentID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTPORTALCUSTOMERDOCUMENT_ACT_DELETE,
@@ -99,7 +99,7 @@ class CTPortalCustomerDocument extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPORTALCUSTOMERDOCUMENT_ACT_UPDATE,
@@ -107,7 +107,7 @@ class CTPortalCustomerDocument extends CTCNC
                 )
             );
         $urlDisplayCustomer =
-            $this->buildLink(
+            Controller::buildLink(
                 'Customer.php',
                 array(
                     'customerID' => $this->dsPortalCustomerDocument->getValue('customerID'),
@@ -213,7 +213,7 @@ class CTPortalCustomerDocument extends CTCNC
         $this->buPortalCustomerDocument->updateDocument($this->dsPortalCustomerDocument, $_FILES['userfile']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'Customer.php',
                 array(
                     'customerID' => $this->dsPortalCustomerDocument->getValue('customerID'),
@@ -241,7 +241,7 @@ class CTPortalCustomerDocument extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'customerID' => $dsPortalCustomerDocument->getValue('customerID'),

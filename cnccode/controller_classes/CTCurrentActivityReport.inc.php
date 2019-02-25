@@ -286,7 +286,7 @@ class CTCurrentActivityReport extends CTCNC
         $_SESSION['selectedUserID'] = $GLOBALS['auth']->is_authenticated();
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );
@@ -311,7 +311,7 @@ class CTCurrentActivityReport extends CTCNC
         );
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 $options ? $options : []
             );
@@ -331,7 +331,7 @@ class CTCurrentActivityReport extends CTCNC
         unset($_SESSION['priorityFilter']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );
@@ -359,7 +359,7 @@ class CTCurrentActivityReport extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );
@@ -436,7 +436,7 @@ class CTCurrentActivityReport extends CTCNC
             do {
 
                 $urlCreateRequestFromCustomerRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'action'                => 'createRequestFromCustomerRequest',
@@ -456,7 +456,7 @@ class CTCurrentActivityReport extends CTCNC
 
                 if ($customerRaisedRequests->Record['cpr_update_existing_request'] == 1) {
                     $urlUpdateCustomerRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'                => 'updateRequestFromCustomerRequest',
@@ -478,7 +478,7 @@ class CTCurrentActivityReport extends CTCNC
 
 
                 $urlDeleteCustomerRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'CurrentActivityReport.php',
                         array(
                             'action'                => 'deleteCustomerRequest',
@@ -487,7 +487,7 @@ class CTCurrentActivityReport extends CTCNC
                     );
 
                 $urlCustomer =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'SalesOrder.php',
                         array(
                             'action'     => 'search',
@@ -497,7 +497,7 @@ class CTCurrentActivityReport extends CTCNC
 
                 if ($customerRaisedRequests->Record['cpr_problemno'] > 0) {
                     $urlServiceRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'    => 'displayServiceRequest',
@@ -529,7 +529,7 @@ class CTCurrentActivityReport extends CTCNC
                 $count++;
 
                 $urlDetailsPopup =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'action'            => 'customerProblemPopup',
@@ -803,7 +803,7 @@ class CTCurrentActivityReport extends CTCNC
         end customer filter
         */
         $urlSetFilter =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'setFilter'
@@ -811,13 +811,13 @@ class CTCurrentActivityReport extends CTCNC
             );
 
         $urlResetFilter =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => 'resetFilter')
             );
 
         $urlShowMineOnly =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => 'showMineOnly')
             );
@@ -920,7 +920,7 @@ class CTCurrentActivityReport extends CTCNC
             $rowCount++;
 
             $urlProblemDetailsPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'reasonPopup',
@@ -930,7 +930,7 @@ class CTCurrentActivityReport extends CTCNC
                 );
 
             $urlViewActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'displayLastActivity',
@@ -939,7 +939,7 @@ class CTCurrentActivityReport extends CTCNC
                 );
 
             $urlAllocateUser =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'allocateUser'
@@ -949,7 +949,7 @@ class CTCurrentActivityReport extends CTCNC
             if ($this->loggedInUserIsSdManager) {
 
                 $urlAllocateAdditionalTime =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'action'    => 'allocateAdditionalTime',
@@ -1017,7 +1017,7 @@ class CTCurrentActivityReport extends CTCNC
             /* ------------------------------ */
 
             $urlCustomer =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'     => 'search',
@@ -1031,7 +1031,7 @@ class CTCurrentActivityReport extends CTCNC
             if ($dsResults->getValue('queueNo') < 5) {
 
                 $urlEscalate =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => 'escalate',
@@ -1050,7 +1050,7 @@ class CTCurrentActivityReport extends CTCNC
 
             if ($dsResults->getValue('queueNo') > 1) {
                 $urlDeEscalate =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => 'deescalate',
@@ -1100,7 +1100,7 @@ class CTCurrentActivityReport extends CTCNC
 
                 if ($_SESSION['selectedCustomerID']) {
                     $urlWork =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'         => 'createFollowOnActivity',
@@ -1117,7 +1117,7 @@ class CTCurrentActivityReport extends CTCNC
                     this customer
                     */
                     $urlWork =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'CurrentActivityReport.php',
                             array(
                                 'action'             => 'setFilter',
@@ -1344,7 +1344,7 @@ class CTCurrentActivityReport extends CTCNC
         $userSelected = ($selectedID == 0) ? CT_SELECTED : '';
 
         $urlAllocateUser =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => 'allocateUser',
@@ -1359,7 +1359,7 @@ class CTCurrentActivityReport extends CTCNC
 
             $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : '';
             $urlAllocateUser =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => 'allocateUser',
@@ -1378,7 +1378,7 @@ class CTCurrentActivityReport extends CTCNC
 
     function getProblemHistoryLink($problemID)
     {
-        $url = $this->buildLink(
+        $url = Controller::buildLink(
             'Activity.php',
             array(
                 'action'    => 'problemHistoryPopup',
@@ -1416,7 +1416,7 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );
@@ -1436,7 +1436,7 @@ class CTCurrentActivityReport extends CTCNC
         );
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );
@@ -1453,7 +1453,7 @@ class CTCurrentActivityReport extends CTCNC
         $this->buActivity->escalateProblemByProblemID($problemID);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );
@@ -1469,7 +1469,7 @@ class CTCurrentActivityReport extends CTCNC
         $this->buActivity->deEscalateProblemByProblemID($problemID);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array()
             );

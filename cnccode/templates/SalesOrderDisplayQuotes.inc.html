@@ -1,24 +1,81 @@
 <!-- Template: SalesOrderDisplayQuotes.inc.html -->
-<table class="singleBorder" width="600px" border="0" cellspacing="2" cellpadding="0">
+<script>
+
+    function handleSendReminder() {
+        if (!confirm('Are you sure?')) {
+            return false;
+        }
+
+        const emailSubjectElm = document.getElementById('emailSubject');
+        const emailSubject = emailSubjectElm.value;
+
+        if (!emailSubject.trim()) {
+            alert('Please provide an Email Subject');
+            emailSubjectElm.focus();
+            return false;
+        }
+
+        window.location = "?action=sendReminder&emailSubject=" + emailSubject + "&quotationID=" + event.target.dataset.quotationId;
+    }
+</script>
+<table class="singleBorder"
+       width="600px"
+       border="0"
+       cellspacing="2"
+       cellpadding="0"
+>
     <tr>
-        <td colspan="4" valign="top" class="listHeadText">
+        <td colspan="4"
+            valign="top"
+            class="listHeadText"
+        >
             <div align="center">Documents</div>
         </td>
     </tr>
     <tr>
-        <td colspan="4" valign="top">
-            <table width="100%" border="0">
+        <td colspan="4"
+            valign="top"
+        >
+            <table width="100%"
+                   border="0"
+            >
                 <!-- BEGIN quotationBlock -->
-                <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
-                    <td width="10%" class="mainHeadText">
+                <tr onMouseOver="this.bgColor='#FFFFCC';"
+                    onMouseOut="this.bgColor='';"
+                >
+                    <td width="5%"
+                        class="mainHeadText"
+                    >
                         <a href="{displayQuoteDocURL}">{quoteVersionNo}</a>
                     </td>
-                    <td width="30%" class="mainHeadText">{quoteUserName}</td>
-                    <td width="40%" class="mainHeadText">{quoteSentDateTime}</td>
-                    <td width="10%" class="mainHeadText"><a href="{sendQuoteDocURL}">{txtSendQuote}</a></td>
-                    <td width="10%" class="mainHeadText" nowrap="nowrap">{documentType}</td>
-                    <td width="10%" class="mainHeadText"><a href="{deleteQuoteDocURL}"
-                                                            onClick="if(!confirm('Are you sure you want to delete quote document {quoteVersionNo}')) return(false)">{txtDelete}</a>
+                    <td width="30%"
+                        class="mainHeadText"
+                    >{quoteUserName}
+                    </td>
+                    <td width="40%"
+                        class="mainHeadText"
+                    >{quoteSentDateTime}
+                    </td>
+                    <td width="10%"
+                        class="mainHeadText"
+                    >
+                        <a href="{sendQuoteDocURL}">{txtSendQuote}</a>
+                    </td>
+                    <td width="10%"
+                        class="mainHeadText"
+                        nowrap="nowrap"
+                    >{documentType}
+                    </td>
+                    <td width="10%"
+                        class="mainHeadText"
+                        style="white-space: nowrap"
+                    >
+                        <a href="{deleteQuoteDocURL}"
+                           onClick="if(!confirm('Are you sure you want to delete quote document {quoteVersionNo}')) return(false)"
+                        >{txtDelete}</a>
+                        <a onclick="handleSendReminder();"
+                           data-quotation-id="{quotationID}"
+                        >{txtReminder}</a>
                     </td>
                 </tr>
                 <!-- END quotationBlock -->

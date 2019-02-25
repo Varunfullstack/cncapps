@@ -141,7 +141,7 @@ class CTDailyReport extends CTCNC
             do {
 
                 $urlRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -216,7 +216,7 @@ class CTDailyReport extends CTCNC
             do {
 
                 $urlRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -225,7 +225,7 @@ class CTDailyReport extends CTCNC
                     );
 
                 $urlActivity =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'callActivityID' => $row[2],
@@ -305,7 +305,7 @@ class CTDailyReport extends CTCNC
             do {
 
                 $urlRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'problemID' => $row[1],
@@ -314,7 +314,7 @@ class CTDailyReport extends CTCNC
                     );
 
                 $urlActivity =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'callActivityID' => $row[2],

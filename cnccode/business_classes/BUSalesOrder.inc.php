@@ -1447,7 +1447,7 @@ class BUSalesOrder extends Business
             $dsOrdhead,
             $dsOrdline
         );
-
+        $buRenQuotation = null;
         while ($dsOrdline->fetchNext()) {
 
             if ($dsOrdline->getValue('renewalCustomerItemID')) {
@@ -1459,7 +1459,10 @@ class BUSalesOrder extends Business
                     $buRenQuotation = new BURenQuotation($this);
                 }
 
-                $buRenQuotation->processQuotationRenewal($dsOrdline->getValue('renewalCustomerItemID'));
+                $buRenQuotation->processQuotationRenewal(
+                    $dsOrdline->getValue('renewalCustomerItemID'),
+                    $convertToOrder
+                );
 
             }
 
@@ -2026,6 +2029,28 @@ WHERE odl_ordno = $ordheadID
         $statement = "DELETE FROM ordline WHERE odl_ordlineno IN (" . $oldOrdlinenos . ")";
 
         $db->query($statement);
+    }
+
+    public function notifyPurchaseOrderCompletion($purchaseOrderHeaderID)
+    {
+        // we need to find out what is the related sales order first
+        $dbePurchaseOrderHeader = new DBEPorhead($this);
+        $dbePurchaseOrderHeader->getRow($purchaseOrderHeaderID);
+
+        $salesOrderID = $dbePurchaseOrderHeader->getValue(DBEPorhead::ordheadID);
+
+        // we need to now find the associated SR, if there's more than one we only care about the one with the smallest ID
+        $problemID = $this->getLinkedServiceRequestID($salesOrderID);
+
+        if ($problemID) {
+            $buActivity = new BUActivity($this);
+            $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
+        }
+        $dbePurchaseOrderHeader->setValue(
+            DBEPorhead::completionNotifiedFlag,
+            'Y'
+        );
+        $dbePurchaseOrderHeader->updateRow();
     }
 
 }// End of class

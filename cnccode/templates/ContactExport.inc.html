@@ -2,14 +2,8 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
 <script type="text/javascript"
         src="ckeditor/ckeditor.js"
-></script>
-<script language='JavaScript'
-        src='jquery/jquery.min.js'
 ></script>
 <script type="text/javascript">
     function download3CXExport() {
@@ -256,6 +250,54 @@
                             >
                         </td>
                     </tr>
+                    <tr>
+                        <td class="promptText">
+                            HR
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="searchForm[1][hrUser]"
+                                   value="Y"
+                                   {hrUserChecked}
+                            >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="promptText">
+                            Review
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="searchForm[1][reviewUser]"
+                                   value="Y"
+                                   {reviewUserChecked}
+                            >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="promptText">
+                            <div align="right">Support Level</div>
+                        </td>
+                        <td>
+                            <div class="contactSupportLevel">
+
+                                <select name="searchForm[1][supportLevel][]"
+                                        style="height: 90px"
+                                        multiple
+                                >
+                                    <!-- BEGIN supportLevelBlock -->
+                                    <option {supportLevelSelected}
+                                            data-test="{supportLevelSelected}"
+                                            value="{supportLevelValue}"
+                                    >
+                                        {supportLevelDescription}
+                                    </option>
+                                    <!-- END supportLevelBlock -->
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+
                     <tr>
                         <td class="promptText">New Between</td>
                         <td><input

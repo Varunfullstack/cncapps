@@ -149,7 +149,7 @@ class CTManagementReports extends CTCNC
         }
 
         $urlGenerateReport =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'spendByManufacturer'
@@ -184,7 +184,7 @@ class CTManagementReports extends CTCNC
         $this->parseYearSelector($_REQUEST['year']);
 
         $supplierPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
                     'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
@@ -257,7 +257,7 @@ class CTManagementReports extends CTCNC
             $this->template->parse('results', 'resultsBlock', true);
         }
         $urlGenerateReport =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'SpendBySupplier'
@@ -353,7 +353,7 @@ class CTManagementReports extends CTCNC
         }
 
         $urlGenerateReport =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'SpendByCategory'
@@ -450,7 +450,7 @@ class CTManagementReports extends CTCNC
 
 
         $customerPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -459,7 +459,7 @@ class CTManagementReports extends CTCNC
             );
 
         $fetchDataUrl =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => self::GetSalesByCustomerDataAction

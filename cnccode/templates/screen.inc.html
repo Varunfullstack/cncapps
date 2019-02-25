@@ -5,7 +5,7 @@
     <META http-equiv="Content-Type"
           content="text/html; charset=UTF-8"
     >
-    <link href="/screen.css?cache=3"
+    <link href="/screen.css?cache=4"
           rel="stylesheet"
           type="text/css"
     >
@@ -13,15 +13,54 @@
           rel="stylesheet"
           type="text/css"
     >
+    <script type="text/javascript">
+        var owa_baseUrl = 'http://webanalytics:89/';
+        var owa_cmds = owa_cmds || [];
+        owa_cmds.push(['setSiteId', 'b39a0f923d7f45bec2ccb7fa0435f82c']);
+        owa_cmds.push(['trackPageView']);
+        owa_cmds.push(['trackClicks']);
+        owa_cmds.push(['trackDomStream']);
+
+        (function () {
+            var _owa = document.createElement('script');
+            _owa.type = 'text/javascript';
+            _owa.async = true;
+            owa_baseUrl = ('https:' == document.location.protocol ? window.owa_baseSecUrl || owa_baseUrl.replace(/http:/, 'https:') : owa_baseUrl);
+            _owa.src = owa_baseUrl + 'modules/base/js/owa.tracker-combined-min.js';
+            var _owa_s = document.getElementsByTagName('script')[0];
+            _owa_s.parentNode.insertBefore(_owa, _owa_s);
+        }());
+
+    </script>
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"
+    />
     <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.4/webcomponents-loader.js"></script>
     <script src="/moment/moment.min.js"></script>
     <script src=".javascript/jquery-3.3.1.min.js"></script>
     <script src=".javascript/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"
+    ></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"
+    ></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"
+    ></script>
+    <script type="text/javascript"
+            src="//cdn.datatables.net/plug-ins/1.10.19/sorting/date-eu.js"
+    ></script>
+    <link href=".javascript/jquery-timepicker/jquery.timepicker.min.css"
+          rel="stylesheet"
+    >
+
     <link rel="stylesheet"
           href=".javascript/jquery-ui-1.12.1/jquery-ui.min.css"
     >
     <!--<link rel="stylesheet"-->
-          <!--href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"-->
+    <!--href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"-->
     <!--&gt;-->
     <link rel="stylesheet"
           href="font-awesome/css/font-awesome.min.css"
@@ -43,6 +82,9 @@
             src=".javascript/mustache.min.js"
     ></script>
     <script src=".javascript/uploader.js"></script>
+    <script src=".javascript/contactLookup.js"></script>
+    <script src=".javascript/jquery-timepicker/jquery.timepicker.min.js"></script>
+    <script src=".javascript/timePicker.js"></script>
     <script src="CommonJS.js"></script>
     <script type="application/javascript">
         /*!
@@ -547,6 +589,7 @@
 <BODY {bodyTagExtras}
       {environmentTag}
 >
+{owa}
 <TABLE width="100%"
        border="0"
 >

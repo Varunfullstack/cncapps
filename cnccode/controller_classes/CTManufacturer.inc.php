@@ -102,7 +102,7 @@ class CTManufacturer extends CTCNC
 
         $this->setMethodName('displayManufacturerSelectPopup');
         // this may be required in a number of situations
-        $urlCreate = $this->buildLink(
+        $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'createManufacturer',
@@ -185,7 +185,7 @@ class CTManufacturer extends CTCNC
         $this->buManufacturer->getAll($dsManufacturer);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'createManufacturer'
@@ -201,7 +201,7 @@ class CTManufacturer extends CTCNC
             while ($dsManufacturer->fetchNext()) {
                 $manufacturerID = $dsManufacturer->getValue('manufacturerID');
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'editManufacturer',
@@ -211,7 +211,7 @@ class CTManufacturer extends CTCNC
                 $txtEdit = '[edit]';
                 /*
                                 $urlDelete =
-                                    $this->buildLink(
+                                    Controller::buildLink(
                                         $_SERVER['PHP_SELF'],
                                         array(
                                             'action'				=>	CTMANUFACTURER_ACT_DELETE,
@@ -262,7 +262,7 @@ class CTManufacturer extends CTCNC
         }
         if ($_REQUEST['action'] == 'editManufacturer' && $this->buManufacturer->canDeleteManufacturer($_REQUEST['manufacturerID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'deleteManufacturer',
@@ -275,7 +275,7 @@ class CTManufacturer extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'updateManufacturer',
@@ -283,7 +283,7 @@ class CTManufacturer extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTMANUFACTURER_ACT_DISPLAY_LIST
@@ -333,7 +333,7 @@ class CTManufacturer extends CTCNC
         $manufacturerID = $this->dsManufacturer->getValue('manufacturerID');
 
         if ($_SESSION['manufacturerParentIDField']) {
-            $urlNext = $this->buildLink(
+            $urlNext = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'displayPopup',
@@ -342,7 +342,7 @@ class CTManufacturer extends CTCNC
                 )
             );
         } else {
-            $urlNext = $this->buildLink(
+            $urlNext = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTMANUFACTURER_ACT_DISPLAY_LIST
@@ -368,7 +368,7 @@ class CTManufacturer extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTMANUFACTURER_ACT_DISPLAY_LIST

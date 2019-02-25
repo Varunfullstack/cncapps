@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1550236916-0">
+        <tagDatabase tag="issue450"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1550236916-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from standardtexttype where sty_desc = 'Sales Meeting Type'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO standardtexttype VALUES ((SELECT MAX(sty_standardtexttypeno) + 1 FROM standardtexttype alias),
+            'Sales Meeting Type',NULL )
+        </sql>
+        <rollback>
+            delete from standardtexttype where sty_desc = 'Sales Meeting Type'
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

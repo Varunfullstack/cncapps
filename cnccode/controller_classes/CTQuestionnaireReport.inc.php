@@ -135,7 +135,7 @@ class CTQuestionnaireReport extends CTCNC
                 )
             );
 
-            $urlSubmit = $this->buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+            $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
             $this->setPageTitle('Questionnaire Report');
 

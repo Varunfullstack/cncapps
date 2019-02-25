@@ -1,6 +1,29 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.2.0]
+### Changed
+- Issue 474 - Request Dashboards visual enhancements
+- Issue 464 - Contact Validation Change
+- Issue 448 - Allow Sales Requests to be editable
+- Issue 459 - Time Request page auto refresh
+- Issue 485 - Move Passwords from Sales to Technical menu
+- Issue 430 - PO Status Report enhancements v5
+- Issue 468 - Sales Renewal enhancements
+### Fixed
+- Issue 471 - Sales quote signature error validation
+- Issue 458 - Customer Analysis Report SQL query
+- Issue 482 - Starter / Leaver database fields
+### Added
+- Issue 450 - Sales Meeting Booking Request
+- Issue 470 - Automated schedule to 'delete' pending user contacts
+- Issue 446 - Add new CNC graphic to quick quotes
+- Issue 467 - Leased line contract expiry notification
+- Issue 483 - Add Password level descriptions
+- Issue 480 - Current Projects shown on Sales Order page
+- Issue 489 - Contract Extraction
+- Issue 404 - Error Log Handling Improvements
+
 ## [v2.1.4] - 2019-02-20
 ### Fixed
 - Fixed Invalid character in customer email
@@ -25,10 +48,10 @@ This project changes will be shown here.
 ### Added
 - Issue 442 - Customer Starter & Leaver questions
 
-## [v2.0.7] - 2019-02-08
+## [v2.0.7] - 2019-02-08 
 ### Fixed 
 - Fix issue with counting open activities
-
+ 
 ## [v2.0.6] - 2019-02-08
 ### Fixed
 - Unnecessary email sending on SR updates

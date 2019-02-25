@@ -83,12 +83,12 @@ class CTContactAudit extends CTCNC
         );
 // Parameters
         $this->setPageTitle("Contact Audit Log");
-        $submitURL = $this->buildLink(
+        $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_SEARCH)
         );
         $customerPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,

@@ -186,7 +186,7 @@ class CTCustomerNote extends CTCNC
 
 
         $urlSubmit =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'customerNotePopup'

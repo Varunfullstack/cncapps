@@ -375,7 +375,6 @@ class DataSet extends DataAccess
                       $value
     )
     {
-//		return(parent::setValue($ixPassedColumn, stripslashes($value)));
         return (parent::setValue(
             $ixPassedColumn,
             (string)$value

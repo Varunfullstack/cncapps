@@ -89,7 +89,7 @@ class CTThirdPartyContact extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
@@ -107,7 +107,7 @@ class CTThirdPartyContact extends CTCNC
         }
 
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -169,7 +169,7 @@ class CTThirdPartyContact extends CTCNC
 
         if ($dsThirdPartyContact) {
             $urlAdd =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'edit',
@@ -177,7 +177,7 @@ class CTThirdPartyContact extends CTCNC
                     )
                 );
             $urlLoadFromCsv =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'loadFromCsv',
@@ -185,7 +185,7 @@ class CTThirdPartyContact extends CTCNC
                     )
                 );
 
-            $urlSubmit = $this->buildLink(
+            $urlSubmit = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'displayList'
@@ -203,7 +203,7 @@ class CTThirdPartyContact extends CTCNC
                 )
             );
 
-            $urlCustomerPopup = $this->buildLink(
+            $urlCustomerPopup = Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -220,7 +220,7 @@ class CTThirdPartyContact extends CTCNC
             while ($dsThirdPartyContact->fetchNext()) {
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'              => 'edit',
@@ -228,7 +228,7 @@ class CTThirdPartyContact extends CTCNC
                         )
                     );
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'              => 'delete',
@@ -308,7 +308,7 @@ class CTThirdPartyContact extends CTCNC
                 $this->buThirdPartyContact->updateThirdPartyContact($dsThirdPartyContact);
 
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'list',
@@ -338,7 +338,7 @@ class CTThirdPartyContact extends CTCNC
         }
 
         $urlEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'edit',
@@ -387,7 +387,7 @@ class CTThirdPartyContact extends CTCNC
 
         $this->buThirdPartyContact->delete($_REQUEST['thirdPartyContactID']);
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'list',

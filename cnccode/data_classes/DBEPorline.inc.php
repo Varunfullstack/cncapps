@@ -7,6 +7,16 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPorline extends DBEntity
 {
+    const porheadID = "porheadID";
+    const sequenceNo = "sequenceNo";
+    const itemID = "itemID";
+    const qtyOrdered = "qtyOrdered";
+    const qtyReceived = "qtyReceived";
+    const qtyInvoiced = "qtyInvoiced";
+    const curUnitCost = "curUnitCost";
+    const stockcat = "stockcat";
+    const expectedDate = "expectedDate";
+
     /**
      * calls constructor()
      * @access public
@@ -18,15 +28,60 @@ class DBEPorline extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("Porline");
-        $this->addColumn("porheadID", DA_ID, DA_NOT_NULL, "pol_porno");
-        $this->addColumn("sequenceNo", DA_INTEGER, DA_NOT_NULL, "pol_lineno");
-        $this->addColumn("itemID", DA_ID, DA_NOT_NULL, "pol_itemno");
-        $this->addColumn("qtyOrdered", DA_FLOAT, DA_NOT_NULL, "pol_qty_ord");
-        $this->addColumn("qtyReceived", DA_FLOAT, DA_ALLOW_NULL, "pol_qty_rec");
-        $this->addColumn("qtyInvoiced", DA_FLOAT, DA_ALLOW_NULL, "pol_qty_inv");
-        $this->addColumn("curUnitCost", DA_FLOAT, DA_NOT_NULL, "pol_cost");
-        $this->addColumn("stockcat", DA_STRING, DA_NOT_NULL, "pol_stockcat");
-        $this->addColumn("expectedDate", DA_DATE, DA_ALLOW_NULL, "pol_exp_date");
+        $this->addColumn(
+            self::porheadID,
+            DA_ID,
+            DA_NOT_NULL,
+            "pol_porno"
+        );
+        $this->addColumn(
+            self::sequenceNo,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "pol_lineno"
+        );
+        $this->addColumn(
+            self::itemID,
+            DA_ID,
+            DA_NOT_NULL,
+            "pol_itemno"
+        );
+        $this->addColumn(
+            self::qtyOrdered,
+            DA_FLOAT,
+            DA_NOT_NULL,
+            "pol_qty_ord"
+        );
+        $this->addColumn(
+            self::qtyReceived,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pol_qty_rec"
+        );
+        $this->addColumn(
+            self::qtyInvoiced,
+            DA_FLOAT,
+            DA_ALLOW_NULL,
+            "pol_qty_inv"
+        );
+        $this->addColumn(
+            self::curUnitCost,
+            DA_FLOAT,
+            DA_NOT_NULL,
+            "pol_cost"
+        );
+        $this->addColumn(
+            self::stockcat,
+            DA_STRING,
+            DA_NOT_NULL,
+            "pol_stockcat"
+        );
+        $this->addColumn(
+            self::expectedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pol_exp_date"
+        );
         $this->setAddColumnsOff();
     }
 

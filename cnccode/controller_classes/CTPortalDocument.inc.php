@@ -84,7 +84,7 @@ class CTPortalDocument extends CTCNC
         }
         if ($_REQUEST['action'] == CTPORTALDOCUMENT_ACT_EDIT && $this->buPortalDocument->canDelete($_REQUEST['portalDocumentID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTPORTALDOCUMENT_ACT_DELETE,
@@ -97,7 +97,7 @@ class CTPortalDocument extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPORTALDOCUMENT_ACT_UPDATE,
@@ -105,7 +105,7 @@ class CTPortalDocument extends CTCNC
                 )
             );
         $urlDisplayHeader =
-            $this->buildLink(
+            Controller::buildLink(
                 'Header.php',
                 array()
             );
@@ -184,7 +184,7 @@ class CTPortalDocument extends CTCNC
         $this->buPortalDocument->updateDocument($this->dsPortalDocument, $_FILES['userfile']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'Header.php',
                 array()
             );
@@ -208,7 +208,7 @@ class CTPortalDocument extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Header.php',
                     array(
                         'action' => CTCNC_ACT_DISP_EDIT

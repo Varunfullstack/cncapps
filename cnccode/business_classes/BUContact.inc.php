@@ -79,6 +79,8 @@ class BUContact extends Business
 
     /**
      * Get Support Contact rows at all customers
+     * @param $dsResults
+     * @param bool $customerID
      * @return bool : One or more rows
      * @access public
      */
@@ -463,6 +465,15 @@ class BUContact extends Business
     public function getSpecialAttentionContacts(&$dsResults)
     {
         $this->dbeContact->getSpecialAttentionCustomers();
+        return $this->getData(
+            $this->dbeContact,
+            $dsResults
+        );
+    }
+
+    public function getReviewContacts($customerID,DataSet  $dsResults)
+    {
+        $this->dbeContact->getReviewContacts($customerID);
         return $this->getData(
             $this->dbeContact,
             $dsResults

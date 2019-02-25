@@ -2,7 +2,9 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans"
+          rel="stylesheet"
+    >
     <style type="text/css">
 
         @page {
@@ -13,7 +15,10 @@
         html {
             height: 100%
         }
-        image { margin: 0 auto; }
+
+        image {
+            margin: 0 auto;
+        }
 
         body {
             /*display: flex;*/
@@ -36,7 +41,11 @@
             flex-direction: column;
         }
 
-        .reportSection { padding-bottom: 30px; display: inline-block; width: 100%; }
+        .reportSection {
+            padding-bottom: 30px;
+            display: inline-block;
+            width: 100%;
+        }
 
         h1 {
             font-size: 16pt;
@@ -65,7 +74,11 @@
         }
 
         table, th, td {
-            border: 1px solid black; font-size: 1em; font-family: 'Open Sans', sans-serif; font-kerning: normal; letter-spacing: 0px;
+            border: 1px solid black;
+            font-size: 1em;
+            font-family: 'Open Sans', sans-serif;
+            font-kerning: normal;
+            letter-spacing: 0px;
         }
 
         .pageBreak {
@@ -118,14 +131,37 @@
             page-break-after: always;
         }
 
-        .rootCause { width: 600px; margin: 0 auto; }
-        .requestCount { width: 450px; margin: 0 auto; }
+        .rootCause {
+            width: 600px;
+            margin: 0 auto;
+        }
 
-        .overflow:nth-child(odd) { width:48%; float: right; margin: 0 !important; }
-        .overflow:nth-child(even) { width:48%; float: left; margin: 0 !important; }
+        .requestCount {
+            width: 450px;
+            margin: 0 auto;
+        }
 
-        .thirdTable { width:32%; float: left; margin: 0 2% 0 0 !important; }
-        .thirdTable:nth-child(4) { margin: 0 !important; }
+        .overflow:nth-child(odd) {
+            width: 48%;
+            float: right;
+            margin: 0 !important;
+        }
+
+        .overflow:nth-child(even) {
+            width: 48%;
+            float: left;
+            margin: 0 !important;
+        }
+
+        .thirdTable {
+            width: 32%;
+            float: left;
+            margin: 0 2% 0 0 !important;
+        }
+
+        .thirdTable:nth-child(4) {
+            margin: 0 !important;
+        }
 
         table.invisible, table.invisible th, table.invisible td {
             border: none;
@@ -134,14 +170,17 @@
         thead {
             display: table-row-group;
         }
+
         tr {
             page-break-before: always;
             page-break-after: always;
             page-break-inside: avoid;
         }
+
         table {
             word-wrap: break-word;
         }
+
         table td {
             word-break: break-all;
         }
@@ -154,10 +193,26 @@
             text-align: left !important;
         }
 
+        #watermark {
+            position: fixed;
+            top: -12mm;
+            left: -12mm;
+            /** The width and height may change
+            according to the dimensions of your letterhead
+            **/
+            /*width: 210cm;*/
+            /*height: 297cm;*/
+
+            /** Your watermark should be behind every content**/
+            z-index: -1000;
+        }
     </style>
 
 </head>
 <body>
+<div id="watermark">
+    <img src="{waterMarkURL}"/>
+</div>
 {htmlBody}
 </body>
 </html>

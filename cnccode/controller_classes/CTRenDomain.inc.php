@@ -142,7 +142,7 @@ class CTRenDomain extends CTCNC
                 $customerItemID = $dsRenDomain->getValue('customerItemID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -152,7 +152,7 @@ class CTRenDomain extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => 'delete',
@@ -162,7 +162,7 @@ class CTRenDomain extends CTCNC
                 $txtDelete = '[delete]';
 
                 $urlList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'list'
@@ -260,7 +260,7 @@ class CTRenDomain extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
@@ -304,7 +304,7 @@ class CTRenDomain extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
@@ -313,7 +313,7 @@ class CTRenDomain extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'list'
@@ -373,7 +373,7 @@ class CTRenDomain extends CTCNC
         }
 
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -382,7 +382,7 @@ class CTRenDomain extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -390,7 +390,7 @@ class CTRenDomain extends CTCNC
                 )
             );
         $urlPrintContract =
-            $this->buildLink(
+            Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'action'         => 'printContract',
@@ -491,7 +491,7 @@ class CTRenDomain extends CTCNC
         );
 
         $urlAddArecord =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'createArecord',
@@ -503,7 +503,7 @@ class CTRenDomain extends CTCNC
         while ($dbeArecord->fetchNext()) {
 
             $urlEditArecord =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => 'editArecord',
@@ -512,7 +512,7 @@ class CTRenDomain extends CTCNC
                 );
 
             $urlDeleteArecord =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => 'deleteArecord',
@@ -570,7 +570,7 @@ class CTRenDomain extends CTCNC
         if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
@@ -580,7 +580,7 @@ class CTRenDomain extends CTCNC
 
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
@@ -617,7 +617,7 @@ class CTRenDomain extends CTCNC
                 $this->buRenDomain->updateArecord($dsArecord);
 
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -647,7 +647,7 @@ class CTRenDomain extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'editArecord',
@@ -697,7 +697,7 @@ class CTRenDomain extends CTCNC
 
         $this->buRenDomain->deleteArecord($_REQUEST['arecordID']);
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',

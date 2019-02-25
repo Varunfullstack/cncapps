@@ -97,7 +97,7 @@ class CTQuestionnaire extends CTCNC
         $this->buQuestionnaire->getAll($dsQuestionnaire);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'create'
@@ -121,7 +121,7 @@ class CTQuestionnaire extends CTCNC
                 $questionnaireID = $dsQuestionnaire->getValue('questionnaireID');
 
                 $urlDisplayQuestionList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'          => 'displayQuestionList',
@@ -129,7 +129,7 @@ class CTQuestionnaire extends CTCNC
                         )
                     );
                 $urlView =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'http://cnc-ltd.co.uk/questionnaire/index.php',
                         array(
                             'questionnaireno' => $questionnaireID
@@ -137,7 +137,7 @@ class CTQuestionnaire extends CTCNC
                     );
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'          => 'edit',
@@ -148,7 +148,7 @@ class CTQuestionnaire extends CTCNC
 
                 if ($this->buQuestionnaire->canDelete($questionnaireID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'          => 'delete',
@@ -223,7 +223,7 @@ class CTQuestionnaire extends CTCNC
         }
         if ($_REQUEST['action'] == 'edit' && $this->buQuestionnaire->canDelete($_REQUEST['questionnaireID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'          => 'delete',
@@ -236,7 +236,7 @@ class CTQuestionnaire extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'update',
@@ -244,7 +244,7 @@ class CTQuestionnaire extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'displayList'
@@ -306,7 +306,7 @@ class CTQuestionnaire extends CTCNC
         $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'questionnaireID' => $this->dsQuestionnaire->getValue('questionnaireID'),
@@ -330,7 +330,7 @@ class CTQuestionnaire extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'displayList'
@@ -365,7 +365,7 @@ class CTQuestionnaire extends CTCNC
         $this->setPageTitle($dsQuestionnaire->getValue('description'));
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'createQuestion',
@@ -391,7 +391,7 @@ class CTQuestionnaire extends CTCNC
                 $questionID = $dsQuestion->getValue('questionID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'editQuestion',
@@ -402,7 +402,7 @@ class CTQuestionnaire extends CTCNC
 
                 if ($this->buQuestionnaire->canDelete($questionID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'     => 'delete',
@@ -486,7 +486,7 @@ class CTQuestionnaire extends CTCNC
             $this->buQuestionnaire->canDelete($_REQUEST['questionID'])
         ) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'deleteQuestion',
@@ -499,7 +499,7 @@ class CTQuestionnaire extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'updateQuestion',
@@ -507,7 +507,7 @@ class CTQuestionnaire extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'displayQuestionList',
@@ -612,7 +612,7 @@ class CTQuestionnaire extends CTCNC
         $this->buQuestionnaire->updateQuestion($this->dsQuestion);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'questionnaireID' => $this->dsQuestion->getValue('questionnaireID'),
@@ -636,7 +636,7 @@ class CTQuestionnaire extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'displayQuestionList'

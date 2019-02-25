@@ -159,7 +159,7 @@ class CTRenHosting extends CTCNC
                 $customerItemID = $dsRenHosting->getValue('customerItemID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -169,7 +169,7 @@ class CTRenHosting extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => 'delete',
@@ -179,7 +179,7 @@ class CTRenHosting extends CTCNC
                 $txtDelete = '[delete]';
 
                 $urlList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'list'
@@ -273,7 +273,7 @@ class CTRenHosting extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
@@ -317,7 +317,7 @@ class CTRenHosting extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
@@ -327,7 +327,7 @@ class CTRenHosting extends CTCNC
             );
 
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'list'
@@ -395,7 +395,7 @@ class CTRenHosting extends CTCNC
             );
         }
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -404,7 +404,7 @@ class CTRenHosting extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -413,7 +413,7 @@ class CTRenHosting extends CTCNC
             );
 
         $urlPrintContract =
-            $this->buildLink(
+            Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'action'         => 'printContract',
@@ -619,7 +619,7 @@ class CTRenHosting extends CTCNC
         if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
@@ -629,7 +629,7 @@ class CTRenHosting extends CTCNC
 
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',

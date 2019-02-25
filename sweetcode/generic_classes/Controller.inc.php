@@ -537,6 +537,7 @@ class Controller extends BaseObject
     )
     {
 
+
         // We always include the page or report template
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
@@ -580,7 +581,6 @@ class Controller extends BaseObject
             "pageTitle",
             $this->getPageTitle()
         );
-
 
         if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
             $this->template->set_var(
@@ -642,12 +642,11 @@ class Controller extends BaseObject
      * @access private
      * @returns string $urlString
      */
-    function buildLink($args)
+    public static function buildLink($args)
     {
-        $this->setMethodName("buildLink");
         $numargs = func_num_args();
         if ($numargs < 2) {
-            $this->displayFatalError("Too few arguments passed");
+            throw new Exception("Too few arguments passed");
         }
         // get args
         $url = func_get_arg(0);
@@ -662,7 +661,7 @@ class Controller extends BaseObject
         }
 
         if ($url == "") {
-            $this->displayFatalError("Blank url");
+            throw new Exception('Invalid URL');
         }
 
         $urlString = $url;
@@ -682,7 +681,7 @@ class Controller extends BaseObject
         };
         // This idiot guard prevents the URL page rom being cached by the browser
         if ((defined('CONFIG_IDIOT_GUARD_ON')) && CONFIG_IDIOT_GUARD_ON) {
-            $urlString = $this->addParametersToLink(
+            $urlString = self::addParametersToLink(
                 $urlString,
                 array("ig" => time())
             );
@@ -695,12 +694,12 @@ class Controller extends BaseObject
      *
      * @access private
      */
-    function addParametersToLink($url,
-                                 $parameters
+    public static function addParametersToLink($url,
+                                               $parameters
     )
     {
         if ($url == "") {
-            $this->displayFatalError("Blank url");
+            throw new Exception('Invalid URL');
         }
 
         $urlString = $url;

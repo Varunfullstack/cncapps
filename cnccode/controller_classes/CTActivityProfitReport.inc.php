@@ -128,12 +128,12 @@ class CTActivityProfitReport extends CTCNC
 
         $this->setTemplateFiles(array('ActivityProfitReport' => 'ActivityProfitReport.inc'));
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
@@ -162,7 +162,7 @@ class CTActivityProfitReport extends CTCNC
         while ($this->dsResults->fetchNext()) {
 
             $urlDrill =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER ['PHP_SELF'],
                     array(
                         'action'     => 'drillDown',
@@ -173,7 +173,7 @@ class CTActivityProfitReport extends CTCNC
                 );
 
             $urlDrillInvoices =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER ['PHP_SELF'],
                     array(
                         'action'     => 'drillDownInvoices',

@@ -6,6 +6,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_bu'] . '/BUContactExport.inc.php');
+require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -218,6 +219,25 @@ class CTContactExport extends CTCNC
             DA_ALLOW_NULL
         );
 
+        $dsSearchForm->addColumn(
+            DBEContact::supportLevel,
+            DA_ARRAY,
+            DA_ALLOW_NULL
+        );
+
+        $dsSearchForm->addColumn(
+            DBEContact::reviewUser,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL
+        );
+
+        $dsSearchForm->addColumn(
+            DBEContact::hrUser,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL
+        );
+
+
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
 
@@ -227,33 +247,28 @@ class CTContactExport extends CTCNC
 
         if ($_REQUEST['Export'] || $_REQUEST['SendEmail']) {
 
+            if (isset($_REQUEST['searchForm'][1]['supportLevel'])) {
+                $_REQUEST['searchForm'][1]['supportLevel'] = json_encode($_REQUEST['searchForm'][1]['supportLevel']);
+            }
             $dsSearchForm->populateFromArray($_REQUEST['searchForm']);
 
             if ($_REQUEST['quotationItemIDs']) {
-
                 $quotationItemIDs = $_REQUEST['quotationItemIDs'];
-
             }
 
             if ($_REQUEST['contractItemIDs']) {
-
                 $contractItemIDs = $_REQUEST['contractItemIDs'];
-
             }
 
             if ($_REQUEST['sectorIDs']) {
-
                 $sectorIDs = $_REQUEST['sectorIDs'];
-
             }
 
             if ($_REQUEST['SendEmail']) {
-
                 $dsSearchForm->setValue(
                     'exportEmailOnlyFlag',
                     0
                 );
-
             }
 
             $results =
@@ -305,7 +320,7 @@ class CTContactExport extends CTCNC
             'ContactExport.inc'
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_SEARCH
@@ -313,7 +328,7 @@ class CTContactExport extends CTCNC
         );
 
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -329,6 +344,23 @@ class CTContactExport extends CTCNC
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
+
+        $this->template->set_block(
+            'ContactExport',
+            'supportLevelBlock',
+            'selectSupportLevel'
+        );
+
+        $buContact = new BUContact($this);
+        $buContact->supportLevelDropDown(
+            '--',
+            $this->template,
+            'supportLevelSelected',
+            'supportLevelValue',
+            'supportLevelDescription',
+            'selectSupportLevel',
+            'supportLevelBlock'
+        );
 
         $this->setPageTitle('Export Contacts');
 
@@ -353,6 +385,12 @@ class CTContactExport extends CTCNC
                 'mailshot4FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
                 'mailshot8FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
                 'mailshot9FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
+                'reviewUserChecked'            => Controller::htmlChecked(
+                    $dsSearchForm->getValue(DBEContact::reviewUser)
+                ),
+                'hrUserChecked'                => Controller::htmlChecked(
+                    $dsSearchForm->getValue(DBEContact::hrUser)
+                ),
                 'noOfPCs'                      => $dsSearchForm->getValue('noOfPCs'),
                 'noOfServers'                  => $dsSearchForm->getValue('noOfServers'),
                 'newCustomerFromDate'          => $dsSearchForm->getValue('newCustomerFromDate'),
@@ -755,9 +793,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 null
             ];
             $str = implode(
-                ',',
-                $data
-            )."\n";
+                    ',',
+                    $data
+                ) . "\n";
             fwrite(
                 $file,
                 $str

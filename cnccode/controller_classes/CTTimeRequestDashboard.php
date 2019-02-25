@@ -72,7 +72,7 @@ class CTTimeRequestDashboard extends CTCNC
         while ($dbejCallActivity->fetchNext()) {
             $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
             $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-            $srLink = $this->buildLink(
+            $srLink = Controller::buildLink(
                 'Activity.php',
                 [
                     "callActivityID" => $lastActivity->getValue(DBEJCallActivity::callActivityID),
@@ -82,7 +82,7 @@ class CTTimeRequestDashboard extends CTCNC
 
             $srLink = "<a href='$srLink' target='_blank'>" . $problemID . "</a>";
 
-            $processCRLink = $this->buildLink(
+            $processCRLink = Controller::buildLink(
                 'Activity.php',
                 [
                     "callActivityID" => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),

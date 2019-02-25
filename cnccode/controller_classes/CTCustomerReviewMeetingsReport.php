@@ -131,7 +131,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
             $locationString = $dbeSite->getValue(DBESite::town) . ', ' . $dbeSite->getValue(DBESite::postcode);
 
-            $customerURL = $this->buildLink(
+            $customerURL = Controller::buildLink(
                 'Customer.php',
                 [
                     'action'     => 'dispEdit',

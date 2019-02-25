@@ -1,8 +1,7 @@
 <!-- Template: CustomerEdit.inc.html -->
 <script language='JavaScript'
         src='.javascript/ajax.js'
->
-</script>
+></script>
 <style>
 
     .has-error table thead tr {
@@ -568,7 +567,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="accounts"
-                       data-except="$('#referred').prop('checked')"
+                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 />
             </div>
         </td>
@@ -579,7 +578,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="invoice"
-                       data-except="$('#referred').prop('checked')"
+                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 />
             </div>
         </td>
@@ -599,7 +598,7 @@
                        class="stmCheckBox"
                        data-validation="atLeastOneAtMostOne"
                        data-type="statement"
-                       data-except="$('#referred').prop('checked')"
+                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 />
             </div>
         </td>
@@ -608,7 +607,7 @@
                 <select name="form[contact][0][supportLevel]"
                         data-validation="atLeastOneMain"
                         data-type="mainSelector"
-                        data-except="$('#referred').prop('checked')"
+                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 >
                     <!-- BEGIN templateSupportLevelBlock -->
                     <option value="{supportLevelValue}"
@@ -635,7 +634,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="review"
-                       data-except="$('#referred').prop('checked')"
+                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 />
             </div>
         </td>
@@ -646,7 +645,7 @@
                        value="Y"
                        data-type="topUp"
                        {topUpValidation}
-                       data-except="$('#referred').prop('checked')"
+                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 />
             </div>
         </td>
@@ -665,7 +664,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="reports"
-                       data-except="$('#referred').prop('checked')"
+                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                 />
             </div>
         </td>
@@ -711,6 +710,23 @@
     </tr>
 </script>
 <script type="text/JavaScript">
+
+
+    function checkProspectFlag() {
+        const prospectFlagElm = document.getElementById('prospectFlag');
+
+        if (prospectFlagElm.checked) {
+            $('#primaryMainContactSelector').attr('required', false);
+        } else {
+            if ('{primaryMainMandatory}') {
+                $('#primaryMainContactSelector').attr('required', true);
+            }
+        }
+    }
+
+    $(function () {
+        checkProspectFlag();
+    })
 
     var isShowingInactive = {isShowingInactive};
 
@@ -826,7 +842,7 @@
 
         $(".contactSupportLevel select").change(function () {
 
-            $('.contactSupportLevel select')
+            $('.contactSupportLevel select');
             $('#primaryMainContactSelector')
         });
 
@@ -1041,8 +1057,6 @@
         $.formUtils.addValidator({
             name: 'atLeastOne',
             validatorFunction: function (value, $el, config, language, $form) {
-
-                const startOfFunction = performance.now();
                 const elementData = $el.data();
                 const dataType = elementData.type;
                 var isValid = false;
@@ -1058,9 +1072,6 @@
 
                 if (validatorData.hasOwnProperty(dataType)) {
                     // there's an initiator...we should return whatever the initiator says
-                    const case1 = performance.now();
-
-                    // console.log('validating ' + dataType + " atLeastOne took " + (case1 - startOfFunction) + " milliseconds ");
                     return validatorData[dataType];
                 }
 
@@ -1069,32 +1080,23 @@
                 var allElements = test.toArray();
 
                 var counter = 0;
-                const startFindIfValid = performance.now();
+
                 do {
                     var elm = $(allElements[counter]);
                     isValid = !!elm.prop('checked');
                     counter++;
                 } while (!isValid && counter < allElements.length);
-                // console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startFindIfValid) + " milliseconds  while trying to find it it was valid");
+
                 validatorData[dataType] = isValid;
-
-                const startValidatingOthers = performance.now();
-
                 test.each(function () {
                     const elm = $(this);
                     const isMe = elm.get(0) === $el.get(0);
                     if (!isMe) {
-                        const startOtherValidation = performance.now();
                         elm.validate(null);
-                        // console.log(" took " + (performance.now() - startOtherValidation) + " milliseconds  while calling validation of other");
                     }
                 });
 
-                // console.log('validating ' + dataType + " atLeastOne took " + (performance.now() - startValidatingOthers) + " milliseconds  while trying call validation of others");
-
                 delete validatorData[dataType];
-                const t1 = performance.now();
-                // console.log('validating ' + dataType + " atLeastOne took " + (t1 - startOfFunction) + " milliseconds (INITIATOR) ");
                 return isValid;
             },
             errorMessage: 'at least one failed',
@@ -1162,6 +1164,11 @@
                 var checkedCount = 0;
                 var except = test.data().except;
                 var exceptCondition = eval(except);
+
+                if (exceptCondition) {
+                    return true;
+                }
+
                 test.each(function () {
                     var elm = $(this);
                     var isMe = elm.get(0) === $el.get(0);
@@ -1177,9 +1184,7 @@
                 });
                 $el.data("toBeValidated", false);
 
-                if (exceptCondition) {
-                    return true;
-                }
+
                 return checkedCount > 0;
             }
         });
@@ -1415,7 +1420,7 @@
 
         // check that the selected primaryMainContact is in fact also a "main"
 
-        if ({customerID} != 0) {
+        if ({customerID} != 0 && !document.getElementById('prospectFlag').checked) {
             const primaryMainContactSelector = $('#primaryMainContactSelector');
             const value = $('#primaryMainContactSelector').val();
 
@@ -1734,6 +1739,8 @@
                                name="form[customer][{customerID}][prospectFlag]"
                                value="Y"
                                {prospectFlagChecked}
+                               id="prospectFlag"
+                               onchange="checkProspectFlag()"
                         >
                         <select {disabled}
                                 name="form[customer][{customerID}][leadStatusID]"
@@ -3122,7 +3129,7 @@
                                    {accountsFlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="accounts"
-                                   data-except="$('#referred').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
                         </div>
                     </td>
@@ -3136,7 +3143,7 @@
                                    {mailshot2FlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="invoice"
-                                   data-except="$('#referred').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
                         </div>
                     </td>
@@ -3162,7 +3169,7 @@
                                    class="stmCheckBox"
                                    data-validation="atLeastOneAtMostOne"
                                    data-type="statement"
-                                   data-except="$('#referred').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
                         </div>
                     </td>
@@ -3172,7 +3179,7 @@
                             <select name="form[contact][{contactID}][supportLevel]"
                                     data-validation="atLeastOneMain"
                                     data-type="mainSelector"
-                                    data-except="$('#referred').prop('checked')"
+                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             >
                                 <!-- BEGIN supportLevelBlock -->
                                 <option {supportLevelSelected}
@@ -3207,7 +3214,7 @@
                                    {reviewUserFlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="review"
-                                   data-except="$('#referred').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
                         </div>
                     </td>
@@ -3221,7 +3228,7 @@
                                    {mailshot8FlagChecked}
                                    data-type="topUp"
                                    {topUpValidation}
-                                   data-except="$('#referred').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
                         </div>
                     </td>
@@ -3246,7 +3253,7 @@
                                    {mailshot9FlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="reports"
-                                   data-except="$('#referred').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
                         </div>
                     </td>

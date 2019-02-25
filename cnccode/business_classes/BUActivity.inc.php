@@ -35,6 +35,7 @@ require_once($cfg ["path_dbe"] . "/DBEJUser.inc.php");
 require_once($cfg ["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEUtilityEmail.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 
 define(
@@ -123,7 +124,7 @@ class BUActivity extends Business
      */
     private $dbeCallActivitySearch = '';
     /** @var DataSet */
-    private $dsHeader;
+    public $dsHeader;
 
     /**
      * Constructor
@@ -9175,6 +9176,76 @@ is currently a balance of ';
         );
     }
 
+    /**
+     * @param $problemID
+     */
+    public function createPurchaseOrderCompletedSalesActivity($problemID)
+    {
+
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+
+        $firstActivity = $this->getFirstActivityInProblem($problemID);
+
+        $contactID = $firstActivity->getValue(DBECallActivity::contactID);
+
+        $dbeContact = new DBEContact($this);
+        $siteNo = $dbeContact->getValue(DBEContact::siteNo);
+
+
+        $dbeCallActivity = new DBECallActivity($this);
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $siteNo
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $contactID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_SALES_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(CONFIG_MYSQL_DATE)
+        );
+        $time = date('H:i');
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            $time
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $time
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            "The entire purchase order for this service request has been received"
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            USER_SYSTEM
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getValue(DBEProblem::problemID)
+        );
+
+        $dbeCallActivity->insertRow();
+        
+        $this->updatedByAnotherUser(
+            $dbeProblem,
+            $dbeCallActivity
+        );
+    }
+
 
     private function isSupportContact($value)
     {
@@ -11082,9 +11153,18 @@ is currently a balance of ';
             "O"
         );
 
-        if ($type == "newStarter") {
-            $destEmail = "salesrequeststarter@cnc-ltd.co.uk";
-        } else if ($type == "otherRequest") {
+
+        $buStandardText = new BUStandardText($this);
+
+        $dbeStandardText = new DataSet($this);
+        $buStandardText->getStandardTextByID(
+            $type,
+            $dbeStandardText
+        );
+        $destEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
+
+        if ($type != "New Starter/Office 365 License") {
+
             $problem = new DBEProblem($this);
             $problem->getRow($problemID);
 
@@ -11103,9 +11183,6 @@ is currently a balance of ';
                 $alarmDate->format('h:i')
             );
             $problem->updateRow();
-            $destEmail = "salesrequestother@cnc-ltd.co.uk";
-        } else {
-            throw new Exception('The type is not valid');
         }
 
         $this->sendSalesRequestEmail(

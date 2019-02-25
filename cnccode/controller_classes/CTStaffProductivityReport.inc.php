@@ -96,7 +96,7 @@ class CTStaffProductivityReport extends CTCNC
         $this->setPageTitle('Staff Productivity Report');
 
         $this->setTemplateFiles('StaffProductivityReport', 'StaffProductivityReport.inc');
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action' => CTCNC_ACT_DISP_CUST_POPUP,

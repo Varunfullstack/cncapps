@@ -51,7 +51,7 @@ class CTCallresolve extends CTCNC
      */
     function displayForm()
     {
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'resolveCalls'

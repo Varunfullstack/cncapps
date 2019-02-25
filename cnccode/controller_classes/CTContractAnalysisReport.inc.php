@@ -146,12 +146,12 @@ class CTContractAnalysisReport extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
@@ -228,7 +228,7 @@ class CTContractAnalysisReport extends CTCNC
             }
 
             $customerAnalysisUrl =
-                $this->buildLink(
+                Controller::buildLink(
                     'CustomerAnalysisReport.php',
                     array(
                         'searchForm[1][customerID]'     => $row['customerID'],
@@ -238,7 +238,7 @@ class CTContractAnalysisReport extends CTCNC
                 );
 
             $reportUrl =
-                $this->buildLink(
+                Controller::buildLink(
                     'ContractAnalysisReport.php',
                     array(
                         'searchForm[1][contracts]'      => $_REQUEST ['searchForm'][1]['contracts'],

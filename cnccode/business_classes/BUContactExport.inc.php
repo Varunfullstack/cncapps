@@ -101,6 +101,15 @@ class BUContactExport extends Business
                 $query .= ", 'Y' AS `Broadband Renewal`";
 
             }
+
+            if ($dsSearchForm->getValue(DBEContact::hrUser)) {
+                $query .= ", 'Y' as HR";
+            }
+
+            if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
+                $query .= ", 'Y' as review";
+            }
+
             if ($dsSearchForm->getValue('broadbandIsp')) {
                 $query .= ", '" . $dsSearchForm->getValue('broadbandIsp') . "' AS `BroadbandIsp`";
 
@@ -138,45 +147,94 @@ class BUContactExport extends Business
 
         $query .= " WHERE con_discontinued = 'N'";
 
-        if ($dsSearchForm->getValue('customerID')) {
-            $query .= " AND cus_custno =  " . $dsSearchForm->getValue('customerID');
+        if ($dsSearchForm->getValue(DBEContact::customerID)) {
+            $query .= " AND cus_custno =  " . $dsSearchForm->getValue(DBEContact::customerID);
         }
 
-        if ($dsSearchForm->getValue('prospectFlag')) {
-            $query .= " AND cus_prospect =  '" . $dsSearchForm->getValue('prospectFlag') . "'";
+        if ($dsSearchForm->getValue(DBECustomer::prospectFlag)) {
+            $query .= " AND cus_prospect =  '" . $dsSearchForm->getValue(DBECustomer::prospectFlag) . "'";
         }
-        if ($dsSearchForm->getValue('noOfServers')) {
-            $query .= " AND noOfServers >=  " . $dsSearchForm->getValue('noOfServers');
-        }
-
-        if ($dsSearchForm->getValue('noOfPCs')) {
-            $query .= " AND noOfPCs =  '" . $dsSearchForm->getValue('noOfPCs') . "'";
+        if ($dsSearchForm->getValue(DBECustomer::noOfServers)) {
+            $query .= " AND noOfServers >=  " . $dsSearchForm->getValue(DBECustomer::noOfServers);
         }
 
-        if ($dsSearchForm->getValue('sendMailshotFlag')) {
+        if ($dsSearchForm->getValue(DBECustomer::noOfPCs)) {
+            $query .= " AND noOfPCs =  '" . $dsSearchForm->getValue(DBECustomer::noOfPCs) . "'";
+        }
+
+        if ($dsSearchForm->getValue(DBEContact::sendMailshotFlag)) {
             $query .= " AND cus_mailshot =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot2Flag')) {
+        if ($dsSearchForm->getValue(DBEContact::mailshot2Flag)) {
             $query .= " AND con_mailflag2 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot3Flag')) {
+        if ($dsSearchForm->getValue(DBEContact::mailshot3Flag)) {
             $query .= " AND con_mailflag3 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot4Flag')) {
+        if ($dsSearchForm->getValue(DBEContact::mailshot4Flag)) {
             $query .= " AND con_mailflag4 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot8Flag')) {
+        if ($dsSearchForm->getValue(DBEContact::mailshot8Flag)) {
             $query .= " AND con_mailflag8 =  'Y'";
         }
-        if ($dsSearchForm->getValue('mailshot9Flag')) {
+        if ($dsSearchForm->getValue(DBEContact::mailshot9Flag)) {
             $query .= " AND con_mailflag9 =  'Y'";
         }
-        if ($dsSearchForm->getValue('supportLevel')) {
-            $query .= " AND supportLevel =  'main'";
+
+        if ($dsSearchForm->getValue(DBEContact::hrUser)) {
+            $query .= " and " . DBEContact::hrUser . " = 'Y'";
         }
+
+        if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
+            $query .= " and " . DBEContact::reviewUser . " = 'Y'";
+        }
+
         if ($dsSearchForm->getValue('broadbandRenewalFlag')) {
             $query .= " AND declinedFlag = 'N'";
         }
+
+        if ($dsSearchForm->getValue(DBEContact::supportLevel)) {
+            $selectedOptions = json_decode($dsSearchForm->getValue(DBEContact::supportLevel));
+            if (count($selectedOptions) < 5) {
+                $hasNone = false;
+                if (in_array(
+                    "",
+                    $selectedOptions
+                )) {
+                    $selectedOptions = array_slice(
+                        $selectedOptions,
+                        1
+                    );
+                    $hasNone = true;
+                }
+
+
+                if ($hasNone) {
+                    if (count($selectedOptions)) {
+                        $query .= " and ( supportLevel is null or supportLevel = '' or supportLevel in (" . implode(
+                                ",",
+                                $selectedOptions
+                            ) . ")) ";
+                    } else {
+                        $query .= " and supportLevel is null";
+                    }
+                } else {
+                    $query .= " and supportLevel in (" . implode(
+                            ",",
+                            array_map(
+                                function ($str) {
+                                    return sprintf(
+                                        "'%s'",
+                                        $str
+                                    );
+                                },
+                                $selectedOptions
+                            )
+                        ) . ")";
+                }
+            }
+        }
+
         if (
             $dsSearchForm->getValue('broadbandRenewalFlag') &&
             $dsSearchForm->getValue('broadbandIsp')
@@ -192,12 +250,22 @@ class BUContactExport extends Business
 
         if ($dsSearchForm->getValue('contractRenewalFlag') && $contractItemIDs) {
             $query .=
-                " AND cui_itemno IN (" . implode(',', $contractItemIDs) . ")";
+                " AND cui_itemno IN(
+                        " . implode(
+                    ',',
+                    $contractItemIDs
+                ) . "
+                    )";
         }
 
         if ($dsSearchForm->getValue('quotationRenewalFlag') && $quotationItemIDs) {
             $query .=
-                " AND cui_itemno IN (" . implode(',', $quotationItemIDs) . ")";
+                " AND cui_itemno IN(
+                        " . implode(
+                    ',',
+                    $quotationItemIDs
+                ) . "
+                    )";
         }
 
         if ($dsSearchForm->getValue('newCustomerFromDate')) {
@@ -222,7 +290,12 @@ class BUContactExport extends Business
 
         if ($sectorIDs) {
             $query .=
-                " AND cus_sectorno IN (" . implode(',', $sectorIDs) . ")";
+                " AND cus_sectorno IN(
+                        " . implode(
+                    ',',
+                    $sectorIDs
+                ) . "
+                    )";
         }
 
         return $this->db->query($query);
@@ -235,7 +308,9 @@ class BUContactExport extends Business
      * @param mixed $dsForm
      * @param mixed $results
      */
-    function sendEmail($dsForm, $results)
+    function sendEmail($dsForm,
+                       $results
+    )
     {
         $senderEmail = $dsForm->getValue('fromEmailAddress');
         $senderName = 'CNC';
@@ -260,7 +335,7 @@ class BUContactExport extends Business
             );
 
             // add name to top of email
-            $thisBody = '<P>' . $row['FirstName'] . ",</P>" . $body;
+            $thisBody = '<P>' . $row['FirstName'] . ",</P > " . $body;
 
             $buMail->mime->setHTMLBody($thisBody);
 

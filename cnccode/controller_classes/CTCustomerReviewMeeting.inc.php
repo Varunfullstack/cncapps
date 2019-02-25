@@ -19,6 +19,9 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 class CTCustomerReviewMeeting extends CTCNC
 {
 
+    /** @var BUCustomerReviewMeeting  */
+    private $buCustomerReviewMeeting;
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -138,7 +141,8 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP2'        => $dsCustomer->getValue(DBECustomer::slaP2),
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
                         'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
-                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5)
+                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
+                        "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
                     )
                 );
 
@@ -240,7 +244,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     $itemNo++;
 
                     $urlServiceRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'    => 'displayLastActivity',
@@ -396,7 +400,7 @@ class CTCustomerReviewMeeting extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -404,13 +408,13 @@ class CTCustomerReviewMeeting extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
 
         $urlGeneratePdf =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array(
                     'action' => 'generatePdf'
@@ -568,9 +572,12 @@ class CTCustomerReviewMeeting extends CTCNC
             'CustomerReviewMeetingAgendaDocument.inc.html'
         );
 
+
         $agendaTemplate->set_var(
-            'htmlBody',
-            $text
+            [
+                'htmlBody' => $text,
+                'URL'      => "http://" . $_SERVER['HTTP_HOST'] . '/images/test.png'
+            ]
         );
 
         $agendaTemplate->parse(
@@ -581,14 +588,13 @@ class CTCustomerReviewMeeting extends CTCNC
 
 
         $html = $agendaTemplate->get_var('output');
-
-        $result = $this->buCustomerReviewMeeting->generateAgendaPdf(
-            $_REQUEST['customerID'],
-            $html,
-            $_REQUEST['meetingDateYmd']
-        );
-
-        if (!$result) {
+        try {
+            $this->buCustomerReviewMeeting->generateAgendaPdf(
+                $_REQUEST['customerID'],
+                $html,
+                $_REQUEST['meetingDateYmd']
+            );
+        } catch (\Exception $exception) {
             return ["status" => "error", "description" => "Failed to generate files"];
         }
 
@@ -607,6 +613,12 @@ class CTCustomerReviewMeeting extends CTCNC
             $endDate,
             $_REQUEST['meetingDateYmd']
         );
+
+        $this->buCustomerReviewMeeting->generateMeetingNotes(
+            $_REQUEST['customerID'],
+            $_REQUEST['meetingDateYmd']
+        );
+
         return ["status" => "ok"];
 
 //        $this->search();  // redisplays text

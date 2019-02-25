@@ -218,6 +218,11 @@ class BUPDF extends BaseObject
     {
         $this->pageNo++;
         $this->pdf->AddPage();
+        $this->pdf->Image(
+            $GLOBALS['cfg']['cncwatermark_path'],
+            0,
+            0
+        );
         $this->setFont();
         return TRUE;
     }

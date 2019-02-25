@@ -10,6 +10,13 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESalesOrderDocumentWithoutFile extends DBEntity
 {
+
+    const salesOrderDocumentID = "salesOrderDocumentID";
+    const ordheadID = "ordheadID";
+    const description = "description";
+    const createdDate = "createdDate";
+    const createdUserID = "createdUserID";
+
     /**
      * portals constructor()
      * @access public
@@ -21,11 +28,31 @@ class DBESalesOrderDocumentWithoutFile extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("salesorder_document");
-        $this->addColumn("salesOrderDocumentID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("ordheadID", DA_ID, DA_ALLOW_NULL);
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("createdDate", DA_DATE, DA_NOT_NULL);
-        $this->addColumn("createdUserID", DA_ID, DA_NOT_NULL);
+        $this->addColumn(
+            self::salesOrderDocumentID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::ordheadID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createdDate,
+            DA_DATE,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createdUserID,
+            DA_ID,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

@@ -1,56 +1,128 @@
 <!-- Template: SalesOrderGenerateQuotes.inc.html -->
 <BR/>
-<table width="600px" border="0" cellspacing="1" cellpadding="0">
-	<tr> 
-		<td width="100%" valign="top">
-			<table class="singleBorder" width="100%" border="0" cellspacing="2" cellpadding="0">
-				<tr> 
-					<td colspan="3" valign="top" class="listHeadText"><div align="center">Quick Quote Parameters</div></td>
-				</tr>
-				<tr> 
-					<td class="promptText"><div align="right">Salutation</div></td>
-					<td colspan="2" valign="middle" class="field">
-            <input type="text" name="form[salutation]" value="{salutation}" maxlength="40" size="40"><font class="formErrorMessage">{salutationMessage}</font>
-          </td>
-        </tr>
-        <tr>
-          <td class="promptText"><div align="right">Email subject</div></td>
-          <td>
-						<input type="text" name="form[emailSubject]" value="{emailSubject}" maxlength="60" size="70">
-          </td>
-        </tr>
-        <tr>
-          <td class="promptText"><div align="right">Quote Introduction</div></td>
-          <td>
-            <textarea name="form[introduction]" cols="80" rows="3">{introduction}</textarea><font class="formErrorMessage">{introductionMessage}</font>
-          </td>
-				</tr>
+<table width="600px"
+       border="0"
+       cellspacing="1"
+       cellpadding="0"
 
-        </form>
-			</table>
-		</td>
-	</tr>
-  <tr> 
-    <td width="100%" valign="top">
-      <table class="singleBorder" width="100%" border="0" cellspacing="2" cellpadding="0">
-        <!-- </table> -->
-        <form name="manualQuoteForm" method="POST" enctype="multipart/form-data" action="{uploadQuoteDocURL}">
-          <input type="hidden" name="form[ordheadID]" value="{ordheadID}">
-          <!-- <table width="455px" border="0" cellspacing="2" cellpadding="0"> -->
-          <tr> 
-            <td colspan="4" valign="top" class="listHeadText"><div align="center">Upload 
-                Manual Quote</div></td>
-          </tr>
-          <tr> 
-            <td class="promptText">File</td>
-            <td valign="middle" class="field"> <input type="file" name="quoteFile" size="50" maxlength="50"> 
-              <font class="formErrorMessage">{quoteFileMessage}</font> </td>
-            <td><input type="submit" name="Upload" value="Upload"></td>
-            <td valign="middle" class="field">&nbsp; </td>
-          </tr>
-        </form>
-      </table>
-    </td>
-  </tr>
+    ><tr>
+        <td width="100%"
+            valign="top"
+        >
+            <table class="singleBorder"
+                   width="100%"
+                   border="0"
+                   cellspacing="2"
+                   cellpadding="0"
+            >
+                <font class="formErrorMessage">{userMessage}</font>
+                <tr>
+                    <td colspan="3"
+                        valign="top"
+                        class="listHeadText"
+                    >
+                        <div align="center">Quick Quote Parameters</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="promptText">
+                        <div align="right">Salutation</div>
+                    </td>
+                    <td colspan="2"
+                        valign="middle"
+                        class="field"
+                    >
+                        <input type="text"
+                               name="form[salutation]"
+                               value="{salutation}"
+                               maxlength="40"
+                               size="40"
+                        ><font class="formErrorMessage">{salutationMessage}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="promptText">
+                        <div align="right">Email subject</div>
+                    </td>
+                    <td>
+                        <input type="text"
+                               name="form[emailSubject]"
+                               value="{emailSubject}"
+                               maxlength="60"
+                               size="70"
+                        id="emailSubject">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="promptText">
+                        <div align="right">Quote Introduction</div>
+                    </td>
+                    <td>
+                        <textarea name="form[introduction]"
+                                  cols="80"
+                                  rows="3"
+                        >{introduction}</textarea><font class="formErrorMessage">{introductionMessage}</font>
+                    </td>
+                </tr>
+
+                </form>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td width="100%"
+            valign="top"
+        >
+            <table class="singleBorder"
+                   width="100%"
+                   border="0"
+                   cellspacing="2"
+                   cellpadding="0"
+            >
+                <!-- </table> -->
+                <form name="manualQuoteForm"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      action="{uploadQuoteDocURL}"
+                >
+                    <input type="hidden"
+                           name="form[ordheadID]"
+                           value="{ordheadID}"
+                    >
+                    <!-- <table width="455px" border="0" cellspacing="2" cellpadding="0"> -->
+                    <tr>
+                        <td colspan="4"
+                            valign="top"
+                            class="listHeadText"
+                        >
+                            <div align="center">
+                                Upload Manual Quote
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="promptText">File</td>
+                        <td valign="middle"
+                            class="field"
+                        ><input type="file"
+                                name="quoteFile"
+                                size="50"
+                                maxlength="50"
+                        >
+                            <font class="formErrorMessage">{quoteFileMessage}</font>
+                        </td>
+                        <td><input type="submit"
+                                   name="Upload"
+                                   value="Upload"
+                        ></td>
+                        <td valign="middle"
+                            class="field"
+                        >&nbsp;
+                        </td>
+                    </tr>
+                </form>
+            </table>
+        </td>
+    </tr>
 </table>
 <!-- End Template: SalesOrderGenerateQuotes.inc.html -->

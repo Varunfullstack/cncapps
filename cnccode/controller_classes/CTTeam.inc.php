@@ -82,7 +82,7 @@ class CTTEAM extends CTCNC
         $teams = $this->buTeam->getAll();
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTTEAM_ACT_CREATE
@@ -106,7 +106,7 @@ class CTTEAM extends CTCNC
                 $teamID = $team['teamID'];
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTTEAM_ACT_EDIT,
@@ -117,7 +117,7 @@ class CTTEAM extends CTCNC
 
                 if ($this->buTeam->canDelete($teamID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action' => CTTEAM_ACT_DELETE,
@@ -173,7 +173,7 @@ class CTTEAM extends CTCNC
         }
         if ($_REQUEST['action'] == CTTEAM_ACT_EDIT && $this->buTeam->canDelete($_REQUEST['teamID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTTEAM_ACT_DELETE,
@@ -186,7 +186,7 @@ class CTTEAM extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTTEAM_ACT_UPDATE,
@@ -194,7 +194,7 @@ class CTTEAM extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTTEAM_ACT_DISPLAY_LIST
@@ -258,7 +258,7 @@ class CTTEAM extends CTCNC
         $this->buTeam->updateTeam($this->dsTeam);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'teamID' => $this->dsTeam->getValue('teamID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -275,7 +275,7 @@ class CTTEAM extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTTEAM_ACT_DISPLAY_LIST

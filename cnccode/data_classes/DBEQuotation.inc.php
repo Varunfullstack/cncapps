@@ -7,6 +7,17 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEQuotation extends DBEntity
 {
+
+    const quotationID = "quotationID";
+    const ordheadID = "ordheadID";
+    const versionNo = "versionNo";
+    const salutation = "salutation";
+    const emailSubject = "emailSubject";
+    const sentDateTime = "sentDateTime";
+    const userID = "userID";
+    const fileExtension = "fileExtension";
+    const documentType = "documentType";
+
     /**
      * calls constructor()
      * @access public
@@ -16,15 +27,51 @@ class DBEQuotation extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("quotation");
-        $this->addColumn("quotationID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("ordheadID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("versionNo", DA_INTEGER, DA_NOT_NULL);
-        $this->addColumn("salutation", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("emailSubject", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("sentDateTime", DA_DATETIME, DA_NOT_NULL);
-        $this->addColumn("userID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("fileExtension", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("documentType", DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(
+            self::quotationID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::ordheadID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::versionNo,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::salutation,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::emailSubject,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::sentDateTime,
+            DA_DATETIME,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::userID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::fileExtension,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::documentType,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -54,7 +101,9 @@ class DBEQuotation extends DBEntity
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
-            'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID')
+            'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName(
+                'ordheadID'
+            ) . ' = ' . $this->getValue('ordheadID')
         );
         return (parent::runQuery());
     }

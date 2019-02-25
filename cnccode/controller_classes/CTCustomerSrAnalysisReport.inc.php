@@ -144,7 +144,7 @@ class CTCustomerSrAnalysisReport extends CTCNC
             'ServiceRequestReport',
             'ServiceRequestReport.inc'
         );
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,

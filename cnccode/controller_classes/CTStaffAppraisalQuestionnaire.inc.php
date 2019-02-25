@@ -173,7 +173,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->buQuestionnaire->getAll($dsQuestionnaire);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'create'
@@ -197,7 +197,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
 
                 $urlDisplayQuestionList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'          => 'displayQuestionList',
@@ -205,7 +205,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                         )
                     );
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'          => 'edit',
@@ -214,7 +214,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     );
                 $txtEdit = '[edit]';
 
-                $sendURL = $this->buildLink(
+                $sendURL = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
                         'action'          => 'sendQuestionnaire',
@@ -229,7 +229,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
                 if ($this->buQuestionnaire->canDelete($questionnaireID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'          => 'delete',
@@ -268,7 +268,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         }
 
-        $sendURL = $this->buildLink(
+        $sendURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'sendQuestionnaire',
@@ -318,7 +318,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         }
         if ($_REQUEST['action'] == 'edit' && $this->buQuestionnaire->canDelete($_REQUEST['questionnaireID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'          => 'delete',
@@ -331,7 +331,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'update',
@@ -339,7 +339,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'displayList'
@@ -402,7 +402,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'questionnaireID' => $this->dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id),
@@ -426,7 +426,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'displayList'
@@ -461,7 +461,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->setPageTitle($dsQuestionnaire->getValue('description'));
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'createQuestion',
@@ -487,7 +487,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'editQuestion',
@@ -498,7 +498,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
                 if ($this->buQuestionnaire->canDelete($questionID)) {
                     $urlDelete =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'     => 'delete',
@@ -592,7 +592,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->buQuestionnaire->canDelete($_REQUEST['questionID'])
         ) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'deleteQuestion',
@@ -605,7 +605,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'updateQuestion',
@@ -613,7 +613,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'displayQuestionList',
@@ -747,7 +747,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->buQuestionnaire->updateQuestion($this->dsQuestion);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'questionnaireID' => $this->dsQuestion->getValue('questionnaireID'),
@@ -771,7 +771,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'displayQuestionList'
@@ -868,7 +868,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     DBEStaffAppraisalQuestionnaireAnswer::managerComments
                 ),
                 "encryptedSalary"          => $staffMember->getValue(DBEUser::encryptedSalary),
-                "completeQuestionnaireURL" => $this->buildLink(
+                "completeQuestionnaireURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'completeQuestionnaire'
@@ -921,7 +921,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->template->setVar(
             [
                 "questions"                => $questionsBody,
-                "autoSaveQuestionnaireURL" => $this->buildLink(
+                "autoSaveQuestionnaireURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'autoSave'
@@ -1066,7 +1066,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                     DBEUser::jobTitle
                 ),
                 "displayManager"           => "style='display: none'",
-                "completeQuestionnaireURL" => $this->buildLink(
+                "completeQuestionnaireURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'completeQuestionnaire'
@@ -1109,7 +1109,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->template->setVar(
             [
                 "questions"                => $questionsBody,
-                "autoSaveQuestionnaireURL" => $this->buildLink(
+                "autoSaveQuestionnaireURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'autoSave'
@@ -1780,7 +1780,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $subject = "Staff Appraisal";
 
-            $appraisalURL = $this->buildLink(
+            $appraisalURL = Controller::buildLink(
                 'http://cncapps/staffAppraisalQuestionnaire.php',
                 [
                     "action"          => "employeeAnswer",
@@ -1889,7 +1889,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 DBEUser::firstName
             ) . " " . $staffMember->getValue(DBEUser::lastName);
 
-        $appraisalURL = $this->buildLink(
+        $appraisalURL = Controller::buildLink(
             'http://cncapps/staffAppraisalQuestionnaire.php',
             [
                 "action"          => "managerAnswer",

@@ -263,16 +263,16 @@ class CTCustomerItem extends CTCNC
 
 // Parameters
         $this->setPageTitle("Customer Items");
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-        $urlCreate = $this->buildLink(
+        $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMERITEM_ACT_ADD)
         );
         $customerPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -468,7 +468,7 @@ class CTCustomerItem extends CTCNC
         switch ($dsCustomerItem->getValue('renewalTypeID')) {
             case CONFIG_BROADBAND_RENEWAL_TYPE_ID:
                 $urlItem =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'RenBroadband.php',
                         array(
                             'action' => 'edit',
@@ -478,7 +478,7 @@ class CTCustomerItem extends CTCNC
                 break;
             case CONFIG_CONTRACT_RENEWAL_TYPE_ID:
                 $urlItem =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'RenContract.php',
                         array(
                             'action' => 'edit',
@@ -488,7 +488,7 @@ class CTCustomerItem extends CTCNC
                 break;
             case CONFIG_QUOTATION_RENEWAL_TYPE_ID:
                 $urlItem =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'RenQuotation.php',
                         array(
                             'action' => 'edit',
@@ -498,7 +498,7 @@ class CTCustomerItem extends CTCNC
                 break;
             case CONFIG_DOMAIN_RENEWAL_TYPE_ID:
                 $urlItem =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'RenDomain.php',
                         array(
                             'action' => 'edit',
@@ -508,7 +508,7 @@ class CTCustomerItem extends CTCNC
                 break;
             case CONFIG_HOSTING_RENEWAL_TYPE_ID:
                 $urlItem =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'RenHosting.php',
                         array(
                             'action' => 'edit',
@@ -518,7 +518,7 @@ class CTCustomerItem extends CTCNC
                 break;
             default:
                 $urlItem =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => CTCUSTOMERITEM_ACT_DISPLAY,
@@ -758,7 +758,7 @@ class CTCustomerItem extends CTCNC
 
         if ($_REQUEST['action'] == CTCUSTOMERITEM_ACT_ADD) {
             $urlSubmit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCUSTOMERITEM_ACT_INSERT
@@ -766,7 +766,7 @@ class CTCustomerItem extends CTCNC
                 );
         } else {
             $urlSubmit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCUSTOMERITEM_ACT_UPDATE
@@ -774,14 +774,14 @@ class CTCustomerItem extends CTCNC
                 );
         }
         $urlContractPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMERITEM_ACT_CONTRACT_POPUP
                 )
             );
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -789,7 +789,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -797,7 +797,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -806,7 +806,7 @@ class CTCustomerItem extends CTCNC
             );
 
         $urlPrintContract =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTCUSTOMERITEM_ACT_PRINT_CONTRACT,
@@ -825,7 +825,7 @@ class CTCustomerItem extends CTCNC
         if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
             if ($buCustomerItem->canDelete($customerItemID)) {
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => CTCUSTOMERITEM_ACT_DELETE,
@@ -841,7 +841,7 @@ class CTCustomerItem extends CTCNC
             }
         }
         $urlSiteEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_EDIT,
@@ -849,7 +849,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlSitePopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_POPUP,
@@ -1109,7 +1109,7 @@ class CTCustomerItem extends CTCNC
             );
 
             $addSecondsiteImageURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'SecondSite.php',
                     array(
                         'action'         => 'add',
@@ -1133,7 +1133,7 @@ class CTCustomerItem extends CTCNC
             while ($dsSecondsiteImage->fetchNext()) {
 
                 $deleteSecondsiteImageLink =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'SecondSite.php',
                         array(
                             'action'            => 'delete',
@@ -1143,7 +1143,7 @@ class CTCustomerItem extends CTCNC
                 $deleteSecondsiteImageText = 'delete';
 
                 $editSecondsiteImageLink =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'SecondSite.php',
                         array(
                             'action'            => 'edit',
@@ -1216,7 +1216,7 @@ class CTCustomerItem extends CTCNC
             );
 
             $urlUploadFile =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTCUSTOMERITEM_ACT_UPLOAD_DOCUMENT,
@@ -1242,7 +1242,7 @@ class CTCustomerItem extends CTCNC
             $dbeJCustomerItemDocument->getRowsByColumn('customerItemID');
             while ($dbeJCustomerItemDocument->fetchNext()) {
                 $urlViewFile =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'                 => CTCUSTOMERITEM_ACT_VIEW_DOCUMENT,
@@ -1250,7 +1250,7 @@ class CTCustomerItem extends CTCNC
                         )
                     );
                 $urlDeleteFile =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'                 => CTCUSTOMERITEM_ACT_DELETE_DOCUMENT,
@@ -1307,7 +1307,7 @@ class CTCustomerItem extends CTCNC
 
 
         $urlSubmit =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMERITEM_ACT_INSERT
@@ -1316,7 +1316,7 @@ class CTCustomerItem extends CTCNC
 
 
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -1324,7 +1324,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -1332,7 +1332,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -1340,7 +1340,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlSiteEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_EDIT,
@@ -1348,7 +1348,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
         $urlSitePopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_POPUP,
@@ -1397,7 +1397,7 @@ class CTCustomerItem extends CTCNC
     function redirectToDisplay($customerItemID)
     {
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'customerItemID' => $customerItemID,
@@ -1527,7 +1527,7 @@ class CTCustomerItem extends CTCNC
 
         $this->dsCustomerItem->initialise();
         // this forces update of itemID back through Javascript to parent HTML window
-        $urlNext = $this->buildLink(
+        $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'         => CTCUSTOMERITEM_ACT_DISPLAY,
@@ -1542,7 +1542,7 @@ class CTCustomerItem extends CTCNC
         $this->setMethodName('delete');
         if ($this->buCustomerItem->canDelete($_REQUEST['customerItemID'])) {
             $this->buCustomerItem->deleteCustomerItem($_REQUEST['customerItemID']);
-            $urlNext = $this->buildLink(
+            $urlNext = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCUSTOMERITEM_ACT_SEARCH
@@ -1575,7 +1575,7 @@ class CTCustomerItem extends CTCNC
             $this->getFile();
         }
         $urlFile =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'                 => CTACTIVITY_ACT_GET_DOCUMENT,

@@ -82,8 +82,19 @@ class CTItemsNotYetReceived extends CTCNC
             $purchaseOrderLink = "/PurchaseOrder.php?action=display&porheadID=" . $item->getPurchaseOrderId();
             $style = "class='" . $item->color() . "'";
 
+            $serviceRequestURL = Controller::buildLink(
+                'Activity.php',
+                [
+                    'action'    => 'displayLastActivity',
+                    'problemID' => $item->getServiceRequestID()
+                ]
+            );
+
+            $serviceRequestLink = "<a href='" . $serviceRequestURL . "' target='_blank'>" . $item->getServiceRequestID(
+                ) . "</a>";
+
             $salesOrderURL =
-                $this->buildLink(
+                Controller::buildLink(
                     "SalesOrder.php",
                     [
                         "action"    => "displaySalesOrder",
@@ -91,14 +102,14 @@ class CTItemsNotYetReceived extends CTCNC
                     ]
                 );
 
-            $salesOrderLink = "<a href='" . $salesOrderURL . "'>" . $item->getSalesOrderId() . "</a>";
+            $salesOrderLink = "<a href='" . $salesOrderURL . "' target='_blank'>" . $item->getSalesOrderId() . "</a>";
 
             $projectLink = "";
 
             if ($item->getProjectID()) {
 
                 $projectURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         "Project.php",
                         [
                             "projectID" => $item->getProjectID(),
@@ -107,7 +118,7 @@ class CTItemsNotYetReceived extends CTCNC
 
                     );
 
-                $projectLink = "<a href='" . $projectURL . "'>" . $item->getProjectName() . "</a>";
+                $projectLink = "<a href='" . $projectURL . "' target='_blank'>" . $item->getProjectName() . "</a>";
             }
 
 
@@ -126,7 +137,8 @@ class CTItemsNotYetReceived extends CTCNC
                     "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
                     "supplierRef"       => $item->getSupplierRef(),
                     "projectLink"       => $projectLink,
-                    "salesOrderLink"    => $salesOrderLink
+                    "salesOrderLink"    => $salesOrderLink,
+                    "SRLink"            => $serviceRequestLink
                 ]
             );
 

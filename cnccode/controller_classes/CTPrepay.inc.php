@@ -60,14 +60,14 @@ class CTPrepay extends CTCNC
     function exportForm($dsResults = false)
     {
         $this->setMethodName('exportForm');
-        $urlPreview = $this->buildLink(
+        $urlPreview = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'exportGenerate',
                 'update' => 0
             )
         );
-        $urlExport = $this->buildLink(
+        $urlExport = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'exportGenerate',
@@ -94,7 +94,7 @@ class CTPrepay extends CTCNC
             $this->template->set_block('PrepayExport', 'resultBlock', 'results');
             while ($dsResults->fetchNext()) {
                 $urlStatement =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTACTIVITY_ACT_EDIT_CALL,

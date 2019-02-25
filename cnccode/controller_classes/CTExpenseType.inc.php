@@ -75,7 +75,7 @@ class CTExpenseType extends CTCNC
         $this->buExpenseType->getAllTypes($dsExpenseType);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTEXPENSETYPE_ACT_CREATE
@@ -91,7 +91,7 @@ class CTExpenseType extends CTCNC
             while ($dsExpenseType->fetchNext()) {
                 $expenseTypeID = $dsExpenseType->getValue('expenseTypeID');
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTEXPENSETYPE_ACT_EDIT,
@@ -101,7 +101,7 @@ class CTExpenseType extends CTCNC
                 $txtEdit = '[edit]';
                 /*
                                 $urlDelete =
-                                    $this->buildLink(
+                                    Controller::buildLink(
                                         $_SERVER['PHP_SELF'],
                                         array(
                                             'action'				=>	CTEXPENSETYPE_ACT_DELETE,
@@ -152,7 +152,7 @@ class CTExpenseType extends CTCNC
         }
         if ($_REQUEST['action'] == CTEXPENSETYPE_ACT_EDIT && $this->buExpenseType->canDeleteExpenseType($_REQUEST['expenseTypeID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTEXPENSETYPE_ACT_DELETE,
@@ -165,7 +165,7 @@ class CTExpenseType extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTEXPENSETYPE_ACT_UPDATE,
@@ -173,7 +173,7 @@ class CTExpenseType extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
@@ -223,7 +223,7 @@ class CTExpenseType extends CTCNC
         $this->buExpenseType->updateExpenseType($this->dsExpenseType);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'expenseTypeID' => $this->dsExpenseType->getValue('expenseTypeID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -246,7 +246,7 @@ class CTExpenseType extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST

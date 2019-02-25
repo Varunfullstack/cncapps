@@ -1,6 +1,15 @@
 <?php
 date_default_timezone_set('Europe/London');
+require_once(__DIR__ . '/../../openWebAnalytics/owa_php.php');
 
+$owa = new owa_php();
+// Set the site id you want to track
+$owa->setSiteId('b39a0f923d7f45bec2ccb7fa0435f82c');
+// Uncomment the next line to set your page title
+//$owa->setPageTitle('somepagetitle');
+// Set other page properties
+//$owa->setProperty('foo', 'bar');
+$owa->trackPageView();
 ini_set(
     'memory_limit',
     '8192M'
@@ -794,6 +803,11 @@ define(
 );
 
 define(
+    'CONFIG_STANDARD_TEXT_TYPE_SALES_REQUEST',
+    5
+);
+
+define(
     'CONFIG_DEFAULT_MEETING_USERID',
     44
 ); // for use on the client information form (Graham)
@@ -1031,6 +1045,7 @@ $cfg["txt_chevron"] = "&gt;";
 // System paths and URLs
 $cfg["cnclogo_path"] = IMAGES_DIR . '/cnc_logo.png';
 $cfg["cncaddress_path"] = IMAGES_DIR . '/cncaddress.gif';
+$cfg["cncwatermark_path"] = IMAGES_DIR . '/CNC_watermarkActualSize.png';
 
 $cfg["php_extension"] = ".php";
 $cfg["html_extension"] = ".html";

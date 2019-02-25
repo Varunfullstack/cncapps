@@ -123,7 +123,7 @@ class CTExternalItem extends CTCNC
                 $_REQUEST['externalItemID']
             )) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CREXTERNALITEM_ACT_DELETE,
@@ -136,7 +136,7 @@ class CTExternalItem extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CREXTERNALITEM_ACT_UPDATE,
@@ -144,7 +144,7 @@ class CTExternalItem extends CTCNC
                 )
             );
         $urlDisplayCustomer =
-            $this->buildLink(
+            Controller::buildLink(
                 'RenewalReport.php',
                 array(
                     'customerID' => $this->dsExternalItem->getValue('customerID'),
@@ -210,7 +210,7 @@ class CTExternalItem extends CTCNC
         $this->buExternalItem->updateExternalItem($this->dsExternalItem);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'RenewalReport.php',
                 array(
                     'customerID' => $this->dsExternalItem->getValue('customerID'),
@@ -240,7 +240,7 @@ class CTExternalItem extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'RenewalReport.php',
                     array(
                         'customerID' => $dsExternalItem->getValue('customerID'),

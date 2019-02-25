@@ -205,7 +205,9 @@ class BUCustomerAnalysisReport extends Business
             $searchForm->getValue('endYearMonth')
         )->modify('last day of this month');
 
-        $numberOfMonths = $startDate->diff($endDate)->m + ($startDate->diff($endDate)->y * 12);
+        $diff = $startDate->diff($endDate);
+
+        $numberOfMonths = round($diff->days/30);
 
         $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
 

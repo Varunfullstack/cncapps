@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1548845244-0">
+        <tagDatabase tag="issue448"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_desc = "Sales Request"
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into standardtexttype values ((select max(sty_standardtexttypeno) + 1 from standardtexttype
+            alias),"Sales Request", null)
+        </sql>
+        <rollback>
+            delete from standardtexttype where sty_desc = "Sales Request"
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-2">
+        <preConditions>
+            <not>
+                <columnExists tableName="standardtext" columnName="salesRequestEmail"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="standardtext">
+            <column name="salesRequestEmail" type="varchar(100)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-3">
+        <preConditions onFail="WARN">
+            <columnExists tableName="standardtext" columnName="salesRequestEmail"/>
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) > 0 FROM standardtexttype WHERE sty_desc = "Sales Request"
+            </sqlCheck>
+        </preConditions>
+        <sql splitStatements="true">
+            <![CDATA[
+            insert into standardtext values ((select max(stt_standardtextno) + 1 from standardtext alias),1,"New Starter/Office 365 License","<table><tbody><tr><td>License Required</td><td></td></tr><tr><td>Quantity</td><td></td></tr><tr><td>Approved By Customer?</td><td></td></tr><tr><td>Installation Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>", (SELECT sty_standardtexttypeno FROM standardtexttype WHERE sty_desc = "Sales Request"), "salesrequeststarter@cnc-ltd.co.uk");
+            insert into standardtext values ((select max(stt_standardtextno) + 1 from standardtext alias),2,"Other Request","<table><tbody><tr><td>Reason for request</td><td></td></tr><tr><td>Software/hardware required</td><td></td></tr><tr><td>Time Needed (hours)</td><td></td></tr><tr><td>Other Information</td><td></td></tr></tbody></table>",(SELECT sty_standardtexttypeno FROM standardtexttype WHERE sty_desc = "Sales Request"),"salesrequestother@cnc-ltd.co.uk");
+            update db_sequence set nextid = (select  max(stt_standardtextno) from standardtext) where seq_name = "standardtext";
+            update standardtexttype set sty_desc = "Service Request from Sales Order" where sty_standardtexttypeno = 3;
+        ]]>
+        </sql>
+        <rollback>
+            <sql splitStatements="true">
+                <![CDATA[
+            delete from standardtexttype where sty_desc = "Sales Request";
+            delete from standardtext where stt_desc in ("New Starter/Office 365 License", "Other Request");
+            update db_sequence set nextid = (select  max(stt_standardtextno) from standardtext) where seq_name = "standardtext";
+            update standardtexttype set sty_desc = "Sales Order Request" where sty_standardtexttypeno = 3;
+        ]]>
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1548845244-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="standardtext" columnName="stt_sort_order"/>
+        </preConditions>
+        <dropColumn tableName="standardtext" columnName="stt_sort_order"/>
+        <rollback>
+            <addColumn tableName="standardtext">
+                <column name="stt_sort_order" type="int(1) unsigned"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

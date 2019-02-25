@@ -254,7 +254,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
             $rowCount++;
             $urlViewActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'displayLastActivity',
@@ -298,7 +298,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             /* ------------------------------ */
 
             $urlCustomer =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'     => 'search',
@@ -484,7 +484,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $rowCount++;
 
             $urlCustomer =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'     => 'search',

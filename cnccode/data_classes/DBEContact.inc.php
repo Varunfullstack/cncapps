@@ -680,7 +680,8 @@ class DBEContact extends DBCNCEntity
         $sql = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::supportLevel) .
-            " is not null AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+            " is not null  and " . $this->getDBColumnName(self::supportLevel) . " <> ''      
+            AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
 
         if ($customerID) {
             $sql .= " AND con_custno = " . $customerID;
@@ -920,14 +921,16 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
-    public function getReviewContacts($getValue)
+    public function getReviewContacts($customerID)
     {
         $this->setMethodName("getReviewContacts");
 
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where specialAttentionContactFlag = 'Y'
+            " where " . $this->getDBColumnName(DBEContact::reviewUser) . " = 'Y' and " . $this->getDBColumnName(
+                DBEContact::customerID
+            ) . " = $customerID
       ORDER BY con_custno, con_contno";
 
         $this->setQueryString($queryString);
