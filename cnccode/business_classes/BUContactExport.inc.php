@@ -195,42 +195,46 @@ class BUContactExport extends Business
 
         if ($dsSearchForm->getValue(DBEContact::supportLevel)) {
             $selectedOptions = json_decode($dsSearchForm->getValue(DBEContact::supportLevel));
-            $hasNone = false;
-            if (in_array(
-                "",
-                $selectedOptions
-            )) {
-                $selectedOptions = array_slice(
-                    $selectedOptions,
-                    1
-                );
-                $hasNone = true;
-            }
-
-
-            if ($hasNone) {
-                if (count($selectedOptions)) {
-                    $query .= " and ( supportLevel is null or supportLevel in (" . implode(
-                            ",",
-                            $selectedOptions
-                        ) . ")) ";
-                } else {
-                    $query .= " and supportLevel is null";
+            if (count($selectedOptions) < 5) {
+                $hasNone = false;
+                if (in_array(
+                    "",
+                    $selectedOptions
+                )) {
+                    $selectedOptions = array_slice(
+                        $selectedOptions,
+                        1
+                    );
+                    $hasNone = true;
                 }
-            } else {
-                $query .= " and supportLevel in (" . implode(
-                        ",",
-                        array_map(
-                            function ($str) {
-                                return sprintf(
-                                    "'%s'",
-                                    $str
-                                );
-                            },
-                            $selectedOptions
-                        )
-                    ) . ")";
+
+
+                if ($hasNone) {
+                    if (count($selectedOptions)) {
+                        $query .= " and ( supportLevel is null or supportLevel = '' or supportLevel in (" . implode(
+                                ",",
+                                $selectedOptions
+                            ) . ")) ";
+                    } else {
+                        $query .= " and supportLevel is null";
+                    }
+                } else {
+                    $query .= " and supportLevel in (" . implode(
+                            ",",
+                            array_map(
+                                function ($str) {
+                                    return sprintf(
+                                        "'%s'",
+                                        $str
+                                    );
+                                },
+                                $selectedOptions
+                            )
+                        ) . ")";
+                }
             }
+
+            var_dump($query);
         }
 
         if (

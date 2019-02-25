@@ -135,6 +135,19 @@ class CTRenQuotation extends CTCNC
             array('RenQuotationList' => 'RenQuotationList.inc')
         );
 
+        if (!isset($_REQUEST['orderBy'])) {
+            header(
+                'Location: ' . Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'         => 'list',
+                        'orderBy'        => 'customerName',
+                        'orderDirection' => 'asc'
+                    )
+                )
+            );
+        }
+
         $this->buRenQuotation->getAll(
             $dsRenQuotation,
             $_REQUEST['orderBy']

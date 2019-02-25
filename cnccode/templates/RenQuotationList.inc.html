@@ -3,55 +3,81 @@
         src="CommonJS.js"
 >
 </script>
+<script>
+
+    $(function () {
+        $('#theTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            columnDefs: [
+                {type: "date-eu", targets: [3, 4]}
+            ],
+            paging: false,
+            order: [
+                [0, 'asc'],
+            ]
+        });
+    })
+
+</script>
 
 
 <table class="singleBorder"
+       id="theTable"
        width="600"
        border="0"
        cellspacing="1"
        cellpadding="2"
 >
+    <thead>
     <tr>
         <td width="300"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=cus_name">Customer</a>
+            Customer
         </td>
         <td width="200"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=itm_desc">Item</a>
+            Item
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=ordheadID">Sales Order</a>
+            Sales Order
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a>
+            Invoice From
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=nextPeriodEndDateYMD">Expiry Date</a>
+            Expiry Date
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=custitem.itemNotes">Comments</a>
+            Comments
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=latestQuoteSent">Latest Quote Sent</a>
+            Latest Quote Sent
         </td>
         <td width="50"
             class="listHeadText"
         >&nbsp;
         </td>
     </tr>
+    </thead>
+    <tbody>
     <!-- BEGIN rowBlock -->
     <tr valign="top"
         onMouseOver="this.style.backgroundColor ='#ffffcc';"
@@ -68,10 +94,10 @@
             <DIV align="left">{salesOrderLink}</div>
         </td>
         <td class="orderLineItem">
-            <DIV align="left">{startDate}</div>
+            {startDate}
         </td>
         <td class="orderLineItem">
-            <DIV align="left">{nextPeriodStartDate}</div>
+            {nextPeriodStartDate}
         </td>
         <td class="orderLineItem">
             <DIV align="left">{comments}</div>
@@ -91,5 +117,6 @@
         </td>
     </tr>
     <!-- END rowBlock -->
+    </tbody>
 </table>
 <!-- End Template: RenQuotationList.inc.html -->

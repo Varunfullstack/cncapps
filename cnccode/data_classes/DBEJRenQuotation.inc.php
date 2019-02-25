@@ -135,7 +135,9 @@ class DBEJRenQuotation extends DBECustomerItem
         $ret = (parent::getRow());
     }
 
-    function getRows($orderBy = false)
+    function getRows($orderBy = false,
+                     $orderAscending = true
+    )
     {
 
         $statement =
@@ -152,11 +154,10 @@ class DBEJRenQuotation extends DBECustomerItem
 
         if ($orderBy) {
             $statement .= " ORDER BY $orderBy";
+            $statement .= $orderAscending ? ' asc' : ' desc';
         } else {
             $statement .= " ORDER BY cus_name";
-
         }
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
