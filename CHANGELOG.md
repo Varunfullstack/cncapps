@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 484 - Improve Password generation functionality
+
 ## [v2.1.4] - 2019-02-20
 ### Fixed
 - Fixed Invalid character in customer email
