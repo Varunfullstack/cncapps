@@ -342,7 +342,7 @@ class CTCNC extends Controller
         global $userName;
 
 
-        $urlLogout = $this->buildLink(
+        $urlLogout = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_LOGOUT)
         );

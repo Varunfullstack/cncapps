@@ -98,7 +98,7 @@ class CTExpense extends CTCNC
         $expenseID = $this->buExpense->createExpenseFromCallActivityID($_REQUEST['callActivityID']);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'expenseID' => $expenseID,
                                  'action' => CTEXPENSE_ACT_EDIT_EXPENSE
@@ -128,7 +128,7 @@ class CTExpense extends CTCNC
         $buActivity->getActivityByID($_REQUEST['callActivityID'], $dsCallActivity);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTEXPENSE_ACT_CREATE_EXPENSE,
@@ -137,7 +137,7 @@ class CTExpense extends CTCNC
             );
 
         $urlCallActivity =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action' => 'displayActivity',
@@ -166,7 +166,7 @@ class CTExpense extends CTCNC
             while ($dsExpense->fetchNext()) {
                 $expenseID = $dsExpense->getValue('expenseID');
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTEXPENSE_ACT_EDIT_EXPENSE,
@@ -175,7 +175,7 @@ class CTExpense extends CTCNC
                     );
                 $txtEdit = '[edit]';
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTEXPENSE_ACT_DELETE_EXPENSE,
@@ -228,7 +228,7 @@ class CTExpense extends CTCNC
         $buActivity = new BUActivity($this);
         $buActivity->getActivityByID($callActivityID, $dsCallActivity);
         $urlUpdateExpense =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTEXPENSE_ACT_UPDATE_EXPENSE,
@@ -236,7 +236,7 @@ class CTExpense extends CTCNC
                 )
             );
         $urlDisplayExpenses =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCNC_ACT_VIEW,
@@ -305,7 +305,7 @@ class CTExpense extends CTCNC
         $this->buExpense->updateExpense($this->dsExpense);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'callActivityID' => $this->dsExpense->getValue('callActivityID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -332,7 +332,7 @@ class CTExpense extends CTCNC
             $callActivityID = $this->buExpense->deleteExpense($_REQUEST['expenseID']);
         }
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCNC_ACT_VIEW,
@@ -348,7 +348,7 @@ class CTExpense extends CTCNC
      */
     function exportExpenseForm()
     {
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTEXPENSE_ACT_EXPORT_GENERATE

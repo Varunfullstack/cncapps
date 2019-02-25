@@ -232,7 +232,7 @@ class CTProject extends CTCNC
         }
         if ($_REQUEST['action'] == CTPROJECT_ACT_EDIT && $this->buProject->canDelete($_REQUEST['projectID'])) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTPROJECT_ACT_DELETE,
@@ -245,7 +245,7 @@ class CTProject extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTPROJECT_ACT_UPDATE,
@@ -253,7 +253,7 @@ class CTProject extends CTCNC
                 )
             );
         $urlDisplayCustomer =
-            $this->buildLink(
+            Controller::buildLink(
                 'Customer.php',
                 array(
                     'customerID' => $this->dsProject->getValue(DBEProject::customerID),
@@ -290,7 +290,7 @@ class CTProject extends CTCNC
         }
 
 
-        $historyPopupURL = $this->buildLink(
+        $historyPopupURL = Controller::buildLink(
             'Project.php',
             array(
                 'action'    => 'historyPopup',
@@ -311,7 +311,7 @@ class CTProject extends CTCNC
                 $problemID = $buSalesOrder->getLinkedServiceRequestID($dsProject->getValue(DBEProject::ordHeadID));
 
                 $urlServiceRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'action'    => 'displayFirstActivity',
@@ -323,7 +323,7 @@ class CTProject extends CTCNC
 
             } else {     // many SRs so display search page
                 $urlServiceRequest =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Activity.php',
                         array(
                             'action'             => 'search',
@@ -338,7 +338,7 @@ class CTProject extends CTCNC
 
 
         $urlLinkedSalesOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 'Project.php',
                 array(
                     'action'    => 'editLinkedSalesOrder',
@@ -347,7 +347,7 @@ class CTProject extends CTCNC
                 )
             );
 
-        $uploadProjectPlanURL = $this->buildLink(
+        $uploadProjectPlanURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action'    => self::UPLOAD_PROJECT_PLAN,
@@ -358,7 +358,7 @@ class CTProject extends CTCNC
         $hasProjectPlan = !!$dsProject->getValue(DBEProject::planFileName);
 
         $projectPlanDownloadURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 [
                     'action'    => self::DOWNLOAD_PROJECT_PLAN,
@@ -371,7 +371,7 @@ class CTProject extends CTCNC
         $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
 
         $projectCalculateBudgetURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 [
                     'action'    => self::CALCULATE_BUDGET,
@@ -398,7 +398,7 @@ class CTProject extends CTCNC
             $projectCalculateBudgetLink = "<a  $projectCalculateBudgetURL  $projectCalculateBudgetClass $projectCalculateBudgetLinkClick>Calculate Budget</a>";
         }
 
-        $fetchProjectDataURL = $this->buildLink(
+        $fetchProjectDataURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action'    => self::GET_BUDGET_DATA,
@@ -466,7 +466,7 @@ class CTProject extends CTCNC
         if ($linkedOrdheadID) {
 
             $linkURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'    => 'displaySalesOrder',
@@ -581,7 +581,7 @@ class CTProject extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'Project.php',
                 array(
                     'projectID' => $this->dsProject->getValue(DBEProject::projectID),
@@ -611,7 +611,7 @@ class CTProject extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'customerID' => $dsProject->getValue('customerID'),
@@ -921,7 +921,7 @@ class CTProject extends CTCNC
         $dbeProject->updateRow();
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'projectID' => $projectID,
@@ -1101,7 +1101,7 @@ GROUP BY caa_callacttypeno,
             $hasProjectPlan = !!$project['planFileName'];
 
             $projectPlanDownloadURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
                         'action'    => self::DOWNLOAD_PROJECT_PLAN,
@@ -1113,7 +1113,7 @@ GROUP BY caa_callacttypeno,
             $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
             $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
 
-            $historyPopupURL = $this->buildLink(
+            $historyPopupURL = Controller::buildLink(
                 'Project.php',
                 array(
                     'action'  => 'historyPopup',
@@ -1122,7 +1122,7 @@ GROUP BY caa_callacttypeno,
                 )
             );
 
-            $projectEditURL = $this->buildLink(
+            $projectEditURL = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 [
                     "action"    => 'edit',
@@ -1393,7 +1393,7 @@ GROUP BY caa_callacttypeno,
 
                 foreach ($problems as $problemID) {
 
-                    $link = $this->buildLink(
+                    $link = Controller::buildLink(
                         "http://cncapps/Activity.php",
                         [
                             "action"    => 'displayFirstActivity',

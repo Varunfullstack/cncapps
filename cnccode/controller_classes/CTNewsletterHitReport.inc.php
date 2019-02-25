@@ -70,7 +70,7 @@ class CTNewsletterHitReport extends CTCNC
 
         $this->setMethodName('searchForm');
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_SEARCH

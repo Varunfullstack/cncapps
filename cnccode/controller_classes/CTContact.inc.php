@@ -141,7 +141,7 @@ class CTContact extends CTCNC
                     $this->raiseError('siteNo not passed');
                 }
         */
-        $urlCreate = $this->buildLink(
+        $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'     => CTCNC_ACT_CONTACT_ADD,
@@ -479,7 +479,7 @@ class CTContact extends CTCNC
             );
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTCONTACT_ACT_CONTACT_INSERT,
@@ -511,7 +511,7 @@ class CTContact extends CTCNC
             }
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTCONTACT_ACT_CONTACT_UPDATE,
@@ -574,7 +574,7 @@ class CTContact extends CTCNC
 
         $this->buContact->updateContact($this->dsContact);
         // this forces update of contactID back through Javascript to parent HTML window
-        $urlNext = $this->buildLink(
+        $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'      => CTCNC_ACT_DISP_CONTACT_POPUP,

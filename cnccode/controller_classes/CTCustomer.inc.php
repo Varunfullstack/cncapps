@@ -1239,7 +1239,7 @@ class CTCustomer extends CTCNC
         $this->buCustomer->createCustomerFolder($this->getCustomerID());
 
         $nextURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCNC_ACT_DISP_EDIT,
@@ -1262,7 +1262,7 @@ class CTCustomer extends CTCNC
         if ($this->buCustomer->getNextReviewProspect($dsCustomer)) {
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCNC_ACT_DISP_EDIT,
@@ -1309,7 +1309,7 @@ class CTCustomer extends CTCNC
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'displayEditForm',
@@ -1557,7 +1557,7 @@ ORDER BY cus_name ASC  ";
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'dispEdit',
@@ -1647,7 +1647,7 @@ ORDER BY cus_name ASC  ";
             while ($dsContact->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'dispEdit',
@@ -1716,7 +1716,7 @@ ORDER BY cus_name ASC  ";
             while ($dsCustomer->fetchNext()) {
 
                 $linkURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'dispEdit',
@@ -1793,16 +1793,16 @@ ORDER BY cus_name ASC  ";
         );
 // Parameters
         $this->setPageTitle("Customer");
-        $submitURL = $this->buildLink(
+        $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_SEARCH)
         );
-        $createURL = $this->buildLink(
+        $createURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTCUSTOMER_ACT_ADDCUSTOMER)
         );
         $customerPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -1833,7 +1833,7 @@ ORDER BY cus_name ASC  ";
             );
             while ($this->dsCustomer->fetchNext()) {
                 $customerURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTCNC_ACT_DISP_EDIT,
@@ -1889,7 +1889,7 @@ ORDER BY cus_name ASC  ";
         } else {
             // reload with this customer
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCNC_ACT_DISP_EDIT,
@@ -1968,7 +1968,7 @@ ORDER BY cus_name ASC  ";
                 $this->getCustomerID(),
                 $this->userID
             )) {
-                $deleteCustomerURL = $this->buildLink(
+                $deleteCustomerURL = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_DELETECUSTOMER,
@@ -1996,7 +1996,7 @@ ORDER BY cus_name ASC  ";
         } else {
             $_SESSION['save_page'] = false;
         }
-        $submitURL = $this->buildLink(
+        $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCUSTOMER_ACT_UPDATE
@@ -2007,13 +2007,13 @@ ORDER BY cus_name ASC  ";
         if ($_SESSION['save_page']) {
             $cancelURL = $_SESSION['save_page'];
         } else {
-            $cancelURL = $this->buildLink(
+            $cancelURL = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => CTCUSTOMER_ACT_DISP_SEARCH)
             );
         }
         $addSiteURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCUSTOMER_ACT_ADDSITE,
@@ -2064,7 +2064,7 @@ ORDER BY cus_name ASC  ";
             $this->dsCustomer->getValue(DBECustomer::customerID)
         )) {
             $urlCreateCustomerFolder =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'createCustomerFolder',
@@ -2075,7 +2075,7 @@ ORDER BY cus_name ASC  ";
                 '<a href="http:' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
         $renewalLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'RenewalReport.php',
                 array(
                     'action'     => 'produceReport',
@@ -2087,7 +2087,7 @@ ORDER BY cus_name ASC  ";
         $renewalLink = '<a href="' . $renewalLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         $passwordLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Password.php',
                 array(
                     'action'     => 'list',
@@ -2098,7 +2098,7 @@ ORDER BY cus_name ASC  ";
 
         $passwordLink = '<a href="' . $passwordLinkURL . '" target="_blank" title="Passwords">Service Passwords</a>';
 
-        $thirdPartyLinkURL = $this->buildLink(
+        $thirdPartyLinkURL = Controller::buildLink(
             'ThirdPartyContact.php',
             [
                 'action'     => 'list',
@@ -2109,7 +2109,7 @@ ORDER BY cus_name ASC  ";
         $thirdPartyLink = '<a href="' . $thirdPartyLinkURL . '" target="_blank" title="Third Party Contacts">Third Party Contacts</a>';
 
         $showInactiveContactsURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'               => 'dispEdit',
@@ -2118,7 +2118,7 @@ ORDER BY cus_name ASC  ";
                 )
             );
         $showInactiveSitesURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'            => 'dispEdit',
@@ -2129,7 +2129,7 @@ ORDER BY cus_name ASC  ";
         $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
 
         $urlContactPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
 //          'action' => CTCNC_ACT_CONTACT_EDIT,
@@ -2479,7 +2479,7 @@ ORDER BY cus_name ASC  ";
         Projects
         */
         $addProjectURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Project.php',
                 array(
                     'action'     => 'add',
@@ -2511,7 +2511,7 @@ ORDER BY cus_name ASC  ";
             while ($dsProject->fetchNext()) {
                 if ($buProject->canDelete($dsProject->getValue(DBEProject::projectID))) {
                     $deleteProjectLink =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Project.php',
                             array(
                                 'action'    => 'delete',
@@ -2525,7 +2525,7 @@ ORDER BY cus_name ASC  ";
                 }
 
                 $editProjectLink =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'Project.php',
                         array(
                             'action'    => 'edit',
@@ -2638,7 +2638,7 @@ ORDER BY cus_name ASC  ";
 
             //      $this->template->set_block('CustomerEdit','contacts', '');
             $addContactURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_ADDCONTACT,
@@ -2651,7 +2651,7 @@ ORDER BY cus_name ASC  ";
                 $this->dsSite->getValue(DBESite::customerID),
                 $this->dsSite->getValue(DBESite::siteNo)
             )) {
-                $deleteSiteURL = $this->buildLink(
+                $deleteSiteURL = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTCUSTOMER_ACT_DELETESITE,
@@ -2838,7 +2838,7 @@ ORDER BY cus_name ASC  ";
         foreach ($customLetterTemplates as $index => $filename) {
 
             $customLetterURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'LetterForm.php',
                     array(
                         'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
@@ -2891,7 +2891,7 @@ ORDER BY cus_name ASC  ";
                 $clientFormURL = '';
             } else {
                 $deleteContactURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCUSTOMER_ACT_DELETECONTACT,
@@ -2901,7 +2901,7 @@ ORDER BY cus_name ASC  ";
                 $deleteContactLink =
                     '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
                 $clientFormURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'ClientInformationForm.php',
                         array(
                             'contactID'   => $this->dsContact->getValue(DBEContact::contactID),
@@ -2913,14 +2913,14 @@ ORDER BY cus_name ASC  ";
                         )
                     );
                 $dearJohnURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'DearJohnForm.php',
                         array(
                             'contactID' => $this->dsContact->getValue(DBEContact::contactID)
                         )
                     );
                 $dmLetterURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'DMLetterForm.php',
                         array(
                             'contactID' => $this->dsContact->getValue(DBEContact::contactID)//,
@@ -3069,7 +3069,7 @@ ORDER BY cus_name ASC  ";
             foreach ($customLetterTemplates as $index => $filename) {
 
                 $customLetterURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'LetterForm.php',
                         array(
                             'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
@@ -3130,7 +3130,7 @@ ORDER BY cus_name ASC  ";
                 $ordheadID = $dbeJOrdhead->getPKValue();
 
                 $orderURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'SalesOrder.php',
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -3192,7 +3192,7 @@ ORDER BY cus_name ASC  ";
             $this->buCustomer->deleteCustomer($this->getCustomerID());
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCUSTOMER_ACT_DISP_SEARCH
@@ -3238,7 +3238,7 @@ ORDER BY cus_name ASC  ";
             $this->setFormError('Cannot delete this site - dependencies exist');
         }
         $nextURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCNC_ACT_DISP_EDIT,
@@ -3266,7 +3266,7 @@ ORDER BY cus_name ASC  ";
         $this->setCustomerID($dsContact->getValue(DBEContact::customerID));
 
         $nextURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => CTCNC_ACT_DISP_EDIT,
@@ -3340,7 +3340,7 @@ ORDER BY cus_name ASC  ";
                 exit;
             } else {
                 $nextURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTCNC_ACT_DISP_EDIT,
@@ -3438,7 +3438,7 @@ ORDER BY cus_name ASC  ";
     {
         if ($customerID) {
             $url =
-                $this->buildLink(
+                Controller::buildLink(
                     'CustomerNote.php',
                     array(
                         'action'     => 'customerNoteHistoryPopup',
@@ -3541,7 +3541,7 @@ ORDER BY cus_name ASC  ";
             );
 
             $urlAddDocument =
-                $this->buildLink(
+                Controller::buildLink(
                     'PortalCustomerDocument.php',
                     array(
                         'action'     => 'add',
@@ -3560,7 +3560,7 @@ ORDER BY cus_name ASC  ";
             while ($dsPortalCustomerDocument->fetchNext()) {
 
                 $urlEditDocument =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalCustomerDocument.php',
                         array(
                             'action'                   => 'edit',
@@ -3571,7 +3571,7 @@ ORDER BY cus_name ASC  ";
                     );
 
                 $urlViewFile =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalCustomerDocument.php',
                         array(
                             'action'                   => 'viewFile',
@@ -3582,7 +3582,7 @@ ORDER BY cus_name ASC  ";
                     );
 
                 $urlDeleteDocument =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalCustomerDocument.php',
                         array(
                             'action'                   => 'delete',

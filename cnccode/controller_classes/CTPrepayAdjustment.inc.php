@@ -80,7 +80,7 @@ class CTPrepayAdjustment extends CTCNC
                 );
 
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         '/',
                         array()
                     );
@@ -91,14 +91,14 @@ class CTPrepayAdjustment extends CTCNC
 
         }
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'update'
             )
         );
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action' => CTCNC_ACT_DISP_CUST_POPUP,

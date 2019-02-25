@@ -751,7 +751,6 @@ class BUCustomerReviewMeeting extends Business
             $tplidx = $pdf->importPage($loop);
             $pdf->addPage();
             $dim = $pdf->useTemplate($tplidx);
-            //var_dump($dim);exit;
         }
         // Allow for array('print', 'modify', 'copy', 'annot-forms');
         $pdf->SetProtection(

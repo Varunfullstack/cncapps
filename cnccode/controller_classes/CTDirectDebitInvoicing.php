@@ -66,7 +66,7 @@ class CTDirectDebitInvoicing extends CTCNC
         $this->setMethodName('display thing');
 
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => "sendInvoices"

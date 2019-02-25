@@ -151,28 +151,28 @@ class CTUtilityEmail extends CTCNC
             true
         );
 
-        $URLDeleteItem = $this->buildLink(
+        $URLDeleteItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'delete'
             ]
         );
 
-        $URLUpdateItem = $this->buildLink(
+        $URLUpdateItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'update'
             ]
         );
 
-        $URLCreateItem = $this->buildLink(
+        $URLCreateItem = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'create'
             ]
         );
 
-        $URLGetData = $this->buildLink(
+        $URLGetData = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             [
                 'action' => 'getData'

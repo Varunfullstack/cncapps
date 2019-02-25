@@ -77,7 +77,7 @@ class CTSalesRequestDashboard extends CTCNC
             $lastActivity = $buActivity->getLastActivityInProblem(
                 $dbejCallActivity->getValue(DBEJCallActivity::problemID)
             );
-            $srLink = $this->buildLink(
+            $srLink = Controller::buildLink(
                 'Activity.php',
                 [
                     "callActivityID" => $lastActivity->getValue(DBEJCallActivity::callActivityID),
@@ -89,7 +89,7 @@ class CTSalesRequestDashboard extends CTCNC
 
 //            http://cncdev7:85/Activity.php?action=salesRequestReview&callActivityID=1813051&fromEmail=true
 
-            $processCRLink = $this->buildLink(
+            $processCRLink = Controller::buildLink(
                 'Activity.php',
                 [
                     "callActivityID" => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),

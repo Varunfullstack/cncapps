@@ -103,7 +103,7 @@ class CTLeadStatusReport extends CTCNC
 
             $urlHot =
 
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'action' => 'dispEdit',
@@ -134,7 +134,7 @@ class CTLeadStatusReport extends CTCNC
 
             $urlWarm =
 
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'action' => 'dispEdit',
@@ -165,7 +165,7 @@ class CTLeadStatusReport extends CTCNC
 
             $urlCold =
 
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'action' => 'dispEdit',
@@ -198,7 +198,7 @@ class CTLeadStatusReport extends CTCNC
 
             $urlDead =
 
-                $this->buildLink(
+                Controller::buildLink(
                     'Customer.php',
                     array(
                         'action' => 'dispEdit',

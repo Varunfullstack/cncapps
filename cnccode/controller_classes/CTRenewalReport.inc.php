@@ -536,7 +536,7 @@ Many thanks.
             )
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
@@ -553,7 +553,7 @@ Many thanks.
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -782,7 +782,7 @@ Many thanks.
         External Items
         */
         $addExternalItemURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'ExternalItem.php',
                 array(
                     'action'     => 'add',
@@ -798,7 +798,7 @@ Many thanks.
         );
 
         if ($displayAccountsInfo) {
-            $urlCreateQuote = $this->buildLink(
+            $urlCreateQuote = Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array('action' => 'createQuote')
             );

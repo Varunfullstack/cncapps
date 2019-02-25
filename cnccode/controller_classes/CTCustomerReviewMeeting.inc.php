@@ -244,7 +244,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     $itemNo++;
 
                     $urlServiceRequest =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'Activity.php',
                             array(
                                 'action'    => 'displayLastActivity',
@@ -400,7 +400,7 @@ class CTCustomerReviewMeeting extends CTCNC
             }
         }
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -408,13 +408,13 @@ class CTCustomerReviewMeeting extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
 
         $urlGeneratePdf =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER ['PHP_SELF'],
                 array(
                     'action' => 'generatePdf'

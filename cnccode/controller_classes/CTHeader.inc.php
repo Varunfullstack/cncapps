@@ -90,7 +90,7 @@ class CTHeader extends CTCNC
             $dsHeader->fetchNext();
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTHEADER_ACT_UPDATE
@@ -101,7 +101,7 @@ class CTHeader extends CTCNC
             array('HeaderEdit' => 'HeaderEdit.inc')
         );
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -387,7 +387,7 @@ class CTHeader extends CTCNC
         $this->buHeader->updateHeader($this->dsHeader);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCNC_ACT_VIEW
@@ -413,7 +413,7 @@ class CTHeader extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'updateHelpDesk'
@@ -463,7 +463,7 @@ class CTHeader extends CTCNC
         $this->buHeader->updateHelpDesk($this->dsHeader);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'editHelpDesk'
@@ -486,7 +486,7 @@ class CTHeader extends CTCNC
             $buPortalDocument->getDocuments($dsPortalDocument);
 
             $urlAddDocument =
-                $this->buildLink(
+                Controller::buildLink(
                     'PortalDocument.php',
                     array(
                         'action' => 'add'
@@ -504,7 +504,7 @@ class CTHeader extends CTCNC
             while ($dsPortalDocument->fetchNext()) {
 
                 $urlEditDocument =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalDocument.php',
                         array(
                             'action'           => 'edit',
@@ -513,7 +513,7 @@ class CTHeader extends CTCNC
                     );
 
                 $urlViewFile =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalDocument.php',
                         array(
                             'action'           => 'viewFile',
@@ -522,7 +522,7 @@ class CTHeader extends CTCNC
                     );
 
                 $urlDeleteDocument =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'PortalDocument.php',
                         array(
                             'action'           => 'delete',

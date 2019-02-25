@@ -106,13 +106,13 @@ class CTFirstTimeFixReport extends CTCNC
             );
         }
 
-        $fetchURL = $urlSubmit = $this->buildLink(
+        $fetchURL = $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => "fetchData")
         );
 
         $customerPopupURL =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,

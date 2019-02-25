@@ -116,7 +116,7 @@ class CTGoodsIn extends CTCNC
         if ($this->dsPorhead->rowCount() == 1) {
             $this->dsPorhead->fetchNext();
             $urlNext =
-                $this->buildLink($_SERVER['PHP_SELF'],
+                Controller::buildLink($_SERVER['PHP_SELF'],
                                  array(
                                      'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
                                      'porheadID' => $this->dsPorhead->getValue('porheadID')
@@ -140,9 +140,9 @@ class CTGoodsIn extends CTCNC
         $this->setTemplateFiles('GoodsInSearch', 'GoodsInSearch.inc');
 // Parameters
         $this->setPageTitle("Goods In");
-        $submitURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $submitURL = Controller::buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
         $urlSupplierPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
                     'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
@@ -161,7 +161,7 @@ class CTGoodsIn extends CTCNC
             $ordheadIDCol = $this->dsPorhead->columnExists('ordheadID');
             while ($this->dsPorhead->fetchNext()) {
                 $goodsInURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
@@ -252,7 +252,7 @@ class CTGoodsIn extends CTCNC
         $this->setTemplateFiles(array('GoodsInDisplay' => 'GoodsInDisplay.inc'));
 
         $urlReceive =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTGOODSIN_ACT_RECEIVE,
@@ -261,7 +261,7 @@ class CTGoodsIn extends CTCNC
             );
 
         $urlPurchaseOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
                     'action' => CTCNC_ACT_DISPLAY_PO,
@@ -381,7 +381,7 @@ class CTGoodsIn extends CTCNC
         $this->buGoodsIn->receive($_REQUEST['porheadID'], $this->userID, $dsGoodsIn);
         $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
                     'action' => CTCNC_ACT_DISPLAY_PO,

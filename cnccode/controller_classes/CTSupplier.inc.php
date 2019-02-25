@@ -105,7 +105,7 @@ class CTSupplier extends CTCNC
 
         // A single slash means create new supplier
         if ($_REQUEST['supplierName']{0} == '/') {
-            $urlCreate = $this->buildLink(
+            $urlCreate = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCNC_ACT_SUPPLIER_ADD,
@@ -176,9 +176,9 @@ class CTSupplier extends CTCNC
         // clear these vars so that context of edit will NOT be assumed to be a pop-up
         unset($_SESSION['supplierParentIDField']);
         unset($_SESSION['supplierParentDescField']);
-        $submitURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
-        $createURL = $this->buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SUPPLIER_ADD));
-        $supplierPopup = $this->buildLink(CTCNC_PAGE_SUPPLIER,
+        $submitURL = Controller::buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $createURL = Controller::buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SUPPLIER_ADD));
+        $supplierPopup = Controller::buildLink(CTCNC_PAGE_SUPPLIER,
                                           array(
                                               'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
                                               'htmlFmt' => CT_HTML_FMT_POPUP
@@ -197,7 +197,7 @@ class CTSupplier extends CTCNC
             $this->template->set_block('SupplierSearch', 'supplierBlock', 'suppliers');
             while ($this->dsSupplier->fetchNext()) {
                 $supplierURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTCNC_ACT_SUPPLIER_EDIT,
@@ -280,7 +280,7 @@ class CTSupplier extends CTCNC
         // If editing a supplier then the contact field will exist
         if ($_REQUEST['action'] == CTCNC_ACT_SUPPLIER_EDIT) {
             $urlContactPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_CONTACT,
                     array(
                         'action' => CTCNC_ACT_CONTACT_POPUP,
@@ -289,7 +289,7 @@ class CTSupplier extends CTCNC
                     )
                 );
             $urlContactEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     CTCNC_PAGE_CONTACT,
                     array(
                         'action' => CTCNC_ACT_CONTACT_EDIT,
@@ -356,7 +356,7 @@ class CTSupplier extends CTCNC
             $this->buSupplier->initialiseNewSupplier($this->dsSupplier);
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTSUPPLIER_ACT_SUPPLIER_INSERT,
@@ -385,7 +385,7 @@ class CTSupplier extends CTCNC
             }
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTSUPPLIER_ACT_SUPPLIER_UPDATE,
@@ -444,7 +444,7 @@ class CTSupplier extends CTCNC
         } else {
 //             if there is a parent (popup) this forces update of supplierID back through Javascript to parent HTML window
             if (isset($_SESSION['supplierParentDescField'])) {
-                $urlNext = $this->buildLink(
+                $urlNext = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
@@ -454,7 +454,7 @@ class CTSupplier extends CTCNC
                 );
             } else {
 
-                $urlNext = $this->buildLink(
+                $urlNext = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array()
                 );

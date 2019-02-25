@@ -157,7 +157,7 @@ class CTRenContract extends CTCNC
                 $customerItemID = $dsRenContract->getValue('customerItemID');
 
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'edit',
@@ -167,7 +167,7 @@ class CTRenContract extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => 'delete',
@@ -177,7 +177,7 @@ class CTRenContract extends CTCNC
                 $txtDelete = '[delete]';
 
                 $urlList =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => 'list'
@@ -272,7 +272,7 @@ class CTRenContract extends CTCNC
         }
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
@@ -316,7 +316,7 @@ class CTRenContract extends CTCNC
         }
 
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
@@ -326,7 +326,7 @@ class CTRenContract extends CTCNC
             );
 
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'list'
@@ -350,7 +350,7 @@ class CTRenContract extends CTCNC
         }
 
         $urlPrintContract =
-            $this->buildLink(
+            Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'action'         => 'printContract',
@@ -411,7 +411,7 @@ class CTRenContract extends CTCNC
             );
         }
         $urlItemPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
@@ -420,7 +420,7 @@ class CTRenContract extends CTCNC
                 )
             );
         $urlItemEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_ITEM,
                 array(
                     'action'  => CTCNC_ACT_ITEM_EDIT,
@@ -428,7 +428,7 @@ class CTRenContract extends CTCNC
                 )
             );
         $urlSiteEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_EDIT,
@@ -436,7 +436,7 @@ class CTRenContract extends CTCNC
                 )
             );
         $urlSitePopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_POPUP,
@@ -666,7 +666,7 @@ class CTRenContract extends CTCNC
             }
 
             $url =
-                $this->buildLink(
+                Controller::buildLink(
                     'CustomerItem.php',
                     array(
                         'action'         => 'displayCI',
@@ -729,7 +729,7 @@ class CTRenContract extends CTCNC
         if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
@@ -739,7 +739,7 @@ class CTRenContract extends CTCNC
 
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',

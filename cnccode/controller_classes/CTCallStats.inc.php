@@ -65,7 +65,7 @@ class CTCallStats extends CTCNC
 
         $this->setPageTitle('Call Statistics');
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCALLSTATS_ACT_GENERATE

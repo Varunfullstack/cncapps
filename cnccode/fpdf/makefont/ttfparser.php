@@ -394,7 +394,7 @@ class TTFParser
 		$this->BuildCmap();
 		$this->BuildHhea();
 		$this->BuildHmtx();
-		$this->BuildLoca();
+		Controller::buildLoca();
 		$this->BuildGlyf();
 		$this->BuildMaxp();
 		$this->BuildPost();

@@ -19,6 +19,14 @@ class CTPassword extends CTCNC
     /** @var BUPassword */
     public $buPassword;
 
+    public static $passwordLevels = [
+        ["level" => 0, "description" => "No Access"],
+        ["level" => 1, "description" => "Standard Access"],
+        ["level" => 2, "description" => "Elevated Access"],
+        ["level" => 3, "description" => "Team Lead Access"],
+        ["level" => 4, "description" => "Management Access"]
+    ];
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -102,7 +110,7 @@ class CTPassword extends CTCNC
             )
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
@@ -120,7 +128,7 @@ class CTPassword extends CTCNC
         }
 
         $urlCustomerPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -189,7 +197,7 @@ class CTPassword extends CTCNC
         if (!$showArchived) {
 
             $urlAdd =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => 'edit',
@@ -197,7 +205,7 @@ class CTPassword extends CTCNC
                     )
                 );
 
-            $urlSubmit = $this->buildLink(
+            $urlSubmit = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'displayList'
@@ -231,7 +239,7 @@ class CTPassword extends CTCNC
 
         while ($dsPassword->fetchNext()) {
 
-            $urlArchive = $this->buildLink(
+            $urlArchive = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'archive',
@@ -239,7 +247,7 @@ class CTPassword extends CTCNC
                 )
             );
 
-            $urlEdit = $this->buildLink(
+            $urlEdit = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'edit',
@@ -393,7 +401,7 @@ class CTPassword extends CTCNC
                 $this->buPassword->updatePassword($dsPassword);
 
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'list',
@@ -428,7 +436,7 @@ class CTPassword extends CTCNC
 
 
         $urlEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'edit',
@@ -446,19 +454,20 @@ class CTPassword extends CTCNC
             'levels'
         );
 
-
+        $minLevel = 1;
         $maxLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
 
         if (!$maxLevel) {
             echo 'You cannot edit this password';
             exit;
         }
-        for ($level = 1; $level <= $maxLevel; $level++) {
+        for ($level = $minLevel; $level <= $maxLevel; $level++) {
 
             $this->template->set_var(
                 array(
-                    'level'         => $level,
-                    'levelSelected' => $dsPassword->getValue(DBEPassword::level) == $level ? 'selected' : ''
+                    'level'            => $level,
+                    'levelSelected'    => $dsPassword->getValue(DBEPassword::level) == $level ? 'selected' : '',
+                    'levelDescription' => self::$passwordLevels[$level]['description']
                 )
             );
             $this->template->parse(
@@ -541,7 +550,7 @@ class CTPassword extends CTCNC
             $this->dbeUser
         );
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'list',

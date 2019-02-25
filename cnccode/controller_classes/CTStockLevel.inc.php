@@ -70,12 +70,12 @@ class CTStockLevel extends CTCNC
 
         }
 
-        $urlSearch = $this->buildLink(
+        $urlSearch = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTSTOCKLEVEL_ACT_SEARCH)
         );
 
-        $urlUpdate = $this->buildLink(
+        $urlUpdate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array('action' => CTSTOCKLEVEL_ACT_UPDATE)
         );

@@ -58,7 +58,7 @@ class CTSystemBuild extends CTCNC
     function select()
     {
         $this->setMethodName('select');
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTSYSTEMBUILD_ACT_GENERATE

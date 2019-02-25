@@ -514,7 +514,7 @@ class CTActivity extends CTCNC
         if (isset($_REQUEST['callActivityID'])) {
             $this->buActivity->createSalesOrdersFromActivities($_REQUEST['callActivityID']);
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'    => 'search',
@@ -526,33 +526,7 @@ class CTActivity extends CTCNC
             header('Location: ' . $urlNext);
         }
     }
-
-    function buildLink($page,
-                       $params
-    )
-    {
-
-        $url = Controller::buildLink(
-            $page,
-            $params
-        );
-
-        if ($this->contactID && !(array_key_exists(
-                'contactID',
-                $params
-            ))) {
-
-            $url = Controller::addParametersToLink(
-                $url,
-                array(
-                    'contactID' => $this->contactID
-                )
-            );
-        }
-
-        return $url;
-    }
-
+    
     function completeSRs()
     {
         $this->setMethodName('completeSRs');
@@ -560,7 +534,7 @@ class CTActivity extends CTCNC
             $this->buActivity->completeSRs($_REQUEST['callActivityID']);
 
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'                      => 'search',
@@ -683,7 +657,7 @@ class CTActivity extends CTCNC
         $this->setMethodName('displaySearchForm');
 
         if (!$this->hasPermissions('PHPLIB_PERM_CUSTOMER')) {
-            $urlCustomerPopup = $this->buildLink(
+            $urlCustomerPopup = Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
                 array(
                     'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -691,7 +665,7 @@ class CTActivity extends CTCNC
                 )
             );
 
-            $urlCreateActivity = $this->buildLink(
+            $urlCreateActivity = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITY_ACT_CONTRACT_BY_CUSTOMER
@@ -699,7 +673,7 @@ class CTActivity extends CTCNC
             );
         }// if (!$this->hasPermission('PHPLIB_PERM_CUSTOMER'){
 
-        $fetchContractsURL = $this->buildLink(
+        $fetchContractsURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => 'contractsForClient'
@@ -711,7 +685,7 @@ class CTActivity extends CTCNC
             'ActivitySearch.inc'
         );
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_SEARCH
@@ -951,7 +925,7 @@ class CTActivity extends CTCNC
 
 
                 $displayActivityURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -981,7 +955,7 @@ class CTActivity extends CTCNC
                     $salesOrderLink = "";
                     if ($salesOrderID) {
                         $salesOrderURL =
-                            $this->buildLink(
+                            Controller::buildLink(
                                 'SalesOrder.php',
                                 array(
                                     'action'    => 'displaySalesOrder',
@@ -1599,7 +1573,7 @@ class CTActivity extends CTCNC
             )
         ) {
             $urlDeleteActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DELETE_ACTIVITY,
@@ -1628,7 +1602,7 @@ class CTActivity extends CTCNC
 //        if (in_array($this->userID, $GLOBALS['can_add_manager_comment'])) {
 //
 //            $urlManagerComment =
-//                $this->buildLink(
+//                Controller::buildLink(
 //                    'Activity.php',
 //                    array(
 //                        'action' => 'managerCommentPopup',
@@ -1670,7 +1644,7 @@ class CTActivity extends CTCNC
         if ($this->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
 
             $urlLinkToProblem =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'             => 'linkProblems',
@@ -1697,7 +1671,7 @@ class CTActivity extends CTCNC
       */
         if ($dsCallActivity->getValue('allowExpensesFlag') == 'Y') {
             $urlViewExpenses =
-                $this->buildLink(
+                Controller::buildLink(
                     'Expense.php',
                     array(
                         'action'         => CTCNC_ACT_VIEW,
@@ -1717,7 +1691,7 @@ class CTActivity extends CTCNC
         if ($buUser->isSdManager($this->userID) &&
             $dsCallActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag) == 'Y') {
             $urlUnhideSR =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => 'unhideSR',
@@ -1733,7 +1707,7 @@ class CTActivity extends CTCNC
       Show SCR report and visit confirmation links if this activity type allows
       */
         $urlAddToCalendar =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_ADD_TO_CALENDAR,
@@ -1744,7 +1718,7 @@ class CTActivity extends CTCNC
         if ($dsCallActivity->getValue('allowSCRFlag') == 'Y') {
 
             $urlSendVistEmail =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_SEND_VISIT_EMAIL,
@@ -1775,7 +1749,7 @@ class CTActivity extends CTCNC
         if ($dbeJProblem->getValue('status') == 'P') {
 
             $urlChangeRequest =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'             => 'createFollowOnActivity',
@@ -1796,7 +1770,7 @@ class CTActivity extends CTCNC
         ) {
 
             $urlSetProblemFixed =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => 'setProblemFixed',
@@ -1820,7 +1794,7 @@ class CTActivity extends CTCNC
         while ($dbeCallActivity->fetchNext()) {
 
             $urlJumpToActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1855,7 +1829,7 @@ class CTActivity extends CTCNC
         if ($linksArray['previous']) {
 
             $urlPreviousActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1871,7 +1845,7 @@ class CTActivity extends CTCNC
         if ($linksArray['first']) {
 
             $urlFirstActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1886,7 +1860,7 @@ class CTActivity extends CTCNC
         if ($linksArray['next']) {
 
             $urlNextActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1901,7 +1875,7 @@ class CTActivity extends CTCNC
         if ($linksArray['last']) {
 
             $urlLastActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1914,7 +1888,7 @@ class CTActivity extends CTCNC
         }
 
         $urlToggleCriticalFlag =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'toggleCriticalFlag',
@@ -1923,7 +1897,7 @@ class CTActivity extends CTCNC
             );
 
         $urlToggleMonitoringFlag =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'toggleMonitoringFlag',
@@ -1932,7 +1906,7 @@ class CTActivity extends CTCNC
             );
 
         $urlToggleIncludeTravel =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'              => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1942,7 +1916,7 @@ class CTActivity extends CTCNC
             );
 
         $urlToggleIncludeOperationalTasks =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'                        => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1952,7 +1926,7 @@ class CTActivity extends CTCNC
             );
 
         $urlToggleIncludeServerGuardUpdates =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'                          => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -1962,7 +1936,7 @@ class CTActivity extends CTCNC
             );
 
         $urlToggleContext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -2014,7 +1988,7 @@ class CTActivity extends CTCNC
             if ($this->buActivity->canEdit($dsCallActivity)) {
 
                 $urlEditActivity =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
@@ -2029,7 +2003,7 @@ class CTActivity extends CTCNC
                 $dbeJProblem->getValue('status') != 'C'           // not completed
             ) {
                 $urlDuplicate =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => 'createFollowOnActivity',
@@ -2037,7 +2011,7 @@ class CTActivity extends CTCNC
                         )
                     );
                 $urlAddTravel =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'             => 'createFollowOnActivity',
@@ -2065,7 +2039,7 @@ class CTActivity extends CTCNC
         }
 
         $urlMessageToSales =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'messageToSales',
@@ -2073,7 +2047,7 @@ class CTActivity extends CTCNC
                 )
             );
         $urlSalesRequest =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => 'sendSalesRequest',
@@ -2094,7 +2068,7 @@ class CTActivity extends CTCNC
         }
 
         $urlLinkedSalesOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'         => 'editLinkedSalesOrder',
@@ -2294,7 +2268,7 @@ class CTActivity extends CTCNC
             do {
 
                 $urlOnSiteActivity =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -2410,7 +2384,7 @@ class CTActivity extends CTCNC
     function getRenewalsLink($customerID)
     {
         $renewalsLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'RenewalReport.php',
                 array(
                     'action'     => 'produceReport',
@@ -2439,7 +2413,7 @@ class CTActivity extends CTCNC
 
     function getCustomerUrl($customerID)
     {
-        return $this->buildLink(
+        return Controller::buildLink(
             'SalesOrder.php',
             array(
                 'action'     => 'search',
@@ -2455,7 +2429,7 @@ class CTActivity extends CTCNC
     function getProblemHistoryLink($problemID)
     {
         if ($problemID) {
-            $url = $this->buildLink(
+            $url = Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'    => 'problemHistoryPopup',
@@ -2476,7 +2450,7 @@ class CTActivity extends CTCNC
     function getPasswordLink($customerID)
     {
         $passwordLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Password.php',
                 array(
                     'action'     => 'list',
@@ -2493,7 +2467,7 @@ class CTActivity extends CTCNC
     function getThirdPartyContactLink($customerID)
     {
         $thirdPartyContactLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'ThirdPartyContact.php',
                 array(
                     'action'     => 'list',
@@ -2510,7 +2484,7 @@ class CTActivity extends CTCNC
     function getGeneratePasswordLink()
     {
         $generatePasswordLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Password.php',
                 array(
                     'action'  => 'generate',
@@ -2531,7 +2505,7 @@ class CTActivity extends CTCNC
     function getContractListPopupLink($customerID)
     {
         $contractListPopupLinkURL =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'     => 'contractListPopup',
@@ -2550,7 +2524,7 @@ class CTActivity extends CTCNC
     {
         if ($linkedOrdheadID) {
             $linkURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesOrder.php',
                     array(
                         'action'    => 'displaySalesOrder',
@@ -2581,7 +2555,7 @@ class CTActivity extends CTCNC
         );
 
         $urlUploadFile =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_UPLOAD_FILE,
@@ -2610,7 +2584,7 @@ class CTActivity extends CTCNC
         while ($dbeJCallDocument->fetchNext()) {
 
             $urlViewFile =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_VIEW_FILE,
@@ -2619,7 +2593,7 @@ class CTActivity extends CTCNC
                 );
 
             $urlDeleteFile =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DELETE_FILE,
@@ -2664,7 +2638,7 @@ class CTActivity extends CTCNC
     function redirectToDisplay($callActivityID)
     {
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'callActivityID' => $callActivityID,
@@ -2678,7 +2652,7 @@ class CTActivity extends CTCNC
     function redirectToFixed($callActivityID)
     {
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'callActivityID' => $callActivityID,
@@ -2822,7 +2796,7 @@ class CTActivity extends CTCNC
 
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => 'activityCreate1')
             );
@@ -2863,7 +2837,7 @@ class CTActivity extends CTCNC
 
                 if ($row['openSrCount'] == 0) {
                     $nextURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'     => 'editServiceRequestHeader',
@@ -2874,7 +2848,7 @@ class CTActivity extends CTCNC
                         );
                 } else {
                     $nextURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'     => 'displayOpenSrs',
@@ -2988,7 +2962,7 @@ class CTActivity extends CTCNC
                 unset ($_SESSION[$this->sessionKey]); // clear the session variable
 
                 $nextURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => 'displayActivity',
@@ -3006,13 +2980,13 @@ class CTActivity extends CTCNC
         );
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => 'editValueOnlyServiceRequest')
             );
 
         $backURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => 'activityCreate1')
             );
@@ -3145,7 +3119,7 @@ class CTActivity extends CTCNC
         while ($dsContactSrs->fetchNext()) {
 
             $urlCreateFollowOn =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'         => 'createFollowOnActivity',
@@ -3155,7 +3129,7 @@ class CTActivity extends CTCNC
                 );
 
             $urlProblemHistoryPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'problemHistoryPopup',
@@ -3205,7 +3179,7 @@ class CTActivity extends CTCNC
         while ($dsActiveSrs->fetchNext()) {
 
             $urlCreateFollowOn =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'         => 'createFollowOnActivity',
@@ -3215,7 +3189,7 @@ class CTActivity extends CTCNC
                 );
 
             $urlProblemHistoryPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'problemHistoryPopup',
@@ -3254,7 +3228,7 @@ class CTActivity extends CTCNC
 
         }
         $urlCreateNewSr =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'editServiceRequestHeader',
@@ -3378,7 +3352,7 @@ class CTActivity extends CTCNC
           */
                 if ($isAddToQueue) {
                     $nextURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'CurrentActivityReport.php',
                             array()
                         );
@@ -3392,7 +3366,7 @@ class CTActivity extends CTCNC
                 if (isset($_REQUEST['StartWork'])) {
 
                     $nextURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'           => 'createFollowOnActivity',
@@ -3465,7 +3439,7 @@ class CTActivity extends CTCNC
 
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'editServiceRequestHeader'
@@ -3480,7 +3454,7 @@ class CTActivity extends CTCNC
         }
 
         $backURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array('action' => 'activityCreate1')
             );
@@ -3726,7 +3700,7 @@ class CTActivity extends CTCNC
 
             /* Gather fixed info */
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => 'gatherFixedInformation',
@@ -3937,7 +3911,7 @@ class CTActivity extends CTCNC
         while ($dsContactSrs->fetchNext()) {
 
             $urlCreateFollowOn =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'         => 'createFollowOnActivity',
@@ -3947,7 +3921,7 @@ class CTActivity extends CTCNC
                 );
 
             $urlProblemHistoryPopup =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     array(
                         'action'    => 'problemHistoryPopup',
@@ -4055,7 +4029,7 @@ class CTActivity extends CTCNC
             $callActivityID = 0;
 
             $urlUpdateActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTACTIVITY_ACT_INSERT_ACTIVITY
@@ -4071,7 +4045,7 @@ class CTActivity extends CTCNC
             }
 
             $urlUpdateActivity =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTACTIVITY_ACT_UPDATE_ACTIVITY
@@ -4156,7 +4130,7 @@ class CTActivity extends CTCNC
         );
 
         $urlDisplayActivity =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -4165,7 +4139,7 @@ class CTActivity extends CTCNC
             );
 
         $urlCancelEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_CANCEL_EDIT,
@@ -4305,7 +4279,7 @@ class CTActivity extends CTCNC
 
 
         $urlLinkedSalesOrder =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'         => 'editLinkedSalesOrder',
@@ -4694,7 +4668,7 @@ class CTActivity extends CTCNC
       */
         if (!$problemID) {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
@@ -4702,7 +4676,7 @@ class CTActivity extends CTCNC
                 );
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => 'displayLastActivity',
@@ -4748,7 +4722,7 @@ class CTActivity extends CTCNC
             } else {
 
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
@@ -5165,7 +5139,7 @@ class CTActivity extends CTCNC
 
             ) {
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'callActivityID' => $callActivityID,
@@ -5196,7 +5170,7 @@ class CTActivity extends CTCNC
                 exit;
             } else {
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'callActivityID' => $callActivityID,
@@ -5229,7 +5203,7 @@ class CTActivity extends CTCNC
         $this->buActivity->setActivityStatusChecked($_REQUEST['callActivityID']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
@@ -5266,7 +5240,7 @@ class CTActivity extends CTCNC
         );
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
@@ -5369,7 +5343,7 @@ class CTActivity extends CTCNC
 
         // Allow details to be entered
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY,
@@ -5422,14 +5396,14 @@ class CTActivity extends CTCNC
     function gscExportForm($dsResults = false)
     {
         $this->setMethodName('gscExportForm');
-        $urlPreview = $this->buildLink(
+        $urlPreview = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTACTIVITY_ACT_EXPORT_GENERATE,
                 'update' => 0
             )
         );
-        $urlExport = $this->buildLink(
+        $urlExport = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTACTIVITY_ACT_EXPORT_GENERATE,
@@ -5467,7 +5441,7 @@ class CTActivity extends CTCNC
             ); // ss avoids naming confict!
             while ($dsResults->fetchNext()) {
                 $urlStatement =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'         => CTACTIVITY_ACT_EDIT_CALL,
@@ -5561,7 +5535,7 @@ class CTActivity extends CTCNC
 
         $urlActivity =
             'http://' . $_SERVER['HTTP_HOST'] .
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'callActivityID' => $dsCallActivity->getValue('callActivityID'),
@@ -5897,7 +5871,7 @@ class CTActivity extends CTCNC
                 if ($_REQUEST['managementReviewFlag'] == 'Y') {
 
                     $nextURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'problemID' => $dsCallActivity->getValue('problemID'),
@@ -5907,7 +5881,7 @@ class CTActivity extends CTCNC
 
                 } else {
                     $nextURL =
-                        $this->buildLink(
+                        Controller::buildLink(
                             'CurrentActivityReport.php',
                             array()
                         );
@@ -5936,7 +5910,7 @@ class CTActivity extends CTCNC
         }
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'gatherFixedInformation'
@@ -5959,7 +5933,7 @@ class CTActivity extends CTCNC
         }
 
         $uploadURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'gatherFixedInformation',
@@ -5969,7 +5943,7 @@ class CTActivity extends CTCNC
             );
 
         $urlMessageToSales =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'messageToSales',
@@ -5978,7 +5952,7 @@ class CTActivity extends CTCNC
             );
 
         $urlSalesRequest =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => 'sendSalesRequest',
@@ -6082,7 +6056,7 @@ class CTActivity extends CTCNC
                 );
 
                 $nextURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         'CurrentActivityReport.php',
                         array()
                     );
@@ -6096,7 +6070,7 @@ class CTActivity extends CTCNC
 
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'gatherManagementReviewDetails'
@@ -6175,7 +6149,7 @@ class CTActivity extends CTCNC
             );
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'CurrentActivityReport.php',
                     array()
                 );
@@ -6203,7 +6177,7 @@ class CTActivity extends CTCNC
         }
 
         $urlProblemHistoryPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'    => 'problemHistoryPopup',
@@ -6213,7 +6187,7 @@ class CTActivity extends CTCNC
             );
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'allocateAdditionalTime'
@@ -6354,7 +6328,7 @@ class CTActivity extends CTCNC
             );
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'SalesRequestDashboard.php',
                     array()
                 );
@@ -6363,7 +6337,7 @@ class CTActivity extends CTCNC
         }
 
         $urlProblemHistoryPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'    => 'problemHistoryPopup',
@@ -6374,7 +6348,7 @@ class CTActivity extends CTCNC
 
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
@@ -6432,7 +6406,7 @@ class CTActivity extends CTCNC
 
         if (isset($_REQUEST['fromEmail'])) {
             $url =
-                $this->buildLink(
+                Controller::buildLink(
                     'Activity.php',
                     [
                         "action"         => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
@@ -6469,7 +6443,7 @@ class CTActivity extends CTCNC
             );
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'CurrentActivityReport.php',
                     array()
                 );
@@ -6479,7 +6453,7 @@ class CTActivity extends CTCNC
         }
 
         $urlProblemHistoryPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'    => 'problemHistoryPopup',
@@ -6490,7 +6464,7 @@ class CTActivity extends CTCNC
 
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
@@ -6617,7 +6591,7 @@ class CTActivity extends CTCNC
             );
 
             $nextURL =
-                $this->buildLink(
+                Controller::buildLink(
                     'TimeRequestDashboard.php',
                     array()
                 );
@@ -6627,7 +6601,7 @@ class CTActivity extends CTCNC
         }
 
         $urlProblemHistoryPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'    => 'problemHistoryPopup',
@@ -6638,7 +6612,7 @@ class CTActivity extends CTCNC
 
 
         $submitURL =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
@@ -6785,7 +6759,7 @@ class CTActivity extends CTCNC
             );
 
             $urlRenewalContract =
-                $this->buildLink(
+                Controller::buildLink(
                     'CustomerItem.php',
                     array(
                         'action'         => 'displayRenewalContract',
@@ -6851,7 +6825,7 @@ class CTActivity extends CTCNC
 
 
         $urlSubmit =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'managerCommentPopup'
@@ -7065,7 +7039,7 @@ class CTActivity extends CTCNC
         }
 
         $urlCreateTravel =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'callActivityID' => $_REQUEST['callActivityID'],
@@ -7077,7 +7051,7 @@ class CTActivity extends CTCNC
         if ($_REQUEST['nextStatus'] == 'Fixed') {
 
             $urlSkipTravel =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'callActivityID' => $_REQUEST['callActivityID'],
@@ -7086,7 +7060,7 @@ class CTActivity extends CTCNC
                 );
         } else {
             $urlSkipTravel =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'callActivityID' => $_REQUEST['callActivityID'],
@@ -7140,7 +7114,7 @@ class CTActivity extends CTCNC
         $this->buActivity->finaliseProblem($_REQUEST['callActivityID']);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 'CurrentActivityReport.php',
                 array()
             );
@@ -7153,7 +7127,7 @@ class CTActivity extends CTCNC
     function redirectToEdit($callActivityID)
     {
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'callActivityID' => $callActivityID,
@@ -7169,7 +7143,7 @@ class CTActivity extends CTCNC
     )
     {
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'callActivityID' => $callActivityID,
@@ -7347,7 +7321,7 @@ class CTActivity extends CTCNC
     private function getServiceRequestForContactLink($contactID)
     {
         $contactHistory =
-            $this->buildLink(
+            Controller::buildLink(
                 'Activity.php',
                 array(
                     'action'    => 'displayServiceRequestForContactPopup',

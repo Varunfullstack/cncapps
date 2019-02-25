@@ -131,7 +131,7 @@ class CTPasswordServices extends CTCNC
 
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPasswordService_ACT_CREATE
@@ -159,7 +159,7 @@ class CTPasswordServices extends CTCNC
             $passwordServiceID = $dbePasswordService->getValue(DBEPasswordService::passwordServiceID);
 
             $urlEdit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'            => CTPasswordService_ACT_EDIT,
@@ -169,7 +169,7 @@ class CTPasswordServices extends CTCNC
             $txtEdit = '[edit]';
 
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'            => CTPasswordService_ACT_DELETE,
@@ -266,7 +266,7 @@ class CTPasswordServices extends CTCNC
         }
         if ($_REQUEST['action'] == CTPasswordService_ACT_EDIT) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'            => CTPasswordService_ACT_DELETE,
@@ -279,7 +279,7 @@ class CTPasswordServices extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'            => CTPasswordService_ACT_UPDATE,
@@ -287,7 +287,7 @@ class CTPasswordServices extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTPASSWORDSERVICE_ACT_DISPLAY_LIST
@@ -364,7 +364,7 @@ class CTPasswordServices extends CTCNC
         $this->buPasswordService->updatePasswordService($this->dsPasswordService);
 
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'passwordServiceID' => $this->dsPasswordService->getValue('passwordServiceID'),
@@ -386,7 +386,7 @@ class CTPasswordServices extends CTCNC
         try {
             $this->buPasswordService->deletePasswordService($_REQUEST['passwordServiceID']);
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTPASSWORDSERVICE_ACT_DISPLAY_LIST

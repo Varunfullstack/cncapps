@@ -704,7 +704,9 @@ class BURenQuotation extends Business
         echo '</ul>';
     }
 
-    function processQuotationRenewal($customerItemID)
+    function processQuotationRenewal($customerItemID,
+                                     $convertToOrder = false
+    )
     {
         $this->dbeRenQuotation->setValue(
             'customerItemID',
@@ -712,10 +714,22 @@ class BURenQuotation extends Business
         );
         $this->dbeRenQuotation->getRowsByColumn('customerItemID');
 
+        $dbRenQuotationUpdate = new DBECustomerItem($this);
+
         if ($this->dbeRenQuotation->fetchNext()) {
-
             $this->dbeRenQuotation->addYearToStartDate($this->dbeRenQuotation->getPKValue());
-
+            if ($convertToOrder) {
+                $dbRenQuotationUpdate->getRow($customerItemID);
+                $dbRenQuotationUpdate->setValue(
+                    DBECustomerItem::ordheadID,
+                    null
+                );
+                $dbRenQuotationUpdate->setValue(
+                    DBECustomerItem::customerItemNotes,
+                    null
+                );
+                $dbRenQuotationUpdate->updateRow();
+            }
         }
 
     }

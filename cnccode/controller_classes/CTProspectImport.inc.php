@@ -60,7 +60,7 @@ class CTProspectImport extends CTCNC
     function select()
     {
         $this->setMethodName('select');
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTPROSPECT_IMPORT_ACT_GENERATE

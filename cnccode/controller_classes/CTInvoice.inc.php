@@ -274,7 +274,7 @@ class CTInvoice extends CTCNC
         $dsSearchForm = &$this->dsSearchForm; // ref to global
         $dsSearchResults = &$this->dsSearchResults; // ref to global
         $this->setMethodName('displaySearchForm');
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -282,19 +282,19 @@ class CTInvoice extends CTCNC
             )
         );
 
-        $urlCreateInvoice = $this->buildLink(
+        $urlCreateInvoice = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTINVOICE_ACT_CREATE_NEW_INVOICE
             )
         );
-        $urlCreateCreditNote = $this->buildLink(
+        $urlCreateCreditNote = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTINVOICE_ACT_CREATE_NEW_CREDIT
             )
         );
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_SEARCH
@@ -356,7 +356,7 @@ class CTInvoice extends CTCNC
             $ordheadIDCol = $dsSearchResults->columnExists('ordheadID');
             while ($dsSearchResults->fetchNext()) {
                 $invoiceURL =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCNC_ACT_DISPLAY_INVOICE,
@@ -427,7 +427,7 @@ class CTInvoice extends CTCNC
         $this->setMethodName('printUnprinted');
 
 
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTINVOICE_ACT_UNPRINTED_GENERATE
@@ -656,7 +656,7 @@ class CTInvoice extends CTCNC
     function invoiceReprint()
     {
         $this->setMethodName('invoiceReprint');
-        $urlSubmit = $this->buildLink(
+        $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action' => CTCNC_ACT_INVOICE_REPRINT_GENERATE
@@ -671,7 +671,7 @@ class CTInvoice extends CTCNC
             $this->buInvoice->initialiseDataset($this->dsPrintRange);
         }
 
-        $urlCustomerPopup = $this->buildLink(
+        $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
                 'action'  => CTCNC_ACT_DISP_CUST_POPUP,
@@ -796,7 +796,7 @@ class CTInvoice extends CTCNC
         $invoiceType = $dsInvhead->getValue('type');
         $datePrinted = $dsInvhead->getValue('datePrinted');
         $urlUpdateHeader =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTINVOICE_ACT_UPDATE_HEADER,
@@ -804,7 +804,7 @@ class CTInvoice extends CTCNC
                 )
             );
         $urlContactPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
                     'action'     => CTCNC_ACT_CONTACT_POPUP,
@@ -813,7 +813,7 @@ class CTInvoice extends CTCNC
                 )
             );
         $urlContactEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
                     'action'  => CTCNC_ACT_CONTACT_EDIT,
@@ -821,7 +821,7 @@ class CTInvoice extends CTCNC
                 )
             );
         $urlSiteEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_EDIT,
@@ -829,7 +829,7 @@ class CTInvoice extends CTCNC
                 )
             );
         $urlSitePopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_SITE,
                 array(
                     'action'  => CTCNC_ACT_SITE_POPUP,
@@ -837,21 +837,21 @@ class CTInvoice extends CTCNC
                 )
             );
         $urlUpdateContact =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTINVOICE_ACT_UPDATE_CONTACT
                 )
             );
         $urlUpdateAddress =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTINVOICE_ACT_UPDATE_ADDRESS
                 )
             );
         $urlDeleteInvoice =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTINVOICE_ACT_DELETE_INVOICE,
@@ -880,7 +880,7 @@ class CTInvoice extends CTCNC
             );
             if ($dbeOrdhead->getRow()) {
                 $urlSalesOrder =
-                    $this->buildLink(
+                    Controller::buildLink(
                         CTCNC_PAGE_SALESORDER,
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -897,7 +897,7 @@ class CTInvoice extends CTCNC
             ($dsInvline->rowCount() > 0)
         ) {
             $urlPrint =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTINVOICE_ACT_PRINT_ONE_INVOICE,
@@ -907,7 +907,7 @@ class CTInvoice extends CTCNC
             $txtPrint = 'Print';
 
             $urlRegeneratePdf =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => 'regeneratePdf',
@@ -917,7 +917,7 @@ class CTInvoice extends CTCNC
             $txtRegeneratePdf = 'Regenerate PDF';
         }
         $urlHome =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
@@ -966,7 +966,7 @@ class CTInvoice extends CTCNC
         );
         if ($dsInvline->rowCount() == 0) {                // no lines yet so need way of adding first
             $urlAddLine =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTINVOICE_ACT_ADD_LINE,
@@ -986,7 +986,7 @@ class CTInvoice extends CTCNC
         }
         if ($dsInvline->rowCount() == 0) {                // no lines yet so need way of adding first
             $urlAddLine =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'     => CTINVOICE_ACT_ADD_LINE,
@@ -1045,7 +1045,7 @@ class CTInvoice extends CTCNC
                     );
                 }
                 $urlEditLine =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTINVOICE_ACT_EDIT_LINE,
@@ -1055,7 +1055,7 @@ class CTInvoice extends CTCNC
                     );
                 // common to comment and item lines
                 $urlAddLine =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTINVOICE_ACT_ADD_LINE,
@@ -1064,7 +1064,7 @@ class CTInvoice extends CTCNC
                         )
                     );
                 $urlMoveLineUp =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTINVOICE_ACT_MOVE_LINE_UP,
@@ -1073,7 +1073,7 @@ class CTInvoice extends CTCNC
                         )
                     );
                 $urlMoveLineDown =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTINVOICE_ACT_MOVE_LINE_DOWN,
@@ -1082,7 +1082,7 @@ class CTInvoice extends CTCNC
                         )
                     );
                 $urlDeleteLine =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTINVOICE_ACT_DELETE_LINE,
@@ -1265,7 +1265,7 @@ class CTInvoice extends CTCNC
         );
         if ($_REQUEST['action'] == CTINVOICE_ACT_EDIT_LINE) {
             $urlSubmit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTINVOICE_ACT_UPDATE_LINE
@@ -1273,7 +1273,7 @@ class CTInvoice extends CTCNC
                 );
         } else {
             $urlSubmit =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTINVOICE_ACT_INSERT_LINE
@@ -1281,7 +1281,7 @@ class CTInvoice extends CTCNC
                 );
         }
         $urlCancel =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'invheadID' => $this->dsInvhead->getValue('invheadID'),
@@ -1492,7 +1492,7 @@ class CTInvoice extends CTCNC
         if ($dsInvhead->getValue('ordheadID') <> '') {
             if ($this->buInvoice->countInvoicesByOrdheadID($dsInvhead->getValue('ordheadID')) > 0) {
                 $urlNext =                        // there is still one or more invoices so display it/them
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCNC_ACT_SEARCH,
@@ -1502,7 +1502,7 @@ class CTInvoice extends CTCNC
                     );
             } else {                                        // no more invoices for order so display order
                 $urlNext =
-                    $this->buildLink(
+                    Controller::buildLink(
                         CTCNC_PAGE_SALESORDER,
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
@@ -1512,7 +1512,7 @@ class CTInvoice extends CTCNC
             }
         } else {                                        // not attached to sales order so display invoice search page
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTINVOICE_ACT_DISP_SEARCH
@@ -1572,7 +1572,7 @@ class CTInvoice extends CTCNC
     function redirectToDisplay($invheadID)
     {
         $urlNext =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'invheadID' => $invheadID,

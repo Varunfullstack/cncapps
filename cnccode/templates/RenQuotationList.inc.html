@@ -3,93 +3,116 @@
         src="CommonJS.js"
 >
 </script>
+<script>
+
+    $(function () {
+        $('#theTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            columnDefs: [
+                {type: "date-eu", targets: [3, 4]}
+            ],
+            paging: false,
+            order: [
+                [2, 'desc'],
+            ]
+        });
+    })
+
+</script>
 
 
 <table class="singleBorder"
+       id="theTable"
        width="600"
        border="0"
        cellspacing="1"
        cellpadding="2"
 >
+    <thead>
     <tr>
         <td width="300"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=cus_name">Customer</a>
+            Customer
         </td>
         <td width="200"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=itm_desc">Item</a>
+            Item
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=ordheadID">Sales Order</a>
+            Sales Order
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=nextPeriodStartDateYMD">Invoice From</a>
+            Invoice From
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=nextPeriodEndDateYMD">Expiry Date</a>
+            Expiry Date
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=custitem.itemNotes">Comments</a>
+            Comments
         </td>
         <td width="50"
             class="listHeadText"
         >
-            <a href="{urlList}&orderBy=latestQuoteSent">Latest Quote Sent</a>
+            Latest Quote Sent
         </td>
         <td width="50"
             class="listHeadText"
         >&nbsp;
         </td>
     </tr>
+    </thead>
+    <tbody>
     <!-- BEGIN rowBlock -->
     <tr valign="top"
         onMouseOver="this.style.backgroundColor ='#ffffcc';"
         onMouseOut="this.style.backgroundColor='{sentQuotationColor}';"
         style="background-color: {sentQuotationColor};"
     >
-        <td class="orderLineItem">
-            <DIV align="left">{customerName}</div>
+        <td class="orderLineItem alignLeft">
+            {customerName}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">{itemDescription}</div>
+        <td class="orderLineItem alignLeft">
+            {itemDescription}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">{salesOrderLink}</div>
+        <td class="orderLineItem alignLeft">
+            {salesOrderLink}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">{startDate}</div>
+        <td class="orderLineItem alignLeft">
+            {startDate}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">{nextPeriodStartDate}</div>
+        <td class="orderLineItem alignLeft">
+            {nextPeriodStartDate}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">{comments}</div>
+        <td class="orderLineItem alignLeft">
+            {comments}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">{latestQuoteSent}</div>
+        <td class="orderLineItem alignLeft">
+            {latestQuoteSent}
         </td>
-        <td class="orderLineItem">
-            <DIV align="left">
-            </div>
-            <DIV align="left">
-                <A href="{urlEdit}"
-                   title="Edit renewal details"
-                   target="_blank"
-                >{txtEdit}</a>
-            </DIV>
+        <td class="orderLineItem alignLeft">
+            <A href="{urlEdit}"
+               title="Edit renewal details"
+               target="_blank"
+            >{txtEdit}</a>
         </td>
     </tr>
     <!-- END rowBlock -->
+    </tbody>
 </table>
 <!-- End Template: RenQuotationList.inc.html -->

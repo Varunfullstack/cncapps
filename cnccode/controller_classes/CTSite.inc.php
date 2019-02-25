@@ -89,7 +89,7 @@ class CTSite extends CTCNC
         if ($_REQUEST['customerID'] == '') {
             $this->raiseError('customerID not passed');
         }
-        $urlCreate = $this->buildLink(
+        $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'     => CTCNC_ACT_SITE_ADD,
@@ -169,7 +169,7 @@ class CTSite extends CTCNC
             )
         );
         $urlContactEdit =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
                     'action'     => CTCNC_ACT_CONTACT_EDIT,
@@ -179,7 +179,7 @@ class CTSite extends CTCNC
                 )
             );
         $urlContactPopup =
-            $this->buildLink(
+            Controller::buildLink(
                 CTCNC_PAGE_CONTACT,
                 array(
                     'action'     => CTCNC_ACT_CONTACT_POPUP,
@@ -244,7 +244,7 @@ class CTSite extends CTCNC
             $this->buSite->initialiseNewSite($_REQUEST['customerID'], $this->dsSite);
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTSITE_ACT_SITE_INSERT,
@@ -273,7 +273,7 @@ class CTSite extends CTCNC
             }
         }
         return (
-        $this->buildLink(
+        Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTSITE_ACT_SITE_UPDATE,
@@ -317,7 +317,7 @@ class CTSite extends CTCNC
             $this->displaySiteSelectPopup();
         }
         /*
-                    $urlNext = $this->buildLink(
+                    $urlNext = Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTCNC_ACT_SITE_POPUP,

@@ -75,7 +75,7 @@ class CTSecurityApp extends CTCNC
         $this->buSecurityApp->getAllRows($dsSecurityApp);
 
         $urlCreate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSECURITYAPP_ACT_CREATE
@@ -91,7 +91,7 @@ class CTSecurityApp extends CTCNC
             while ($dsSecurityApp->fetchNext()) {
                 $securityAppID = $dsSecurityApp->getValue('securityAppID');
                 $urlEdit =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTSECURITYAPP_ACT_EDIT,
@@ -101,7 +101,7 @@ class CTSecurityApp extends CTCNC
                 $txtEdit = '[edit]';
 
                 $urlDelete =
-                    $this->buildLink(
+                    Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action' => CTSECURITYAPP_ACT_DELETE,
@@ -152,7 +152,7 @@ class CTSecurityApp extends CTCNC
         }
         if ($_REQUEST['action'] == CTSECURITYAPP_ACT_EDIT) {
             $urlDelete =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSECURITYAPP_ACT_DELETE,
@@ -165,7 +165,7 @@ class CTSecurityApp extends CTCNC
             $txtDelete = '';
         }
         $urlUpdate =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSECURITYAPP_ACT_UPDATE,
@@ -173,7 +173,7 @@ class CTSecurityApp extends CTCNC
                 )
             );
         $urlDisplayList =
-            $this->buildLink(
+            Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => CTSECURITYAPP_ACT_DISPLAY_LIST
@@ -223,7 +223,7 @@ class CTSecurityApp extends CTCNC
         $this->buSecurityApp->updateSecurityApp($this->dsSecurityApp);
 
         $urlNext =
-            $this->buildLink($_SERVER['PHP_SELF'],
+            Controller::buildLink($_SERVER['PHP_SELF'],
                              array(
                                  'securityAppID' => $this->dsSecurityApp->getValue('securityAppID'),
                                  'action' => CTCNC_ACT_VIEW
@@ -246,7 +246,7 @@ class CTSecurityApp extends CTCNC
             exit;
         } else {
             $urlNext =
-                $this->buildLink(
+                Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => CTSECURITYAPP_ACT_DISPLAY_LIST
