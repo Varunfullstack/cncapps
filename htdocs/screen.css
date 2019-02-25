@@ -333,6 +333,10 @@ DIV.purchOrderSearchScroll {
     text-align: right;
 }
 
+.alignLeft {
+    text-align: left;
+}
+
 .orderLineLoss {
     color: Red;
     text-align: right;
