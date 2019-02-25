@@ -220,10 +220,23 @@ class CTContactExport extends CTCNC
         );
 
         $dsSearchForm->addColumn(
-            'supportLevel',
+            DBEContact::supportLevel,
             DA_ARRAY,
             DA_ALLOW_NULL
         );
+
+        $dsSearchForm->addColumn(
+            DBEContact::reviewUser,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL
+        );
+
+        $dsSearchForm->addColumn(
+            DBEContact::hrUser,
+            DA_YN_FLAG,
+            DA_ALLOW_NULL
+        );
+
 
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
@@ -372,6 +385,12 @@ class CTContactExport extends CTCNC
                 'mailshot4FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot4FlagDesc')),
                 'mailshot8FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot8FlagDesc')),
                 'mailshot9FlagDesc'            => Controller::htmlDisplayText($dsHeader->getValue('mailshot9FlagDesc')),
+                'reviewUserChecked'            => Controller::htmlChecked(
+                    $dsSearchForm->getValue(DBEContact::reviewUser)
+                ),
+                'hrUserChecked'                => Controller::htmlChecked(
+                    $dsSearchForm->getValue(DBEContact::hrUser)
+                ),
                 'noOfPCs'                      => $dsSearchForm->getValue('noOfPCs'),
                 'noOfServers'                  => $dsSearchForm->getValue('noOfServers'),
                 'newCustomerFromDate'          => $dsSearchForm->getValue('newCustomerFromDate'),

@@ -1447,7 +1447,7 @@ class BUSalesOrder extends Business
             $dsOrdhead,
             $dsOrdline
         );
-
+        $buRenQuotation = null;
         while ($dsOrdline->fetchNext()) {
 
             if ($dsOrdline->getValue('renewalCustomerItemID')) {
@@ -1459,7 +1459,10 @@ class BUSalesOrder extends Business
                     $buRenQuotation = new BURenQuotation($this);
                 }
 
-                $buRenQuotation->processQuotationRenewal($dsOrdline->getValue('renewalCustomerItemID'));
+                $buRenQuotation->processQuotationRenewal(
+                    $dsOrdline->getValue('renewalCustomerItemID'),
+                    $convertToOrder
+                );
 
             }
 
