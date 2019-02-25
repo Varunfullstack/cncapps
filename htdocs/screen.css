@@ -337,6 +337,10 @@ DIV.purchOrderSearchScroll {
     text-align: left;
 }
 
+.dataTables_wrapper table {
+    margin: 0px !important;
+}
+
 .orderLineLoss {
     color: Red;
     text-align: right;
