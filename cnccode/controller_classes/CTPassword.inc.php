@@ -19,6 +19,14 @@ class CTPassword extends CTCNC
     /** @var BUPassword */
     public $buPassword;
 
+    public static $passwordLevels = [
+        ["level" => 0, "description" => "No Access"],
+        ["level" => 1, "description" => "Standard Access"],
+        ["level" => 2, "description" => "Elevated Access"],
+        ["level" => 3, "description" => "Team Lead Access"],
+        ["level" => 4, "description" => "Management Access"]
+    ];
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -446,19 +454,20 @@ class CTPassword extends CTCNC
             'levels'
         );
 
-
+        $minLevel = 1;
         $maxLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
 
         if (!$maxLevel) {
             echo 'You cannot edit this password';
             exit;
         }
-        for ($level = 1; $level <= $maxLevel; $level++) {
+        for ($level = $minLevel; $level <= $maxLevel; $level++) {
 
             $this->template->set_var(
                 array(
-                    'level'         => $level,
-                    'levelSelected' => $dsPassword->getValue(DBEPassword::level) == $level ? 'selected' : ''
+                    'level'            => $level,
+                    'levelSelected'    => $dsPassword->getValue(DBEPassword::level) == $level ? 'selected' : '',
+                    'levelDescription' => self::$passwordLevels[$level]['description']
                 )
             );
             $this->template->parse(

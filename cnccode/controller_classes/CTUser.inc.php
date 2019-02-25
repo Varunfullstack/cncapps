@@ -397,13 +397,7 @@ class CTUser extends CTCNC
             'levelBlock',
             'levels'
         );
-        $passwordLevels = [
-            ["level" => 0, "description" => "No Access"],
-            ["level" => 1, "description" => "Standard Access"],
-            ["level" => 2, "description" => "Elevated Access"],
-            ["level" => 3, "description" => "Team Lead Access"],
-            ["level" => 4, "description" => "Management Access"]
-        ];
+        $passwordLevels = CTPassword::$passwordLevels;
 
         foreach ($passwordLevels as $level) {
 
