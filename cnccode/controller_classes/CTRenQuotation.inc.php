@@ -199,7 +199,12 @@ class CTRenQuotation extends CTCNC
                 if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent) && $dsRenQuotation->getValue(
                         DBEJRenQuotation::latestQuoteSent
                     ) != '0000-00-00 00:00:00') {
-                    $latestQuoteSent = $dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent);
+                    $latestQuoteSent = DateTime::createFromFormat(
+                        'Y-m-d H:i:s',
+                        $dsRenQuotation->getValue(
+                            DBEJRenQuotation::latestQuoteSent
+                        )
+                    );
                 }
 
                 $salesOrderLink = null;
@@ -240,8 +245,8 @@ class CTRenQuotation extends CTCNC
                         'urlList'             => $urlList,
                         'txtEdit'             => $txtEdit,
                         'salesOrderLink'      => $salesOrderLink,
-                        'sentQuotationColor'  => $sent ? "#B2FFB2" : "#F5AEBD",
-                        'latestQuoteSent'     => $latestQuoteSent,
+                        'sentQuotationColor'  => !$salesOrderLink ? 'white' : ($sent ? "#B2FFB2" : "#F5AEBD"),
+                        'latestQuoteSent'     => $latestQuoteSent ? $latestQuoteSent->format('d/m/Y H:i:s') : '',
                         'comments'            => substr(
                             $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes),
                             0,

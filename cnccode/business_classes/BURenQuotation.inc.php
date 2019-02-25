@@ -725,7 +725,7 @@ class BURenQuotation extends Business
                     null
                 );
                 $dbRenQuotationUpdate->setValue(
-                    DBECustomerItem::comment,
+                    DBECustomerItem::customerItemNotes,
                     null
                 );
                 $dbRenQuotationUpdate->updateRow();
