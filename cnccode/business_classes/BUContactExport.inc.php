@@ -233,8 +233,6 @@ class BUContactExport extends Business
                         ) . ")";
                 }
             }
-
-            var_dump($query);
         }
 
         if (
