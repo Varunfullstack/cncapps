@@ -684,22 +684,7 @@ class BUDailyReport extends Business
             $sql .= " AND pro_priority < 5";
         }
 
-        $sql .= "
-        /*
-        Exclude SRs with open future activities
-        */
-        AND
-          (
-            SELECT
-              COUNT(*)
-            FROM
-              callactivity
-            WHERE
-              caa_problemno = pro_problemno
-              AND caa_date > DATE( NOW() )
-              AND caa_endtime = ''
-          ) = 0
-      ORDER BY customer,
+        $sql .= "      ORDER BY customer,
         pro_problemno";
 
         return $this->db->query($sql);

@@ -1,7 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.2.0]
+## [v2.2.1] - 2019-02-26
+### Fixed
+- Timezone Issue
+- Goods In Issue
+- Open for over 7 Days Issue
+
+## [v2.2.0] - 2019-02-25
 ### Changed
 - Issue 474 - Request Dashboards visual enhancements
 - Issue 464 - Contact Validation Change

@@ -11,6 +11,7 @@ require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DBETeam.inc.php');
+require_once($cfg['path_ct'] . '/CTPassword.inc.php');
 // Actions
 define(
     'CTUSER_ACT_DISPLAY_LIST',
