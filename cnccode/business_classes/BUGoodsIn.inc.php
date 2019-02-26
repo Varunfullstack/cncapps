@@ -840,7 +840,7 @@ class BUGoodsIn extends Business
      * @param Dataset $dsGoodsIn Dataset of recieved items
      */
     function receiveFromStock($porheadID,
-                              DBEPorhead &$dsPorhead,
+                              DataSet &$dsPorhead,
                               $userID,
                               & $dsGoodsIn
     )

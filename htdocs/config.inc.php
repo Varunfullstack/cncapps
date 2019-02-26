@@ -9,7 +9,7 @@ $owa->setSiteId('b39a0f923d7f45bec2ccb7fa0435f82c');
 //$owa->setPageTitle('somepagetitle');
 // Set other page properties
 //$owa->setProperty('foo', 'bar');
-$owa->trackPageView();
+//$owa->trackPageView();
 ini_set(
     'memory_limit',
     '8192M'
