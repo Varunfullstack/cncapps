@@ -7,18 +7,34 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
-ini_set('zend.ze1_compatibility_mode', 0);
+ini_set(
+    'zend.ze1_compatibility_mode',
+    0
+);
 require_once("config.inc.php");
 require_once("../cnccode/business_classes/BUMail.inc.php");
 
-define('OS_CALL_EMAIL_FROM_USER', 'sales@cnc-ltd.co.uk');
-define('OS_CALL_EMAIL_SUBJECT', 'Open SR Activities');
-define('FORMAT_MYSQL_UK_DATE', '%e/%c/%Y');
+define(
+    'OS_CALL_EMAIL_FROM_USER',
+    'sales@cnc-ltd.co.uk'
+);
+define(
+    'OS_CALL_EMAIL_SUBJECT',
+    'Open SR Activities'
+);
+define(
+    'FORMAT_MYSQL_UK_DATE',
+    '%e/%c/%Y'
+);
 
 
 $domain = 'cnc-ltd.co.uk';
 
-if (!$localDb = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
+if (!$localDb = mysqli_connect(
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD
+)) {
     echo 'Could not connect to mysql host ' . DB_HOST;
     exit;
 }
@@ -96,7 +112,10 @@ foreach ($engineers as $row) {
         <?php
         while ($i = $result->fetch_row()) {
             $managerId = $i[4];
-            if ($managerId && (strtotime($i[3]) <= strtotime('-5 days', time()))) {
+            if ($managerId && (strtotime($i[3]) <= strtotime(
+                        '-5 days',
+                        time()
+                    ))) {
                 //this guy has a manager and this activity was open more than two days ago
                 if (!isset($managers[$managerId])) {
                     $managers[$managerId] = (object)[
@@ -106,7 +125,7 @@ foreach ($engineers as $row) {
 
                 if (!isset($managers[$managerId]->minionConsultants[$row['cns_consno']])) {
                     $managers[$managerId]->minionConsultants[$row['cns_consno']] = (object)[
-                        "name" => $row['Engineer'],
+                        "name"           => $row['Engineer'],
                         "openActivities" => []
                     ];
                 }
@@ -143,16 +162,16 @@ foreach ($engineers as $row) {
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
 
         $hdrs = array(
-            'From' => CONFIG_SALES_MANAGER_EMAIL,
-            'Subject' => $emailSubject,
+            'From'         => CONFIG_SALES_MANAGER_EMAIL,
+            'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -190,6 +209,7 @@ foreach ($managers as $managerId => $manager) {
 
     $sender_name = "Call System";
     $sender_email = OS_CALL_EMAIL_FROM_USER;
+
     $headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html";
@@ -269,22 +289,23 @@ foreach ($managers as $managerId => $manager) {
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $buMail->mime->get($mime_params);
 
+        $sendTo = $managerRow['cns_logname'] . '@' . $domain;
         $hdrs = array(
-            'From' => CONFIG_SALES_MANAGER_EMAIL,
-            'Subject' => $emailSubject,
+            'To'           => $sendTo,
+            'From'         => CONFIG_SALES_MANAGER_EMAIL,
+            'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $sendTo = $managerRow['cns_logname'] . '@' . $domain;
 
         $sent = $buMail->send(
             $sendTo,
