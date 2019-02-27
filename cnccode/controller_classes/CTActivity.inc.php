@@ -526,7 +526,7 @@ class CTActivity extends CTCNC
             header('Location: ' . $urlNext);
         }
     }
-    
+
     function completeSRs()
     {
         $this->setMethodName('completeSRs');
@@ -2745,13 +2745,14 @@ class CTActivity extends CTCNC
               WHERE
                 pro_custno = cus_custno
                 AND pro_status IN( 'I', 'P')
-            ) AS openSrCount
+            ) AS openSrCount,
+       (SELECT cui_itemno IS NOT NULL FROM custitem WHERE custitem.`cui_itemno` = 4111 AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1) AS hasPrepay,
+       (SELECT item.`itm_desc` FROM custitem LEFT JOIN item ON cui_itemno = item.`itm_itemno` WHERE itm_desc LIKE '%servicedesk%' AND custitem.`declinedFlag` <> 'Y' AND custitem.`cui_custno` = customer.`cus_custno` limit 1 ) AS hasServiceDesk
                 
           FROM customer
           
             JOIN contact ON con_custno = cus_custno
             JOIN address ON add_custno = cus_custno AND add_siteno = con_siteno
-          
           WHERE supportLevel is not null and supportLevel <> '' ";
 
                 if ($_REQUEST['customerString']) {
@@ -2778,7 +2779,6 @@ class CTActivity extends CTCNC
                     $query .= " AND con_contno = " . $_REQUEST['contactID'];
                 }
 
-                $query .= " AND  supportLevel is not null ";
                 $query .= " ORDER BY cus_name, con_last_name, con_first_name";
                 $result = mysqli_query(
                     $db,
@@ -2895,7 +2895,8 @@ class CTActivity extends CTCNC
                         'add_phone'            => $site_phone,
                         'site_name'            => $site_name,
                         'contact_notes'        => $row['con_notes'],
-                        'contact_supportLevel' => $row['supportLevel']
+                        'contact_supportLevel' => $row['supportLevel'],
+                        'contract'             => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required')
                     )
                 );
                 $this->template->parse(
