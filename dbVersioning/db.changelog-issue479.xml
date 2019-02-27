@@ -17,8 +17,15 @@
         </addColumn>
     </changeSet>
     <changeSet author="pavwebdev" id="1550835051-2">
-        <preConditions>
-            <not
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ignoredADDomain"/>
+            </not>
         </preConditions>
+        <createTable tableName="ignoredADDomain">
+            <column name="ignoredADDomainID" type="int(11)"/>
+            <column name="domain" type="text"/>
+            <column name="customerID" type="int(11)"/>
+        </createTable>
     </changeSet>
 </databaseChangeLog>

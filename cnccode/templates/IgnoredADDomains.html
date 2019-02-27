@@ -50,7 +50,13 @@
          data-id="{% id %}"
     >
         <div class="email">
-            <span>{% firstPart %}@{% lastPart %}</span>
+            <span>{% domain %}</span>
+            {% #customerID %}
+            <span>{% customerString  %}</span>
+            {% /customerID %}
+            {% ^customerID %}
+            <span>Global</span>
+            {% /customerID %}
         </div>
         <div class="buttons">
             <button class="editButton">Edit</button>
@@ -182,7 +188,7 @@
                 url: url,
                 method: 'GET',
             }).then(function (result) {
-                ignoredADDomainItems.splice(foundIndex);
+                ignoredADDomainItems.splice(foundIndex, 1);
                 drawList();
             })
         });
@@ -198,9 +204,17 @@
                 return;
             }
 
+            const customerString = customerSection.find('[name="form[customerString]"]').val();
+            const customerID = +customerSection.find('[name="customerID"]').val();
+            if ($('[name="isCustomerSpecific"][value="1"]')[0].checked && !customerID) {
+                alert('Please select a customer');
+                return;
+            }
+
             const data = {
-                firstPart: domainInput.val(),
-                lastPart: customerSection.val(),
+                domain: domainInput.val(),
+                customerID: customerID,
+                customerString: customerString,
                 id: editingItem.id
             };
 
@@ -211,8 +225,9 @@
                 dataType: 'json',
                 data: data
             }).then(function (result) {
-                editingItem.firstPart = data.firstPart;
-                editingItem.lastPart = data.lastPart;
+                editingItem.domain = data.domain;
+                editingItem.customerID = data.customerID;
+                editingItem.customerString = data.customerString;
 
                 drawList();
                 cancelEdit();
@@ -225,10 +240,17 @@
                 detail.submit();
                 return;
             }
+            const customerString = customerSection.find('[name="form[customerString]"]').val();
+            const customerID = +customerSection.find('[name="customerID"]').val();
+            if ($('[name="isCustomerSpecific"][value="1"]')[0].checked && !customerID) {
+                alert('Please select a customer');
+                return;
+            }
 
             const data = {
                 domain: domainInput.val(),
-                customerID: customerSection.find('[name="form[customerString]"]').val(),
+                customerID: customerSection.find('[name="customerID"]').val(),
+                customerString: customerString
             };
 
             $.ajax({
@@ -251,10 +273,10 @@
     });
 
     function cancelEdit() {
-        changeWildCard(true);
+        changeWildCard(false);
         $('[name="isCustomerSpecific"]').each(function () {
             const $radio = $(this);
-            $radio.prop('checked', +$radio.val());
+            $radio.prop('checked', !+$radio.val());
         });
         cancelButton.hide();
         saveButton.hide();
@@ -281,24 +303,6 @@
             }
         } else {
             document.form.customerID.value = "";
-        }
-    }
-
-    function createQuote() {
-        if (document.searchForm.customerID.value != "") {
-            document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
-        }
-    }
-
-    function createOrder() {
-        if (document.searchForm.customerID.value != "") {
-            document.location = '{createOrderURL}&customerID=' + escape(document.searchForm.customerID.value)
-        }
-    }
-
-    function submitOnReturn() {
-        if (event.keyCode == 13) {
-            document.searchForm.submit();
         }
     }
 
@@ -344,11 +348,10 @@
         <div class="customerSection">
             Customer
             <br>
-            <input
-                    type="hidden"
-                    name="customerID"
-                    id="customerID"
-                    value="{customerID}"
+            <input type="hidden"
+                   name="customerID"
+                   id="customerID"
+                   value="{customerID}"
             >
             <input type="text"
                    name="form[customerString]"

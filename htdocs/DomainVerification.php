@@ -9,6 +9,7 @@
 
 require_once("config.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
+require_once($cfg["path_dbe"] . "/DBEIgnoredADDomain.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 global $db;
 $thing = null;
@@ -45,7 +46,7 @@ $labtechDB = new PDO(
     $options
 );
 
-$query = "SELECT 
+$query = "select * from (SELECT 
   fakeTable.customerID, 
   clients.`Name` as customerName,
   computers.`Name` as computerName,
@@ -57,8 +58,28 @@ FROM
     ON clients.`ExternalID` = fakeTable.customerID 
   LEFT JOIN computers 
     ON computers.`ClientID` = clients.`ClientID` 
-    AND computers.`Domain` <> fakeTable.domainName  
+    AND computers.`Domain` <> fakeTable.domainName
+  ) 
+  result  
 ";
+
+$dbeIgnoredADDomains = new DBEIgnoredADDomain($thing);
+
+$dbeIgnoredADDomains->getRows(DBEIgnoredADDomain::customerID);
+$ignoredWhere = "where result.reportedDomain is not null ";
+while ($dbeIgnoredADDomains->fetchNext()) {
+    $ignoredWhere .= " and ";
+    if ($dbeIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID)) {
+        $ignoredWhere .= " NOT (result.customerID = " . $dbeIgnoredADDomains->getValue(
+                DBEIgnoredADDomain::customerID
+            ) . " and result.reportedDomain = '" . $dbeIgnoredADDomains->getValue(DBEIgnoredADDomain::domain) . "') ";
+    } else {
+        $ignoredWhere .= " result.reportedDomain <> '" . $dbeIgnoredADDomains->getValue(
+                DBEIgnoredADDomain::domain
+            ) . "' ";
+    }
+}
+$query .= $ignoredWhere;
 
 $stm = $labtechDB->prepare($query);
 
@@ -68,11 +89,8 @@ $data = $stm->fetchAll();
 
 $onScreen = isset($_GET['onScreen']);
 
-$body = $template->get_var('output');
-
-echo $body;
-
 if (!count($data)) {
+    echo 'All clear';
     exit;
 }
 
@@ -110,13 +128,14 @@ foreach ($data as $datum) {
     );
 
 }
-
 $template->parse(
     'output',
     'DomainVerificationEmail.html',
     true
 );
+$body = $template->get_var('output');
 
+echo $body;
 
 $buMail = new BUMail($this);
 

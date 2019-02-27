@@ -78,12 +78,12 @@ class CTIgnoredADDomains extends CTCNC
                 }
 
                 $DBEIgnoredADDomain->setValue(
-                    DBEIgnoredADDomain::firstPart,
-                    $_REQUEST['firstPart']
+                    DBEIgnoredADDomain::domain,
+                    $_REQUEST['domain']
                 );
                 $DBEIgnoredADDomain->setValue(
-                    DBEIgnoredADDomain::lastPart,
-                    $_REQUEST['lastPart']
+                    DBEIgnoredADDomain::customerID,
+                    $_REQUEST['customerID']
                 );
 
                 $DBEIgnoredADDomain->updateRow();
@@ -103,12 +103,19 @@ class CTIgnoredADDomains extends CTCNC
 
                 $DBEIgnoredADDomain->insertRow();
 
+                $customerString = null;
+                if ($DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID)) {
+                    $dbeCustomer = new DBECustomer($this);
+                    $dbeCustomer->getRow($DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID));
+                    $customerString = $dbeCustomer->getValue(DBECustomer::name);
+                }
+
                 echo json_encode(
                     [
                         "id"             => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::ignoredADDomainID),
                         "domain"         => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::domain),
                         "customerID"     => $DBEIgnoredADDomain->getValue(DBEIgnoredADDomain::customerID),
-                        "customerString" => $_REQUEST['form']['customerString']
+                        "customerString" => $customerString
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -120,10 +127,17 @@ class CTIgnoredADDomains extends CTCNC
                 $DBEIgnoredADDomains->getRows();
                 $data = [];
                 while ($DBEIgnoredADDomains->fetchNext()) {
+                    $customerString = null;
+                    if ($DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID)) {
+                        $dbeCustomer = new DBECustomer($this);
+                        $dbeCustomer->getRow($DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID));
+                        $customerString = $dbeCustomer->getValue(DBECustomer::name);
+                    }
                     $data[] = [
-                        "id"        => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::IgnoredADDomainsID),
-                        "firstPart" => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::firstPart),
-                        "lastPart"  => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::lastPart)
+                        "id"             => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::ignoredADDomainID),
+                        "domain"         => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::domain),
+                        "customerID"     => $DBEIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID),
+                        "customerString" => $customerString
                     ];
                 }
                 echo json_encode(
@@ -144,7 +158,7 @@ class CTIgnoredADDomains extends CTCNC
      */
     function displayForm()
     {
-        $this->setPageTitle('Utility Emails');
+        $this->setPageTitle('Ignored AD Domains');
         $this->setTemplateFiles(
             'IgnoredADDomains',
             'IgnoredADDomains'
