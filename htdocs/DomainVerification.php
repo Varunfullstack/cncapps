@@ -68,6 +68,15 @@ $data = $stm->fetchAll();
 
 $onScreen = isset($_GET['onScreen']);
 
+$body = $template->get_var('output');
+
+echo $body;
+
+if (!count($data)) {
+    exit;
+}
+
+
 $template = new Template (
     EMAIL_TEMPLATE_DIR,
     "remove"
@@ -108,9 +117,7 @@ $template->parse(
     true
 );
 
-$body = $template->get_var('output');
 
-echo $body;
 $buMail = new BUMail($this);
 
 $buMail->mime->setHTMLBody($body);
