@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 495 - Date generated fields in renewal items get deleted when a comment is added and saved
+
 ## [v2.2.2] - 2019-02-27
 ### Fixed
 - Show customer support contact
