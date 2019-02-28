@@ -570,7 +570,7 @@ class DBECustomerItem extends DBCNCEntity
         );
         $this->addColumn(
             self::dateGenerated,
-            DA_STRING,
+            DA_DATE,
             DA_ALLOW_NULL,
             "custitem.dateGenerated"
         );

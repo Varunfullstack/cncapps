@@ -18,9 +18,6 @@ class DBECustomer extends DBCNCEntity
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
     const prospectFlag = "prospectFlag";
-//    const othersEmailMainFlag = "othersEmailMainFlag";
-//    const workStartedEmailMainFlag = "workStartedEmailMainFlag";
-//    const autoCloseEmailMainFlag = "autoCloseEmailMainFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -67,6 +64,7 @@ class DBECustomer extends DBCNCEntity
     const sortCode = 'sortCode';
     const accountName = 'accountName';
     const accountNumber = 'accountNumber';
+    const activeDirectoryName = "activeDirectoryName";
 
     /**
      * calls constructor()
@@ -413,6 +411,12 @@ class DBECustomer extends DBCNCEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::activeDirectoryName,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -674,16 +678,21 @@ class DBECustomer extends DBCNCEntity
      * Returns list of customers with special attention set
      *
      * @access public
+     * @param bool $ignoreProspects
      * @return bool Success
      */
-    function getActiveCustomers()
+    function getActiveCustomers($ignoreProspects = false)
     {
         $this->setMethodName("getSpecialAttentionCustomers");
 
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " = 'N'";
+            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " <> 'Y'";
+
+        if ($ignoreProspects) {
+            $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
+        }
 
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
