@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v2.3.0] - 2019-02-28
 ### Added
 - Issue 479 - Domain verification and Labtech computer customer assignment verification
 - Issue 475 - Additional folders for default customer creation v2 & Bitlocker Key export
