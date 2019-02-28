@@ -82,7 +82,6 @@ while ($dbeIgnoredADDomains->fetchNext()) {
 $query .= $ignoredWhere;
 
 $stm = $labtechDB->prepare($query);
-var_dump($query);
 $stm->execute([]);
 
 $data = $stm->fetchAll();
