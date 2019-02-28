@@ -683,7 +683,7 @@ class DBECustomer extends DBCNCEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " = 'N'";
+            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " <> 'Y'";
 
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
