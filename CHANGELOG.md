@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 479 - Domain verification and Labtech computer customer assignment verification
+- Issue 475 - Additional folders for default customer creation v2 & Bitlocker Key export
 
 ## [v2.2.2] - 2019-02-27
 ### Fixed

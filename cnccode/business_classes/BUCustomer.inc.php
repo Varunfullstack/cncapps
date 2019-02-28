@@ -1517,7 +1517,8 @@ class BUCustomer extends Business
             array(
                 'Documents and Forms',
                 'Old Documentation',
-                'Photos'
+                'Photos',
+                'Bitlocker Recovery Keys'
             );
 
         foreach ($subfolders as $folder) {
