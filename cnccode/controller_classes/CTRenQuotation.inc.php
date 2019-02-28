@@ -555,7 +555,6 @@ class CTRenQuotation extends CTCNC
     {
         $this->setMethodName('update');
         $dsRenQuotation = &$this->dsRenQuotation;
-
         $this->formError = (!$this->dsRenQuotation->populateFromArray($_REQUEST['renQuotation']));
 
         if ($this->formError) {
