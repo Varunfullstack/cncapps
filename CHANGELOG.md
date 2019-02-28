@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Added
 - Issue 479 - Domain verification and Labtech computer customer assignment verification
 - Issue 475 - Additional folders for default customer creation v2 & Bitlocker Key export
+### Fixed
+- Issue 495 - Date generated fields in renewal items get deleted when a comment is added and saved
 
 ## [v2.2.2] - 2019-02-27
 ### Fixed
