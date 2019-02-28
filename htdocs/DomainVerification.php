@@ -51,14 +51,14 @@ $query = "select * from (SELECT
   clients.`Name` as customerName,
   computers.`Name` as computerName,
   fakeTable.domainName as expectedDomain,
-  computers.`Domain` as reportedDomain
+  replace(computers.`Domain`, 'DC:', '') as reportedDomain
 FROM
   ($fakeTable) fakeTable 
   LEFT JOIN clients 
     ON clients.`ExternalID` = fakeTable.customerID 
   LEFT JOIN computers 
     ON computers.`ClientID` = clients.`ClientID` 
-    AND computers.`Domain` <> fakeTable.domainName
+    AND lower(REPLACE(computers.`Domain`, 'DC:', '')) <> lower(fakeTable.domainName)
   ) 
   result  
 ";
@@ -66,7 +66,7 @@ FROM
 $dbeIgnoredADDomains = new DBEIgnoredADDomain($thing);
 
 $dbeIgnoredADDomains->getRows(DBEIgnoredADDomain::customerID);
-$ignoredWhere = "where result.reportedDomain is not null ";
+$ignoredWhere = "where result.reportedDomain is not null and result.reportedDomain <> '' ";
 while ($dbeIgnoredADDomains->fetchNext()) {
     $ignoredWhere .= " and ";
     if ($dbeIgnoredADDomains->getValue(DBEIgnoredADDomain::customerID)) {
@@ -82,7 +82,7 @@ while ($dbeIgnoredADDomains->fetchNext()) {
 $query .= $ignoredWhere;
 
 $stm = $labtechDB->prepare($query);
-
+var_dump($query);
 $stm->execute([]);
 
 $data = $stm->fetchAll();
