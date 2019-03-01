@@ -313,8 +313,8 @@ class BUCustomerReviewMeeting extends Business
 
         $template->set_var(
             [
-                'htmlBody'     => $htmlBody,
-//                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+                'htmlBody' => $htmlBody,
+                //                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
             ]
         );
 
@@ -821,22 +821,28 @@ class BUCustomerReviewMeeting extends Business
             'reviewMeetingDate',
             $meetingDate->format('d/m/Y')
         );
-
-        $templateProcessor->saveAs('temp.docx');
+        $uniqueId = uniqid(
+            null,
+            true
+        );
+        $docFile = $uniqueId . ".docx";
+        $pdfFile = $uniqueId . '.pdf';
+        $templateProcessor->saveAs($docFile);
         $output = shell_exec(
-            '"c:\Program Files\LibreOffice\program\soffice.exe" --headless --convert-to pdf temp.docx'
+            '"c:\Program Files\LibreOffice\program\soffice.exe" --headless --convert-to pdf ' . $docFile
         );
 
-        if (!file_exists('temp.pdf')) {
+        if (!file_exists($pdfFile)) {
             throw new Exception('Failed to generate Clients Notes PDF');
         }
 
+        unlink($docFile);
         $documentFolderPath = $buCustomer->getCustomerFolderPath($customerID);
 
         $reviewMeetingFolderPath = $documentFolderPath . '/Review Meetings';
 
         rename(
-            'temp.pdf',
+            $pdfFile,
             $reviewMeetingFolderPath . '/CIF ' . $meetingDate->format('d-m-Y') . '.pdf'
         );
 
