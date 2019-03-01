@@ -314,7 +314,7 @@ class BUCustomerReviewMeeting extends Business
         $template->set_var(
             [
                 'htmlBody'     => $htmlBody,
-                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+//                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
             ]
         );
 
