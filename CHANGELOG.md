@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.3.1]
+### Fixed
+- Customer Review Meeting fails to generate files
+
 ## [v2.3.0] - 2019-02-28
 ### Added
 - Issue 479 - Domain verification and Labtech computer customer assignment verification

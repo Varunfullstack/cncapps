@@ -19,7 +19,7 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 class CTCustomerReviewMeeting extends CTCNC
 {
 
-    /** @var BUCustomerReviewMeeting  */
+    /** @var BUCustomerReviewMeeting */
     private $buCustomerReviewMeeting;
 
     function __construct($requestMethod,
@@ -595,7 +595,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 $_REQUEST['meetingDateYmd']
             );
         } catch (\Exception $exception) {
-            return ["status" => "error", "description" => "Failed to generate files"];
+            http_response_code(500);
+            return ["status" => $exception->getMessage(), "description" => "Failed to generate files"];
         }
 
         $startDate = (DateTime::createFromFormat(

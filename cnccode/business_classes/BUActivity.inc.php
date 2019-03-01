@@ -9239,7 +9239,7 @@ is currently a balance of ';
         );
 
         $dbeCallActivity->insertRow();
-        
+
         $this->updatedByAnotherUser(
             $dbeProblem,
             $dbeCallActivity
@@ -11162,18 +11162,18 @@ is currently a balance of ';
             $dbeStandardText
         );
         $destEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
+        $problem = new DBEProblem($this);
+        $problem->getRow($problemID);
 
-        if ($type != "New Starter/Office 365 License") {
-
-            $problem = new DBEProblem($this);
-            $problem->getRow($problemID);
-
-            $alarmDate = (new DateTime())->add(new DateInterval('P1D'));
-
+        if ($dbeStandardText->getValue(DBEStandardText::salesRequestUnassignFlag) == 'Y') {
             $problem->setValue(
                 DBEProblem::userID,
                 0
             );
+        }
+
+        if ($type != "New Starter/Office 365 License") {
+            $alarmDate = (new DateTime())->add(new DateInterval('P1D'));
             $problem->setValue(
                 DBEProblem::alarmDate,
                 $alarmDate->format('Y-m-d')
@@ -11182,8 +11182,8 @@ is currently a balance of ';
                 DBEProblem::alarmTime,
                 $alarmDate->format('h:i')
             );
-            $problem->updateRow();
         }
+        $problem->updateRow();
 
         $this->sendSalesRequestEmail(
             $salesRequestActivity,

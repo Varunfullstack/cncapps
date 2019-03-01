@@ -15,6 +15,7 @@ class DBEStandardText extends DBEntity
     const stt_text = "stt_text";
     const stt_standardtexttypeno = "stt_standardtexttypeno";
     const salesRequestEmail = 'salesRequestEmail';
+    const salesRequestUnassignFlag = 'salesRequestUnassignFlag';
 
     /**
      * calls constructor()
@@ -55,6 +56,12 @@ class DBEStandardText extends DBEntity
         $this->addColumn(
             self::salesRequestEmail,
             DA_STRING,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::salesRequestUnassignFlag,
+            DA_YN_FLAG,
             DA_ALLOW_NULL
         );
 

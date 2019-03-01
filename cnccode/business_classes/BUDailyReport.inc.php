@@ -1278,7 +1278,7 @@ IF(
 problem.pro_awaiting_customer_response_flag = 'Y',
 'Awaiting Customer',
 'In Progress'
-) AS STATUS,
+) AS status,
 callactivity.reason AS details,
 contact.con_first_name AS contactName,
 contact.con_email AS contactEmail,
