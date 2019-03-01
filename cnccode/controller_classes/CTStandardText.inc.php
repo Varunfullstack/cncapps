@@ -294,17 +294,24 @@ class CTSTANDARDTEXT extends CTCNC
 
         $this->template->set_var(
             array(
-                'stt_standardtextno' => $stt_standardtextno,
-                'stt_desc'           => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
-                'stt_descMessage'    => Controller::htmlDisplayText($dsStandardText->getMessage('stt_desc')),
-                'stt_text'           => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
-                'stt_textMessage'    => Controller::htmlDisplayText($dsStandardText->getMessage('stt_text')),
-                'urlUpdate'          => $urlUpdate,
-                'urlDelete'          => $urlDelete,
-                'txtDelete'          => $txtDelete,
-                'urlDisplayList'     => $urlDisplayList,
-                'salesRequestTypeID' => $salesRequestTypeID,
-                'salesRequestEmail'  => $dsStandardText->getValue(DBEStandardText::salesRequestEmail)
+                'stt_standardtextno'              => $stt_standardtextno,
+                'stt_desc'                        => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
+                'stt_descMessage'                 => Controller::htmlDisplayText(
+                    $dsStandardText->getMessage('stt_desc')
+                ),
+                'stt_text'                        => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
+                'stt_textMessage'                 => Controller::htmlDisplayText(
+                    $dsStandardText->getMessage('stt_text')
+                ),
+                'urlUpdate'                       => $urlUpdate,
+                'urlDelete'                       => $urlDelete,
+                'txtDelete'                       => $txtDelete,
+                'urlDisplayList'                  => $urlDisplayList,
+                'salesRequestTypeID'              => $salesRequestTypeID,
+                'salesRequestEmail'               => $dsStandardText->getValue(DBEStandardText::salesRequestEmail),
+                'salesRequestUnassignFlagChecked' => $this->getChecked(
+                    $dsStandardText->getValue(DBEStandardText::salesRequestUnassignFlag)
+                )
             )
         );
 
