@@ -56,9 +56,11 @@
     function updateType(type) {
         if (type == '{salesRequestTypeID}') {
             $('#salesRequestEmailRow').show();
+            $('#salesRequestUnassignFlagRow').show();
             $('#salesRequestEmailRow input').attr('required', true);
         } else {
             $('#salesRequestEmailRow').hide();
+            $('#salesRequestUnassignFlagRow').hide();
             $('#salesRequestEmailRow input').attr('required', false);
         }
     }
@@ -133,6 +135,18 @@
                        type="text"
                        value="{salesRequestEmail}"
                        size="50"
+                >
+            </td>
+        </tr>
+        <tr hidden
+            id="salesRequestUnassignFlagRow"
+        >
+            <td class="promptText">Unassign SR</td>
+            <td class="fieldText">
+                <input name="standardText[1][salesRequestUnassignFlag]"
+                       type="checkbox"
+                       {salesRequestUnassignFlagChecked}
+                       value="Y"
                 >
             </td>
         </tr>

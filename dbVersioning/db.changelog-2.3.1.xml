@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix2.3.1-0">
+        <tagDatabase tag="Hotfix-2.3.1"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix2.3.1-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="standardText" columnName="salesRequestUnassignFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="standardText">
+            <column name="salesRequestUnassignFlag" type="char(1)" defaultValue="N"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
+
+

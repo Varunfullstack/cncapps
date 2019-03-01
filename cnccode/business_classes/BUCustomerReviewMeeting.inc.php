@@ -312,8 +312,10 @@ class BUCustomerReviewMeeting extends Business
         );
 
         $template->set_var(
-            'htmlBody',
-            $htmlBody
+            [
+                'htmlBody' => $htmlBody,
+                //                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+            ]
         );
 
         $template->parse(
@@ -370,9 +372,10 @@ class BUCustomerReviewMeeting extends Business
             }
         }
         if ($_error) {
-            unlink($tempFilePath);
+//            unlink($tempFilePath);
             throw new Exception(json_encode($_error));
         } else {
+            unlink($tempFilePath);
             return true;
         }
     }
@@ -503,7 +506,8 @@ class BUCustomerReviewMeeting extends Business
                     $totalLabour,
                     2
 
-                ),'totalProfit'        => number_format(
+                ),
+                'totalProfit'        => number_format(
                     $totalSales - $totalCost - $totalLabour,
                     2
                 ),
@@ -817,22 +821,28 @@ class BUCustomerReviewMeeting extends Business
             'reviewMeetingDate',
             $meetingDate->format('d/m/Y')
         );
-
-        $templateProcessor->saveAs('temp.docx');
+        $uniqueId = uniqid(
+            null,
+            true
+        );
+        $docFile = $uniqueId . ".docx";
+        $pdfFile = $uniqueId . '.pdf';
+        $templateProcessor->saveAs($docFile);
         $output = shell_exec(
-            '"c:\Program Files\LibreOffice\program\soffice.exe" --headless --convert-to pdf temp.docx'
+            '"c:\Program Files\LibreOffice\program\soffice.exe" --headless --convert-to pdf ' . $docFile
         );
 
-        if (!file_exists('temp.pdf')) {
+        if (!file_exists($pdfFile)) {
             throw new Exception('Failed to generate Clients Notes PDF');
         }
 
+        unlink($docFile);
         $documentFolderPath = $buCustomer->getCustomerFolderPath($customerID);
 
         $reviewMeetingFolderPath = $documentFolderPath . '/Review Meetings';
 
         rename(
-            'temp.pdf',
+            $pdfFile,
             $reviewMeetingFolderPath . '/CIF ' . $meetingDate->format('d-m-Y') . '.pdf'
         );
 
