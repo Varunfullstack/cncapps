@@ -312,8 +312,10 @@ class BUCustomerReviewMeeting extends Business
         );
 
         $template->set_var(
-            'htmlBody',
-            $htmlBody
+            [
+                'htmlBody'     => $htmlBody,
+                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+            ]
         );
 
         $template->parse(
@@ -370,9 +372,10 @@ class BUCustomerReviewMeeting extends Business
             }
         }
         if ($_error) {
-            unlink($tempFilePath);
+//            unlink($tempFilePath);
             throw new Exception(json_encode($_error));
         } else {
+            unlink($tempFilePath);
             return true;
         }
     }
@@ -503,7 +506,8 @@ class BUCustomerReviewMeeting extends Business
                     $totalLabour,
                     2
 
-                ),'totalProfit'        => number_format(
+                ),
+                'totalProfit'        => number_format(
                     $totalSales - $totalCost - $totalLabour,
                     2
                 ),
