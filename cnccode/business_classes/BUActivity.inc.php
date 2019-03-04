@@ -1181,7 +1181,7 @@ class BUActivity extends Business
                     $dbeLastActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y'
                 ) {
 
-                    $subjectSuffix .= 'Requires YOUR Attention';
+                    $subjectSuffix = 'Requires YOUR Attention';
                     $fields['extra'] = "The service request requires YOUR attention as detailed above. 
                     Please note that we will take NO further action until we hear from you.";
                 }

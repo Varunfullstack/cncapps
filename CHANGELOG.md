@@ -1,7 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.3.1]
+## [v2.3.2] - 2019-03-04
+### Fixed
+- Awaiting Customer email subjects are incorrect
+
+## [v2.3.1] - 2019-03-01
 ### Fixed
 - Customer Review Meeting fails to generate files
 
