@@ -3398,7 +3398,7 @@ class CTSalesOrder extends CTCNC
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(
-            'Please fax back to 0845 0700 584 to confirm your order or email a scanned copy to sales@cnc-ltd.co.uk'
+            'Please return a signed copy to sales@cnc-ltd.co.uk'
         );
         $buPDF->endPage();
         // End of second page
