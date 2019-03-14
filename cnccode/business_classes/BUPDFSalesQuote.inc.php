@@ -574,7 +574,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString('Please fax to 0845 0700 584 or email a scanned copy to sales@cnc-ltd.co.uk');
+        $buPDF->printString('Please return a signed copy to sales@cnc-ltd.co.uk');
         $buPDF->endPage();
         // End of second page
         $buPDF->close();
