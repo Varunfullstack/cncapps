@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.3.3] - 2019-03-04
+## [v2.3.3] - 2019-03-14
 ### Changed
 - Remove “Please fax back…..” from generated PDF's and show, “Please return a signed copy to sales@cnc-ltd.co.uk” instead
 
