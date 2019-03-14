@@ -5,7 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Remove “Please fax back…..” from generated PDF's and show, “Please return a signed copy to sales@cnc-ltd.co.uk” instead
 
-## [v2.3.2] - 2019-03-04
+## [v2.3.2] - 2019-03-14
 ### Fixed
 - Awaiting Customer email subjects are incorrect
 
