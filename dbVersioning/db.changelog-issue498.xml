@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1553167099-0">
+        <tagDatabase tag="issue498"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1553167099-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM
+                information_schema.tables
+                WHERE table_name = "contactAuditLogColumns"
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            ALTER ALGORITHM = UNDEFINED DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `contactAuditLogColumns` AS (
+                SELECT `information_schema`.`columns`.`COLUMN_NAME`            AS `contactAuditColumnName`,
+                       (`information_schema`.`columns`.`ORDINAL_POSITION` - 4) AS `contactAuditOrdinalPosition`,
+                       `information_schema`.`columns`.`COLUMN_TYPE`            AS `contactAuditColumnType`
+                FROM `information_schema`.`columns`
+                WHERE ((`information_schema`.`columns`.`TABLE_SCHEMA` = DATABASE())
+                    AND (`information_schema`.`columns`.`TABLE_NAME` = 'contactauditlog')
+                    AND (`information_schema`.`columns`.`ORDINAL_POSITION` > 4))
+            );
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1553167099-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM
+                information_schema.tables
+                WHERE table_name = "contactColumns"
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            ALTER ALGORITHM = UNDEFINED DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `contactColumns` AS (
+                SELECT `information_schema`.`columns`.`COLUMN_NAME`      AS `contactColumnName`,
+                       `information_schema`.`columns`.`ORDINAL_POSITION` AS `contactOrdinalPosition`,
+                       `information_schema`.`columns`.`COLUMN_TYPE`      AS `contactColumnType`
+                FROM `information_schema`.`columns`
+                WHERE ((`information_schema`.`columns`.`TABLE_SCHEMA` = DATABASE())
+                    AND (`information_schema`.`columns`.`TABLE_NAME` = 'contact')));
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1553167099-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM
+                information_schema.tables
+                WHERE table_name = "toFixContactAuditColumns"
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <sql><![CDATA[
+            ALTER ALGORITHM = TEMPTABLE DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `toFixContactAuditColumns` AS (
+                SELECT `a`.`contactAuditColumnName`      AS `contactAuditColumnName`,
+                       `a`.`contactAuditOrdinalPosition` AS `contactAuditOrdinalPosition`,
+                       `a`.`contactAuditColumnType`      AS `contactAuditColumnType`,
+                       `b`.`contactColumnName`           AS `contactColumnName`,
+                       `b`.`contactOrdinalPosition`      AS `contactOrdinalPosition`,
+                       `b`.`contactColumnType`           AS `contactColumnType`
+                FROM (`cncappsdev`.`contactauditlogcolumns` `a`
+                         JOIN `cncappsdev`.`contactcolumns` `b`
+                              ON ((`a`.`contactAuditColumnName` = `b`.`contactColumnName`)))
+                WHERE (`a`.`contactAuditOrdinalPosition` <> `b`.`contactOrdinalPosition`)
+                ORDER BY `b`.`contactOrdinalPosition`)
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1553167099-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="PROCEDURE"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND routine_name = "fixContactAuditLog"
+            </sqlCheck>
+        </preConditions>
+        <sql splitStatements="true" endDelimiter="$$">
+            <![CDATA[
+            CREATE
+                DEFINER =`root`@`localhost` PROCEDURE `fixContactAuditLog`()
+            BEGIN
+                DECLARE endCursor INT;
+                DECLARE contactAuditColumnName TEXT;
+                DECLARE contactAuditOrdinalPosition INT;
+                DECLARE contactAuditColumnType TEXT;
+                DECLARE contactColumnName TEXT;
+                DECLARE contactOrdinalPosition INT;
+                DECLARE contactColumnType TEXT;
+                DECLARE previousColumnName TEXT;
+                DECLARE toFixCursor CURSOR FOR SELECT * FROM toFixContactAuditColumns;
+                DECLARE CONTINUE HANDLER FOR NOT FOUND SET endCursor = 1;
+                OPEN toFixCursor;
+                REPEAT
+                    BEGIN
+                        SET @query = "ALTER TABLE contactAuditLog CHANGE ";
+                        FETCH toFixCursor INTO contactAuditColumnName, contactAuditOrdinalPosition,contactAuditColumnType,contactColumnName,contactOrdinalPosition,contactColumnType;
+                        SET @query = CONCAT(@query, contactAuditColumnName, " ", contactAuditColumnName, " ",
+                                            contactColumnType);
+                        IF (contactOrdinalPosition = 1) THEN
+                            SET @query = CONCAT(@query, " first");
+                        ELSE
+                            BEGIN
+                                SELECT column_name INTO previousColumnName
+                                FROM information_schema.columns
+                                WHERE table_name = "contactAuditLog"
+                                  AND table_schema = DATABASE()
+                                  AND ordinal_position = (`contactOrdinalPosition` - 1 + 4);
+                                SET @query = CONCAT(@query, " after ", previousColumnName);
+                            END;
+                        END IF;
+                        SELECT @query;
+                        PREPARE stmt FROM @query;
+                        EXECUTE stmt;
+                        DEALLOCATE PREPARE stmt;
+                    END;
+                UNTIL endCursor = 1 END REPEAT;
+            END$$
+
+            call fixContactAuditLog()$$
+
+            ]]>
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

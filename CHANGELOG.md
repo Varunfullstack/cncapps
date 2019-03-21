@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 498 - ContactAudit doesn't show contact support level
+
 ## [v2.3.4] - 2019-03-21
 ### Removed
 - Suspend WebAnalytics
