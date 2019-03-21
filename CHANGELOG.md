@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.3.4] - 2019-03-21
+### Removed
+- Suspend WebAnalytics
+
 ## [v2.3.3] - 2019-03-04
 ### Changed
 - Remove “Please fax back…..” from generated PDF's and show, “Please return a signed copy to sales@cnc-ltd.co.uk” instead
