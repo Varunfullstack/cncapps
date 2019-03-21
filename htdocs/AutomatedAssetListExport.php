@@ -7,11 +7,16 @@
  */
 
 require_once("config.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
+require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require './../vendor/autoload.php';
 global $db;
 
+$dbeCustomer = new DBECustomer($thing);
 
-$db->query('select * from customer where cus_referred <> "Y"');
+$dbeCustomer->getActiveCustomers();
+
 
 $customerIDs = [];
 
@@ -27,7 +32,8 @@ $labtechDB = new PDO(
     $options
 );
 
-while ($db->next_record(MYSQLI_ASSOC)) {
+$buCustomer = new BUCustomer($thing);
+while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
         "SELECT 
@@ -142,9 +148,17 @@ ORDER BY clients.name,
   computers.os,
   computers.name,
   software.name";
-    echo '<div>Getting Labtech Data for Customer: ' . $db->Record['cus_custno'] . ' - ' . $db->Record['cus_name'] . '</div>';
+
+    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $customerName = $dbeCustomer->getValue(DBECustomer::name);
+
+    echo '<div>Getting Labtech Data for Customer: ' . $customerID . ' - ' . $customerName . '</div>';
     $statement = $labtechDB->prepare($query);
-    $test = $statement->execute([$db->Record['cus_custno']]);
+    $test = $statement->execute(
+        [
+            $customerID
+        ]
+    );
     if (!$test) {
         echo '<div>Something went wrong...' . implode(
                 ',',
@@ -171,7 +185,8 @@ ORDER BY clients.name,
         );
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $folderName = '\\\cncltd.local\cnc\Customer\\' . $db->Record['cus_name'] . "\Review Meetings\\";
+        $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
+        $folderName = $customerFolder . "\Review Meetings\\";
         if (!file_exists($folderName)) {
             mkdir(
                 $folderName,
@@ -185,6 +200,47 @@ ORDER BY clients.name,
             $writer->save(
                 $fileName
             );
+            $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
+            $dbeCustomerDocument->getCurrentAssetList($customerID);
+            if (!$dbeCustomerDocument->rowCount) {
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::customerID,
+                    $customerID
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::description,
+                    'Current Asset List'
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::filename,
+                    "Current Asset List Extract.xlsx"
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::fileMimeType,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::startersFormFlag,
+                    'N'
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::leaversFormFlag,
+                    'N'
+                );
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::mainContactOnlyFlag,
+                    'Y'
+                );
+
+                $dbeCustomerDocument->insertRow();
+
+            }
+
+            $dbeCustomerDocument->setValue(
+                DBEPortalCustomerDocument::file,
+                file_get_contents($fileName)
+            );
+            $dbeCustomerDocument->updateRow();
 
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (\Exception $exception) {

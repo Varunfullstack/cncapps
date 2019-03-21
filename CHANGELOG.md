@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 477 - Asset list export & upload exported file to website
+
 ## [v2.3.4] - 2019-03-21
 ### Removed
 - Suspend WebAnalytics
