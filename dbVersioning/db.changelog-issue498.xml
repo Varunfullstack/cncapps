@@ -67,8 +67,8 @@
                        `b`.`contactColumnName`           AS `contactColumnName`,
                        `b`.`contactOrdinalPosition`      AS `contactOrdinalPosition`,
                        `b`.`contactColumnType`           AS `contactColumnType`
-                FROM (`cncappsdev`.`contactauditlogcolumns` `a`
-                         JOIN `cncappsdev`.`contactcolumns` `b`
+                FROM (`contactAuditLogColumns` `a`
+                         JOIN `contactColumns` `b`
                               ON ((`a`.`contactAuditColumnName` = `b`.`contactColumnName`)))
                 WHERE (`a`.`contactAuditOrdinalPosition` <> `b`.`contactOrdinalPosition`)
                 ORDER BY `b`.`contactOrdinalPosition`)
