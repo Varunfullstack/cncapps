@@ -17,7 +17,7 @@
         </preConditions>
         <sql>
             <![CDATA[
-            ALTER ALGORITHM = UNDEFINED DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `contactAuditLogColumns` AS (
+            create ALGORITHM = UNDEFINED DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `contactAuditLogColumns` AS (
                 SELECT `information_schema`.`columns`.`COLUMN_NAME`            AS `contactAuditColumnName`,
                        (`information_schema`.`columns`.`ORDINAL_POSITION` - 4) AS `contactAuditOrdinalPosition`,
                        `information_schema`.`columns`.`COLUMN_TYPE`            AS `contactAuditColumnType`
@@ -40,7 +40,7 @@
             </sqlCheck>
         </preConditions>
         <sql>
-            ALTER ALGORITHM = UNDEFINED DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `contactColumns` AS (
+            create ALGORITHM = UNDEFINED DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `contactColumns` AS (
                 SELECT `information_schema`.`columns`.`COLUMN_NAME`      AS `contactColumnName`,
                        `information_schema`.`columns`.`ORDINAL_POSITION` AS `contactOrdinalPosition`,
                        `information_schema`.`columns`.`COLUMN_TYPE`      AS `contactColumnType`
@@ -60,7 +60,7 @@
             </sqlCheck>
         </preConditions>
         <sql><![CDATA[
-            ALTER ALGORITHM = TEMPTABLE DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `toFixContactAuditColumns` AS (
+            create ALGORITHM = TEMPTABLE DEFINER =`root`@`localhost` SQL SECURITY DEFINER VIEW `toFixContactAuditColumns` AS (
                 SELECT `a`.`contactAuditColumnName`      AS `contactAuditColumnName`,
                        `a`.`contactAuditOrdinalPosition` AS `contactAuditOrdinalPosition`,
                        `a`.`contactAuditColumnType`      AS `contactAuditColumnType`,
@@ -87,7 +87,7 @@
                 AND routine_name = "fixContactAuditLog"
             </sqlCheck>
         </preConditions>
-        <sql splitStatements="true" endDelimiter="$$">
+        <sql splitStatements="false" endDelimiter="$$">
             <![CDATA[
             CREATE
                 DEFINER =`root`@`localhost` PROCEDURE `fixContactAuditLog`()
@@ -127,12 +127,26 @@
                         DEALLOCATE PREPARE stmt;
                     END;
                 UNTIL endCursor = 1 END REPEAT;
-            END$$
-
-            call fixContactAuditLog()$$
-
+            END
             ]]>
         </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1553167099-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="PROCEDURE"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND routine_name = "fixContactAuditLog"
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            call fixContactAuditLog();
+        </sql>
+        <rollback/>
     </changeSet>
 
 </databaseChangeLog>
