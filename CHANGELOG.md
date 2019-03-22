@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 513 - 2nd Site Backup Validation Completed email formatting
+
 ## [v2.3.5] - 2019-03-22
 ### Fixed
 - ProcessPendingLeavers not working with dates in the past
