@@ -193,6 +193,7 @@ class BUDailyReport extends Business
             $priorityFiveOnly
         );
         $totalRequests = 0;
+        $openFor = 0;
         if ($row = $outstandingRequests->fetch_row()) {
 
             $template = new Template (
@@ -303,6 +304,8 @@ class BUDailyReport extends Business
                     true
                 );
                 $totalRequests++;
+                $openFor += $row[4];
+
             } while ($row = $outstandingRequests->fetch_row());
 
             $csvTemplate->parse(
@@ -332,6 +335,10 @@ class BUDailyReport extends Business
                 array(
                     'daysAgo'            => $daysAgo,
                     'totalRequests'      => $totalRequests,
+                    'avgDays'            => $totalRequests ? number_format(
+                        $openFor / $totalRequests,
+                        1
+                    ) : 'N/A',
                     'selectDaysSelector' => $select,
                     'isDashboard'        => $dashboard ? 'true' : 'false'
                 )
