@@ -2039,10 +2039,36 @@ WHERE odl_ordno = $ordheadID
 
         $salesOrderID = $dbePurchaseOrderHeader->getValue(DBEPorhead::ordheadID);
 
+
+        $purchaseOrdersForSalesOrder = new DBEPorhead($this);
+
+        $purchaseOrdersForSalesOrder->setValue(
+            DBEPorhead::ordheadID,
+            $salesOrderID
+        );
+        $purchaseOrdersForSalesOrder->getRowsByColumn(DBEPorhead::ordheadID);
+
+        $shouldNotify = true;
+
+        while ($purchaseOrdersForSalesOrder->fetchNext()) {
+            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID) == $purchaseOrderHeaderID) {
+                continue;
+            }
+
+            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
+                $shouldNotify = false;
+                break;
+            }
+        }
+
+
+        // we have to pull all the purchase orders and only notify if the given order is the only one pending of notification
+
+
         // we need to now find the associated SR, if there's more than one we only care about the one with the smallest ID
         $problemID = $this->getLinkedServiceRequestID($salesOrderID);
 
-        if ($problemID) {
+        if ($problemID && $shouldNotify) {
             $buActivity = new BUActivity($this);
             $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
         }
