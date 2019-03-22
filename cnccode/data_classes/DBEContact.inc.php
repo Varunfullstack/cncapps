@@ -871,7 +871,7 @@ class DBEContact extends DBCNCEntity
             " left join customer on con_custno = cus_custno 
              WHERE " .
             $this->getDBColumnName(self::pendingLeaverFlag) . " = 'Y' and " .
-            $this->getDBColumnName(self::pendingLeaverDate) . " = curdate() ";
+            $this->getDBColumnName(self::pendingLeaverDate) . " <= curdate() ";
         $this->setQueryString($sqlQuery);
         $this->getRows();
         return $this;
