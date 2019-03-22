@@ -1,4 +1,25 @@
 <!-- Template: ActivityCreate1.inc.html -->
+<style>
+    .fakeLink {
+        background: none;
+        border: none;
+        color: blue;
+        cursor: pointer;
+        outline: none;
+    }
+
+    .fakeLink.mainSupportContact {
+        color: red;
+    }
+
+    .fakeLink:hover {
+        text-decoration: underline;
+    }
+
+    .fakeLink:active {
+        color: red;
+    }
+</style>
 {reasonMarkup}
 <form name="form"
       method="post"
@@ -7,6 +28,7 @@
     <input type="hidden"
            name="reason"
            value="{reason}"
+           id="reason"
     >
     <table border="0"
            cellspacing="0"
@@ -48,6 +70,53 @@
     </table>
 </form>
 <P class="bigErrorMessage">{referred}</P>
+<script>
+
+    function addInputs(array, form) {
+        array.forEach((element) => {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = element.name;
+            input.value = element.value;
+            form.appendChild(input);
+        })
+    }
+
+    function submitThis() {
+        var form = document.createElement("form"); // CREATE A NEW FORM TO DUMP ELEMENTS INTO FOR SUBMISSION
+        form.method = "post"; // CHOOSE FORM SUBMISSION METHOD, "GET" OR "POST"
+        form.action = "/Activity.php"; // TELL THE FORM WHAT PAGE TO SUBMIT TO
+        var elm$ = $(event.target);
+
+        var reasonElm = document.getElementById('reason');
+
+        // lets find the row where the data is stored
+        var rowElm$ = elm$.closest('tr');
+
+        var data = rowElm$.data();
+
+        addInputs([
+            {
+                name: 'action',
+                value: data.formAction,
+            },
+            {
+                name: 'contactID',
+                value: data.contactId,
+            },
+            {
+                name: 'customerID',
+                value: data.customerId,
+            },
+            {
+                name: 'reason',
+                value: reasonElm.value,
+            }
+        ], form);
+        document.body.appendChild(form);
+        form.submit()
+    }
+</script>
 <table width="1000"
        border="0"
        cellspacing="1"
@@ -97,12 +166,43 @@
     <!-- BEGIN resultsBlock -->
     <tr onMouseOver="this.bgColor='#FFFFCC';"
         onMouseOut="this.bgColor='';"
+        data-customer-id="{customerID}"
+        data-contact-id="{contactID}"
+        data-form-action="{formAction}"
     >
-        <td nowrap="nowrap">{cus_name}</td>
-        <td nowrap="nowrap">{site_name}</td>
+        <td nowrap="nowrap">
+            <button type="button"
+                    onclick="submitThis()"
+                    class="fakeLink {supportClass}"
+            >
+                {cus_name}
+            </button>
+        </td>
+        <td nowrap="nowrap">
+            <button type="button"
+                    onclick="submitThis()"
+                    class="fakeLink {supportClass}"
+            >
+                {site_name}
+            </button>
+        </td>
         <td nowrap="nowrap"><a href="tel:{add_phone}">{add_phone}</a></td>
-        <td nowrap="nowrap">{contact_name}</td>
-        <td nowrap="nowrap">{contact_position}</td>
+        <td nowrap="nowrap">
+            <button type="button"
+                    onclick="submitThis()"
+                    class="fakeLink {supportClass}"
+            >
+                {contact_name}
+            </button>
+        </td>
+        <td nowrap="nowrap">
+            <button type="button"
+                    onclick="submitThis()"
+                    class="fakeLink {supportClass}"
+            >
+                {contact_position}
+            </button>
+        </td>
         <td nowrap="nowrap">{contact_supportLevel}</td>
         <td nowrap="nowrap"><a href="tel:{con_phone}">{con_phone}</a></td>
         <td nowrap="nowrap">{contract}</td>
