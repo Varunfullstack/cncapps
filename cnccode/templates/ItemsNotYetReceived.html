@@ -1,6 +1,18 @@
 <script>
+    var dataTable = null;
+
+    var redSelect = null;
+    var orangeSelect = null;
+    var blackSelect = null;
+    var greenSelect = null;
     $(function () {
-        $('#theTable').DataTable({
+        redSelect = $('#red-selector');
+        orangeSelect = $('#orange-selector');
+        blackSelect = $('#black-selector');
+        greenSelect = $('#green-selector');
+
+
+        dataTable = $('#theTable').DataTable({
             dom: 'Blfrtip',
             buttons: [
                 {
@@ -12,9 +24,44 @@
             order: [
                 [3, 'asc'],
                 [10, 'asc']
+            ],
+            columnDefs: [
+                {
+                    "targets": [13],
+                    "visible": false,
+                    "searchable": true
+                }
             ]
         });
-    })
+    });
+
+    function filterColor() {
+        var colors = [];
+
+        if (redSelect.prop('checked')) {
+            colors.push('red');
+        }
+
+        if (orangeSelect.prop('checked')) {
+            colors.push('orange');
+        }
+
+        if (blackSelect.prop('checked')) {
+            colors.push('black');
+        }
+
+        if (greenSelect.prop('checked')) {
+            colors.push('green');
+        }
+
+        var search = 'thisshouldnotwork';
+
+        if (colors.length) {
+            search = '(' + colors.join('|') + ')';
+        }
+
+        dataTable.column(13).search(search, !!colors.length, false).draw();
+    }
 </script>
 <style>
     table.dataTable tfoot th {
@@ -39,10 +86,34 @@
     }
 </style>
 <P>
-    <span style="color:red;background-color: red">R</span> Not ordered yet.
-    <span style="color: orange;background-color: orange">A</span> Ordered but not
-    received. <span style="color: black;background-color: black">B</span> Ordered and
-    received. <span style="color: green;background-color: green">G</span> Entire purchase order received.
+    <span style="color:red;background-color: red">R</span>
+    <input type="checkbox"
+           id="red-selector"
+           checked
+           onchange="filterColor()"
+    >
+    Not ordered yet.
+    <span style="color: orange;background-color: orange">A</span>
+    <input type="checkbox"
+           checked
+           onchange="filterColor()"
+           id="orange-selector"
+    >
+    Ordered but not
+    received. <span style="color: black;background-color: black">B</span>
+    <input type="checkbox"
+           checked
+           onchange="filterColor()"
+           id="black-selector"
+    >
+    Ordered and
+    received. <span style="color: green;background-color: green">G</span>
+    <input type="checkbox"
+           checked
+           onchange="filterColor()"
+           id="green-selector"
+    >
+    Entire purchase order received.
 </P>
 <TABLE id="theTable">
     <thead>
@@ -85,6 +156,9 @@
         </th>
         <th>
             Project Name
+        </th>
+        <th>
+            Color
         </th>
     </TR>
     </thead>
@@ -132,7 +206,9 @@
         <td>
             {projectLink}
         </td>
-
+        <td>
+            {color}
+        </td>
     </TR>
     <!-- END notYetReceivedItemBlock -->
     </tbody>

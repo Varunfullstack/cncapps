@@ -136,6 +136,7 @@ class CTItemsNotYetReceived extends CTCNC
                     "futureDate"        => $this->getDateOrNA($item->getFutureDate()),
                     "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
                     "supplierRef"       => $item->getSupplierRef(),
+                    "color"             => $item->color(),
                     "projectLink"       => $projectLink,
                     "salesOrderLink"    => $salesOrderLink,
                     "SRLink"            => $serviceRequestLink
