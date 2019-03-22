@@ -563,8 +563,6 @@ class CTPassword extends CTCNC
 
         $this->setPageTitle('New Password');
 
-
-
         $this->setTemplateFiles(array('PasswordGenerate' => 'PasswordGenerate.inc'));
 
         $this->template->parse(
