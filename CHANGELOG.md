@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.3.5] - 2019-03-22
+### Fixed
+- ProcessPendingLeavers not working with dates in the past
+
 ## [v2.3.4] - 2019-03-21
 ### Removed
 - Suspend WebAnalytics
