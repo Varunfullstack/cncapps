@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 501 - Deleting contacts confirmation
+
 ## [v2.3.5] - 2019-03-22
 ### Fixed
 - ProcessPendingLeavers not working with dates in the past
