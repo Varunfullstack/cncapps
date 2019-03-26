@@ -2049,14 +2049,19 @@ WHERE odl_ordno = $ordheadID
         $purchaseOrdersForSalesOrder->getRowsByColumn(DBEPorhead::ordheadID);
 
         $shouldNotify = true;
-
+        echo '<div>We are pulling all the purchase orders for the sales order: ' . $salesOrderID . '</div>';
         while ($purchaseOrdersForSalesOrder->fetchNext()) {
+            echo '<div>We are looking at purchase order with ID: ' . $purchaseOrdersForSalesOrder->getValue(
+                    DBEPorhead::porheadID
+                ) . '</div>';
             if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID) == $purchaseOrderHeaderID) {
+                echo '<div> This is the same as the one we are processing</div>';
                 continue;
             }
 
             if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
                 $shouldNotify = false;
+                echo '<div>We have found another purchase order that is not completed yet..so we cannot create the activity</div>';
                 break;
             }
         }

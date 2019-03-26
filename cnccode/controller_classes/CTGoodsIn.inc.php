@@ -388,7 +388,7 @@ class CTGoodsIn extends CTCNC
                     'porheadID' => $_REQUEST['porheadID']
                 )
             );
-        header('Location: ' . $urlNext);
+//        header('Location: ' . $urlNext);
         exit;
     }
 }// end of class
