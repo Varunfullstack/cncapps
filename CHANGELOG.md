@@ -7,6 +7,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 498 - ContactAudit doesn't show contact support level
 - Issue 491 - Improve the way that new requests are posted
+- Issue 513 - 2nd Site Backup Validation Completed email formatting
 
 ## [v2.3.5] - 2019-03-22
 ### Fixed
