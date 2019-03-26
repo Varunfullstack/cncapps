@@ -2031,14 +2031,11 @@ WHERE odl_ordno = $ordheadID
         $db->query($statement);
     }
 
-    public function notifyPurchaseOrderCompletion($purchaseOrderHeaderID)
+    public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
     {
         // we need to find out what is the related sales order first
-        $dbePurchaseOrderHeader = new DBEPorhead($this);
-        $dbePurchaseOrderHeader->getRow($purchaseOrderHeaderID);
 
-        $salesOrderID = $dbePurchaseOrderHeader->getValue(DBEPorhead::ordheadID);
-
+        $salesOrderID = $purchaseOrderHeader->getValue(DBEPorhead::ordheadID);
 
         $purchaseOrdersForSalesOrder = new DBEPorhead($this);
 
@@ -2054,7 +2051,9 @@ WHERE odl_ordno = $ordheadID
             echo '<div>We are looking at purchase order with ID: ' . $purchaseOrdersForSalesOrder->getValue(
                     DBEPorhead::porheadID
                 ) . '</div>';
-            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID) == $purchaseOrderHeaderID) {
+            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID) == $purchaseOrderHeader->getValue(
+                    DBEPorhead::porheadID
+                )) {
                 echo '<div> This is the same as the one we are processing</div>';
                 continue;
             }
@@ -2073,11 +2072,14 @@ WHERE odl_ordno = $ordheadID
             $buActivity = new BUActivity($this);
             $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
         }
-        $dbePurchaseOrderHeader->setValue(
+        $purchaseOrderHeader->setShowSQLOn();
+        $purchaseOrderHeader->setValue(
             DBEPorhead::completionNotifiedFlag,
             'Y'
         );
-        $dbePurchaseOrderHeader->updateRow();
+
+        $purchaseOrderHeader->updateRow();
+
     }
 
 }// End of class

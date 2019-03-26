@@ -786,6 +786,7 @@ class CTPurchaseOrder extends CTCNC
                 'deliveryConfirmedFlagChecked' => $this->getChecked(
                     $dsPorhead->getValue(DBEPorhead::deliveryConfirmedFlag)
                 ),
+                'completionNotifiedFlag'       => $dsPorhead->getValue(DBEPorhead::completionNotifiedFlag),
                 'supplierRef'                  => Controller::htmlInputText(
                     $dsPorhead->getValue(DBEJPorhead::supplierRef)
                 ),
@@ -1353,7 +1354,14 @@ class CTPurchaseOrder extends CTCNC
                     DBEJPorhead::deliveryConfirmedFlag
                 ) == 'Y') {
                 $buSalesOrder = new BUSalesOrder($this);
-                $buSalesOrder->notifyPurchaseOrderCompletion($dsPorhead->getValue(DBEPorhead::porheadID));
+
+                $buSalesOrder->notifyPurchaseOrderCompletion($dbePurchaseOrder);
+
+                $dsPorhead->setValue(
+                    DBEJPorhead::completionNotifiedFlag,
+                    $dbePurchaseOrder->getValue(DBEPorhead::deliveryConfirmedFlag)
+                );
+
             }
             $this->buPurchaseOrder->updateHeader($dsPorhead);
 
