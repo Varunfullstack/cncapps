@@ -1346,7 +1346,17 @@ class CTPurchaseOrder extends CTCNC
             $this->displayOrder();
             exit;
         } else {
+            $dbePurchaseOrder = new DBEPorhead($this);
+            $dbePurchaseOrder->getRow($dsPorhead->getValue(DBEJPorhead::porheadID));
+
+            if ($dbePurchaseOrder->getValue(DBEPorhead::deliveryConfirmedFlag) == 'N' && $dsPorhead->getValue(
+                    DBEJPorhead::deliveryConfirmedFlag
+                ) == 'Y') {
+                $buSalesOrder = new BUSalesOrder($this);
+                $buSalesOrder->notifyPurchaseOrderCompletion($dsPorhead->getValue(DBEPorhead::porheadID));
+            }
             $this->buPurchaseOrder->updateHeader($dsPorhead);
+
             $urlNext =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],

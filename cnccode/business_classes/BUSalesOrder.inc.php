@@ -2066,10 +2066,6 @@ WHERE odl_ordno = $ordheadID
             }
         }
 
-
-        // we have to pull all the purchase orders and only notify if the given order is the only one pending of notification
-
-
         // we need to now find the associated SR, if there's more than one we only care about the one with the smallest ID
         $problemID = $this->getLinkedServiceRequestID($salesOrderID);
 
