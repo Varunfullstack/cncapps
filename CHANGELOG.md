@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 517 - Fix Hours background formatting on home page
+
 ## [v2.3.5] - 2019-03-22
 ### Fixed
 - ProcessPendingLeavers not working with dates in the past
