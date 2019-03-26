@@ -2497,7 +2497,7 @@ class CTActivity extends CTCNC
         onClick = "window.open(
           \'' . $generatePasswordLinkURL . '\',
           \'reason\',
-          \'scrollbars=yes,resizable=yes,height=50,width=80,copyhistory=no, menubar=0\')" >Generate Password</a> ';
+          \'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
     }

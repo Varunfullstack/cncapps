@@ -6,7 +6,6 @@
  */
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEPassword.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEBasePassword.inc.php");
 
 
 class BUPassword extends Business
@@ -22,7 +21,6 @@ class BUPassword extends Business
     {
         parent::__construct($owner);
         $this->dbePassword = new DBEPassword ($this);
-        $this->dbeBasePassword = new DBEBasePassword ($this);
     }
 
     function updatePassword(&$dsData)
@@ -89,14 +87,6 @@ class BUPassword extends Business
     /*
     Return a new password from a list of words with a random special char on the end
     */
-    function generatePassword()
-    {
-        $specialChars = array('!', '@', '#', '$', '%', '&', '*', '?');
-
-        $this->dbeBasePassword->getRandomRow();
-        return $this->dbeBasePassword->getValue('passwordString') . $specialChars[array_rand($specialChars)];
-    }
-
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
