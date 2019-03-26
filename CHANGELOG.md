@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 477 - Asset list export & upload exported file to website
+### Fixed
+- Issue 498 - ContactAudit doesn't show contact support level
 
 ## [v2.3.5] - 2019-03-22
 ### Fixed
