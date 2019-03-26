@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 477 - Asset list export & upload exported file to website
 - Issue 510 - Include Average SR open length for 7 dayers report
 - Issue 484 - Improve Password generation functionality
+- Issue 502 - PO Status Report v6
 ### Fixed
 - Issue 498 - ContactAudit doesn't show contact support level
 - Issue 491 - Improve the way that new requests are posted

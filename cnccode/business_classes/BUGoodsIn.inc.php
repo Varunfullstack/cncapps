@@ -18,7 +18,8 @@ class BUGoodsIn extends Business
 {
     /** @var BUSalesOrder */
     public $buSalesOrder;
-    var $dbePorhead = '';
+    /** @var DBEPorhead */
+    var $dbePorhead;
     var $dbeItem = '';
     var $dsOrdhead = '';
 
@@ -799,7 +800,7 @@ class BUGoodsIn extends Business
             );
             if (($dbePorline->countOutstandingRows() == 0)) {
                 if ($dsPorhead->getValue(DBEPorhead::completionNotifiedFlag) != 'Y') {
-                    $this->buSalesOrder->notifyPurchaseOrderCompletion($dsPorhead->getValue(DBEPorhead::porheadID));
+                    $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
                 }
                 $this->dbePorhead->setValue(
                     'type',
@@ -936,7 +937,7 @@ class BUGoodsIn extends Business
             );
             if (($dbePorline->countOutstandingRows() == 0)) {
                 if ($dsPorhead->getValue(DBEPorhead::completionNotifiedFlag) != 'Y') {
-                    $this->buSalesOrder->notifyPurchaseOrderCompletion($dsPorhead->getValue(DBEPorhead::porheadID));
+                    $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
                 }
                 $this->dbePorhead->setValue(
                     'type',
