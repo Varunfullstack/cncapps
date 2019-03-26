@@ -11,6 +11,8 @@ This project changes will be shown here.
 - Issue 491 - Improve the way that new requests are posted
 - Issue 513 - 2nd Site Backup Validation Completed email formatting
 - Issue 514 - 3CX Address Book Export to be fixed
+### Added
+- Issue 501 - Deleting contacts confirmation
 
 ## [v2.3.5] - 2019-03-22
 ### Fixed

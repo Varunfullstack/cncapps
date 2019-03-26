@@ -731,6 +731,11 @@
     var isShowingInactive = {isShowingInactive};
 
     function clearRow(contactID) {
+
+        if (!confirm('Are you sure you want to delete this contact?')) {
+            return;
+        }
+
         var row = $(event.target).closest('tr');
 
         var object = {
