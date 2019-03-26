@@ -2041,20 +2041,15 @@ class CTSalesOrder extends CTCNC
                             )
                         );
                     $quoteSent = ($this->dsQuotation->getValue("sentDateTime") != '0000-00-00 00:00:00');
+                    $fileExists = $this->checkQuoteDocFile($this->dsQuotation);
+
                     $sendQuoteDocURL = '';
                     $deleteQuoteDocURL = '';
                     $txtDelete = '';
                     $txtSendQuote = '';
                     $txtReminder = null;
-                    if (!$quoteSent) {
-                        $sendQuoteDocURL =
-                            Controller::buildLink(
-                                $_SERVER['PHP_SELF'],
-                                array(
-                                    'action'      => CTSALESORDER_ACT_SEND_QUOTE_DOC,
-                                    'quotationID' => $this->dsQuotation->getValue("quotationID")
-                                )
-                            );
+
+                    if (!$fileExists) {
                         $deleteQuoteDocURL =
                             Controller::buildLink(
                                 $_SERVER['PHP_SELF'],
@@ -2063,22 +2058,42 @@ class CTSalesOrder extends CTCNC
                                     'quotationID' => $this->dsQuotation->getValue("quotationID")
                                 )
                             );
-                        $txtDelete = CTSALESORDER_TXT_DELETE;
-                        $txtSendQuote = CTSALESORDER_TXT_SEND;
-                        $quoteSentDateTime = 'Not sent';
+                        $txtDelete = 'File Not Found: ' . CTSALESORDER_TXT_DELETE;
                     } else {
-
-
-                        if ($this->dsQuotation->getValue(
-                                DBEQuotation::fileExtension
-                            ) == 'pdf' && $this->dsQuotation->getValue(DBEQuotation::documentType == 'quotation')) {
-                            $txtReminder = "Send Reminder";
+                        if (!$quoteSent) {
+                            $sendQuoteDocURL =
+                                Controller::buildLink(
+                                    $_SERVER['PHP_SELF'],
+                                    array(
+                                        'action'      => CTSALESORDER_ACT_SEND_QUOTE_DOC,
+                                        'quotationID' => $this->dsQuotation->getValue("quotationID")
+                                    )
+                                );
+                            $deleteQuoteDocURL =
+                                Controller::buildLink(
+                                    $_SERVER['PHP_SELF'],
+                                    array(
+                                        'action'      => CTSALESORDER_ACT_DELETE_QUOTE_DOC,
+                                        'quotationID' => $this->dsQuotation->getValue("quotationID")
+                                    )
+                                );
+                            $txtDelete = CTSALESORDER_TXT_DELETE;
+                            $txtSendQuote = CTSALESORDER_TXT_SEND;
+                            $quoteSentDateTime = 'Not sent';
+                        } else {
+                            if ($this->dsQuotation->getValue(
+                                    DBEQuotation::fileExtension
+                                ) == 'pdf' && $this->dsQuotation->getValue(DBEQuotation::documentType == 'quotation')) {
+                                $txtReminder = "Send Reminder";
+                            }
+                            $quoteSentDateTime = date(
+                                "j/n/Y H:i:s",
+                                strtotime($this->dsQuotation->getValue("sentDateTime"))
+                            );
                         }
-                        $quoteSentDateTime = date(
-                            "j/n/Y H:i:s",
-                            strtotime($this->dsQuotation->getValue("sentDateTime"))
-                        );
                     }
+
+
                     $this->template->set_var(
                         array(
                             'displayQuoteDocURL' => $displayQuoteDocURL,
@@ -4876,6 +4891,22 @@ now that the notes are in a text field we need to split the lines up for the PDF
             'SalesOrderDisplayDocuments',
             true
         );
+    }
+
+
+    private function checkQuoteDocFile($dsQuotation)
+    {
+        $quoteFile = $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
+                DBEQuotation::versionNo
+            );
+        if ($dsQuotation->getValue(DBEQuotation::fileExtension) == '') {
+            $quoteFile .= '.pdf';
+        } else {
+            $quoteFile .= '.' . $this->dsQuotation->getValue(
+                    DBEQuotation::fileExtension
+                );        // if no extension in DB then assume PDF
+        }
+        return file_exists('quotes/' . $quoteFile);
     } // end function documents
 
 }// end of class
