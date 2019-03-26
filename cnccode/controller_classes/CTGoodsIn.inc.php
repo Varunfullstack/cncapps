@@ -14,13 +14,31 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_gc'] . '/DataSet.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 // Messages
-define('CTGOODSIN_MSG_PURCHASEORDER_NOT_FND', 'Purchase Order not found');
-define('CTGOODSIN_MSG_PORHEADID_NOT_PASSED', 'porheadID not passed');
-define('CTGOODSIN_MSG_SEQNO_NOT_PASSED', 'sequence no not passed');
-define('CTGOODSIN_MSG_ORDLINE_NOT_FND', 'order line not found');
+define(
+    'CTGOODSIN_MSG_PURCHASEORDER_NOT_FND',
+    'Purchase Order not found'
+);
+define(
+    'CTGOODSIN_MSG_PORHEADID_NOT_PASSED',
+    'porheadID not passed'
+);
+define(
+    'CTGOODSIN_MSG_SEQNO_NOT_PASSED',
+    'sequence no not passed'
+);
+define(
+    'CTGOODSIN_MSG_ORDLINE_NOT_FND',
+    'order line not found'
+);
 // Actions
-define('CTGOODSIN_ACT_DISP_SEARCH', 'dispSearch');
-define('CTGOODSIN_ACT_RECEIVE', 'recieve');
+define(
+    'CTGOODSIN_ACT_DISP_SEARCH',
+    'dispSearch'
+);
+define(
+    'CTGOODSIN_ACT_RECEIVE',
+    'recieve'
+);
 
 // Page text
 class CTGoodsIn extends CTCNC
@@ -44,9 +62,20 @@ class CTGoodsIn extends CTCNC
      * @var     DSForm
      * @access  private
      */
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "sales",
             "accounts"
@@ -108,7 +137,8 @@ class CTGoodsIn extends CTCNC
                 $_REQUEST['porheadID'],
                 '',
                 '',
-                'B',                        // initial and part receieved only
+                'B',
+                // initial and part receieved only
                 '',
                 $this->dsPorhead
             );
@@ -116,11 +146,12 @@ class CTGoodsIn extends CTCNC
         if ($this->dsPorhead->rowCount() == 1) {
             $this->dsPorhead->fetchNext();
             $urlNext =
-                Controller::buildLink($_SERVER['PHP_SELF'],
-                                 array(
-                                     'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
-                                     'porheadID' => $this->dsPorhead->getValue('porheadID')
-                                 )
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
+                        'porheadID' => $this->dsPorhead->getValue('porheadID')
+                    )
                 );
             header('Location: ' . $urlNext);
             exit;
@@ -137,21 +168,31 @@ class CTGoodsIn extends CTCNC
     function displaySearchForm()
     {
         $this->setMethodName('displaySearchForm');
-        $this->setTemplateFiles('GoodsInSearch', 'GoodsInSearch.inc');
+        $this->setTemplateFiles(
+            'GoodsInSearch',
+            'GoodsInSearch.inc'
+        );
 // Parameters
         $this->setPageTitle("Goods In");
-        $submitURL = Controller::buildLink($_SERVER['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $submitURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
         $urlSupplierPopup =
             Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
-                    'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                    'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
         $this->dsPorhead->initialise();
         if ($this->dsPorhead->rowCount() > 0) {
-            $this->template->set_block('GoodsInSearch', 'orderBlock', 'orders');
+            $this->template->set_block(
+                'GoodsInSearch',
+                'orderBlock',
+                'orders'
+            );
             $supplierNameCol = $this->dsPorhead->columnExists('supplierName');
             $typeCol = $this->dsPorhead->columnExists('type');
             $customerNameCol = $this->dsPorhead->columnExists('customerName');
@@ -164,7 +205,7 @@ class CTGoodsIn extends CTCNC
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
+                            'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
                             'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
                         )
                     );
@@ -174,33 +215,44 @@ class CTGoodsIn extends CTCNC
                     array(
                         'listCustomerName' => $customerName,
                         'listSupplierName' => $supplierName,
-                        'listGoodsInURL' => $goodsInURL,
-                        'listPorheadID' => $this->dsPorhead->getValue($porheadIDCol),
-                        'listOrderType' => $this->orderTypeArray[$this->dsPorhead->getValue($typeCol)],
-                        'listSupplierRef' => $this->dsPorhead->getValue($supplierRefCol)//,
+                        'listGoodsInURL'   => $goodsInURL,
+                        'listPorheadID'    => $this->dsPorhead->getValue($porheadIDCol),
+                        'listOrderType'    => $this->orderTypeArray[$this->dsPorhead->getValue($typeCol)],
+                        'listSupplierRef'  => $this->dsPorhead->getValue($supplierRefCol)//,
                     )
                 );
-                $this->template->parse('orders', 'orderBlock', true);
+                $this->template->parse(
+                    'orders',
+                    'orderBlock',
+                    true
+                );
             }
         }
 // search parameter section
         if ($_REQUEST['supplierID'] != '') {
             $buSupplier = new BUSupplier($this);
-            $buSupplier->getSupplierByID($_REQUEST['supplierID'], $dsSupplier);
+            $buSupplier->getSupplierByID(
+                $_REQUEST['supplierID'],
+                $dsSupplier
+            );
             $supplierName = $dsSupplier->getValue('name');
         } else {
             $supplierName = '';
         }
         $this->template->set_var(
             array(
-                'supplierName' => $supplierName,
-                'porheadID' => $_REQUEST['porheadID'],
-                'supplierID' => $_REQUEST['supplierID'],
-                'submitURL' => $submitURL,
+                'supplierName'     => $supplierName,
+                'porheadID'        => $_REQUEST['porheadID'],
+                'supplierID'       => $_REQUEST['supplierID'],
+                'submitURL'        => $submitURL,
                 'urlSupplierPopup' => $urlSupplierPopup
             )
         );
-        $this->template->parse('CONTENTS', 'GoodsInSearch', true);
+        $this->template->parse(
+            'CONTENTS',
+            'GoodsInSearch',
+            true
+        );
         $this->parsePage();
     }
 
@@ -217,14 +269,23 @@ class CTGoodsIn extends CTCNC
             $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
             return;
         }
-        $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
+        $this->buPurchaseOrder->getHeaderByID(
+            $_REQUEST['porheadID'],
+            $dsPorhead
+        );
         $dsPorhead->fetchNext();
-        $this->buPurchaseOrder->getLinesByID($dsPorhead->getValue('porheadID'), $dsPorline);
+        $this->buPurchaseOrder->getLinesByID(
+            $dsPorhead->getValue('porheadID'),
+            $dsPorline
+        );
         // determine whether we should be asking for serial no and warranty for any items on this
         // order. e.g. There is a sales order and addItem flag is set.
         if ($dsPorhead->getValue('ordheadID') != 0) {
             $buSalesOrder = new BUSalesOrder($this);
-            $buSalesOrder->getOrdheadByID($dsPorhead->getValue('ordheadID'), $dsOrdhead);
+            $buSalesOrder->getOrdheadByID(
+                $dsPorhead->getValue('ordheadID'),
+                $dsOrdhead
+            );
             $addCustomerItems = ($dsOrdhead->getValue('addItem') == 'Y');
         } else {
             $addCustomerItems = FALSE;
@@ -235,15 +296,23 @@ class CTGoodsIn extends CTCNC
             If the customer is an internal stock location then update the appropriate stock level
             */
             if ($dsPorhead->getValue('supplierID') == CONFIG_SALES_STOCK_SUPPLIERID) {
-                $this->buGoodsIn->getInitialStockReceieveQtys(CONFIG_SALES_STOCK_CUSTOMERID,
-                                                              $dsPorline,
-                                                              $this->dsGoodsIn);
+                $this->buGoodsIn->getInitialStockReceieveQtys(
+                    CONFIG_SALES_STOCK_CUSTOMERID,
+                    $dsPorline,
+                    $this->dsGoodsIn
+                );
             } else if ($dsPorhead->getValue('supplierID') == CONFIG_MAINT_STOCK_SUPPLIERID) {
-                $this->buGoodsIn->getInitialStockReceieveQtys(CONFIG_MAINT_STOCK_CUSTOMERID,
-                                                              $dsPorline,
-                                                              $this->dsGoodsIn);
+                $this->buGoodsIn->getInitialStockReceieveQtys(
+                    CONFIG_MAINT_STOCK_CUSTOMERID,
+                    $dsPorline,
+                    $this->dsGoodsIn
+                );
             } else {
-                $this->buGoodsIn->getInitialReceieveQtys($dsPorline, $this->dsGoodsIn, $addCustomerItems);
+                $this->buGoodsIn->getInitialReceieveQtys(
+                    $dsPorline,
+                    $this->dsGoodsIn,
+                    $addCustomerItems
+                );
             }
         }
         $porheadID = $dsPorhead->getValue('porheadID');
@@ -255,7 +324,7 @@ class CTGoodsIn extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTGOODSIN_ACT_RECEIVE,
+                    'action'    => CTGOODSIN_ACT_RECEIVE,
                     'porheadID' => $porheadID
                 )
             );
@@ -264,19 +333,19 @@ class CTGoodsIn extends CTCNC
             Controller::buildLink(
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
-                    'action' => CTCNC_ACT_DISPLAY_PO,
+                    'action'    => CTCNC_ACT_DISPLAY_PO,
                     'porheadID' => $porheadID
                 )
             );
 
         $this->template->set_var(
             array(
-                'porheadID' => $porheadID,
-                'supplierName' => $dsPorhead->getValue('supplierName'),
-                'customerName' => $dsOrdhead->getValue('customerName'),
-                'ordheadID' => $dsPorhead->getValue('ordheadID'),
-                'customerID' => $dsOrdhead->getValue('customerID'),
-                'urlReceive' => $urlReceive,
+                'porheadID'        => $porheadID,
+                'supplierName'     => $dsPorhead->getValue('supplierName'),
+                'customerName'     => $dsOrdhead->getValue('customerName'),
+                'ordheadID'        => $dsPorhead->getValue('ordheadID'),
+                'customerID'       => $dsOrdhead->getValue('customerID'),
+                'urlReceive'       => $urlReceive,
                 'urlPurchaseOrder' => $urlPurchaseOrder
             )
         );
@@ -288,32 +357,53 @@ class CTGoodsIn extends CTCNC
         $dsPorline->initialise();
         $this->dsGoodsIn->initialise();
         if ($this->dsGoodsIn->rowCount() > 0) {
-            $this->template->set_block('GoodsInDisplay', 'warrantyBlock', 'warranties'); // innermost first
-            $this->template->set_block('GoodsInDisplay', 'orderLineBlock', 'orderLines');
+            $this->template->set_block(
+                'GoodsInDisplay',
+                'warrantyBlock',
+                'warranties'
+            ); // innermost first
+            $this->template->set_block(
+                'GoodsInDisplay',
+                'orderLineBlock',
+                'orderLines'
+            );
             while ($this->dsGoodsIn->fetchNext()) {
                 $this->template->set_var(
                     array(
-                        'description' => Controller::htmlDisplayText($this->dsGoodsIn->getValue("description")),
-                        'sequenceNo' => $this->dsGoodsIn->getValue('sequenceNo'),
+                        'description'     => Controller::htmlDisplayText($this->dsGoodsIn->getValue("description")),
+                        'sequenceNo'      => $this->dsGoodsIn->getValue('sequenceNo'),
                         'orderSequenceNo' => $this->dsGoodsIn->getValue('orderSequenceNo')
                     )
                 );
                 $this->template->set_var(
                     array(
-                        'qtyOrdered' => number_format($this->dsGoodsIn->getValue("qtyOrdered"), 1, '.', ''),
-                        'itemID' => $this->dsGoodsIn->getValue("itemID"),
-                        'partNo' => Controller::htmlDisplayText($this->dsGoodsIn->getValue("partNo")),
-                        'qtyOS' => number_format($this->dsGoodsIn->getValue("qtyOS"), 1, '.', ''),
-                        'qtyToReceive' => $this->dsGoodsIn->getValue("qtyToReceive"),
-                        'serialNo' => $this->dsGoodsIn->getValue("serialNo"),
+                        'qtyOrdered'      => number_format(
+                            $this->dsGoodsIn->getValue("qtyOrdered"),
+                            1,
+                            '.',
+                            ''
+                        ),
+                        'itemID'          => $this->dsGoodsIn->getValue("itemID"),
+                        'partNo'          => Controller::htmlDisplayText($this->dsGoodsIn->getValue("partNo")),
+                        'qtyOS'           => number_format(
+                            $this->dsGoodsIn->getValue("qtyOS"),
+                            1,
+                            '.',
+                            ''
+                        ),
+                        'qtyToReceive'    => $this->dsGoodsIn->getValue("qtyToReceive"),
+                        'serialNo'        => $this->dsGoodsIn->getValue("serialNo"),
                         'requireSerialNo' => $this->dsGoodsIn->getValue("requireSerialNo"),
-                        'allowReceive' => $this->dsGoodsIn->getValue("allowReceive"),
-                        'renew' => $this->dsGoodsIn->getValue("renew") ? CT_CHECKED : '',
-                        'customerItemID' => $this->dsGoodsIn->getValue("customerItemID"),
+                        'allowReceive'    => $this->dsGoodsIn->getValue("allowReceive"),
+                        'renew'           => $this->dsGoodsIn->getValue("renew") ? CT_CHECKED : '',
+                        'customerItemID'  => $this->dsGoodsIn->getValue("customerItemID"),
                     )
                 );
                 if ($this->dsGoodsIn->getValue('requireSerialNo')) {
-                    $this->template->set_var('DISABLED', '');
+                    $this->template->set_var(
+                        'DISABLED',
+                        ''
+                    );
                     // There is a warranty drop-down for each line
                     $dsWarranty->initialise();
                     $thisWarrantyID = $this->dsGoodsIn->getValue('warrantyID');
@@ -321,28 +411,54 @@ class CTGoodsIn extends CTCNC
                         $this->template->set_var(
                             array(
                                 'warrantyDescription' => $dsWarranty->getValue('description'),
-                                'warrantyID' => $dsWarranty->getValue('warrantyID'),
-                                'warrantySelected' => ($thisWarrantyID == $dsWarranty->getValue('warrantyID')) ? CT_SELECTED : ''
+                                'warrantyID'          => $dsWarranty->getValue('warrantyID'),
+                                'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
+                                        'warrantyID'
+                                    )) ? CT_SELECTED : ''
                             )
                         );
-                        $this->template->parse('warranties', 'warrantyBlock', true);
+                        $this->template->parse(
+                            'warranties',
+                            'warrantyBlock',
+                            true
+                        );
                     } // while ($dsWarranty->fetchNext()
 
                 } else {
-                    $this->template->set_var('DISABLED', 'disabled'); // no serial no or warranty
+                    $this->template->set_var(
+                        'DISABLED',
+                        'disabled'
+                    ); // no serial no or warranty
                 }
 
                 if ($this->dsGoodsIn->getValue('allowReceive') == FALSE) {
-                    $this->template->set_var('lineDisabled', 'disabled'); // entry of anything!
+                    $this->template->set_var(
+                        'lineDisabled',
+                        'disabled'
+                    ); // entry of anything!
                 } else {
-                    $this->template->set_var('lineDisabled', '');
+                    $this->template->set_var(
+                        'lineDisabled',
+                        ''
+                    );
                 }
 
-                $this->template->parse('orderLines', 'orderLineBlock', true);
-                $this->template->set_var('warranties', ''); // clear for next line
+                $this->template->parse(
+                    'orderLines',
+                    'orderLineBlock',
+                    true
+                );
+                $this->template->set_var(
+                    'warranties',
+                    ''
+                ); // clear for next line
             } // while ($dsPorline->fetchNext())
         }// if ($dsPorline->rowCount() > 0)
-        $this->template->parse('CONTENTS', 'GoodsInDisplay', true);
+        $this->template->parse(
+            'CONTENTS',
+            'GoodsInDisplay',
+            true
+        );
         $this->parsePage();
     }
 
@@ -378,17 +494,24 @@ class CTGoodsIn extends CTCNC
             exit;
         }
 
-        $this->buGoodsIn->receive($_REQUEST['porheadID'], $this->userID, $dsGoodsIn);
-        $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
+        $this->buGoodsIn->receive(
+            $_REQUEST['porheadID'],
+            $this->userID,
+            $dsGoodsIn
+        );
+        $this->buPurchaseOrder->getHeaderByID(
+            $_REQUEST['porheadID'],
+            $dsPorhead
+        );
         $urlNext =
             Controller::buildLink(
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
-                    'action' => CTCNC_ACT_DISPLAY_PO,
+                    'action'    => CTCNC_ACT_DISPLAY_PO,
                     'porheadID' => $_REQUEST['porheadID']
                 )
             );
-//        header('Location: ' . $urlNext);
+        header('Location: ' . $urlNext);
         exit;
     }
 }// end of class

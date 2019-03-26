@@ -2072,7 +2072,6 @@ WHERE odl_ordno = $ordheadID
             $buActivity = new BUActivity($this);
             $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
         }
-        $purchaseOrderHeader->setShowSQLOn();
         $purchaseOrderHeader->setValue(
             DBEPorhead::completionNotifiedFlag,
             'Y'
