@@ -26,7 +26,7 @@ switch ($_REQUEST ['action']) {
         $buDailyReport->prepayOverValue($daysAgo);
         break;
     case 'outstandingIncidents' :
-        $buDailyReport->outstandingIncidents($daysAgo, null, $onScreen);
+        $buDailyReport->outstandingIncidents($daysAgo, false, $onScreen);
         break;
     case 'outstandingPriorityFiveIncidents' :
         $buDailyReport->outstandingIncidents($daysAgo, true);
