@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.4.0]
+## [v2.4.0] - 2019-03-27
 ### Changed
 - Issue 477 - Asset list export & upload exported file to website
 - Issue 510 - Include Average SR open length for 7 dayers report
