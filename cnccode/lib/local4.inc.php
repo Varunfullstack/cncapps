@@ -164,6 +164,7 @@ class auSweetcode extends Auth
         global $cfg;
         //$GLOBALS['loginMessage'] = ''; // reset message
         include(PHPLIB_PAGE_LOGIN);
+
     }
 
     function authenticate_on_ldap($username,
@@ -208,7 +209,6 @@ class auSweetcode extends Auth
 
     function auth_validatelogin()
     {
-
         if (isset($_POST["username"])) {
             $this->auth["uname"] = $_POST["username"];
         } else { // KA: added this so that PHP Notice isn't raised
