@@ -1,6 +1,22 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.4.0]
+### Changed
+- Issue 477 - Asset list export & upload exported file to website
+- Issue 510 - Include Average SR open length for 7 dayers report
+- Issue 484 - Improve Password generation functionality
+- Issue 502 - PO Status Report v6
+- Issue 516 - Sales Quote reminder not creating PDF document
+### Fixed
+- Issue 498 - ContactAudit doesn't show contact support level
+- Issue 491 - Improve the way that new requests are posted
+- Issue 513 - 2nd Site Backup Validation Completed email formatting
+- Issue 514 - 3CX Address Book Export to be fixed
+- Issue 517 - Fix Hours background formatting on home page
+### Added
+- Issue 501 - Deleting contacts confirmation
+
 ## [v2.3.5] - 2019-03-22
 ### Fixed
 - ProcessPendingLeavers not working with dates in the past
@@ -9,7 +25,7 @@ This project changes will be shown here.
 ### Removed
 - Suspend WebAnalytics
 
-## [v2.3.3] - 2019-03-04
+## [v2.3.3] - 2019-03-14
 ### Changed
 - Remove “Please fax back…..” from generated PDF's and show, “Please return a signed copy to sales@cnc-ltd.co.uk” instead
 

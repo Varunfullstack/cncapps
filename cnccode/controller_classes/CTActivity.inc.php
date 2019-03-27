@@ -2497,7 +2497,7 @@ class CTActivity extends CTCNC
         onClick = "window.open(
           \'' . $generatePasswordLinkURL . '\',
           \'reason\',
-          \'scrollbars=yes,resizable=yes,height=50,width=80,copyhistory=no, menubar=0\')" >Generate Password</a> ';
+          \'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
     }
@@ -2829,58 +2829,23 @@ class CTActivity extends CTCNC
                 'results'
             );
 
+
             while ($row = mysqli_fetch_assoc($result)) {
-
-                // only allow selection of support contacts
-                $rowColor = '';
-
-
-                if ($row['openSrCount'] == 0) {
-                    $nextURL =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'     => 'editServiceRequestHeader',
-                                'customerID' => $row['cus_custno'],
-                                'contactID'  => $row['con_contno'],
-                                'reason'     => $reason
-                            )
-                        );
-                } else {
-                    $nextURL =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'     => 'displayOpenSrs',
-                                'customerID' => $row['cus_custno'],
-                                'contactID'  => $row['con_contno'],
-                                'reason'     => $reason
-                            )
-                        );
-
-                }
-
+                $supportClass = "";
                 // main suport contact?
                 if ($row['supportLevel'] == 'main') {
-                    $linkClass = 'class="mainSupportContact"';
-                } else {
-                    $linkClass = '';
+                    $supportClass = "mainSupportContact";
                 }
-
-                $cus_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['cus_name'] . '</A>';
-                $contact_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['con_first_name'] . ' ' . $row['con_last_name'] . '</A>';
-                $site_name = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['site_name'] . '</A>';
+                $action = 'displayOpenSrs';
+                if ($row['openSrCount'] == 0) {
+                    $action = 'editServiceRequestHeader';
+                }
+                $cus_name = $row['cus_name'];
+                $contact_name = $row['con_first_name'] . ' ' . $row['con_last_name'];
+                $site_name = $row['site_name'];
                 $contact_phone = $row['con_phone'];
-                $contact_position = '<A ' . $linkClass . ' HREF="' . $nextURL . '">' . $row['con_position'] . '</A>';
+                $contact_position = $row['con_position'];
                 $site_phone = $row['add_phone'];
-
-
-//                    $cus_name = $row['cus_name'];
-//                    $contact_name = $row['con_first_name'] . ' ' . $row['con_last_name'];
-//                    $site_name = $row['site_name'];
-//                    $contact_phone = '';
-//                    $contact_position = '';
-//                    $site_phone = '';
 
                 if ($row['specialAttentionContactFlag'] == 'Y') {
                     $rowColor = "style='background-color:#ffe6e6 '";
@@ -2894,6 +2859,10 @@ class CTActivity extends CTCNC
                         'con_phone'            => $contact_phone,
                         'add_phone'            => $site_phone,
                         'site_name'            => $site_name,
+                        'supportClass'         => $supportClass,
+                        'formAction'           => $action,
+                        'customerID'           => $row['cus_custno'],
+                        'contactID'            => $row['con_contno'],
                         'contact_notes'        => $row['con_notes'],
                         'contact_supportLevel' => $row['supportLevel'],
                         'contract'             => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required')

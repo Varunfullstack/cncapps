@@ -15,20 +15,33 @@ $buSecondsite = new BUSecondsite($this);
 
 set_time_limit(0); // unlimited execution time
 
-$buSecondsite->validateBackups(null, $testRun);
+$buSecondsite->validateBackups(
+    null,
+    $testRun
+);
 
-$template = new Template(EMAIL_TEMPLATE_DIR, "remove");
+$template = new Template(
+    EMAIL_TEMPLATE_DIR,
+    "remove"
+);
 
-$template->set_file('page', 'secondSiteCompletedEmail.inc.html');
+$template->set_file(
+    'page',
+    'secondSiteCompletedEmail.inc.html'
+);
 
-$template->set_block('page', 'logBlock', 'logs');
+$template->set_block(
+    'page',
+    'logBlock',
+    'logs'
+);
 
 foreach ($buSecondsite->log as $logEntry) {
 
     if ($logEntry['type'] == BUSecondsite::LOG_TYPE_SUCCESS) {
         continue; // don't report successes in detail
     }
-
+    $class = "";
     switch ($logEntry['type']) {
 
         case BUSecondsite::LOG_TYPE_ERROR_INCOMPLETE:
@@ -47,14 +60,22 @@ foreach ($buSecondsite->log as $logEntry) {
     $template->set_var(
         array(
             'message' => $logEntry['message'],
-            'class' => $class
+            'class'   => $class
         )
     );
-    $template->parse('logs', 'logBlock', true);
+    $template->parse(
+        'logs',
+        'logBlock',
+        true
+    );
 
 } // end foreach
 
-$template->set_block('page', 'delayedCheckServerBlock', 'delayedServers');
+$template->set_block(
+    'page',
+    'delayedCheckServerBlock',
+    'delayedServers'
+);
 
 $servers = $buSecondsite->getDelayedCheckServers();
 foreach ($servers as $server) {
@@ -62,17 +83,25 @@ foreach ($servers as $server) {
     $template->set_var(
         array(
             'customerName' => $server['cus_name'],
-            'serverName' => $server['serverName'],
-            'delayDays' => $server['secondsiteImageDelayDays'],
-            'delayUser' => $server['delayUser'],
-            'delayDate' => $server['secondsiteImageDelayDate']
+            'serverName'   => $server['serverName'],
+            'delayDays'    => $server['secondsiteImageDelayDays'],
+            'delayUser'    => $server['delayUser'],
+            'delayDate'    => $server['secondsiteImageDelayDate']
         )
     );
-    $template->parse('delayedServers', 'delayedCheckServerBlock', true);
+    $template->parse(
+        'delayedServers',
+        'delayedCheckServerBlock',
+        true
+    );
 
 }
 
-$template->set_block('page', 'suspendedCheckServerBlock', 'suspendedServers');
+$template->set_block(
+    'page',
+    'suspendedCheckServerBlock',
+    'suspendedServers'
+);
 
 $servers = $buSecondsite->getSuspendedCheckServers();
 
@@ -80,18 +109,26 @@ foreach ($servers as $server) {
 
     $template->set_var(
         array(
-            'customerName' => $server['cus_name'],
-            'serverName' => $server['serverName'],
+            'customerName'       => $server['cus_name'],
+            'serverName'         => $server['serverName'],
             'suspendedUntilDate' => $server['secondsiteValidationSuspendUntilDate'],
-            'suspendUser' => $server['suspendUser'],
-            'suspendedDate' => $server['secondsiteSuspendedDate']
+            'suspendUser'        => $server['suspendUser'],
+            'suspendedDate'      => $server['secondsiteSuspendedDate']
         )
     );
-    $template->parse('suspendedServers', 'suspendedCheckServerBlock', true);
+    $template->parse(
+        'suspendedServers',
+        'suspendedCheckServerBlock',
+        true
+    );
 
 }
 
-$template->set_block('page', 'excludedLocalServerBlock', 'excludedLocalServers');
+$template->set_block(
+    'page',
+    'excludedLocalServerBlock',
+    'excludedLocalServers'
+);
 
 $servers = $buSecondsite->getExcludedLocalServers();
 
@@ -100,31 +137,42 @@ foreach ($servers as $server) {
     $template->set_var(
         array(
             'customerName' => $server['cus_name'],
-            'serverName' => $server['serverName']
+            'serverName'   => $server['serverName']
         )
     );
-    $template->parse('excludedLocalServers', 'excludedLocalServerBlock', true);
+    $template->parse(
+        'excludedLocalServers',
+        'excludedLocalServerBlock',
+        true
+    );
 
 }
 
 $template->setVar(
     array(
-        'serverCount' => $buSecondsite->serverCount,
-        'serverErrorCount' => $buSecondsite->serverErrorCount,
+        'serverCount'          => $buSecondsite->serverCount,
+        'serverErrorCount'     => $buSecondsite->serverErrorCount,
         'suspendedServerCount' => $buSecondsite->suspendedServerCount,
-        'imageCount' => $buSecondsite->imageCount,
-        'imageErrorCount' => $buSecondsite->imageErrorCount,
-        'successCount' => $buSecondsite->imagePassesCount,
-        'successRate' => round($buSecondsite->imageCount ? $buSecondsite->imagePassesCount / $buSecondsite->imageCount * 100 : 0,1)
+        'imageCount'           => $buSecondsite->imageCount,
+        'imageErrorCount'      => $buSecondsite->imageErrorCount,
+        'successCount'         => $buSecondsite->imagePassesCount,
+        'successRate'          => round(
+            $buSecondsite->imageCount ? $buSecondsite->imagePassesCount / $buSecondsite->imageCount * 100 : 0,
+            1
+        )
     )
 );
 
-$template->parse('output', 'page', true);
+$template->parse(
+    'output',
+    'page',
+    true
+);
 
 $html = $template->get_var('output');
 $subject = '2nd Site Backup Validation Completed';
 
-if($testRun){
+if ($testRun) {
     $subject = '2nd Site Backup Test Run Completed';
 }
 
@@ -135,10 +183,10 @@ $senderName = 'CNC Support Department';
 $toEmail = '2sprocesscompleted@' . CONFIG_PUBLIC_DOMAIN;
 
 $hdrs = array(
-    'To' => $toEmail,
-    'From' => $senderEmail,
-    'Subject' => $subject,
-    'Date' => date("r"),
+    'To'           => $toEmail,
+    'From'         => $senderEmail,
+    'Subject'      => $subject,
+    'Date'         => date("r"),
     'Content-Type' => 'text/html; charset=UTF-8'
 );
 
@@ -148,9 +196,9 @@ $buMail->mime->setHTMLBody($html);
 
 $mime_params = array(
     'text_encoding' => '7bit',
-    'text_charset' => 'UTF-8',
-    'html_charset' => 'UTF-8',
-    'head_charset' => 'UTF-8'
+    'text_charset'  => 'UTF-8',
+    'html_charset'  => 'UTF-8',
+    'head_charset'  => 'UTF-8'
 );
 $body = $buMail->mime->get($mime_params);
 

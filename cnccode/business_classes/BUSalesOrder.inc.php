@@ -2031,26 +2031,54 @@ WHERE odl_ordno = $ordheadID
         $db->query($statement);
     }
 
-    public function notifyPurchaseOrderCompletion($purchaseOrderHeaderID)
+    public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
     {
         // we need to find out what is the related sales order first
-        $dbePurchaseOrderHeader = new DBEPorhead($this);
-        $dbePurchaseOrderHeader->getRow($purchaseOrderHeaderID);
 
-        $salesOrderID = $dbePurchaseOrderHeader->getValue(DBEPorhead::ordheadID);
+        $salesOrderID = $purchaseOrderHeader->getValue(DBEPorhead::ordheadID);
+
+        $purchaseOrdersForSalesOrder = new DBEPorhead($this);
+
+        $purchaseOrdersForSalesOrder->setValue(
+            DBEPorhead::ordheadID,
+            $salesOrderID
+        );
+        $purchaseOrdersForSalesOrder->getRowsByColumn(DBEPorhead::ordheadID);
+
+        $shouldNotify = true;
+        echo '<div>We are pulling all the purchase orders for the sales order: ' . $salesOrderID . '</div>';
+        while ($purchaseOrdersForSalesOrder->fetchNext()) {
+            echo '<div>We are looking at purchase order with ID: ' . $purchaseOrdersForSalesOrder->getValue(
+                    DBEPorhead::porheadID
+                ) . '</div>';
+            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID) == $purchaseOrderHeader->getValue(
+                    DBEPorhead::porheadID
+                )) {
+                echo '<div> This is the same as the one we are processing</div>';
+                continue;
+            }
+
+            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
+                $shouldNotify = false;
+                echo '<div>We have found another purchase order that is not completed yet..so we cannot create the activity</div>';
+                break;
+            }
+        }
 
         // we need to now find the associated SR, if there's more than one we only care about the one with the smallest ID
         $problemID = $this->getLinkedServiceRequestID($salesOrderID);
 
-        if ($problemID) {
+        if ($problemID && $shouldNotify) {
             $buActivity = new BUActivity($this);
             $buActivity->createPurchaseOrderCompletedSalesActivity($problemID);
         }
-        $dbePurchaseOrderHeader->setValue(
+        $purchaseOrderHeader->setValue(
             DBEPorhead::completionNotifiedFlag,
             'Y'
         );
-        $dbePurchaseOrderHeader->updateRow();
+
+        $purchaseOrderHeader->updateRow();
+
     }
 
 }// End of class

@@ -572,15 +572,7 @@ class CTPassword extends CTCNC
 
         $this->setPageTitle('New Password');
 
-        $password = $this->buPassword->generatePassword();
-
         $this->setTemplateFiles(array('PasswordGenerate' => 'PasswordGenerate.inc'));
-
-        $this->template->set_var(
-            array(
-                'password' => $password
-            )
-        );
 
         $this->template->parse(
             'CONTENTS',
