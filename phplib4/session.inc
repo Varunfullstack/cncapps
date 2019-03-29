@@ -413,40 +413,40 @@ class Session
         switch ($t) {
 
             case "array":
-        ## $$var is an array. Enumerate the elements and serialize them.
-                eval("reset(\$$var); \$l = gettype(list(\$k)=each(\$$var));");
-//                var_dump(gettype($k));
-
-                $str .= "\$$var = array(); ";
-
-                while ("array" == $l) {
-                    ## Structural recursion
-//          $this->serialize($var."['".eregi_replace("([\\'])", "\\\\1", $k)."']", $str);
-          $this->serialize($var."['".preg_replace("/([\\'])/", "\\\\1", $k)."']", $str);
-                    eval("\$l = gettype(list(\$k)=each(\$$var));");
-
-                }
-
-//                $l = $t;
-//                eval(
-//                "
-//                \$str .= '\$$var = array(); ';
+//        ## $$var is an array. Enumerate the elements and serialize them.
+//                eval("reset(\$$var); \$l = gettype(list(\$k)=each(\$$var));");
+////                var_dump(gettype($k));
 //
-//                foreach (\$$var as \$k => \$value){
-////                    echo '<div>key is '.\$k.' and value is '.\$value.'</div>';
-//                    \$arrayString = \$var . \"['\" . preg_replace(
-//                            \"/([\\'])/\",
-//                            \"\\\\1\",
-//                            \$k
-//                        ) . \"']\";
+//                $str .= "\$$var = array(); ";
 //
-////                        var_dump(\$arrayString);
-//                    \$this->serialize(
-//                        \$arrayString,
-//                        \$str
-//                    );
-//                }"
-//                );
+//                while ("array" == $l) {
+//                    ## Structural recursion
+////          $this->serialize($var."['".eregi_replace("([\\'])", "\\\\1", $k)."']", $str);
+//          $this->serialize($var."['".preg_replace("/([\\'])/", "\\\\1", $k)."']", $str);
+//                    eval("\$l = gettype(list(\$k)=each(\$$var));");
+//
+//                }
+
+                $l = $t;
+                eval(
+                "
+                \$str .= '\$$var = array(); ';
+
+                foreach (\$$var as \$k => \$value){
+//                    echo '<div>key is '.\$k.' and value is '.\$value.'</div>';
+                    \$arrayString = \$var . \"['\" . preg_replace(
+                            \"/([\\'])/\",
+                            \"\\\\1\",
+                            \$k
+                        ) . \"']\";
+
+//                        var_dump(\$arrayString);
+                    \$this->serialize(
+                        \$arrayString,
+                        \$str
+                    );
+                }"
+                );
 
 
                 break;
