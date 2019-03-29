@@ -505,8 +505,8 @@ class Session
             $str
         );
 
-        reset($this->pt);
-        while (list($thing) = each($this->pt)) {
+
+        foreach ($this->pt as $thing) {
             $thing = trim($thing);
             if ($thing) {
                 $this->serialize(
