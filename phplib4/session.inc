@@ -62,7 +62,7 @@ class Session
             $things
         );
         reset($things);
-        foreach ($things as $thing) {
+    while ( list(,$thing) = each($things) ) {
             $thing = trim($thing);
             if ($thing) {
                 $this->pt[$thing] = true;
@@ -413,7 +413,7 @@ class Session
         switch ($t) {
 
             case "array":
-//                ## $$var is an array. Enumerate the elements and serialize them.
+        ## $$var is an array. Enumerate the elements and serialize them.
                 eval("reset(\$$var); \$l = gettype(list(\$k)=each(\$$var));");
 //                var_dump(gettype($k));
 
@@ -421,14 +421,8 @@ class Session
 
                 while ("array" == $l) {
                     ## Structural recursion
-                    $this->serialize(
-                        $var . "['" . preg_replace(
-                            "/([\\'])/",
-                            "\\\\1",
-                            $k
-                        ) . "']",
-                        $str
-                    );
+//          $this->serialize($var."['".eregi_replace("([\\'])", "\\\\1", $k)."']", $str);
+          $this->serialize($var."['".preg_replace("/([\\'])/", "\\\\1", $k)."']", $str);
                     eval("\$l = gettype(list(\$k)=each(\$$var));");
 
                 }
@@ -502,17 +496,11 @@ class Session
     {
         $str = "";
 
-        $this->serialize(
-            "this->in",
-            $str
-        );
-        $this->serialize(
-            "this->pt",
-            $str
-        );
-//        echo '<br>';
-//        var_dump($str);
-        foreach ($this->pt as $thing) {
+    $this->serialize("this->in", $str);
+    $this->serialize("this->pt", $str);
+
+    reset($this->pt);
+    while ( list($thing) = each($this->pt) ) {
             $thing = trim($thing);
             if ($thing) {
                 $this->serialize(
