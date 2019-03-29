@@ -433,14 +433,14 @@ class Session
                 \$str .= '\$$var = array(); ';
 
                 foreach (\$$var as \$k => \$value){
-//                    echo '<div>key is '.\$k.' and value is '.\$value.'</div>';
+                    echo '<div>key is '.\$k.' and value is '.\$value.'</div>';
                     \$arrayString = \$var . \"['\" . preg_replace(
                             \"/([\\'])/\",
                             \"\\\\1\",
                             \$k
                         ) . \"']\";
 
-//                        var_dump(\$arrayString);
+                        var_dump(\$arrayString);
                     \$this->serialize(
                         \$arrayString,
                         \$str
