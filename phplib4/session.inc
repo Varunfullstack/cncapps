@@ -61,8 +61,8 @@ class Session
             ",",
             $things
         );
-        reset($things);
-    while ( list(,$thing) = each($things) ) {
+
+        foreach ($things as $thing) {
             $thing = trim($thing);
             if ($thing) {
                 $this->pt[$thing] = true;
@@ -83,8 +83,8 @@ class Session
             ",",
             $things
         );
-        reset($things);
-        while (list(, $thing) = each($things)) {
+
+        foreach ($things as $thing) {
             $thing = trim($thing);
             if ($thing) {
                 unset($this->pt[$thing]);
@@ -496,11 +496,17 @@ class Session
     {
         $str = "";
 
-    $this->serialize("this->in", $str);
-    $this->serialize("this->pt", $str);
+        $this->serialize(
+            "this->in",
+            $str
+        );
+        $this->serialize(
+            "this->pt",
+            $str
+        );
 
-    reset($this->pt);
-    while ( list($thing) = each($this->pt) ) {
+        reset($this->pt);
+        while (list($thing) = each($this->pt)) {
             $thing = trim($thing);
             if ($thing) {
                 $this->serialize(
