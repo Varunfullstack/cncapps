@@ -415,7 +415,7 @@ class Session
             case "array":
 //                ## $$var is an array. Enumerate the elements and serialize them.
                 eval("reset(\$$var); \$l = gettype(list(\$k)=each(\$$var));");
-                var_dump(gettype($k));
+//                var_dump(gettype($k));
 
                 $str .= "\$$var = array(); ";
 
