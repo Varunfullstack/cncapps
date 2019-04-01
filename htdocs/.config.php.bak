@@ -5,8 +5,8 @@ session_start();
 ini_set('zlib.output_compression', 'On');
 ini_set('zlib.output_compression_level', '9');
 // define 2 error levels
-define('CONFIG_ERROR_LEVEL_DEVELOPMENT', E_ALL & ~E_STRICT & ~E_WARNING);            // we want to see them all!
-define('CONFIG_ERROR_LEVEL_PRODUCTION', CONFIG_ERROR_LEVEL_DEVELOPMENT);
+define('CONFIG_ERROR_LEVEL_DEVELOPMENT', E_ALL & ~E_STRICT & ~E_WARNING &  ~E_DEPRECATED);            // we want to see them all!
+define('CONFIG_ERROR_LEVEL_PRODUCTION', CONFIG_ERROR_LEVEL_DEVELOPMENT );
 /*
 * Handy
 */

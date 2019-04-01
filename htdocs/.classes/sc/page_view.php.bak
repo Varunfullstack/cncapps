@@ -6,7 +6,6 @@
 * (C) Sweetcode Ltd 2005
 * @access Public
 */
-//require_once($_SERVER['DOCUMENT_ROOT'] . '/.config.php');
 require_once(CONFIG_PATH_SC_CLASSES . 'db.php');
 
 class SC_PageView extends SC_DB {

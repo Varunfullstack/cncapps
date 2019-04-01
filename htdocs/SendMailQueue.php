@@ -2,7 +2,8 @@
 /* really send the messages */
 require_once("config.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
-$buMail = new BUMail($this);
+$thing = null;
+$buMail = new BUMail($thing);
 $result = $buMail->sendQueue();
 
 //
@@ -10,6 +11,5 @@ $result = $buMail->sendQueue();
 //var_dump($result);
 //
 //}
-
 echo 'All done';
 ?>

@@ -203,8 +203,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
-//            error_reporting(E_ALL);
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'
@@ -333,7 +332,7 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             'PrePayOverFixedAmount@cnc-ltd.co.uk'
         );
-        error_reporting(E_ALL & ~E_WARNING & ~E_STRICT);
+        error_reporting(E_ALL & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'off'
@@ -381,7 +380,7 @@ switch ($server_type) {
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 //            error_reporting(E_ALL & ~E_STRICT)
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'
@@ -467,7 +466,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'
