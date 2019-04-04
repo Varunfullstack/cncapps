@@ -52,7 +52,9 @@ class DBEntity extends DataAccess
     var $rowBefore = '';        // For comparison during update
     var $arrayRowBefore = '';    // For comparison during update
     var $rowCount = 0;
-    var $dbColName = array();        // Array of database column names
+    var $dbColName = array();
+
+    // Array of database column names
 
     function __construct(&$owner)
     {
@@ -216,9 +218,7 @@ class DBEntity extends DataAccess
                 ($this->getPKName() != $this->getName($ixCol))
             ) {
                 if ($colString != "") $colString = $colString . ",";
-                $colString = $colString . $this->getDBColumnName($ixCol) . "='" .
-                    $this->prepareForSQL($this->getValue($ixCol)) .
-                    "'";
+                $colString = $colString . $this->getDBColumnName($ixCol) . "=" . $this->prepareForSQL($ixCol);
             }
         }
         return $colString;
@@ -749,17 +749,21 @@ class DBEntity extends DataAccess
         $this->setMethodName("getColumnValuesAsString");
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
-
-            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-
-            if ($this->colType[$ixCol] == DA_BOOLEAN) {
-                $colString = $colString . ($this->getValue($ixCol) ? 1 : 0);
-            } else {
-                $colString = $colString .
-                    $this->quoteForColumnValues .
-                    $this->prepareForSQL($this->getValue($ixCol)) .
-                    $this->quoteForColumnValues;
+            if ($colString != "") {
+                $colString = $colString . DA_COLUMN_SEPARATOR;
             }
+            $colString .= $this->prepareForSQL($ixCol);
+            if ($this->debug) {
+                echo '<br>';
+                var_dump(
+                    $this->dbColName[$ixCol],
+                    $this->colType[$ixCol],
+                    $this->prepareForSQL($ixCol),
+                    $colString
+                );
+                echo '<br>';
+            }
+
         }
         return $colString;
     }
@@ -826,7 +830,7 @@ class DBEntity extends DataAccess
      */
     function getFormattedLikeValue($ixColumn)
     {
-        return $this->quoteForColumnValues . '%' . $this->prepareForSQL(
+        return $this->quoteForColumnValues . '%' . $this->escapeValue(
                 $this->getValue($ixColumn)
             ) . '%' . $this->quoteForColumnValues;
     }
@@ -838,19 +842,13 @@ class DBEntity extends DataAccess
      */
     function getFormattedValue($ixColumn)
     {
-        $columnValue = $this->getValue($ixColumn);
-        $columnType = $this->getType($ixColumn);
-        if ($columnType == DA_STRING | $columnType == DA_DATE | $columnType == DA_DATETIME | $columnType == DA_TIME | $columnType == DA_YN) {
-            return $this->quoteForColumnValues . $this->prepareForSQL($columnValue) . $this->quoteForColumnValues;
-        } else {
-            return $columnValue;
-        }
+        return $this->prepareForSQL($ixColumn);
     }
 
     /**
      * Get column value by name or column number and trim trailing spaces
      * @access public
-     * @param  string|int $ixPassedColumn
+     * @param string|int $ixPassedColumn
      * @return string|int|float|boolean Right-trimmed column value
      */
     function getValue($ixPassedColumn)
@@ -1034,13 +1032,48 @@ class DBEntity extends DataAccess
         }
     }
 
-    function prepareForSQL($string)
+    function escapeValue($value)
     {
-        $escapedString = mysqli_real_escape_string(
+        return mysqli_real_escape_string(
             $this->db->link_id(),
-            $string
+            $value
         );
-        return $escapedString;
+    }
+
+    function prepareForSQL($colIdx)
+    {
+        $colType = $this->colType[$colIdx];
+        $value = $this->getValue($colIdx);
+
+        if ($value === null) {
+            return 'null';
+        }
+        $value = $this->escapeValue($value);
+
+        switch ($colType) {
+            case DA_BOOLEAN:
+                return $value ? 1 : 0;
+            case DA_INTEGER:
+            case DA_FLOAT:
+            case DA_ID:
+                if ($value === '') {
+                    return 'null';
+                }
+
+                return $value;
+            case DA_DATETIME:
+                if ($value == '0000-00-00 00:00:00') {
+                    return 'null';
+                }
+            case DA_DATE:
+                if ($value == '0000-00-00') {
+                    return 'null';
+                }
+
+            default:
+                return $this->quoteForColumnValues . $value . $this->quoteForColumnValues;
+        }
+
     }
 }
 

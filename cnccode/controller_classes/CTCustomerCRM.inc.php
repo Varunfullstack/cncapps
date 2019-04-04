@@ -812,29 +812,6 @@ class CTCustomerCRM extends CTCustomer
         return ($flag == 'N' || $flag == false ? '' : CT_CHECKED);
     }
 
-    function convertDateYMD($dateDMY)
-    {
-        if ($dateDMY != '') {
-            $dateArray = explode(
-                '/',
-                $dateDMY
-            );
-            return ($dateArray[2] . '-' . str_pad(
-                    $dateArray[1],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ) . '-' . str_pad(
-                    $dateArray[0],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ));
-        } else {
-            return '';
-        }
-    }
-
     function getOrderTypeDescription($type)
     {
         return $this->orderTypeArray[$type];

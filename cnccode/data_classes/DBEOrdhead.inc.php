@@ -50,7 +50,6 @@ class DBEOrdhead extends DBEntity
     const debtorCode = "debtorCode";
     const wip = "wip";
     const consultantID = "consultantID";
-    const payMethod = "payMethod";
     const paymentTermsID = "paymentTermsID";
     const addItem = "addItem";
     const callID = "callID";
@@ -125,7 +124,7 @@ class DBEOrdhead extends DBEntity
         );
         $this->addColumn(
             self::quotationOrdheadID,
-            DA_STRING,
+            DA_INTEGER,
             DA_ALLOW_NULL,
             "odh_quotation_ordno"
         );
@@ -332,12 +331,6 @@ class DBEOrdhead extends DBEntity
             DA_ID,
             DA_ALLOW_NULL,
             "odh_consno"
-        );
-        $this->addColumn(
-            self::payMethod,
-            DA_STRING,
-            DA_ALLOW_NULL,
-            "odh_pay_method"
         );
         $this->addColumn(
             self::paymentTermsID,

@@ -1,32 +1,41 @@
 <?php
 /**
-* Client introduction letter
-* CNC Ltd
-*
-* @access public
-* @authors Karim Ahmed - Sweet Code Limited
-*/
+ * Client introduction letter
+ * CNC Ltd
+ *
+ * @access public
+ * @authors Karim Ahmed - Sweet Code Limited
+ */
 require_once("config.inc.php");
 GLOBAL $cfg;
 page_open(
-	array(
-		'sess' => PHPLIB_CLASSNAME_SESSION,
-		'auth' => PHPLIB_CLASSNAME_AUTH,
-		'',
-		''
-	)
+    array(
+        'sess' => PHPLIB_CLASSNAME_SESSION,
+        'auth' => PHPLIB_CLASSNAME_AUTH,
+        '',
+        ''
+    )
 );
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
 require_once($cfg['path_gc'] . '/Controller.inc.php');
-$dbeUser=new DBEUser($this);
-$dbeUser->setValue('userID', $_REQUEST['userID']);
+$thing = null;
+$dbeUser = new DBEUser($thing);
+$dbeUser->setValue(
+    'userID',
+    $_REQUEST['userID']
+);
 $dbeUser->getRow();
 ?>
 <html>
 <head>
-<title>Introduction Letter</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="form.css" rel="stylesheet" type="text/css">
+    <title>Introduction Letter</title>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8"
+    >
+    <link href="form.css"
+          rel="stylesheet"
+          type="text/css"
+    >
 </head>
 <body style=font-size:"10pt">
 <!-- 9 lines at top for headed paper -->
@@ -45,34 +54,37 @@ For and on behalf of<BR/>
 COMPUTER & NETWORK CONSULTANTS LTD
 <BR/>
 <?php
-if ( $dbeUser->getValue('signatureFilename') ){
-	?>
-	<img height="120px" src="/images/<?php echo $dbeUser->getValue('signatureFilename') ?>">
-	<?php
-}
-else{
-	?>
-	<BR/>
-	<BR/>
-	<BR/>
-	<BR/>
-	<?php
+if ($dbeUser->getValue('signatureFilename')) {
+    ?>
+    <img height="120px"
+         src="/images/<?php echo $dbeUser->getValue('signatureFilename') ?>"
+    >
+    <?php
+} else {
+    ?>
+    <BR/>
+    <BR/>
+    <BR/>
+    <BR/>
+    <?php
 }
 ?>
 <BR/>
-<?php echo Controller::htmlDisplayText($dbeUser->getValue('firstName').' '.$dbeUser->getValue('lastName')); ?>
+<?php echo Controller::htmlDisplayText($dbeUser->getValue('firstName') . ' ' . $dbeUser->getValue('lastName')); ?>
 <BR/>
 <STRONG>
-<?php echo Controller::htmlDisplayText($dbeUser->getValue('jobTitle')); ?>
+    <?php echo Controller::htmlDisplayText($dbeUser->getValue('jobTitle')); ?>
 </STRONG>
 </P>
 </body>
 </html>
-<script type="text/javascript" language="javascript1.2">
-<!--
-// Do print the page
-if (typeof(window.print) != 'undefined') {
-    window.print();
-}
-//-->
+<script type="text/javascript"
+        language="javascript1.2"
+>
+    <!--
+    // Do print the page
+    if (typeof (window.print) != 'undefined') {
+        window.print();
+    }
+    //-->
 </script>

@@ -7,32 +7,123 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESupplier extends DBEntity
 {
+    const supplierID = "supplierID";
+    const name = "name";
+    const add1 = "add1";
+    const add2 = "add2";
+    const town = "town";
+    const county = "county";
+    const postcode = "postcode";
+    const phone = "phone";
+    const fax = "fax";
+    const webSiteURL = "webSiteURL";
+    const payMethodID = "payMethodID";
+    const creditLimit = "creditLimit";
+    const scopeID = "scopeID";
+    const contactID = "contactID";
+    const cncAccountNo = "cncAccountNo";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("Supplier");
-        $this->addColumn("supplierID", DA_ID, DA_NOT_NULL, "sup_suppno");
-        $this->addColumn("name", DA_STRING, DA_NOT_NULL, "sup_name");
-        $this->addColumn("add1", DA_STRING, DA_NOT_NULL, "sup_add1");
-        $this->addColumn("add2", DA_STRING, DA_ALLOW_NULL, "sup_add2");
-        $this->addColumn("town", DA_STRING, DA_NOT_NULL, "sup_town");
-        $this->addColumn("county", DA_STRING, DA_ALLOW_NULL, "sup_county");
-        $this->addColumn("postcode", DA_STRING, DA_NOT_NULL, "sup_postcode");
-        $this->addColumn("phone", DA_STRING, DA_ALLOW_NULL, "sup_phone");
-        $this->addColumn("fax", DA_STRING, DA_ALLOW_NULL, "sup_fax");
-        $this->addColumn("webSiteURL", DA_STRING, DA_ALLOW_NULL, "sup_web_site_url");
-        $this->addColumn("payMethodID", DA_ID, DA_NOT_NULL, "sup_payno");
-        $this->addColumn("creditLimit", DA_STRING, DA_ALLOW_NULL, "sup_credit_limit");
-        $this->addColumn("scopeID", DA_ID, DA_NOT_NULL, "sup_scopeno");
-        $this->addColumn("contactID", DA_ID, DA_NOT_NULL, "sup_contno");
-        $this->addColumn("cncAccountNo", DA_STRING, DA_ALLOW_NULL, "sup_cnc_accno");
+        $this->addColumn(
+            self::supplierID,
+            DA_ID,
+            DA_NOT_NULL,
+            "sup_suppno"
+        );
+        $this->addColumn(
+            self::name,
+            DA_STRING,
+            DA_NOT_NULL,
+            "sup_name"
+        );
+        $this->addColumn(
+            self::add1,
+            DA_STRING,
+            DA_NOT_NULL,
+            "sup_add1"
+        );
+        $this->addColumn(
+            self::add2,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_add2"
+        );
+        $this->addColumn(
+            self::town,
+            DA_STRING,
+            DA_NOT_NULL,
+            "sup_town"
+        );
+        $this->addColumn(
+            self::county,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_county"
+        );
+        $this->addColumn(
+            self::postcode,
+            DA_STRING,
+            DA_NOT_NULL,
+            "sup_postcode"
+        );
+        $this->addColumn(
+            self::phone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_phone"
+        );
+        $this->addColumn(
+            self::fax,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_fax"
+        );
+        $this->addColumn(
+            self::webSiteURL,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_web_site_url"
+        );
+        $this->addColumn(
+            self::payMethodID,
+            DA_ID,
+            DA_NOT_NULL,
+            "sup_payno"
+        );
+        $this->addColumn(
+            self::creditLimit,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_credit_limit"
+        );
+        $this->addColumn(
+            self::scopeID,
+            DA_ID,
+            DA_NOT_NULL,
+            "sup_scopeno"
+        );
+        $this->addColumn(
+            self::contactID,
+            DA_ID,
+            DA_NOT_NULL,
+            "sup_contno"
+        );
+        $this->addColumn(
+            self::cncAccountNo,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "sup_cnc_accno"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -44,6 +135,9 @@ class DBESupplier extends DBEntity
  */
 class DBEJSupplier extends DBESupplier
 {
+
+    const contactName = "contactName";
+
     /**
      * calls constructor()
      * @access public
@@ -55,7 +149,12 @@ class DBEJSupplier extends DBESupplier
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("contactName", DA_STRING, DA_ALLOW_NULL, "CONCAT(contact.con_first_name,' ',contact.con_last_name)");
+        $this->addColumn(
+            self::contactName,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "CONCAT(contact.con_first_name,' ',contact.con_last_name)"
+        );
         $this->setAddColumnsOff();
     }
 
@@ -64,7 +163,9 @@ class DBEJSupplier extends DBESupplier
      * @access public
      * @return bool Success
      */
-    function getRowsByNameMatch($name, $address)
+    function getRowsByNameMatch($name,
+                                $address
+    )
     {
         $this->setMethodName("getRowsByNameMatch");
         $ret = FALSE;

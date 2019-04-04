@@ -10,11 +10,9 @@
 require_once("config.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUItemsNotYetReceived.php');
-
-
 $outputToScreen = isset($_GET['toScreen']);
-$something = null;
-$buItemsNotYetReceived = new BUItemsNotYetReceived($something);
+$thing = null;
+$buItemsNotYetReceived = new BUItemsNotYetReceived($thing);
 
 
 $sender_name = "System";
@@ -223,7 +221,7 @@ if (!$outputToScreen) {
     $body = ob_get_contents();
     ob_end_clean();
 
-    $buMail = new BUMail($this);
+    $buMail = new BUMail($thing);
 
     $toEmail = 'unreceivedpo@' . CONFIG_PUBLIC_DOMAIN;
 

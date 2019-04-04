@@ -69,8 +69,8 @@ class DBECustomer extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -160,7 +160,7 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::noOfPCs,
-            DA_INTEGER,
+            DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
@@ -278,14 +278,14 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::sendContractEmail,
-            DA_INTEGER,
-            DA_NOT_NULL,
+            DA_STRING,
+            DA_ALLOW_NULL,
             "cus_send_contract_email"
         );
         $this->addColumn(
             self::sendTandcEmail,
-            DA_INTEGER,
-            DA_NOT_NULL,
+            DA_STRING,
+            DA_ALLOW_NULL,
             "cus_send_tandc_email"
         );
         $this->addColumn(
@@ -395,7 +395,7 @@ class DBECustomer extends DBCNCEntity
 
         $this->addColumn(
             self::sortCode,
-            DA_INTEGER,
+            DA_STRING,
             DA_ALLOW_NULL
         );
 

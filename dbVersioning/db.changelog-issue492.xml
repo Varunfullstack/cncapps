@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1554199133-0">
+        <tagDatabase tag="issue492"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ordhead" columnName="odh_pay_method"/>
+        </preConditions>
+        <dropColumn tableName="ordhead" columnName="odh_pay_method"/>
+        <rollback>
+            <addColumn tableName="ordhead">
+                <column name="odh_pay_method" afterColumn="odh_consno" type="char(30)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="invhead" columnName="inh_pay_method"/>
+        </preConditions>
+        <dropColumn tableName="invhead" columnName="inh_pay_method"/>
+        <rollback>
+            <addColumn tableName="invhead">
+                <column name="inh_pay_method" afterColumn="inh_salutation" type="char(30)">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-3">
+        <dropNotNullConstraint columnName="cus_dropped_customer_date" tableName="customer" columnDataType="date"/>
+        <dropNotNullConstraint tableName="customer" columnName="cus_became_customer_date" columnDataType="date"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-4">
+        <dropNotNullConstraint tableName="problem" columnName="pro_hd_pause_count" columnDataType="int(3)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-5">
+        <dropNotNullConstraint tableName="problem" columnName="pro_management_review_reason" columnDataType="text"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-6">
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_cuino" columnDataType="int(11) unsigned"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-7">
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_secondsite_error_cuino" columnDataType="int(11) unsigned"/>
+    </changeSet>
+
+
+</databaseChangeLog>

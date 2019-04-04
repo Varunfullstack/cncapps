@@ -7,6 +7,8 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+
+$thing = null;
 ini_set(
     'zend.ze1_compatibility_mode',
     0
@@ -67,7 +69,7 @@ Send each engineer an email
 */
 $engineers = $resultSet->fetch_all(MYSQLI_ASSOC);
 
-$buMail = new BUMail($this);
+$buMail = new BUMail($thing);
 
 $managers = [];
 foreach ($engineers as $row) {

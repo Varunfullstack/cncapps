@@ -212,6 +212,17 @@ class DataAccess extends BaseObject
     var $failOutOfRange = TRUE;
     var $_colCount = 0;
     protected $colValidation = [];
+    protected $debug;
+
+    function enableDebugging()
+    {
+        $this->debug = true;
+    }
+
+    function disableDebugging()
+    {
+        $this->debug = false;
+    }
 
     function __construct(&$owner)
     {

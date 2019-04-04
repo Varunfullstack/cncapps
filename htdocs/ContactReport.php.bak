@@ -20,6 +20,6 @@ $ctContact = new CTContactReport(
     $_COOKIE,
     $cfg
 );
-$ctContactReport->execute();
+$ctContact->execute();
 page_close();
 ?>

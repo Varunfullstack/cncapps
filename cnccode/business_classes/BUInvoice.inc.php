@@ -441,7 +441,6 @@ class BUInvoice extends Business
         );
 
 
-
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatCode = $dsOrdhead->getValue('vatCode');
@@ -592,11 +591,16 @@ class BUInvoice extends Business
         ));
     }
 
-    function getUnprintedInvoiceValues(&$dsResults, $directDebit = false)
+    function getUnprintedInvoiceValues(&$dsResults,
+                                       $directDebit = false
+    )
     {
         $this->setMethodName('getUnprintedInvoiceValues');
         $dbeInvoiceTotals = new DBEInvoiceTotals($this);
-        $dbeInvoiceTotals->getRow('I', $directDebit);
+        $dbeInvoiceTotals->getRow(
+            'I',
+            $directDebit
+        );
         return ($this->getData(
             $dbeInvoiceTotals,
             $dsResults

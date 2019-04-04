@@ -60,7 +60,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('search');
         $dbeJOrdhead = new DBEJOrdhead($this);
-        if ($ordheadID != '') {
+        if ($ordheadID) {
             $ret = ($this->getDatasetByPK(
                 $ordheadID,
                 $dbeJOrdhead,
@@ -90,7 +90,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('getOrderWithCustomerName');
         $ret = FALSE;
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('order ID not passed');
         } else {
             $dbeJOrdline = new DBEJOrdline($this);
@@ -132,7 +132,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('getOrderByOrdheadID');
         $ret = FALSE;
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('order ID not passed');
         } else {
             $dbeOrdline = new DBEOrdline($this);
@@ -169,7 +169,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('getOrdheadByID');
         $ret = FALSE;
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('order ID not passed');
         } else {
             $dbeJOrdhead = new DBEJOrdhead($this);
@@ -189,10 +189,10 @@ class BUSalesOrder extends Business
         $this->setMethodName('getOrdlineByIDSeqNo');
         $ret = FALSE;
 
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('order ID not passed');
         }
-        if ($sequenceNo == '') {
+        if (!$sequenceNo) {
             $this->raiseError('sequenceNo not passed');
         }
         $dbeJOrdline = new DBEJOrdline($this);
@@ -232,7 +232,7 @@ class BUSalesOrder extends Business
     function deleteQuotationDoc($quotationID)
     {
         $this->setMethodName('deleteQuotationDoc');
-        if ($quotationID == '') {
+        if (!$quotationID) {
             $this->raiseError('quotationID not passed');
         }
         $this->dbeQuotation->setPKValue($quotationID);
@@ -267,7 +267,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('getQuotationsByOrdheadID');
         $ret = FALSE;
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('order ID not passed');
         } else {
             $this->dbeJQuotation->setValue(
@@ -349,7 +349,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('deleteOrder');
         // Validation
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         if (!$this->getOrdheadByID(
@@ -761,7 +761,7 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('updateInvoiceAddress');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -844,7 +844,7 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('updateDeliveryAddress');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -927,10 +927,10 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('updateInvoiceContact');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
-        if ($contactID == '') {
+        if (!$contactID) {
             $this->raiseError('contactID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -975,10 +975,10 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('updateDeliveryContact');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
-        if ($contactID == '') {
+        if (!$contactID) {
             $this->raiseError('contactID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -1155,10 +1155,10 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('initialiseNewOrdline');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
-        if ($sequenceNo == '') {
+        if (!$sequenceNo) {
             $this->raiseError('sequenceNo not passed');
         }
         $dbeJOrdline = new DBEJOrdline($this);
@@ -1171,11 +1171,11 @@ class BUSalesOrder extends Business
         );
         $dsOrdline->setValue(
             'itemID',
-            ''
+            null
         );
         $dsOrdline->setValue(
             'supplierID',
-            ''
+            null
         );
         $dsOrdline->setValue(
             'sequenceNo',
@@ -1234,10 +1234,10 @@ class BUSalesOrder extends Business
                              $sequenceNo
     )
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
-        if ($sequenceNo == '') {
+        if (!$sequenceNo) {
             $this->raiseError('sequenceNo not passed');
         }
         if ($sequenceNo == 1) {
@@ -1262,10 +1262,10 @@ class BUSalesOrder extends Business
                                $sequenceNo
     )
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
-        if ($sequenceNo == '') {
+        if (!$sequenceNo) {
             $this->raiseError('sequenceNo not passed');
         }
         $dbeOrdline = new DBEOrdline($this);
@@ -1287,11 +1287,11 @@ class BUSalesOrder extends Business
                              $sequenceNo
     )
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
 
-        if ($sequenceNo == '') {
+        if (!$sequenceNo) {
             $sequenceNo = 0;
         }
 
@@ -1329,7 +1329,7 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('convertQuoteToOrder');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         if (!is_a(
@@ -1522,7 +1522,7 @@ class BUSalesOrder extends Business
     function createRenewalQuote($ordheadID)
     {
         $this->setMethodName('createRenewalQuote');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         if (!$this->getOrderWithCustomerName(
@@ -1600,7 +1600,7 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('deleteLines');
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         if (!is_a(
@@ -1641,7 +1641,7 @@ class BUSalesOrder extends Business
         $addItem
     )
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -1675,7 +1675,7 @@ class BUSalesOrder extends Business
         $serviceRequestText
     )
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -1700,7 +1700,7 @@ class BUSalesOrder extends Business
 
     function deleteServiceRequestDetails($ordheadID)
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);
@@ -1710,15 +1710,15 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue(
             'serviceRequestCustomerItemID',
-            ''
+            null
         );
         $dbeOrdhead->setValue(
             'servicePriority',
-            ''
+            null
         );
         $dbeOrdhead->setValue(
             'serviceRequestText',
-            ''
+            null
         );
         $dbeOrdhead->post();
     }
@@ -1733,7 +1733,7 @@ class BUSalesOrder extends Business
                                 &$dsOrdline
     )
     {
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeOrdhead = new DBEOrdhead($this);

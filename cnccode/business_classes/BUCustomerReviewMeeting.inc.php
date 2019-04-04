@@ -14,8 +14,6 @@ require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-use Dompdf\Dompdf;
-
 class BUCustomerReviewMeeting extends Business
 {
 
@@ -582,7 +580,7 @@ class BUCustomerReviewMeeting extends Business
 
             $coveredItemsString = '';
 
-            if (count($item['coveredItems']) > 0) {
+            if (isset($item['coveredItems']) && is_array($item['coveredItems']) && count($item['coveredItems']) > 0) {
 
                 foreach ($item['coveredItems'] as $coveredItem) {
 

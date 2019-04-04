@@ -1062,7 +1062,7 @@ class CTCustomer extends CTCNC
 
     function convertDateYMD($dateDMY)
     {
-        if ($dateDMY != '') {
+        if ($dateDMY) {
             $dateArray = explode(
                 '/',
                 $dateDMY
@@ -1079,7 +1079,7 @@ class CTCustomer extends CTCNC
                     STR_PAD_LEFT
                 ));
         } else {
-            return '';
+            return null;
         }
     }
 

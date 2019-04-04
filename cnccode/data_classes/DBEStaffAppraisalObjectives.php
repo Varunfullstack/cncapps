@@ -20,8 +20,8 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -84,7 +84,7 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
     /**
      * Allocates the next site number for this customer
      * @access private
-     * @param  void
+     * @param void
      * @return integer Next Siteno
      */
     function getNextPKValue()
@@ -118,8 +118,8 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
             // exclude primary key columns
             if (($this->getName($ixCol) != self::questionnaireAnswerID) & ($this->getName($ixCol) != self::id)) {
                 if ($colString != "") $colString = $colString . ",";
-                $colString = $colString . $this->getDBColumnName($ixCol) . "='" .
-                    $this->prepareForSQL($this->getValue($ixCol)) . "'";
+                $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
+                    $this->prepareForSQL($this->getValue($ixCol));
             }
         }
         return $colString;

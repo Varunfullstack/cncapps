@@ -13,7 +13,8 @@
 require_once("config.inc.php");
 GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-$buHeader = new BUHeader($this);
+$thing = null;
+$buHeader = new BUHeader($thing);
 $buHeader->clearActivityProblemField();
 echo "Cleared help-desk problem field on system header"
 ?>

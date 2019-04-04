@@ -84,11 +84,11 @@ class BUDirectDebitContracts extends Business
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
+        $buMail->send(
+            'xavi@pavilionweb.co.uk',
             $hdrs,
             $body
+
         );
     }
 

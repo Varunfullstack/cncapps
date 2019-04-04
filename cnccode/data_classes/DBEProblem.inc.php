@@ -105,7 +105,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::dateRaised,
-            DA_INTEGER,
+            DA_DATE,
             DA_ALLOW_NULL,
             "pro_date_raised"
         );
@@ -273,7 +273,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::workingHoursCalculatedToTime,
-            DA_YN,
+            DA_DATETIME,
             DA_ALLOW_NULL,
             "pro_working_hours_calculated_to_time"
         );

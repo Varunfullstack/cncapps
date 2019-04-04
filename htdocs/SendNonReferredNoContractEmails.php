@@ -11,6 +11,7 @@ require_once("config.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
+$thing = null;
 global $db;
 
 $db->query(
@@ -114,7 +115,7 @@ if ($db->num_rows()) {
 
     $hdrs = $mime->headers($hdrs);
 
-    $buMail = new BUMail($this);
+    $buMail = new BUMail($thing);
 
     $buMail->putInQueue(
         CONFIG_SUPPORT_EMAIL,

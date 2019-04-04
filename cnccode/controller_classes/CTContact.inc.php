@@ -50,6 +50,11 @@ define(
     'Update Contact'
 );
 
+define(
+    'CTCNC_ACT_DISP_CONTACT_POPUP',
+    'CTCNC_ACT_DISP_CONTACT_POPUP'
+);
+
 class CTContact extends CTCNC
 {
     /**
@@ -59,6 +64,8 @@ class CTContact extends CTCNC
      * @access  private
      */
     var $dsContact = '';
+
+    /** @var BUContact  */
     private $buContact;
 
     function __construct($requestMethod,
@@ -523,6 +530,7 @@ class CTContact extends CTCNC
 
     function parsePayMethodSelector($payMethodID)
     {
+        $dsPayMethod = new DataSet($this);
         $this->buContact->getAllPayMethods($dsPayMethod);
         $this->template->set_block(
             'ContactEdit',
@@ -532,9 +540,11 @@ class CTContact extends CTCNC
         while ($dsPayMethod->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'payMethodDescription' => $dsPayMethod->getValue('description'),
-                    'payMethodID'          => $dsPayMethod->getValue('payMethodID'),
-                    'payMethodSelected'    => ($payMethodID == $dsPayMethod->getValue('payMethodID')) ? CT_SELECTED : ''
+                    'payMethodDescription' => $dsPayMethod->getValue(DBEPayMethod::description),
+                    'payMethodID'          => $dsPayMethod->getValue(DBEPayMethod::payMethodID),
+                    'payMethodSelected'    => ($payMethodID == $dsPayMethod->getValue(
+                            DBEPayMethod::payMethodID
+                        )) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse(

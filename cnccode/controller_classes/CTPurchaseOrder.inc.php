@@ -821,10 +821,10 @@ class CTPurchaseOrder extends CTCNC
         while ($dsPayMethod->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'payMethodDescription' => $dsPayMethod->getValue('description'),
-                    'payMethodID'          => $dsPayMethod->getValue('payMethodID'),
+                    'payMethodDescription' => $dsPayMethod->getValue(DBEPayMethod::description),
+                    'payMethodID'          => $dsPayMethod->getValue(DBEPayMethod::payMethodID),
                     'payMethodSelected'    => ($dsPorhead->getValue(DBEJPorhead::payMethodID) == $dsPayMethod->getValue(
-                            'payMethodID'
+                            DBEPayMethod::payMethodID
                         )) ? CT_SELECTED : ''
                 )
             );

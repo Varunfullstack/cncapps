@@ -161,7 +161,7 @@ class BUProblemSLA extends Business
 
             if ($this->hoursCalculated) {
                 $this->dbeProblem->setValue(
-                    'workingHoursCalculatedToTime',
+                    DBEProblem::workingHoursCalculatedToTime,
                     date(CONFIG_MYSQL_DATETIME)
                 );
             }
@@ -196,7 +196,7 @@ class BUProblemSLA extends Business
             if ($this->hoursCalculated) {
 
                 $this->dbeProblem->setValue(
-                    'workingHoursCalculatedToTime',
+                    DBEProblem::workingHoursCalculatedToTime,
                     date(CONFIG_MYSQL_DATETIME)
                 );
 
@@ -234,7 +234,7 @@ class BUProblemSLA extends Business
             if ($this->hoursCalculated) {
 
                 $this->dbeProblem->setValue(
-                    'workingHoursCalculatedToTime',
+                    DBEProblem::workingHoursCalculatedToTime,
                     date(CONFIG_MYSQL_DATETIME)
                 );
 
@@ -714,18 +714,12 @@ class BUProblemSLA extends Business
         the problem. The field is reset when a Request is amended to force a recalculation from
         the start of the problem raised date.
         */
-        if ($this->dbeJProblem->getValue('workingHoursCalculatedToTime') > '0000-00-00 00:00:00') {
-
+        if ($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)) {
             $addHoursSinceLastCalculation = true;
-
-            $utCalculationStart = strtotime($this->dbeJProblem->getValue('workingHoursCalculatedToTime'));
-
+            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime));
         } else {
-
             $addHoursSinceLastCalculation = false;
-
-            $utCalculationStart = strtotime($this->dbeJProblem->getValue('dateRaised'));
-
+            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::dateRaised));
         }
 
         $this->hoursCalculated = $this->getWorkingHoursBetweenUnixDates(
@@ -735,7 +729,7 @@ class BUProblemSLA extends Business
         );
 
         if ($addHoursSinceLastCalculation) {
-            $returnHours = $this->dbeJProblem->getValue('workingHours') + $this->hoursCalculated;
+            $returnHours = $this->dbeJProblem->getValue(DBEProblem::workingHours) + $this->hoursCalculated;
         } else {
             $returnHours = $this->hoursCalculated;
         }

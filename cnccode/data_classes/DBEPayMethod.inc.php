@@ -7,23 +7,60 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPayMethod extends DBEntity
 {
+    const payMethodID = "payMethodID";
+    const description = "description";
+    const cardFlag = "cardFlag";
+    const cardNumber = "cardNumber";
+    const expiryDate = "expiryDate";
+    const userID = "userID";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("paymeth");
-        $this->addColumn("payMethodID", DA_ID, DA_NOT_NULL, "pay_payno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "pay_desc");
-        $this->addColumn("cardFlag", DA_YN, DA_NOT_NULL, "pay_card");
-        $this->addColumn("cardNumber", DA_STRING, DA_ALLOW_NULL, "pay_cardno");
-        $this->addColumn("expiryDate", DA_DATE, DA_ALLOW_NULL, "pay_exp_date");
-        $this->addColumn("userID", DA_ID, DA_ALLOW_NULL, "pay_consno");
+        $this->addColumn(
+            self::payMethodID,
+            DA_ID,
+            DA_NOT_NULL,
+            "pay_payno"
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL,
+            "pay_desc"
+        );
+        $this->addColumn(
+            self::cardFlag,
+            DA_YN,
+            DA_NOT_NULL,
+            "pay_card"
+        );
+        $this->addColumn(
+            self::cardNumber,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "pay_cardno"
+        );
+        $this->addColumn(
+            self::expiryDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "pay_exp_date"
+        );
+        $this->addColumn(
+            self::userID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "pay_consno"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

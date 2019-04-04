@@ -44,142 +44,226 @@ require_once 'PEAR.php';
 /**
  * The code returned by many methods upon success
  */
-define('DB_OK', 1);
+define(
+    'DB_OK',
+    1
+);
 
 /**
  * Unkown error
  */
-define('DB_ERROR', -1);
+define(
+    'DB_ERROR',
+    -1
+);
 
 /**
  * Syntax error
  */
-define('DB_ERROR_SYNTAX', -2);
+define(
+    'DB_ERROR_SYNTAX',
+    -2
+);
 
 /**
  * Tried to insert a duplicate value into a primary or unique index
  */
-define('DB_ERROR_CONSTRAINT', -3);
+define(
+    'DB_ERROR_CONSTRAINT',
+    -3
+);
 
 /**
  * An identifier in the query refers to a non-existant object
  */
-define('DB_ERROR_NOT_FOUND', -4);
+define(
+    'DB_ERROR_NOT_FOUND',
+    -4
+);
 
 /**
  * Tried to create a duplicate object
  */
-define('DB_ERROR_ALREADY_EXISTS', -5);
+define(
+    'DB_ERROR_ALREADY_EXISTS',
+    -5
+);
 
 /**
  * The current driver does not support the action you attempted
  */
-define('DB_ERROR_UNSUPPORTED', -6);
+define(
+    'DB_ERROR_UNSUPPORTED',
+    -6
+);
 
 /**
  * The number of parameters does not match the number of placeholders
  */
-define('DB_ERROR_MISMATCH', -7);
+define(
+    'DB_ERROR_MISMATCH',
+    -7
+);
 
 /**
  * A literal submitted did not match the data type expected
  */
-define('DB_ERROR_INVALID', -8);
+define(
+    'DB_ERROR_INVALID',
+    -8
+);
 
 /**
  * The current DBMS does not support the action you attempted
  */
-define('DB_ERROR_NOT_CAPABLE', -9);
+define(
+    'DB_ERROR_NOT_CAPABLE',
+    -9
+);
 
 /**
  * A literal submitted was too long so the end of it was removed
  */
-define('DB_ERROR_TRUNCATED', -10);
+define(
+    'DB_ERROR_TRUNCATED',
+    -10
+);
 
 /**
  * A literal number submitted did not match the data type expected
  */
-define('DB_ERROR_INVALID_NUMBER', -11);
+define(
+    'DB_ERROR_INVALID_NUMBER',
+    -11
+);
 
 /**
  * A literal date submitted did not match the data type expected
  */
-define('DB_ERROR_INVALID_DATE', -12);
+define(
+    'DB_ERROR_INVALID_DATE',
+    -12
+);
 
 /**
  * Attempt to divide something by zero
  */
-define('DB_ERROR_DIVZERO', -13);
+define(
+    'DB_ERROR_DIVZERO',
+    -13
+);
 
 /**
  * A database needs to be selected
  */
-define('DB_ERROR_NODBSELECTED', -14);
+define(
+    'DB_ERROR_NODBSELECTED',
+    -14
+);
 
 /**
  * Could not create the object requested
  */
-define('DB_ERROR_CANNOT_CREATE', -15);
+define(
+    'DB_ERROR_CANNOT_CREATE',
+    -15
+);
 
 /**
  * Could not drop the database requested because it does not exist
  */
-define('DB_ERROR_CANNOT_DROP', -17);
+define(
+    'DB_ERROR_CANNOT_DROP',
+    -17
+);
 
 /**
  * An identifier in the query refers to a non-existant table
  */
-define('DB_ERROR_NOSUCHTABLE', -18);
+define(
+    'DB_ERROR_NOSUCHTABLE',
+    -18
+);
 
 /**
  * An identifier in the query refers to a non-existant column
  */
-define('DB_ERROR_NOSUCHFIELD', -19);
+define(
+    'DB_ERROR_NOSUCHFIELD',
+    -19
+);
 
 /**
  * The data submitted to the method was inappropriate
  */
-define('DB_ERROR_NEED_MORE_DATA', -20);
+define(
+    'DB_ERROR_NEED_MORE_DATA',
+    -20
+);
 
 /**
  * The attempt to lock the table failed
  */
-define('DB_ERROR_NOT_LOCKED', -21);
+define(
+    'DB_ERROR_NOT_LOCKED',
+    -21
+);
 
 /**
  * The number of columns doesn't match the number of values
  */
-define('DB_ERROR_VALUE_COUNT_ON_ROW', -22);
+define(
+    'DB_ERROR_VALUE_COUNT_ON_ROW',
+    -22
+);
 
 /**
  * The DSN submitted has problems
  */
-define('DB_ERROR_INVALID_DSN', -23);
+define(
+    'DB_ERROR_INVALID_DSN',
+    -23
+);
 
 /**
  * Could not connect to the database
  */
-define('DB_ERROR_CONNECT_FAILED', -24);
+define(
+    'DB_ERROR_CONNECT_FAILED',
+    -24
+);
 
 /**
  * The PHP extension needed for this DBMS could not be found
  */
-define('DB_ERROR_EXTENSION_NOT_FOUND', -25);
+define(
+    'DB_ERROR_EXTENSION_NOT_FOUND',
+    -25
+);
 
 /**
  * The present user has inadequate permissions to perform the task requestd
  */
-define('DB_ERROR_ACCESS_VIOLATION', -26);
+define(
+    'DB_ERROR_ACCESS_VIOLATION',
+    -26
+);
 
 /**
  * The database requested does not exist
  */
-define('DB_ERROR_NOSUCHDB', -27);
+define(
+    'DB_ERROR_NOSUCHDB',
+    -27
+);
 
 /**
  * Tried to insert a null value into a column that doesn't allow nulls
  */
-define('DB_ERROR_CONSTRAINT_NOT_NULL', -29);
+define(
+    'DB_ERROR_CONSTRAINT_NOT_NULL',
+    -29
+);
 /**#@-*/
 
 
@@ -197,7 +281,10 @@ define('DB_ERROR_CONSTRAINT_NOT_NULL', -29);
  *
  * Quote and escape the value as necessary.
  */
-define('DB_PARAM_SCALAR', 1);
+define(
+    'DB_PARAM_SCALAR',
+    1
+);
 
 /**
  * Indicates an opaque (<kbd>&</kbd>) placeholder was used
@@ -205,14 +292,20 @@ define('DB_PARAM_SCALAR', 1);
  * The value presented is a file name.  Extract the contents of that file
  * and place them in this column.
  */
-define('DB_PARAM_OPAQUE', 2);
+define(
+    'DB_PARAM_OPAQUE',
+    2
+);
 
 /**
  * Indicates a misc (<kbd>!</kbd>) placeholder was used
  *
  * The value should not be quoted or escaped.
  */
-define('DB_PARAM_MISC', 3);
+define(
+    'DB_PARAM_MISC',
+    3
+);
 /**#@-*/
 
 
@@ -227,19 +320,28 @@ define('DB_PARAM_MISC', 3);
 /**
  * Sends the fetched data straight through to output
  */
-define('DB_BINMODE_PASSTHRU', 1);
+define(
+    'DB_BINMODE_PASSTHRU',
+    1
+);
 
 /**
  * Lets you return data as usual
  */
-define('DB_BINMODE_RETURN', 2);
+define(
+    'DB_BINMODE_RETURN',
+    2
+);
 
 /**
  * Converts the data to hex format before returning it
  *
  * For example the string "123" would become "313233".
  */
-define('DB_BINMODE_CONVERT', 3);
+define(
+    'DB_BINMODE_CONVERT',
+    3
+);
 /**#@-*/
 
 
@@ -256,22 +358,34 @@ define('DB_BINMODE_CONVERT', 3);
  * Indicates the current default fetch mode should be used
  * @see DB_common::$fetchmode
  */
-define('DB_FETCHMODE_DEFAULT', 0);
+define(
+    'DB_FETCHMODE_DEFAULT',
+    0
+);
 
 /**
  * Column data indexed by numbers, ordered from 0 and up
  */
-define('DB_FETCHMODE_ORDERED', 1);
+define(
+    'DB_FETCHMODE_ORDERED',
+    1
+);
 
 /**
  * Column data indexed by column names
  */
-define('DB_FETCHMODE_ASSOC', 2);
+define(
+    'DB_FETCHMODE_ASSOC',
+    2
+);
 
 /**
  * Column data as object properties
  */
-define('DB_FETCHMODE_OBJECT', 3);
+define(
+    'DB_FETCHMODE_OBJECT',
+    3
+);
 
 /**
  * For multi-dimensional results, make the column name the first level
@@ -280,15 +394,27 @@ define('DB_FETCHMODE_OBJECT', 3);
  * This is flipped from the normal behavior, which puts the row numbers
  * in the first level of the array and the column names in the second level.
  */
-define('DB_FETCHMODE_FLIPPED', 4);
+define(
+    'DB_FETCHMODE_FLIPPED',
+    4
+);
 /**#@-*/
 
 /**#@+
  * Old fetch modes.  Left here for compatibility.
  */
-define('DB_GETMODE_ORDERED', DB_FETCHMODE_ORDERED);
-define('DB_GETMODE_ASSOC', DB_FETCHMODE_ASSOC);
-define('DB_GETMODE_FLIPPED', DB_FETCHMODE_FLIPPED);
+define(
+    'DB_GETMODE_ORDERED',
+    DB_FETCHMODE_ORDERED
+);
+define(
+    'DB_GETMODE_ASSOC',
+    DB_FETCHMODE_ASSOC
+);
+define(
+    'DB_GETMODE_FLIPPED',
+    DB_FETCHMODE_FLIPPED
+);
 /**#@-*/
 
 
@@ -307,9 +433,18 @@ define('DB_GETMODE_FLIPPED', DB_FETCHMODE_FLIPPED);
  * {@internal Since the TABLEINFO constants are bitwised, if more of them are
  * added in the future, make sure to adjust DB_TABLEINFO_FULL accordingly.}}
  */
-define('DB_TABLEINFO_ORDER', 1);
-define('DB_TABLEINFO_ORDERTABLE', 2);
-define('DB_TABLEINFO_FULL', 3);
+define(
+    'DB_TABLEINFO_ORDER',
+    1
+);
+define(
+    'DB_TABLEINFO_ORDERTABLE',
+    2
+);
+define(
+    'DB_TABLEINFO_FULL',
+    3
+);
 /**#@-*/
 
 
@@ -317,8 +452,14 @@ define('DB_TABLEINFO_FULL', 3);
  * The type of query to create with the automatic query building methods.
  * @see DB_common::autoPrepare(), DB_common::autoExecute()
  */
-define('DB_AUTOQUERY_INSERT', 1);
-define('DB_AUTOQUERY_UPDATE', 2);
+define(
+    'DB_AUTOQUERY_INSERT',
+    1
+);
+define(
+    'DB_AUTOQUERY_UPDATE',
+    2
+);
 /**#@-*/
 
 
@@ -341,28 +482,43 @@ define('DB_AUTOQUERY_UPDATE', 2);
 /**
  * Turn off all portability features
  */
-define('DB_PORTABILITY_NONE', 0);
+define(
+    'DB_PORTABILITY_NONE',
+    0
+);
 
 /**
  * Convert names of tables and fields to lower case
  * when using the get*(), fetch*() and tableInfo() methods
  */
-define('DB_PORTABILITY_LOWERCASE', 1);
+define(
+    'DB_PORTABILITY_LOWERCASE',
+    1
+);
 
 /**
  * Right trim the data output by get*() and fetch*()
  */
-define('DB_PORTABILITY_RTRIM', 2);
+define(
+    'DB_PORTABILITY_RTRIM',
+    2
+);
 
 /**
  * Force reporting the number of rows deleted
  */
-define('DB_PORTABILITY_DELETE_COUNT', 4);
+define(
+    'DB_PORTABILITY_DELETE_COUNT',
+    4
+);
 
 /**
  * Enable hack that makes numRows() work in Oracle
  */
-define('DB_PORTABILITY_NUMROWS', 8);
+define(
+    'DB_PORTABILITY_NUMROWS',
+    8
+);
 
 /**
  * Makes certain error messages in certain drivers compatible
@@ -375,18 +531,27 @@ define('DB_PORTABILITY_NUMROWS', 8);
  *   07001, which means 'too few parameters.'  When this option is on
  *   that code gets mapped to DB_ERROR_NOSUCHFIELD.
  */
-define('DB_PORTABILITY_ERRORS', 16);
+define(
+    'DB_PORTABILITY_ERRORS',
+    16
+);
 
 /**
  * Convert null values to empty strings in data output by
  * get*() and fetch*()
  */
-define('DB_PORTABILITY_NULL_TO_EMPTY', 32);
+define(
+    'DB_PORTABILITY_NULL_TO_EMPTY',
+    32
+);
 
 /**
  * Turn on all portability features
  */
-define('DB_PORTABILITY_ALL', 63);
+define(
+    'DB_PORTABILITY_ALL',
+    63
+);
 /**#@-*/
 
 // }}}
@@ -444,7 +609,9 @@ class DB
      *
      * @see DB_common::setOption()
      */
-    function &factory($type, $options = false)
+    function &factory($type,
+                      $options = false
+    )
     {
         if (!is_array($options)) {
             $options = array('persistent' => $options);
@@ -460,17 +627,26 @@ class DB
         $classname = "DB_${type}";
 
         if (!class_exists($classname)) {
-            $tmp = PEAR::raiseError(null, DB_ERROR_NOT_FOUND, null, null,
+            $tmp = PEAR::raiseError(
+                null,
+                DB_ERROR_NOT_FOUND,
+                null,
+                null,
                 "Unable to include the DB/{$type}.php"
                 . " file for '$dsn'",
-                'DB_Error', true);
+                'DB_Error',
+                true
+            );
             return $tmp;
         }
 
         @$obj = new $classname;
 
         foreach ($options as $option => $value) {
-            $test = $obj->setOption($option, $value);
+            $test = $obj->setOption(
+                $option,
+                $value
+            );
             if (DB::isError($test)) {
                 return $test;
             }
@@ -515,7 +691,9 @@ class DB
      *
      * @uses DB::parseDSN(), DB_common::setOption(), PEAR::isError()
      */
-    function &connect($dsn, $options = array())
+    function &connect($dsn,
+                      $options = array()
+    )
     {
 
         $dsninfo = DB::parseDSN($dsn);
@@ -539,26 +717,43 @@ class DB
         $classname = "DB_${type}";
 
         if (!class_exists($classname)) {
-            $tmp = PEAR::raiseError(null, DB_ERROR_NOT_FOUND, null, null,
+            $tmp = PEAR::raiseError(
+                null,
+                DB_ERROR_NOT_FOUND,
+                null,
+                null,
                 "Unable to include the DB/{$type}.php"
                 . " file for '$dsn'",
-                'DB_Error', true);
+                'DB_Error',
+                true
+            );
             return $tmp;
         }
 
         @$obj = new $classname;
 
         foreach ($options as $option => $value) {
-            $test = $obj->setOption($option, $value);
+            $test = $obj->setOption(
+                $option,
+                $value
+            );
             if (DB::isError($test)) {
                 return $test;
             }
         }
 
-        $err = $obj->connect($dsninfo, $obj->getOption('persistent'));
+        $err = $obj->connect(
+            $dsninfo,
+            $obj->getOption('persistent')
+        );
         if (DB::isError($err)) {
             if (is_array($dsn)) {
-                $err->addUserInfo(DB::getDSNString($dsn, true));
+                $err->addUserInfo(
+                    DB::getDSNString(
+                        $dsn,
+                        true
+                    )
+                );
             } else {
                 $err->addUserInfo($dsn);
             }
@@ -593,7 +788,10 @@ class DB
      */
     function isError($value)
     {
-        return is_object($value) && is_a($value, 'DB_Error');
+        return is_object($value) && is_a(
+                $value,
+                'DB_Error'
+            );
     }
 
     // }}}
@@ -609,8 +807,14 @@ class DB
     function isConnection($value)
     {
         return (is_object($value) &&
-            is_subclass_of($value, 'db_common') &&
-            method_exists($value, 'simpleQuery'));
+            is_subclass_of(
+                $value,
+                'db_common'
+            ) &&
+            method_exists(
+                $value,
+                'simpleQuery'
+            ));
     }
 
     // }}}
@@ -634,7 +838,10 @@ class DB
             . 'LOAD DATA|SELECT .* INTO .* FROM|COPY|'
             . 'ALTER|GRANT|REVOKE|'
             . 'LOCK|UNLOCK';
-        if (preg_match('/^\s*"?(' . $manips . ')\s+/i', $query)) {
+        if (preg_match(
+            '/^\s*"?(' . $manips . ')\s+/i',
+            $query
+        )) {
             return true;
         }
         return false;
@@ -656,34 +863,34 @@ class DB
         static $errorMessages;
         if (!isset($errorMessages)) {
             $errorMessages = array(
-                DB_ERROR => 'unknown error',
-                DB_ERROR_ACCESS_VIOLATION => 'insufficient permissions',
-                DB_ERROR_ALREADY_EXISTS => 'already exists',
-                DB_ERROR_CANNOT_CREATE => 'can not create',
-                DB_ERROR_CANNOT_DROP => 'can not drop',
-                DB_ERROR_CONNECT_FAILED => 'connect failed',
-                DB_ERROR_CONSTRAINT => 'constraint violation',
+                DB_ERROR                     => 'unknown error',
+                DB_ERROR_ACCESS_VIOLATION    => 'insufficient permissions',
+                DB_ERROR_ALREADY_EXISTS      => 'already exists',
+                DB_ERROR_CANNOT_CREATE       => 'can not create',
+                DB_ERROR_CANNOT_DROP         => 'can not drop',
+                DB_ERROR_CONNECT_FAILED      => 'connect failed',
+                DB_ERROR_CONSTRAINT          => 'constraint violation',
                 DB_ERROR_CONSTRAINT_NOT_NULL => 'null value violates not-null constraint',
-                DB_ERROR_DIVZERO => 'division by zero',
+                DB_ERROR_DIVZERO             => 'division by zero',
                 DB_ERROR_EXTENSION_NOT_FOUND => 'extension not found',
-                DB_ERROR_INVALID => 'invalid',
-                DB_ERROR_INVALID_DATE => 'invalid date or time',
-                DB_ERROR_INVALID_DSN => 'invalid DSN',
-                DB_ERROR_INVALID_NUMBER => 'invalid number',
-                DB_ERROR_MISMATCH => 'mismatch',
-                DB_ERROR_NEED_MORE_DATA => 'insufficient data supplied',
-                DB_ERROR_NODBSELECTED => 'no database selected',
-                DB_ERROR_NOSUCHDB => 'no such database',
-                DB_ERROR_NOSUCHFIELD => 'no such field',
-                DB_ERROR_NOSUCHTABLE => 'no such table',
-                DB_ERROR_NOT_CAPABLE => 'DB backend not capable',
-                DB_ERROR_NOT_FOUND => 'not found',
-                DB_ERROR_NOT_LOCKED => 'not locked',
-                DB_ERROR_SYNTAX => 'syntax error',
-                DB_ERROR_UNSUPPORTED => 'not supported',
-                DB_ERROR_TRUNCATED => 'truncated',
-                DB_ERROR_VALUE_COUNT_ON_ROW => 'value count on row',
-                DB_OK => 'no error',
+                DB_ERROR_INVALID             => 'invalid',
+                DB_ERROR_INVALID_DATE        => 'invalid date or time',
+                DB_ERROR_INVALID_DSN         => 'invalid DSN',
+                DB_ERROR_INVALID_NUMBER      => 'invalid number',
+                DB_ERROR_MISMATCH            => 'mismatch',
+                DB_ERROR_NEED_MORE_DATA      => 'insufficient data supplied',
+                DB_ERROR_NODBSELECTED        => 'no database selected',
+                DB_ERROR_NOSUCHDB            => 'no such database',
+                DB_ERROR_NOSUCHFIELD         => 'no such field',
+                DB_ERROR_NOSUCHTABLE         => 'no such table',
+                DB_ERROR_NOT_CAPABLE         => 'DB backend not capable',
+                DB_ERROR_NOT_FOUND           => 'not found',
+                DB_ERROR_NOT_LOCKED          => 'not locked',
+                DB_ERROR_SYNTAX              => 'syntax error',
+                DB_ERROR_UNSUPPORTED         => 'not supported',
+                DB_ERROR_TRUNCATED           => 'truncated',
+                DB_ERROR_VALUE_COUNT_ON_ROW  => 'value count on row',
+                DB_OK                        => 'no error',
             );
         }
 
@@ -735,19 +942,22 @@ class DB
     function parseDSN($dsn)
     {
         $parsed = array(
-            'phptype' => false,
+            'phptype'  => false,
             'dbsyntax' => false,
             'username' => false,
             'password' => false,
             'protocol' => false,
             'hostspec' => false,
-            'port' => false,
-            'socket' => false,
+            'port'     => false,
+            'socket'   => false,
             'database' => false,
         );
 
         if (is_array($dsn)) {
-            $dsn = array_merge($parsed, $dsn);
+            $dsn = array_merge(
+                $parsed,
+                $dsn
+            );
             if (!$dsn['dbsyntax']) {
                 $dsn['dbsyntax'] = $dsn['phptype'];
             }
@@ -755,9 +965,19 @@ class DB
         }
 
         // Find phptype and dbsyntax
-        if (($pos = strpos($dsn, '://')) !== false) {
-            $str = substr($dsn, 0, $pos);
-            $dsn = substr($dsn, $pos + 3);
+        if (($pos = strpos(
+                $dsn,
+                '://'
+            )) !== false) {
+            $str = substr(
+                $dsn,
+                0,
+                $pos
+            );
+            $dsn = substr(
+                $dsn,
+                $pos + 3
+            );
         } else {
             $str = $dsn;
             $dsn = null;
@@ -765,7 +985,11 @@ class DB
 
         // Get phptype and dbsyntax
         // $str => phptype(dbsyntax)
-        if (preg_match('|^(.+?)\((.*?)\)$|', $str, $arr)) {
+        if (preg_match(
+            '|^(.+?)\((.*?)\)$|',
+            $str,
+            $arr
+        )) {
             $parsed['phptype'] = $arr[1];
             $parsed['dbsyntax'] = !$arr[2] ? $arr[1] : $arr[2];
         } else {
@@ -773,18 +997,42 @@ class DB
             $parsed['dbsyntax'] = $str;
         }
 
-        if (!count($dsn)) {
+        if (is_array($dsn) && !count($dsn)) {
             return $parsed;
         }
 
         // Get (if found): username and password
         // $dsn => username:password@protocol+hostspec/database
-        if (($at = strrpos($dsn, '@')) !== false) {
-            $str = substr($dsn, 0, $at);
-            $dsn = substr($dsn, $at + 1);
-            if (($pos = strpos($str, ':')) !== false) {
-                $parsed['username'] = rawurldecode(substr($str, 0, $pos));
-                $parsed['password'] = rawurldecode(substr($str, $pos + 1));
+        if (($at = strrpos(
+                $dsn,
+                '@'
+            )) !== false) {
+            $str = substr(
+                $dsn,
+                0,
+                $at
+            );
+            $dsn = substr(
+                $dsn,
+                $at + 1
+            );
+            if (($pos = strpos(
+                    $str,
+                    ':'
+                )) !== false) {
+                $parsed['username'] = rawurldecode(
+                    substr(
+                        $str,
+                        0,
+                        $pos
+                    )
+                );
+                $parsed['password'] = rawurldecode(
+                    substr(
+                        $str,
+                        $pos + 1
+                    )
+                );
             } else {
                 $parsed['username'] = rawurldecode($str);
             }
@@ -792,7 +1040,11 @@ class DB
 
         // Find protocol and hostspec
 
-        if (preg_match('|^([^(]+)\((.*?)\)/?(.*?)$|', $dsn, $match)) {
+        if (preg_match(
+            '|^([^(]+)\((.*?)\)/?(.*?)$|',
+            $dsn,
+            $match
+        )) {
             // $dsn => proto(proto_opts)/database
             $proto = $match[1];
             $proto_opts = $match[2] ? $match[2] : false;
@@ -800,11 +1052,25 @@ class DB
 
         } else {
             // $dsn => protocol+hostspec/database (old format)
-            if (strpos($dsn, '+') !== false) {
-                list($proto, $dsn) = explode('+', $dsn, 2);
+            if (strpos(
+                    $dsn,
+                    '+'
+                ) !== false) {
+                list($proto, $dsn) = explode(
+                    '+',
+                    $dsn,
+                    2
+                );
             }
-            if (strpos($dsn, '/') !== false) {
-                list($proto_opts, $dsn) = explode('/', $dsn, 2);
+            if (strpos(
+                    $dsn,
+                    '/'
+                ) !== false) {
+                list($proto_opts, $dsn) = explode(
+                    '/',
+                    $dsn,
+                    2
+                );
             } else {
                 $proto_opts = $dsn;
                 $dsn = null;
@@ -814,8 +1080,14 @@ class DB
         // process the different protocol options
         $parsed['protocol'] = (!empty($proto)) ? $proto : 'tcp';
         $proto_opts = rawurldecode($proto_opts);
-        if (strpos($proto_opts, ':') !== false) {
-            list($proto_opts, $parsed['port']) = explode(':', $proto_opts);
+        if (strpos(
+                $proto_opts,
+                ':'
+            ) !== false) {
+            list($proto_opts, $parsed['port']) = explode(
+                ':',
+                $proto_opts
+            );
         }
         if ($parsed['protocol'] == 'tcp') {
             $parsed['hostspec'] = $proto_opts;
@@ -826,20 +1098,41 @@ class DB
         // Get dabase if any
         // $dsn => database
         if ($dsn) {
-            if (($pos = strpos($dsn, '?')) === false) {
+            if (($pos = strpos(
+                    $dsn,
+                    '?'
+                )) === false) {
                 // /database
                 $parsed['database'] = rawurldecode($dsn);
             } else {
                 // /database?param1=value1&param2=value2
-                $parsed['database'] = rawurldecode(substr($dsn, 0, $pos));
-                $dsn = substr($dsn, $pos + 1);
-                if (strpos($dsn, '&') !== false) {
-                    $opts = explode('&', $dsn);
+                $parsed['database'] = rawurldecode(
+                    substr(
+                        $dsn,
+                        0,
+                        $pos
+                    )
+                );
+                $dsn = substr(
+                    $dsn,
+                    $pos + 1
+                );
+                if (strpos(
+                        $dsn,
+                        '&'
+                    ) !== false) {
+                    $opts = explode(
+                        '&',
+                        $dsn
+                    );
                 } else { // database?param1=value1
                     $opts = array($dsn);
                 }
                 foreach ($opts as $opt) {
-                    list($key, $value) = explode('=', $opt);
+                    list($key, $value) = explode(
+                        '=',
+                        $opt
+                    );
                     if (!isset($parsed[$key])) {
                         // don't allow params overwrite
                         $parsed[$key] = rawurldecode($value);
@@ -861,7 +1154,9 @@ class DB
      * @param boolean true to hide the password, false to include it
      * @return string
      */
-    function getDSNString($dsn, $hidePassword)
+    function getDSNString($dsn,
+                          $hidePassword
+    )
     {
         /* Calling parseDSN will ensure that we have all the array elements
          * defined, and means that we deal with strings and array in the same
@@ -874,7 +1169,10 @@ class DB
 
         /* Protocol is special-cased, as using the default "tcp" along with an
          * Oracle TNS connection string fails. */
-        if (is_string($dsn) && strpos($dsn, 'tcp') === false && $dsnArray['protocol'] == 'tcp') {
+        if (is_string($dsn) && strpos(
+                $dsn,
+                'tcp'
+            ) === false && $dsnArray['protocol'] == 'tcp') {
             $dsnArray['protocol'] = false;
         }
 
@@ -904,7 +1202,8 @@ class DB
         /* Option handling. Unfortunately, parseDSN simply places options into
          * the top-level array, so we'll first get rid of the fields defined by
          * DB and see what's left. */
-        unset($dsnArray['phptype'],
+        unset(
+            $dsnArray['phptype'],
             $dsnArray['dbsyntax'],
             $dsnArray['username'],
             $dsnArray['password'],
@@ -961,15 +1260,28 @@ class DB_Error extends PEAR_Error
      *
      * @see PEAR_Error
      */
-    function __construct($code = DB_ERROR, $mode = PEAR_ERROR_RETURN,
-                         $level = E_USER_NOTICE, $debuginfo = null)
+    function __construct($code = DB_ERROR,
+                         $mode = PEAR_ERROR_RETURN,
+                         $level = E_USER_NOTICE,
+                         $debuginfo = null
+    )
     {
         if (is_int($code)) {
-            PEAR_Error::__construct('DB Error: ' . DB::errorMessage($code), $code,
-                $mode, $level, $debuginfo);
+            PEAR_Error::__construct(
+                'DB Error: ' . DB::errorMessage($code),
+                $code,
+                $mode,
+                $level,
+                $debuginfo
+            );
         } else {
-            PEAR_Error::__construct("DB Error: $code", DB_ERROR,
-                $mode, $level, $debuginfo);
+            PEAR_Error::__construct(
+                "DB Error: $code",
+                DB_ERROR,
+                $mode,
+                $level,
+                $debuginfo
+            );
         }
     }
 
@@ -1097,7 +1409,10 @@ class DB_result
      *
      * @return void
      */
-    function __construct(&$dbh, $result, $options = array())
+    function __construct(&$dbh,
+                         $result,
+                         $options = array()
+    )
     {
         $this->autofree = $dbh->options['autofree'];
         $this->dbh = &$dbh;
@@ -1108,7 +1423,10 @@ class DB_result
         $this->result = $result;
         $this->statement = empty($dbh->last_stmt) ? null : $dbh->last_stmt;
         foreach ($options as $key => $value) {
-            $this->setOption($key, $value);
+            $this->setOption(
+                $key,
+                $value
+            );
         }
     }
 
@@ -1120,7 +1438,9 @@ class DB_result
      *
      * @return void
      */
-    function setOption($key, $value = null)
+    function setOption($key,
+                       $value = null
+    )
     {
         switch ($key) {
             case 'limit_from':
@@ -1161,7 +1481,9 @@ class DB_result
      *
      * @see DB_common::setOption(), DB_common::setFetchMode()
      */
-    function &fetchRow($fetchmode = DB_FETCHMODE_DEFAULT, $rownum = null)
+    function &fetchRow($fetchmode = DB_FETCHMODE_DEFAULT,
+                       $rownum = null
+    )
     {
         if ($fetchmode === DB_FETCHMODE_DEFAULT) {
             $fetchmode = $this->fetchmode;
@@ -1177,7 +1499,11 @@ class DB_result
                 if ($this->dbh->features['limit'] === false) {
                     $i = 0;
                     while ($i++ < $this->limit_from) {
-                        $this->dbh->fetchInto($this->result, $arr, $fetchmode);
+                        $this->dbh->fetchInto(
+                            $this->result,
+                            $arr,
+                            $fetchmode
+                        );
                     }
                 }
             }
@@ -1193,7 +1519,12 @@ class DB_result
             }
             $this->row_counter++;
         }
-        $res = $this->dbh->fetchInto($this->result, $arr, $fetchmode, $rownum);
+        $res = $this->dbh->fetchInto(
+            $this->result,
+            $arr,
+            $fetchmode,
+            $rownum
+        );
         if ($res === DB_OK) {
             if (isset($object_class)) {
                 // The default mode is specified in the
@@ -1242,7 +1573,10 @@ class DB_result
      *
      * @see DB_common::setOption(), DB_common::setFetchMode()
      */
-    function fetchInto(&$arr, $fetchmode = DB_FETCHMODE_DEFAULT, $rownum = null)
+    function fetchInto(&$arr,
+                       $fetchmode = DB_FETCHMODE_DEFAULT,
+                       $rownum = null
+    )
     {
         if ($fetchmode === DB_FETCHMODE_DEFAULT) {
             $fetchmode = $this->fetchmode;
@@ -1258,7 +1592,11 @@ class DB_result
                 if ($this->dbh->features['limit'] === false) {
                     $i = 0;
                     while ($i++ < $this->limit_from) {
-                        $this->dbh->fetchInto($this->result, $arr, $fetchmode);
+                        $this->dbh->fetchInto(
+                            $this->result,
+                            $arr,
+                            $fetchmode
+                        );
                     }
                 }
             }
@@ -1275,7 +1613,12 @@ class DB_result
 
             $this->row_counter++;
         }
-        $res = $this->dbh->fetchInto($this->result, $arr, $fetchmode, $rownum);
+        $res = $this->dbh->fetchInto(
+            $this->result,
+            $arr,
+            $fetchmode,
+            $rownum
+        );
         if ($res === DB_OK) {
             if (isset($object_class)) {
                 // default mode specified in the
@@ -1320,7 +1663,10 @@ class DB_result
         if ($this->dbh->features['numrows'] === 'emulate'
             && $this->dbh->options['portability'] & DB_PORTABILITY_NUMROWS) {
             if ($this->dbh->features['prepare']) {
-                $res = $this->dbh->query($this->query, $this->parameters);
+                $res = $this->dbh->query(
+                    $this->query,
+                    $this->parameters
+                );
             } else {
                 $res = $this->dbh->query($this->query);
             }
@@ -1328,7 +1674,10 @@ class DB_result
                 return $res;
             }
             $i = 0;
-            while ($res->fetchInto($tmp, DB_FETCHMODE_ORDERED)) {
+            while ($res->fetchInto(
+                $tmp,
+                DB_FETCHMODE_ORDERED
+            )) {
                 $i++;
             }
             $count = $i;
@@ -1404,7 +1753,10 @@ class DB_result
         if (is_string($mode)) {
             return $this->dbh->raiseError(DB_ERROR_NEED_MORE_DATA);
         }
-        return $this->dbh->tableInfo($this, $mode);
+        return $this->dbh->tableInfo(
+            $this,
+            $mode
+        );
     }
 
     // }}}

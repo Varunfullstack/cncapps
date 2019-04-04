@@ -261,7 +261,10 @@ class DB_Sql
             $this->halt("next_record called with no query pending.");
             return 0;
         }
-        $object = @mysqli_fetch_object($this->Query_ID, $className);
+        $object = @mysqli_fetch_object(
+            $this->Query_ID,
+            $className
+        );
         $this->Row += 1;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
