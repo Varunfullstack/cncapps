@@ -67,14 +67,14 @@ class BUActivity extends Business
     public $template;
     var $csvSummaryFileHandle;
     var $totalCost = 0;
-    var $loggedInEmail = '';
-    var $loggedInUserID = '';
+    var $loggedInEmail = null;
+    var $loggedInUserID = null;
     var $standardVatRate = 0;
     /**
      *
      * @var DBEJCallActivity
      */
-    public $dbeJCallActivity = '';
+    public $dbeJCallActivity = null;
     public $priorityArray;
     public $problemStatusArray =
         array(
@@ -112,17 +112,17 @@ class BUActivity extends Business
      *
      * @var DBEProblem
      */
-    private $dbeProblem = '';
+    private $dbeProblem = null;
     /**
      *
      * @var DBEUser
      */
-    private $dbeUser = '';
+    private $dbeUser = null;
     /**
      *
      * @var DBECallActivitySearch
      */
-    private $dbeCallActivitySearch = '';
+    private $dbeCallActivitySearch = null;
     /** @var DataSet */
     public $dsHeader;
 
@@ -266,19 +266,19 @@ class BUActivity extends Business
 
         $dsData->setValue(
             'customerID',
-            ''
+            null
         );
         $dsData->setValue(
             'userID',
-            ''
+            null
         );
         $dsData->setValue(
             'contractType',
-            ''
+            null
         );
         $dsData->setValue(
             'rootCauseID',
-            ''
+            null
         );
         $dsData->setValue(
             'contractCustomerItemID',
@@ -286,11 +286,11 @@ class BUActivity extends Business
         ); // all(blank is used for T&M)
         $dsData->setValue(
             'priority',
-            ''
+            null
         );
         $dsData->setValue(
             'customerName',
-            ''
+            null
         );
         $dsData->setValue(
             'status',
@@ -298,11 +298,11 @@ class BUActivity extends Business
         );
         $dsData->setValue(
             'callActTypeID',
-            ''
+            null
         );
         $dsData->setValue(
             'linkedSalesOrderID',
-            ''
+            null
         );
         $dsData->setValue(
             'managementReviewOnly',
@@ -310,7 +310,7 @@ class BUActivity extends Business
         );
         $dsData->setValue(
             'breachedSlaOption',
-            ''
+            null
         );
     } // end sendServiceReallocatedEmail
 
@@ -334,7 +334,7 @@ class BUActivity extends Business
         );
         $dsData->setValue(
             'customerID',
-            ''
+            null
         );
     } // end sendSalesRequestAlertEmail
 
@@ -559,7 +559,7 @@ class BUActivity extends Business
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
-            ''
+            null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::date,
@@ -571,7 +571,7 @@ class BUActivity extends Business
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::endTime,
-            ''
+            null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::status,
@@ -579,7 +579,7 @@ class BUActivity extends Business
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::reason,
-            ''
+            null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::siteDesc,
@@ -780,7 +780,7 @@ class BUActivity extends Business
 
             $dbeProblem->setValue(
                 DBEJProblem::userID,
-                ''
+                null
             );
 
             $dbeProblem->setValue(
@@ -836,7 +836,7 @@ class BUActivity extends Business
 
             $dbeProblem->setValue(
                 DBEJProblem::userID,
-                ''
+                null
             );
             $dbeProblem->setValue(
                 DBEJProblem::awaitingCustomerResponseFlag,
@@ -867,7 +867,7 @@ class BUActivity extends Business
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
-        $dbeCallActivity->setPKValue('');
+        $dbeCallActivity->setPKValue(null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
@@ -1042,8 +1042,8 @@ class BUActivity extends Business
         }
 
 
-        $templateName = '';
-        $subjectSuffix = '';
+        $templateName = null;
+        $subjectSuffix = null;
 
         $contactID = $dbeLastActivity->getValue(DBECallActivity::contactID);
 
@@ -1472,7 +1472,7 @@ class BUActivity extends Business
     {
         $this->setMethodName('updateCallActivity');
         $dbeCallActivity = new DBECallActivity($this);
-        $oldEndTime = ''; // new activity
+        $oldEndTime = null; // new activity
         if ($dsCallActivity->getValue(DBEJCallActivity::callActivityID) != 0) {
             $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
             $oldEndTime = $dbeCallActivity->getValue(DBEJCallActivity::endTime);
@@ -1485,7 +1485,7 @@ class BUActivity extends Business
 
 
         // if this activity will now have an end time and the type specifies that we do not need to check it, set status to checked
-        if ($oldEndTime == '' && $dsCallActivity->getValue(DBEJCallActivity::endTime) != '') {
+        if (!$oldEndTime && $dsCallActivity->getValue(DBEJCallActivity::endTime)) {
             if ($dbeCallActType->getValue(DBECallActType::requireCheckFlag) == 'N') {
                 $dsCallActivity->setUpdateModeUpdate();
                 $dsCallActivity->setValue(
@@ -1611,7 +1611,7 @@ class BUActivity extends Business
 
         $dbeProblem->setValue(
             DBEJProblem::workingHoursCalculatedToTime,
-            '0000-00-00 00:00:00'
+            null
         );
 
         // if amended initial call activity date/time then set the problem date raised field to match
@@ -1705,7 +1705,7 @@ class BUActivity extends Business
         } else {
             if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(
                     DBEJCallActivity::endTime
-                ) != '') {
+                )) {
                 $this->sendEmailToCustomer(
                     $dsCallActivity->getValue(DBEJProblem::problemID),
                     self::WorkUpdatesCustomerEmailCategory,
@@ -1770,7 +1770,7 @@ class BUActivity extends Business
       If this is a future on-site visit then send notification email( issue #8750 )
       */
             if (
-                $dbeCallActivity->getValue(DBEJCallActivity::endTime) == '' &
+                !$dbeCallActivity->getValue(DBEJCallActivity::endTime) &
                 $dbeCallActivity->getValue(DBEJCallActivity::date) >= date('Y-m-d')
             ) {
                 $this->sendFutureVisitEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
@@ -1998,7 +1998,7 @@ class BUActivity extends Business
                 $this->loggedInUserID != USER_SYSTEM &&                                        // exclude automated server alerts
                 $dbeCallActivity->getValue(
                     DBEJCallActivity::endTime
-                ) != ''                  // exclude future scheduled activity
+                )                // exclude future scheduled activity
             )
         ) {
             $this->sendUpdatedByAnotherUserEmail(
@@ -2800,11 +2800,11 @@ class BUActivity extends Business
         $dbeProblem->getRow($problemID);
         $dbeProblem->setValue(
             DBEJProblem::alarmDate,
-            ''
+            null
         );
         $dbeProblem->setValue(
             DBEJProblem::alarmTime,
-            ''
+            null
         );
         return ($dbeProblem->updateRow());
     }
@@ -2819,7 +2819,7 @@ class BUActivity extends Business
         $dbeNewActivity = new DBECallActivity($this);
         $dbeNewActivity->getRow($dbeJLastCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-        $dbeNewActivity->setPKValue('');
+        $dbeNewActivity->setPKValue(null);
 
         $dbeNewActivity->setValue(
             DBEJCallActivity::date,
@@ -2866,7 +2866,7 @@ class BUActivity extends Business
 
         $dbeNewActivity = $dbeCallActivity;
 
-        $dbeNewActivity->setPKValue('');
+        $dbeNewActivity->setPKValue(null);
 
         $dbeNewActivity->setValue(
             DBEJCallActivity::date,
@@ -3273,7 +3273,7 @@ class BUActivity extends Business
 
         $dbeTravelActivity = $dbeCallActivity;
 
-        $dbeTravelActivity->setPKValue('');
+        $dbeTravelActivity->setPKValue(null);
 
         $dbeTravelActivity->setValue(
             DBEJCallActivity::startTime,
@@ -3293,7 +3293,7 @@ class BUActivity extends Business
         );
         $dbeTravelActivity->setValue(
             DBEJCallActivity::reason,
-            ''
+            null
         );
 
         $dbeTravelActivity->insertRow();
@@ -3649,7 +3649,7 @@ class BUActivity extends Business
         $reason = '<P>Completed</P>';
         $userID = $this->loggedInUserID;
         // create a completion activity
-        $dbeCallActivity->setPKValue('');
+        $dbeCallActivity->setPKValue(null);
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
@@ -3792,7 +3792,7 @@ class BUActivity extends Business
         $lastProblemID = false;
         $lastUserID = false;
         $lastDate = false;
-        $consultantName = '';
+        $consultantName = null;
 
         while ($dbeJCallActivity->fetchNext()) {
 
@@ -3885,14 +3885,14 @@ class BUActivity extends Business
                         'N'
                     );
                     $dsOrdhead->setValue(
-                        DBEJOrdhead::payMethod,
+                        DBEJOrdhead::paymentTermsID,
                         CONFIG_PAYMENT_TERMS_30_DAYS
                     );
                     $dsOrdhead->post();
                     $buSalesOrder->updateHeader(
                         $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                         $dsOrdhead->getValue(DBEOrdhead::custPORef),
-                        $dsOrdhead->getValue(DBEOrdhead::payMethod),
+                        $dsOrdhead->getValue(DBEOrdhead::paymentTermsID),
                         $dsOrdhead->getValue(DBEOrdhead::partInvoice),
                         $dsOrdhead->getValue(DBEOrdhead::addItem)
                     );
@@ -3945,11 +3945,11 @@ class BUActivity extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::itemID,
-                    ''
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::stockcat,
-                    ''
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::sequenceNo,
@@ -4846,13 +4846,13 @@ class BUActivity extends Business
 
                 $this->template->set_var(
                     array(
-                        'activityDate'     => '',
-                        'activityPostcode' => '',
-                        'activityRef'      => '',
-                        'activityContact'  => '',
-                        'activityType'     => '',
-                        'activityHours'    => '',
-                        'activityCost'     => '',
+                        'activityDate'     => null,
+                        'activityPostcode' => null,
+                        'activityRef'      => null,
+                        'activityContact'  => null,
+                        'activityType'     => null,
+                        'activityHours'    => null,
+                        'activityCost'     => null,
                         'activityDetails'  => 'No activity for this period'
                     )
                 );
@@ -4993,14 +4993,14 @@ class BUActivity extends Business
             'N'
         );
         $dsOrdhead->setValue(
-            DBEOrdhead::payMethod,
+            DBEOrdhead::paymentTermsID,
             CONFIG_PAYMENT_TERMS_30_DAYS
         );
         $dsOrdhead->post();
         $buSalesOrder->updateHeader(
             $dsOrdhead->getValue(DBEOrdhead::ordheadID),
             $dsOrdhead->getValue(DBEOrdhead::custPORef),
-            $dsOrdhead->getValue(DBEOrdhead::payMethod),
+            $dsOrdhead->getValue(DBEOrdhead::paymentTermsID),
             $dsOrdhead->getValue(DBEOrdhead::partInvoice),
             $dsOrdhead->getValue(DBEOrdhead::addItem)
         );
@@ -5263,7 +5263,7 @@ is currently a balance of ';
         } else {
             $timeFrameDesc = '';
         }
-        if ($Record ['reason'] == '') {
+        if (!$Record['reason']) {
             $details = trim($Record ['cat_desc']);
         } else {
             $details = substr(
@@ -5486,7 +5486,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            ''
+            null
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
@@ -5494,7 +5494,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
-            ''
+            null
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::userID,
@@ -5672,11 +5672,11 @@ is currently a balance of ';
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::statementYearMonth,
-            ''
+            null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::customerItemID,
-            ''
+            null
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::authorisedFlag,
@@ -5980,10 +5980,10 @@ is currently a balance of ';
     )
     {
         $this->setMethodName('uploadDocumentFile');
-        if ($problemID == '') {
+        if (!$problemID) {
             $this->raiseError('problemID not passed');
         }
-        if ($description == '') {
+        if (!$description) {
             $this->raiseError('description not passed');
         }
 
@@ -6006,7 +6006,7 @@ is currently a balance of ';
     )
     {
         $dbeCallDocument = new DBECallDocument($this);
-        $dbeCallDocument->setPKValue('');
+        $dbeCallDocument->setPKValue(null);
         $dbeCallDocument->setValue(
             DBEJCallDocument::problemID,
             $problemID
@@ -6145,15 +6145,15 @@ is currently a balance of ';
         );
         $dsData->setValue(
             'customerID',
-            ''
+            null
         );
         $dsData->setValue(
             'userID',
-            ''
+            null
         );
         $dsData->setValue(
             'customerName',
-            ''
+            null
         );
     }
 
@@ -6583,7 +6583,7 @@ is currently a balance of ';
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
 
         if (
-            trim($reason) <> '' &&
+            trim($reason) &&
             $reason <> $dbeCallActivity->getValue(DBEJCallActivity::reason)
         ) {
             $dbeCallActivity->setValue(
@@ -6596,7 +6596,7 @@ is currently a balance of ';
         }
 
         if (
-            trim($internalNotes) <> '' &&
+            trim($internalNotes) &&
             $internalNotes <> $dbeProblem->getValue(DBEJProblem::internalNotes)
         ) {
 
@@ -7041,7 +7041,7 @@ is currently a balance of ';
 
 
         $dateRaised = date(CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME);
-        $timeRaised = date(CONFIG_MYSQL_TIME);
+        $timeRaised = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
 
         $internalNotes = '<P>' . str_replace(
                 "\r\n",
@@ -7153,21 +7153,18 @@ is currently a balance of ';
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
+
         $dbeProblem->insertRow();
+
 
         /* Use type of first SO line as first line of reason */
         while ($dsOrdline->fetchNext()) {
 
-            if (
-                $dsOrdline->getValue(DBEOrdline::itemID) &&
-
-                (!$selectedOrderLine OR
-
-                    ($selectedOrderLine &&
-                        in_array(
-                            $dsOrdline->getValue(DBEOrdline::sequenceNo),
-                            $selectedOrderLine
-                        )
+            if ($dsOrdline->getValue(DBEOrdline::itemID) &&
+                (!is_array($selectedOrderLine) ||
+                    in_array(
+                        $dsOrdline->getValue(DBEOrdline::sequenceNo),
+                        $selectedOrderLine
                     )
                 )
             ) {
@@ -7272,11 +7269,11 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::statementYearMonth,
-            ''
+            null
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::customerItemID,
-            ''
+            null
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::underContractFlag,
@@ -7307,7 +7304,7 @@ is currently a balance of ';
             "UPDATE
       ordhead
     SET
-      odh_service_request_text = '',
+      odh_service_request_text = null,
       odh_service_request_custitemno = 0
     WHERE
       odh_ordno = " . $ordheadID;
@@ -7753,7 +7750,7 @@ is currently a balance of ';
     function processServerGuard(\CNCLTD\AutomatedRequest $automatedRequest)
     {
         $details = $automatedRequest->getTextBody();
-        if ($automatedRequest->getMonitorStatus() == '') {
+        if (!$automatedRequest->getMonitorStatus()) {
             /* Create new request */
             $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
             $details .= 'Raised from ServerGuard on ' . date(CONFIG_MYSQL_DATETIME);
@@ -8136,7 +8133,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::userID,
-            ''
+            null
         );        // not allocated
         $dbeProblem->insertRow();
 
@@ -8304,7 +8301,7 @@ is currently a balance of ';
                         $filePath
                     );
                 } else {
-                    $attachmentMimeType = '';   // failed to locate magic file for MimeTypes
+                    $attachmentMimeType = null;   // failed to locate magic file for MimeTypes
                 }
 
                 $this->addDocument(
@@ -8411,7 +8408,7 @@ is currently a balance of ';
 
         $isTravel = false;
 
-        $endTime = '';                // default no end time
+        $endTime = null;                // default no end time
 
         if ($callActivityTypeID) {
             $dbeCallActType = new DBECallActType($this);
@@ -8535,7 +8532,7 @@ is currently a balance of ';
                     if ($dbeProblem->getValue(DBEJProblem::priority) == 1) {
                         $dbeProblem->setValue(
                             DBEJProblem::userID,
-                            ''
+                            null
                         );              // ensure not assigned
                         $this->sendPriorityOneReopenedEmail($problemID);
                     } /*
@@ -8555,11 +8552,11 @@ is currently a balance of ';
 
             $dbeProblem->setValue(
                 DBEJProblem::alarmDate,
-                ''
+                null
             );
             $dbeProblem->setValue(
                 DBEJProblem::alarmTime,
-                ''
+                null
             );
             $dbeProblem->updateRow();
 
@@ -8600,7 +8597,7 @@ is currently a balance of ';
         }
 
 
-        $dbeCallActivity->setPKValue('');
+        $dbeCallActivity->setPKValue(null);
 
         $activityUserID = $userID;
 
@@ -8884,7 +8881,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::userID,
-            ''
+            null
         );                  // problem no longer allocated
         $dbeProblem->setValue(
             DBEJProblem::status,
@@ -8968,7 +8965,7 @@ is currently a balance of ';
       FROM
           callactivity
       WHERE
-          caa_endtime = ''
+          (caa_endtime is null or caa_endtime = '')
             AND
             caa_problemno = " . $problemID;
 
@@ -8988,7 +8985,7 @@ is currently a balance of ';
     public function closeActivitiesWithEndTime($problemID)
     {
         global $db;
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime <> ''";
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and (caa_endtime is not null or caa_endtime <> '' )";
         $db->query($sql);
         return true;
     }
@@ -9017,7 +9014,7 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
 
-        $dbeCallActivity->setPKValue('');
+        $dbeCallActivity->setPKValue(null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)
@@ -9936,7 +9933,7 @@ is currently a balance of ';
             );
             $dbeProblem->setValue(
                 DBEProblem::userID,
-                ''
+                null
             );        // not allocated
             $dbeProblem->insertRow();
 
@@ -10763,7 +10760,7 @@ is currently a balance of ';
 
       WHERE
         callacttype.`travelFlag` = 'N'
-        AND caa_endtime > ''";
+        AND (caa_endtime is not null and caa_endtime <> '')";
 
         if ($days) {
             $sql .=
@@ -11297,7 +11294,7 @@ is currently a balance of ';
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
-        $dbeCallActivity->setPKValue('');
+        $dbeCallActivity->setPKValue(null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(CONFIG_MYSQL_DATE)

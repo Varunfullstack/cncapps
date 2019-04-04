@@ -105,7 +105,7 @@ class BURenewal extends Business
             $this->dbeCustomer->getRow($dsCustomer->getValue(DBECustomer::customerID));
             $this->dbeCustomer->setValue(
                 DBECustomer::sendContractEmail,
-                ''
+                null
             );
             $this->dbeCustomer->updateRow();
         }

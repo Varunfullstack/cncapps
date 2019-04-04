@@ -90,8 +90,6 @@ if ($dsRenBroadband->rowCount()) {
     } else {
         $buMail = new BUMail($thing);
 
-        $buMail = new BUMail($this);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
 

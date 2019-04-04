@@ -21,6 +21,10 @@ class CTContactAudit extends CTCNC
      * @access  private
      */
     var $dsContact = '';
+    /**
+     * @var BUContact
+     */
+    private $buContact;
 
     function __construct($requestMethod,
                          $postVars,
@@ -85,7 +89,7 @@ class CTContactAudit extends CTCNC
         $this->setPageTitle("Contact Audit Log");
         $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
-            array('action' => CTCUSTOMER_ACT_SEARCH)
+            array('action' => 'search')
         );
         $customerPopupURL =
             Controller::buildLink(

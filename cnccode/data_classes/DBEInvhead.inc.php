@@ -22,7 +22,6 @@ class DBEInvhead extends DBEntity
     const contactID = "contactID";
     const contactName = "contactName";
     const salutation = "salutation";
-    const payMethod = "payMethod";
     const paymentTermsID = "paymentTermsID";
     const vatCode = "vatCode";
     const vatRate = "vatRate";
@@ -130,12 +129,6 @@ class DBEInvhead extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL,
             "inh_salutation"
-        );
-        $this->addColumn(
-            self::payMethod,
-            DA_STRING,
-            DA_NOT_NULL,
-            "inh_pay_method"
         );
         $this->addColumn(
             self::paymentTermsID,

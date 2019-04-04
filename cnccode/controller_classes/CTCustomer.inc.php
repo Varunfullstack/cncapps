@@ -7,11 +7,6 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
-use Signable\ApiClient;
-use Signable\DocumentWithoutTemplate;
-use Signable\Envelopes;
-use Signable\Party;
-
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -1066,7 +1061,7 @@ class CTCustomer extends CTCNC
 
     function convertDateYMD($dateDMY)
     {
-        if ($dateDMY != '') {
+        if ($dateDMY) {
             $dateArray = explode(
                 '/',
                 $dateDMY
@@ -1083,7 +1078,7 @@ class CTCustomer extends CTCNC
                     STR_PAD_LEFT
                 ));
         } else {
-            return '';
+            return null;
         }
     }
 

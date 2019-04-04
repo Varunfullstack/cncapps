@@ -7,11 +7,25 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJCustomerItem extends DBECustomerItem
 {
+
+    const customerName = "customerName";
+    const siteDescription = "siteDescription";
+    const contractItemTypeID = "contractItemTypeID";
+    const itemDescription = "itemDescription";
+    const itemNotes = "itemNotes";
+    const renewalTypeID = "renewalTypeID";
+    const partNo = "partNo";
+    const servercareFlag = "servercareFlag";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -19,75 +33,75 @@ class DBEJCustomerItem extends DBECustomerItem
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "customerName",
+            self::customerName,
             DA_STRING,
             DA_ALLOW_NULL,
             "cus_name"
         );
         $this->addColumn(
-            "siteDescription",
+            self::siteDescription,
             DA_STRING,
             DA_ALLOW_NULL,
             "CONCAT_WS(', ', add_add1, add_town, add_postcode)"
         );
         $this->addColumn(
-            "contractItemTypeID",
+            self::contractItemTypeID,
             DA_ID,
             DA_ALLOW_NULL,
             "citem.itm_itemtypeno"
         );
         $this->addColumn(
-            "itemDescription",
+            self::itemDescription,
             DA_STRING,
             DA_ALLOW_NULL,
             "citem.itm_desc"
         );
         $this->addColumn(
-            "itemNotes",
+            self::itemNotes,
             DA_STRING,
             DA_ALLOW_NULL,
             "citem.notes"
         );
         $this->addColumn(
-            "renewalTypeID",
+            self::renewalTypeID,
             DA_ID,
             DA_ALLOW_NULL,
             "citem.renewalTypeID"
         );
         $this->addColumn(
-            "partNo",
+            self::partNo,
             DA_STRING,
             DA_ALLOW_NULL,
             "citem.itm_unit_of_sale"
         );
         $this->addColumn(
-            "servercareFlag",
+            self::servercareFlag,
             DA_INTEGER,
             DA_ALLOW_NULL,
             "citem.itm_servercare_flag"
         );
         $this->addColumn(
-            "invoiceFromDate",
+            self::invoiceFromDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceToDate",
+            self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')"
         );
 
         $this->addColumn(
-            "invoiceFromDateYMD",
+            self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
         );
 
         $this->addColumn(
-            "invoiceToDateYMD",
+            self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD"

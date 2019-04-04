@@ -154,20 +154,20 @@ class BUPDFPurchaseOrder extends BaseObject
         }
         $this->_dsPorhead->fetchNext();
         $this->_buSupplier->getSupplierByID(
-            $this->_dsPorhead->getValue('supplierID'),
+            $this->_dsPorhead->getValue(DBEPorhead::supplierID),
             $this->_dsSupplier
         );
         $this->_buContact->getContactByID(
-            $this->_dsPorhead->getValue('contactID'),
+            $this->_dsPorhead->getValue(DBEPorhead::contactID),
             $this->_dsSupplierContact
         );
         $this->_buSalesOrder->getUserByID(
-            $this->_dsPorhead->getValue('userID'),
+            $this->_dsPorhead->getValue(DBEPorhead::userID),
             $this->_dsUser
         );
-        if ($this->_dsPorhead->getValue('ordheadID') != 0) {
+        if ($this->_dsPorhead->getValue(DBEPorhead::ordheadID) != 0) {
             $this->_buSalesOrder->getOrdheadByID(
-                $this->_dsPorhead->getValue('ordheadID'),
+                $this->_dsPorhead->getValue(DBEPorhead::ordheadID),
                 $this->_dsOrdhead
             );
             $this->_buContact->getContactByID(
@@ -175,7 +175,7 @@ class BUPDFPurchaseOrder extends BaseObject
                 $this->_dsCustomerContact
             );
         }
-        $this->_dbePayMethod->getRow($this->_dsPorhead->getValue('payMethodID'));
+        $this->_dbePayMethod->getRow($this->_dsPorhead->getValue(DBEPorhead::payMethodID));
         // initialisation
         $this->_buPDF = new BUPDF(
             $this,
@@ -463,11 +463,13 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->printString('Please part-ship if necessary.');
         $this->_buPDF->CR();
         $this->_buPDF->CR();
-        $this->_buPDF->printString('Please accept payment by ' . $this->_dbePayMethod->getValue('description') . '.');
+        $this->_buPDF->printString(
+            'Please accept payment by ' . $this->_dbePayMethod->getValue(DBEPayMethod::description) . '.'
+        );
         $this->_buPDF->CR();
-        if ($this->_dbePayMethod->getValue('cardFlag') == 'Y') {
+        if ($this->_dbePayMethod->getValue(DBEPayMethod::cardFlag) == 'Y') {
             $this->_buSalesOrder->getUserByID(
-                $this->_dbePayMethod->getValue('userID'),
+                $this->_dbePayMethod->getValue(DBEPayMethod::userID),
                 $dsCardholder
             );
             $dsCardholder->fetchNext();
@@ -479,7 +481,7 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_buPDF->setFont();
             $this->_buPDF->printStringAt(
                 40,
-                $this->_dbePayMethod->getValue('cardNumber')
+                $this->_dbePayMethod->getValue(DBEPayMethod::cardNumber)
             );
             $this->_buPDF->CR();
             $this->_buPDF->setBoldOn();
@@ -492,7 +494,7 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_buPDF->setFont();
             $this->_buPDF->printStringAt(
                 40,
-                Controller::dateYMDtoDMY($this->_dbePayMethod->getValue('expiryDate'))
+                Controller::dateYMDtoDMY($this->_dbePayMethod->getValue(DBEPayMethod::expiryDate))
             );
             $this->_buPDF->CR();
             $this->_buPDF->setBoldOn();

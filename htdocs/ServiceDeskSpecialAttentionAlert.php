@@ -9,7 +9,8 @@
 require_once("config.inc.php");
 GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUProblemSLA.inc.php');
-$buProblemSLA = new BUProblemSLA($this);
+$thing = null;
+$buProblemSLA = new BUProblemSLA($thing);
 $buProblemSLA->specialAttentionEmailAlert();
 echo "Special Attention Customer Email Alert Routine Finished";
 ?>

@@ -11,31 +11,99 @@ class DBEActivityProfitReport extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("callactivity");
-        $this->addColumn("CustomerID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("CustomerName", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("PPHours", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("PPCharge", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("TMHours", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("TMCharge", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SDHours", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SDCharge", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SCHours", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SCCharge", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SDPaid", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SCPaid", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("TotalHours", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SDProRata", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("SCProRata", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("CncCost", DA_DECIMAL, DA_ALLOW_NULL);
-        $this->addColumn("Profit", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn(
+            "CustomerID",
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            "CustomerName",
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            "PPHours",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "PPCharge",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "TMHours",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "TMCharge",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SDHours",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SDCharge",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SCHours",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SCCharge",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SDPaid",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SCPaid",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "TotalHours",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SDProRata",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "SCProRata",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "CncCost",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            "Profit",
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

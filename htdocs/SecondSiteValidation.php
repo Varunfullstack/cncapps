@@ -9,9 +9,9 @@
 require_once("config.inc.php");
 GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUSecondsite.inc.php');
-
+$thing = null;
 $testRun = !!@$_REQUEST['testRun'];
-$buSecondsite = new BUSecondsite($this);
+$buSecondsite = new BUSecondsite($thing);
 
 set_time_limit(0); // unlimited execution time
 
@@ -190,7 +190,7 @@ $hdrs = array(
     'Content-Type' => 'text/html; charset=UTF-8'
 );
 
-$buMail = new BUMail($this);
+$buMail = new BUMail($thing);
 
 $buMail->mime->setHTMLBody($html);
 

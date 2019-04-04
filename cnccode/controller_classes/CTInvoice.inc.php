@@ -1151,14 +1151,14 @@ class CTInvoice extends CTCNC
             'payMethods'
         );
         while ($dbePaymentTerms->fetchNext()) {
-            $payMethodSelected = ($dsInvhead->getValue("paymentTermsID") == $dbePaymentTerms->getValue(
-                'paymentTermsID'
+            $payMethodSelected = ($dsInvhead->getValue(DBEInvhead::paymentTermsID) == $dbePaymentTerms->getValue(
+                DBEPaymentTerms::paymentTermsID
             ) ? CT_SELECTED : '');
             $this->template->set_var(
                 array(
                     'payMethodSelected' => $payMethodSelected,
-                    'paymentTermsID'    => $dbePaymentTerms->getValue('paymentTermsID'),
-                    'payMethodDesc'     => $dbePaymentTerms->getValue('description')
+                    'paymentTermsID'    => $dbePaymentTerms->getValue(DBEPaymentTerms::paymentTermsID),
+                    'payMethodDesc'     => $dbePaymentTerms->getValue(DBEPaymentTerms::description)
                 )
             );
             $this->template->parse(

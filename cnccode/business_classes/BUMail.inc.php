@@ -9,10 +9,10 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 /*
  * PEAR Mail classes
  */
-require_once("Mail.php");
-require_once("Mail/mime.php");
-require_once("Mail/smtp.php");
-require_once("Mail/Queue.php");
+require_once(__DIR__."/../../php/PEAR/Mail.php");
+require_once(__DIR__."/../../php/PEAR/Mail/smtp.php");
+require_once(__DIR__."/../../php/PEAR/Mail/mime.php");
+require_once(__DIR__."/../../php/PEAR/Mail/Queue.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUMail extends Business
@@ -37,10 +37,9 @@ class BUMail extends Business
         parent::__construct($owner);
 
         $this->mime = new Mail_Mime;
-
         $this->mailQueue = new Mail_Queue (
-            $GLOBALS ['db_options'],
-            $GLOBALS ['mail_options']
+            $GLOBALS['db_options'],
+            $GLOBALS['mail_options']
         );
 
         $this->buUser = new BUUser($this);
@@ -62,7 +61,10 @@ class BUMail extends Business
         $sendToSdManagerRecipients = false      // obsolete
     )
     {
-        $parameters = $this->prepareMessage($toEmail, $headers);
+        $parameters = $this->prepareMessage(
+            $toEmail,
+            $headers
+        );
 
         $mail = new Mail_smtp(
             $GLOBALS ['mail_options']
@@ -87,7 +89,10 @@ class BUMail extends Business
     {
         $userID = false; // initialise
 
-        $parameters = $this->prepareMessage($toEmail, $headers);
+        $parameters = $this->prepareMessage(
+            $toEmail,
+            $headers
+        );
 
         return $this->mailQueue->put(
             $fromEmail,
@@ -101,7 +106,9 @@ class BUMail extends Business
 
     }
 
-    private function prepareMessage($toEmail, $headers)
+    private function prepareMessage($toEmail,
+                                    $headers
+    )
     {
         /*
         if we are not in live environment then send to test account but append list of

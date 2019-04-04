@@ -1,15 +1,6 @@
 <?php
 date_default_timezone_set('Europe/London');
-require_once(__DIR__ . '/../../openWebAnalytics/owa_php.php');
 
-$owa = new owa_php();
-// Set the site id you want to track
-$owa->setSiteId('b39a0f923d7f45bec2ccb7fa0435f82c');
-// Uncomment the next line to set your page title
-//$owa->setPageTitle('somepagetitle');
-// Set other page properties
-//$owa->setProperty('foo', 'bar');
-//$owa->trackPageView();
 ini_set(
     'memory_limit',
     '8192M'
@@ -1033,6 +1024,12 @@ define(
     'CONFIG_MYSQL_TIME',
     'H:i:s'
 );
+
+define(
+    'CONFIG_MYSQL_TIME_HOURS_MINUTES',
+    'H:i'
+);
+
 define(
     'CONFIG_MYSQL_DATETIME',
     CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME

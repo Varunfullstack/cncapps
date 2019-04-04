@@ -9,7 +9,9 @@
 require_once "config.inc.php";
 require_once $cfg['path_dbe'] . '/DBEJContactAudit.php';
 require_once $cfg['path_bu'] . '/BUMail.inc.php';
-$test = new DBEJContactAudit($this);
+
+$thing = null;
+$test = new DBEJContactAudit($thing);
 
 $days = isset($_REQUEST['days']) ? $_REQUEST['days'] : 7;
 

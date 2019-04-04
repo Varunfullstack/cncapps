@@ -1,8 +1,8 @@
 <?php
 require_once("config.inc.php");
 require_once($cfg["path_bu"] . "/BUTeamPerformance.inc.php");
-
-$buTeamPerformance = new BUTeamPerformance($this);
+$thing = null;
+$buTeamPerformance = new BUTeamPerformance($thing);
 $buTeamPerformance->update(
     date('Y'),
     date('m')

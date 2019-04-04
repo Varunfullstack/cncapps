@@ -2338,14 +2338,14 @@ class CTSalesOrder extends CTCNC
             'payMethods'
         );
         while ($dbePaymentTerms->fetchNext()) {
-            $payMethodSelected = ($dsOrdhead->getValue("paymentTermsID") == $dbePaymentTerms->getValue(
+            $payMethodSelected = ($dsOrdhead->getValue(DBEPaymentTerms::paymentTermsID) == $dbePaymentTerms->getValue(
                 'paymentTermsID'
             ) ? CT_SELECTED : '');
             $this->template->set_var(
                 array(
                     'payMethodSelected' => $payMethodSelected,
-                    'paymentTermsID'    => $dbePaymentTerms->getValue('paymentTermsID'),
-                    'payMethodDesc'     => $dbePaymentTerms->getValue('description')
+                    'paymentTermsID'    => $dbePaymentTerms->getValue(DBEPaymentTerms::paymentTermsID),
+                    'payMethodDesc'     => $dbePaymentTerms->getValue(DBEPaymentTerms::description)
                 )
             );
             $this->template->parse(

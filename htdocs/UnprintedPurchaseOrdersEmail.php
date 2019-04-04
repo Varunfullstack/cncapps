@@ -9,10 +9,17 @@
 require_once("config.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
+$thing = null;
+define(
+    'OUTPUT_TO_SCREEN',
+    false
+);
 
-define('OUTPUT_TO_SCREEN', false);
-
-if (!$db1 = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD)) {
+if (!$db1 = mysqli_connect(
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD
+)) {
     echo 'Could not connect to mysql host ' . DB_HOST;
     exit;
 }
@@ -92,15 +99,15 @@ if (!OUTPUT_TO_SCREEN) {
     ob_end_clean();
     $result->free();
 
-    $buMail = new BUMail($this);
+    $buMail = new BUMail($thing);
 
     $toEmail = 'unprintedpo@' . CONFIG_PUBLIC_DOMAIN;
 
     $hdrs = array(
-        'From' => CONFIG_SALES_EMAIL,
-        'To' => $toEmail,
-        'Subject' => 'Unprinted Purchase Orders',
-        'Date' => date("r"),
+        'From'         => CONFIG_SALES_EMAIL,
+        'To'           => $toEmail,
+        'Subject'      => 'Unprinted Purchase Orders',
+        'Date'         => date("r"),
         'Content-Type' => 'text/html; charset=UTF-8'
     );
 
@@ -108,9 +115,9 @@ if (!OUTPUT_TO_SCREEN) {
 
     $mime_params = array(
         'text_encoding' => '7bit',
-        'text_charset' => 'UTF-8',
-        'html_charset' => 'UTF-8',
-        'head_charset' => 'UTF-8'
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
     );
     $body = $buMail->mime->get($mime_params);
 
