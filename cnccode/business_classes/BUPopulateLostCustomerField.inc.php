@@ -29,7 +29,7 @@ class BUPopulateLostCustomerField extends Business
             JOIN customer ON cus_custno = odh_custno
             WHERE cus_prospect = 'N'
             AND odh_type = 'C'
-            AND cus_became_customer_date <> '0000-00-00'
+            AND cus_became_customer_date is not null
             GROUP BY odh_custno";
 
         $result = $this->db->query($sql);
@@ -49,7 +49,10 @@ class BUPopulateLostCustomerField extends Business
             $row1 = $result1->fetch_object();
 
             if (
-                $row->lastOrderDate < date(CONFIG_MYSQL_DATETIME, strtotime('- 9 months')) &&
+                $row->lastOrderDate < date(
+                    CONFIG_MYSQL_DATETIME,
+                    strtotime('- 9 months')
+                ) &&
                 $row1->orderCount >= 4
             ) {
 
@@ -61,7 +64,7 @@ class BUPopulateLostCustomerField extends Business
                   cus_dropped_customer_date = '" . $row->lastOrderDate . "'
               WHERE
                   cus_custno = " . $row->cus_custno . "
-                  AND cus_dropped_customer_date = '0000-00-00'";
+                  AND cus_dropped_customer_date is null ";
 
                 if (!$this->db->query($sql)) {
                     echo "Error";

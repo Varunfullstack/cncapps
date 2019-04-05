@@ -2307,13 +2307,13 @@ class CTSalesOrder extends CTCNC
                     "%d/%m/%Y",
                     strtotime($dsOrdhead->getValue('date'))
                 ),
-                'requestedDate'      => ($dsOrdhead->getValue('requestedDate') != '0000-00-00' ? $dsOrdhead->getValue(
+                'requestedDate'      => ($dsOrdhead->getValue(DBEOrdhead::requestedDate) ? $dsOrdhead->getValue(
                     'requestedDate'
                 ) : 'N/A'),
-                'promisedDate'       => ($dsOrdhead->getValue('promisedDate') != '0000-00-00' ? $dsOrdhead->getValue(
+                'promisedDate'       => ($dsOrdhead->getValue(DBEOrdhead::promisedDate) ? $dsOrdhead->getValue(
                     'promisedDate'
                 ) : 'N/A'),
-                'expectedDate'       => ($dsOrdhead->getValue('expectedDate') != '0000-00-00' ? $dsOrdhead->getValue(
+                'expectedDate'       => ($dsOrdhead->getValue(DBEOrdhead::expectedDate) ? $dsOrdhead->getValue(
                     'expectedDate'
                 ) : 'N/A'),
                 'quotationOrdheadID' => substr(

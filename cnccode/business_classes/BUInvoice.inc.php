@@ -838,69 +838,6 @@ class BUInvoice extends Business
         ));
     }
 
-//    /**
-//     * Initialise new ordline dataset row
-//     * This DOES NOT change the database
-//     * @access public
-//     * @param $invheadID
-//     * @param $sequenceNo
-//     * @param $dsInvline
-//     */
-//    function initialiseNewOrdline($invheadID,
-//                                  $sequenceNo,
-//                                  &$dsInvline
-//    )
-//    {
-//        $this->setMethodName('initialiseNewOrdline');
-//        if (!$invheadID) {
-//            $this->raiseError('invheadID not passed');
-//        }
-//        if (!$sequenceNo) {
-//            $this->raiseError('sequenceNo not passed');
-//        }
-//        $dbeJInvline = new DBEJInvline($this);
-//        $dsInvline = new DSForm($this);
-//        $dsInvline->copyColumnsFrom($dbeJInvline);
-//        $dsInvline->setAllowEmpty('itemID');
-//        $dsInvline->setUpdateModeInsert();
-//        $dsInvline->setValue(
-//            DBEInvline::invheadID,
-//            $invheadID
-//        );
-//        $dsInvline->setValue(
-//            DBEInvline::itemID,
-//            ''
-//        );
-//        $dsInvline->setValue(
-//            DBEInvline::sequenceNo,
-//            $sequenceNo
-//        );
-//        $dsInvline->setValue(
-//            DBEPorline::qtyInvoiced,
-//            1
-//        );    // default 1
-//        $dsInvline->setValue(
-//            DBEPorline::qtyReceived,
-//            0
-//        );
-//        $dsInvline->setValue(
-//            DBEInvline::qtyInvoiced,
-//            0
-//        );
-//        $dsInvline->setValue(
-//            DBEInvline::curUnitCost,
-//            0
-//        );
-//        $dsInvline->setValue(
-//            DBEInvline::expectedDate,
-//            date(
-//                'Y-m-d',
-//                strtotime('+ 3 days')
-//            )
-//        ); // today + 3 days
-//        $dsInvline->post();
-//    }
-
     function moveLineUp($invheadID,
                         $sequenceNo
     )
@@ -1946,7 +1883,7 @@ class BUInvoice extends Business
         return $buPdfInvoice->generateBatchFile($dsInvhead);
 
     }
-    
+
     function regeneratePdfInvoice($invoiceID)
     {
         $dbeInvhead = new DBEInvhead($this);

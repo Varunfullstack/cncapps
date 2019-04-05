@@ -306,7 +306,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     )
                 );
 
-            if ($problems->getValue('alarmDate') && $problems->getValue('alarmDate') != '0000-00-00') {
+            if ($problems->getValue(DBEProblem::alarmDate)) {
 
                 $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
                         $problems->getValue('alarmDate')

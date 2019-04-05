@@ -507,8 +507,7 @@ class DataSet extends DataAccess
                         } else {
                             switch ($columnType) {
                                 case DA_DATE:
-                                    if ($value != '') {
-
+                                    if ($value) {
                                         $date = DateTime::createFromFormat(
                                             'd/m/Y',
                                             $value
@@ -530,11 +529,11 @@ class DataSet extends DataAccess
                                             );
                                         }
                                     } else {
-                                        $value = '0000-00-00';    // signifies no date
+                                        $value = null;    // signifies no date
                                     }
                                     break;
                                 case DA_TIME:
-                                    if ($value != '') {
+                                    if ($value) {
                                         if (!$this->isTime($value)) {
                                             $this->setMessage(
                                                 $fieldName,
@@ -605,10 +604,10 @@ class DataSet extends DataAccess
     }
 
     /**
-     * @return void
      * @param string $columnName Column for which to set message
      * @param string $message Message
      * @desc Set a form error message
+     * @return void
      */
     function setMessage($columnName,
                         $message

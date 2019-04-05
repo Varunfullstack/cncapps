@@ -520,17 +520,17 @@ class CTCustomerReviewMeeting extends CTCNC
 
         while ($dsServer->fetchNext()) {
 
-            if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
-                $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
+            if ($dsServer->getValue(DBEJCustomerItem::sOrderDate)) {
+                $purchaseDate = self::dateYMDtoDMY($dsServer->getValue(DBEJCustomerItem::sOrderDate));
             } else {
                 $purchaseDate = '';
             }
 
             $serverCareContractsTemplate->set_var(
                 array(
-                    'itemDescription' => $dsServer->getValue('itemDescription'),
-                    'serialNo'        => $dsServer->getValue('serialNo'),
-                    'serverName'      => $dsServer->getValue('serverName'),
+                    'itemDescription' => $dsServer->getValue(DBEJCustomerItem::itemDescription),
+                    'serialNo'        => $dsServer->getValue(DBEJCustomerItem::serialNo),
+                    'serverName'      => $dsServer->getValue(DBEJCustomerItem::serverName),
                     'purchaseDate'    => $purchaseDate,
                 )
             );

@@ -794,7 +794,7 @@ class CTInvoice extends CTCNC
         }
         $invheadID = $dsInvhead->getValue('invheadID');
         $invoiceType = $dsInvhead->getValue('type');
-        $datePrinted = $dsInvhead->getValue('datePrinted');
+        $datePrinted = $dsInvhead->getValue(DBEInvhead::datePrinted);
         $urlUpdateHeader =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -893,7 +893,7 @@ class CTInvoice extends CTCNC
         }
         // if there are lines then allow print
         if (
-            ($datePrinted != '0000-00-00') &
+            $datePrinted &&
             ($dsInvline->rowCount() > 0)
         ) {
             $urlPrint =
