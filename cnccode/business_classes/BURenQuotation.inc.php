@@ -740,7 +740,6 @@ class BURenQuotation extends Business
 
         if
         (
-            $this->dbeRenQuotation->getValue(DBEJRenQuotation::startDate) != '0000-00-00' AND
             $this->dbeRenQuotation->getValue(DBEJRenQuotation::startDate) AND
             $this->dbeRenQuotation->getValue(DBEJRenQuotation::qty) > 0 AND
             $this->dbeRenQuotation->getValue(DBEJRenQuotation::salePrice) > 0 AND

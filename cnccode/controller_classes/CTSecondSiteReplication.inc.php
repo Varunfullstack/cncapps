@@ -325,7 +325,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 $imageAgeDays = '';
 
             }
-            if ($record['secondsiteValidationSuspendUntilDate'] != '0000-00-00') {
+            if ($record['secondsiteValidationSuspendUntilDate']) {
                 $suspendedUntil = strftime(
                     "%d/%m/%Y",
                     strtotime($record['secondsiteValidationSuspendUntilDate'])

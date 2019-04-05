@@ -593,15 +593,15 @@ class BUSalesOrder extends Business
         );
         $dsOrdhead->setValue(
             DBEOrdhead::requestedDate,
-            '0000-00-00'
+            null
         );
         $dsOrdhead->setValue(
             DBEOrdhead::promisedDate,
-            '0000-00-00'
+            null
         );
         $dsOrdhead->setValue(
             DBEOrdhead::expectedDate,
-            '0000-00-00'
+            null
         );
 
         $dsOrdhead->setValue(

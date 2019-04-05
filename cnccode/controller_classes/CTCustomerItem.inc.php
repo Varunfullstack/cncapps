@@ -916,7 +916,6 @@ class CTCustomerItem extends CTCNC
 
         if (
             $dsCustomerItem->getValue('secondsiteValidationSuspendUntilDate') &&
-            $dsCustomerItem->getValue('secondsiteValidationSuspendUntilDate') != '0000-00-00' &&
             $dsCustomerItem->getValue('secondsiteSuspendedByUserID')
         ) {
             $buUser->getUserByID(

@@ -97,6 +97,109 @@
             <modifyDataType tableName="ordhead" columnName="odh_del_contact" newDataType="char(25)"/>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-16">
+        <sql>
+            UPDATE porhead
+            SET poh_ord_date = NULL
+            WHERE poh_ord_date = '0000-00-00';
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-17">
+        <sql>
+            UPDATE porhead
+            SET poh_required_by = NULL
+            WHERE poh_required_by = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-18">
+        <sql>
+            UPDATE customer
+            SET cus_became_customer_date = NULL
+            WHERE cus_became_customer_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-19">
+        <sql>
+            UPDATE customer
+            SET cus_dropped_customer_date = NULL
+            WHERE cus_dropped_customer_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-20">
+        <sql>
+            UPDATE custitem
+            SET startDate = NULL
+            WHERE startDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-21">
+        <sql>
+            UPDATE custitem
+            SET secondsiteValidationSuspendUntilDate = NULL
+            WHERE secondsiteValidationSuspendUntilDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-22">
+        <sql>
+            UPDATE problem
+            SET pro_alarm_date = NULL
+            WHERE pro_alarm_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-22">
+        <sql>
+            UPDATE custitem
+            SET cui_ord_date = NULL
+            WHERE cui_ord_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-23">
+        <sql>
+            UPDATE invhead
+            SET inh_date_printed = NULL
+            WHERE inh_date_printed = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-24">
+        <sql>
+            UPDATE porline
+            SET pol_exp_date = NULL
+            WHERE pol_exp_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-25">
+        <sql>
+            UPDATE ordhead
+            SET odh_req_date = NULL
+            WHERE odh_req_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-26">
+        <sql>
+            UPDATE ordhead
+            SET odh_prom_date = NULL
+            WHERE odh_prom_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
 
-
+    <changeSet author="pavwebdev" id="1554199133-27">
+        <sql>
+            UPDATE ordhead
+            SET odh_expect_date = NULL
+            WHERE odh_expect_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

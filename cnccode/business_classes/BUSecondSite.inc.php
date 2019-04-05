@@ -473,7 +473,6 @@ class BUSecondsite extends Business
     {
         if (
             $server['secondsiteValidationSuspendUntilDate'] &&
-            $server['secondsiteValidationSuspendUntilDate'] != '0000-00-00' &&
             $server['secondsiteValidationSuspendUntilDate'] > date('Y-m-d')
         ) {
 
@@ -640,7 +639,7 @@ class BUSecondsite extends Business
      * Get the size of file, platform- and architecture-independant.
      * This function supports 32bit and 64bit architectures and works fith large files > 2 GB
      * The return value type depends on platform/architecture: (float) when PHP_INT_SIZE < 8 or (int) otherwise
-     * @param   resource $fp
+     * @param resource $fp
      * @return  mixed (int|float) File size on success or (bool) FALSE on error
      */
     function my_filesize($filepath)

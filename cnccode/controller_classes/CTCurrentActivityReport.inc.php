@@ -1068,11 +1068,10 @@ class CTCurrentActivityReport extends CTCNC
             }
 
 
-            if ($dsResults->getValue('alarmDate') && $dsResults->getValue('alarmDate') != '0000-00-00') {
-
+            if ($dsResults->getValue(DBEProblem::alarmDate)) {
                 $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
-                        $dsResults->getValue('alarmDate')
-                    ) . ' ' . $dsResults->getValue('alarmTime');
+                        $dsResults->getValue(DBEProblem::alarmDate)
+                    ) . ' ' . $dsResults->getValue(DBEProblem::alarmTime);
 
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
@@ -1310,7 +1309,7 @@ class CTCurrentActivityReport extends CTCNC
     )
     {
 
-        if ($alarmDate && $alarmDate != '0000-00-00') {
+        if ($alarmDate) {
             $dateNow = strtotime(date('Y-m-d H:i'));
             $dateAlarm = strtotime($alarmDate . ' ' . $alarmTime);
 
