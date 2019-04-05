@@ -7,18 +7,26 @@ require_once($cfg["path_dbe"] . "/DBEInvline.inc.php");
 
 class DBEJInvline extends DBEInvline
 {
+
+    const itemDescription = "itemDescription";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("itemDescription", DA_STRING, DA_ALLOW_NULL, "itm_desc");
+        $this->addColumn(
+            self::itemDescription,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "itm_desc"
+        );
         $this->setAddColumnsOff();
     }
 
