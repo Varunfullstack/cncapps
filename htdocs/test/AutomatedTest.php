@@ -1,6 +1,5 @@
 <?php
 
-
 $files = scandir(__DIR__ . '/..');
 
 $phpFiles = [];
@@ -33,48 +32,66 @@ foreach ($files as $file) {
     var phpFiles = <?=  json_encode($phpFiles) ?>;
     var resultElement = document.getElementById('result');
 
-    phpFiles.map(
+
+    //we want to have at most 10 requests being sent at any given time
+
+    var inFlightRequests = 0;
+
+
+    var sendingFunctions = phpFiles.map(
         phpFile => {
 
             var url = window.location.protocol + "//" + window.location.host + '/' + phpFile;
 
-            return fetch(url)
-                .catch((error) => {
-                    console.log(error);
-                    debugger;
-                })
-                .then(
-                    (response) => {
-                        if (!response.ok) {
-                            return false;
+            return () => {
+                return fetch(url)
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                    .then(
+                        (response) => {
+                            if (!response.ok) {
+                                return false;
+                            }
+                            return response.text().then(text => {
+                                return text.indexOf('Fatal error') < 0 && text.indexOf('Warning') < 0
+                            })
                         }
-                        return response.text().then(text => {
-                            return text.indexOf('Fatal error') < 0 && text.indexOf('Warning') < 0
-                        })
-                    }
-                ).then(success => {
+                    ).then(success => {
 
-                    var element = document.createElement('div');
-                    if (success) {
+                        var element = document.createElement('div');
+                        if (success) {
 
-                        element.className = 'success';
-                        element.innerText = phpFile + " was tested successfully";
-                    } else {
-                        element.className = 'fail';
-                        element.append(`${phpFile} failed miserably `);
-                        var link = document.createElement('a');
+                            element.className = 'success';
+                            element.innerText = phpFile + " was tested successfully";
+                        } else {
+                            element.className = 'fail';
+                            element.append(`${phpFile} failed miserably `);
+                            var link = document.createElement('a');
 
-                        link.href = url;
-                        link.setAttribute('target', '_blank');
-                        link.innerText = url;
-                        element.append(link)
-                    }
-                    resultElement.append(
-                        element
-                    )
-                })
-        }
-    )
+                            link.href = url;
+                            link.setAttribute('target', '_blank');
+                            link.innerText = url;
+                            element.append(link)
+                        }
+                        resultElement.append(
+                            element
+                        )
+                    })
+            }
+        });
+
+    function sendRequests(sendingFunctions) {
+        Promise.all(sendingFunctions.map(sendingFunction => {
+            return sendingFunction();
+        })).then(() => alert('All Done'));
+    }
+
+    function done() {
+
+    }
+
+    sendRequests(sendingFunctions);
 
 
 </script>

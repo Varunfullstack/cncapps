@@ -2,6 +2,7 @@
 require_once("config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
 GLOBAL $cfg;
+$thing = null;
 page_open(
     array(
         'sess' => PHPLIB_CLASSNAME_SESSION,
@@ -10,14 +11,14 @@ page_open(
         ''
     )
 );
-$dbeUser = new DBEUser($this);
+$dbeUser = new DBEUser($thing);
 $dbeUser->setValue(
     'userID',
     $GLOBALS['auth']->is_authenticated()
 );
 $dbeUser->getRow();
 
-$dbeUserList = new DBEUser($this);
+$dbeUserList = new DBEUser($thing);
 $dbeUserList->getRows();
 
 if (!isset($_REQUEST['attendeeUserID'])) {

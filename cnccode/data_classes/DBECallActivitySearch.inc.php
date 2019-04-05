@@ -328,7 +328,7 @@ class DBECallActivitySearch extends DBEntity
         $toDate,
         $contractCustomerItemID,
         $callActTypeID,
-        $linkedSalesOrderID,
+        $linkedSalesOrderID = null,
         $managementReviewOnly = 'N',
         $breachedSlaOption = '',
         $sortColumn = false,

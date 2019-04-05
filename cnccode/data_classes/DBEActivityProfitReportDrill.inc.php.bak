@@ -8,6 +8,25 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEActivityProfitReport extends DBEntity
 {
+    const CustomerID = "CustomerID";
+    const CustomerName = "CustomerName";
+    const PPHours = "PPHours";
+    const PPCharge = "PPCharge";
+    const TMHours = "TMHours";
+    const TMCharge = "TMCharge";
+    const SDHours = "SDHours";
+    const SDCharge = "SDCharge";
+    const SCHours = "SCHours";
+    const SCCharge = "SCCharge";
+    const SDPaid = "SDPaid";
+    const SCPaid = "SCPaid";
+    const TotalHours = "TotalHours";
+    const SDProRata = "SDProRata";
+    const SCProRata = "SCProRata";
+    const CncCost = "CncCost";
+    const Profit = "Profit";
+
+
     /**
      * calls constructor()
      * @access public
@@ -20,87 +39,87 @@ class DBEActivityProfitReport extends DBEntity
         parent::__construct($owner);
         $this->setTableName("callactivity");
         $this->addColumn(
-            "CustomerID",
+            self::CustomerID,
             DA_ID,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "CustomerName",
+            self::CustomerName,
             DA_STRING,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "PPHours",
+            self::PPHours,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "PPCharge",
+            self::PPCharge,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "TMHours",
+            self::TMHours,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "TMCharge",
+            self::TMCharge,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SDHours",
+            self::SDHours,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SDCharge",
+            self::SDCharge,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SCHours",
+            self::SCHours,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SCCharge",
+            self::SCCharge,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SDPaid",
+            self::SDPaid,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SCPaid",
+            self::SCPaid,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "TotalHours",
+            self::TotalHours,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SDProRata",
+            self::SDProRata,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "SCProRata",
+            self::SCProRata,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "CncCost",
+            self::CncCost,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "Profit",
+            self::Profit,
             DA_FLOAT,
             DA_ALLOW_NULL
         );

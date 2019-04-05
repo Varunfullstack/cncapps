@@ -8,49 +8,58 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 class DBEJRenDomain extends DBECustomerItem
 {
 
+    const customerName = "customerName";
+    const siteName = "siteName";
+    const itemDescription = "itemDescription";
+    const itemTypeDescription = "itemTypeDescription";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
+
 
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "customerName",
+            self::customerName,
             DA_STRING,
             DA_NOT_NULL,
             "cus_name"
         );
         $this->addColumn(
-            "siteName",
+            self::siteName,
             DA_STRING,
             DA_NOT_NULL,
             "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)"
         );
         $this->addColumn(
-            "itemDescription",
+            self::itemDescription,
             DA_STRING,
             DA_NOT_NULL,
             "itm_desc"
         );
         $this->addColumn(
-            "itemTypeDescription",
+            self::itemTypeDescription,
             DA_STRING,
             DA_NOT_NULL,
             "ity_desc"
         );
         $this->addColumn(
-            "itemID",
+            self::itemID,
             DA_ID,
             DA_NOT_NULL,
             "itm_itemno"
         );
         $this->addColumn(
-            "invoiceFromDate",
+            self::invoiceFromDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceToDate",
+            self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT(
@@ -61,13 +70,13 @@ class DBEJRenDomain extends DBECustomerItem
  				, '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceFromDateYMD",
+            self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%%Y-%m-%d') as invoiceFromDateYMD"
         );
         $this->addColumn(
-            "invoiceToDateYMD",
+            self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT(
@@ -78,13 +87,13 @@ class DBEJRenDomain extends DBECustomerItem
          , '%Y-%m-%d')as invoiceToDateYMD"
         );
         $this->addColumn(
-            "salePrice",
+            self::salePrice,
             DA_FLOAT,
             DA_NOT_NULL,
             "itm_sstk_price"
         );
         $this->addColumn(
-            "costPrice",
+            self::costPrice,
             DA_FLOAT,
             DA_NOT_NULL,
             "itm_sstk_cost"

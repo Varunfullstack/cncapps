@@ -34,6 +34,6 @@ $buRenBroadband->createRenewalsSalesOrders();
 $buRenContract->createRenewalsSalesOrders();
 $buRenHosting->createRenewalsSalesOrders();
 $buRenQuotation->createRenewalsQuotations();
-//$buRenDomain->createRenewalsSalesOrders();
+$buRenDomain->createRenewalsSalesOrders();
 echo "PROCESS COMPLETED";
 ?>
