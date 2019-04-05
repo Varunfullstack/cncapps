@@ -45,7 +45,57 @@
         <dropNotNullConstraint tableName="callactivity" columnName="caa_cuino" columnDataType="int(11) unsigned"/>
     </changeSet>
     <changeSet author="pavwebdev" id="1554199133-7">
-        <dropNotNullConstraint tableName="callactivity" columnName="caa_secondsite_error_cuino" columnDataType="int(11) unsigned"/>
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_secondsite_error_cuino"
+                               columnDataType="int(11) unsigned"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-8">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_fax" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_fax" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-9">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_phone" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_phone" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-10">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_salutation" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_salutation" newDataType="char(15)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-11">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_contact" newDataType="char(35)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_contact" newDataType="char(25)"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1554199133-12">
+        <modifyDataType tableName="ordhead" columnName="odh_del_fax" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_fax" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-13">
+        <modifyDataType tableName="ordhead" columnName="odh_del_phone" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_phone" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-14">
+        <modifyDataType tableName="ordhead" columnName="odh_del_salutation" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_salutation" newDataType="char(15)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-15">
+        <modifyDataType tableName="ordhead" columnName="odh_del_contact" newDataType="char(35)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_contact" newDataType="char(25)"/>
+        </rollback>
     </changeSet>
 
 

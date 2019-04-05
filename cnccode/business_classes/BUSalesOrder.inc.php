@@ -24,6 +24,9 @@ require_once($cfg["path_dbe"] . "/DBEPorhead.inc.php");
 
 class BUSalesOrder extends Business
 {
+
+    const DBEOrdheadCustomerName = "customerName";
+
     var $dbeQuotation = "";
     var $dbeJQuotation = "";
 
@@ -43,6 +46,15 @@ class BUSalesOrder extends Business
      * Get ordhead rows whose names match the search string or, if the string is numeric, try to select by customerID
      * @parameter String $nameSearchString String to match against or numeric customerID
      * @parameter DataSet &$dsResults results
+     * @param $customerID
+     * @param $ordheadID
+     * @param $orderType
+     * @param $custPORef
+     * @param $lineText
+     * @param $fromDate
+     * @param $toDate
+     * @param $userID
+     * @param $dsResults
      * @return bool : One or more rows
      * @access public
      */
@@ -61,7 +73,7 @@ class BUSalesOrder extends Business
         $this->setMethodName('search');
         $dbeJOrdhead = new DBEJOrdhead($this);
         if ($ordheadID) {
-            $ret = ($this->getDatasetByPK(
+            return ($this->getDatasetByPK(
                 $ordheadID,
                 $dbeJOrdhead,
                 $dsResults
@@ -79,9 +91,16 @@ class BUSalesOrder extends Business
             $dbeJOrdhead->initialise();
             $dsResults = $dbeJOrdhead;
         }
-        return $ret;
+        return true;
     }
 
+    /**
+     * @param $ordheadID
+     * @param DataSet $dsOrdhead
+     * @param DataSet $dsJOrdline
+     * @param $dsDeliveryContact
+     * @return bool
+     */
     function getOrderWithCustomerName($ordheadID,
                                       &$dsOrdhead,
                                       &$dsJOrdline,
@@ -108,8 +127,7 @@ class BUSalesOrder extends Business
                 $ordheadID
             );
             $dbeJOrdline->getRowsByColumn(
-                DBEJOrdline::ordheadID,
-                DBEJOrdline::sequenceNo
+                DBEJOrdline::ordheadID
             );
             $this->getData(
                 $dbeJOrdline,
@@ -118,7 +136,7 @@ class BUSalesOrder extends Business
             $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
             $buCustomer = new BUCustomer($this);
             $buCustomer->getContactByID(
-                $dsOrdhead->getValue('delContactID'),
+                $dsOrdhead->getValue(DBEOrdhead::delContactID),
                 $dsDeliveryContact
             );
         }
@@ -147,12 +165,12 @@ class BUSalesOrder extends Business
             }
 
             $dbeOrdline->setValue(
-                'ordheadID',
+                DBEOrdline::ordheadID,
                 $ordheadID
             );
             $dbeOrdline->getRowsByColumn(
-                'ordheadID',
-                'sequenceNo'
+                DBEOrdline::ordheadID,
+                DBEOrdline::sequenceNo
             );
             $this->getData(
                 $dbeOrdline,
@@ -168,9 +186,9 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('getOrdheadByID');
-        $ret = FALSE;
         if (!$ordheadID) {
             $this->raiseError('order ID not passed');
+            return false;
         } else {
             $dbeJOrdhead = new DBEJOrdhead($this);
             return ($this->getDatasetByPK(
@@ -187,7 +205,6 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('getOrdlineByIDSeqNo');
-        $ret = FALSE;
 
         if (!$ordheadID) {
             $this->raiseError('order ID not passed');
@@ -197,11 +214,11 @@ class BUSalesOrder extends Business
         }
         $dbeJOrdline = new DBEJOrdline($this);
         $dbeJOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dbeJOrdline->setValue(
-            'sequenceNo',
+            DBEOrdline::sequenceNo,
             $sequenceNo
         );
 
@@ -216,6 +233,7 @@ class BUSalesOrder extends Business
      * Send email to order delivery contact from cnc user as PDF attachment
      * @parameter Integer $ordheadID Order ID
      * @parameter Integer $userID CNC User
+     * @param DataSet $dsData
      * @return bool : Successfully sent
      * @access public
      */
@@ -226,7 +244,7 @@ class BUSalesOrder extends Business
             $dsData,
             $this->dbeQuotation
         );
-        return $dsData->getValue('quotationID');
+        return $dsData->getValue(DBEQuotation::quotationID);
     }
 
     function deleteQuotationDoc($quotationID)
@@ -242,6 +260,7 @@ class BUSalesOrder extends Business
     /**
      * Get next quotation version to use for given sales order no
      * @parameter Integer $ordheadID Order ID
+     * @param $ordheadID
      * @return integer version no
      * @access public
      */
@@ -249,7 +268,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('getNextQuoteVersion');
         $this->dbeQuotation->setValue(
-            'ordheadID',
+            DBEQuotation::ordheadID,
             $ordheadID
         );
         return ($this->dbeQuotation->getNextVersionNo());
@@ -258,7 +277,9 @@ class BUSalesOrder extends Business
     /**
      * Get sent quotations for order
      * @parameter Integer $ordheadID Order ID
-     * @return DataSet Quotations
+     * @param $ordheadID
+     * @param $dsResults
+     * @return bool Quotations
      * @access public
      */
     function getQuotationsByOrdheadID($ordheadID,
@@ -266,26 +287,28 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('getQuotationsByOrdheadID');
-        $ret = FALSE;
+
         if (!$ordheadID) {
             $this->raiseError('order ID not passed');
+            return false;
         } else {
             $this->dbeJQuotation->setValue(
-                'ordheadID',
+                DBEQuotation::ordheadID,
                 $ordheadID
             );
             $this->dbeJQuotation->getRowsByOrdheadID();
-            $ret = ($this->getData(
+            return ($this->getData(
                 $this->dbeJQuotation,
                 $dsResults
             ));
         }
-        return $ret;
+
     }
 
     /**
      * Get all users
      * @parameter DataSet &$dsResults results
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -304,6 +327,8 @@ class BUSalesOrder extends Business
      * Get one users
      * @parameter integer $userID user
      * @parameter DataSet &$dsResults results
+     * @param $userID
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -324,6 +349,8 @@ class BUSalesOrder extends Business
      * Get one quote
      * @parameter integer $quoteID quoteID
      * @parameter DataSet &$dsResults results
+     * @param $quoteID
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -342,6 +369,7 @@ class BUSalesOrder extends Business
     /**
      * Delete quote and all associated quote documents
      * @parameter integer $quoteID quoteID
+     * @param $ordheadID
      * @return bool : Success
      * @access public
      */
@@ -352,6 +380,8 @@ class BUSalesOrder extends Business
         if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
+
+        $dsOrdhead = new DataSet($this);
         if (!$this->getOrdheadByID(
             $ordheadID,
             $dsOrdhead
@@ -360,9 +390,11 @@ class BUSalesOrder extends Business
             exit;
         }
 
+        $orderType = $dsOrdhead->getValue(DBEOrdhead::type);
+
         if (
-            ($dsOrdhead->getValue('type') <> 'I') &
-            ($dsOrdhead->getValue('type') <> 'Q')
+            ($orderType <> 'I') &
+            ($orderType <> 'Q')
         ) {
             $this->raiseError('Must be quote or initial order');
             exit;
@@ -370,7 +402,7 @@ class BUSalesOrder extends Business
 
         if (
             ($orderType <> 'Q') &&
-            $this->countPurchaseOrders($dsOrdhead->getValue('ordheadID')) > 0
+            $this->countPurchaseOrders($dsOrdhead->getValue(DBEOrdhead::ordheadID)) > 0
         ) {
             $this->raiseError('Cannot delete order because purchase orders exist');
             exit;
@@ -378,7 +410,7 @@ class BUSalesOrder extends Business
 
         if ($orderType <> 'Q') {
             $buInvoice = new BUInvoice($this);
-            if ($buInvoice->countInvoicesByOrdheadID($dsOrdhead->getValue('ordheadID')) > 0) {
+            if ($buInvoice->countInvoicesByOrdheadID($dsOrdhead->getValue(DBEOrdhead::ordheadID)) > 0) {
                 $this->raiseError('Cannot delete order because invoices exist');
                 exit;
             }
@@ -389,17 +421,18 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setPKValue($ordheadID);
         $dbeOrdhead->deleteRow();
         $dbeOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dbeOrdline->deleteRowsByOrderID();
 
         // delete any quote rows and associated documents
         $this->dbeQuotation->setValue(
-            'ordheadID',
+            DBEQuotation::ordheadID,
             $ordheadID
         );
-        $this->dbeQuotation->getRowsByColumn('ordheadID');
+        $this->dbeQuotation->getRowsByColumn(DBEQuotation::ordheadID);
+        $dsQuotation = new DataSet($this);
         $this->getData(
             $this->dbeQuotation,
             $dsQuotation
@@ -408,9 +441,11 @@ class BUSalesOrder extends Business
         while ($dsQuotation->fetchNext()) {
             $quoteFile =
                 'quotes/' .
-                $dsQuotation->getValue('ordheadID') . '_' . $dsQuotation->getValue('versionNo') . '.' .
-                $dsQuotation->getValue('fileExtension');
-            $this->deleteQuotationDoc($dsQuotation->getValue('quotationID'));
+                $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
+                    DBEQuotation::versionNo
+                ) . '.' .
+                $dsQuotation->getValue(DBEQuotation::fileExtension);
+            $this->deleteQuotationDoc($dsQuotation->getValue(DBEQuotation::quotationID));
             unlink($quoteFile);
         }
         return TRUE;
@@ -419,7 +454,7 @@ class BUSalesOrder extends Business
     /**
      * Initialse fields for new order
      * @parameter integer $customerID
-     * @param $dsOrdhead
+     * @param DataSet $dsOrdhead
      * @param $dsOrdline
      * @param $dsCustomer
      * @param bool $directDebit
@@ -444,15 +479,15 @@ class BUSalesOrder extends Business
             $transactionType
         );
         $buCustomer = new BUCustomer($this);
-        $buCustomer->setProspectFlagOff($dsOrdhead->getValue('customerID'));
+        $buCustomer->setProspectFlagOff($dsOrdhead->getValue(DBEOrdhead::customerID));
     }
 
     /**
      * Initialse fields for new quote
      * @parameter integer $customerID
-     * @param $dsOrdhead
-     * @param $dsOrdline
-     * @param $dsCustomer
+     * @param DataSet $dsOrdhead
+     * @param DataSet $dsOrdline
+     * @param DataSet $dsCustomer
      * @param string $type
      * @param bool $directDebit
      * @param string $transactionType
@@ -473,7 +508,7 @@ class BUSalesOrder extends Business
         $dsOrdhead->copyColumnsFrom($dbeOrdhead);
         $dsOrdhead->setUpdateModeInsert();
         $dsOrdhead->addColumn(
-            'customerName',
+            self::DBEOrdheadCustomerName,
             DA_STRING,
             DA_NOT_NULL
         );
@@ -484,7 +519,7 @@ class BUSalesOrder extends Business
         );
 
         $dsOrdhead->setValue(
-            'customerName',
+            self::DBEOrdheadCustomerName,
             $dsCustomer->getValue(DBECustomer::name)
         );
         $dsOrdhead->setValue(
@@ -496,9 +531,10 @@ class BUSalesOrder extends Business
             $type
         );
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
-        $vatCode = $dsHeader->getValue('stdVATCode');
+        $vatCode = $dsHeader->getValue(DBEHeader::stdVATCode);
         $dsOrdhead->setValue(
             DBEOrdhead::vatCode,
             $vatCode
@@ -606,6 +642,11 @@ class BUSalesOrder extends Business
         $dsOrdline->copyColumnsFrom($dbeOrdline);
     }
 
+    /**
+     * @param $customerID
+     * @param $siteNo
+     * @param DataSet $dsOrdhead
+     */
     function setInvoiceSiteAndContact($customerID,
                                       $siteNo,
                                       &$dsOrdhead
@@ -614,73 +655,81 @@ class BUSalesOrder extends Business
         $this->setMethodName('setInvoiceSiteAndContact');
         $buCustomer = new BUCustomer($this);
 
+        $dsSite = new DataSet($this);
         $buCustomer->getSiteByCustomerIDSiteNo(
             $customerID,
             $siteNo,
             $dsSite
         );
         $dsOrdhead->setValue(
-            'invSiteNo',
+            DBEOrdhead::invSiteNo,
             $siteNo
         );
         $dsOrdhead->setValue(
-            'invAdd1',
+            DBEOrdhead::invAdd1,
             $dsSite->getValue(DBESite::add1)
         );
         $dsOrdhead->setValue(
-            'invAdd2',
+            DBEOrdhead::invAdd2,
             $dsSite->getValue(DBESite::add2)
         );
         $dsOrdhead->setValue(
-            'invAdd3',
+            DBEOrdhead::invAdd3,
             $dsSite->getValue(DBESite::add3)
         );
         $dsOrdhead->setValue(
-            'invTown',
+            DBEOrdhead::invTown,
             $dsSite->getValue(DBESite::town)
         );
         $dsOrdhead->setValue(
-            'invCounty',
+            DBEOrdhead::invCounty,
             $dsSite->getValue(DBESite::county)
         );
         $dsOrdhead->setValue(
-            'invPostcode',
+            DBEOrdhead::invPostcode,
             $dsSite->getValue(DBESite::postcode)
         );
         $dsOrdhead->setValue(
-            'invSitePhone',
+            DBEOrdhead::invSitePhone,
             $dsSite->getValue(DBESite::phone)
         );
+        $dsContact = new DataSet($this);
+
         $buCustomer->getContactByID(
             $dsSite->getValue(DBESite::invoiceContactID),
             $dsContact
         );
         $dsOrdhead->setValue(
-            'invContactID',
-            $dsContact->getValue('contactID')
+            DBEOrdhead::invContactID,
+            $dsContact->getValue(DBEContact::contactID)
         );
         $dsOrdhead->setValue(
-            'invContactName',
-            $dsContact->getValue('lastName')
+            DBEOrdhead::invContactName,
+            $dsContact->getValue(DBEContact::lastName)
         );
         $dsOrdhead->setValue(
-            'invContactSalutation',
-            $dsContact->getValue('firstName')
+            DBEOrdhead::invContactSalutation,
+            $dsContact->getValue(DBEContact::firstName)
         );
         $dsOrdhead->setValue(
-            'invContactPhone',
-            $dsContact->getValue('phone')
+            DBEOrdhead::invContactPhone,
+            $dsContact->getValue(DBEContact::phone)
         );
         $dsOrdhead->setValue(
-            'invContactFax',
-            $dsContact->getValue('fax')
+            DBEOrdhead::invContactFax,
+            $dsContact->getValue(DBEContact::fax)
         );
         $dsOrdhead->setValue(
-            'invContactEmail',
-            $dsContact->getValue('email')
+            DBEOrdhead::invContactEmail,
+            $dsContact->getValue(DBEContact::email)
         );
     }
 
+    /**
+     * @param $customerID
+     * @param $siteNo
+     * @param DataSet $dsOrdhead
+     */
     function setDeliverySiteAndContact($customerID,
                                        $siteNo,
                                        &$dsOrdhead
@@ -689,70 +738,73 @@ class BUSalesOrder extends Business
         $this->setMethodName('setDeliverSiteAndContact');
         $buCustomer = new BUCustomer($this);
 
+        $dsSite = new DataSet($this);
         $buCustomer->getSiteByCustomerIDSiteNo(
             $customerID,
             $siteNo,
             $dsSite
         );
         $dsOrdhead->setValue(
-            'delSiteNo',
+            DBEOrdhead::delSiteNo,
             $siteNo
         );
         $dsOrdhead->setValue(
-            'delAdd1',
+            DBEOrdhead::delAdd1,
             $dsSite->getValue(DBESite::add1)
         );
         $dsOrdhead->setValue(
-            'delAdd2',
+            DBEOrdhead::delAdd2,
             $dsSite->getValue(DBESite::add2)
         );
         $dsOrdhead->setValue(
-            'delAdd3',
+            DBEOrdhead::delAdd3,
             $dsSite->getValue(DBESite::add3)
         );
         $dsOrdhead->setValue(
-            'delTown',
+            DBEOrdhead::delTown,
             $dsSite->getValue(DBESite::town)
         );
         $dsOrdhead->setValue(
-            'delCounty',
+            DBEOrdhead::delCounty,
             $dsSite->getValue(DBESite::county)
         );
         $dsOrdhead->setValue(
-            'delPostcode',
+            DBEOrdhead::delPostcode,
             $dsSite->getValue(DBESite::postcode)
         );
         $dsOrdhead->setValue(
-            'delSitePhone',
+            DBEOrdhead::delSitePhone,
             $dsSite->getValue(DBESite::phone)
         );
+        $dsContact = new DataSet($this);
+
         $buCustomer->getContactByID(
             $dsSite->getValue(DBESite::deliverContactID),
             $dsContact
         );
         $dsOrdhead->setValue(
-            'delContactID',
-            $dsContact->getValue('contactID')
+            DBEOrdhead::delContactID,
+            $dsContact->getValue(DBEContact::contactID)
         );
         $dsOrdhead->setValue(
-            'delContactName',
-            $dsContact->getValue('lastName')
+            DBEOrdhead::delContactName,
+            $dsContact->getValue(DBEContact::lastName)
         );
         $dsOrdhead->setValue(
-            'delContactSalutation',
-            $dsContact->getValue('firstName')
+            DBEOrdhead::delContactSalutation,
+            $dsContact->getValue(DBEContact::firstName)
         );
         $dsOrdhead->setValue(
-            'delContactPhone',
-            $dsContact->getValue('phone')
+            DBEOrdhead::delContactPhone,
+            $dsContact->getValue(DBEContact::phone)
         );
         $dsOrdhead->setValue(
-            'delContactFax',
-            $dsContact->getValue('fax')
+            DBEOrdhead::delContactFax,
+            $dsContact->getValue(DBEContact::fax)
         );
         $dsOrdhead->setValue(
-            'delContactEmail',
-            $dsContact->getValue('email')
+            DBEOrdhead::delContactEmail,
+            $dsContact->getValue(DBEContact::email)
         );
     }
 
@@ -769,71 +821,75 @@ class BUSalesOrder extends Business
         $dbeOrdhead->getRow();
         $buCustomer = new BUCustomer($this);
 
+        $dsSite = new DataSet($this);
         $buCustomer->getSiteByCustomerIDSiteNo(
-            $dbeOrdhead->getValue('customerID'),
+            $dbeOrdhead->getValue(DBEOrdhead::customerID),
             $siteNo,
             $dsSite
         );
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue(
-            'invSiteNo',
+            DBEOrdhead::invSiteNo,
             $siteNo
         );
         $dbeOrdhead->setValue(
-            'invAdd1',
+            DBEOrdhead::invAdd1,
             $dsSite->getValue(DBESite::add1)
         );
         $dbeOrdhead->setValue(
-            'invAdd2',
+            DBEOrdhead::invAdd2,
             $dsSite->getValue(DBESite::add2)
         );
         $dbeOrdhead->setValue(
-            'invAdd3',
+            DBEOrdhead::invAdd3,
             $dsSite->getValue(DBESite::add3)
         );
         $dbeOrdhead->setValue(
-            'invTown',
+            DBEOrdhead::invTown,
             $dsSite->getValue(DBESite::town)
         );
         $dbeOrdhead->setValue(
-            'invCounty',
+            DBEOrdhead::invCounty,
             $dsSite->getValue(DBESite::county)
         );
         $dbeOrdhead->setValue(
-            'invPostcode',
+            DBEOrdhead::invPostcode,
             $dsSite->getValue(DBESite::postcode)
         );
         $dbeOrdhead->setValue(
-            'invSitePhone',
+            DBEOrdhead::invSitePhone,
             $dsSite->getValue(DBESite::phone)
         );
+
+        $dsContact = new DataSet($this);
+
         $buCustomer->getContactByID(
             $dsSite->getValue(DBESite::invoiceContactID),
             $dsContact
         );
         $dbeOrdhead->setValue(
-            'invContactID',
-            $dsContact->getValue('contactID')
+            DBEOrdhead::invContactID,
+            $dsContact->getValue(DBEContact::contactID)
         );
         $dbeOrdhead->setValue(
-            'invContactName',
-            $dsContact->getValue('lastName')
+            DBEOrdhead::invContactName,
+            $dsContact->getValue(DBEContact::lastName)
         );
         $dbeOrdhead->setValue(
-            'invContactSalutation',
-            $dsContact->getValue('firstName')
+            DBEOrdhead::invContactSalutation,
+            $dsContact->getValue(DBEContact::firstName)
         );
         $dbeOrdhead->setValue(
-            'invContactPhone',
-            $dsContact->getValue('phone')
+            DBEOrdhead::invContactPhone,
+            $dsContact->getValue(DBEContact::phone)
         );
         $dbeOrdhead->setValue(
-            'invContactFax',
-            $dsContact->getValue('fax')
+            DBEOrdhead::invContactFax,
+            $dsContact->getValue(DBEContact::fax)
         );
         $dbeOrdhead->setValue(
-            'invContactEmail',
-            $dsContact->getValue('email')
+            DBEOrdhead::invContactEmail,
+            $dsContact->getValue(DBEContact::email)
         );
         $dbeOrdhead->post();
         return TRUE;
@@ -852,71 +908,74 @@ class BUSalesOrder extends Business
         $dbeOrdhead->getRow();
         $buCustomer = new BUCustomer($this);
 
+        $dsSite = new DataSet($this);
+
         $buCustomer->getSiteByCustomerIDSiteNo(
-            $dbeOrdhead->getValue('customerID'),
+            $dbeOrdhead->getValue(DBEOrdhead::customerID),
             $siteNo,
             $dsSite
         );
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue(
-            'delSiteNo',
+            DBEOrdhead::delSiteNo,
             $siteNo
         );
         $dbeOrdhead->setValue(
-            'delAdd1',
+            DBEOrdhead::delAdd1,
             $dsSite->getValue(DBESite::add1)
         );
         $dbeOrdhead->setValue(
-            'delAdd2',
+            DBEOrdhead::delAdd2,
             $dsSite->getValue(DBESite::add2)
         );
         $dbeOrdhead->setValue(
-            'delAdd3',
+            DBEOrdhead::delAdd3,
             $dsSite->getValue(DBESite::add3)
         );
         $dbeOrdhead->setValue(
-            'delTown',
+            DBEOrdhead::delTown,
             $dsSite->getValue(DBESite::town)
         );
         $dbeOrdhead->setValue(
-            'delCounty',
+            DBEOrdhead::delCounty,
             $dsSite->getValue(DBESite::county)
         );
         $dbeOrdhead->setValue(
-            'delPostcode',
+            DBEOrdhead::delPostcode,
             $dsSite->getValue(DBESite::postcode)
         );
         $dbeOrdhead->setValue(
-            'delSitePhone',
+            DBEOrdhead::delSitePhone,
             $dsSite->getValue(DBESite::phone)
         );
+        $dsContact = new DataSet($this);
         $buCustomer->getContactByID(
             $dsSite->getValue(DBESite::deliverContactID),
             $dsContact
         );
         $dbeOrdhead->setValue(
-            'delContactID',
-            $dsContact->getValue('contactID')
+            DBEOrdhead::delContactID,
+            $dsContact->getValue(DBEContact::contactID)
         );
         $dbeOrdhead->setValue(
-            'delContactName',
-            $dsContact->getValue('lastName')
+            DBEOrdhead::delContactName,
+            $dsContact->getValue(DBEContact::lastName)
         );
         $dbeOrdhead->setValue(
-            'delContactSalutation',
-            $dsContact->getValue('firstName')
+            DBEOrdhead::delContactSalutation,
+            $dsContact->getValue(DBEContact::firstName)
         );
         $dbeOrdhead->setValue(
-            'delContactPhone',
-            $dsContact->getValue('phone')
+            DBEOrdhead::delContactPhone,
+            $dsContact->getValue(DBEContact::phone)
         );
         $dbeOrdhead->setValue(
-            'delContactFax',
-            $dsContact->getValue('fax')
+            DBEOrdhead::delContactFax,
+            $dsContact->getValue(DBEContact::fax)
         );
         $dbeOrdhead->setValue(
-            'delContactEmail',
-            $dsContact->getValue('email')
+            DBEOrdhead::delContactEmail,
+            $dsContact->getValue(DBEContact::email)
         );
         $dbeOrdhead->post();
         return TRUE;
@@ -938,33 +997,35 @@ class BUSalesOrder extends Business
         $dbeOrdhead->getRow();
         $dbeOrdhead->setUpdateModeUpdate();
         $buCustomer = new BUCustomer($this);
+
+        $dsContact = new DataSet($this);
         $buCustomer->getContactByID(
             $contactID,
             $dsContact
         );
         $dbeOrdhead->setValue(
-            'invContactID',
-            $dsContact->getValue('contactID')
+            DBEOrdhead::invContactID,
+            $dsContact->getValue(DBEContact::contactID)
         );
         $dbeOrdhead->setValue(
-            'invContactName',
-            $dsContact->getValue('lastName')
+            DBEOrdhead::invContactName,
+            $dsContact->getValue(DBEContact::lastName)
         );
         $dbeOrdhead->setValue(
-            'invContactSalutation',
-            $dsContact->getValue('firstName')
+            DBEOrdhead::invContactSalutation,
+            $dsContact->getValue(DBEContact::firstName)
         );
         $dbeOrdhead->setValue(
-            'invContactPhone',
-            $dsContact->getValue('phone')
+            DBEOrdhead::invContactPhone,
+            $dsContact->getValue(DBEContact::phone)
         );
         $dbeOrdhead->setValue(
-            'invContactFax',
-            $dsContact->getValue('fax')
+            DBEOrdhead::invContactFax,
+            $dsContact->getValue(DBEContact::fax)
         );
         $dbeOrdhead->setValue(
-            'invContactEmail',
-            $dsContact->getValue('email')
+            DBEOrdhead::invContactEmail,
+            $dsContact->getValue(DBEContact::email)
         );
         $dbeOrdhead->post();
         return TRUE;
@@ -986,43 +1047,42 @@ class BUSalesOrder extends Business
         $dbeOrdhead->getRow();
         $dbeOrdhead->setUpdateModeUpdate();
         $buCustomer = new BUCustomer($this);
+        $dsContact = new DataSet($this);
         $buCustomer->getContactByID(
             $contactID,
             $dsContact
         );
         $dbeOrdhead->setValue(
-            'delContactID',
-            $dsContact->getValue('contactID')
+            DBEOrdhead::delContactID,
+            $dsContact->getValue(DBEContact::contactID)
         );
         $dbeOrdhead->setValue(
-            'delContactName',
-            $dsContact->getValue('lastName')
+            DBEOrdhead::delContactName,
+            $dsContact->getValue(DBEContact::lastName)
         );
         $dbeOrdhead->setValue(
-            'delContactSalutation',
-            $dsContact->getValue('firstName')
+            DBEOrdhead::delContactSalutation,
+            $dsContact->getValue(DBEContact::firstName)
         );
         $dbeOrdhead->setValue(
-            'delContactPhone',
-            $dsContact->getValue('phone')
+            DBEOrdhead::delContactPhone,
+            $dsContact->getValue(DBEContact::phone)
         );
         $dbeOrdhead->setValue(
-            'delContactFax',
-            $dsContact->getValue('fax')
+            DBEOrdhead::delContactFax,
+            $dsContact->getValue(DBEContact::fax)
         );
         $dbeOrdhead->setValue(
-            'delContactEmail',
-            $dsContact->getValue('email')
+            DBEOrdhead::delContactEmail,
+            $dsContact->getValue(DBEContact::email)
         );
         $dbeOrdhead->post();
         return TRUE;
     }
 
     /**
-     * Update sales order line
-     * @parameter integer $quoteID quoteID
-     * @return bool : Success
-     * @access public
+     * @param DataSet $dsOrdline
+     * @param string $action
      */
     function updateOrderLine(&$dsOrdline,
                              $action = "U"
@@ -1030,7 +1090,7 @@ class BUSalesOrder extends Business
     {
         $this->setMethodName('updateOrderLine');
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($dsOrdline->getValue('ordheadID'));
+        $dbeOrdhead->setPKValue($dsOrdline->getValue(DBEOrdline::ordheadID));
         if (!$dbeOrdhead->getRow()) {
             $this->raiseError('order header not found');
         }
@@ -1038,100 +1098,101 @@ class BUSalesOrder extends Business
         $dbeOrdline = new DBEOrdline($this);
 
         $dbeOrdline->setValue(
-            'lineType',
-            $dsOrdline->getValue('lineType')
+            DBEOrdline::lineType,
+            $dsOrdline->getValue(DBEOrdline::lineType)
         );
         $dbeOrdline->setValue(
-            'qtyOrdered',
-            $dsOrdline->getValue('qtyOrdered')
+            DBEOrdline::qtyOrdered,
+            $dsOrdline->getValue(DBEOrdline::qtyOrdered)
         );
         $dbeOrdline->setValue(
-            'curUnitSale',
-            $dsOrdline->getValue('curUnitSale')
+            DBEOrdline::curUnitSale,
+            $dsOrdline->getValue(DBEOrdline::curUnitSale)
         );
         $dbeOrdline->setValue(
-            'curUnitCost',
-            $dsOrdline->getValue('curUnitCost')
+            DBEOrdline::curUnitCost,
+            $dsOrdline->getValue(DBEOrdline::curUnitCost)
         );
         $dbeOrdline->setValue(
-            'supplierID',
-            $dsOrdline->getValue('supplierID')
+            DBEOrdline::supplierID,
+            $dsOrdline->getValue(DBEOrdline::supplierID)
         );
         $dbeOrdline->setValue(
-            'renewalCustomerItemID',
-            $dsOrdline->getValue('renewalCustomerItemID')
+            DBEOrdline::renewalCustomerItemID,
+            $dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)
         );
         $dbeOrdline->setValue(
-            'ordheadID',
-            $dsOrdline->getValue('ordheadID')
+            DBEOrdline::ordheadID,
+            $dsOrdline->getValue(DBEOrdline::ordheadID)
         );
         $dbeOrdline->setValue(
-            'sequenceNo',
-            $dsOrdline->getValue('sequenceNo')
+            DBEOrdline::sequenceNo,
+            $dsOrdline->getValue(DBEOrdline::sequenceNo)
         );
         $dbeOrdline->setValue(
-            'customerID',
-            $dbeOrdhead->getValue('customerID')
+            DBEOrdline::customerID,
+            $dbeOrdhead->getValue(DBEOrdhead::customerID)
         );
         $dbeOrdline->setValue(
-            'qtyDespatched',
+            DBEOrdline::qtyDespatched,
             0
         );
         $dbeOrdline->setValue(
-            'qtyLastDespatched',
+            DBEOrdline::qtyLastDespatched,
             0
         );
-        if ($dsOrdline->getValue('lineType') == 'I') {
+        if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
             $dbeOrdline->setValue(
-                'itemID',
-                $dsOrdline->getValue('itemID')
+                DBEOrdline::itemID,
+                $dsOrdline->getValue(DBEOrdline::itemID)
             );
             $buItem = new BUItem($this);
+            $dsItem = new DataSet($this);
             if ($buItem->getItemByID(
-                $dsOrdline->getValue('itemID'),
+                $dsOrdline->getValue(DBEOrdline::itemID),
                 $dsItem
             )) {
                 $dbeOrdline->setValue(
-                    'stockcat',
-                    $dsItem->getValue('stockcat')
+                    DBEOrdline::stockcat,
+                    $dsItem->getValue(DBEItem::stockcat)
                 );
             }
             $dbeOrdline->setValue(
-                'description',
-                $dsOrdline->getValue('description')
+                DBEOrdline::description,
+                $dsOrdline->getValue(DBEOrdline::description)
             );
             $dbeOrdline->setValue(
-                'curTotalCost',
-                $dsOrdline->getValue('curUnitCost') * $dsOrdline->getValue('qtyOrdered')
+                DBEOrdline::curTotalCost,
+                $dsOrdline->getValue(DBEOrdline::curUnitCost) * $dsOrdline->getValue(DBEOrdline::qtyOrdered)
             );
             $dbeOrdline->setValue(
-                'curTotalSale',
-                $dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered')
+                DBEOrdline::curTotalSale,
+                $dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(DBEOrdline::qtyOrdered)
             );
         } else {
             $dbeOrdline->setValue(
-                'qtyOrdered',
+                DBEOrdline::qtyOrdered,
                 0
             );
             $dbeOrdline->setValue(
-                'curUnitCost',
+                DBEOrdline::curUnitCost,
                 0
             );
             $dbeOrdline->setValue(
-                'curUnitSale',
+                DBEOrdline::curUnitSale,
                 0
             );
             $dbeOrdline->setValue(
-                'curTotalCost',
+                DBEOrdline::curTotalCost,
                 0
             );
             $dbeOrdline->setValue(
-                'curTotalSale',
+                DBEOrdline::curTotalSale,
                 0
             );
             $dbeOrdline->setValue(
-                'description',
-                $dsOrdline->getValue('description')
+                DBEOrdline::description,
+                $dsOrdline->getValue(DBEOrdline::description)
             );
         }
         if ($action == "U") {
@@ -1142,12 +1203,11 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setUpdatedTime();
     }
 
+
     /**
-     * Initialise new ordline dataset row
-     * This DOES NOT change the database
-     * @parameter dateset $dsOrdline
-     * @return bool : Success
-     * @access public
+     * @param $ordheadID
+     * @param $sequenceNo
+     * @param $dsOrdline
      */
     function initialiseNewOrdline($ordheadID,
                                   $sequenceNo,
@@ -1166,38 +1226,34 @@ class BUSalesOrder extends Business
         $dsOrdline->copyColumnsFrom($dbeJOrdline);
         $dsOrdline->setUpdateModeInsert();
         $dsOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dsOrdline->setValue(
-            'itemID',
+            DBEOrdline::itemID,
             null
         );
         $dsOrdline->setValue(
-            'supplierID',
+            DBEOrdline::supplierID,
             null
         );
         $dsOrdline->setValue(
-            'sequenceNo',
+            DBEOrdline::sequenceNo,
             $sequenceNo
         );
         $dsOrdline->setValue(
-            'lineType',
+            DBEOrdline::lineType,
             'I'
         );    // default item line
         $dsOrdline->setValue(
-            'qtyOrdered',
+            DBEOrdline::qtyOrdered,
             1
         );    // default 1
         $dsOrdline->post();
     }
 
     /**
-     * Insert new ordline dataset row
-     * This changes the database
-     * @parameter dateset $dsOrdline
-     * @return bool : Success
-     * @access public
+     * @param DataSet $dsOrdline
      */
     function insertNewOrderLine(&$dsOrdline)
     {
@@ -1206,27 +1262,27 @@ class BUSalesOrder extends Business
         $dsOrdline->fetchNext();
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->setValue(
-            'ordheadID',
-            $dsOrdline->getValue('ordheadID')
+            DBEOrdline::ordheadID,
+            $dsOrdline->getValue(DBEOrdline::ordheadID)
         );
-        if ($dbeOrdline->countRowsByColumn('ordheadID') > 0) {
+        if ($dbeOrdline->countRowsByColumn(DBEOrdline::ordheadID) > 0) {
             // shuffle down existing rows before inserting new one
             $dbeOrdline->setValue(
-                'ordheadID',
-                $dsOrdline->getValue('ordheadID')
+                DBEOrdline::ordheadID,
+                $dsOrdline->getValue(DBEOrdline::ordheadID)
             );
             $dbeOrdline->setValue(
-                'sequenceNo',
-                $dsOrdline->getValue('sequenceNo')
+                DBEOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEOrdline::sequenceNo)
             );
             $dbeOrdline->shuffleRowsDown();
         }
-        $ret = ($this->updateOrderLine(
+        $this->updateOrderLine(
             $dsOrdline,
             "I"
-        ));
+        );
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($dsOrdline->getValue('ordheadID'));
+        $dbeOrdhead->setPKValue($dsOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
@@ -1245,11 +1301,11 @@ class BUSalesOrder extends Business
         }
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dbeOrdline->setValue(
-            'sequenceNo',
+            DBEOrdline::sequenceNo,
             $sequenceNo
         );
         $dbeOrdline->moveRow('UP');
@@ -1270,11 +1326,11 @@ class BUSalesOrder extends Business
         }
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dbeOrdline->setValue(
-            'sequenceNo',
+            DBEOrdline::sequenceNo,
             $sequenceNo
         );
         $dbeOrdline->moveRow('DOWN');
@@ -1298,20 +1354,20 @@ class BUSalesOrder extends Business
 
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dbeOrdline->setValue(
-            'sequenceNo',
+            DBEOrdline::sequenceNo,
             $sequenceNo
         );
         $dbeOrdline->deleteRow();
         $dbeOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
         $dbeOrdline->setValue(
-            'sequenceNo',
+            DBEOrdline::sequenceNo,
             $sequenceNo
         );
         $dbeOrdline->shuffleRowsUp();
@@ -1322,6 +1378,10 @@ class BUSalesOrder extends Business
 
     /**
      * Converts a quote into an order
+     * @param $ordheadID
+     * @param $convertToOrder
+     * @param DataSet $dsSelectedOrderLine
+     * @return bool|float|int|string
      */
     function convertQuoteToOrder($ordheadID,
                                  $convertToOrder,
@@ -1338,6 +1398,8 @@ class BUSalesOrder extends Business
         )) {
             $this->raiseError('orderLines object not passed');
         }
+        $dsOrdhead = new DataSet($this);
+        $dsOrdline = new DataSet($this);
         if (!$this->getOrderWithCustomerName(
             $ordheadID,
             $dsOrdhead,
@@ -1351,7 +1413,7 @@ class BUSalesOrder extends Business
         $dsOrdhead->setPK(0);
         $dsOrdhead->fetchNext();
         // if all lines selected AND convert flag set so change quote status to initial
-        $originalNo = $dsOrdhead->getValue('ordheadID');
+        $originalNo = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
 
         if (
             ($dsOrdline->rowCount() == $dsSelectedOrderLine->rowCount()) and
@@ -1359,15 +1421,15 @@ class BUSalesOrder extends Business
         ) {
             $dsOrdhead->setUpdateModeUpdate();
             $dsOrdhead->setValue(
-                'quotationOrdheadID',
+                DBEOrdhead::quotationOrdheadID,
                 $originalNo
             );
             $dsOrdhead->setValue(
-                'type',
+                DBEOrdhead::type,
                 'I'
             ); // all lines selected so convert to initial order
             $dsOrdhead->setValue(
-                'date',
+                DBEOrdhead::date,
                 date('Y-m-d')
             );
             $dsOrdhead->post();
@@ -1379,19 +1441,19 @@ class BUSalesOrder extends Business
         } else {        // create new initial order (leaving quote intact)
             $dsOrdhead->setUpdateModeUpdate();
             $dsOrdhead->setValue(
-                'ordheadID',
+                DBEOrdhead::ordheadID,
                 0
             );
             $dsOrdhead->setValue(
-                'type',
+                DBEOrdhead::type,
                 'I'
             );
             $dsOrdhead->setValue(
-                'quotationOrdheadID',
+                DBEOrdhead::quotationOrdheadID,
                 $originalNo
             );
             $dsOrdhead->setValue(
-                'date',
+                DBEOrdhead::date,
                 date('Y-m-d')
             );
             $dsOrdhead->post();
@@ -1399,25 +1461,25 @@ class BUSalesOrder extends Business
                 $dsOrdhead,
                 $dbeOrdhead
             );    // create new order header
-            $newOrdheadID = $dsOrdhead->getValue('ordheadID');
+            $newOrdheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
             // Add selected lines to new order
             $sequenceNo = 0;
             $dsNewOrdline = new DataSet($this);
             $dsNewOrdline->copyColumnsFrom($dsOrdline);
             while ($dsOrdline->fetchNext()) {
                 if ($dsSelectedOrderLine->search(
-                    'sequenceNo',
-                    $dsOrdline->getValue("sequenceNo")
+                    DBEOrdline::sequenceNo,
+                    $dsOrdline->getValue(DBEOrdline::sequenceNo)
                 )) {
                     $sequenceNo++;
                     $dsNewOrdline->setUpdateModeInsert();
                     $dsNewOrdline->row = $dsOrdline->row;
                     $dsNewOrdline->setValue(
-                        'ordheadID',
+                        DBEOrdline::ordheadID,
                         $newOrdheadID
                     );
                     $dsNewOrdline->setValue(
-                        'sequenceNo',
+                        DBEOrdline::sequenceNo,
                         $sequenceNo
                     );
                     $dsNewOrdline->post();
@@ -1436,7 +1498,7 @@ class BUSalesOrder extends Business
             $ret = $newOrdheadID;
         }
         $buCustomer = new BUCustomer($this);
-        $buCustomer->setProspectFlagOff($dsOrdhead->getValue('customerID'));
+        $buCustomer->setProspectFlagOff($dsOrdhead->getValue(DBEOrdhead::customerID));
 
         /*
          * Now we need to go through the lines looking for any quotation or domain renwals
@@ -1450,7 +1512,7 @@ class BUSalesOrder extends Business
         $buRenQuotation = null;
         while ($dsOrdline->fetchNext()) {
 
-            if ($dsOrdline->getValue('renewalCustomerItemID')) {
+            if ($dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)) {
 
                 /*
                  * Only updates renewal if found on one of these renewal tables
@@ -1460,7 +1522,7 @@ class BUSalesOrder extends Business
                 }
 
                 $buRenQuotation->processQuotationRenewal(
-                    $dsOrdline->getValue('renewalCustomerItemID'),
+                    $dsOrdline->getValue(DBEOrdline::renewalCustomerItemID),
                     $convertToOrder
                 );
 
@@ -1472,6 +1534,11 @@ class BUSalesOrder extends Business
     }
 
 
+    /**
+     * @param $ordheadID
+     * @param $supplierID
+     * @param DataSet $dsSelectedOrderLine
+     */
     function changeSupplier($ordheadID,
                             $supplierID,
                             &$dsSelectedOrderLine
@@ -1502,11 +1569,11 @@ class BUSalesOrder extends Business
         while ($dsSelectedOrderLine->fetchNext()) {
             $dbeOrdline->getRowBySequence(
                 $ordheadID,
-                $dsSelectedOrderLine->getValue('sequenceNo')
+                $dsSelectedOrderLine->getValue(DBEOrdline::sequenceNo)
             );
-            if ($dbeOrdline->getValue('lineType') != 'C') {
+            if ($dbeOrdline->getValue(DBEOrdline::lineType) != 'C') {
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     $supplierID
                 );
                 $dbeOrdline->updateRow();
@@ -1517,7 +1584,8 @@ class BUSalesOrder extends Business
     /**
      * Create a duplicate quotation from an existing sales order
      * NOTE: The name of this function is missleading and has NOTHING to do with renewals!
-     *
+     * @param $ordheadID
+     * @return bool|float|int|string
      */
     function createRenewalQuote($ordheadID)
     {
@@ -1525,6 +1593,8 @@ class BUSalesOrder extends Business
         if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
+        $dsOrdhead = new DataSet($this);
+        $dsOrdline = new DataSet($this);
         if (!$this->getOrderWithCustomerName(
             $ordheadID,
             $dsOrdhead,
@@ -1538,22 +1608,18 @@ class BUSalesOrder extends Business
         $dsOrdhead->setPK(0);
         $dsOrdhead->fetchNext();
 
-        $originalNo = $dsOrdhead->getValue('ordheadID');
+
         $dsOrdhead->setUpdateModeUpdate();
         $dsOrdhead->setValue(
-            'ordheadID',
+            DBEOrdhead::ordheadID,
             0
         );
         $dsOrdhead->setValue(
-            'type',
+            DBEOrdhead::type,
             'Q'
         );
         $dsOrdhead->setValue(
-            'originalOrdheadID',
-            $originalNo
-        );
-        $dsOrdhead->setValue(
-            'date',
+            DBEOrdhead::date,
             date('Y-m-d')
         );
         $dsOrdhead->post();
@@ -1561,7 +1627,7 @@ class BUSalesOrder extends Business
             $dsOrdhead,
             $dbeOrdhead
         );    // create new order header
-        $newOrdheadID = $dsOrdhead->getValue('ordheadID');
+        $newOrdheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
         // Add selected lines to new order
         $sequenceNo = 0;
         $dsNewOrdline = new DataSet($this);
@@ -1571,19 +1637,19 @@ class BUSalesOrder extends Business
             $dsNewOrdline->setUpdateModeInsert();
             $dsNewOrdline->row = $dsOrdline->row;
             $dsNewOrdline->setValue(
-                'ordheadID',
+                DBEOrdline::ordheadID,
                 $newOrdheadID
             );
             $dsNewOrdline->setValue(
-                'sequenceNo',
+                DBEOrdline::sequenceNo,
                 $sequenceNo
             );
             $dsNewOrdline->setValue(
-                'qtyDespatched',
+                DBEOrdline::qtyDespatched,
                 0
             );
             $dsNewOrdline->setValue(
-                'qtyLastDespatched',
+                DBEOrdline::qtyLastDespatched,
                 0
             );
             $dsNewOrdline->post();
@@ -1594,6 +1660,9 @@ class BUSalesOrder extends Business
 
     /**
      * Delete multiple Order Lines
+     * @param $ordheadID
+     * @param DataSet $dsSelectedOrderLine
+     * @return bool
      */
     function deleteLines($ordheadID,
                          &$dsSelectedOrderLine
@@ -1626,7 +1695,7 @@ class BUSalesOrder extends Business
         while ($dsSelectedOrderLine->fetchNext()) {
             $this->deleteOrderLine(
                 $ordheadID,
-                $dsSelectedOrderLine->getValue('sequenceNo') - $deletedCount
+                $dsSelectedOrderLine->getValue(DBEOrdline::sequenceNo) - $deletedCount
             );
             $deletedCount++;
         }
@@ -1650,19 +1719,19 @@ class BUSalesOrder extends Business
         }
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue(
-            'custPORef',
+            DBEOrdhead::custPORef,
             $custPORef
         );
         $dbeOrdhead->setValue(
-            'paymentTermsID',
+            DBEOrdhead::paymentTermsID,
             $paymentTermsID
         );
         $dbeOrdhead->setValue(
-            'partInvoice',
+            DBEOrdhead::partInvoice,
             $partInvoice
         );
         $dbeOrdhead->setValue(
-            'addItem',
+            DBEOrdhead::addItem,
             $addItem
         );
         $dbeOrdhead->post();
@@ -1684,15 +1753,15 @@ class BUSalesOrder extends Business
         }
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue(
-            'serviceRequestCustomerItemID',
+            DBEOrdhead::serviceRequestCustomerItemID,
             $serviceRequestCustomerItemID
         );
         $dbeOrdhead->setValue(
-            'serviceRequestPriority',
+            DBEOrdhead::serviceRequestPriority,
             $serviceRequestPriority
         );
         $dbeOrdhead->setValue(
-            'serviceRequestText',
+            DBEOrdhead::serviceRequestText,
             $serviceRequestText
         );
         $dbeOrdhead->post();
@@ -1709,15 +1778,11 @@ class BUSalesOrder extends Business
         }
         $dbeOrdhead->setUpdateModeUpdate();
         $dbeOrdhead->setValue(
-            'serviceRequestCustomerItemID',
+            DBEOrdhead::serviceRequestCustomerItemID,
             null
         );
         $dbeOrdhead->setValue(
-            'servicePriority',
-            null
-        );
-        $dbeOrdhead->setValue(
-            'serviceRequestText',
+            DBEOrdhead::serviceRequestText,
             null
         );
         $dbeOrdhead->post();
@@ -1728,6 +1793,9 @@ class BUSalesOrder extends Business
      * amalgamate same item lines onto one
      * sort by supplier/sequence no
      * exclude comment lines
+     * @param $ordheadID
+     * @param $dsOrdline
+     * @return bool
      */
     function getOrderItemsForPO($ordheadID,
                                 &$dsOrdline
@@ -1753,10 +1821,10 @@ class BUSalesOrder extends Business
         $this->setMethodName('countPurchaseOrders');
         $dbePorhead = new DBEPorhead($this);
         $dbePorhead->setValue(
-            'ordheadID',
+            DBEPorhead::ordheadID,
             $ordheadID
         );
-        return ($dbePorhead->countRowsByColumn('ordheadID'));
+        return ($dbePorhead->countRowsByColumn(DBEPorhead::ordheadID));
     }
 
     function countLinkedServiceRequests($ordheadID)
@@ -1764,10 +1832,10 @@ class BUSalesOrder extends Business
         $this->setMethodName('countLinkedServiceRequests');
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
-            'linkedSalesOrderID',
+            DBEProblem::linkedSalesOrderID,
             $ordheadID
         );
-        return ($dbeProblem->countRowsByColumn('linkedSalesOrderID'));
+        return ($dbeProblem->countRowsByColumn(DBEProblem::linkedSalesOrderID));
     }
 
     function getLinkedServiceRequestID($ordheadID)
@@ -1775,17 +1843,19 @@ class BUSalesOrder extends Business
         $this->setMethodName('getLinkedServiceRequestID');
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
-            'linkedSalesOrderID',
+            DBEProblem::linkedSalesOrderID,
             $ordheadID
         );
-        $dbeProblem->getRowByColumn('linkedSalesOrderID');
-        return $dbeProblem->getValue('problemID');
+        $dbeProblem->getRowByColumn(DBEProblem::linkedSalesOrderID);
+        return $dbeProblem->getValue(DBEProblem::problemID);
     }
 
     /**
      * Update all sales order lines with given qty, cost and sale values
      * @parameter dataset $dsOrdline dataset
-     * @return bool : Success
+     * @param $ordheadID
+     * @param DataSet $dsOrdline
+     * @return void : Success
      * @access public
      */
     function updateOrderLineValues($ordheadID,
@@ -1802,42 +1872,42 @@ class BUSalesOrder extends Business
         $dsOrdline->initialise();
         while ($dsOrdline->fetchNext()) {
             $dbeOrdline->setValue(
-                'ordheadID',
+                DBEOrdline::ordheadID,
                 $ordheadID
             );
             $dbeOrdline->setValue(
-                'sequenceNo',
-                $dsOrdline->getValue('sequenceNo')
+                DBEOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEOrdline::sequenceNo)
             );
             $dbeOrdline->getRow();
             $dbeOrdline->setValue(
-                'qtyOrdered',
-                $dsOrdline->getValue('qtyOrdered')
+                DBEOrdline::qtyOrdered,
+                $dsOrdline->getValue(DBEOrdline::qtyOrdered)
             );
             $dbeOrdline->setValue(
-                'curUnitSale',
-                $dsOrdline->getValue('curUnitSale')
+                DBEOrdline::curUnitSale,
+                $dsOrdline->getValue(DBEOrdline::curUnitSale)
             );
             $dbeOrdline->setValue(
-                'curUnitCost',
-                $dsOrdline->getValue('curUnitCost')
+                DBEOrdline::curUnitCost,
+                $dsOrdline->getValue(DBEOrdline::curUnitCost)
             );
             $dbeOrdline->setValue(
-                'curUnitCost',
-                $dsOrdline->getValue('curUnitCost')
+                DBEOrdline::curUnitCost,
+                $dsOrdline->getValue(DBEOrdline::curUnitCost)
             );
             $dbeOrdline->setValue(
-                'curTotalCost',
-                $dsOrdline->getValue('curUnitCost') * $dsOrdline->getValue('qtyOrdered')
+                DBEOrdline::curTotalCost,
+                $dsOrdline->getValue(DBEOrdline::curUnitCost) * $dsOrdline->getValue(DBEOrdline::qtyOrdered)
             );
             $dbeOrdline->setValue(
-                'curTotalSale',
-                $dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered')
+                DBEOrdline::curTotalSale,
+                $dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(DBEOrdline::qtyOrdered)
             );
             // this is to get around a bug I just found where the string does not get escaped!!!
             $dbeOrdline->setValue(
-                'description',
-                $dbeOrdline->getValue('description')
+                DBEOrdline::description,
+                $dbeOrdline->getValue(DBEOrdline::description)
             );
             $dbeOrdline->updateRow();
         }
@@ -1847,6 +1917,8 @@ class BUSalesOrder extends Business
     /**
      * Called from BUPurchaseInv in order to force direct delivery sales order to completed when
      * all purchase orders have been authorised.
+     * @param $ordheadID
+     * @return bool
      */
     function setStatusCompleted($ordheadID)
     {
@@ -1856,7 +1928,7 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setStatusCompleted();
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $ordheadID
         );
 //			$dbeOrdline->setRowsToDespatched();
@@ -1865,6 +1937,11 @@ class BUSalesOrder extends Business
 
     /**
      * copy lines from one sales order and paste them to the end of another
+     * @param $fromOrdheadID
+     * @param $toOrdheadID
+     * @param bool $keepRenewals
+     * @param bool $sequenceNo
+     * @return bool
      */
     function pasteLinesFromOrder($fromOrdheadID,
                                  $toOrdheadID,
@@ -1878,21 +1955,21 @@ class BUSalesOrder extends Business
         $dbeToOrdline = new DBEOrdline($this);
 
         $dbeFromOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $fromOrdheadID
         );
         $dbeFromOrdline->getRowsByColumn(
-            'ordheadID',
-            'sequenceNo'
+            DBEOrdline::ordheadID,
+            DBEOrdline::sequenceNo
         );
 
         $dbeToOrdline->setValue(
-            'ordheadID',
+            DBEOrdline::ordheadID,
             $toOrdheadID
         );
         $dbeToOrdline->getRowsByColumn(
-            'ordheadID',
-            'sequenceNo'
+            DBEOrdline::ordheadID,
+            DBEOrdline::sequenceNo
         );
         $dbeToOrdline->resetQueryString();
 
@@ -1929,24 +2006,24 @@ class BUSalesOrder extends Business
                 );
             }
             $dbeToOrdline->setValue(
-                'ordheadID',
+                DBEOrdline::ordheadID,
                 $toOrdheadID
             );
             $dbeToOrdline->setValue(
-                'qtyDespatched',
+                DBEOrdline::qtyDespatched,
                 0
             );
             $dbeToOrdline->setValue(
-                'qtyLastDespatched',
+                DBEOrdline::qtyLastDespatched,
                 0
             );
             $dbeToOrdline->setValue(
-                'sequenceNo',
+                DBEOrdline::sequenceNo,
                 $sequenceNo
             );
             if (!$keepRenewals) {
                 $dbeToOrdline->setValue(
-                    'renewalCustomerItemID',
+                    DBEOrdline::renewalCustomerItemID,
                     0
                 );
             }
@@ -2081,5 +2158,4 @@ WHERE odl_ordno = $ordheadID
 
     }
 
-}// End of class
-?>
+}

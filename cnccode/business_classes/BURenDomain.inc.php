@@ -120,19 +120,19 @@ class BURenDomain extends Business
         $dsCustomerItem->setUpdateModeInsert();
 
         $dsCustomerItem->setValue(
-            'customerItemID',
+            DBEJCustomerItem::customerItemID,
             0
         );
         $dsCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
         $dsCustomerItem->setValue(
-            'itemID',
+            DBEJCustomerItem::itemID,
             $itemID
         );
         $dsCustomerItem->setValue(
-            'siteNo',
+            DBEJCustomerItem::siteNo,
             $siteNo
         );
 
@@ -152,7 +152,7 @@ class BURenDomain extends Business
     {
 
         $this->dbeRenDomain->setValue(
-            'customerItemID',
+            DBEJRenDomain::customerItemID,
             $customerItemID
         );
         $this->dbeRenDomain->getRowsByColumn('customerItemID');
@@ -190,10 +190,10 @@ class BURenDomain extends Business
             </tr>
             <?php while ($this->dbeJRenDomain->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenDomain->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenDomain->getValue('itemDescription') ?></td>
-                    <td><?php echo $this->dbeJRenDomain->getValue('notes') ?></td>
-                    <td><?php echo $this->dbeJRenDomain->getValue('invoiceToDate') ?></td>
+                    <td><?php echo $this->dbeJRenDomain->getValue(DBEJRenDomain::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenDomain->getValue(DBEJRenDomain::itemDescription) ?></td>
+                    <td><?php echo $this->dbeJRenDomain->getValue(DBEJRenDomain::notes) ?></td>
+                    <td><?php echo $this->dbeJRenDomain->getValue(DBEJRenDomain::invoiceToDate) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -257,12 +257,12 @@ class BURenDomain extends Business
                 contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
             </div>
             <?php
-            if ($dbeJCustomerItem->getRow($this->dbeJRenDomain->getValue('customerItemID'))) {
+            if ($dbeJCustomerItem->getRow($this->dbeJRenDomain->getValue(DBEJRenDomain::customerItemID))) {
                 /*
                  * Group many domains for same customer under one sales order
                  */
                 if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
+                    $previousCustomerID != $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID) ||
                     (
                         !$generateInvoice &&
                         $this->dbeJRenDomain->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
@@ -271,10 +271,10 @@ class BURenDomain extends Business
                 ) {
                     if ($generateInvoice && $dsOrdhead) {
 
-                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
                         $buSalesOrder->getOrderByOrdheadID(
-                            $dsOrdhead->getValue('ordheadID'),
+                            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                             $dsOrdhead,
                             $dsOrdline
                         );
@@ -288,13 +288,13 @@ class BURenDomain extends Business
                     /*
                      *  create order header
                      */
-                    $dbeCustomer->getRow($dbeJCustomerItem->getValue('customerID'));
+                    $dbeCustomer->getRow($dbeJCustomerItem->getValue(DBEJCustomerItem::customerID));
                     $this->getData(
                         $dbeCustomer,
                         $dsCustomer
                     );
 
-
+                    $dsOrdhead = new DataSet($this);
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
@@ -308,61 +308,61 @@ class BURenDomain extends Business
                 $generateInvoice = $this->dbeJRenDomain->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
                 // period comment line
                 $line++;
-                $description = $this->dbeJRenDomain->getValue('notes');
+                $description = $this->dbeJRenDomain->getValue(DBEJRenDomain::notes);
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -374,66 +374,71 @@ class BURenDomain extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
-                    $dbeJCustomerItem->getValue('itemID'),
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
                 );
                 $dbeOrdline->setValue(
-                    'stockcat',
-                    $dsItem->getValue('stockcat')
+                    DBEOrdline::stockcat,
+                    $dsItem->getValue(DBEItem::stockcat)
                 );
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    $this->dbeJRenDomain->getValue('customerItemID')
+                    DBEOrdline::renewalCustomerItemID,
+                    $this->dbeJRenDomain->getValue(DBEJRenDomain::customerItemID)
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
-                    $dbeJCustomerItem->getValue('itemID')
+                    DBEOrdline::itemID,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID)
                 );
                 $dbeOrdline->setValue(
-                    'description',
-                    $dbeJCustomerItem->getValue('itemDescription')
+                    DBEOrdline::description,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     1
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
-                    ($dsItem->getValue('curUnitSale') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths')
+                    DBEOrdline::curUnitSale,
+                    ($dsItem->getValue(DBEItem::curUnitSale) / 12) * $this->dbeJRenDomain->getValue(
+                        DBEJRenDomain::invoicePeriodMonths
+                    )
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
-                    ($dsItem->getValue('curUnitCost') / 12) * $this->dbeJRenDomain->getValue('invoicePeriodMonths')
+                    DBEOrdline::curUnitCost,
+                    ($dsItem->getValue(DBEItem::curUnitCost) / 12) * $this->dbeJRenDomain->getValue(
+                        DBEJRenDomain::invoicePeriodMonths
+                    )
                 );
 
                 $dbeOrdline->insertRow();
@@ -441,62 +446,62 @@ class BURenDomain extends Business
                 // period comment line
                 $line++;
                 $description = $this->dbeJRenDomain->getValue(
-                        'invoiceFromDate'
-                    ) . ' to ' . $this->dbeJRenDomain->getValue('invoiceToDate');
+                        DBEJRenDomain::invoiceFromDate
+                    ) . ' to ' . $this->dbeJRenDomain->getValue(DBEJRenDomain::invoiceToDate);
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -506,18 +511,18 @@ class BURenDomain extends Business
                  * set generated date
                  */
                 $dbeRenDomainUpdate->setValue(
-                    'customerItemID',
+                    DBEJCustomerItem::customerItemID,
                     $this->dbeJRenDomain->getPKValue()
                 );
                 $dbeRenDomainUpdate->getRow();
                 $dbeRenDomainUpdate->setValue(
-                    'totalInvoiceMonths',
-                    $this->dbeJRenDomain->getValue('totalInvoiceMonths') +
-                    $this->dbeJRenDomain->getValue('invoicePeriodMonths')
+                    DBEJCustomerItem::totalInvoiceMonths,
+                    $this->dbeJRenDomain->getValue(DBEJRenDomain::totalInvoiceMonths) +
+                    $this->dbeJRenDomain->getValue(DBEJRenDomain::invoicePeriodMonths)
                 );
                 $dbeRenDomainUpdate->updateRow();
 
-                $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
+                $previousCustomerID = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
 
             }
 
@@ -528,10 +533,10 @@ class BURenDomain extends Business
        */
         if ($generateInvoice && $generatedOrder) {
 
-            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
             $buSalesOrder->getOrderByOrdheadID(
-                $dsOrdhead->getValue('ordheadID'),
+                $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                 $dsOrdhead,
                 $dsOrdline
             );
@@ -559,8 +564,8 @@ class BURenDomain extends Business
 
         if
         (
-            $this->dbeRenDomain->getValue('installationDate') &&
-            $this->dbeRenDomain->getValue('invoicePeriodMonths')
+            $this->dbeRenDomain->getValue(DBEJRenDomain::installationDate) &&
+            $this->dbeRenDomain->getValue(DBEJRenDomain::invoicePeriodMonths)
         ) {
             $ret = true;
 

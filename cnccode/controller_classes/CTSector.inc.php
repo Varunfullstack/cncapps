@@ -10,20 +10,48 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 // Actions
-define('CTSECTOR_ACT_DISPLAY_LIST', 'sectorList');
-define('CTSECTOR_ACT_CREATE', 'createSector');
-define('CTSECTOR_ACT_EDIT', 'editSector');
-define('CTSECTOR_ACT_DELETE', 'deleteSector');
-define('CTSECTOR_ACT_UPDATE', 'updateSector');
+define(
+    'CTSECTOR_ACT_DISPLAY_LIST',
+    'sectorList'
+);
+define(
+    'CTSECTOR_ACT_CREATE',
+    'createSector'
+);
+define(
+    'CTSECTOR_ACT_EDIT',
+    'editSector'
+);
+define(
+    'CTSECTOR_ACT_DELETE',
+    'deleteSector'
+);
+define(
+    'CTSECTOR_ACT_UPDATE',
+    'updateSector'
+);
 
 class CTSECTOR extends CTCNC
 {
     public $dsSector;
     public $buSector;
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    const getCustomerWithoutSector = "getCustomerWithoutSector";
+
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "sales",
             "maintenance"
@@ -39,6 +67,7 @@ class CTSECTOR extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -56,7 +85,7 @@ class CTSECTOR extends CTCNC
                 $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
                 $this->update();
                 break;
-            case getCustomerWithoutSector:
+            case self::getCustomerWithoutSector:
                 $this->checkPermissions(PHPLIB_PERM_SALES);
                 $this->getCustomerWithoutSector();
                 break;
@@ -71,6 +100,7 @@ class CTSECTOR extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -79,6 +109,7 @@ class CTSECTOR extends CTCNC
         $this->setTemplateFiles(
             array('SectorList' => 'SectorList.inc')
         );
+        $dsSector = new DataSet($this);
 
         $this->buSector->getAll($dsSector);
 
@@ -110,7 +141,7 @@ class CTSECTOR extends CTCNC
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTSECTOR_ACT_EDIT,
+                            'action'   => CTSECTOR_ACT_EDIT,
                             'sectorID' => $sectorID
                         )
                     );
@@ -121,7 +152,7 @@ class CTSECTOR extends CTCNC
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action' => CTSECTOR_ACT_DELETE,
+                                'action'   => CTSECTOR_ACT_DELETE,
                                 'sectorID' => $sectorID
                             )
                         );
@@ -133,26 +164,35 @@ class CTSECTOR extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'sectorID' => $sectorID,
+                        'sectorID'    => $sectorID,
                         'description' => Controller::htmlDisplayText($dsSector->getValue('description')),
-                        'urlEdit' => $urlEdit,
-                        'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit,
-                        'txtDelete' => $txtDelete
+                        'urlEdit'     => $urlEdit,
+                        'urlDelete'   => $urlDelete,
+                        'txtEdit'     => $txtEdit,
+                        'txtDelete'   => $txtDelete
                     )
                 );
 
-                $this->template->parse('sectors', 'SectorBlock', true);
+                $this->template->parse(
+                    'sectors',
+                    'SectorBlock',
+                    true
+                );
 
             }//while $dsSector->fetchNext()
         }
-        $this->template->parse('CONTENTS', 'SectorList', true);
+        $this->template->parse(
+            'CONTENTS',
+            'SectorList',
+            true
+        );
         $this->parsePage();
     }
 
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -161,11 +201,17 @@ class CTSECTOR extends CTCNC
 
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == CTSECTOR_ACT_EDIT) {
-                $this->buSector->getSectorByID($_REQUEST['sectorID'], $dsSector);
+                $this->buSector->getSectorByID(
+                    $_REQUEST['sectorID'],
+                    $dsSector
+                );
                 $sectorID = $_REQUEST['sectorID'];
             } else {                                                                    // creating new
                 $dsSector->initialise();
-                $dsSector->setValue('sectorID', '0');
+                $dsSector->setValue(
+                    'sectorID',
+                    '0'
+                );
                 $sectorID = '0';
             }
         } else {                                                                        // form validation error
@@ -178,7 +224,7 @@ class CTSECTOR extends CTCNC
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => CTSECTOR_ACT_DELETE,
+                        'action'   => CTSECTOR_ACT_DELETE,
                         'sectorID' => $sectorID
                     )
                 );
@@ -191,7 +237,7 @@ class CTSECTOR extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTSECTOR_ACT_UPDATE,
+                    'action'   => CTSECTOR_ACT_UPDATE,
                     'sectorID' => $sectorID
                 )
             );
@@ -208,27 +254,31 @@ class CTSECTOR extends CTCNC
         );
         $this->template->set_var(
             array(
-                'sectorID' => $sectorID,
-                'description' => Controller::htmlInputText($dsSector->getValue('description')),
+                'sectorID'           => $sectorID,
+                'description'        => Controller::htmlInputText($dsSector->getValue('description')),
                 'descriptionMessage' => Controller::htmlDisplayText($dsSector->getMessage('description')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList
             )
         );
-        $this->template->parse('CONTENTS', 'SectorEdit', true);
+        $this->template->parse(
+            'CONTENTS',
+            'SectorEdit',
+            true
+        );
         $this->parsePage();
     }// end function editFurther Action()
 
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsSector = &$this->dsSector;
         $this->formError = (!$this->dsSector->populateFromArray($_REQUEST['sector']));
         if ($this->formError) {
             if ($this->dsSector->getValue('sectorID') == '') {                    // attempt to insert
@@ -243,11 +293,12 @@ class CTSECTOR extends CTCNC
         $this->buSector->updateSector($this->dsSector);
 
         $urlNext =
-            Controller::buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'sectorID' => $this->dsSector->getValue('sectorID'),
-                                 'action' => CTCNC_ACT_VIEW
-                             )
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'sectorID' => $this->dsSector->getValue('sectorID'),
+                    'action'   => CTCNC_ACT_VIEW
+                )
             );
         header('Location: ' . $urlNext);
     }
@@ -257,6 +308,7 @@ class CTSECTOR extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
@@ -282,6 +334,7 @@ class CTSECTOR extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function getCustomerWithoutSector()
     {
@@ -293,7 +346,7 @@ class CTSECTOR extends CTCNC
                 Controller::buildLink(
                     'Customer.php',
                     array(
-                        'action' => 'dispEdit',
+                        'action'     => 'dispEdit',
                         'customerID' => $customerID
                     )
                 );

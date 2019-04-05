@@ -1990,6 +1990,8 @@ ORDER BY cus_name ASC  ";
             'CustomerEdit',
             'CustomerEditSimple.inc'
         );
+
+
 // Parameters
         $this->setPageTitle("Customer");
         if ($_REQUEST['save_page']) {
@@ -2866,7 +2868,6 @@ ORDER BY cus_name ASC  ";
 
         } // end foreach
 
-
         while ($this->dsContact->fetchNext()) {
 
             $this->template->set_block(
@@ -3105,6 +3106,7 @@ ORDER BY cus_name ASC  ";
             );
 
         }
+
         /*
         List of sales orders with links. Very similar to code in CTSalesOrder
         */
