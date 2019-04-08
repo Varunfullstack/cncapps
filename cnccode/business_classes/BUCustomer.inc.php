@@ -316,13 +316,17 @@ class BUCustomer extends Business
     }
 
     function duplicatedEmail($email,
-                             $contactID = null
+                             $contactID = null,
+                             $customerID = null
     )
     {
         if ($email === '') {
             return true;
         }
+
+
         $query = "select count(con_contno) as count from contact where con_email = ? ";
+
 
         $paramTypes = 's';
         $params = [
@@ -333,6 +337,12 @@ class BUCustomer extends Business
             $query .= " and con_contno <> ? ";
             $paramTypes .= "i";
             $params[] = +$contactID;
+        }
+
+        if ($customerID) {
+            $query .= " and con_custno <> ?";
+            $paramTypes .= "i";
+            $params[] = +$customerID;
         }
 
         $params = array_merge(

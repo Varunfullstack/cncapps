@@ -709,7 +709,7 @@ class BUPDFSalesQuote extends Business
 
         $body = $template->get_var('output');
         $toEmail = $dsOrdhead->getValue(DBEOrdhead::delContactEmail);
-        $senderEmail = "sales@cnc-ltd-co.uk";
+        $senderEmail = "sales@cnc-ltd.co.uk";
 
         $hdrs = array(
             'From'         => $senderEmail,
