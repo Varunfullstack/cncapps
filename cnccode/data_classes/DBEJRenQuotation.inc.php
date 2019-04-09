@@ -182,6 +182,24 @@ class DBEJRenQuotation extends DBECustomerItem
         $ret = (parent::getRows());
     }
 
+    function getRowsBySalesOrderID($salesOrderID){
+        $statement =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " JOIN item ON  itm_itemno = cui_itemno
+      JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
+			JOIN customer ON  cus_custno = cui_custno
+      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
+			JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
+			WHERE declinedFlag = 'N'
+				AND cui_ordno = $salesOrderID		
+        AND renewalTypeID = 3
+			ORDER BY cus_name";
+
+        $this->setQueryString($statement);
+        $ret = (parent::getRows());
+    }
+
     /**
      * Get all renewals due in 1 months time
      *

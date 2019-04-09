@@ -640,9 +640,9 @@ class BUPDFSalesQuote extends Business
             $this->displayFatalError('Quotation Not Found');
 
         }
-
+        $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $dbeQuotation->getValue('ordheadID'),
+            $dbeQuotation->getValue(DBEQuotation::ordheadID),
             $dsOrdhead,
             $dsOrdline,
             $dsDeliveryContact
@@ -674,12 +674,8 @@ class BUPDFSalesQuote extends Business
         );
 
         $DBEJRenQuotation = new DBEJRenQuotation($this);
-
-        $DBEJRenQuotation->setValue(
-            DBEJRenQuotation::ordheadID,
-            $dsOrdhead->getValue(DBEOrdhead::ordheadID)
-        );
-        $DBEJRenQuotation->getRowsByColumn(DBEJRenQuotation::ordheadID);
+        $DBEJRenQuotation->setShowSQLOn();
+        $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
         if (!$DBEJRenQuotation->rowCount()) {
             return false;
@@ -696,7 +692,7 @@ class BUPDFSalesQuote extends Business
         $template->set_var(
             [
                 'contactFirstName' => $dsDeliveryContact->getValue(DBEContact::firstName),
-                'renewalType'      => $DBEJRenQuotation->getValue($DBEJRenQuotation::type),
+                'renewalType'      => $DBEJRenQuotation->getValue(DBEJRenQuotation::type),
                 'sentDate'         => $sentDate->format('d/m/Y')
             ]
         );
