@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v2.4.1] - 2019-04-08
+## [v2.4.1] - 2019-04-09
 ### Fixed
 - Archived passwords not observing access levels
 - Saving contacts when there are duplicate email addresses transposes the email onto other contacts. See attached video.
