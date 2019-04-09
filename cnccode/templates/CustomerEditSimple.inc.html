@@ -710,6 +710,7 @@
     </tr>
 </script>
 <script type="text/JavaScript">
+    let contactsTableErrors;
 
 
     function checkProspectFlag() {
@@ -921,7 +922,7 @@
         var erroredElements = {};
         var errorsShowing = {};
 
-        const contactsTableErrors = $('#contactsTableErrors');
+        contactsTableErrors = $('#contactsTableErrors');
 
         function showErrors(data) {
             contactsTableErrors.find('.errors').html(data.html);
@@ -1035,6 +1036,7 @@
 
                     ///we need to check that no other email is set to the same
                     var test = $('input[data-validation*="emailOrEmpty"]');
+
                     var isDuplicate = false;
 
                     test.each(function () {
@@ -1385,6 +1387,21 @@
     function checkMailShotOptions() {
 
         window.isSubmitting = true;
+        debugger;
+
+        const emails = {};
+
+        const inputs = $(".contacts input[type='email']");
+        for (let i = 0; i < inputs.length; i++) {
+            const email = inputs[i].value;
+
+            if (emails[email]) {
+                alert('Please review form errors, fix them before submitting');
+                return false;
+            }
+
+            emails[email] = true;
+        }
 
         // var x = document.getElementsByClassName('stmCheckBox');
         // var count = 0;
@@ -1424,6 +1441,8 @@
         // }
 
         // check that the selected primaryMainContact is in fact also a "main"
+        contactsTable
+
 
         if ({customerID} != 0 && !document.getElementById('prospectFlag').checked) {
             const primaryMainContactSelector = $('#primaryMainContactSelector');

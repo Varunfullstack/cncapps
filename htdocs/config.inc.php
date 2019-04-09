@@ -531,7 +531,7 @@ switch ($server_type) {
 
 define(
     'CONFIG_LDAP_DOMAINCONTROLLER',
-    'cncdc01'
+    'cncdc1'
 );
 define(
     'CONFIG_LDAP_DOMAIN',
