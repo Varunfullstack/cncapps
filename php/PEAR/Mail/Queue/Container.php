@@ -90,7 +90,7 @@ class Mail_Queue_Container
      * @var integer
      * @access private
      */
-	var $_last_item = 0;
+    var $_last_item = 0;
 
     /**
      * Options
@@ -125,9 +125,14 @@ class Mail_Queue_Container
         }
         if ($err !== true) {
             // limit met
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_INITIALIZE,
-                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'Cannot preload items: limit');
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_INITIALIZE,
+                $this->pearErrorMode,
+                E_USER_ERROR,
+                __FILE__,
+                __LINE__,
+                'Cannot preload items: limit'
+            );
         }
 
         if (empty($this->queue_data)) {
@@ -135,15 +140,20 @@ class Mail_Queue_Container
         }
         if (!isset($this->queue_data[$this->_current_item])) {
             //unlikely...
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_INITIALIZE,
-                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'No item: '.$this->_current_item.' in queue!');
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_INITIALIZE,
+                $this->pearErrorMode,
+                E_USER_ERROR,
+                __FILE__,
+                __LINE__,
+                'No item: ' . $this->_current_item . ' in queue!'
+            );
         }
 
         $object = $this->queue_data[$this->_current_item];
-		unset($this->queue_data[$this->_current_item]);
-		$this->_current_item++;
-		return $object;
+        unset($this->queue_data[$this->_current_item]);
+        $this->_current_item++;
+        return $object;
     }
 
     // }}}
@@ -171,27 +181,27 @@ class Mail_Queue_Container
      *
      * Mail_Queue_Container::put()
      *
-     * @param string $time_to_send  When mail have to be send
-     * @param integer $id_user  Sender id
-     * @param string $ip  Sender ip
-     * @param string $from  Sender e-mail
-     * @param string $to  Reciepient e-mail
-     * @param string $hdrs  Mail headers (in RFC)
-     * @param string $body  Mail body (in RFC)
+     * @param string $time_to_send When mail have to be send
+     * @param integer $id_user Sender id
+     * @param string $ip Sender ip
+     * @param string $from Sender e-mail
+     * @param string $to Reciepient e-mail
+     * @param string $hdrs Mail headers (in RFC)
+     * @param string $body Mail body (in RFC)
      * @return bool True on success
      * @access public
      **/
-/*
-    function put($time_to_send, $id_user, $ip, $from, $to, $hdrs, $body, $delete_after_send)
-    {
-        $this->_last_item = count($this->queue_data);
-		$this->queue_data[$this->_last_item] = new Mail_Queue_Body($id, date("d-m-y G:i:s"),
-                    $time_to_send, null, $id_user,
-                    $ip, $sender, $recipient, unserialize($headers),
-                    unserialize($body), $delete_after_send, 0);
-        return true;
-    }
-*/
+    /*
+        function put($time_to_send, $id_user, $ip, $from, $to, $hdrs, $body, $delete_after_send)
+        {
+            $this->_last_item = count($this->queue_data);
+            $this->queue_data[$this->_last_item] = new Mail_Queue_Body($id, date("d-m-y G:i:s"),
+                        $time_to_send, null, $id_user,
+                        $ip, $sender, $recipient, unserialize($headers),
+                        unserialize($body), $delete_after_send, 0);
+            return true;
+        }
+    */
     // }}}
     // {{{ setOption()
 
@@ -200,17 +210,20 @@ class Mail_Queue_Container
      *
      * Mail_Queue_Container::setOption()
      *
-     * @param integer  $limit  Optional - Number of mails loaded to queue
-     * @param integer  $offset Optional - You could also specify offset
-     * @param integer  $try  Optional - how many times should system try sent
+     * @param integer $limit Optional - Number of mails loaded to queue
+     * @param integer $offset Optional - You could also specify offset
+     * @param integer $try Optional - how many times should system try sent
      *                       each mail
-     * @param boolean  $force_preload  Optional - FIXME
+     * @param boolean $force_preload Optional - FIXME
      * @return void
      *
      * @access public
      **/
-    function setOption($limit = MAILQUEUE_ALL, $offset = MAILQUEUE_START,
-                        $try = MAILQUEUE_TRY, $force_preload = false)
+    function setOption($limit = MAILQUEUE_ALL,
+                       $offset = MAILQUEUE_START,
+                       $try = MAILQUEUE_TRY,
+                       $force_preload = false
+    )
     {
         $this->limit = $limit;
         $this->offset = $offset;
@@ -254,7 +267,7 @@ class Mail_Queue_Container
     /**
      * Return mail by id $id (bypass mail_queue)
      *
-     * @param integer $id  Mail ID
+     * @param integer $id Mail ID
      * @return mixed  Mail object or false on error.
      * @access public
      */
@@ -274,7 +287,7 @@ class Mail_Queue_Container
     /**
      * Remove from queue mail with $id identifier.
      *
-     * @param integer $id  Mail ID
+     * @param integer $id Mail ID
      * @return bool  True on success ale false.
      * @access public
      */
@@ -311,7 +324,10 @@ class Mail_Queue_Container
         if ($bkp_limit == MAILQUEUE_ALL) {
             $this->limit = $this->buffer_size;
         } else {
-            $this->limit = min($this->buffer_size, $this->limit);
+            $this->limit = min(
+                $this->buffer_size,
+                $this->limit
+            );
         }
 
         if (Mail_Queue::isError($err = $this->_preload())) {
@@ -327,7 +343,7 @@ class Mail_Queue_Container
 
         //set buffer pointers
         $this->_current_item = 0;
-        $this->_last_item    = count($this->queue_data)-1;
+        $this->_last_item = count($this->queue_data) - 1;
 
         return true;
     }
@@ -343,26 +359,40 @@ class Mail_Queue_Container
      * @access protected
      */
     function _isSerialized($string)
+
     {
         if (!is_string($string) || strlen($string) < 4) {
             return false;
         }
         // serialized integer?
-        if (preg_match('/^i:\d+;$/', $string)) {
+        if (preg_match(
+            '/^i:\d+;$/',
+            $string
+        )) {
             return true;
         }
         // serialized float?
-        if (preg_match('/^d:\d(\.\d+)?;$/', $string)) {
+        if (preg_match(
+            '/^d:\d(\.\d+)?;$/',
+            $string
+        )) {
             return true;
         }
         // serialized string?
-        if (preg_match('/^s:\d+\:\"(.*)\";$/', $string)) {
+        if (preg_match(
+            '/^s:\d+\:\"(.*)\";$/',
+            $string
+        )) {
             return true;
         }
         //serialized array?
-        return preg_match('/^a:\d+\:\{(.*)\}$/', $string);
+        return preg_match(
+            '/^a:\d+\:\{(.*)\}$/',
+            $string
+        );
     }
 
     // }}}
 }
+
 ?>

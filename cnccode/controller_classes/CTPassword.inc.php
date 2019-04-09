@@ -181,18 +181,11 @@ class CTPassword extends CTCNC
 
         $dbeCustomer->getRow($customerID);
         $dsPassword = new DBEJPassword($this);
-        if ($showArchived) {
-            $dsPassword->getRowsByCustomerIDAndPasswordLevel(
-                $customerID,
-                null,
-                true
-            );
-        } else {
-            $dsPassword->getRowsByCustomerIDAndPasswordLevel(
-                $customerID,
-                $this->dbeUser->getValue(DBEUser::passwordLevel)
-            );
-        }
+        $dsPassword->getRowsByCustomerIDAndPasswordLevel(
+            $customerID,
+            $this->dbeUser->getValue(DBEUser::passwordLevel),
+            $showArchived
+        );
 
         if (!$showArchived) {
 

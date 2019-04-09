@@ -7,11 +7,6 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
-use Signable\ApiClient;
-use Signable\DocumentWithoutTemplate;
-use Signable\Envelopes;
-use Signable\Party;
-
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -373,7 +368,8 @@ class CTCustomer extends CTCNC
 
                 if ($this->buCustomer->duplicatedEmail(
                     $email,
-                    $value['contactID']
+                    $value['contactID'],
+                    $value['customerID']
                 )) {
                     $this->setFormErrorOn();
                     $this->dsContact->setValue(
