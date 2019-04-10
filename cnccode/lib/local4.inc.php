@@ -198,6 +198,7 @@ class auSweetcode extends Auth
             $ldaprdn,
             $password
         );
+
         if ($bind) {
             $ret = true;
         } else {
@@ -230,6 +231,7 @@ class auSweetcode extends Auth
             $GLOBALS['loginMessage'] = 'Login blocked: You are not on the CNC network';
             return false;
         }
+
 
         if (
             ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT
