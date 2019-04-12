@@ -77,18 +77,19 @@ define(
 class BUPDFInvoice extends BaseObject
 {
     /** @var BUPDF */
-    var $_buPDF = '';
+    public $_buPDF;
     /** @var BUInvoice */
-    var $_buInvoice = '';
-    var $_buNotepad = '';
-    var $_dsInvhead = '';
-    var $_customerID = '';
-    var $_startDate = '';
-    var $_endDate = '';
-    var $_dateToUse = '';
-    var $_startInvheadID = '';
-    var $_endInvheadID = '';
-    var $_titleLine = 0;
+    public $_buInvoice;
+    public $_buNotepad;
+    /** @var DataSet|DBEInvhead */
+    public $_dsInvhead;
+    public $_customerID;
+    public $_startDate;
+    public $_endDate;
+    public $_dateToUse;
+    public $_startInvheadID;
+    public $_endInvheadID;
+    public $_titleLine;
 
     /**
      * Constructor
@@ -143,11 +144,9 @@ class BUPDFInvoice extends BaseObject
      *
      * @access private
      * @param $dsInvhead
-     * @param bool $directDebit
      * @return String PDF disk file name or FALSE
      */
-    function generateFile($dsInvhead,
-                          $directDebit = false
+    function generateFile($dsInvhead
     )
     {
 
@@ -168,7 +167,7 @@ class BUPDFInvoice extends BaseObject
             'A4'
         );
 
-        $this->produceInvoice($directDebit);
+        $this->produceInvoice();
 
         $this->_buPDF->close();
 
@@ -182,6 +181,7 @@ class BUPDFInvoice extends BaseObject
      * Generate all invoices as one pdf file and return file path
      *
      * @access private
+     * @param $dsInvhead
      * @return String PDF disk file name or FALSE
      */
     function generateBatchFile($dsInvhead)
@@ -224,14 +224,15 @@ class BUPDFInvoice extends BaseObject
         $this->invoiceHead();
         $dsInvline = new DataSet($this);
         $this->_buInvoice->getInvoiceLines(
-            $this->_dsInvhead->getValue('invheadID'),
+            $this->_dsInvhead->getValue(DBEInvhead::invheadID),
             $dsInvline
         );
         $this->_buPDF->CR();
         $lineCount = 0;
         $linesForLastPage = 5;
         $linesForLogo = 10;
-
+        $grandTotal = 0;
+        $dbePaymentTerms = null;
         while ($dsInvline->fetchNext()) {
             $lineCount++;
             if ($lineCount > BUPDFINV_NUMBER_OF_LINES - $linesForLastPage) {
@@ -247,35 +248,35 @@ class BUPDFInvoice extends BaseObject
                 $this->_buPDF->CR();
                 $lineCount = 2;
             }
-            if ($dsInvline->getValue('lineType') == "I") {
+            if ($dsInvline->getValue(DBEInvline::lineType) == "I") {
                 if (
-                    ($dsInvline->getValue('itemDescription') != '') AND
-                    ($dsInvline->getValue('stockcat') != 'G')
+                    ($dsInvline->getValue(DBEJInvline::itemDescription) != '') AND
+                    ($dsInvline->getValue(DBEInvline::stockcat) != 'G')
                 ) {
                     $this->_buPDF->printStringAt(
                         BUPDFINV_DETAILS_COL,
-                        $dsInvline->getValue('itemDescription')
+                        $dsInvline->getValue(DBEJInvline::itemDescription)
                     );
                 } else {
                     $this->_buPDF->printStringAt(
                         BUPDFINV_DETAILS_COL,
-                        $dsInvline->getValue('description')
+                        $dsInvline->getValue(DBEInvline::description)
                     );
                 }
                 $this->_buPDF->printStringRJAt(
                     BUPDFINV_QTY_COL,
-                    $dsInvline->getValue('qty')
+                    $dsInvline->getValue(DBEInvline::qty)
                 );
                 $this->_buPDF->printStringRJAt(
                     BUPDFINV_UNIT_PRICE_COL,
                     POUND_CHAR . number_format(
-                        $dsInvline->getValue('curUnitSale'),
+                        $dsInvline->getValue(DBEInvline::curUnitSale),
                         2,
                         '.',
                         ','
                     )
                 );
-                $total = ($dsInvline->getValue('curUnitSale') * $dsInvline->getValue('qty'));
+                $total = ($dsInvline->getValue(DBEInvline::curUnitSale) * $dsInvline->getValue(DBEInvline::qty));
                 $this->_buPDF->printStringRJAt(
                     BUPDFINV_COST_COL,
                     POUND_CHAR . number_format(
@@ -286,20 +287,21 @@ class BUPDFInvoice extends BaseObject
                     )
                 );
                 $grandTotal += $total;
+                $dsNotepad = new DataSet($this);
                 $this->_buNotepad->getNotes(
                     BUPDFINV_NOTEPAD_ITEM,
-                    $dsInvline->getValue('itemID'),
+                    $dsInvline->getValue(DBEInvline::itemID),
                     $dsNotepad
                 );
                 if ($dsNotepad->fetchNext()) {
                     $this->_buPDF->setFontSize(8);
                     $this->_buPDF->setFont();
                     do {
-                        if (trim($dsNotepad->getValue('noteText')) != '') {
+                        if (trim($dsNotepad->getValue(DBENotepad::noteText)) != '') {
                             $this->_buPDF->CR();
                             $this->_buPDF->printStringAt(
                                 BUPDFINV_DETAILS_COL,
-                                $dsNotepad->getValue('noteText')
+                                $dsNotepad->getValue(DBENotepad::noteText)
                             );
                         }
                     } while ($dsNotepad->fetchNext());
@@ -309,7 +311,7 @@ class BUPDFInvoice extends BaseObject
             } else {
                 $this->_buPDF->printStringAt(
                     BUPDFINV_DETAILS_COL,
-                    $dsInvline->getValue('description')
+                    $dsInvline->getValue(DBEInvline::description)
                 ); // comment line
             }
 
@@ -344,14 +346,14 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
 
-        if ($this->_dsInvhead->getValue('type') == 'I') {
+        if ($this->_dsInvhead->getValue(DBEInvhead::type) == 'I') {
             $this->_buPDF->moveYTo((BUPDFINV_NUMBER_OF_LINES - 7.5) * $this->_buPDF->getFontSize());
             $this->_buPDF->printStringAt(
                 BUPDFINV_DETAILS_COL,
                 '***** Thank you for your business *****'
             );
 
-            if ($this->_dsInvhead->getValue('type') == 'I') {
+            if ($this->_dsInvhead->getValue(DBEInvhead::type) == 'I') {
                 $this->_buPDF->CR();
                 $this->_buPDF->printStringAt(
                     BUPDFINV_DETAILS_COL,
@@ -367,7 +369,7 @@ class BUPDFInvoice extends BaseObject
             if (!$dbePaymentTerms) {
                 $dbePaymentTerms = new DBEPaymentTerms($this);
             }
-            $dbePaymentTerms->getRow($this->_dsInvhead->getValue('paymentTermsID'));
+            $dbePaymentTerms->getRow($this->_dsInvhead->getValue(DBEInvhead::paymentTermsID));
             $this->_buPDF->moveYTo($this->_titleLine + (BUPDFINV_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
         } else {
             $this->_buPDF->moveYTo($this->_titleLine + (BUPDFINV_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
@@ -399,8 +401,8 @@ class BUPDFInvoice extends BaseObject
             )
         );
         $this->_buPDF->CR();
-        if ($this->_dsInvhead->getValue('type') == 'I') {
-            $this->_buPDF->printString('Payment terms: ' . $dbePaymentTerms->getValue('description'));
+        if ($this->_dsInvhead->getValue(DBEInvhead::type) == 'I') {
+            $this->_buPDF->printString('Payment terms: ' . $dbePaymentTerms->getValue(DBEPaymentTerms::description));
         }
         $this->_buPDF->box(
             BUPDFINV_UNIT_PRICE_BOX_LEFT_EDGE,
@@ -417,11 +419,11 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->printStringRJAt(
             BUPDFINV_UNIT_PRICE_COL,
             'VAT @ ' . number_format(
-                $this->_dsInvhead->getValue('vatRate'),
+                $this->_dsInvhead->getValue(DBEInvhead::vatRate),
                 1
             ) . '%'
         );
-        $vatValue = $grandTotal * ($this->_dsInvhead->getValue('vatRate') / 100);
+        $vatValue = $grandTotal * ($this->_dsInvhead->getValue(DBEInvhead::vatRate) / 100);
 
         // for some reason number_format insists on truncating the VAT value so I round it first!
         $vatValue = $this->myFormattedRoundedNumber($vatValue);
@@ -498,9 +500,7 @@ class BUPDFInvoice extends BaseObject
      */
     function invoiceHead()
     {
-        $dsInvhead = &$this->_dsInvhead;
         $this->_buPDF->startPage();
-//		$this->_buPDF->placeImageAt( $GLOBALS['cfg']['cnclogo_path'], 'JPEG', 90, 110);
         $this->_buPDF->placeImageAt(
             $GLOBALS['cfg']['cnclogo_path'],
             'PNG',
@@ -522,7 +522,7 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->setFontSize(20);
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
-        if ($this->_dsInvhead->getValue('type') == 'I') {
+        if ($this->_dsInvhead->getValue(DBEInvhead::type) == 'I') {
             $this->_buPDF->printString('Invoice');
         } else {
             $this->_buPDF->printString('Credit Note');
@@ -532,38 +532,38 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->CR();
         $this->_buPDF->CR();
         $firstAddLine = $this->_buPDF->getYPos();    // remember this line no
-        $this->_buPDF->printString($this->_dsInvhead->getValue('customerName'));
+        $this->_buPDF->printString($this->_dsInvhead->getValue(DBEJInvhead::customerName));
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
-        $this->_buPDF->printString($this->_dsInvhead->getValue('add1'));
-        if ($this->_dsInvhead->getValue('add2') != '') {
+        $this->_buPDF->printString($this->_dsInvhead->getValue(DBEInvhead::add1));
+        if ($this->_dsInvhead->getValue(DBEInvhead::add2) != '') {
             $this->_buPDF->CR();
-            $this->_buPDF->printString($this->_dsInvhead->getValue('add2'));
+            $this->_buPDF->printString($this->_dsInvhead->getValue(DBEInvhead::add2));
         }
-        if ($this->_dsInvhead->getValue('add3') != '') {
+        if ($this->_dsInvhead->getValue(DBEInvhead::add3) != '') {
             $this->_buPDF->CR();
-            $this->_buPDF->printString($this->_dsInvhead->getValue('add3'));
-        }
-        $this->_buPDF->CR();
-        $this->_buPDF->printString($this->_dsInvhead->getValue('town'));
-        if ($this->_dsInvhead->getValue('county') != '') {
-            $this->_buPDF->CR();
-            $this->_buPDF->printString($this->_dsInvhead->getValue('county'));
+            $this->_buPDF->printString($this->_dsInvhead->getValue(DBEInvhead::add3));
         }
         $this->_buPDF->CR();
-        $this->_buPDF->printString($this->_dsInvhead->getValue('postcode'));
+        $this->_buPDF->printString($this->_dsInvhead->getValue(DBEInvhead::town));
+        if ($this->_dsInvhead->getValue(DBEInvhead::county) != '') {
+            $this->_buPDF->CR();
+            $this->_buPDF->printString($this->_dsInvhead->getValue(DBEInvhead::county));
+        }
+        $this->_buPDF->CR();
+        $this->_buPDF->printString($this->_dsInvhead->getValue(DBEInvhead::postcode));
         $this->_buPDF->CR();
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(10);
         $this->_buPDF->setFont();
         $this->_buPDF->printString(
             'F.A.O. ' .
-            $this->_dsInvhead->getValue('title') . ' ' .
-            $this->_dsInvhead->getValue('firstName') . ' ' .
-            $this->_dsInvhead->getValue('lastName')
+            $this->_dsInvhead->getValue(DBEJInvhead::title) . ' ' .
+            $this->_dsInvhead->getValue(DBEJInvhead::firstName) . ' ' .
+            $this->_dsInvhead->getValue(DBEJInvhead::lastName)
         );
-        $faoLine = $this->_buPDF->getYPos();
+        $this->_buPDF->getYPos();
         $this->_buPDF->moveYTo($firstAddLine);    //move back up the page
         $this->_buPDF->CR();
         $this->_buPDF->box(
@@ -578,7 +578,7 @@ class BUPDFInvoice extends BaseObject
             BUPDFINV_UNIT_PRICE_BOX_WIDTH,
             $this->_buPDF->getFontSize() / 2
         );
-        if ($this->_dsInvhead->getValue('type') == 'I') {
+        if ($this->_dsInvhead->getValue(DBEInvhead::type) == 'I') {
             $this->_buPDF->printStringRJAt(
                 BUPDFINV_UNIT_PRICE_COL,
                 'Invoice No'
@@ -593,7 +593,7 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFINV_COST_BOX_LEFT_EDGE,
-            $this->_dsInvhead->getValue('invheadID')
+            $this->_dsInvhead->getValue(DBEInvhead::invheadID)
         );
         $this->_buPDF->CR();
         $this->_buPDF->box(
@@ -624,7 +624,7 @@ class BUPDFInvoice extends BaseObject
         } else {
             $this->_buPDF->printStringAt(
                 BUPDFINV_COST_BOX_LEFT_EDGE,
-                Controller::dateYMDtoDMY($this->_dsInvhead->getValue('datePrinted'))
+                Controller::dateYMDtoDMY($this->_dsInvhead->getValue(DBEInvhead::datePrinted))
             );
         }
         $this->_buPDF->CR();
@@ -663,8 +663,8 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFINV_COST_BOX_LEFT_EDGE,
-            $this->_dsInvhead->getValue('customerID') . '/' . $this->_dsInvhead->getValue(
-                'ordheadID'
+            $this->_dsInvhead->getValue(DBEInvhead::customerID) . '/' . $this->_dsInvhead->getValue(
+                DBEInvhead::ordheadID
             )
         );
         $this->_buPDF->CR();
@@ -716,7 +716,7 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->printStringAt(
             BUPDFINV_COST_BOX_LEFT_EDGE,
             substr(
-                $this->_dsInvhead->getValue('custPORef'),
+                $this->_dsInvhead->getValue(DBEInvhead::custPORef),
                 0,
                 15
             )
@@ -793,7 +793,6 @@ class BUPDFInvoice extends BaseObject
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
-        $grandTotal = 0;
     }
 
     function getLastDateOfMonth($date)
@@ -831,5 +830,4 @@ class BUPDFInvoice extends BaseObject
             (($number >= 0) ? ($number + $fuzz) : ($number - $fuzz))
         );
     }
-}// End of class
-?>
+}

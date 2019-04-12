@@ -16,12 +16,30 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class BUGoodsIn extends Business
 {
+    const receiveDataSetRequireSerialNo = 'setRequireSerialNo';
+    const receiveDataSetSerialNo = 'setSerialNo';
+    const receiveDataSetDescription = 'setDescription';
+    const receiveDataSetSequenceNo = 'setSequenceNo';
+    const receiveDataSetOrderSequenceNo = 'setOrderSequenceNo';
+    const receiveDataSetQtyOrdered = 'setQtyOrdered';
+    const receiveDataSetQtyReceived = 'setQtyReceived';
+    const receiveDataSetQtyToReceive = 'setQtyToReceive';
+    const receiveDataSetWarrantyID = 'setWarrantyID';
+    const receiveDataSetQtyOS = 'setQtyOS';
+    const receiveDataSetItemID = 'setItemID';
+    const receiveDataSetCustomerItemID = 'setCustomerItemID';
+    const receiveDataSetPartNo = 'setPartNo';
+    const receiveDataSetAllowReceive = 'setAllowReceive';
+    const receiveDataSetRenew = 'setRenew';
+
+
     /** @var BUSalesOrder */
     public $buSalesOrder;
     /** @var DBEPorhead */
     var $dbePorhead;
     var $dbeItem = '';
     var $dsOrdhead = '';
+    private $dsPorhead;
 
     /**
      * Constructor
@@ -51,7 +69,7 @@ class BUGoodsIn extends Business
                 $dbeJPorhead,
                 $dsResults
             ));
-            if ($dsResults->getValue('directDeliveryFlag' == 'Y')) {
+            if ($dsResults->getValue(DBEPorhead::directDeliveryFlag) == 'Y') {
                 $ret = FALSE;
             } else {
                 $ret = TRUE;
@@ -96,8 +114,8 @@ class BUGoodsIn extends Business
         $sequenceNo = 0;
 
         while ($dsPorline->fetchNext()) {
-            $itemID = $dsPorline->getValue('itemID');
-            $qtyOS = $dsPorline->getValue('qtyOrdered') - $dsPorline->getValue('qtyReceived');
+            $itemID = $dsPorline->getValue(DBEPorline::itemID);
+            $qtyOS = $dsPorline->getValue(DBEPorline::qtyOrdered) - $dsPorline->getValue(DBEPorline::qtyReceived);
             // skip if nothing outstanding for this order line
             if ($qtyOS <= 0) {
                 continue;
@@ -105,64 +123,64 @@ class BUGoodsIn extends Business
             // else add a line to receipts dataset
             $dbeItem->getRow($itemID);
             // if this item requires a serial number and this purchase order requires customer items adding
-            if (($dbeItem->getValue('serialNoFlag') == 'Y') & $addCustomerItems) {
+            if (($dbeItem->getValue(DBEItem::serialNoFlag) == 'Y') & $addCustomerItems) {
                 for ($i = 1; $i <= $qtyOS; $i++) {
                     $sequenceNo++;
                     $dsReceive->setUpdateModeInsert();
                     $dsReceive->setValue(
-                        'requireSerialNo',
+                        self::receiveDataSetRequireSerialNo,
                         TRUE
                     );
                     $dsReceive->setValue(
-                        'serialNo',
+                        self::receiveDataSetSerialNo,
                         ''
                     );
                     $dsReceive->setValue(
-                        'description',
-                        $dsPorline->getValue('itemDescription')
+                        self::receiveDataSetDescription,
+                        $dsPorline->getValue(DBEJPorline::itemDescription)
                     );
                     $dsReceive->setValue(
-                        'sequenceNo',
+                        self::receiveDataSetSequenceNo,
                         $sequenceNo
                     );
                     $dsReceive->setValue(
-                        'orderSequenceNo',
-                        $dsPorline->getValue('sequenceNo')
+                        self::receiveDataSetOrderSequenceNo,
+                        $dsPorline->getValue(DBEPorline::sequenceNo)
                     );
                     $dsReceive->setValue(
-                        'qtyOrdered',
+                        self::receiveDataSetQtyOrdered,
                         1
                     );
                     $dsReceive->setValue(
-                        'qtyReceived',
+                        self::receiveDataSetQtyReceived,
                         0
                     );
                     $dsReceive->setValue(
-                        'qtyToReceive',
+                        self::receiveDataSetQtyToReceive,
                         0
                     );
                     $dsReceive->setValue(
-                        'warrantyID',
-                        $dbeItem->getValue('warrantyID')
+                        self::receiveDataSetWarrantyID,
+                        $dbeItem->getValue(DBEItem::warrantyID)
                     );
                     $dsReceive->setValue(
-                        'qtyOS',
+                        self::receiveDataSetQtyOS,
                         1
                     );
                     $dsReceive->setValue(
-                        'itemID',
-                        $dbeItem->getValue('itemID')
+                        self::receiveDataSetItemID,
+                        $dbeItem->getValue(DBEItem::itemID)
                     );
                     $dsReceive->setValue(
-                        'partNo',
-                        $dbeItem->getValue('partNo')
+                        self::receiveDataSetPartNo,
+                        $dbeItem->getValue(DBEItem::partNo)
                     );
                     $dsReceive->setValue(
-                        'allowReceive',
+                        self::receiveDataSetAllowReceive,
                         TRUE
                     );
                     $dsReceive->setValue(
-                        'renew',
+                        self::receiveDataSetRenew,
                         FALSE
                     );
                     $dsReceive->post();
@@ -172,59 +190,59 @@ class BUGoodsIn extends Business
                 $sequenceNo++;
                 $dsReceive->setUpdateModeInsert();
                 $dsReceive->setValue(
-                    'requireSerialNo',
+                    self::receiveDataSetRequireSerialNo,
                     FALSE
                 );
                 $dsReceive->setValue(
-                    'serialNo',
+                    self::receiveDataSetSerialNo,
                     ''
                 );
                 $dsReceive->setValue(
-                    'description',
-                    $dsPorline->getValue('itemDescription')
+                    self::receiveDataSetDescription,
+                    $dsPorline->getValue(DBEJPorline::itemDescription)
                 );
                 $dsReceive->setValue(
-                    'sequenceNo',
+                    self::receiveDataSetSequenceNo,
                     $sequenceNo
                 );
                 $dsReceive->setValue(
-                    'orderSequenceNo',
-                    $dsPorline->getValue('sequenceNo')
+                    self::receiveDataSetOrderSequenceNo,
+                    $dsPorline->getValue(DBEPorline::sequenceNo)
                 );
                 $dsReceive->setValue(
-                    'qtyOrdered',
-                    $dsPorline->getValue('qtyOrdered')
+                    self::receiveDataSetQtyOrdered,
+                    $dsPorline->getValue(DBEPorline::qtyOrdered)
                 );
                 $dsReceive->setValue(
-                    'qtyReceived',
-                    $dsPorline->getValue('qtyReceived')
+                    self::receiveDataSetQtyReceived,
+                    $dsPorline->getValue(DBEPorline::qtyReceived)
                 );
                 $dsReceive->setValue(
-                    'qtyToReceive',
+                    self::receiveDataSetQtyToReceive,
                     0
                 );
                 $dsReceive->setValue(
-                    'warrantyID',
+                    self::receiveDataSetWarrantyID,
                     ''
                 );
                 $dsReceive->setValue(
-                    'qtyOS',
+                    self::receiveDataSetQtyOS,
                     $qtyOS
                 );
                 $dsReceive->setValue(
-                    'itemID',
-                    $dbeItem->getValue('itemID')
+                    self::receiveDataSetItemID,
+                    $dbeItem->getValue(DBEItem::itemID)
                 );
                 $dsReceive->setValue(
-                    'partNo',
-                    $dbeItem->getValue('partNo')
+                    self::receiveDataSetPartNo,
+                    $dbeItem->getValue(DBEItem::partNo)
                 );
                 $dsReceive->setValue(
-                    'allowReceive',
+                    self::receiveDataSetAllowReceive,
                     TRUE
                 );
                 $dsReceive->setValue(
-                    'renew',
+                    self::receiveDataSetRenew,
                     FALSE
                 );
                 $dsReceive->post();
@@ -257,8 +275,8 @@ class BUGoodsIn extends Business
         $dsPorline->initialise();
         $sequenceNo = 0;
         while ($dsPorline->fetchNext()) {
-            $itemID = $dsPorline->getValue('itemID');
-            $qtyOS = $dsPorline->getValue('qtyOrdered') - $dsPorline->getValue('qtyReceived');
+            $itemID = $dsPorline->getValue(DBEJPorline::itemID);
+            $qtyOS = $dsPorline->getValue(DBEJPorline::qtyOrdered) - $dsPorline->getValue(DBEJPorline::qtyReceived);
             // skip if nothing outstanding for this order line
             if ($qtyOS <= 0) {
                 continue;
@@ -273,7 +291,7 @@ class BUGoodsIn extends Business
             * line. The fact that no customer item ID will exist indicates that the program
             * can not receive against this item.
             */
-            if (($dbeItem->getValue('serialNoFlag') == 'Y')) {
+            if (($dbeItem->getValue(DBEJPorline::serialNoFlag) == 'Y')) {
                 // get all customer items at this stock customer
                 $dbeCustomerItem->getRowsByCustomerAndItemID(
                     $customerID,
@@ -288,107 +306,107 @@ class BUGoodsIn extends Business
                     $sequenceNo++;
                     $dsReceive->setUpdateModeInsert();
                     $dsReceive->setValue(
-                        'requireSerialNo',
+                        self::receiveDataSetRequireSerialNo,
                         TRUE
                     );
                     $dsReceive->setValue(
-                        'description',
-                        $dsPorline->getValue('itemDescription')
+                        self::receiveDataSetDescription,
+                        $dsPorline->getValue(DBEJPorline::itemDescription)
                     );
                     $dsReceive->setValue(
-                        'sequenceNo',
+                        self::receiveDataSetSequenceNo,
                         $sequenceNo
                     );
                     $dsReceive->setValue(
-                        'orderSequenceNo',
-                        $dsPorline->getValue('sequenceNo')
+                        self::receiveDataSetOrderSequenceNo,
+                        $dsPorline->getValue(DBEJPorline::sequenceNo)
                     );
                     $dsReceive->setValue(
-                        'qtyReceived',
+                        self::receiveDataSetQtyReceived,
                         0
                     );
                     $dsReceive->setValue(
-                        'qtyToReceive',
+                        self::receiveDataSetQtyToReceive,
                         0
                     );
                     $dsReceive->setValue(
-                        'qtyOS',
+                        self::receiveDataSetQtyOS,
                         1
                     );
                     $dsReceive->setValue(
-                        'itemID',
-                        $dbeItem->getValue('itemID')
+                        self::receiveDataSetItemID,
+                        $dbeItem->getValue(DBEItem::itemID)
                     );
                     $dsReceive->setValue(
-                        'partNo',
-                        $dbeItem->getValue('partNo')
+                        self::receiveDataSetPartNo,
+                        $dbeItem->getValue(DBEItem::partNo)
                     );
                     if ($dsCustomerItem->fetchNext()) {
                         $dsReceive->setValue(
-                            'serialNo',
-                            $dsCustomerItem->getValue('serialNo')
+                            self::receiveDataSetSerialNo,
+                            $dsCustomerItem->getValue(DBECustomerItem::serialNo)
                         );
                         $dsReceive->setValue(
-                            'warrantyID',
-                            $dsCustomerItem->getValue('warrantyID')
+                            self::receiveDataSetWarrantyID,
+                            $dsCustomerItem->getValue(DBECustomerItem::warrantyID)
                         );
                         $dsReceive->setValue(
-                            'qtyOrdered',
+                            self::receiveDataSetQtyOrdered,
                             1
                         );
                         $dsReceive->setValue(
-                            'qtyReceived',
+                            self::receiveDataSetQtyReceived,
                             0
                         );
                         $dsReceive->setValue(
-                            'qtyToReceive',
+                            self::receiveDataSetQtyToReceive,
                             0
                         );
                         $dsReceive->setValue(
-                            'qtyOS',
+                            self::receiveDataSetQtyOS,
                             1
                         );
                         $dsReceive->setValue(
-                            'allowReceive',
+                            self::receiveDataSetAllowReceive,
                             TRUE
                         );
                         $dsReceive->setValue(
-                            'renew',
+                            self::receiveDataSetRenew,
                             FALSE
                         );
                         $dsReceive->setValue(
-                            'customerItemID',
-                            $dsCustomerItem->getValue('customerItemID')
+                            self::receiveDataSetCustomerItemID,
+                            $dsCustomerItem->getValue(DBECustomerItem::customerItemID)
                         );
                         $dsReceive->post();
                     } else {
                         // all the rest are out of stock so include on one line and break our of for loop
                         $dsReceive->setValue(
-                            'serialNo',
+                            self::receiveDataSetSerialNo,
                             'NOT IN STOCK'
                         );
                         $dsReceive->setValue(
-                            'customerItemID',
+                            self::receiveDataSetCustomerItemID,
                             null
                         );        // indicates disabled
                         $dsReceive->setValue(
-                            'qtyOrdered',
+                            self::receiveDataSetQtyOrdered,
                             $qtyOS - $i + 1
                         );
                         $dsReceive->setValue(
-                            'qtyOS',
+                            self::receiveDataSetQtyOS,
                             $qtyOS - $i + 1
                         );   // remaining qty are o/s
                         $dsReceive->setValue(
-                            'warrantyID',
+                            self::receiveDataSetWarrantyID,
                             null
                         );
                         $dsReceive->setValue(
-                            'allowReceive',
+                            self::receiveDataSetAllowReceive,
                             FALSE
                         );
                         $dsReceive->setValue(
-                            'renew',
+                            self::receiveDataSetRenew,
                             FALSE
                         );
                         $dsReceive->post();
@@ -399,59 +417,59 @@ class BUGoodsIn extends Business
                 $sequenceNo++;
                 $dsReceive->setUpdateModeInsert();
                 $dsReceive->setValue(
-                    'requireSerialNo',
+                    self::receiveDataSetRequireSerialNo,
                     FALSE
                 );
                 $dsReceive->setValue(
-                    'serialNo',
+                    self::receiveDataSetSerialNo,
                     ''
                 );
                 $dsReceive->setValue(
-                    'description',
-                    $dsPorline->getValue('itemDescription')
+                    self::receiveDataSetDescription,
+                    $dsPorline->getValue(DBEJPorline::itemDescription)
                 );
                 $dsReceive->setValue(
-                    'sequenceNo',
+                    self::receiveDataSetSequenceNo,
                     $sequenceNo
                 );
                 $dsReceive->setValue(
-                    'orderSequenceNo',
-                    $dsPorline->getValue('sequenceNo')
+                    self::receiveDataSetOrderSequenceNo,
+                    $dsPorline->getValue(DBEJPorline::sequenceNo)
                 );
                 $dsReceive->setValue(
-                    'qtyOrdered',
-                    $dsPorline->getValue('qtyOrdered')
+                    self::receiveDataSetQtyOrdered,
+                    $dsPorline->getValue(DBEJPorline::qtyOrdered)
                 );
                 $dsReceive->setValue(
-                    'qtyReceived',
-                    $dsPorline->getValue('qtyReceived')
+                    self::receiveDataSetQtyReceived,
+                    $dsPorline->getValue(DBEJPorline::qtyReceived)
                 );
                 $dsReceive->setValue(
-                    'qtyToReceive',
+                    self::receiveDataSetQtyToReceive,
                     0
                 );
                 $dsReceive->setValue(
-                    'warrantyID',
+                    self::receiveDataSetWarrantyID,
                     ''
                 );
                 $dsReceive->setValue(
-                    'qtyOS',
+                    self::receiveDataSetQtyOS,
                     $qtyOS
                 );
                 $dsReceive->setValue(
-                    'itemID',
-                    $dbeItem->getValue('itemID')
+                    self::receiveDataSetItemID,
+                    $dbeItem->getValue(DBEItem::itemID)
                 );
                 $dsReceive->setValue(
-                    'partNo',
-                    $dbeItem->getValue('partNo')
+                    self::receiveDataSetPartNo,
+                    $dbeItem->getValue(DBEItem::partNo)
                 );
                 $dsReceive->setValue(
-                    'allowReceive',
+                    self::receiveDataSetAllowReceive,
                     TRUE
                 );
                 $dsReceive->setValue(
-                    'renew',
+                    self::receiveDataSetRenew,
                     FALSE
                 );
                 $dsReceive->post();
@@ -465,77 +483,77 @@ class BUGoodsIn extends Business
         $this->setMethodName('initialiseReceiveDataset');
         $dsReceive = new DataSet($this);
         $dsReceive->addColumn(
-            'requireSerialNo',
+            self::receiveDataSetRequireSerialNo,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'serialNo',
+            self::receiveDataSetSerialNo,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'description',
+            self::receiveDataSetDescription,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'sequenceNo',
+            self::receiveDataSetSequenceNo,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'orderSequenceNo',
+            self::receiveDataSetOrderSequenceNo,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'qtyOrdered',
+            self::receiveDataSetQtyOrdered,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'qtyReceived',
+            self::receiveDataSetQtyReceived,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'qtyToReceive',
+            self::receiveDataSetQtyToReceive,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'warrantyID',
+            self::receiveDataSetWarrantyID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'qtyOS',
+            self::receiveDataSetQtyOS,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'itemID',
+            self::receiveDataSetItemID,
             DA_ID,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'customerItemID',
+            self::receiveDataSetCustomerItemID,
             DA_ID,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'partNo',
+            self::receiveDataSetPartNo,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'allowReceive',
+            self::receiveDataSetAllowReceive,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
-            'renew',
+            self::receiveDataSetRenew,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
@@ -558,8 +576,10 @@ class BUGoodsIn extends Business
         $ret = TRUE;
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
-            if ($dsGoodsIn->getValue('allowReceive')) {
-                if ($dsGoodsIn->getValue('qtyOS') < $dsGoodsIn->getValue('qtyToReceive')) {
+            if ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive)) {
+                if ($dsGoodsIn->getValue(self::receiveDataSetQtyOS) < $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    )) {
                     $ret = FALSE;
                     break;
                 }
@@ -575,10 +595,10 @@ class BUGoodsIn extends Business
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
             if (
-                ($dsGoodsIn->getValue('qtyToReceive') > 0) &
-                ($dsGoodsIn->getValue('serialNo') == '') &
-                ($dsGoodsIn->getValue('allowReceive')) &
-                ($dsGoodsIn->getValue('requireSerialNo'))
+                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) > 0) &
+                ($dsGoodsIn->getValue(self::receiveDataSetSerialNo) == '') &
+                ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive)) &
+                ($dsGoodsIn->getValue(self::receiveDataSetRequireSerialNo))
             ) {
                 $ret = FALSE;
                 break;
@@ -594,10 +614,10 @@ class BUGoodsIn extends Business
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
             if (
-                ($dsGoodsIn->getValue('qtyToReceive') > 0) &
-                ($dsGoodsIn->getValue('warrantyID') == '') &
-                ($dsGoodsIn->getValue('allowReceive')) &
-                ($dsGoodsIn->getValue('requireSerialNo'))
+                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) > 0) &
+                ($dsGoodsIn->getValue(self::receiveDataSetWarrantyID) == '') &
+                ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive)) &
+                ($dsGoodsIn->getValue(self::receiveDataSetRequireSerialNo))
             ) {
                 $ret = FALSE;
                 break;
@@ -633,7 +653,7 @@ class BUGoodsIn extends Business
         );
         $this->buSalesOrder = new BUSalesOrder($this);
         $this->buSalesOrder->getOrdheadByID(
-            $dsPorhead->getValue('ordheadID'),
+            $dsPorhead->getValue(DBEJPorhead::ordheadID),
             $this->dsOrdhead
         );
         /*
@@ -641,8 +661,8 @@ class BUGoodsIn extends Business
         use non-stock method.
         */
         if (
-            ($dsPorhead->getValue('supplierID') == CONFIG_SALES_STOCK_SUPPLIERID) OR
-            ($dsPorhead->getValue('supplierID') == CONFIG_MAINT_STOCK_SUPPLIERID)
+            ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) OR
+            ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_MAINT_STOCK_SUPPLIERID)
         ) {
             $this->receiveFromStock(
                 $porheadID,
@@ -686,108 +706,108 @@ class BUGoodsIn extends Business
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
             if (
-                ($dsGoodsIn->getValue('qtyToReceive') <= 0) OR
-                ($dsGoodsIn->getValue('allowReceive') == FALSE)
+                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) <= 0) OR
+                ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive) == FALSE)
             ) {
                 continue;
             }
             // if RequireSerialNo is TRUE then we know this is an item related to a sales order and
             // therefore must have a customer item created for it.
-            if ($dsGoodsIn->getValue('requireSerialNo')) {
+            if ($dsGoodsIn->getValue(self::receiveDataSetRequireSerialNo)) {
                 if (!is_object($dbeCustomerItem)) {
                     $dbeCustomerItem = new DBECustomerItem($this);
                 }
                 $dbeCustomerItem->setValue(
-                    'customerItemID',
+                    DBECustomerItem::customerItemID,
                     0
                 );
                 $dbeCustomerItem->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBECustomerItem::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeCustomerItem->setValue(
-                    'siteNo',
-                    $dsOrdhead->getValue('delSiteNo')
+                    DBECustomerItem::siteNo,
+                    $dsOrdhead->getValue(DBEOrdhead::delSiteNo)
                 );
                 $dbeCustomerItem->setValue(
-                    'itemID',
-                    $dsGoodsIn->getValue('itemID')
+                    DBECustomerItem::itemID,
+                    $dsGoodsIn->getValue(self::receiveDataSetItemID)
                 );
                 $dbeCustomerItem->setValue(
-                    'ordheadID',
-                    $dsPorhead->getValue('ordheadID')
+                    DBECustomerItem::ordheadID,
+                    $dsPorhead->getValue(DBEJPorhead::ordheadID)
                 );
                 $dbeCustomerItem->setValue(
-                    'porheadID',
+                    DBECustomerItem::porheadID,
                     $porheadID
                 );
                 $dbeCustomerItem->setValue(
-                    'sOrderDate',
-                    $dsOrdhead->getValue('date')
+                    DBECustomerItem::sOrderDate,
+                    $dsOrdhead->getValue(DBEOrdhead::date)
                 );
                 $dbeCustomerItem->setValue(
-                    'despatchDate',
+                    DBECustomerItem::despatchDate,
                     date('Y-m-d')
                 );
                 $dbeCustomerItem->setValue(
-                    'curUnitSale',
+                    DBECustomerItem::curUnitSale,
                     ''
                 );    // redundant I think
                 $dbeCustomerItem->setValue(
-                    'curUnitCost',
+                    DBECustomerItem::curUnitCost,
                     ''
                 );    // redundant
-                $stockcat = $dbeItem->getValue('stockcat');
+                $stockcat = $dbeItem->getValue(DBEItem::stockcat);
                 if (($stockcat == 'M') or ($stockcat == 'R')) {                        // cnc support contract
                     $dbeCustomerItem->setValue(
-                        'expiryDate',
+                        DBECustomerItem::expiryDate,
                         date(
                             'Y-m-d',
                             strtotime('+ 1 year')
                         )
                     );
-                } else if ($dsGoodsIn->getValue('renew') == TRUE) {
+                } else if ($dsGoodsIn->getValue(self::receiveDataSetRenew) == TRUE) {
                     // bug 245: Add warranty years to current date to calculate expiry date.
                     $dbeWarranty = new DBEWarranty($this);
-                    $dbeWarranty->getRow($dsGoodsIn->getValue('warrantyID'));
+                    $dbeWarranty->getRow($dsGoodsIn->getValue(self::receiveDataSetWarrantyID));
                     $dbeCustomerItem->setValue(
-                        'expiryDate',
+                        DBECustomerItem::expiryDate,
                         date(
                             'Y-m-d',
-                            strtotime('+ ' . $dbeWarranty->getValue('years') . ' year')
+                            strtotime('+ ' . $dbeWarranty->getValue(DBEWarranty::years) . ' year')
                         )
                     );
                 }
                 $dbeCustomerItem->setValue(
-                    'warrantyID',
-                    $dsGoodsIn->getValue('warrantyID')
+                    DBECustomerItem::warrantyID,
+                    $dsGoodsIn->getValue(self::receiveDataSetWarrantyID)
                 );
                 $dbeCustomerItem->setValue(
-                    'serialNo',
-                    $dsGoodsIn->getValue('serialNo')
+                    DBECustomerItem::serialNo,
+                    $dsGoodsIn->getValue(self::receiveDataSetSerialNo)
                 );
                 $dbeCustomerItem->insertRow();
             }
             // update recieved qty on porline
             $dbePorline->setValue(
-                'porheadID',
+                DBEJPorline::porheadID,
                 $porheadID
             );
             $dbePorline->setValue(
-                'sequenceNo',
-                $dsGoodsIn->getValue('orderSequenceNo')
+                DBEJPorline::sequenceNo,
+                $dsGoodsIn->getValue(self::receiveDataSetOrderSequenceNo)
             );
             $dbePorline->getRow();
-            $newQtyRecieved = $dbePorline->getValue('qtyReceived') + $dsGoodsIn->getValue('qtyToReceive');
+            $newQtyRecieved = $dbePorline->getValue(DBEJPorline::qtyReceived) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive);
             $dbePorline->setValue(
-                'qtyReceived',
+                DBEPorline::qtyReceived,
                 $newQtyRecieved
             );
             if ($newQtyRecieved == $dbePorline->getValue(
-                    'qtyOrdered'
+                    DBEJPorline::qtyOrdered
                 )) {    // if line fully recieved then set to expected date blank
                 $dbePorline->setValue(
-                    'expectedDate',
+                    DBEJPorline::expectedDate,
                     null
                 );
             }
@@ -795,7 +815,7 @@ class BUGoodsIn extends Business
             // update status on purchase order header
             $this->dbePorhead->getRow($porheadID);
             $dbePorline->setValue(
-                'porheadID',
+                DBEJPorline::porheadID,
                 $porheadID
             );
             if (($dbePorline->countOutstandingRows() == 0)) {
@@ -803,12 +823,12 @@ class BUGoodsIn extends Business
                     $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
                 }
                 $this->dbePorhead->setValue(
-                    'type',
+                    DBEJPorhead::type,
                     'C'
                 );
             } else {
                 $this->dbePorhead->setValue(
-                    'type',
+                    DBEJPorhead::type,
                     'P'
                 );
             }
@@ -816,13 +836,13 @@ class BUGoodsIn extends Business
             /*
             If the customer is an internal stock location then update the appropriate stock level
             */
-            if ($dsOrdhead->getValue('customerID') == CONFIG_SALES_STOCK_CUSTOMERID) {
-                $dbeItem->getRow($dsGoodsIn->getValue('itemID'));
-                $newValue = $dbeItem->getValue('salesStockQty') + $dsGoodsIn->getValue('qtyToReceive');
+            if ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) {
+                $dbeItem->getRow($dsGoodsIn->getValue(self::receiveDataSetItemID));
+                $newValue = $dbeItem->getValue(DBEItem::salesStockQty) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive);
                 $dbeItem->updateSalesStockQty($newValue);
-            } else if ($dsOrdhead->getValue('customerID') == CONFIG_MAINT_STOCK_CUSTOMERID) {
-                $dbeItem->getRow($dsGoodsIn->getValue('itemID'));
-                $newValue = $dbeItem->getValue('maintStockQty') + $dsGoodsIn->getValue('qtyToReceive');
+            } else if ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_MAINT_STOCK_CUSTOMERID) {
+                $dbeItem->getRow($dsGoodsIn->getValue(self::receiveDataSetItemID));
+                $newValue = $dbeItem->getValue(DBEItem::maintStockQty) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive);
                 $dbeItem->updateMaintStockQty($newValue);
             }
         }//dsGoodsIn->fetchNext()
@@ -854,85 +874,85 @@ class BUGoodsIn extends Business
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
             if (
-                ($dsGoodsIn->getValue('qtyToReceive') <= 0) OR
-                ($dsGoodsIn->getValue('allowReceive') == FALSE)
+                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) <= 0) OR
+                ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive) == FALSE)
             ) {
                 continue;
             }
             // if RequireSerialNo is TRUE then we know this item must have a customerItem
             // so we must update the customerID and Warranty ID accordingly.
-            if ($dsGoodsIn->getValue('requireSerialNo')) {
+            if ($dsGoodsIn->getValue(self::receiveDataSetRequireSerialNo)) {
                 if (!is_object($dbeCustomerItem)) {
                     $dbeCustomerItem = new DBECustomerItem($this);
                 }
-                if (!$dbeCustomerItem->getRow($dsGoodsIn->getValue('customerItemID'))) {
+                if (!$dbeCustomerItem->getRow($dsGoodsIn->getValue(self::receiveDataSetCustomerItemID))) {
                     $this->raiseError('customer item not found');
                 }
                 $dbeCustomerItem->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBECustomerItem::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeCustomerItem->setValue(
-                    'siteNo',
-                    $dsOrdhead->getValue('delSiteNo')
+                    DBECustomerItem::siteNo,
+                    $dsOrdhead->getValue(DBEOrdhead::delSiteNo)
                 );
                 $dbeCustomerItem->setValue(
-                    'serialNo',
-                    $dsGoodsIn->getValue('serialNo')
+                    DBECustomerItem::serialNo,
+                    $dsGoodsIn->getValue(self::receiveDataSetSerialNo)
                 );
                 $dbeCustomerItem->setValue(
-                    'ordheadID',
-                    $dsPorhead->getValue('ordheadID')
+                    DBECustomerItem::ordheadID,
+                    $dsPorhead->getValue(DBEPorhead::ordheadID)
                 );
 
                 // If purchase from stock then do not update the original purchase order info
-                if (!common_isAnInternalStockSupplier($dsPorhead->getValue('supplierID'))) {
+                if (!common_isAnInternalStockSupplier($dsPorhead->getValue(DBEPorhead::supplierID))) {
                     $dbeCustomerItem->setValue(
-                        'porheadID',
+                        DBECustomerItem::porheadID,
                         $porheadID
                     );
                 }
 
                 $dbeCustomerItem->setValue(
-                    'sOrderDate',
-                    $dsOrdhead->getValue('date')
+                    DBECustomerItem::sOrderDate,
+                    $dsOrdhead->getValue(DBEOrdhead::date)
                 );
                 $dbeCustomerItem->setValue(
-                    'expiryDate',
+                    DBECustomerItem::expiryDate,
                     null
                 );
                 $dbeCustomerItem->setValue(
-                    'warrantyID',
-                    $dsGoodsIn->getValue('warrantyID')
+                    DBECustomerItem::warrantyID,
+                    $dsGoodsIn->getValue(self::receiveDataSetWarrantyID)
                 );
                 $dbeCustomerItem->updateRow();
             }
             // update recieved qty on porline
             $dbePorline->setValue(
-                'porheadID',
+                DBEPorline::porheadID,
                 $porheadID
             );
             $dbePorline->setValue(
-                'sequenceNo',
-                $dsGoodsIn->getValue('orderSequenceNo')
+                DBEPorline::sequenceNo,
+                $dsGoodsIn->getValue(self::receiveDataSetOrderSequenceNo)
             );
             $dbePorline->getRow();
             $dbePorline->setValue(
-                'qtyReceived',
-                $dbePorline->getValue('qtyReceived') + $dsGoodsIn->getValue('qtyToReceive')
+                DBEPorline::qtyReceived,
+                $dbePorline->getValue(DBEPorline::qtyReceived) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive)
             );
 
             // there is no purchase invoice authorisation for stock suppliers so we update the invoiced qty here
             $dbePorline->setValue(
-                'qtyInvoiced',
-                $dbePorline->getValue('qtyInvoiced') + $dsGoodsIn->getValue('qtyToReceive')
+                DBEPorline::qtyInvoiced,
+                $dbePorline->getValue(DBEPorline::qtyInvoiced) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive)
             ); // not really required but hey!
             $dbePorline->updateRow();
 
             // update status on purchase order header
             $this->dbePorhead->getRow($porheadID);
             $dbePorline->setValue(
-                'porheadID',
+                DBEJPorline::porheadID,
                 $porheadID
             );
             if (($dbePorline->countOutstandingRows() == 0)) {
@@ -940,37 +960,45 @@ class BUGoodsIn extends Business
                     $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
                 }
                 $this->dbePorhead->setValue(
-                    'type',
+                    DBEPorhead::type,
                     'A'
                 );
             } else {
                 $this->dbePorhead->setValue(
-                    'type',
+                    DBEPorhead::type,
                     'P'
                 );
             }
             $this->dbePorhead->updateRow();
 
             //	Reduce appropriate stock level
-            $dbeItem->getRow($dsGoodsIn->getValue('itemID'));
-            if ($dsPorhead->getValue('supplierID') == CONFIG_SALES_STOCK_SUPPLIERID) {
+            $dbeItem->getRow($dsGoodsIn->getValue(DBEItem::itemID));
+            if ($dsPorhead->getValue(DBEPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) {
                 // sales stock
-                $newValue = $dbeItem->getValue('salesStockQty') - $dsGoodsIn->getValue('qtyToReceive');
+                $newValue = $dbeItem->getValue(DBEItem::salesStockQty) - $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    );
                 $dbeItem->updateSalesStockQty($newValue);
             } else {
                 // maint stock
-                $newValue = $dbeItem->getValue('maintStockQty') - $dsGoodsIn->getValue('qtyToReceive');
+                $newValue = $dbeItem->getValue(DBEItem::maintStockQty) - $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    );
                 $dbeItem->updateMaintStockQty($newValue);
             }
 
             /*
             If the customer is an internal stock location then increase the appropriate stock level
             */
-            if ($dsOrdhead->getValue('customerID') == CONFIG_SALES_STOCK_CUSTOMERID) {
-                $newValue = $dbeItem->getValue('salesStockQty') + $dsGoodsIn->getValue('qtyToReceive');
+            if ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) {
+                $newValue = $dbeItem->getValue(DBEItem::salesStockQty) + $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    );
                 $dbeItem->updateSalesStockQty($newValue);
-            } else if ($dsOrdhead->getValue('customerID') == CONFIG_MAINT_STOCK_CUSTOMERID) {
-                $newValue = $dbeItem->getValue('maintStockQty') + $dsGoodsIn->getValue('qtyToReceive');
+            } else if ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_MAINT_STOCK_CUSTOMERID) {
+                $newValue = $dbeItem->getValue(DBEItem::maintStockQty) + $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    );
                 $dbeItem->updateMaintStockQty($newValue);
             }
         }//dsGoodsIn->fetchNext()
@@ -983,10 +1011,10 @@ class BUGoodsIn extends Business
         set sales order	status to completed.
         */
         if (
-            (common_isAnInternalStockLocation($this->dsOrdhead->getValue('customerID'))) &
-            ($this->dbePorhead->countNonAuthorisedRowsBySO($this->dsPorhead->getValue('ordheadID')) == 0)
+            (common_isAnInternalStockLocation($this->dsOrdhead->getValue(DBEOrdhead::customerID))) &
+            ($this->dbePorhead->countNonAuthorisedRowsBySO($this->dsPorhead->getValue(DBEPorhead::ordheadID)) == 0)
         ) {
-            $this->buSalesOrder->setStatusCompleted($this->dsPorhead->getValue('ordheadID'));
+            $this->buSalesOrder->setStatusCompleted($this->dsPorhead->getValue(DBEPorhead::ordheadID));
         }
     }
 }// End of class

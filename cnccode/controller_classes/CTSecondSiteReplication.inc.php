@@ -309,7 +309,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
         foreach ($suspended as $record) {
 
-            if ($record['replicationImageTime'] && $record['replicationImageTime'] != '0000-00-00 00:00:00') {
+            if ($record['replicationImageTime']) {
                 $imageTime = strftime(
                     "%d/%m/%Y %H:%M:%S",
                     strtotime($record['replicationImageTime'])

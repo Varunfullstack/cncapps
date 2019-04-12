@@ -10,8 +10,8 @@ class DBEInvoiceTotals extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -59,7 +59,7 @@ class DBEInvoiceTotals extends DBEntity
                 $this->db->link_id(),
                 $type
             ) . "'" .
-            " AND inh_date_printed ='0000-00-00'" .
+            " AND inh_date_printed is null" .
             " AND inl_unit_price IS NOT NULL" .
             " AND inl_line_type = 'I' 
               AND directDebitFlag " . ($directDebit ? " = 'Y' " : " <> 'Y' ")
@@ -102,7 +102,7 @@ class DBEInvoiceTotals extends DBEntity
             "SUM( inl_qty * inl_unit_price ) as salePrice" .
             " FROM " . $this->getTableName() .
             " JOIN invline ON inh_invno =inl_invno" .
-            " WHERE inh_date_printed ='0000-00-00'" .
+            " WHERE inh_date_printed is null " .
             " AND inl_unit_price IS NOT NULL" .
             " AND inl_line_type = 'I'"
         );

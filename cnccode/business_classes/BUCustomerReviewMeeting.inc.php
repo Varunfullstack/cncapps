@@ -17,6 +17,14 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 class BUCustomerReviewMeeting extends Business
 {
 
+    const searchFormCustomerID = 'customerID';
+    const searchFormStartYearMonth = 'startYearMonth';
+    const searchFormEndYearMonth = 'endYearMonth';
+    const searchFormMeetingDate = 'meetingDate';
+
+    const templateClientName = 'clientName';
+    const templateReviewMeetingDate = 'reviewMeetingDate';
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -144,17 +152,17 @@ class BUCustomerReviewMeeting extends Business
 
                 $buSite->getSiteByID(
                     $customer['customerID'],
-                    $dbeContact->getValue('siteNo'),
+                    $dbeContact->getValue(DBEContact::siteNo),
                     $dsSite
                 );
                 /*
                 SUMMARY;LANGUAGE=en-gb:Review Meeting - {customerName} {contactName} {contactPhone}
                 LOCATION:{add1} {add2} {add3} {town} {county} {postcode}
                 */
-                if ($dbeContact->getValue('phone')) {
-                    $phone = $dbeContact->getValue('phone');
+                if ($dbeContact->getValue(DBEContact::phone)) {
+                    $phone = $dbeContact->getValue(DBEContact::phone);
                 } else {
-                    $phone = $dbeContact->getValue('mobilePhone');
+                    $phone = $dbeContact->getValue(DBEContact::mobilePhone);
                 }
 
                 $template->set_var(
@@ -166,7 +174,7 @@ class BUCustomerReviewMeeting extends Business
                         'county'       => $dsSite->getValue(DBESite::county),
                         'postcode'     => $dsSite->getValue(DBESite::postcode),
                         'contactPhone' => $phone,
-                        'contactName'  => $dbeContact->getValue('firstName') . ' ' . $dbeContact->getValue('lastName')
+                        'contactName'  => $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName)
                     )
                 );
 
@@ -262,24 +270,24 @@ class BUCustomerReviewMeeting extends Business
         };
 
         $dsData->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_NOT_NULL
         );
         $dsData->addColumn(
-            'startYearMonth',
+            self::searchFormStartYearMonth,
             DA_STRING,
             DA_NOT_NULL,
             $checkMonthYear
         );
         $dsData->addColumn(
-            'endYearMonth',
+            self::searchFormEndYearMonth,
             DA_STRING,
             DA_NOT_NULL,
             $checkMonthYear
         );
         $dsData->addColumn(
-            'meetingDate',
+            self::searchFormMeetingDate,
             DA_DATE,
             DA_NOT_NULL
         );
@@ -418,15 +426,15 @@ class BUCustomerReviewMeeting extends Business
         $this->initialiseSearchForm($dsSearchForm);
 
         $dsSearchForm->setValue(
-            'customerID',
+            self::searchFormCustomerID,
             $customerID
         );
         $dsSearchForm->setValue(
-            'startYearMonth',
+            self::searchFormStartYearMonth,
             $startDate->format('m/Y')
         );
         $dsSearchForm->setValue(
-            'endYearMonth',
+            self::searchFormEndYearMonth,
             $endDate->format('m/Y')
         );
 
@@ -811,12 +819,12 @@ class BUCustomerReviewMeeting extends Business
         }
 
         $templateProcessor->setValue(
-            'clientName',
+            self::templateClientName,
             $clientName
         );
         $meetingDate = new \DateTime($meetingDate);
         $templateProcessor->setValue(
-            'reviewMeetingDate',
+            self::templateReviewMeetingDate,
             $meetingDate->format('d/m/Y')
         );
         $uniqueId = uniqid(

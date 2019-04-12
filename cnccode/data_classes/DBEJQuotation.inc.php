@@ -7,18 +7,25 @@ require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 
 class DBEJQuotation extends DBEQuotation
 {
+    const userName = "userName";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("userName", DA_STRING, DA_NOT_NULL, 'cns_name');
+        $this->addColumn(
+            self::userName,
+            DA_STRING,
+            DA_NOT_NULL,
+            'cns_name'
+        );
         $this->setAddColumnsOff();
     }
 
@@ -35,8 +42,11 @@ class DBEJQuotation extends DBEQuotation
         }
         $this->setQueryString(
             'SELECT ' . $this->getDBColumnNamesAsString() .
-            ' FROM ' . $this->getTableName() . ' LEFT JOIN consultant ON ' . $this->getTableName() . '.' . $this->getDBColumnName('userID') . '=consultant.cns_consno' .
-            ' WHERE ' . $this->getTableName() . '.' . $this->getDBColumnName('ordheadID') . '=' . $this->getFormattedValue('ordheadID')
+            ' FROM ' . $this->getTableName() . ' LEFT JOIN consultant ON ' . $this->getTableName(
+            ) . '.' . $this->getDBColumnName('userID') . '=consultant.cns_consno' .
+            ' WHERE ' . $this->getTableName() . '.' . $this->getDBColumnName(
+                'ordheadID'
+            ) . '=' . $this->getFormattedValue('ordheadID')
         );
         return (parent::getRows());
     }

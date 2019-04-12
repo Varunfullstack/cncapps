@@ -7,20 +7,39 @@ require_once($cfg["path_dbe"] . "/DBEOrdhead.inc.php");
 
 class DBEJOrdhead extends DBEOrdhead
 {
+    const customerName = "customerName";
+    const contract = "contract";
+    const customerItemID = "customerItemID";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("customerName", DA_STRING, DA_NOT_NULL, 'cus_name');
-        $this->addColumn("contract", DA_STRING, DA_ALLOW_NULL, 'itm_desc');
-        $this->addColumn("customerItemID", DA_INTEGER, DA_ALLOW_NULL, 'cui_cuino');
+        $this->addColumn(
+            self::customerName,
+            DA_STRING,
+            DA_NOT_NULL,
+            'cus_name'
+        );
+        $this->addColumn(
+            self::contract,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'itm_desc'
+        );
+        $this->addColumn(
+            self::customerItemID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'cui_cuino'
+        );
         $this->setAddColumnsOff();
     }
 
@@ -85,30 +104,48 @@ class DBEJOrdhead extends DBEOrdhead
                 break;
             default:
                 $statement = $statement .
-                    " AND " . $this->getDBColumnName('type') . "='" . mysqli_real_escape_string($this->db->link_id(), $orderType) . "'";
+                    " AND " . $this->getDBColumnName('type') . "='" . mysqli_real_escape_string(
+                        $this->db->link_id(),
+                        $orderType
+                    ) . "'";
                 break;
         }
         if ($lineText != '') {
             $statement = $statement .
 
                 " AND ( MATCH (ordline.odl_desc)
-					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $lineText) . "' IN BOOLEAN MODE)";
+					AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $lineText
+                ) . "' IN BOOLEAN MODE)";
 
             $statement = $statement .
                 " OR MATCH (item.notes, item.itm_unit_of_sale)
-					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $lineText) . "' IN BOOLEAN MODE) )";
+					AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $lineText
+                ) . "' IN BOOLEAN MODE) )";
         }
         if ($custPORef != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('custPORef') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $custPORef) . "%'";
+                " AND " . $this->getDBColumnName('custPORef') . " LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $custPORef
+                ) . "%'";
         }
         if ($fromDate != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('date') . ">='" . mysqli_real_escape_string($this->db->link_id(), $fromDate) . "'";
+                " AND " . $this->getDBColumnName('date') . ">='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $fromDate
+                ) . "'";
         }
         if ($toDate != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('date') . "<='" . mysqli_real_escape_string($this->db->link_id(), $toDate) . "'";
+                " AND " . $this->getDBColumnName('date') . "<='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $toDate
+                ) . "'";
         }
         $statement = $statement . " ORDER BY " . $this->getDBColumnName('date') . " DESC";
         $statement = $statement . " LIMIT 0,200";
@@ -125,7 +162,9 @@ class DBEJOrdhead extends DBEOrdhead
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName('customerID') . "= customer.cus_custno" .
+            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName(
+                'customerID'
+            ) . "= customer.cus_custno" .
             " LEFT JOIN custitem ON renewalOrdheadID = odh_ordno" .
             " LEFT JOIN item ON cui_itemno = itm_itemno" .
             " WHERE " . $this->getPKWhere()

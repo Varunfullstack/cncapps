@@ -438,7 +438,7 @@ class CTSecondSite extends CTCNC
 
         foreach ($suspended as $record) {
 
-            if ($record['imageTime'] != '0000-00-00 00:00:00') {
+            if ($record['imageTime']) {
                 $imageTime = strftime(
                     "%d/%m/%Y %H:%M:%S",
                     strtotime($record['imageTime'])

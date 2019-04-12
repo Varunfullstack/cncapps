@@ -153,7 +153,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-22">
+    <changeSet author="pavwebdev" id="1554199133-23">
         <sql>
             UPDATE custitem
             SET cui_ord_date = NULL
@@ -161,7 +161,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-23">
+    <changeSet author="pavwebdev" id="1554199133-24">
         <sql>
             UPDATE invhead
             SET inh_date_printed = NULL
@@ -169,7 +169,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-24">
+    <changeSet author="pavwebdev" id="1554199133-25">
         <sql>
             UPDATE porline
             SET pol_exp_date = NULL
@@ -177,7 +177,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-25">
+    <changeSet author="pavwebdev" id="1554199133-26">
         <sql>
             UPDATE ordhead
             SET odh_req_date = NULL
@@ -185,7 +185,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-26">
+    <changeSet author="pavwebdev" id="1554199133-27">
         <sql>
             UPDATE ordhead
             SET odh_prom_date = NULL
@@ -194,11 +194,115 @@
         <rollback/>
     </changeSet>
 
-    <changeSet author="pavwebdev" id="1554199133-27">
+    <changeSet author="pavwebdev" id="1554199133-28">
         <sql>
             UPDATE ordhead
             SET odh_expect_date = NULL
             WHERE odh_expect_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-29">
+        <sql>
+            UPDATE customer
+            SET reviewDate = NULL
+            WHERE reviewDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-30">
+        <sql>
+            UPDATE customer
+            SET cus_last_review_meeting_date = NULL
+            WHERE cus_last_review_meeting_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-31">
+        <sql>
+            UPDATE secondsite_image
+            SET imageTime = NULL
+            WHERE imageTime = '0000-00-00 00:00:00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-32">
+        <sql>
+            UPDATE secondsite_image
+            SET replicationImageTime = NULL
+            WHERE replicationImageTime = '0000-00-00 00:00:00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-33">
+        <sql>
+            UPDATE custitem
+            SET cui_expiry_date = NULL
+            WHERE cui_expiry_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-34">
+        <sql>
+            UPDATE custitem
+            SET dateGenerated = NULL
+            WHERE dateGenerated = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-35">
+        <sql>
+            UPDATE custitem
+            SET cui_desp_date = NULL
+            WHERE cui_desp_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-36">
+        <sql>
+            UPDATE custitem
+            SET cui_pord_date = NULL
+            WHERE cui_pord_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-37">
+        <sql>
+            UPDATE custitem
+            SET secondsiteSuspendedDate = NULL
+            WHERE secondsiteSuspendedDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-38">
+        <sql>
+            UPDATE custitem
+            SET secondsiteImageDelayDate = NULL
+            WHERE secondsiteImageDelayDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-39">
+        <sql>
+            UPDATE project
+            SET expiryDate = NULL
+            WHERE expiryDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-40">
+        <sql>
+            UPDATE project
+            SET commenceDate = NULL
+            WHERE commenceDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-40">
+        <sql>
+            UPDATE staffAppraisalQuestionnaire
+            SET dateSent = NULL
+            WHERE dateSent = '0000-00-00 00:00:00'
         </sql>
         <rollback/>
     </changeSet>

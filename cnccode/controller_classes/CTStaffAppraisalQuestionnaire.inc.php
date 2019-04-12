@@ -223,7 +223,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 );
                 $sendLink = "<a href='$sendURL'>[Send To Staff members]</a>";
                 $dateSent = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
-                if ($dateSent && $dateSent != '0000-00-00 00:00:00') {
+                if ($dateSent) {
                     $sendLink = "";
                 }
 
@@ -1719,7 +1719,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $dateSent = $dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
 
 
-        if ($dateSent && $dateSent != "0000-00-00 00:00:00") {
+        if ($dateSent) {
             throw new Exception('This questionnaire has already been sent');
         }
 

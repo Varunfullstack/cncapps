@@ -63,6 +63,51 @@ class BUActivity extends Business
     const Fixed = 'completedFixed';
     const FixedReopen = 'completedReopen';
 
+    const searchFormStatus = 'status';
+    const searchFormCustomerID = 'customerID';
+    const searchFormUserID = 'userID';
+    const searchFormRootCauseID = 'rootCauseID';
+    const searchFormContractCustomerItemID = 'contractCustomerItemID';
+    const searchFormPriority = 'priority';
+    const searchFormCustomerName = 'customerName';
+    const searchFormActivityText = 'activityText';
+    const searchFormServiceRequestSpentTime = 'serviceRequestSpentTime';
+    const searchFormIndividualActivitySpentTime = 'individualActivitySpentTime';
+    const searchFormFromDate = 'fromDate';
+    const searchFormToDate = 'toDate';
+    const searchFormCallActivityID = 'callActivityID';
+    const searchFormProblemID = 'problemID';
+    const searchFormCallActTypeID = 'callActTypeID';
+    const searchFormContractType = 'contractType';
+    const searchFormLinkedSalesOrderID = 'linkedSalesOrderID';
+    const searchFormManagementReviewOnly = 'managementReviewOnly';
+    const searchFormBreachedSlaOption = 'breachedSlaOption';
+
+    const customerActivityMonthFormCustomerID = 'customerID';
+    const customerActivityMonthFormFromDate = 'fromDate';
+    const customerActivityMonthFormToDate = 'toDate';
+
+
+    const exportDataSetEndDate = 'endDate';
+    const exportDataSetPreviewRun = 'previewRun';
+
+    const exportPrePayActivitiesFormCustomerName = 'customerName';
+    const exportPrePayActivitiesFormPreviousBalance = 'previousBalance';
+    const exportPrePayActivitiesFormCurrentBalance = 'currentBalance';
+    const exportPrePayActivitiesFormExpiryDate = 'expiryDate';
+    const exportPrePayActivitiesFormTopUp = 'topUp';
+    const exportPrePayActivitiesFormContacts = 'contacts';
+    const exportPrePayActivitiesFormContractType = 'contractType';
+    const exportPrePayActivitiesFormWebFileLink = 'webFileLink';
+
+    const customerActivityFormCustomerID = 'customerID';
+    const customerActivityFormUserID = 'userID';
+    const customerActivityFormContractType = 'contractType';
+    const customerActivityFormCustomerName = 'customerName';
+    const customerActivityFormFromDate = 'fromDate';
+    const customerActivityFormToDate = 'toDate';
+
+
     /** @var Template */
     public $template;
     var $csvSummaryFileHandle;
@@ -167,149 +212,149 @@ class BUActivity extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'status',
+            self::searchFormStatus,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
 //        $dsData->addColumn('project', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn(
-            'userID',
+            self::searchFormUserID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'rootCauseID',
+            self::searchFormRootCauseID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'contractCustomerItemID',
+            self::searchFormContractCustomerItemID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'priority',
+            self::searchFormPriority,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'customerName',
+            self::searchFormCustomerName,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'activityText',
+            self::searchFormActivityText,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'serviceRequestSpentTime',
+            self::searchFormServiceRequestSpentTime,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'individualActivitySpentTime',
+            self::searchFormIndividualActivitySpentTime,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'fromDate',
+            self::searchFormFromDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'toDate',
+            self::searchFormToDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'callActivityID',
+            self::searchFormCallActivityID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'problemID',
+            self::searchFormProblemID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'callActTypeID',
+            self::searchFormCallActTypeID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'contractType',
+            self::searchFormContractType,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'linkedSalesOrderID',
+            self::searchFormLinkedSalesOrderID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'managementReviewOnly',
+            self::searchFormManagementReviewOnly,
             DA_YN,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'breachedSlaOption',
+            self::searchFormBreachedSlaOption,
             DA_STRING,
             DA_ALLOW_NULL
         );
 
 
         $dsData->setValue(
-            'customerID',
+            self::searchFormCustomerID,
             null
         );
         $dsData->setValue(
-            'userID',
+            self::searchFormUserID,
             null
         );
         $dsData->setValue(
-            'contractType',
+            self::searchFormContractType,
             null
         );
         $dsData->setValue(
-            'rootCauseID',
+            self::searchFormRootCauseID,
             null
         );
         $dsData->setValue(
-            'contractCustomerItemID',
+            self::searchFormContractCustomerItemID,
             '99'
         ); // all(blank is used for T&M)
         $dsData->setValue(
-            'priority',
+            self::searchFormPriority,
             null
         );
         $dsData->setValue(
-            'customerName',
+            self::searchFormCustomerName,
             null
         );
         $dsData->setValue(
-            'status',
+            self::searchFormStatus,
             'U'
         );
         $dsData->setValue(
-            'callActTypeID',
+            self::searchFormCallActTypeID,
             null
         );
         $dsData->setValue(
-            'linkedSalesOrderID',
+            self::searchFormLinkedSalesOrderID,
             null
         );
         $dsData->setValue(
-            'managementReviewOnly',
+            self::searchFormManagementReviewOnly,
             'N'
         );
         $dsData->setValue(
-            'breachedSlaOption',
+            self::searchFormBreachedSlaOption,
             null
         );
     } // end sendServiceReallocatedEmail
@@ -318,22 +363,22 @@ class BUActivity extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'customerID',
+            self::customerActivityMonthFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'fromDate',
+            self::customerActivityMonthFormFromDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'toDate',
+            self::customerActivityMonthFormToDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'customerID',
+            self::customerActivityMonthFormCustomerID,
             null
         );
     } // end sendSalesRequestAlertEmail
@@ -1121,8 +1166,10 @@ class BUActivity extends Business
                 $completeDate = $dbeJProblem->getValue(DBEProblem::completeDate);
 
                 $fields['completeDate'] = Controller::dateYMDtoDMY($completeDate);
-                $fields['resolvedEngineerName'] = $dbeFixedUser->getValue('firstName') . ' ' . $dbeFixedUser->getValue(
-                        'lastName'
+                $fields['resolvedEngineerName'] = $dbeFixedUser->getValue(
+                        DBEUser::firstName
+                    ) . ' ' . $dbeFixedUser->getValue(
+                        DBEUser::lastName
                     );
 
                 $subjectSuffix = 'Pending Closure on ' . Controller::dateYMDtoDMY($completeDate);
@@ -2595,7 +2642,7 @@ class BUActivity extends Business
 
         $problem->setValue(
             DBEProblem::alarmDate,
-            "0000-00-00"
+            null
         );
         $problem->setValue(
             DBEProblem::alarmTime,
@@ -4175,18 +4222,18 @@ class BUActivity extends Business
         $this->setMethodName('initialiseExportDataset');
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'endDate',
+            self::exportDataSetEndDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'previewRun',
+            self::exportDataSetPreviewRun,
             DA_YN_FLAG,
             DA_ALLOW_NULL
         );
         $dsData->setUpdateModeUpdate();
         $dsData->setValue(
-            'previewRun',
+            self::exportDataSetPreviewRun,
             'Y'
         );
         $dsData->post();
@@ -4282,42 +4329,42 @@ class BUActivity extends Business
 
         $dsResults = new DataSet($this);
         $dsResults->addColumn(
-            'customerName',
+            self::exportPrePayActivitiesFormCustomerName,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'previousBalance',
+            self::exportPrePayActivitiesFormPreviousBalance,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'currentBalance',
+            self::exportPrePayActivitiesFormCurrentBalance,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'expiryDate',
+            self::exportPrePayActivitiesFormExpiryDate,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'topUp',
+            self::exportPrePayActivitiesFormTopUp,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'contacts',
+            self::exportPrePayActivitiesFormContacts,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'contractType',
+            self::exportPrePayActivitiesFormContractType,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsResults->addColumn(
-            'webFileLink',
+            self::exportPrePayActivitiesFormWebFileLink,
             DA_STRING,
             DA_ALLOW_NULL
         ); // link to statement
@@ -4338,8 +4385,10 @@ class BUActivity extends Business
         WHERE cui_itemno = " . $this->dsHeader->getValue(
                 DBEHeader::gscItemID
             ) . " AND cui_expiry_date >= '" . $dsData->getValue(
-                'endDate'
-            ) . "'" . " AND cui_desp_date <= '" . $dsData->getValue('endDate') . "'" . // and the contract has started
+                self::exportDataSetEndDate
+            ) . "'" . " AND cui_desp_date <= '" . $dsData->getValue(
+                self::exportDataSetEndDate
+            ) . "'" . // and the contract has started
             " AND cui_expiry_date >= now()" . // and is not expired
             " AND  cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND  renewalStatus  <> 'D'";
 
@@ -5120,35 +5169,35 @@ class BUActivity extends Business
 
         $dsResults->setUpdateModeInsert();
         $dsResults->setValue(
-            'customerName',
+            self::exportPrePayActivitiesFormCustomerName,
             $Record ['cus_name']
         );
         $dsResults->setValue(
-            'previousBalance',
+            self::exportPrePayActivitiesFormPreviousBalance,
             $Record ['curGSCBalance']
         );
         $dsResults->setValue(
-            'currentBalance',
+            self::exportPrePayActivitiesFormCurrentBalance,
             common_numberFormat($newBalance)
         );
         $dsResults->setValue(
-            'expiryDate',
+            self::exportPrePayActivitiesFormExpiryDate,
             Controller::dateYMDtoDMY($Record ['cui_expiry_date'])
         );
         $dsResults->setValue(
-            'topUp',
+            self::exportPrePayActivitiesFormTopUp,
             common_numberFormat($topupAmount)
         );
         $dsResults->setValue(
-            'contacts',
+            self::exportPrePayActivitiesFormContacts,
             $contacts
         );
         $dsResults->setValue(
-            'contractType',
+            self::exportPrePayActivitiesFormContractType,
             $Record ['ity_desc']
         );
         $dsResults->setValue(
-            'webFileLink',
+            self::exportPrePayActivitiesFormWebFileLink,
             $webFileLink
         );
         $dsResults->post();
@@ -6116,45 +6165,45 @@ is currently a balance of ';
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'customerID',
+            self::customerActivityFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'userID',
+            self::customerActivityFormUserID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'contractType',
+            self::customerActivityFormContractType,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'customerName',
+            self::customerActivityFormCustomerName,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'fromDate',
+            self::customerActivityFormFromDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'toDate',
+            self::customerActivityFormToDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'customerID',
+            self::customerActivityFormCustomerID,
             null
         );
         $dsData->setValue(
-            'userID',
+            self::customerActivityFormUserID,
             null
         );
         $dsData->setValue(
-            'customerName',
+            self::customerActivityFormCustomerName,
             null
         );
     }

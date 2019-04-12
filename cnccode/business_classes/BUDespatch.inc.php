@@ -17,9 +17,9 @@ require_once($cfg["path_dbe"] . "/DBEOrdline.inc.php");
 
 class BUDespatch extends Business
 {
+    const despatchSequenceNo = 'sequenceNo';
+    const despatchQtyToDespatch = 'qtyToDespatch';
 
-    const sequenceNo = "sequenceNo";
-    const qtyToDespatch = "qtyToDespatch";
     /** @var DBEOrdline */
     public $dbeOrdline;
 
@@ -97,11 +97,11 @@ class BUDespatch extends Business
         while ($dsOrdline->fetchNext()) {
             $dsDespatch->setUpdateModeInsert();
             $dsDespatch->setValue(
-                'sequenceNo',
+                self::despatchSequenceNo,
                 $dsOrdline->getValue(DBEJOrdline::sequenceNo)
             );
             $dsDespatch->setValue(
-                'qtyToDespatch',
+                self::despatchQtyToDespatch,
                 0
             );    // comment line
             $dsDespatch->post();
@@ -113,12 +113,12 @@ class BUDespatch extends Business
     {
         $dsDespatch = new DataSet($this);
         $dsDespatch->addColumn(
-            'sequenceNo',
+            self::despatchSequenceNo,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsDespatch->addColumn(
-            'qtyToDespatch',
+            self::despatchQtyToDespatch,
             DA_FLOAT,
             DA_ALLOW_NULL
         );
@@ -163,7 +163,7 @@ class BUDespatch extends Business
                 $qtyOutstanding = $dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(
                         DBEOrdline::qtyDespatched
                     );
-                if ($qtyOutstanding - $dsDespatch->getValue('qtyToDespatch') != 0) {
+                if ($qtyOutstanding - $dsDespatch->getValue(self::despatchQtyToDespatch) != 0) {
                     $fullyDespatched = FALSE;
                     break;
                 }
@@ -180,7 +180,7 @@ class BUDespatch extends Business
 
             $dsOrdline->fetchNext();
 
-            $qtyToDespatch = $dsDespatch->getValue('qtyToDespatch');
+            $qtyToDespatch = $dsDespatch->getValue(self::despatchQtyToDespatch);
 
             if ($qtyToDespatch <= 0) {
                 continue;
@@ -322,7 +322,7 @@ class BUDespatch extends Business
         );
         $noteNo = $dbeDeliveryNote->getNextNoteNo();
 
-        $dbeDeliveryNote->setPKValue('0');
+        $dbeDeliveryNote->setPKValue(null);
         $dbeDeliveryNote->setValue(
             DBEDeliveryNote::ordheadID,
             $dsOrdhead->getValue(DBEOrdhead::ordheadID)
@@ -366,11 +366,11 @@ class BUDespatch extends Business
         $dbeOrdline->getRow();
         $dbeOrdline->setValue(
             DBEOrdline::qtyDespatched,
-            $dsOrdline->getValue(DBEOrdline::qtyDespatched) + $dsDespatch->getValue('qtyToDespatch')
+            $dsOrdline->getValue(DBEOrdline::qtyDespatched) + $dsDespatch->getValue(self::despatchQtyToDespatch)
         );
         $dbeOrdline->setValue(
             DBEOrdline::qtyLastDespatched,
-            $dsDespatch->getValue('qtyToDespatch')
+            $dsDespatch->getValue(self::despatchQtyToDespatch)
         );
         $dbeOrdline->setValue(
             DBEOrdline::description,

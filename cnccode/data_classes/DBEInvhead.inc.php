@@ -38,8 +38,8 @@ class DBEInvhead extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -227,7 +227,7 @@ class DBEInvhead extends DBEntity
                 $this->db->link_id(),
                 $date
             ) . "'" .
-            " WHERE " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'";
+            " WHERE " . $this->getDBColumnName(self::datePrinted) . " is null ";
 
         if (!$directDebit) {
             $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
@@ -258,7 +258,7 @@ class DBEInvhead extends DBEntity
                 $this->db->link_id(),
                 $type
             ) . "'" .
-            " AND " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'";
+            " AND " . $this->getDBColumnName(self::datePrinted) . " is null ";
         if (!$directDebit) {
             $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
         } else {
@@ -293,7 +293,7 @@ class DBEInvhead extends DBEntity
                 $this->db->link_id(),
                 $type
             ) . "'" .
-            " AND " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'" .
+            " AND " . $this->getDBColumnName(self::datePrinted) . " is null " .
             " AND inl_unit_price IS NOT NULL";
 
         if (!$directDebit) {

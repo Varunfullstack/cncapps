@@ -869,7 +869,6 @@ class BUSecondsite extends Business
         ssi.status,
         ssi.imagePath,
         ssi.imageTime
-
       FROM
         custitem ci
         JOIN customer c ON c.cus_custno = ci.cui_custno

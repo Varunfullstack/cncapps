@@ -7,21 +7,46 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBENotepad extends DBEntity
 {
+    const noteType = 'noteType';
+    const noteKey = 'noteKey';
+    const lineNo = 'lineNo';
+    const noteText = 'noteText';
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("Notepad");
-        $this->addColumn("noteType", DA_STRING, DA_NOT_NULL, "not_type");
-        $this->addColumn("noteKey", DA_INTEGER, DA_NOT_NULL, "not_key");
-        $this->addColumn("lineNo", DA_INTEGER, DA_NOT_NULL, "not_line");
-        $this->addColumn("noteText", DA_STRING, DA_ALLOW_NULL, "not_text");
+        $this->addColumn(
+            self::noteType,
+            DA_STRING,
+            DA_NOT_NULL,
+            "not_type"
+        );
+        $this->addColumn(
+            self::noteKey,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "not_key"
+        );
+        $this->addColumn(
+            self::lineNo,
+            DA_INTEGER,
+            DA_NOT_NULL,
+            "not_line"
+        );
+        $this->addColumn(
+            self::noteText,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "not_text"
+        );
         $this->setAddColumnsOff();
     }
 
@@ -30,7 +55,9 @@ class DBENotepad extends DBEntity
      * @access public
      * @return bool Success
      */
-    function getRowsByTypeAndKey($noteType, $noteKey)
+    function getRowsByTypeAndKey($noteType,
+                                 $noteKey
+    )
     {
         $this->setMethodName("getRowsByTypeAndKey");
         if ($noteType == '') {
@@ -42,26 +69,40 @@ class DBENotepad extends DBEntity
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('noteType') . "='" . mysqli_real_escape_string($this->db->link_id(),$noteType) . "'" .
-            " AND " . $this->getDBColumnName('noteKey') . "='" . mysqli_real_escape_string($this->db->link_id(),$noteKey) . "'" .
+            " WHERE " . $this->getDBColumnName('noteType') . "='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $noteType
+            ) . "'" .
+            " AND " . $this->getDBColumnName('noteKey') . "='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $noteKey
+            ) . "'" .
             " ORDER BY " . $this->getDBColumnName('lineNo')
         );
         return ($this->getRows());
     }
 
-    function deleteRowsByTypeAndKey($noteType, $noteKey)
+    function deleteRowsByTypeAndKey($noteType,
+                                    $noteKey
+    )
     {
         $this->setMethodName("deleteRowsByTypeAndKey");
         if ($noteType == '') {
             $this->raiseError('noteType not passed');
         }
-        if ($noteKey == '') { 
+        if ($noteKey == '') {
             $this->raiseError('noteKey not passed');
         }
         $this->setQueryString(
             "DELETE FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('noteType') . "='" . mysqli_real_escape_string($this->db->link_id(),$noteType) . "'" .
-            " AND " . $this->getDBColumnName('noteKey') . "='" . mysqli_real_escape_string($this->db->link_id(),$noteKey) . "'"
+            " WHERE " . $this->getDBColumnName('noteType') . "='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $noteType
+            ) . "'" .
+            " AND " . $this->getDBColumnName('noteKey') . "='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $noteKey
+            ) . "'"
         );
         $ret = (parent::runQuery());
         $this->resetQueryString();

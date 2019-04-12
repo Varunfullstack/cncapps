@@ -55,6 +55,7 @@ class CTGoodsIn extends CTCNC
         "C" => "Completed",
         "A" => "Authorised"
     );
+    private $dsGoodsIn;
 
     /**
      * Dataset for Purchase Order record storage.

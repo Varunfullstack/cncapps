@@ -196,9 +196,7 @@ class CTRenQuotation extends CTCNC
 
                 $latestQuoteSent = null;
 
-                if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent) && $dsRenQuotation->getValue(
-                        DBEJRenQuotation::latestQuoteSent
-                    ) != '0000-00-00 00:00:00') {
+                if ($dsRenQuotation->getValue(DBEJRenQuotation::latestQuoteSent)) {
                     $latestQuoteSent = DateTime::createFromFormat(
                         'Y-m-d H:i:s',
                         $dsRenQuotation->getValue(

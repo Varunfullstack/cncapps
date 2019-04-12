@@ -1743,7 +1743,7 @@ class BUCustomer extends Business
     )
     {
         $dbePortalCustomerDocument = new DBEPortalCustomerDocument ($this);
-        $dbePortalCustomerDocument->setPKValue('');
+        $dbePortalCustomerDocument->setPKValue(null);
         $dbePortalCustomerDocument->setValue(
             DBEPortalCustomerDocument::file,
             fread(

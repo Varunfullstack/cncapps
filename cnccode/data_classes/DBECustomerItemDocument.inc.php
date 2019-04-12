@@ -7,26 +7,72 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECustomerItemDocument extends DBEntity
 {
+    const customerItemDocumentID = "customerItemDocumentID";
+    const customerItemID = "customerItemID";
+    const description = "description";
+    const filename = "filename";
+    const file = "file";
+    const fileLength = "fileLength";
+    const fileMIMEType = "fileMIMEType";
+    const createDate = "createDate";
+    const createUserID = "createUserID";
+
     /**
      * customerItems constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("customeritemdocument");
-        $this->addColumn("customerItemDocumentID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("customerItemID", DA_ID, DA_NOT_NULL);
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("filename", DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn("file", DA_BLOB, DA_ALLOW_NULL);
-        $this->addColumn("fileLength", DA_INTEGER, DA_ALLOW_NULL);
-        $this->addColumn("fileMIMEType", DA_STRING, DA_NOT_NULL);
-        $this->addColumn("createDate", DA_DATE, DA_NOT_NULL);
-        $this->addColumn("createUserID", DA_ID, DA_NOT_NULL);
+        $this->addColumn(
+            self::customerItemDocumentID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::customerItemID,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::description,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::filename,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::file,
+            DA_BLOB,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::fileLength,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::fileMIMEType,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createDate,
+            DA_DATE,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createUserID,
+            DA_ID,
+            DA_NOT_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -37,19 +83,26 @@ class DBEJCustomerItemDocument extends DBEcustomerItemDocument
     /**
      * customerItems constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("createUserName", DA_ID, DA_NOT_NULL, "CONCAT(firstName, ' ', lastName)");
+        $this->addColumn(
+            "createUserName",
+            DA_ID,
+            DA_NOT_NULL,
+            "CONCAT(firstName, ' ', lastName)"
+        );
         $this->setAddColumnsOff();
     }
 
-    function getRowsByColumn($column, $sortColumn = '')
+    function getRowsByColumn($column,
+                             $sortColumn = ''
+    )
     {
         $this->setMethodName("getRowsByColumn");
         if ($column == '') {

@@ -164,7 +164,7 @@ define(
 );
 define(
     "DA_DATE_NOT_SET",
-    "0000-00-00 00:00:00"
+    "null"
 );
 define(
     "DA_COLUMN_SEPARATOR",

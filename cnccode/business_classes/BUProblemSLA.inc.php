@@ -34,9 +34,8 @@ class BUProblemSLA extends Business
     const workingHoursAlertLimit = 40;
     const special_attention_customer_alert_days = 3;
 
-    private $dateFourWeekAgo = '';
-    private $startSupportTime = '';
-    private $endSupportTime = '';
+    private $startSupportTime;
+    private $endSupportTime;
     private $workingHoursInDay = 0;
 
     private $hoursCalculated = 0;
@@ -53,6 +52,10 @@ class BUProblemSLA extends Business
     private $dbeJCallActivity;
     private $srAutocompleteThresholdHours;
     private $startersLeaversAutoCompleteThresholdHours;
+    /**
+     * @var false|string
+     */
+    private $dateFourWeeksAgo;
 
     /**
      * Constructor
@@ -83,13 +86,14 @@ class BUProblemSLA extends Business
         );
 
         $buHeader = new BUHeader ($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
-        $this->startSupportTime = $dsHeader->getValue('billingStartTime');
+        $this->startSupportTime = $dsHeader->getValue(DBEHeader::billingStartTime);
 
-        $this->endSupportTime = $dsHeader->getValue('billingEndTime');
+        $this->endSupportTime = $dsHeader->getValue(DBEHeader::billingEndTime);
 
-        $this->srAutocompleteThresholdHours = $dsHeader->getValue('srAutocompleteThresholdHours');
+        $this->srAutocompleteThresholdHours = $dsHeader->getValue(DBEHeader::srAutocompleteThresholdHours);
         $this->startersLeaversAutoCompleteThresholdHours = $dsHeader->getValue(
             DBEHeader::srStartersLeaversAutoCompleteThresholdHours
         );
@@ -109,21 +113,22 @@ class BUProblemSLA extends Business
 
     function monitor()
     {
+        $dsProblems = new DataSet($this);
         $this->buActivity->getProblemsByStatus(
             'I',
-            $dsResults
+            $dsProblems
         ); // initial status
 
-
-        while ($dsResults->fetchNext()) {
-
-
-            $this->dbeProblem->getRow($dsResults->getValue('problemID'));
-
-            $workingHours = $this->getWorkingHours($dsResults->getValue('problemID'));
+        $percentageSLA = 0;
+        while ($dsProblems->fetchNext()) {
 
 
-            $hoursToSLA = $dsResults->getValue('slaResponseHours') - $workingHours;
+            $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
+
+            $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
+
+
+            $hoursToSLA = $dsProblems->getValue(DBEProblem::slaResponseHours) - $workingHours;
 
             /*
             Send an alert email to managers if within 20 minutes of SLA response hours and not priority 4 or 5
@@ -131,31 +136,31 @@ class BUProblemSLA extends Business
             if (
                 $hoursToSLA <= .3 &&                    // within one third of time to SLA
 
-                $this->dbeProblem->getValue('sentSlaAlertFlag') == 'N' &&          // hasn't already been sent
-                $this->dbeProblem->getValue('userID') != '' &&                     // is asssigned
-                $this->dbeProblem->getValue('userID') != USER_SYSTEM &&
-                $dsResults->getValue('priority') < 5
+                $this->dbeProblem->getValue(DBEProblem::sentSlaAlertFlag) == 'N' &&          // hasn't already been sent
+                $this->dbeProblem->getValue(DBEProblem::userID) != '' &&                     // is asssigned
+                $this->dbeProblem->getValue(DBEProblem::userID) != USER_SYSTEM &&
+                $dsProblems->getValue(DBEProblem::priority) < 5
 
             ) {
 
                 $this->sendSlaAlertEmail(
-                    $dsResults->getValue('problemID'),
+                    $dsProblems->getValue(DBEProblem::problemID),
                     $percentageSLA
                 );
 
                 $this->dbeProblem->setValue(
-                    'sentSlaAlertFlag',
+                    DBEProblem::sentSlaAlertFlag,
                     'Y'
                 );
 
             }
 
             $this->dbeProblem->setValue(
-                'awaitingCustomerResponseFlag',
+                DBEProblem::awaitingCustomerResponseFlag,
                 $this->awaitingCustomerResponseFlag
             );
             $this->dbeProblem->setValue(
-                'workingHours',
+                DBEProblem::workingHours,
                 $workingHours
             );
 
@@ -166,7 +171,7 @@ class BUProblemSLA extends Business
                 );
             }
 
-            echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
+            echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
 
 
             $this->dbeProblem->updateRow();
@@ -177,19 +182,17 @@ class BUProblemSLA extends Business
 
         $this->buActivity->getProblemsByStatus(
             'P',
-            $dsResults
+            $dsProblems
         ); // in progress status
 
-        while ($dsResults->fetchNext()) {
+        while ($dsProblems->fetchNext()) {
 
-            $responseHours = $this->buCustomerItem->getMinumumContractResponseHours($dsResults->getValue('customerID'));
+            $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
 
-            $workingHours = $this->getWorkingHours($dsResults->getValue('problemID'));
-
-            $this->dbeProblem->getRow($dsResults->getValue('problemID'));
+            $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
 
             $this->dbeProblem->setValue(
-                'workingHours',
+                DBEProblem::workingHours,
                 $workingHours
             );
 
@@ -203,31 +206,29 @@ class BUProblemSLA extends Business
             }
 
             $this->dbeProblem->setValue(
-                'awaitingCustomerResponseFlag',
+                DBEProblem::awaitingCustomerResponseFlag,
                 $this->awaitingCustomerResponseFlag
             );
             $this->dbeProblem->updateRow();
 
-            echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
+            echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
 
         }
 
         $this->buActivity->getProblemsByStatus(
             'P',
-            $dsResults,
+            $dsProblems,
             true
         ); // in progress future alarm date status
 
-        while ($dsResults->fetchNext()) {
+        while ($dsProblems->fetchNext()) {
 
-            $responseHours = $this->buCustomerItem->getMinumumContractResponseHours($dsResults->getValue('customerID'));
+            $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
 
-            $workingHours = $this->getWorkingHours($dsResults->getValue('problemID'));
-
-            $this->dbeProblem->getRow($dsResults->getValue('problemID'));
+            $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
 
             $this->dbeProblem->setValue(
-                'workingHours',
+                DBEProblem::workingHours,
                 $workingHours
             );
 
@@ -241,40 +242,41 @@ class BUProblemSLA extends Business
             }
 
             $this->dbeProblem->setValue(
-                'awaitingCustomerResponseFlag',
+                DBEProblem::awaitingCustomerResponseFlag,
                 $this->awaitingCustomerResponseFlag
             );
             $this->dbeProblem->updateRow();
 
-            echo $this->dbeProblem->getValue('problemID') . ': ' . $workingHours . '<BR/>';
+            echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
 
         }
 
     } // end function monitor
 
+    /**
+     * @throws Exception
+     */
     function autoCompletion()
     {
         $dbeCustomer = new DBECustomer($this);
-
-        $dbeCallActivity = new DBECallActivity($this);
-
+        $dsProblems = new DataSet($this);
         $this->buActivity->getProblemsByStatus(
             'F',
-            $dsResults,
+            $dsProblems,
             true
         ); // fixed status
 
-        while ($dsResults->fetchNext()) {
+        while ($dsProblems->fetchNext()) {
 
-            $problemID = $dsResults->getValue('problemID');
+            $problemID = $dsProblems->getValue(DBEProblem::problemID);
 
             $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
 
             if ($dbeCallActivity) {
 
-                $this->dbeProblem->getRow($dsResults->getValue('problemID'));
+                $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
 
-                $fixedDate = strtotime($this->dbeProblem->getValue('completeDate'));
+                $fixedDate = strtotime($this->dbeProblem->getValue(DBEProblem::completeDate));
 
                 $hoursUntilComplete =
                     $this->getWorkingHoursBetweenUnixDates(
@@ -282,7 +284,9 @@ class BUProblemSLA extends Business
                         date('U'),
                         // from now
                         strtotime(
-                            $this->dbeProblem->getValue('completeDate') . ' ' . $dbeCallActivity->getValue('endTime')
+                            $this->dbeProblem->getValue(DBEProblem::completeDate) . ' ' . $dbeCallActivity->getValue(
+                                DBEJCallActivity::endTime
+                            )
                         ),
                         // time on completion date
                         false                                                           // no pauses
@@ -291,12 +295,12 @@ class BUProblemSLA extends Business
                 Autocomplete NON-T&M SRs that have activity duration of less than one hour and have reached their complete date
                 */
 
-                $dbeCustomer->getRow($this->dbeProblem->getValue('customerID'));
+                $dbeCustomer->getRow($this->dbeProblem->getValue(DBEProblem::customerID));
                 $buCustomerItem = new BUCustomerItem($this);
                 $startersLeavers = [62, 58];
 
                 $serverCareContractID = $serverCareContractID = $buCustomerItem->getValidServerCareContractID(
-                    $this->dbeProblem->getValue('customerID')
+                    $this->dbeProblem->getValue(DBEProblem::customerID)
                 );
 
                 $thresholdCheck = $this->dbeProblem->getValue(
@@ -355,9 +359,11 @@ class BUProblemSLA extends Business
                 }
 
                 if (
-                    $this->dbeProblem->getValue('contractCustomerItemID') != 0 &&
+                    $this->dbeProblem->getValue(DBEProblem::contractCustomerItemID) != 0 &&
                     $hoursUntilComplete <= 0 &
-                    $this->dbeProblem->getValue('totalActivityDurationHours') <= $this->srAutocompleteThresholdHours
+                    $this->dbeProblem->getValue(
+                        DBEProblem::totalActivityDurationHours
+                    ) <= $this->srAutocompleteThresholdHours
                 ) {
                     $this->buActivity->setProblemToCompleted($problemID);
                 } else {
@@ -366,11 +372,11 @@ class BUProblemSLA extends Business
                     */
                     if (
                         $hoursUntilComplete <= ($this->workingHoursInDay * 2) &&
-                        $this->dbeProblem->getValue('completionAlertCount') < 2
+                        $this->dbeProblem->getValue(DBEProblem::completionAlertCount) < 2
                     ) {
                         $this->dbeProblem->setValue(
-                            'completionAlertCount',
-                            $this->dbeProblem->getValue('completionAlertCount') + 1
+                            DBEProblem::completionAlertCount,
+                            $this->dbeProblem->getValue(DBEProblem::completionAlertCount) + 1
                         );
                         $this->dbeProblem->updateRow();
 
@@ -487,7 +493,6 @@ class BUProblemSLA extends Business
         $buMail = new BUMail($this);
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
 
         $toEmail = 'specialattentionends@' . CONFIG_PUBLIC_DOMAIN;
 
@@ -546,7 +551,8 @@ class BUProblemSLA extends Business
     /**
      * Sends email to managers when request is near SLA
      *
-     * @param mixed $callActivityID
+     * @param $problemID
+     * @param $percentage
      */
     function sendSlaAlertEmail(
         $problemID,
@@ -561,10 +567,9 @@ class BUProblemSLA extends Business
         if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID)) {
 
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $senderName = 'CNC Support Department';
 
-            if ($dbeJProblem->getValue('engineerLogname')) {
-                $toEmail = $dbeJProblem->getValue('engineerLogname') . '@' . CONFIG_PUBLIC_DOMAIN;
+            if ($dbeJProblem->getValue(DBEJProblem::engineerLogname)) {
+                $toEmail = $dbeJProblem->getValue(DBEJProblem::engineerLogname) . '@' . CONFIG_PUBLIC_DOMAIN;
             } else {
                 $toEmail = false;
             }
@@ -574,9 +579,7 @@ class BUProblemSLA extends Business
             }
             $toEmail .= 'slabreachalert@' . CONFIG_PUBLIC_DOMAIN;
 
-            $activityRef = $dbeJCallActivity->getValue('problemID');
-
-            $buCustomer = new BUCustomer ($this);
+            $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
 
             $template = new Template (
                 EMAIL_TEMPLATE_DIR,
@@ -593,9 +596,9 @@ class BUProblemSLA extends Business
             $template->setVar(
                 array(
                     'urlActivity'                 => $urlActivity,
-                    'customerName'                => $dbeJProblem->getValue('customerName'),
+                    'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
                     'activityRef'                 => $activityRef,
-                    'reason'                      => $dbeJCallActivity->getValue('reason'),
+                    'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
                     'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
                     'percentage'                  => number_format(
                         $percentage,
@@ -616,8 +619,8 @@ class BUProblemSLA extends Business
                 'To'           => $toEmail,
                 'From'         => $senderEmail,
                 'Subject'      => 'WARNING - SR for ' . $dbeJProblem->getValue(
-                        'customerName'
-                    ) . 'assigned to ' . $dbeJProblem->getValue('engineerName') . ' close to breaching SLA',
+                        DBEJProblem::customerName
+                    ) . 'assigned to ' . $dbeJProblem->getValue(DBEJProblem::engineerName) . ' close to breaching SLA',
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
@@ -651,6 +654,7 @@ class BUProblemSLA extends Business
      * Calculate number of working hours for a problem
      *
      * @param integer $problemID
+     * @return bool|float|int|string
      */
     function getWorkingHours($problemID)
     {
@@ -661,8 +665,6 @@ class BUProblemSLA extends Business
             false
         );
 
-        $utProblemStart = strtotime($this->dbeJProblem->getValue('dateRaised'));  // unix date start
-
         $utNow = date('U');                                                         // unix date now
         /*
         Build an array of pauses for the problem
@@ -671,28 +673,29 @@ class BUProblemSLA extends Business
         $this->awaitingCustomerResponseFlag = false;
 
         $pauseStart = false;
-
+        $pauseArray = [];
         $this->dbeJCallActivity->fetchNext();
 
 
         while ($this->dbeJCallActivity->fetchNext()) {
 
-            if ($this->dbeJCallActivity->getValue('awaitingCustomerResponseFlag') == 'Y') {
-
-                if (!$utPauseStart) {  // if not already paused
-
+            if ($this->dbeJCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y') {
+                if (!$pauseStart) {  // if not already paused
                     $pauseStart = strtotime(
-                        $this->dbeJCallActivity->getValue('date') . ' ' . $this->dbeJCallActivity->getValue('startTime')
+                        $this->dbeJCallActivity->getValue(
+                            DBEJCallActivity::date
+                        ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
                     );
 
                 }
-
             } else {
 
                 if ($pauseStart) {   // currently paused so record begining and end
 
                     $pauseArray[$pauseStart] = strtotime(
-                        $this->dbeJCallActivity->getValue('date') . ' ' . $this->dbeJCallActivity->getValue('startTime')
+                        $this->dbeJCallActivity->getValue(
+                            DBEJCallActivity::date
+                        ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
                     );
 
                     $pauseStart = false;
@@ -701,7 +704,9 @@ class BUProblemSLA extends Business
 
             }
 
-            $this->awaitingCustomerResponseFlag = $this->dbeJCallActivity->getValue('awaitingCustomerResponseFlag');
+            $this->awaitingCustomerResponseFlag = $this->dbeJCallActivity->getValue(
+                DBEJCallActivity::awaitingCustomerResponseFlag
+            );
         } // end while callactivity loop
 
         // There wasn't an activity after the start pause so set end of the open pause to now
@@ -745,31 +750,21 @@ class BUProblemSLA extends Business
      */
     function updateFixDurations()
     {
-        $dbeJCallActivity = new DBEJCallActivity($this);
-
+        $dsProblems = new DataSet($this);
         $this->buActivity->getProblemsByStatus(
             'C',
-            $dsResults
+            $dsProblems
         ); // completed
 
-        while ($dsResults->fetchNext()) {
+        while ($dsProblems->fetchNext()) {
 
-            $workingHours = $this->getWorkingHours(
-                $dsResults->getValue('problemID'),
-                true,
-                $fixDate
-            );
+            $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
 
-            $this->dbeProblem->getRow($dsResults->getValue('problemID'));
+            $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
 
             $this->dbeProblem->setValue(
-                'workingHours',
+                DBEProblem::workingHours,
                 $workingHours
-            );
-
-            $this->dbeProblem->setValue(
-                'fixedDate',
-                $fixDate
             );
 
             $this->dbeProblem->updateRow();
@@ -787,8 +782,9 @@ class BUProblemSLA extends Business
         */
         $utCounter = $utStart;
         $includedSeconds = 0;
-
-        if ($pauseArray) {
+        $pauseStart = null;
+        $pauseEnd = null;
+        if (count($pauseArray)) {
             $pauseEnd = current($pauseArray);                     // the value is the end
             $pauseStart = key($pauseArray);                       // the key is the start
         }
@@ -890,9 +886,11 @@ class BUProblemSLA extends Business
 
         $totalDays = 0;
 
+        $utTestDate = null;
+
         while ($totalDays < self::DAYS_UNTIL_COMPLETE) {
 
-            $utTestDate = strtotime($nowDateYMD . ' + ' . $addDays . ' days');
+            $utTestDate = strtotime($ymdNowDate . ' + ' . $addDays . ' days');
 
             if (
                 date(

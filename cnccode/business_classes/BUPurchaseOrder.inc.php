@@ -143,7 +143,7 @@ class BUPurchaseOrder extends Business
             0
         ); // new PK
         $dbePorhead->setValue(
-            'ordheadID',
+            DBEPorhead::ordheadID,
             $dsOrdhead->getValue('ordheadID')
         );
         $dbePorhead->setValue(

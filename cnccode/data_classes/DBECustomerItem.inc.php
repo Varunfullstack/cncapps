@@ -103,8 +103,8 @@ class DBECustomerItem extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -770,7 +770,7 @@ class DBECustomerItem extends DBCNCEntity
             "
       UPDATE " . $this->getTableName() .
             " SET startDate = DATE_ADD( `startDate`, INTERVAL 1 YEAR ),
-      dateGenerated = '0000-00-00'
+      dateGenerated = null
         WHERE cui_cuino = $customerItemID;";
 
         $this->setQueryString($statement);

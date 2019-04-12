@@ -136,7 +136,7 @@ class Controller extends BaseObject
 {
 // instance vars
     var $requestMethod = "";        // this->requestMethod from html request
-    var $postVars = "";                    // HTTP_POST_VARS from html request
+    public $postVars = [];                    // HTTP_POST_VARS from html request
     var $startTime;
     var $getVars = "";                    // HTTP_GET_VARS from html request
     var $cookieVars = "";                // HTTP_COOKIE_VARS from html request
@@ -1069,7 +1069,7 @@ class Controller extends BaseObject
     )
     {
         if (($dateYMD == '') OR ($dateYMD == '0000-00-00')) {
-            return '';
+            return null;
         } else {
             if (preg_match_all(
                 "/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",

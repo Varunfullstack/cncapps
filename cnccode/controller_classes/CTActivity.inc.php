@@ -186,6 +186,7 @@ class CTActivity extends CTCNC
                         => "Checked Non-T&M Due Completion",
             "UNCHECKED" => "Unchecked"
         );
+    private $dsGSCExport;
 
     function __construct($requestMethod,
                          $postVars,

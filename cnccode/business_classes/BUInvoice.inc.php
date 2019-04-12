@@ -264,11 +264,11 @@ class BUInvoice extends Business
 
             $dsOrdline->fetchNext();
 
-            if ($dsDespatch->getValue(BUDespatch::qtyToDespatch) > 0) {
+            if ($dsDespatch->getValue(BUDespatch::despatchQtyToDespatch) > 0) {
 
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
 
-                    $totalValue += $dsDespatch->getValue(BUDespatch::qtyToDespatch) * $dsOrdline->getValue(
+                    $totalValue += $dsDespatch->getValue(BUDespatch::despatchQtyToDespatch) * $dsOrdline->getValue(
                             DBEOrdline::curUnitSale
                         );
 
@@ -290,7 +290,7 @@ class BUInvoice extends Business
         $dbeInvline = new DBEInvline($this);
         while ($dsDespatch->fetchNext()) {
             $dsOrdline->fetchNext();
-            if ($dsDespatch->getValue(BUDespatch::qtyToDespatch) == 0) {
+            if ($dsDespatch->getValue(BUDespatch::despatchQtyToDespatch) == 0) {
                 continue;
             }
             $sequenceNo++;
@@ -320,7 +320,7 @@ class BUInvoice extends Business
             );
             $dbeInvline->setValue(
                 DBEInvline::qty,
-                $dsDespatch->getValue(BUDespatch::qtyToDespatch)
+                $dsDespatch->getValue(BUDespatch::despatchQtyToDespatch)
             );
             $dbeInvline->setValue(
                 DBEInvline::curUnitSale,

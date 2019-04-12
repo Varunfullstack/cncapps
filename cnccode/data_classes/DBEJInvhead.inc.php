@@ -7,11 +7,17 @@ require_once($cfg["path_dbe"] . "/DBEInvhead.inc.php");
 
 class DBEJInvhead extends DBEInvhead
 {
+    const customerName = "customerName";
+    const firstName = "firstName";
+    const lastName = "lastName";
+    const title = "title";
+    const paymentTerms = "paymentTerms";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -19,31 +25,31 @@ class DBEJInvhead extends DBEInvhead
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "customerName",
+            self::customerName,
             DA_STRING,
             DA_ALLOW_NULL,
             "cus_name"
         );
         $this->addColumn(
-            "firstName",
+            self::firstName,
             DA_STRING,
             DA_ALLOW_NULL,
             "con_first_name"
         );
         $this->addColumn(
-            "lastName",
+            self::lastName,
             DA_STRING,
             DA_ALLOW_NULL,
             "con_last_name"
         );
         $this->addColumn(
-            "title",
+            self::title,
             DA_STRING,
             DA_ALLOW_NULL,
             "con_title"
         );
         $this->addColumn(
-            "paymentTerms",
+            self::paymentTerms,
             DA_STRING,
             DA_ALLOW_NULL,
             "description"
@@ -101,7 +107,7 @@ class DBEJInvhead extends DBEInvhead
                 ' AND ' . $this->getDBColumnName('invheadID') . ' <= \'' . $endID . '\'';
         }
 
-        $queryString .= ' AND ' . $this->getDBColumnName('datePrinted') . ' <> \'0000-00-00\'';
+        $queryString .= ' AND ' . $this->getDBColumnName('datePrinted') . ' is not null ';
 
         $queryString .= ' ORDER BY ' . $this->getDBColumnName('invheadID');
 
@@ -117,9 +123,11 @@ class DBEJInvhead extends DBEInvhead
             ' LEFT JOIN customer ON inh_custno = cus_custno' .
             ' LEFT JOIN contact ON inh_contno = con_contno' .
             ' JOIN paymentterms ON invhead.paymentTermsID = paymentterms.paymentTermsID ' .
-            ' WHERE ' . $this->getDBColumnName('datePrinted') . ' = \'0000-00-00\'';
+            ' WHERE ' . $this->getDBColumnName('datePrinted') . ' is null';
 
-        $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ($directDebit ? ' = "Y" ' : ' <> "Y" ');
+        $queryString .= " and " . $this->getDBColumnName(
+                self::directDebitFlag
+            ) . ($directDebit ? ' = "Y" ' : ' <> "Y" ');
 
         $queryString .= ' ORDER BY ' . $this->getDBColumnName('customerID');
 
@@ -174,7 +182,7 @@ class DBEJInvhead extends DBEInvhead
                 }
             } else {
                 $statement = $statement .
-                    " AND " . $this->getDBColumnName('datePrinted') . "='0000-00-00'";
+                    " AND " . $this->getDBColumnName('datePrinted') . " is null ";
             }
         }
         $statement .= " ORDER BY " . $this->getDBColumnName('ordheadID') . " DESC";
