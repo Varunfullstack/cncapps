@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.4.2] - 2019-04-12
+### Fixed
+- Fix issue with duplicated emails in contacts.
+
 ## [v2.4.1] - 2019-04-09
 ### Fixed
 - Archived passwords not observing access levels
