@@ -74,21 +74,11 @@ class BURenContract extends Business
         ));
     }
 
-    function deleteRenContract($ID)
-    {
-        $this->setMethodName('deleteRenContract');
-        if ($this->canDeleteRenContract($ID)) {
-            return $this->dbeRenContract->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
-    }
-
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
-        &$customerItemID
+        &$customerItemID,
+        $siteNo = 0
     )
     {
         // create a customer item
@@ -160,11 +150,14 @@ class BURenContract extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
+                <!--suppress HtmlDeprecatedAttribute -->
                 <td bgcolor="#999999">Customer</td>
+                <!--suppress HtmlDeprecatedAttribute -->
                 <td bgcolor="#999999">Service</td>
             </tr>
             <?php while ($this->dbeJRenContract->fetchNext()) { ?>
@@ -218,7 +211,7 @@ class BURenContract extends Business
         $dbeCustomer = new DBECustomer ($this);
 
         $dbeOrdline = new DBEOrdline ($this);
-
+        /** @var DataSet $dsOrdhead */
         $dsOrdhead = null;
         $dsOrdline = new DataSet($this);
 
@@ -226,6 +219,7 @@ class BURenContract extends Business
 
         $generateInvoice = false;
         $generatedOrder = false;
+        $line = null;
         echo "<div> Contract Renewals - START </div>";
         while ($dsRenContract->fetchNext()) {
             $generatedOrder = false;
@@ -399,6 +393,7 @@ class BURenContract extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
                     $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
@@ -422,11 +417,11 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    $dbeJCustomerItem->getValue('itemID')
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,
-                    $dbeJCustomerItem->getValue('itemDescription')
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::supplierID,
@@ -646,7 +641,7 @@ HEREDOC;
 
 
                 }
-
+                $dsLinkedItems = new DataSet($this);
                 /**
                  * add customer items linked to this contract as a comment lines
                  */
@@ -774,78 +769,4 @@ HEREDOC;
 
         echo "<div> Contract Renewals - END </div>";
     }
-
-
-    function emailSalesOrderNotification($customerName,
-                                         $ordheadID
-    ) // GL
-    {
-        $toEmail = false;
-        $senderEmail = CONFIG_SALES_EMAIL;
-
-        $buMail = new BUMail($this);
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'Subject'      => 'ServiceDesk renewal sales order created for ' . $customerName,
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-
-        ob_start(); ?>
-        <HTML>
-        <BODY>
-        <TABLE border="1">
-            <tr>
-                <td><A HREF="/SalesOrder.php?ordheadID=<?php echo $ordheadID ?>">Open Order</A></td>
-            </tr>
-        </TABLE>
-        </BODY>
-        </HTML>
-        <?php
-
-        $message = ob_get_contents();
-        ob_end_clean();
-
-        $buMail->mime->setHTMLBody($message);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body,
-            true
-        );
-
-    } // end send email to technical manager
-
-    function isCompleted($customerItemID)
-    {
-        $this->dbeRenContract->getRow($customerItemID);
-
-        if
-        (
-            $this->dbeRenContract->getValue('installationDate') &&
-            $this->dbeRenContract->getValue('invoicePeriodMonths')
-        ) {
-            $ret = true;
-
-        }
-
-        return $ret;
-
-    }
-} // End of class
-?>
+}

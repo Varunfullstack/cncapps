@@ -80,6 +80,8 @@ class DBECustomerItemDocument extends DBEntity
 
 class DBEJCustomerItemDocument extends DBEcustomerItemDocument
 {
+    const createUserName = "createUserName";
+
     /**
      * customerItems constructor()
      * @access public
@@ -92,7 +94,7 @@ class DBEJCustomerItemDocument extends DBEcustomerItemDocument
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "createUserName",
+            self::createUserName,
             DA_ID,
             DA_NOT_NULL,
             "CONCAT(firstName, ' ', lastName)"

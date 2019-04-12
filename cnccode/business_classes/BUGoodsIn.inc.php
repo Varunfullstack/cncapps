@@ -36,10 +36,10 @@ class BUGoodsIn extends Business
     /** @var BUSalesOrder */
     public $buSalesOrder;
     /** @var DBEPorhead */
-    var $dbePorhead;
-    var $dbeItem = '';
-    var $dsOrdhead = '';
-    private $dsPorhead;
+    public $dbePorhead;
+    public $dbeItem;
+    /** @var DataSet|DBEOrdhead */
+    public $dsOrdhead;
 
     /**
      * Constructor
@@ -52,6 +52,16 @@ class BUGoodsIn extends Business
         $this->dbeItem = new DBEItem($this);        // ref to class var
     }
 
+    /**
+     * @param $supplierID
+     * @param $porheadID
+     * @param $ordheadID
+     * @param $supplierRef
+     * @param $type
+     * @param $lineText
+     * @param DataSet $dsResults
+     * @return bool
+     */
     function search($supplierID,
                     $porheadID,
                     $ordheadID,
@@ -64,16 +74,12 @@ class BUGoodsIn extends Business
         $this->setMethodName('search');
         $dbeJPorhead = new DBEJPorhead($this);
         if ($porheadID != '') {
-            $ret = ($this->getDatasetByPK(
+            $this->getDatasetByPK(
                 $porheadID,
                 $dbeJPorhead,
                 $dsResults
-            ));
-            if ($dsResults->getValue(DBEPorhead::directDeliveryFlag) == 'Y') {
-                $ret = FALSE;
-            } else {
-                $ret = TRUE;
-            }
+            );
+            return $dsResults->getValue(DBEPorhead::directDeliveryFlag) == 'Y';
         } else {
             $dbeJPorhead->getRowsBySearchCriteria(
                 $supplierID,
@@ -89,7 +95,7 @@ class BUGoodsIn extends Business
             $dbeJPorhead->initialise();
             $dsResults = $dbeJPorhead;
         }
-        return $ret;
+        return true;
     }
 
     /**
@@ -97,14 +103,15 @@ class BUGoodsIn extends Business
      *
      * We only need to ask for serial numbers and warranty details if the associated sales order has
      * addItem = "Y"
-     * @param DataSet dsPorline Purchase order lines
-     * @param DataSet dsReceieve Result set of receive lines with correct default values
+     * @param DataSet $dsPorline
+     * @param DataSet $dsReceive
      * @param String $addCustomerItems Y/N flag to indicate whether we need to ask for serial no
      * and warranty info for adding a customeritem
+     * @return bool
      */
-    function getInitialReceieveQtys(&$dsPorline,
-                                    &$dsReceive,
-                                    $addCustomerItems
+    function getInitialReceiveQtys(&$dsPorline,
+                                   &$dsReceive,
+                                   $addCustomerItems
     )
     {
         $this->setMethodName('getInitialReceieveQtys');
@@ -260,12 +267,13 @@ class BUGoodsIn extends Business
      * and the warranty will default to that on the customer item.
      *
      * @param Integer $customerID CustomerID
-     * @param DataSet dsPorline Purchase order lines
-     * @param DataSet dsReceieve Result set of receive lines with correct default values
+     * @param DataSet $dsPorline Purchase order lines
+     * @param DataSet $dsReceive Result set of receive lines with correct default values
+     * @return bool
      */
-    function getInitialStockReceieveQtys($customerID,
-                                         &$dsPorline,
-                                         &$dsReceive
+    function getInitialStockReceiveQtys($customerID,
+                                        &$dsPorline,
+                                        &$dsReceive
     )
     {
         $this->setMethodName('getInitialStockReceieveQtys');
@@ -291,7 +299,7 @@ class BUGoodsIn extends Business
             * line. The fact that no customer item ID will exist indicates that the program
             * can not receive against this item.
             */
-            if (($dbeItem->getValue(DBEJPorline::serialNoFlag) == 'Y')) {
+            if (($dbeItem->getValue(DBEItem::serialNoFlag) == 'Y')) {
                 // get all customer items at this stock customer
                 $dbeCustomerItem->getRowsByCustomerAndItemID(
                     $customerID,
@@ -570,6 +578,10 @@ class BUGoodsIn extends Business
         ));
     }
 
+    /**
+     * @param DataSet $dsGoodsIn
+     * @return bool
+     */
     function validateQtys(&$dsGoodsIn)
     {
         $this->setMethodName('validateQtys');
@@ -588,6 +600,10 @@ class BUGoodsIn extends Business
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsGoodsIn
+     * @return bool
+     */
     function validateSerialNos(&$dsGoodsIn)
     {
         $this->setMethodName('validateSerialNos');
@@ -607,6 +623,10 @@ class BUGoodsIn extends Business
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsGoodsIn
+     * @return bool
+     */
     function validateWarranties(&$dsGoodsIn)
     {
         $this->setMethodName('validateWarranties');
@@ -635,18 +655,17 @@ class BUGoodsIn extends Business
      * method selected (direct, hand, etc). Because we are creating customer items at goods in we
      * don't have some of the info to hand.
      *
-     * @param Integer porheadID purchase order number
-     * @param Dataset $dsGoodsIn Dataset of recieved items
+     * @param $porheadID
+     * @param Dataset $dsGoodsIn Dataset of received items
      */
     function receive($porheadID,
-                     $userID,
-                     & $dsGoodsIn
+                     &$dsGoodsIn
     )
     {
         $this->setMethodName('receive');
         $this->dbePorhead = new DBEPorhead($this);
-        $dbeItem = &$this->dbeItem;        // ref to class var
         $buPurchaseOrder = new BUPurchaseOrder($this);
+        $dsPorhead = new DataSet($this);
         $buPurchaseOrder->getHeaderByID(
             $porheadID,
             $dsPorhead
@@ -667,14 +686,12 @@ class BUGoodsIn extends Business
             $this->receiveFromStock(
                 $porheadID,
                 $dsPorhead,
-                $userID,
                 $dsGoodsIn
             );
         } else {
             $this->receiveFromNonStock(
                 $porheadID,
                 $dsPorhead,
-                $userID,
                 $dsGoodsIn
             );
         }
@@ -689,19 +706,20 @@ class BUGoodsIn extends Business
      * method selected (direct, hand, etc). Because we are creating customer items at goods in we
      * don't have some of the info to hand.
      *
-     * @param Integer porheadID purchase order number
+     * @param $porheadID
+     * @param DataSet|DBEPorhead $dsPorhead
      * @param Dataset $dsGoodsIn Dataset of recieved items
      */
     function receiveFromNonStock($porheadID,
                                  &$dsPorhead,
-                                 $userID,
-                                 & $dsGoodsIn
+                                 &$dsGoodsIn
     )
     {
         $this->setMethodName('receiveFromNonStock');
         $dsOrdhead = &$this->dsOrdhead;
         $dbePorline = new DBEPorline($this);
         $dbeItem = &$this->dbeItem;
+        $dbeCustomerItem = null;
         // Must process each item in dataset and update received qtys and possibly create customer item
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
@@ -798,7 +816,9 @@ class BUGoodsIn extends Business
                 $dsGoodsIn->getValue(self::receiveDataSetOrderSequenceNo)
             );
             $dbePorline->getRow();
-            $newQtyRecieved = $dbePorline->getValue(DBEJPorline::qtyReceived) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive);
+            $newQtyRecieved = $dbePorline->getValue(DBEJPorline::qtyReceived) + $dsGoodsIn->getValue(
+                    self::receiveDataSetQtyToReceive
+                );
             $dbePorline->setValue(
                 DBEPorline::qtyReceived,
                 $newQtyRecieved
@@ -838,11 +858,15 @@ class BUGoodsIn extends Business
             */
             if ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) {
                 $dbeItem->getRow($dsGoodsIn->getValue(self::receiveDataSetItemID));
-                $newValue = $dbeItem->getValue(DBEItem::salesStockQty) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive);
+                $newValue = $dbeItem->getValue(DBEItem::salesStockQty) + $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    );
                 $dbeItem->updateSalesStockQty($newValue);
             } else if ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_MAINT_STOCK_CUSTOMERID) {
                 $dbeItem->getRow($dsGoodsIn->getValue(self::receiveDataSetItemID));
-                $newValue = $dbeItem->getValue(DBEItem::maintStockQty) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive);
+                $newValue = $dbeItem->getValue(DBEItem::maintStockQty) + $dsGoodsIn->getValue(
+                        self::receiveDataSetQtyToReceive
+                    );
                 $dbeItem->updateMaintStockQty($newValue);
             }
         }//dsGoodsIn->fetchNext()
@@ -857,19 +881,20 @@ class BUGoodsIn extends Business
      * method selected (direct, hand, etc). Because we are creating customer items at goods in we
      * don't have some of the info to hand.
      *
-     * @param Integer porheadID purchase order number
+     * @param $porheadID
+     * @param DataSet $dsPorhead
      * @param Dataset $dsGoodsIn Dataset of recieved items
      */
     function receiveFromStock($porheadID,
                               DataSet &$dsPorhead,
-                              $userID,
-                              & $dsGoodsIn
+                              &$dsGoodsIn
     )
     {
         $this->setMethodName('receiveFromStock');
         $dsOrdhead = &$this->dsOrdhead; // ref to class var
         $dbeItem = &$this->dbeItem;            // ref to class var
         $dbePorline = new DBEPorline($this);
+        $dbeCustomerItem = null;
         // Must process each item in dataset and update received qtys and possibly create customer item
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
@@ -1003,19 +1028,4 @@ class BUGoodsIn extends Business
             }
         }//dsGoodsIn->fetchNext()
     }
-
-    function updateSalesOrderStatus()
-    {
-        /*
-        If customer is a stock location and all purchase orders for this sales order are now authorised then
-        set sales order	status to completed.
-        */
-        if (
-            (common_isAnInternalStockLocation($this->dsOrdhead->getValue(DBEOrdhead::customerID))) &
-            ($this->dbePorhead->countNonAuthorisedRowsBySO($this->dsPorhead->getValue(DBEPorhead::ordheadID)) == 0)
-        ) {
-            $this->buSalesOrder->setStatusCompleted($this->dsPorhead->getValue(DBEPorhead::ordheadID));
-        }
-    }
-}// End of class
-?>
+}

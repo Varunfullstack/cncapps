@@ -139,6 +139,11 @@ class BUCustomerItem extends Business
         );
     }
 
+    /**
+     * @param DataSet $dsSearchForm
+     * @param DataSet $dsResults
+     * @param int $row_limit
+     */
     function search(&$dsSearchForm,
                     &$dsResults,
                     $row_limit = 1000
@@ -172,7 +177,6 @@ class BUCustomerItem extends Business
             $this->dbeJCustomerItem->initialise();
             $dsResults = $this->dbeJCustomerItem;
         }
-        return $ret;
     }
 
     function getCustomerItemByID($ID,
@@ -254,6 +258,7 @@ class BUCustomerItem extends Business
     /**
      * Create a new dataset containing defaults for new item row
      * @parameter DataSet &$dsResults results
+     * @param DataSet $dsResults
      * @return bool : Success
      * @access public
      */
@@ -271,6 +276,8 @@ class BUCustomerItem extends Business
      *    Only handles one row in dataset.
      *
      * @parameter DataSet &$dsResults results
+     * @param DataSet|DBECustomerItem $dsCustomerItem
+     * @param bool $contractIDs
      * @return bool : Success
      * @access public
      */
@@ -357,6 +364,7 @@ class BUCustomerItem extends Business
                 DBECustomerItem::customerID
             ) && $customerItemID != 0) {
             $buCustomer = new BUCustomer($this);
+            $dsSite = new DataSet($this);
             $buCustomer->getDeliverSiteByCustomerID(
                 $dsCustomerItem->getValue(DBECustomerItem::customerID),
                 $dsSite,
@@ -388,17 +396,10 @@ class BUCustomerItem extends Business
      * @return bool : TRUE = has dependencies
      * @access public
      */
-    function canDelete($customerItemID)
+    function canDelete()
     {
         $this->setMethodName('canDelete');
-        $return = TRUE;
-        /*
-            are there any service calls?
-        */
-        $dbeProblem = new DBEProblem($this);
-        // calls for this item as a contract item (e.g. General Support Contract)
-
-        return $return;
+        return true;
     }
 
     function deleteCustomerItem($customerItemID)
@@ -415,9 +416,9 @@ class BUCustomerItem extends Business
     /**
      * Upload document file
      * NOTE: Only expects one document
-     * @param Integer $callID call to upload file for
-     * @param String $filename
-     * @param Array $userfile parameters from browser POST
+     * @param $customerItemID
+     * @param $description
+     * @param $userfile
      * @return bool : success
      * @access public
      */
@@ -476,10 +477,6 @@ class BUCustomerItem extends Business
                                           &$dsResults
     )
     {
-        /*
-        @todo: update for new many-to-many
-        */
-
         $this->setMethodName('getCustomerItemsByContractID');
         $dbeJCustomerItem = new DBEJCustomerItem($this);
         $dbeJCustomerItem->getItemsByContractID($contractCustomerItemID);
@@ -580,6 +577,8 @@ class BUCustomerItem extends Business
      * Get server customer items by customerID
      *
      * @param integer $customerID
+     * @param $dsResults
+     * @return bool
      */
     function getServersByCustomerID($customerID,
                                     &$dsResults
@@ -630,8 +629,13 @@ class BUCustomerItem extends Business
         );
     }
 
+    /**
+     * @param $customerID
+     * @return bool
+     */
     function customerHasServiceDeskContract($customerID)
     {
+        $dsContract = new DataSet($this);
         $this->getContractsByCustomerID(
             $customerID,
             $dsContract
@@ -649,7 +653,6 @@ class BUCustomerItem extends Business
 
     function serverIsUnderLocalSecondsiteContract($customerItemID)
     {
-        global $db; //PHPLib DB object
         $dbeJContract = new DBEJContract($this);
         $dbeJContract->getRowsByCustomerItemID($customerItemID);
 
@@ -657,7 +660,7 @@ class BUCustomerItem extends Business
             if ($dbeJContract->getValue(DBEJContract::itemTypeID) == CONFIG_2NDSITE_LOCAL_ITEMTYPEID) {
                 return true;
             }
-        }// end while
+        }
 
         return false;
     }
@@ -687,5 +690,4 @@ class BUCustomerItem extends Business
             $dsResults
         );
     }
-}// End of class
-?>
+}
