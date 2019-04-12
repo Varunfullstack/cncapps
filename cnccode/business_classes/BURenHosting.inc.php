@@ -625,7 +625,7 @@ class BURenHosting extends Business
                 <td><?php echo $dbeJRenHosting->getValue('subnetMask') ?></td>
             </tr>
             <tr>
-                <td valign="top">Router IP Address</td>
+                <td style="vertical-align:top;">Router IP Address</td>
                 <td><?php echo Controller::htmlDisplayText(
                         $dbeJRenHosting->getValue('routerIPAddress'),
                         1

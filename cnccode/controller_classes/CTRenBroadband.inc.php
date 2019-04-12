@@ -253,9 +253,9 @@ class CTRenBroadband extends CTCNC
 
             $this->buRenBroadband->createNewRenewal(
                 $dsOrdhead->getValue('customerID'),
-                $dsOrdhead->getValue('delSiteNo'),
                 $dsOrdline->getValue('itemID'),
-                $renewalCustomerItemID                // returned by function
+                $renewalCustomerItemID,
+                $dsOrdhead->getValue('delSiteNo')                // returned by function
             );
 
 

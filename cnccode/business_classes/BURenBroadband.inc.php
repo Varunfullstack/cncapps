@@ -92,16 +92,18 @@ class BURenBroadband extends Business
     /**
      *    canDeleteRenBroadband
      * Only allowed if type has no activities
+     * @param $ID
+     * @return bool
      */
     function canDeleteRenBroadband($ID)
     {
-        $dbeRenBroadband = new DBERenBroadband ($this);
+        $dbeRenBroadband = new DBEJRenBroadband ($this);
         // validate no activities of this type
         $dbeRenBroadband->setValue(
-            'customerItemID',
+            DBEJRenBroadband::customerItemID,
             $ID
         );
-        if ($dbeRenBroadband->countRowsByColumn('customerItemID') < 1) {
+        if ($dbeRenBroadband->countRowsByColumn(DBEJRenBroadband::customerItemID) < 1) {
             return TRUE;
         } else {
             return FALSE;
@@ -110,9 +112,9 @@ class BURenBroadband extends Business
 
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
-        &$customerItemID
+        &$customerItemID,
+        $siteNo = null
     )
     {
         // create a customer item
@@ -125,19 +127,19 @@ class BURenBroadband extends Business
         $dsCustomerItem->setUpdateModeInsert();
 
         $dsCustomerItem->setValue(
-            'customerItemID',
-            0
+            DBEJCustomerItem::customerItemID,
+            null
         );
         $dsCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
         $dsCustomerItem->setValue(
-            'itemID',
+            DBEJCustomerItem::itemID,
             $itemID
         );
         $dsCustomerItem->setValue(
-            'siteNo',
+            DBEJCustomerItem::siteNo,
             $siteNo
         );
 
@@ -170,11 +172,13 @@ class BURenBroadband extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
-        <TABLE border="1"
-               bgcolor="#FFFFFF"
+        <!--suppress HtmlDeprecatedAttribute -->
+        <TABLE bgcolor="#FFFFFF"
+               border="1"
         >
+            <!--suppress HtmlDeprecatedAttribute -->
             <tr bordercolor="#333333"
                 bgcolor="#CCCCCC"
             >
@@ -183,8 +187,8 @@ class BURenBroadband extends Business
             </tr>
             <?php while ($this->dbeJRenBroadband->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenBroadband->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenBroadband->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenBroadband->getValue(DBEJRenBroadband::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenBroadband->getValue(DBEJRenBroadband::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -230,10 +234,12 @@ class BURenBroadband extends Business
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;
+        /** @var DataSet $dsOrdhead */
         $dsOrdhead = null;
         $generateInvoice = false;
         $generatedOrder = false;
         $line = 0;
+        $description = null;
         while ($this->dbeJRenBroadband->fetchNext()) {
 
             ?>
@@ -397,6 +403,7 @@ class BURenBroadband extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
                     $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
@@ -484,11 +491,11 @@ class BURenBroadband extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::ordheadID,
-                    $dsOrdhead->getValue('ordheadID')
+                    $dsOrdhead->getValue(DBEJOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::customerID,
-                    $dsOrdhead->getValue('customerID')
+                    $dsOrdhead->getValue(DBEJOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
@@ -562,10 +569,10 @@ class BURenBroadband extends Business
                 ) == "Y" ? 'true' : 'false' ?>
             </div>
             <?php
-            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEJOrdhead::ordheadID));
 
             $buSalesOrder->getOrderByOrdheadID(
-                $dsOrdhead->getValue('ordheadID'),
+                $dsOrdhead->getValue(DBEJOrdhead::ordheadID),
                 $dsOrdhead,
                 $dsOrdline
             );
@@ -585,8 +592,8 @@ class BURenBroadband extends Business
 
         if
         (
-            $this->dbeRenBroadband->getValue('installationDate') &&
-            $this->dbeRenBroadband->getValue('invoicePeriodMonths')
+            $this->dbeRenBroadband->getValue(DBEJRenBroadband::installationDate) &&
+            $this->dbeRenBroadband->getValue(DBEJRenBroadband::invoicePeriodMonths)
         ) {
             $ret = true;
 
@@ -602,7 +609,7 @@ class BURenBroadband extends Business
     {
         $dbeJRenBroadband = new DBEJRenBroadband($this);
         $dbeJRenBroadband->setValue(
-            'customerItemID',
+            DBEJRenBroadband::customerItemID,
             $ID
         );
         $dbeJRenBroadband->getRow();
@@ -623,64 +630,64 @@ class BURenBroadband extends Business
 
         ob_start(); ?>
 
-        <HTML>
+        <HTML lang="en">
         <BODY>
         <TABLE>
             <tr>
                 <td>Customer</td>
-                <td><?php echo $dbeJRenBroadband->getValue('customerName') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::customerName) ?></td>
             </tr>
             <tr>
                 <td>Service</td>
-                <td><?php echo $dbeJRenBroadband->getValue('itemDescription') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::itemDescription) ?></td>
             </tr>
             <tr>
                 <td>ispID</td>
-                <td><?php echo $dbeJRenBroadband->getValue('ispID') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::ispID) ?></td>
             </tr>
 
             <tr>
                 <td>ADSL Phone</td>
-                <td><?php echo $dbeJRenBroadband->getValue('adslPhone') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::adslPhone) ?></td>
             </tr>
             <tr>
                 <td>MAC Code</td>
-                <td><?php echo $dbeJRenBroadband->getValue('macCode') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::macCode) ?></td>
             </tr>
             <tr>
                 <td>Reference</td>
-                <td><?php echo $dbeJRenBroadband->getValue('reference') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::reference) ?></td>
             </tr>
             <tr>
                 <td>Default Gateway</td>
-                <td><?php echo $dbeJRenBroadband->getValue('defaultGateway') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::defaultGateway) ?></td>
             </tr>
             <tr>
                 <td>Network Address</td>
-                <td><?php echo $dbeJRenBroadband->getValue('networkAddress') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::networkAddress) ?></td>
             </tr>
             <tr>
                 <td>Subnet Mask</td>
-                <td><?php echo $dbeJRenBroadband->getValue('subnetMask') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::subnetMask) ?></td>
             </tr>
             <tr>
-                <td valign="top">Router IP Address</td>
+                <td style="vertical-align:top;">Router IP Address</td>
                 <td><?php echo Controller::htmlDisplayText(
-                        $dbeJRenBroadband->getValue('routerIPAddress'),
+                        $dbeJRenBroadband->getValue(DBEJRenBroadband::routerIPAddress),
                         1
                     ) ?></td>
             </tr>
             <tr>
                 <td>User Name</td>
-                <td><?php echo $dbeJRenBroadband->getValue('userName') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::userName) ?></td>
             </tr>
             <tr>
                 <td>Password</td>
-                <td><?php echo $dbeJRenBroadband->getValue('password') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::password) ?></td>
             </tr>
             <tr>
                 <td>eta Date</td>
-                <td><?php echo $dbeJRenBroadband->getValue('etaDate') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::etaDate) ?></td>
             </tr>
         </TABLE>
         </BODY>

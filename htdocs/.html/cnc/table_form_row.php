@@ -8,7 +8,7 @@
 */
 ?>
 <tr>
-	<td class="b" valign="top">
+	<td class="b" style="vertical-align:top;">
 		<?php	print SC_String::display($business->getLabel($field), SC_STRING_FMT_UC_WORDS) ?>
 	</td><td class="formError">
 		<?php	print $business->requiredFlag($field) ?>
