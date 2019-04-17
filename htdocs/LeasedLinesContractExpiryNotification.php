@@ -10,8 +10,6 @@
 GLOBAL $cfg;
 require_once("config.inc.php");
 require_once($cfg["path_ct"] . "/CTLeadStatusReport.inc.php");
-
-require_once($cfg['path_dbe'] . '/DBEBroadbandServiceType.inc.php');
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');

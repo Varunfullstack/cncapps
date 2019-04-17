@@ -5,6 +5,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\AutomatedRequest;
+
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerCallActivity.inc.php");
@@ -221,7 +224,6 @@ class BUActivity extends Business
             DA_STRING,
             DA_ALLOW_NULL
         );
-//        $dsData->addColumn('project', DA_STRING, DA_ALLOW_NULL);
         $dsData->addColumn(
             self::searchFormUserID,
             DA_STRING,
@@ -399,23 +401,23 @@ class BUActivity extends Business
     )
     {
         $this->dbeCallActivitySearch->getRowsBySearchCriteria(
-            trim($dsSearchForm->getValue('callActivityID')),
-            trim($dsSearchForm->getValue('problemID')),
-            trim($dsSearchForm->getValue('customerID')),
-            trim($dsSearchForm->getValue('userID')),
-            trim($dsSearchForm->getValue('status')),
-            trim($dsSearchForm->getValue('rootCauseID')),
-            trim($dsSearchForm->getValue('priority')),
-            trim($dsSearchForm->getValue('activityText')),
-            trim($dsSearchForm->getValue('serviceRequestSpentTime')),
-            trim($dsSearchForm->getValue('individualActivitySpentTime')),
-            trim($dsSearchForm->getValue('fromDate')),
-            trim($dsSearchForm->getValue('toDate')),
-            trim($dsSearchForm->getValue('contractCustomerItemID')),
-            trim($dsSearchForm->getValue('callActTypeID')),
-            trim($dsSearchForm->getValue('linkedSalesOrderID')),
-            trim($dsSearchForm->getValue('managementReviewOnly')),
-            trim($dsSearchForm->getValue('breachedSlaOption')),
+            trim($dsSearchForm->getValue(self::searchFormCallActivityID)),
+            trim($dsSearchForm->getValue(self::searchFormProblemID)),
+            trim($dsSearchForm->getValue(self::searchFormCustomerID)),
+            trim($dsSearchForm->getValue(self::searchFormUserID)),
+            trim($dsSearchForm->getValue(self::searchFormStatus)),
+            trim($dsSearchForm->getValue(self::searchFormRootCauseID)),
+            trim($dsSearchForm->getValue(self::searchFormPriority)),
+            trim($dsSearchForm->getValue(self::searchFormActivityText)),
+            trim($dsSearchForm->getValue(self::searchFormServiceRequestSpentTime)),
+            trim($dsSearchForm->getValue(self::searchFormIndividualActivitySpentTime)),
+            trim($dsSearchForm->getValue(self::searchFormFromDate)),
+            trim($dsSearchForm->getValue(self::searchFormToDate)),
+            trim($dsSearchForm->getValue(self::searchFormContractCustomerItemID)),
+            trim($dsSearchForm->getValue(self::searchFormCallActTypeID)),
+            trim($dsSearchForm->getValue(self::searchFormLinkedSalesOrderID)),
+            trim($dsSearchForm->getValue(self::searchFormManagementReviewOnly)),
+            trim($dsSearchForm->getValue(self::searchFormBreachedSlaOption)),
             $sortColumn,
             $sortDirection,
             $limit
@@ -976,6 +978,7 @@ class BUActivity extends Business
      * reopen problem that has previously been fixed
      *
      * @param mixed problemID
+     * @throws Exception
      */
     function reopenProblem($problemID)
     {
@@ -997,7 +1000,11 @@ class BUActivity extends Business
 
 
             $dbeUser = new DBEJUser($this);
-            $dbeUser->getRow($dbeProblem->getValue(DBEJProblem::fixedUserID));
+            $dbeUser->setValue(
+                DBEJUser::userID,
+                $dbeProblem->getValue(DBEJProblem::fixedUserID)
+            );
+            $dbeUser->getRow();
 
             $teamID = $dbeUser->getValue(DBEJUser::teamID);
 
@@ -1106,9 +1113,9 @@ class BUActivity extends Business
 
         $emails = "";
         $fields = [];
-        if ($dbeJProblem->getValue('rootCauseID')) {
+        if ($dbeJProblem->getValue(DBEJProblem::rootCauseID)) {
             $dbeRootCause = new DBERootCause($this);
-            $dbeRootCause->getRow($dbeJProblem->getValue('rootCauseID'));
+            $dbeRootCause->getRow($dbeJProblem->getValue(DBEJProblem::rootCauseID));
             $rootCause = $dbeRootCause->getValue('description');
         } else {
             $rootCause = 'Unknown';
@@ -1157,7 +1164,7 @@ class BUActivity extends Business
                 $selfFlagName = DBEContact::pendingClosureEmailFlag;
                 $othersFlagName = DBEContact::othersPendingClosureEmailFlag;
 
-                $fixedUserID = $dbeJProblem->getValue('fixedUserID');
+                $fixedUserID = $dbeJProblem->getValue(DBEJProblem::fixedUserID);
                 $dbeFixedUser = new DBEUser($this);
                 $dbeFixedUser->getRow($fixedUserID);
 
@@ -1241,7 +1248,7 @@ class BUActivity extends Business
 
             case self::Fixed:
 
-                if ($dbeJProblem->getValue('fixedUserID') == USER_SYSTEM) {
+                if ($dbeJProblem->getValue(DBEJProblem::fixedUserID) == USER_SYSTEM) {
                     return;
                 }
                 $templateName = 'ServiceFixedEmail';
@@ -1511,10 +1518,10 @@ class BUActivity extends Business
      * Create or update activity
      *
      * @param mixed $dsCallActivity
-     * @param mixed $isFixed Indicates whether SR is being set to fixed
+     * @return bool
+     * @throws Exception
      */
-    function updateCallActivity(&$dsCallActivity,
-                                $isFixed = false
+    function updateCallActivity(&$dsCallActivity
     )
     {
         $this->setMethodName('updateCallActivity');
@@ -2056,6 +2063,10 @@ class BUActivity extends Business
 
     }
 
+    /**
+     * @param $problemID
+     * @param DBEJCallActivity|DataSet|DataAccess $callActivity
+     */
     function sendUpdatedByAnotherUserEmail($problemID,
                                            $callActivity
     )
@@ -3638,6 +3649,7 @@ class BUActivity extends Business
      * and we still want to set the checked activities to authorised.
      * @param $activityIDArray
      * @return bool
+     * @throws Exception
      */
     function skipSalesOrdersForActivities(&$activityIDArray)
     {
@@ -3675,6 +3687,7 @@ class BUActivity extends Business
      *
      * @param $problemID
      * @return string
+     * @throws Exception
      */
     function setProblemToCompleted($problemID)
     {
@@ -3684,10 +3697,6 @@ class BUActivity extends Business
         if ($dbeFirstCallActivity->getValue(DBEJCallActivity::problemStatus) == 'C') {
             return null;
         }
-        /*
-    This should be the fixed summary
-    */
-        $dbeFixedCallActivity = $this->getLastActivityInProblem($problemID);
 
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($dbeFirstCallActivity->getValue(DBEJCallActivity::callActivityID));
@@ -3759,6 +3768,11 @@ class BUActivity extends Business
 
     }
 
+    /**
+     * @param $activityIDArray
+     * @return bool
+     * @throws Exception
+     */
     function createSalesOrdersFromActivities(&$activityIDArray)
     {
         $db = new dbSweetcode(); // database connection for query
@@ -4197,6 +4211,10 @@ class BUActivity extends Business
         return true;
     } // end check default site contacts exists
 
+    /**
+     * @param $activityIDArray
+     * @throws Exception
+     */
     function completeSRs($activityIDArray)
     {
         $this->setMethodName('completeSRs');
@@ -4237,82 +4255,6 @@ class BUActivity extends Business
             'Y'
         );
         $dsData->post();
-    }
-
-    /**
-     * @param DataSet $dsData
-     * @param $failList
-     * @return bool
-     */
-    function checkDefaultSiteContacts(&$dsData,
-                                      &$failList
-    )
-    {
-
-        $this->setMethodName('checkDefaultSiteContacts');
-
-        $db = new dbSweetcode(); // database connection for query
-
-
-        /* get a list of valid PrePay support contracts */
-        $queryString = "
-  SELECT
-    pro_custno,
-    caa_siteno,
-    cus_name,
-    add_town,
-    add_postcode
-  FROM callactivity
-    JOIN problem ON pro_problemno = caa_problemno
-    JOIN custitem
-      ON pro_contract_cuino = cui_cuino
-    JOIN customer
-      ON pro_custno = cus_custno
-    JOIN address
-      ON add_custno = cui_custno
-        AND add_siteno = cui_siteno
-
-      WHERE cui_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . "
-        AND cui_expiry_date >=  '" . $dsData->getValue('endDate') . "'
-        AND cui_desp_date <= '" . $dsData->getValue('endDate') . "'
-        AND cui_expiry_date >= NOW()
-        AND pro_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . "
-        AND renewalStatus <> 'D'
-    GROUP BY
-        add_postcode";
-
-        $db->query($queryString);
-
-        $buCustomer = new BUCustomer($this);
-
-        $failList = '';
-
-        while ($db->next_record()) {
-
-            $dsSite = new DataSet($this);
-            $buCustomer->getSiteByCustomerIDSiteNo(
-                $db->Record['pro_custno'],
-                $db->Record['caa_siteno'],
-                $dsSite
-            );
-
-            if (!$dsSite->getValue(DBESite::invoiceContactID)) {
-
-                $failList .= '<BR/>' . $db->Record['cus_name'] . ', Site: ' . $db->Record['add_town'] . ',' . $db->Record['add_postcode'];
-
-            }
-
-        }
-
-        if ($failList) {
-
-            return false;
-        } else {
-
-            return true;
-
-        }
-
     }
 
     /**
@@ -5263,7 +5205,7 @@ is currently a balance of ';
             $senderName = '';
 
             // create mime
-            $html = '<html>' . $message . '</html>';
+            $html = '<html lang="en">' . $message . '</html>';
 //            $file = '$statementFilename';
 //      $crlf = "\n";
 
@@ -5561,10 +5503,11 @@ is currently a balance of ';
         return $callActivityID;
     }
 
-    /*
-    Create sales order for top-up
-  */
-
+    /**
+     * @param $sessionKey
+     * @return DataSet
+     * @throws Exception
+     */
     function createActivityFromSession($sessionKey)
     {
         $dbeCallActivity = new DBECallActivity($this);
@@ -5715,10 +5658,12 @@ is currently a balance of ';
             DBEJCallActivity::serverGuard,
             $_SESSION [$sessionKey] ['serverGuard']
         );
+        $dsCallActivity->enableDebugging();
         $dsCallActivity->setValue(
             DBEJCallActivity::curValue,
             $_SESSION [$sessionKey] ['curValue']
         );
+        $dsCallActivity->disableDebugging();
         $dsCallActivity->setValue(
             DBEJCallActivity::statementYearMonth,
             null
@@ -5736,6 +5681,11 @@ is currently a balance of ';
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
+        $dbeContact = null;
+        if ($_SESSION[$sessionKey]['contactID']) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($_SESSION[$sessionKey]['contactID']);
+        }
 
         $this->updateDataAccessObject(
             $dsCallActivity,
@@ -5779,6 +5729,7 @@ is currently a balance of ';
      *
      * @param mixed $callActTypeID
      * @param mixed $startTime Optional. If false then use current time
+     * @throws Exception
      */
     function getEndtime($callActTypeID,
                         $startTime = false
@@ -5928,25 +5879,25 @@ is currently a balance of ';
 
         ob_start();
         ?>
-        <html>
+        <html lang="en">
 
         <body style="font-family: arial, helvetica, sans-serif; font-size: 10pt">
         <p>Unchecked Support Activities</p>
 
         <TABLE bordercolor="#0000FF">
             <TR>
-                <TD bgcolor="#CCCCCC"><strong> Ref </strong></TD>
-                <TD bgcolor="#CCCCCC"><strong> Customer </strong></TD>
-                <TD bgcolor="#CCCCCC"><strong> Details </strong></TD>
-                <TD bgcolor="#CCCCCC"><strong> Engineer </strong></TD>
-                <TD bgcolor="#CCCCCC"><strong> Date </strong></TD>
+                <TD style="background-color:#CCCCCC"><strong> Ref </strong></TD>
+                <TD style="background-color:#CCCCCC"><strong> Customer </strong></TD>
+                <TD style="background-color:#CCCCCC"><strong> Details </strong></TD>
+                <TD style="background-color:#CCCCCC"><strong> Engineer </strong></TD>
+                <TD style="background-color:#CCCCCC"><strong> Date </strong></TD>
             </TR>
             <?php
             while ($this->dbeCallActivitySearch->fetchNext()) {
                 ?>
                 <TR>
                     <TD nowrap
-                        bgcolor="#E0DFE3"
+                        style="background-color:#E0DFE3"
                     ><A
                                 href="http://<?php
                                 echo $_SERVER ['HTTP_HOST'] ?>/Activity.php?action=displayActivity&callActivityID=<?php
@@ -5957,17 +5908,17 @@ is currently a balance of ';
                             ?></A>
                     </TD>
                     <TD nowrap
-                        bgcolor="#E0DFE3"
+                        style="background-color:#E0DFE3"
                     >
                         <?php
                         echo $this->dbeCallActivitySearch->getValue(DBEJCallActivity::customerName) ?>        </TD>
                     <TD nowrap
-                        bgcolor="#E0DFE3"
+                        style="background-color:#E0DFE3"
                     >
                         <?php
                         echo $this->dbeCallActivitySearch->getValue(DBEJCallActivity::userName) ?>        </TD>
                     <TD nowrap
-                        bgcolor="#E0DFE3"
+                        style="background-color:#E0DFE3"
                     >
                         <?php
                         echo Controller::dateYMDtoDMY(
@@ -6207,215 +6158,6 @@ is currently a balance of ';
             null
         );
     }
-
-    /**
-     * @param DataSet $dsSearchForm
-     * @param DataSet $dsServiceDesk
-     * @param DataSet $dsTAndM
-     * @param DataSet $dsServerCare
-     * @param DataSet $dsPrePay
-     * @param DataSet $dsActivityType
-     * @param DataSet $dsActivityEngineer
-     */
-    function getCustomerActivities(
-        &$dsSearchForm,
-        &$dsServiceDesk,
-        &$dsTAndM,
-        &$dsServerCare,
-        &$dsPrePay,
-        &$dsActivityType,
-        &$dsActivityEngineer
-    )
-    {
-
-        $dbeCustomerCallActivity = new DBECustomerCallActivity($this);
-
-        $customerID = trim($dsSearchForm->getValue('customerID'));
-        $userID = trim($dsSearchForm->getValue('userID'));
-        $fromDate = trim($dsSearchForm->getValue('fromDate'));
-        $toDate = trim($dsSearchForm->getValue('toDate'));
-        $contractType = trim($dsSearchForm->getValue('contractType'));
-
-        $dbeCustomerCallActivity->getMonthyActivityByContract(
-            'ServiceDesk',
-            $customerID,
-            $userID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivity,
-            $dsServiceDesk
-        );
-
-        $dbeCustomerCallActivity->getMonthyActivityByContract(
-            false,
-            // t and m
-            $customerID,
-            $userID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivity,
-            $dsTAndM
-        );
-
-        $dbeCustomerCallActivity->getMonthyActivityByContract(
-            'ServerCare',
-            $customerID,
-            $userID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivity,
-            $dsServerCare
-        );
-
-        $dbeCustomerCallActivity->getMonthyActivityByContract(
-            'Pre-Pay',
-            $customerID,
-            $userID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivity,
-            $dsPrePay
-        );
-
-        $dbeCustomerCallActivity->getActivityType(
-            $contractType,
-            $customerID,
-            $userID,
-            $fromDate,
-            $toDate
-        );
-        $this->getData(
-            $dbeCustomerCallActivity,
-            $dsActivityType
-        );
-
-        $dbeCustomerCallActivity->getActivityEngineer(
-            $contractType,
-            $customerID,
-            $userID,
-            $fromDate,
-            $toDate
-        );
-        $this->getData(
-            $dbeCustomerCallActivity,
-            $dsActivityEngineer
-        );
-    }
-
-    function getCustomerActivitiesForExport(
-        $fromDate,
-        $toDate,
-        $customerID,
-        &$dsServiceDesk,
-        &$dsTAndM,
-        &$dsServerCare,
-        &$dsPrePay,
-        &$dsSite,
-        &$dsStaff
-    )
-    {
-
-        $dbeCustomerCallActivityMonth = new DBECustomerCallActivityMonth($this);
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityByContract(
-            'ServiceDesk',
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsServiceDesk
-        );
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityByContract(
-            'ServerCare',
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsServerCare
-        );
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityByContract(
-            'Pre-Pay',
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsPrePay
-        );
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityByContract(
-            'T & M',
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsTAndM
-        );
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityByContract(
-            'T & M',
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsTAndM
-        );
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityByStaff(
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsStaff
-        );
-
-        $dbeCustomerCallActivityMonth->getMonthyActivityBySite(
-            $customerID,
-            $fromDate,
-            $toDate
-        );
-
-        $this->getData(
-            $dbeCustomerCallActivityMonth,
-            $dsSite
-        );
-
-    }
-
-    /*
-  Engineer activity is one not raised by system
-  */
 
     function getCurrentActivities(&$dsActivityEngineer)
     {
@@ -6663,11 +6405,14 @@ is currently a balance of ';
 
     /**
      * @param DataSet $dsCallActivity
+     * @param CTCNC $ctActivity
      * @return bool
      */
-    function canEdit($dsCallActivity)
+    function canEdit($dsCallActivity,
+                     $ctActivity
+    )
     {
-        if ($this->owner->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
+        if ($ctActivity->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
             $ret = true;
         }
 
@@ -6704,13 +6449,12 @@ is currently a balance of ';
 
         // if this is onSite then the report and email generated when the send time is confirmed
         if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N' && !$onSite) {
-
-            $this->sendActivityLoggedEmail(
-                $callActivityID,
-                false
-            );
-
-
+            //TODO: check this ..as the function doesn't exist
+//            $this->sendActivityLoggedEmail(
+//                $callActivityID,
+//                false
+//            );
+            $test = null;
         }
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
@@ -6964,8 +6708,7 @@ is currently a balance of ';
         );
 
         $dsResults->sortAscending(
-            'dashboardSortColumn',
-            SORT_NUMERIC
+            'dashboardSortColumn'
         );
 
         $dbeJProblem->getRowsByQueueNo($queueNo);       // then assigned
@@ -6977,8 +6720,7 @@ is currently a balance of ';
         );
 
         $dsAssignedResults->sortAscending(
-            'dashboardSortColumn',
-            SORT_NUMERIC
+            'dashboardSortColumn'
         );
 
         $dsResults->setClearRowsBeforeReplicateOff();
@@ -6987,7 +6729,7 @@ is currently a balance of ';
     }
 
     /**
-     * Get acvtive problems by customer
+     * Get active problems by customer
      *
      * @param mixed $customerID
      * @return mixed $dsResults
@@ -7072,6 +6814,7 @@ is currently a balance of ';
      * @param DataSet $dsInput
      * @param bool|int $selectedOrderLine
      * @return string
+     * @throws Exception
      */
     function createSalesServiceRequest($ordheadID,
                                        $dsInput,
@@ -7634,8 +7377,12 @@ is currently a balance of ';
         return $nextid;
     }
 
-    function processAutomaticRequest(\CNCLTD\AutomatedRequest $automatedRequest,
-                                     &$errorString
+    /**
+     * @param AutomatedRequest $automatedRequest
+     * @return bool|mixed
+     * @throws Exception
+     */
+    function processAutomaticRequest(AutomatedRequest $automatedRequest
     )
     {
 
@@ -7798,7 +7545,12 @@ is currently a balance of ';
         return $this->raiseNewRequestFromImport($automatedRequest);
     }
 
-    function processServerGuard(\CNCLTD\AutomatedRequest $automatedRequest)
+    /**
+     * @param AutomatedRequest $automatedRequest
+     * @return bool
+     * @throws Exception
+     */
+    function processServerGuard(AutomatedRequest $automatedRequest)
     {
         $details = $automatedRequest->getTextBody();
         if (!$automatedRequest->getMonitorStatus()) {
@@ -7838,8 +7590,7 @@ is currently a balance of ';
                     $request['pro_contno'],
                     $details,
                     false,
-                    true,
-                    USER_SYSTEM
+                    true
                 );
 
                 /*
@@ -7891,8 +7642,7 @@ is currently a balance of ';
                         $request['pro_contno'],
                         $details,
                         false,
-                        true,
-                        USER_SYSTEM
+                        true
                     );
                 $this->setActivityAwaitingCNC($callActivityID);
 
@@ -7977,7 +7727,7 @@ is currently a balance of ';
      * @return mixed
      * @throws Exception
      */
-    function raiseNewRequestFromImport(\CNCLTD\AutomatedRequest $record,
+    function raiseNewRequestFromImport(AutomatedRequest $record,
                                        $forcedDetails = null,
                                        $serverGuard = false
     )
@@ -7986,13 +7736,12 @@ is currently a balance of ';
         $customerID = $record->getCustomerID();
         $dbeProblem = new DBEProblem($this);
 
-        $dbeContact = new \DBEContact($this);
+        $dbeContact = new DBEContact($this);
         $dbeContact->setValue(
-            \DBEContact::email,
+            DBEContact::email,
             $record->getSenderEmailAddress()
         );
-        $dbeContact->getRowsByColumn(\DBEContact::email);
-        $details = $record->getHtmlBody();
+        $dbeContact->getRowsByColumn(DBEContact::email);
         $forceHidden = false;
         if (!$dbeContact->rowCount || $serverGuard) {
             echo "<div>The sender contact was not found, or this is a server Guard,  we need to pull the primary contact of the customer: " . $customerID . "</div>";
@@ -8264,7 +8013,7 @@ is currently a balance of ';
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($customerID);
 
-        $testTime = (new \DateTime($record->getCreateDateTime()))->format('H:i');
+        $testTime = (new DateTime($record->getCreateDateTime()))->format('H:i');
 
         $startTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hBegin);
         $endTime = $this->dsHeader->getValue(DBEHeader::serviceDeskNotification24hEnd);
@@ -8330,7 +8079,7 @@ is currently a balance of ';
     }
 
     function processAttachment($problemID,
-                               \CNCLTD\AutomatedRequest $record
+                               AutomatedRequest $record
     )
     {
 
@@ -8435,10 +8184,11 @@ is currently a balance of ';
      * @param bool $passedReason
      * @param bool $ifUnallocatedSetToCurrentUser
      * @param bool $setEndTimeToNow
-     * @param $userID
+     * @param int $userID
      * @param bool $moveToUsersQueue
      * @param bool $resetAwaitingCustomerResponse
      * @return string
+     * @throws Exception
      */
     function createFollowOnActivity(
         $callActivityID,
@@ -8447,7 +8197,7 @@ is currently a balance of ';
         $passedReason = false,
         $ifUnallocatedSetToCurrentUser = true,
         $setEndTimeToNow = false,
-        $userID,
+        $userID = USER_SYSTEM,
         $moveToUsersQueue = false,
         $resetAwaitingCustomerResponse = false
     )
@@ -8475,7 +8225,8 @@ is currently a balance of ';
                 /*
         Prepopulate reason
         */
-                $reason = "<table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
+                $reason = "<!--suppress HtmlDeprecatedAttribute -->
+<table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
             }
         }
 
@@ -8896,6 +8647,7 @@ is currently a balance of ';
      * @param $rootCauseID
      * @param $resolutionSummary
      * @return bool
+     * @throws Exception
      */
     function setProblemToFixed(
         $problemID,
@@ -9006,6 +8758,12 @@ is currently a balance of ';
         return true;
     }
 
+    /**
+     * @param $problemID
+     * @param bool $exceptCallActivityID
+     * @return int
+     * @throws Exception
+     */
     function countOpenActivitiesInRequest($problemID,
                                           $exceptCallActivityID = false
     )
@@ -9052,6 +8810,12 @@ is currently a balance of ';
 
     }
 
+    /**
+     * @param $problemID
+     * @param $resolutionSummary
+     * @param bool $zeroTime
+     * @throws Exception
+     */
     function createFixedActivity($problemID,
                                  $resolutionSummary,
                                  $zeroTime = false
@@ -9294,12 +9058,6 @@ is currently a balance of ';
         );
     }
 
-
-    private function isSupportContact($value)
-    {
-
-    }
-
     function getContactInfo($record)
     {
         global $db;
@@ -9506,7 +9264,7 @@ is currently a balance of ';
 //    }
 
 
-    function addCustomerRaisedRequest(\CNCLTD\AutomatedRequest $record,
+    function addCustomerRaisedRequest(AutomatedRequest $record,
                                       $contact = null,
                                       $updateExistingRequest = false,
                                       $prependMessage = false,
@@ -9610,6 +9368,7 @@ is currently a balance of ';
      * @param integer $contactID
      * @param string $reason
      * @param bool $oldProblemID
+     * @throws Exception
      */
     function addInitialActivityToNewRequest($dbeProblem,
                                             $siteNo,
@@ -9862,6 +9621,7 @@ is currently a balance of ';
      *
      * @param mixed $record
      * @param mixed $contact
+     * @throws Exception
      */
     function raiseSecondSiteMissingImageRequest(
         $customerID,
@@ -9892,6 +9652,15 @@ is currently a balance of ';
         );
     } // end sendPriorityOneReopenedEmail
 
+    /**
+     * @param $customerID
+     * @param $contractCustomerItemID
+     * @param $matchText
+     * @param $details
+     * @param $serverName
+     * @param $serverCustomerItemID
+     * @throws Exception
+     */
     function createSecondsiteSR(
         $customerID,
         $contractCustomerItemID,
@@ -10057,8 +9826,7 @@ is currently a balance of ';
                 $dbeContact->getValue(DBEContact::contactID),
                 $details,
                 false,
-                true,
-                USER_SYSTEM
+                true
             );
         }
 
@@ -10100,6 +9868,14 @@ is currently a balance of ';
         }
     } // end sendServiceReallocatedEmail
 
+    /**
+     * @param $customerID
+     * @param $serverName
+     * @param $serverCustomerItemID
+     * @param $contractCustomerItemID
+     * @param $networkPath
+     * @throws Exception
+     */
     function raiseSecondSiteLocationNotFoundRequest(
         $customerID,
         $serverName,
@@ -10351,179 +10127,6 @@ is currently a balance of ';
         );
     }
 
-    private function sendRequestAdditionalTimeEmail($problemID,
-                                                    $reason,
-                                                    $requestorID
-    )
-    {
-        $buMail = new BUMail($this);
-
-        $this->dbeUser->getRow($requestorID);
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-//        $senderName = 'CNC Support Department';
-
-        $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-
-        $template->set_file(
-            'page',
-            'ServiceAdditionalTimeEmail.inc.html'
-        );
-
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
-        $teamID = $this->dbeUser->getValue(DBEUser::teamID);
-
-        $leftOnBudget = null;
-        $usedMinutes = 0;
-        $assignedMinutes = 0;
-
-        $dbeProblem = new DBEJProblem($this);
-        $dbeProblem->getRow($problemID);
-
-        switch ($teamID) {
-            case 1:
-                $usedMinutes = $this->getHDTeamUsedTime($problemID);
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
-                $toEmail = 'hdtimerequest@' . CONFIG_PUBLIC_DOMAIN;
-                break;
-            case 2:
-                $usedMinutes = $this->getESTeamUsedTime($problemID);
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-                $toEmail = 'eqtimerequest@' . CONFIG_PUBLIC_DOMAIN;
-                break;
-            /** @noinspection PhpMissingBreakStatementInspection */
-            case 4:
-                $usedMinutes = $this->getIMTeamUsedTime($problemID);
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
-            default:
-                $toEmail = 'imptimerequest@' . CONFIG_PUBLIC_DOMAIN;
-        }
-
-        $leftOnBudget = $assignedMinutes - $usedMinutes;
-        $subject = 'Time Requested: ' . CONFIG_SERVICE_REQUEST_DESC . ' ' . $problemID . ' ' . $dbeJLastCallActivity->getValue(
-                DBEJCallActivity::customerName
-            ) . ' allocated to ' . $userName;
-
-        $requestedReason = $reason;
-
-        $urlAllocateAdditionalTime = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=allocateAdditionalTime&problemID=' . $problemID;
-
-        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getValue(
-                DBEJCallActivity::callActivityID
-            );
-
-        $template->setVar(
-            array(
-                'problemID' => $problemID,
-
-                'allocatedUserName' => $userName,
-
-                'urlAllocateAdditionalTime' => $urlAllocateAdditionalTime,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'internalNotes' => $dbeProblem->getValue(DBEJProblem::internalNotes),
-
-                'requestedReason' => $requestedReason,
-
-                'chargeableActivityDurationHours' => $dbeProblem->getValue(
-                    DBEJProblem::chargeableActivityDurationHours
-                ),
-
-                'totalActivityDurationHours' => $dbeProblem->getValue(DBEJProblem::totalActivityDurationHours),
-                'timeLeftOnBudget'           => $leftOnBudget
-            )
-        );
-
-        /* start history */
-        $dsActivities = $this->getActivitiesByProblemID($problemID);
-
-        $template->set_block(
-            'page',
-            'activityBlock',
-            'rows'
-        );
-
-        while ($dsActivities->fetchNext()) {
-
-            $template->set_var(
-                array(
-                    'reason'       => $dsActivities->getValue(DBEJCallActivity::reason),
-                    'date'         => Controller::dateYMDtoDMY($dsActivities->getValue(DBEJCallActivity::date)),
-                    'startTime'    => $dsActivities->getValue(DBEJCallActivity::startTime),
-                    'endTime'      => $dsActivities->getValue(DBEJCallActivity::endTime),
-                    'activityType' => $dsActivities->getValue(DBEJCallActivity::activityType),
-                    'contactName'  => $dsActivities->getValue(DBEJCallActivity::contactName),
-                    'duration'     => number_format(
-                        $dsActivities->getValue(DBEJCallActivity::durationMinutes) / 60,
-                        2
-                    ),
-                    'userName'     => $dsActivities->getValue(DBEJCallActivity::userName),
-                )
-            );
-
-            $template->parse(
-                'rows',
-                'activityBlock',
-                true
-            );
-
-        }
-
-        /* end history */
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body,
-            true
-        );
-
-
-        $text = 'Additional time requested - Reason: ' . $reason;
-
-        $this->logOperationalActivity(
-            $problemID,
-            $text
-        );
-
-    }
-
     function getUserPerformanceWeekToDate($userID)
     {
         return $this->getUserPerformanceDaysToDate(
@@ -10568,6 +10171,7 @@ is currently a balance of ';
      * Called by a timed process last thing at night to ensure all active users
      * have a log entry for each working day.
      * @param string $date
+     * @throws Exception
      */
     function createUserTimeLogsForMissingUsers($date = null)
     {
@@ -11405,7 +11009,7 @@ is currently a balance of ';
         return $dsResults;
     }
 
-    private function contactNotAuthorized(\CNCLTD\AutomatedRequest $record,
+    private function contactNotAuthorized(AutomatedRequest $record,
                                           DBEContact $dbeContact
     )
     {

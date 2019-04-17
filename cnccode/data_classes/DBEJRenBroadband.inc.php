@@ -13,6 +13,10 @@ class DBEJRenBroadband extends DBECustomerItem
     const customerName = "customerName";
     const invoiceFromDate = "invoiceFromDate";
     const invoiceToDate = "invoiceToDate";
+    const siteName = "siteName";
+    const itemTypeDescription = "itemTypeDescription";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
 
     function __construct(&$owner)
     {
@@ -25,13 +29,13 @@ class DBEJRenBroadband extends DBECustomerItem
             "cus_name"
         );
         $this->addColumn(
-            "siteName",
+            self::siteName,
             DA_STRING,
             DA_NOT_NULL,
             "CONCAT(add_add1, ' ', add_town, ' ' , add_postcode)"
         );
         $this->addColumn(
-            "itemID",
+            self::itemID,
             DA_STRING,
             DA_NOT_NULL,
             "itm_itemno"
@@ -43,7 +47,7 @@ class DBEJRenBroadband extends DBECustomerItem
             "itm_desc"
         );
         $this->addColumn(
-            "itemTypeDescription",
+            self::itemTypeDescription,
             DA_STRING,
             DA_NOT_NULL,
             "ity_desc"
@@ -61,13 +65,13 @@ class DBEJRenBroadband extends DBECustomerItem
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceFromDateYMD",
+            self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
         );
         $this->addColumn(
-            "invoiceToDateYMD",
+            self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"

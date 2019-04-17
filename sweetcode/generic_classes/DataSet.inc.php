@@ -48,16 +48,8 @@ class DataSet extends DataAccess
      * constructor
      * If arguments are passed then these are used as string columns to create
      * @access public
-     * @return void
+     * @param $owner
      */
-
-    /*
-    I am not using the usual "constructor" function because I can't see how to preserve the
-    variable-length argument list accross the call.
-
-    As this class is unlikely to be inherrited from, it probably doesn't matter
-    anyhow.
-    */
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -184,18 +176,14 @@ class DataSet extends DataAccess
      * Sort the order of the rows in the dataset by given column
      * @parameter integer Column Column to sort on
      * @access public
+     * @param $ixColumn
      * @return boolean
      */
-    function sortAscending($ixColumn,
-                           $sortType = false
+    function sortAscending($ixColumn
     )
     {
         $this->setMethodName("sortAscending");
         $ret = FALSE;
-
-        if ($sortType === false) {
-            $sortType = SORT_STRING;
-        }
 
         if ($this->rowCount() > 0) {
             $ixColumnNumber = $this->columnExists($ixColumn);
@@ -244,7 +232,7 @@ class DataSet extends DataAccess
             if (is_string($arg)) {
                 $columnNo = $this->columnExists($arg);
                 if ($columnNo == DA_OUT_OF_RANGE) {
-                    $this->raiseError('columnSort(). Column ' . $ixColumn . " out of range");
+                    $this->raiseError('columnSort(). Column ' . $arg . " out of range");
                 }
                 foreach ($this->rows as $row_key => $row) {
                     $sort_array[$i][] = $row[$columnNo];
@@ -263,19 +251,19 @@ class DataSet extends DataAccess
      * Load data from a CSV file assuming column names in first row
      * @access public
      * @parameter String $fileName The local filesystem path from which data will be loaded
+     * @param $fileName
      * @return boolean
      */
     function loadFromCSVFile($fileName)
     {
         $this->setMethodName("loadFromCSVFile");
-        $ret = FALSE;
         // Open the file
         $pointer = fopen(
             $fileName,
             "r"
         );
         if (!$pointer) {
-            $this->raiseError("Unable to open file " . $filename);
+            $this->raiseError("Unable to open file " . $fileName);
         }
         $this->setAddColumnsOn();
         // Create the columns from first row data
@@ -315,12 +303,12 @@ class DataSet extends DataAccess
      * Dump data to a CSV file with column names in first row
      * @access public
      * @parameter String $fileName The local filesystem path to which data will be dumped
+     * @param $fileName
      * @return boolean
      */
     function saveToCSVFile($fileName)
     {
         $this->setMethodName("saveToCSVFile");
-        $ret = FALSE;
         // Open the file
         $pointer = fopen(
             $fileName,
@@ -339,8 +327,8 @@ class DataSet extends DataAccess
         while ($this->fetchNext()) {
             fwrite(
                 $pointer,
-                ereg_replace(
-                    "\n",
+                preg_replace(
+                    "/[\n\r]/",
                     "",
                     $this->getColumnValuesAsString()
                 ) . "\n"
@@ -349,26 +337,6 @@ class DataSet extends DataAccess
         fclose($pointer);
         $ret = TRUE;
         return $ret;
-    }
-
-    /**
-     * Copy columns from another dataaccess object
-     * @access private
-     * @parameter DataAccess $dataaccess Data access object to copy
-     * @return boolean
-     */
-    function copyColumns($dataaccess)
-    {
-        $this->setMethodName("copyColumns");
-        $this->clear();
-        for ($col = 0; $col < $dataaccess->col_count(); $col++) {
-            $this->addColumn(
-                $dataaccess->getName($col),
-                $dataaccess->getType($col),
-                $dataaccess->getNull($col)
-            );
-        }
-        return true;
     }
 
     function setValue($ixPassedColumn,
@@ -401,6 +369,7 @@ class DataSet extends DataAccess
     )
     {
         $ret = FALSE;
+        $searchArray = [];
         if ($this->rowCount() > 0) {
             $ixColumnNumber = $this->columnExists($ixColumn);
             if ($ixColumnNumber != DA_OUT_OF_RANGE) {
@@ -462,9 +431,9 @@ class DataSet extends DataAccess
         if (!is_array($entityArray)) {
             $this->raiseError('entityArray not an array');
         }
-        while (list($key, $row) = each($entityArray)) {                            // loop though rows
+        foreach ($entityArray as $key => $row) {                            // loop though rows
             $this->setUpdateModeInsert();
-            while (list($fieldName, $value) = each($row)) {                        // loop through column values
+            foreach ($row as $fieldName => $value) {                        // loop through column values
                 if (
                     ($this->getNull($fieldName) == DA_NOT_NULL) & ($value == '')
                 ) {
@@ -482,7 +451,7 @@ class DataSet extends DataAccess
                             ($value == 'Y' ? 'Y' : 'N')
                         );
                     }
-                    if (($this->getNull($fieldName) == DA_ALLOW_NULL) & ($value == '')) {
+                    if (($this->getNull($fieldName) == DA_ALLOW_NULL) && !$value) {
                         $this->setValue(
                             $fieldName,
                             ''
@@ -755,6 +724,5 @@ class DataSet extends DataAccess
         return $ret;
 
     }
-}
 
-?>
+}

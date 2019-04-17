@@ -15,6 +15,7 @@ class BURootCause extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -56,6 +57,8 @@ class BURootCause extends Business
     /**
      *    canDeleteRootCause
      * Only allowed if this further actionhas no future action rows at the moment
+     * @param $ID
+     * @return bool
      */
     function canDelete($ID)
     {
@@ -68,5 +71,4 @@ class BURootCause extends Business
             return FALSE;
         }
     }
-}// End of class
-?>
+}

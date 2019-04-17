@@ -151,10 +151,6 @@ class CTCustomerItem extends CTCNC
             case CTCUSTOMERITEM_ACT_ADD:
                 $this->add();
                 break;
-
-            case CTCUSTOMERITEM_ACT_EDIT:
-                $this->edit();
-                break;
             case CTCUSTOMERITEM_ACT_INSERT:
             case CTCUSTOMERITEM_ACT_UPDATE:
                 $this->update();
@@ -171,17 +167,11 @@ class CTCustomerItem extends CTCNC
             case CTCUSTOMERITEM_ACT_VIEW_DOCUMENT:
                 $this->viewDocument();
                 break;
-            case CTCUSTOMERITEM_ACT_GET_DOCUMENT:
-                $this->getDocument();
-                break;
             case CTCUSTOMERITEM_ACT_DELETE_DOCUMENT:
                 $this->deleteDocument();
                 break;
             case CTCUSTOMERITEM_ACT_PRINT_CONTRACT:
                 $this->printContract();
-                break;
-            case 'displayContractItemList':
-                $this->displayContractItemList();
                 break;
             default:
                 $this->displaySearchForm();
@@ -210,6 +200,7 @@ class CTCustomerItem extends CTCNC
      * Run search based upon passed parameters
      * Display search form with results
      * @access private
+     * @throws Exception
      */
     function search()
     {
@@ -245,6 +236,7 @@ class CTCustomerItem extends CTCNC
     /**
      * Display the results of order search
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -263,10 +255,6 @@ class CTCustomerItem extends CTCNC
             $_SERVER['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
         );
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => CTCUSTOMERITEM_ACT_ADD)
-        );
         $customerPopupURL =
             Controller::buildLink(
                 CTCNC_PAGE_CUSTOMER,
@@ -280,8 +268,10 @@ class CTCustomerItem extends CTCNC
         if ($dsSearchForm->rowCount() == 0) {
             $this->buCustomerItem->initialiseSearchForm($dsSearchForm);
         }
+        $customerString = null;
         if ($dsSearchForm->getValue(DBECustomerItem::customerID) != '') {
             $buCustomer = new BUCustomer($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
                 $dsSearchForm->getValue(DBECustomerItem::customerID),
                 $dsCustomer
@@ -536,6 +526,7 @@ class CTCustomerItem extends CTCNC
      * Display the renewal status drop-down selector
      *
      * @access private
+     * @param $renewalStatus
      */
     function parseRenewalSelector($renewalStatus)
     {
@@ -560,6 +551,7 @@ class CTCustomerItem extends CTCNC
      * Display the second site delay days drop-down selector
      *
      * @access private
+     * @param $delayDays
      */
     function parseSecondsiteImageDelayDaysSelector($delayDays)
     {
@@ -737,11 +729,11 @@ class CTCustomerItem extends CTCNC
             'CustomerItemDisplay',
             'CustomerItemDisplay.inc'
         );
-// Parameters
+
         $this->setPageTitle("Customer Item");
         $dsCustomerItem = &$this->dsCustomerItem; // local refs
         $buCustomerItem = &$this->buCustomerItem;
-
+        $customerItemID = null;
         if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
             if (!$this->getFormError()) {
                 $buCustomerItem->getCustomerItemByID(
@@ -1501,7 +1493,7 @@ class CTCustomerItem extends CTCNC
         );
 
         while ($dsContract->fetchNext()) {
-
+            $selected = null;
             if ($contractIDs && count($contractIDs) > 0) {
 
                 if (in_array(
@@ -1509,10 +1501,7 @@ class CTCustomerItem extends CTCNC
                     $contractIDs
                 )) {
                     $selected = CT_CHECKED;
-                } else {
-                    $selected = '';
                 }
-
             }
 
             $this->template->set_var(
@@ -1798,5 +1787,4 @@ class CTCustomerItem extends CTCNC
 
     }
 
-}// end of class
-?>
+}

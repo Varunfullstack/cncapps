@@ -298,7 +298,7 @@
         </sql>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-40">
+    <changeSet author="pavwebdev" id="1554199133-41">
         <sql>
             UPDATE staffAppraisalQuestionnaire
             SET dateSent = NULL
@@ -306,4 +306,17 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-42">
+        <preConditions>
+            <tableExists tableName="broadbandservicetype"/>
+        </preConditions>
+        <dropTable tableName="broadbandservicetype"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-43">
+        <dropNotNullConstraint columnName="curGSCBalance" tableName="custitem" columnDataType="decimal(8,2)"/>
+        <rollback/>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -306,28 +306,33 @@ class DBEntity extends DataAccess
 
     /**
      * Add a new column to the object
-     * @param string Column name
-     * @param type column type
-     * @param null DA_ALLOW_NULL DA_NOT_NULL
-     * @param type Optional database column name
-     * @access public
+     * @param $name
+     * @param $type
+     * @param $allowNull
+     * @param null $dbColumnName
+     * @param null $defaultValue
+     * @param null $validationFunction
      * @return integer New column number or DA_COLUMN_NOT_ADDED
+     * @access public
      */
-    function addColumn($arg)
+    function addColumn($name,
+                       $type,
+                       $allowNull,
+                       $dbColumnName = null,
+                       $defaultValue = null,
+                       $validationFunction = null
+    )
     {
-        $name = func_get_arg(0);
-        $type = func_get_arg(1);
-        $null = func_get_arg(2);
         $ixColumnNo = parent::addColumn(
             $name,
             $type,
-            $null
+            $allowNull,
+            $defaultValue,
+            $validationFunction
         );
         $ret = $ixColumnNo;
-        $numArgs = func_num_args();
         if ($ixColumnNo != DA_OUT_OF_RANGE) {
-            if ($numArgs == 4) {
-                $dbColumnName = func_get_arg(3);
+            if ($dbColumnName) {
                 $this->setDBColumnName(
                     $ixColumnNo,
                     $dbColumnName

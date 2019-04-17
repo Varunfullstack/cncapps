@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection HtmlDeprecatedAttribute */
 /**
  * Activity controller class
  * CNC Ltd
@@ -148,17 +148,16 @@ class CTActivity extends CTCNC
             "O"   => "Other Contract",
             ""    => "All"
         );
-    private $dsPrintRange = '';
     /**
      *
      * @var DSForm
      */
-    private $dsSearchForm = '';
+    private $dsSearchForm;
     /**
      *
      * @var DataSet
      */
-    private $dsSearchResults = '';
+    private $dsSearchResults;
     /**
      *
      * @var DataSet
@@ -170,7 +169,7 @@ class CTActivity extends CTCNC
      *
      * @var BUActivity
      */
-    private $buActivity = '';
+    private $buActivity;
     private $statusArray =
         array(
             ""          => "All",
@@ -186,7 +185,10 @@ class CTActivity extends CTCNC
                         => "Checked Non-T&M Due Completion",
             "UNCHECKED" => "Unchecked"
         );
-    private $dsGSCExport;
+    /**
+     * @var DSForm
+     */
+    public $dsCallActivity;
 
     function __construct($requestMethod,
                          $postVars,
@@ -258,6 +260,7 @@ class CTActivity extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -374,14 +377,6 @@ class CTActivity extends CTCNC
             case 'linkProblems':
                 $this->linkProblems();
                 break;
-            case CTACTIVITY_ACT_EXPORT_FORM:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-                $this->gscExportForm();
-                break;
-            case CTACTIVITY_ACT_EXPORT_GENERATE:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-                $this->gscExportGenerate();
-                break;
             case CTACTIVITY_ACT_ADD_TO_CALENDAR:
                 $this->addToCalendar();
                 break;
@@ -458,13 +453,6 @@ class CTActivity extends CTCNC
 
                 $this->updateHistoricUserTimeLogs($startDate);
                 break;
-            case 'test':
-                $this->buActivity->sendSalesRequestAlertEmail(
-                    387378,
-                    null
-                );
-                break;
-
             case 'toggleMonitoringFlag':
                 $this->toggleMonitoringFlag();
                 break;
@@ -508,6 +496,7 @@ class CTActivity extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function createSalesOrder()
     {
@@ -528,6 +517,9 @@ class CTActivity extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function completeSRs()
     {
         $this->setMethodName('completeSRs');
@@ -552,6 +544,7 @@ class CTActivity extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function skipSalesOrder()
     {
@@ -571,11 +564,11 @@ class CTActivity extends CTCNC
         if (isset($_REQUEST['linkedSalesOrderID'])) {
             $this->dsSearchForm->setUpdateModeUpdate();
             $this->dsSearchForm->setValue(
-                'linkedSalesOrderID',
+                BUActivity::searchFormLinkedSalesOrderID,
                 $_REQUEST['linkedSalesOrderID']
             );
             $this->dsSearchForm->setValue(
-                'callActTypeID',
+                BUActivity::searchFormCallActTypeID,
                 CONFIG_INITIAL_ACTIVITY_TYPE_ID
             );
             $this->dsSearchForm->post();
@@ -587,9 +580,9 @@ class CTActivity extends CTCNC
             } else {
                 if (
                     $this->countParamsSet($_REQUEST['activity']) < 2 AND
-                    empty($this->dsSearchForm->getValue('customerID')) AND
-                    $this->dsSearchForm->getValue('contractCustomerItemID') == '99' and
-                    $this->dsSearchForm->getValue('status') !== 'CHECKED_NON_T_AND_M'
+                    empty($this->dsSearchForm->getValue(BUActivity::searchFormCustomerID)) AND
+                    $this->dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID) == '99' and
+                    $this->dsSearchForm->getValue(BUActivity::searchFormStatus) !== 'CHECKED_NON_T_AND_M'
                 ) {
                     $this->formErrorMessage = 'you have not selected any filtering criteria for your search, this is not allowed';
                     $this->setFormErrorOn();
@@ -601,7 +594,7 @@ class CTActivity extends CTCNC
             // default (i.e. called from menu link) is last 7 days
             $this->dsSearchForm->setUpdateModeUpdate();
             $this->dsSearchForm->setValue(
-                'fromDate',
+                BUActivity::searchFormFromDate,
                 date(
                     'Y-m-d',
                     strtotime("-1 week")
@@ -650,6 +643,7 @@ class CTActivity extends CTCNC
     /**
      * Display search form
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -701,19 +695,20 @@ class CTActivity extends CTCNC
         if ($this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
             $dbeUser = new DBEUser($this);
             $dbeUser->setValue(
-                'userID',
+                DBEUser::userID,
                 $this->userID
             );
             $dbeUser->getRow();
             $dsSearchForm->setValue(
-                'customerID',
-                $dbeUser->getValue('customerID')
+                BUActivity::searchFormCustomerID,
+                $dbeUser->getValue(DBEUser::customerID)
             );
         }
-        if ($dsSearchForm->getValue('customerID') != 0) {
+        if ($dsSearchForm->getValue(BUActivity::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue('customerID'),
+                $dsSearchForm->getValue(BUActivity::searchFormCustomerID),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
@@ -722,31 +717,43 @@ class CTActivity extends CTCNC
         $this->template->set_var(
             array(
                 'formError'                   => $this->formError,
-                'customerID'                  => $dsSearchForm->getValue('customerID'),
+                'customerID'                  => $dsSearchForm->getValue(BUActivity::searchFormCustomerID),
                 'customerString'              => $customerString,
-                'problemID'                   => Controller::htmlDisplayText($dsSearchForm->getValue('problemID')),
-                'problemIDMessage'            => Controller::htmlDisplayText($dsSearchForm->getMessage('problemID')),
-                'callActivityID'              => Controller::htmlDisplayText($dsSearchForm->getValue('callActivityID')),
+                'problemID'                   => Controller::htmlDisplayText(
+                    $dsSearchForm->getValue(BUActivity::searchFormProblemID)
+                ),
+                'problemIDMessage'            => Controller::htmlDisplayText(
+                    $dsSearchForm->getMessage(BUActivity::searchFormProblemID)
+                ),
+                'callActivityID'              => Controller::htmlDisplayText(
+                    $dsSearchForm->getValue(BUActivity::searchFormCallActivityID)
+                ),
                 'callActivityIDMessage'       => Controller::htmlDisplayText(
-                    $dsSearchForm->getMessage('callActivityID')
+                    $dsSearchForm->getMessage(BUActivity::searchFormCallActivityID)
                 ),
                 'serviceRequestSpentTime'     => Controller::htmlDisplayText(
-                    $dsSearchForm->getValue('serviceRequestSpentTime')
+                    $dsSearchForm->getValue(BUActivity::searchFormServiceRequestSpentTime)
                 ),
                 'individualActivitySpentTime' => Controller::htmlDisplayText(
-                    $dsSearchForm->getValue('individualActivitySpentTime')
+                    $dsSearchForm->getValue(BUActivity::searchFormIndividualActivitySpentTime)
                 ),
-                'activityText'                => Controller::htmlDisplayText($dsSearchForm->getValue('activityText')),
-                'fromDate'                    => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage'             => $dsSearchForm->getMessage('fromDate'),
-                'toDate'                      => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage'               => $dsSearchForm->getMessage('toDate'),
+                'activityText'                => Controller::htmlDisplayText(
+                    $dsSearchForm->getValue(BUActivity::searchFormActivityText)
+                ),
+                'fromDate'                    => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUActivity::searchFormFromDate)
+                ),
+                'fromDateMessage'             => $dsSearchForm->getMessage(BUActivity::searchFormFromDate),
+                'toDate'                      => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUActivity::searchFormToDate)
+                ),
+                'toDateMessage'               => $dsSearchForm->getMessage(BUActivity::searchFormToDate),
                 'rowsFound'                   => $dsSearchResults->rowCount(),
                 'urlCreateActivity'           => $urlCreateActivity,
                 'urlCustomerPopup'            => $urlCustomerPopup,
                 'fetchContractsURL'           => $fetchContractsURL,
                 'managementReviewOnlyChecked' => Controller::htmlChecked(
-                    $dsSearchForm->getValue('managementReviewOnly')
+                    $dsSearchForm->getValue(BUActivity::searchFormManagementReviewOnly)
                 ),
                 'urlSubmit'                   => $urlSubmit
             )
@@ -764,7 +771,7 @@ class CTActivity extends CTCNC
         }
 
         foreach ($statusArray as $key => $value) {
-            $statusSelected = ($dsSearchForm->getValue('status') == $key) ? CT_SELECTED : '';
+            $statusSelected = ($dsSearchForm->getValue(BUActivity::searchFormStatus) == $key) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'statusSelected'    => $statusSelected,
@@ -780,41 +787,41 @@ class CTActivity extends CTCNC
         }
 
         $this->rootCauseDropdown(
-            $dsSearchForm->getValue('rootCauseID'),
+            $dsSearchForm->getValue(BUActivity::searchFormRootCauseID),
             'ActivitySearch',
             'rootCauseBlock'
         );
 
         $this->priorityDropdown(
-            $dsSearchForm->getValue('priority'),
+            $dsSearchForm->getValue(BUActivity::searchFormPriority),
             'ActivitySearch',
             'priorityBlock'
         );
 
-        $this->breachedSlaDropdown($dsSearchForm->getValue('breachedSlaOption'));
+        $this->breachedSlaDropdown($dsSearchForm->getValue(BUActivity::searchFormBreachedSlaOption));
 
         //Contract selection
-        if ($dsSearchForm->getValue('customerID')) {
+        if ($dsSearchForm->getValue(BUActivity::searchFormCustomerID)) {
             $this->contractDropdown(
-                $dsSearchForm->getValue('customerID'),
-                $dsSearchForm->getValue('contractCustomerItemID'),
+                $dsSearchForm->getValue(BUActivity::searchFormCustomerID),
+                $dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID),
                 'ActivitySearch',
                 'contractBlock'
             );
         }
 
         $this->userDropdown(
-            $dsSearchForm->getValue('userID'),
+            $dsSearchForm->getValue(BUActivity::searchFormUserID),
             'ActivitySearch'
         );
 
         $dbeCallActType = new DBECallActType($this);
         $dbeCallActType->setValue(
-            'activeFlag',
+            DBECallActType::activeFlag,
             'Y'
         );
         $dbeCallActType->getRowsByColumn(
-            'activeFlag',
+            DBECallActType::activeFlag,
             'description'
         );
 
@@ -825,14 +832,16 @@ class CTActivity extends CTCNC
             'activityTypes'
         );
         while ($dbeCallActType->fetchNext()) {
-            $activityTypeSelected = ($dsSearchForm->getValue('callActTypeID') == $dbeCallActType->getValue(
-                    'callActTypeID'
+            $activityTypeSelected = ($dsSearchForm->getValue(
+                    BUActivity::searchFormCallActTypeID
+                ) == $dbeCallActType->getValue(
+                    DBECallActType::callActTypeID
                 )) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'activityTypeSelected'    => $activityTypeSelected,
-                    'callActTypeID'           => $dbeCallActType->getValue('callActTypeID'),
-                    'activityTypeDescription' => $dbeCallActType->getValue('description')
+                    'callActTypeID'           => $dbeCallActType->getValue(DBECallActType::callActTypeID),
+                    'activityTypeDescription' => $dbeCallActType->getValue(DBECallActType::description)
                 )
             );
             $this->template->parse(
@@ -857,11 +866,8 @@ class CTActivity extends CTCNC
             );
             $customerNameCol = $dsSearchResults->columnExists('customerName');
             $callActivityIDCol = $dsSearchResults->columnExists('callActivityID');
-//            $projectDescriptionCol = $dsSearchResults->columnExists('projectDescription');
-            $customerIDCol = $dsSearchResults->columnExists('customerID');
             $statusCol = $dsSearchResults->columnExists('status');
             $reasonCol = $dsSearchResults->columnExists('reason');
-            $fixCol = $dsSearchResults->columnExists('fix');
             $dateCol = $dsSearchResults->columnExists('date');
             $startCol = $dsSearchResults->columnExists('startTime');
             $endCol = $dsSearchResults->columnExists('endTime');
@@ -871,14 +877,14 @@ class CTActivity extends CTCNC
             /*
         if we are displaying checked T&M activities then show Generate Sales Order and Skip Sales Order buttons
         */
-            if ($dsSearchForm->getValue('status') == 'CHECKED_T_AND_M') {
+            if ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M') {
                 $bulkActionButtons =
                     '<input name="Search" type="submit" value="Generate Sales Orders" />
           <input name="Search" type="submit" value="Skip Sales Orders" />';
                 $checkAllBox =
                     '<input type="checkbox" name="checkAllBox" id="checkAllBox" value="0" onClick="checkAll();"/>';
 
-            } elseif ($dsSearchForm->getValue('status') == 'CHECKED_NON_T_AND_M') {
+            } elseif ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_NON_T_AND_M') {
                 $bulkActionButtons =
                     '<input name="Search" type="submit" value="Complete SRs" />';
                 $checkAllBox =
@@ -900,8 +906,8 @@ class CTActivity extends CTCNC
 
             $headerColSpan = 13;
 
-            if ($dsSearchForm->getValue('status') == 'CHECKED_T_AND_M' ||
-                $dsSearchForm->getValue('status') == 'CHECKED_NON_T_AND_M') {
+            if ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M' ||
+                $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_NON_T_AND_M') {
                 $weirdColumns = '<td class="listHeadText"><div style="width: 100px">SO</div></td>';
                 $headerColSpan = 10;
             }
@@ -936,14 +942,14 @@ class CTActivity extends CTCNC
 
                 $weirdFields = '<td align="top" class="listItemText">' . $dsSearchResults->getValue($startCol) . '</td>
             <td align="top" class="listItemText">' . $dsSearchResults->getValue($endCol) . '</td>
-            <td align="right" nowrap>' . $dsSearchResults->getValue('slaResponseHours') . '</td>
-            <td align="right" nowrap>' . $dsSearchResults->getValue('respondedHours') . '</td>';
+            <td align="right" nowrap>' . $dsSearchResults->getValue(DBECallActivitySearch::slaResponseHours) . '</td>
+            <td align="right" nowrap>' . $dsSearchResults->getValue(DBECallActivitySearch::respondedHours) . '</td>';
 
                 $contractField = $dsSearchResults->getValue($contractDescriptionCol);
 
                 if (
-                    $dsSearchForm->getValue('status') == 'CHECKED_T_AND_M' ||
-                    $dsSearchForm->getValue('status') == 'CHECKED_NON_T_AND_M'
+                    $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M' ||
+                    $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_NON_T_AND_M'
                 ) {
                     $checkBox =
                         '<input type="checkbox" id="callActivityID" name="callActivityID[' . $callActivityID . ']" value="' . $callActivityID . '" />';
@@ -985,7 +991,7 @@ class CTActivity extends CTCNC
 
                         foreach ($contractItems as $contractItem) {
                             $selected = $contractCustomerItemID == $contractItem['id'];
-                            $contractField .= "<option value='" . $contractItem['id'] . "'" . ($selected ? 'selected' : '') . ">" . $contractItem['description'] . " </option>";
+                            $contractField .= "<option value='" . $contractItem['id'] . "' " . ($selected ? 'selected' : '') . ">" . $contractItem['description'] . " </option>";
                         }
                         $contractField .= "</optgroup>";
                     }
@@ -1013,14 +1019,16 @@ class CTActivity extends CTCNC
                         'listDate'                  => Controller::dateYMDtoDMY($dsSearchResults->getValue($dateCol)),
                         //                        'listStart'                 => $dsSearchResults->getValue($startCol),
                         //                        'listEnd'                   => $dsSearchResults->getValue($endCol),
-                        'listPriority'              => $dsSearchResults->getValue('priority'),
-                        //                        'listSlaResponseHours'      => $dsSearchResults->getValue('slaResponseHours'),
-                        //                        'listRespondedHours'        => $dsSearchResults->getValue('respondedHours'),
-                        'listWorkingHours'          => $dsSearchResults->getValue('workingHours'),
-                        'listActivityDurationHours' => $dsSearchResults->getValue('activityDurationHours'),
-                        'listRootCause'             => $dsSearchResults->getValue('rootCause'),
-                        'listFixEngineer'           => $dsSearchResults->getValue('fixEngineer'),
-                        'listActivityCount'         => $dsSearchResults->getValue('activityCount'),
+                        'listPriority'              => $dsSearchResults->getValue(DBECallActivitySearch::priority),
+                        //                        'listSlaResponseHours'      => $dsSearchResults->getValue(DBECallActivitySearch::slaResponseHours),
+                        //                        'listRespondedHours'        => $dsSearchResults->getValue(DBECallActivitySearch::respondedHours),
+                        'listWorkingHours'          => $dsSearchResults->getValue(DBECallActivitySearch::workingHours),
+                        'listActivityDurationHours' => $dsSearchResults->getValue(
+                            DBECallActivitySearch::activityDurationHours
+                        ),
+                        'listRootCause'             => $dsSearchResults->getValue(DBECallActivitySearch::rootCause),
+                        'listFixEngineer'           => $dsSearchResults->getValue(DBECallActivitySearch::fixEngineer),
+                        'listActivityCount'         => $dsSearchResults->getValue(DBECallActivitySearch::activityCount),
                         'reason'                    => substr(
                             common_stripEverything($reason),
                             0,
@@ -1057,19 +1065,22 @@ class CTActivity extends CTCNC
         );
 
         $buRootCause = new BURootCause($this);
+        $dsRootCause = new DataSet($this);
         $buRootCause->getAll($dsRootCause);
 
         while ($dsRootCause->fetchNext()) {
 
-            $rootCauseSelected = ($selectedID == $dsRootCause->getValue("rootCauseID")) ? CT_SELECTED : '';
+            $rootCauseSelected = ($selectedID == $dsRootCause->getValue(DBERootCause::rootCauseID)) ? CT_SELECTED : '';
 
             $this->template->set_var(
 
                 array(
                     'rootCauseSelected'    => $rootCauseSelected,
-                    'rootCauseID'          => $dsRootCause->getValue("rootCauseID"),
-                    'rootCauseDescription' => $dsRootCause->getValue("description") . " (" . $dsRootCause->getValue(
-                            "longDescription"
+                    'rootCauseID'          => $dsRootCause->getValue(DBERootCause::rootCauseID),
+                    'rootCauseDescription' => $dsRootCause->getValue(
+                            DBERootCause::description
+                        ) . " (" . $dsRootCause->getValue(
+                            DBERootCause::longDescription
                         ) . ")"
                 )
 
@@ -1154,10 +1165,8 @@ class CTActivity extends CTCNC
         $blockName = 'contractBlock'
     )
     {
-
-        $includeExpired = false;
-
         $buCustomerItem = new BUCustomerItem($this);
+        $dsContract = new DataSet($this);
         $buCustomerItem->getContractsByCustomerID(
             $customerID,
             $dsContract
@@ -1189,7 +1198,7 @@ class CTActivity extends CTCNC
             /*
         Option group renewal Type
         */
-            if ($dsContract->getValue('renewalType') != $lastRenewalType) {
+            if ($dsContract->getValue(DBEJContract::renewalType) != $lastRenewalType) {
                 if ($lastRenewalType != '') {
                     $optGroupClose = '</optgroup>';
                 } else {
@@ -1197,23 +1206,27 @@ class CTActivity extends CTCNC
 
                 }
 
-                $optGroupOpen = '<optgroup label="' . $dsContract->getValue('renewalType') . '">';
+                $optGroupOpen = '<optgroup label="' . $dsContract->getValue(DBEJContract::renewalType) . '">';
             } else {
                 $optGroupOpen = '';
                 $optGroupClose = '';
             }
-            $lastRenewalType = $dsContract->getValue('renewalType');
+            $lastRenewalType = $dsContract->getValue(DBEJContract::renewalType);
 
-            $contractSelected = ($contractCustomerItemID == $dsContract->getValue("customerItemID")) ? CT_SELECTED : '';
+            $contractSelected = ($contractCustomerItemID == $dsContract->getValue(
+                    DBEJContract::customerItemID
+                )) ? CT_SELECTED : '';
 
-            $description = $dsContract->getValue("itemDescription") . ' ' . $dsContract->getValue(
-                    'adslPhone'
-                ) . ' ' . $dsContract->getValue('notes') . ' ' . $dsContract->getValue('postcode');
+            $description = $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
+                    DBEJContract::adslPhone
+                ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
+                    DBEJContract::postcode
+                );
 
             $this->template->set_var(
                 array(
                     'contractSelected'       => $contractSelected,
-                    'contractCustomerItemID' => $dsContract->getValue("customerItemID"),
+                    'contractCustomerItemID' => $dsContract->getValue(DBEJContract::customerItemID),
                     'contractDescription'    => $description,
                     'optGroupOpen'           => $optGroupOpen,
                     'optGroupClose'          => $optGroupClose
@@ -1244,24 +1257,18 @@ class CTActivity extends CTCNC
         );
 
         while ($dbeUser->fetchNext()) {
-
-            if ($userID == $dbeUser->getValue("userID")) {
-                $userSelected = CT_SELECTED;
-            } else {
-                $userSelected = '';
-
-                if ($activeUsersOnly && $dbeUser->getValue('activeFlag') == 'N') {
-                    continue;
-                }
-
+            if ($userID != $dbeUser->getValue(DBEUser::userID) && $activeUsersOnly && $dbeUser->getValue(
+                    DBEUser::activeFlag
+                ) == 'N') {
+                continue;
             }
 
-            $userSelected = ($userID == $dbeUser->getValue("userID")) ? CT_SELECTED : '';
+            $userSelected = ($userID == $dbeUser->getValue(DBEUser::userID)) ? CT_SELECTED : '';
             $this->template->set_var(
                 array(
                     'userSelected' => $userSelected,
-                    'userID'       => $dbeUser->getValue("userID"),
-                    'userName'     => $dbeUser->getValue("name")
+                    'userID'       => $dbeUser->getValue(DBEUser::userID),
+                    'userName'     => $dbeUser->getValue(DBEUser::name)
                 )
             );
             $this->template->parse(
@@ -1322,39 +1329,41 @@ class CTActivity extends CTCNC
         echo "customerName,postcode,contactName,serviceRequestID,priority,callActivityID,date,startTime,endTime,duration,value,activityType,userName,projectDescription,contractDescription,reason,internalNotes,managementReviewReason,rootCause\n";
 
         while ($this->dsSearchResults->fetchNext()) {
-            echo $this->dsSearchResults->getExcelValue('customerName') . "," .
-                $this->dsSearchResults->getExcelValue('postcode') . "," .
-                $this->dsSearchResults->getExcelValue('contactName') . "," .
-                $this->dsSearchResults->getExcelValue('problemID') . "," .
-                $this->dsSearchResults->getExcelValue('priority') . "," .
-                $this->dsSearchResults->getExcelValue('callActivityID') . "," .
-                $this->dsSearchResults->getExcelValue('date') . "," .
-                $this->dsSearchResults->getExcelValue('startTime') . "," .
-                $this->dsSearchResults->getExcelValue('endTime') . "," .
+            echo $this->dsSearchResults->getExcelValue(DBECallActivitySearch::customerName) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::postcode) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::contactName) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::problemID) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::priority) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::callActivityID) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::date) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::startTime) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::endTime) . "," .
                 number_format(
-                    $this->dsSearchResults->getExcelValue('duration') / 60 / 60,
+                    $this->dsSearchResults->getExcelValue(DBECallActivitySearch::duration) / 60 / 60,
                     2
                 ) . "," .
                 number_format(
-                    $this->dsSearchResults->getExcelValue('duration') / 60 / 60,
+                    $this->dsSearchResults->getExcelValue(DBECallActivitySearch::duration) / 60 / 60,
                     2
-                ) * $this->dsSearchResults->getValue('salePrice') . "," .
-                $this->dsSearchResults->getExcelValue('activityType') . "," .
-                $this->dsSearchResults->getExcelValue('userName') . "," .
-                $this->dsSearchResults->getExcelValue('projectDescription') . "," .
-                $this->dsSearchResults->getExcelValue('contractDescription') . "," .
+                ) * $this->dsSearchResults->getValue(DBECallActivitySearch::salePrice) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::activityType) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::userName) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::projectDescription) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::contractDescription) . "," .
                 str_replace(
                     ',',
                     '\'',
-                    addslashes(common_stripEverything($this->dsSearchResults->getValue('reason')))
+                    addslashes(common_stripEverything($this->dsSearchResults->getValue(DBECallActivitySearch::reason)))
                 ) . "," .
                 str_replace(
                     ',',
                     '\'',
-                    addslashes(common_stripEverything($this->dsSearchResults->getValue('internalNotes')))
+                    addslashes(
+                        common_stripEverything($this->dsSearchResults->getValue(DBECallActivitySearch::internalNotes))
+                    )
                 ) . "," .
-                $this->dsSearchResults->getExcelValue('managementReviewReason') . "," .
-                $this->dsSearchResults->getExcelValue('rootCause') .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::managementReviewReason) . "," .
+                $this->dsSearchResults->getExcelValue(DBECallActivitySearch::rootCause) .
                 "\n";
         }
         $this->pageClose();
@@ -1364,19 +1373,20 @@ class CTActivity extends CTCNC
     /**
      * Edit/Add Activity
      * @access private
+     * @throws Exception
      */
     function displayActivity()
     {
         $this->setMethodName('displayActivity');
         $this->setPageTitle('Activity');
-
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsCallActivity
         );
-        $callActivityID = $dsCallActivity->getValue('callActivityID');
+        $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
 
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
 
@@ -1391,7 +1401,7 @@ class CTActivity extends CTCNC
 
         // only allow include travel
         if (
-            $dsCallActivity->getValue('travelFlag') == 'Y' &&
+            $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y' &&
             strstr(
                 $_SERVER['HTTP_REFERER'],
                 'search'
@@ -1419,7 +1429,7 @@ class CTActivity extends CTCNC
         }
 
         if (
-            $dsCallActivity->getValue('callActTypeID') == CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
+            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
         ) {
 
             $_SESSION['includeOperationalTasks'] = 1;
@@ -1443,7 +1453,7 @@ class CTActivity extends CTCNC
 
 
         if (
-            $dsCallActivity->getValue('callActTypeID') == CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID &&
+            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID &&
             strstr(
                 $_SERVER['HTTP_REFERER'],
                 'search'
@@ -1478,7 +1488,7 @@ class CTActivity extends CTCNC
             }
         }
 
-        if (!$dsCallActivity->getValue('projectID')) {
+        if (!$dsCallActivity->getValue(DBEJCallActivity::projectID)) {
 
             $_SESSION['context'] = 'Problem';
 
@@ -1489,7 +1499,7 @@ class CTActivity extends CTCNC
                 true
             );
         }
-
+        $dbeCallActivity = new DataSet($this);
         // get list of other activities in this problem or project
         $linksArray =
             $this->buActivity->getNavigateLinks(
@@ -1503,13 +1513,13 @@ class CTActivity extends CTCNC
         /*
       Now decide what we should do about travel
       */
-        if (!$_SESSION['includeTravel'] && $dsCallActivity->getValue('travelFlag') == 'Y') {
+        if (!$_SESSION['includeTravel'] && $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y') {
 
             if ($dbeCallActivity->rowCount() > 0) {
 
                 $dbeCallActivity->fetchNext();
 
-                $callActivityID = $dbeCallActivity->getValue('callActivityID');
+                $callActivityID = $dbeCallActivity->getValue(DBEJCallActivity::callActivityID);
 
                 $this->buActivity->getActivityByID(
                     $callActivityID,
@@ -1519,23 +1529,23 @@ class CTActivity extends CTCNC
 
         }
 
-        $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue('problemID'));
+        $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue(DBEJCallActivity::problemID));
 
         $buCustomer = new BUCustomer($this);
-
+        $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
-            $dsCallActivity->getValue('customerID'),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $dsCustomer
         );
-
+        $dsSite = new DataSet($this);
         $buCustomer->getSiteByCustomerIDSiteNo(
-            $dsCallActivity->getValue('customerID'),
-            $dsCallActivity->getValue('siteNo'),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
+            $dsCallActivity->getValue(DBEJCallActivity::siteNo),
             $dsSite
         );
-
+        $dsContact = new DataSet($this);
         $buCustomer->getContactByID(
-            $dsCallActivity->getValue('contactID'),
+            $dsCallActivity->getValue(DBEJCallActivity::contactID),
             $dsContact
         );
 
@@ -1550,15 +1560,15 @@ class CTActivity extends CTCNC
 
         if ($dsContact) {
             $customerDetails .=
-                ', ' . $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName');
+                ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName);
 
 
-            if ($dsContact->getValue('email') != '') {
+            if ($dsContact->getValue(DBEContact::email) != '') {
                 $customerDetails .=
                     '<A HREF="mailto:' . $dsContact->getValue(
-                        'email'
-                    ) . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') . '"' .
-                    ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
+                        DBEContact::email
+                    ) . '?subject=Service Request ' . $dsCallActivity->getValue(DBEJCallActivity::problemID) . '"' .
+                    ' title="Send email to contact"><img src="images/email.gif" border="0" alt="email"></A>';
             }
         }
         $customerName = $customerDetails;
@@ -1567,9 +1577,9 @@ class CTActivity extends CTCNC
       not authorised)
       */
         if (
-            $dsCallActivity->getValue('endTime') == '' ||
+            $dsCallActivity->getValue(DBEJCallActivity::endTime) == '' ||
             (
-                $dsCallActivity->getValue('status') != 'A' AND
+                $dsCallActivity->getValue(DBEJCallActivity::status) != 'A' AND
                 $this->hasPermissions(PHPLIB_PERM_MAINTENANCE)
             )
         ) {
@@ -1597,48 +1607,7 @@ class CTActivity extends CTCNC
             $deleteLink = '';
 
         }
-//        /*
-//      Allow certain named users to add managers comments
-//      */
-//        if (in_array($this->userID, $GLOBALS['can_add_manager_comment'])) {
-//
-//            $urlManagerComment =
-//                Controller::buildLink(
-//                    'Activity.php',
-//                    array(
-//                        'action' => 'managerCommentPopup',
-//                        'problemID' => $problemID,
-//                        'htmlFmt' => CT_HTML_FMT_POPUP
-//                    )
-//                );
-//
-//            if (
-//            $this->buActivity->getManagerComment($problemID)
-//            ) {
-//
-//                $txtManagerComment = '<div class="navigateLinkCustomerNoteExists">Comment</div>';
-//            } else {
-//                $txtManagerComment = 'Comment';
-//
-//            }
-//        } else {
-//            $urlManagerComment = '';
-//            $txtManagerComment = '';
-//        }
-//
-//        $this->template->set_var(
-//            array(
-//                'urlManagerComment' => $urlManagerComment,
-//                'txtManagerComment' => $txtManagerComment
-//            )
-//        );
-//
-//        $this->template->set_var(
-//            array(
-//                'urlManagerComment' => $urlManagerComment,
-//                'txtManagerComment' => $txtManagerComment
-//            )
-//        );
+
         /*
       allow move of activity/Problem to another Problem
       */
@@ -1652,12 +1621,10 @@ class CTActivity extends CTCNC
                         'fromCallActivityID' => $callActivityID
                     )
                 );
-            $txtLinkToProblem = 'Move';
 
             $this->template->set_var(
                 array(
-                    'urlLinkToProblem'     => $urlLinkToProblem,
-                    'toCustomerActivityID' => $toCustomerActivityID
+                    'urlLinkToProblem' => $urlLinkToProblem,
                 )
             );
             $this->template->parse(
@@ -1670,7 +1637,7 @@ class CTActivity extends CTCNC
         /*
       Expenses edit
       */
-        if ($dsCallActivity->getValue('allowExpensesFlag') == 'Y') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::allowExpensesFlag) == 'Y') {
             $urlViewExpenses =
                 Controller::buildLink(
                     'Expense.php',
@@ -1716,7 +1683,7 @@ class CTActivity extends CTCNC
                 )
             );
         $txtAddToCalendar = 'Calendar';
-        if ($dsCallActivity->getValue('allowSCRFlag') == 'Y') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::allowSCRFlag) == 'Y') {
 
             $urlSendVistEmail =
                 Controller::buildLink(
@@ -1729,9 +1696,9 @@ class CTActivity extends CTCNC
             $txtSendVisitEmail = 'Confirm Email';
 
             if (            // old call ref SCR
-                $dsCallActivity->getValue('projectID') != 0 AND
-                $dsCallActivity->getValue('projectID') > 5 AND
-                $dsCallActivity->getValue('projectID') < 21249
+                $dsCallActivity->getValue(DBEJCallActivity::projectID) != 0 AND
+                $dsCallActivity->getValue(DBEJCallActivity::projectID) > 5 AND
+                $dsCallActivity->getValue(DBEJCallActivity::projectID) < 21249
             ) {
                 $projectSCRText = 'Old Call SCR';
                 $activitySCRText = '';
@@ -1742,12 +1709,11 @@ class CTActivity extends CTCNC
 
 
         } else {
-            $urlSendVisitEmail = '';
             $txtSendVisitEmail = '';
         }
 
 
-        if ($dbeJProblem->getValue('status') == 'P') {
+        if ($dbeJProblem->getValue(DBEJProblem::status) == 'P') {
 
             $urlChangeRequest =
                 Controller::buildLink(
@@ -1766,8 +1732,8 @@ class CTActivity extends CTCNC
 
 
         if (
-            $dbeJProblem->getValue('status') == 'P' &&
-            $dbeJProblem->getValue('rootCauseID') != false
+            $dbeJProblem->getValue(DBEJProblem::status) == 'P' &&
+            $dbeJProblem->getValue(DBEJProblem::rootCauseID) != false
         ) {
 
             $urlSetProblemFixed =
@@ -1775,8 +1741,8 @@ class CTActivity extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => 'setProblemFixed',
-                        'problemID'      => $dsCallActivity->getValue('problemID'),
-                        'callActivityID' => $dsCallActivity->getValue('callActivityID')
+                        'problemID'      => $dsCallActivity->getValue(DBEJCallActivity::problemID),
+                        'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                     )
                 );
             $txtSetProblemFixed = 'Fixed';
@@ -1799,20 +1765,20 @@ class CTActivity extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
-                        'callActivityID' => $dbeCallActivity->getValue('callActivityID')
+                        'callActivityID' => $dbeCallActivity->getValue(DBEJCallActivity::callActivityID)
                     )
                 );
 
 
             $this->template->set_var(
                 array(
-                    'callActivityID'    => $dbeCallActivity->getValue('callActivityID'),
-                    'dateEngineer'      => $dbeCallActivity->getValue('dateEngineer'),
-                    'contactName'       => $dbeCallActivity->getValue('contactName'),
-                    'activityType'      => $dbeCallActivity->getValue('activityType'),
+                    'callActivityID'    => $dbeCallActivity->getValue(DBEJCallActivity::callActivityID),
+                    'dateEngineer'      => $dbeCallActivity->getValue(DBEJCallActivity::dateEngineer),
+                    'contactName'       => $dbeCallActivity->getValue(DBEJCallActivity::contactName),
+                    'activityType'      => $dbeCallActivity->getValue(DBEJCallActivity::activityType),
                     'urlJumpToActivity' => $urlJumpToActivity,
                     'selected'          => $dbeCallActivity->getValue(
-                        'callActivityID'
+                        DBEJCallActivity::callActivityID
                     ) == $callActivityID ? 'SELECTED' : ''
                 )
             );
@@ -1946,17 +1912,19 @@ class CTActivity extends CTCNC
                 )
             );
         $buCustomerItem = new BUCustomerItem($this);
-        $minResponseTime = $buCustomerItem->getMinResponseTime($dsCallActivity->getValue('customerID'));
+        $minResponseTime = $buCustomerItem->getMinResponseTime($dsCallActivity->getValue(DBEJCallActivity::customerID));
 
-        $problemStatus = $this->buActivity->problemStatusArray[$dbeJProblem->getValue('status')];
+        $problemStatus = $this->buActivity->problemStatusArray[$dbeJProblem->getValue(DBEJProblem::status)];
 
-        $dbeLastActivity = $this->buActivity->getLastActivityInProblem($dsCallActivity->getValue('problemID'));
+        $dbeLastActivity = $this->buActivity->getLastActivityInProblem(
+            $dsCallActivity->getValue(DBEJCallActivity::problemID)
+        );
 
 
         // If In Progress, find out whether this problem is waiting on CNC or on Customer
-        if ($dbeJProblem->getValue('status') == 'P') {
+        if ($dbeJProblem->getValue(DBEJProblem::status) == 'P') {
 
-            if ($dbeJProblem->getValue('awaitingCustomerResponseFlag') == 'Y') {
+            if ($dbeJProblem->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y') {
 
                 $problemStatus .= ' - Awaiting Customer';
 
@@ -1977,16 +1945,21 @@ class CTActivity extends CTCNC
         $txtEditActivity = '';
 
         if (
-            $dbeLastActivity->getValue('callActTypeID') == 0 &&
-            $dbeLastActivity->getValue('userID') != $GLOBALS['auth']->is_authenticated()
+            $dbeLastActivity->getValue(DBEJCallActivity::callActTypeID) == 0 &&
+            $dbeLastActivity->getValue(DBEJCallActivity::userID) != $GLOBALS['auth']->is_authenticated()
         ) {
             $currentUserBgColor = self::GREEN;
-            $currentUser = $dbeLastActivity->getValue('userName') . ' Is Adding New Activity To This Request Now';
+            $currentUser = $dbeLastActivity->getValue(
+                    DBEJCallActivity::userName
+                ) . ' Is Adding New Activity To This Request Now';
         } else {
             $currentUserBgColor = self::CONTENT;
             $currentUser = '';;
 
-            if ($this->buActivity->canEdit($dsCallActivity)) {
+            if ($this->buActivity->canEdit(
+                $dsCallActivity,
+                $this
+            )) {
 
                 $urlEditActivity =
                     Controller::buildLink(
@@ -2001,7 +1974,7 @@ class CTActivity extends CTCNC
 
             if (
                 $dsCustomer->getValue(DBECustomer::referredFlag) != 'Y' &&   // customer not referred
-                $dbeJProblem->getValue('status') != 'C'           // not completed
+                $dbeJProblem->getValue(DBEJProblem::status) != 'C'           // not completed
             ) {
                 $urlDuplicate =
                     Controller::buildLink(
@@ -2025,9 +1998,9 @@ class CTActivity extends CTCNC
             if the problem status is Initial, not ServerGuard and Email Flag is set to email customer then warn user about commencing work email to client
             */
                 if (
-                    $dbeCallActivity->getValue('problemStatus') == 'I' &&
-                    $dbeCallActivity->getValue('serverGuard') == 'N' &&
-                    $dbeJProblem->getValue('hideFromCustomerFlag') == 'N'
+                    $dbeCallActivity->getValue(DBEJCallActivity::problemStatus) == 'I' &&
+                    $dbeCallActivity->getValue(DBEJCallActivity::serverGuard) == 'N' &&
+                    $dbeJProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N'
                 ) {
                     $followLink = '<A href="' . $urlDuplicate . '"  title="Create Follow On" onClick="if(!confirm(\'You are about to commence work and an email will be sent to the customer?\')) return(false)"> Follow-on</A>';
                 } else {
@@ -2056,13 +2029,15 @@ class CTActivity extends CTCNC
                 )
             );
 
-        if ($dsCallActivity->getValue('contractCustomerItemID')) {
+        if ($dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)) {
             $dbeContract = new DBEJContract($this);
-            $dbeContract->getRowByContractID($dsCallActivity->getValue('contractCustomerItemID'));
+            $dbeContract->getRowByContractID($dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID));
             $contractDescription = Controller::htmlDisplayText(
-                $description = $dbeContract->getValue("itemDescription") . ' ' . $dbeContract->getValue(
-                        'adslPhone'
-                    ) . ' ' . $dbeContract->getValue('notes') . ' ' . $dbeContract->getValue('postcode')
+                $description = $dbeContract->getValue(DBEJContract::itemDescription) . ' ' . $dbeContract->getValue(
+                        DBEJContract::adslPhone
+                    ) . ' ' . $dbeContract->getValue(DBEJContract::notes) . ' ' . $dbeContract->getValue(
+                        DBEJContract::postcode
+                    )
             );
         } else {
             $contractDescription = 'T & M';
@@ -2085,8 +2060,8 @@ class CTActivity extends CTCNC
         }
 
         if (
-            $dsCallActivity->getValue('hideFromCustomerFlag') == 'Y' ||
-            $dsCallActivity->getValue('problemHideFromCustomerFlag') == 'Y'
+            $dsCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag) == 'Y' ||
+            $dsCallActivity->getValue(DBEJCallActivity::problemHideFromCustomerFlag) == 'Y'
         ) {
             $hiddenText = 'Hidden From Customer';
         } else {
@@ -2106,66 +2081,85 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             array(
-                'hiddenText'               => $hiddenText,
-                'currentUserBgColor'       => $currentUserBgColor,
-                'currentUser'              => $currentUser,
-                'problemPriority'          => $this->buActivity->priorityArray[$dbeJProblem->getValue('priority')],
-                'problemStatus'            => $problemStatus,
-                'renewalsLink'             => $this->getRenewalsLink($dsCallActivity->getValue('customerID')),
-                'callActivityID'           => $callActivityID,
-                'problemID'                => $dsCallActivity->getValue('problemID'),
-                'customerID'               => $dsCallActivity->getValue('customerID'),
-                'underContractFlag'        => $dsCallActivity->getValue('underContractFlag'),
-                'contactName'              => Controller::htmlDisplayText($dsCallActivity->getValue('contactName')),
-                'engineerName'             => Controller::htmlDisplayText($dsCallActivity->getValue('userName')),
-                'priority'                 => Controller::htmlDisplayText(
-                    $this->buActivity->priorityArray[$dsCallActivity->getValue('priority')]
+                'hiddenText'                         => $hiddenText,
+                'currentUserBgColor'                 => $currentUserBgColor,
+                'currentUser'                        => $currentUser,
+                'problemPriority'                    => $this->buActivity->priorityArray[$dbeJProblem->getValue(
+                    DBEJProblem::priority
+                )],
+                'problemStatus'                      => $problemStatus,
+                'renewalsLink'                       => $this->getRenewalsLink(
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'customerDetails'          => $customerDetails,
-                'customerName'             => $customerDetails,
-                'customerNameDisplayClass' => $this->getCustomerNameDisplayClass($dsCustomer),
-                'urlCustomer'              => $this->getCustomerUrl($dsCallActivity->getValue('customerID')),
-                'urlMessageToSales'        => $urlMessageToSales,
-                'callDate'                 => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
-                'customerItemID'           => $dsCallActivity->getValue('customerItemID'),
-                'contractDescription'      => $contractDescription,
-                'projectDescription'       => Controller::htmlDisplayText(
-                    $dsCallActivity->getValue('projectDescription')
+                'callActivityID'                     => $callActivityID,
+                'problemID'                          => $dsCallActivity->getValue(DBEJCallActivity::problemID),
+                'customerID'                         => $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                'underContractFlag'                  => $dsCallActivity->getValue(DBEJCallActivity::underContractFlag),
+                'contactName'                        => Controller::htmlDisplayText(
+                    $dsCallActivity->getValue(DBEJCallActivity::contactName)
                 ),
-                'date'                     => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
-                'completeDate'             => Controller::dateYMDtoDMY($dsCallActivity->getValue('completeDate')),
-                'curValue'                 => Controller::htmlDisplayText($dsCallActivity->getValue('curValue')),
-                'startTime'                => Controller::htmlDisplayText($dsCallActivity->getValue('startTime')),
-                'endTime'                  => Controller::htmlDisplayText($dsCallActivity->getValue('endTime')),
-                'reason'                   => $dsCallActivity->getValue('reason'),
-                'internalNotes'            => $dsCallActivity->getValue('internalNotes'),
-                'siteDesc'                 => Controller::htmlInputText($dsCallActivity->getValue('siteDesc')),
-                'status'                   => $dsCallActivity->getValue('status'),
-                'rootCauseDescription'     => Controller::htmlInputText(
-                    $dsCallActivity->getValue('rootCauseDescription')
+                'engineerName'                       => Controller::htmlDisplayText(
+                    $dsCallActivity->getValue(DBEJCallActivity::userName)
                 ),
-                'urlEditActivity'          => $urlEditActivity,
-                'txtEditActivity'          => $txtEditActivity,
-                'urlSetActivityComplete'   => $urlSetActivityComplete,
-                'txtSetActivityComplete'   => $txtSetActivityComplete,
-                'urlSetProblemFixed'       => $urlSetProblemFixed,
-                'txtSetProblemFixed'       => $txtSetProblemFixed,
-                'urlViewExpenses'          => $urlViewExpenses,
-                'txtViewExpenses'          => $txtViewExpenses,
-                'deleteLink'               => $deleteLink,
-
-                'urlToggleIncludeTravel' => $urlToggleIncludeTravel,
-
-                'urlToggleOperationalTasks' => $urlToggleOperationalTasks,
-
-                'urlToggleCriticalFlag'          => $urlToggleCriticalFlag,
-                'criticalFlagChecked'            => $dsCallActivity->getValue('criticalFlag') == 'Y' ? 'CHECKED' : '',
-                'urlToggleMonitoringFlag'        => $urlToggleMonitoringFlag,
-                'monitoringFlagChecked'          => $this->checkMonitoring(
-                    $dsCallActivity->getValue('problemID')
+                'priority'                           => Controller::htmlDisplayText(
+                    $this->buActivity->priorityArray[$dsCallActivity->getValue(DBEJCallActivity::priority)]
+                ),
+                'customerDetails'                    => $customerDetails,
+                'customerName'                       => $customerDetails,
+                'customerNameDisplayClass'           => $this->getCustomerNameDisplayClass($dsCustomer),
+                'urlCustomer'                        => $this->getCustomerUrl(
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
+                ),
+                'urlMessageToSales'                  => $urlMessageToSales,
+                'callDate'                           => Controller::dateYMDtoDMY(
+                    $dsCallActivity->getValue(DBEJCallActivity::date)
+                ),
+                'customerItemID'                     => $dsCallActivity->getValue(DBEJCallActivity::customerItemID),
+                'contractDescription'                => $contractDescription,
+                'projectDescription'                 => Controller::htmlDisplayText(
+                    $dsCallActivity->getValue(DBEJCallActivity::projectDescription)
+                ),
+                'date'                               => Controller::dateYMDtoDMY(
+                    $dsCallActivity->getValue(DBEJCallActivity::date)
+                ),
+                'completeDate'                       => Controller::dateYMDtoDMY(
+                    $dsCallActivity->getValue(DBEJCallActivity::completeDate)
+                ),
+                'curValue'                           => Controller::htmlDisplayText(
+                    $dsCallActivity->getValue(DBEJCallActivity::curValue)
+                ),
+                'startTime'                          => Controller::htmlDisplayText(
+                    $dsCallActivity->getValue(DBEJCallActivity::startTime)
+                ),
+                'endTime'                            => Controller::htmlDisplayText(
+                    $dsCallActivity->getValue(DBEJCallActivity::endTime)
+                ),
+                'reason'                             => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'internalNotes'                      => $dsCallActivity->getValue(DBEJCallActivity::internalNotes),
+                'siteDesc'                           => Controller::htmlInputText(
+                    $dsCallActivity->getValue(DBEJCallActivity::siteDesc)
+                ),
+                'status'                             => $dsCallActivity->getValue(DBEJCallActivity::status),
+                'rootCauseDescription'               => Controller::htmlInputText(
+                    $dsCallActivity->getValue(DBEJCallActivity::rootCauseDescription)
+                ),
+                'urlEditActivity'                    => $urlEditActivity,
+                'txtEditActivity'                    => $txtEditActivity,
+                'urlSetProblemFixed'                 => $urlSetProblemFixed,
+                'txtSetProblemFixed'                 => $txtSetProblemFixed,
+                'urlViewExpenses'                    => $urlViewExpenses,
+                'txtViewExpenses'                    => $txtViewExpenses,
+                'deleteLink'                         => $deleteLink,
+                'urlToggleIncludeTravel'             => $urlToggleIncludeTravel,
+                'urlToggleCriticalFlag'              => $urlToggleCriticalFlag,
+                'criticalFlagChecked'                => $dsCallActivity->getValue(
+                    DBEJCallActivity::criticalFlag
+                ) == 'Y' ? 'CHECKED' : '',
+                'urlToggleMonitoringFlag'            => $urlToggleMonitoringFlag,
+                'monitoringFlagChecked'              => $this->checkMonitoring(
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 ) ? 'CHECKED' : '',
-                'includeOperationalTasksChecked' => $_SESSION['includeOperationalTasks'] ? 'CHECKED' : '',
-
+                'includeOperationalTasksChecked'     => $_SESSION['includeOperationalTasks'] ? 'CHECKED' : '',
                 'urlToggleIncludeServerGuardUpdates' => $urlToggleIncludeServerGuardUpdates,
                 'urlToggleIncludeOperationalTasks'   => $urlToggleIncludeOperationalTasks,
                 'urlToggleContext'                   => $urlToggleContext,
@@ -2174,10 +2168,10 @@ class CTActivity extends CTCNC
                 'urlUnhideSR'                        => $urlUnhideSR,
                 'txtUnhideSR'                        => $txtUnhideSR,
                 'activityType'                       => Controller::htmlDisplayText(
-                    $dsCallActivity->getValue('activityType')
+                    $dsCallActivity->getValue(DBEJCallActivity::activityType)
                 ),
                 'serverGuard'                        => Controller::htmlDisplayText(
-                    $this->serverGuardArray[$dsCallActivity->getValue('serverGuard')]
+                    $this->serverGuardArray[$dsCallActivity->getValue(DBEJCallActivity::serverGuard)]
                 ),
                 'urlAddToCalendar'                   => $urlAddToCalendar,
                 'txtAddToCalendar'                   => $txtAddToCalendar,
@@ -2189,7 +2183,7 @@ class CTActivity extends CTCNC
                 'linkLastActivity'                   => $linkLastActivity,
                 'linkPreviousActivity'               => $linkPreviousActivity,
                 'linkFirstActivity'                  => $linkFirstActivity,
-                'projectID'                          => $dsCallActivity->getValue('projectID'),
+                'projectID'                          => $dsCallActivity->getValue(DBEJCallActivity::projectID),
                 'projectSCRText'                     => $projectSCRText,
                 'activitySCRText'                    => $activitySCRText,
                 'activityChainCount'                 => $activityChainCount,
@@ -2198,36 +2192,39 @@ class CTActivity extends CTCNC
                 'includeServerGuardUpdatesChecked'   => $_SESSION['includeServerGuardUpdates'] ? 'CHECKED' : '',
                 'projectChecked'                     => $_SESSION['context'] == 'project' ? 'CHECKED' : '',
                 'minResponseTime'                    => $minResponseTime,
-                'totalActivityDurationHours'         => $dbeJProblem->getValue('totalActivityDurationHours'),
-                'chargeableActivityDurationHours'    => $dbeJProblem->getValue('chargeableActivityDurationHours'),
-                'currentDocumentsLink'               => $currentDocumentsLink,
+                'totalActivityDurationHours'         => $dbeJProblem->getValue(DBEJProblem::totalActivityDurationHours),
+                'chargeableActivityDurationHours'    => $dbeJProblem->getValue(
+                    DBEJProblem::chargeableActivityDurationHours
+                ),
                 'problemHistoryLink'                 => $this->getProblemHistoryLink(
-                    $dsCallActivity->getValue('problemID')
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 ),
                 'projectLink'                        => BUProject::getCurrentProjectLink(
-                    $dsCallActivity->getValue('customerID')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'passwordLink'                       => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
+                'passwordLink'                       => $this->getPasswordLink(
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
+                ),
                 'generatePasswordLink'               => $this->getGeneratePasswordLink(),
                 'thirdPartyContactLink'              => $this->getThirdPartyContactLink(
-                    $dsCallActivity->getValue('customerID')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
                 'contractListPopupLink'              => $this->getContractListPopupLink(
-                    $dsCallActivity->getValue('customerID')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
                 'contactHistoryLink'                 => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'salesOrderLink'                     => $this->getSalesOrderLink(
-                    $dsCallActivity->getValue('linkedSalesOrderID')
+                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
                 ),
-                'contactNotes'                       => $dsCallActivity->getValue('contactNotes'),
-                'techNotes'                          => $dsCallActivity->getValue('techNotes'),
+                'contactNotes'                       => $dsCallActivity->getValue(DBEJCallActivity::contactNotes),
+                'techNotes'                          => $dsCallActivity->getValue(DBEJCallActivity::techNotes),
                 'urlLinkedSalesOrder'                => $urlLinkedSalesOrder,
                 'urlSalesRequest'                    => $urlSalesRequest,
                 'disabled'                           => $disabled,
                 'contactPhone'                       => $buCustomer->getContactPhoneForHtml(
-                    $dsCallActivity->getValue('contactID')
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ),
                 'authorisedByHide'                   => $authorisedByName ? '' : "hidden",
                 'authorisedByName'                   => $authorisedByName
@@ -2235,7 +2232,7 @@ class CTActivity extends CTCNC
             )
         );
 
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
         $this->documents(
             $callActivityID,
             $problemID,
@@ -2247,12 +2244,7 @@ class CTActivity extends CTCNC
 
       show a list of any on-site activity within 5 days either side
       */
-        $db =
-            $this->buActivity->getOnSiteActivitiesWithinFiveDaysOfActivity(
-                $callActivityID,
-                $problemID,
-                $dsCallActivity->getValue('date')
-            );
+        $db = $this->buActivity->getOnSiteActivitiesWithinFiveDaysOfActivity($callActivityID);
 
         $db->next_record();
 
@@ -2301,11 +2293,8 @@ class CTActivity extends CTCNC
             $haveOnSiteActivitiesWithinFiveDays = false;
 
         }
-
-        /*
-      Expenses section
-      */
-        if ($dsCallActivity->getValue('allowExpensesFlag') == 'Y') {
+        $totalValue = 0;
+        if ($dsCallActivity->getValue(DBEJCallActivity::allowExpensesFlag) == 'Y') {
 
             $buExpense = new BUExpense($this);
 
@@ -2313,7 +2302,7 @@ class CTActivity extends CTCNC
                 'totalValue',
                 Controller::formatNumber($totalValue)
             );
-
+            $dsExpense = new DataSet($this);
             $buExpense->getExpensesByCallActivityID(
                 $callActivityID,
                 $dsExpense
@@ -2328,19 +2317,21 @@ class CTActivity extends CTCNC
                 );
                 while ($dsExpense->fetchNext()) {
 
-                    $expenseID = $dsExpense->getValue('expenseID');
+                    $expenseID = $dsExpense->getValue(DBEJExpense::expenseID);
 
                     $this->template->set_var(
                         array(
                             'expenseID'   => $expenseID,
-                            'expenseType' => Controller::htmlDisplayText($dsExpense->getValue('expenseType')),
-                            'mileage'     => Controller::htmlDisplayText($dsExpense->getValue('mileage')),
-                            'value'       => Controller::formatNumber($dsExpense->getValue('value')),
-                            'vatFlag'     => Controller::htmlDisplayText($dsExpense->getValue('vatFlag'))
+                            'expenseType' => Controller::htmlDisplayText(
+                                $dsExpense->getValue(DBEJExpense::expenseType)
+                            ),
+                            'mileage'     => Controller::htmlDisplayText($dsExpense->getValue(DBEJExpense::mileage)),
+                            'value'       => Controller::formatNumber($dsExpense->getValue(DBEJExpense::value)),
+                            'vatFlag'     => Controller::htmlDisplayText($dsExpense->getValue(DBEJExpense::vatFlag))
                         )
                     );
 
-                    $totalValue += $dsExpense->getValue('value');
+                    $totalValue += $dsExpense->getValue(DBEJExpense::value);
 
                     $this->template->parse(
                         'expenses',
@@ -2382,6 +2373,11 @@ class CTActivity extends CTCNC
         $this->parsePage();
     } // end siteDropdown
 
+    /**
+     * @param $customerID
+     * @return string
+     * @throws Exception
+     */
     function getRenewalsLink($customerID)
     {
         $renewalsLinkURL =
@@ -2399,6 +2395,10 @@ class CTActivity extends CTCNC
         return $renewalsLink;
     }// end displayProjects
 
+    /**
+     * @param DataSet|DBECustomer $dsCustomer
+     * @return string
+     */
     function getCustomerNameDisplayClass($dsCustomer)
     {
         if (
@@ -2412,6 +2412,11 @@ class CTActivity extends CTCNC
         return $ret;
     }// end create5
 
+    /**
+     * @param $customerID
+     * @return mixed|string
+     * @throws Exception
+     */
     function getCustomerUrl($customerID)
     {
         return Controller::buildLink(
@@ -2427,6 +2432,11 @@ class CTActivity extends CTCNC
 
 //----------------
 
+    /**
+     * @param $problemID
+     * @return string
+     * @throws Exception
+     */
     function getProblemHistoryLink($problemID)
     {
         if ($problemID) {
@@ -2448,6 +2458,11 @@ class CTActivity extends CTCNC
 
     }// end create6
 
+    /**
+     * @param $customerID
+     * @return string
+     * @throws Exception
+     */
     function getPasswordLink($customerID)
     {
         $passwordLinkURL =
@@ -2465,6 +2480,11 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
+    /**
+     * @param $customerID
+     * @return string
+     * @throws Exception
+     */
     function getThirdPartyContactLink($customerID)
     {
         $thirdPartyContactLinkURL =
@@ -2482,6 +2502,10 @@ class CTActivity extends CTCNC
         return $thirdPartyContactLink;
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     function getGeneratePasswordLink()
     {
         $generatePasswordLinkURL =
@@ -2503,6 +2527,11 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
+    /**
+     * @param $customerID
+     * @return string
+     * @throws Exception
+     */
     function getContractListPopupLink($customerID)
     {
         $contractListPopupLinkURL =
@@ -2521,6 +2550,11 @@ class CTActivity extends CTCNC
         return $contractListPopupLink;
     }
 
+    /**
+     * @param $linkedOrdheadID
+     * @return string
+     * @throws Exception
+     */
     function getSalesOrderLink($linkedOrdheadID)
     {
         if ($linkedOrdheadID) {
@@ -2543,6 +2577,10 @@ class CTActivity extends CTCNC
     /**
      * Documents display and upload
      *
+     * @param $callActivityID
+     * @param $problemID
+     * @param $templateName
+     * @throws Exception
      */
     function documents($callActivityID,
                        $problemID,
@@ -2577,10 +2615,10 @@ class CTActivity extends CTCNC
 
         $dbeJCallDocument = new DBEJCallDocument($this);
         $dbeJCallDocument->setValue(
-            'problemID',
+            DBEJCallDocument::problemID,
             $problemID
         );
-        $dbeJCallDocument->getRowsByColumn('problemID');
+        $dbeJCallDocument->getRowsByColumn(DBEJCallDocument::problemID);
 
         while ($dbeJCallDocument->fetchNext()) {
 
@@ -2589,7 +2627,7 @@ class CTActivity extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'         => CTACTIVITY_ACT_VIEW_FILE,
-                        'callDocumentID' => $dbeJCallDocument->getValue('callDocumentID')
+                        'callDocumentID' => $dbeJCallDocument->getValue(DBEJCallDocument::callDocumentID)
                     )
                 );
 
@@ -2599,16 +2637,16 @@ class CTActivity extends CTCNC
                     array(
                         'action'         => CTACTIVITY_ACT_DELETE_FILE,
                         'callActivityID' => $callActivityID,
-                        'callDocumentID' => $dbeJCallDocument->getValue('callDocumentID')
+                        'callDocumentID' => $dbeJCallDocument->getValue(DBEJCallDocument::callDocumentID)
                     )
                 );
 
             $this->template->set_var(
                 array(
-                    'description'    => $dbeJCallDocument->getValue("description"),
-                    'filename'       => $dbeJCallDocument->getValue("filename"),
-                    'createUserName' => $dbeJCallDocument->getValue("createUserName"),
-                    'createDate'     => $dbeJCallDocument->getValue("createDate"),
+                    'description'    => $dbeJCallDocument->getValue(DBEJCallDocument::description),
+                    'filename'       => $dbeJCallDocument->getValue(DBEJCallDocument::filename),
+                    'createUserName' => $dbeJCallDocument->getValue(DBEJCallDocument::createUserName),
+                    'createDate'     => $dbeJCallDocument->getValue(DBEJCallDocument::createDate),
                     'urlViewFile'    => $urlViewFile,
                     'urlDeleteFile'  => $urlDeleteFile,
                     'txtDeleteFile'  => '[delete]'
@@ -2624,17 +2662,21 @@ class CTActivity extends CTCNC
 
     }// end function editActivity()
 
+    /**
+     * @throws Exception
+     */
     function displayFirstActivity()
     {
         $dbeCallActivity = $this->buActivity->getFirstActivityInProblem($_REQUEST['problemID']);
 
-        $this->redirectToDisplay($dbeCallActivity->getValue('callActivityID'));
+        $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
     }// end function editLinkedSalesOrder()
 
     /**
      * Redirect to call page
      * @access private
+     * @throws Exception
      */
     function redirectToDisplay($callActivityID)
     {
@@ -2650,6 +2692,10 @@ class CTActivity extends CTCNC
         exit;
     }
 
+    /**
+     * @param $callActivityID
+     * @throws Exception
+     */
     function redirectToFixed($callActivityID)
     {
         $urlNext =
@@ -2664,17 +2710,21 @@ class CTActivity extends CTCNC
         exit;
     }
 
+    /**
+     * @throws Exception
+     */
     function displayLastActivity()
     {
         $dbeCallActivity = $this->buActivity->getLastActivityInProblem($_REQUEST['problemID']);
 
-        $this->redirectToDisplay($dbeCallActivity->getValue('callActivityID'));
+        $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
     }
 
     /**
      * Create wizard step 1: Customer, site and contact selection
      * @access private
+     * @throws Exception
      */
     function activityCreate1($referred = false,
                              $reason = false
@@ -2848,10 +2898,6 @@ class CTActivity extends CTCNC
                 $contact_position = $row['con_position'];
                 $site_phone = $row['add_phone'];
 
-                if ($row['specialAttentionContactFlag'] == 'Y') {
-                    $rowColor = "style='background-color:#ffe6e6 '";
-                }
-
                 $this->template->set_var(
                     array(
                         'cus_name'             => $cus_name,
@@ -2888,6 +2934,7 @@ class CTActivity extends CTCNC
     /**
      * edit a value only SR
      * @access private
+     * @throws Exception
      */
     function editValueOnlyServiceRequest()
     {
@@ -2901,7 +2948,7 @@ class CTActivity extends CTCNC
         );
         // Parameters
         $this->setPageTitle("Create Activity: Value");
-
+        $error = [];
         /* validate if this is a POST request */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -2928,7 +2975,7 @@ class CTActivity extends CTCNC
                 $_SESSION[$this->sessionKey]['userID'] = $GLOBALS['auth']->is_authenticated();
 
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-                $callActivityID = $dsCallActivity->getValue('callActivityID');
+                $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
 
                 unset ($_SESSION[$this->sessionKey]); // clear the session variable
 
@@ -3024,26 +3071,18 @@ class CTActivity extends CTCNC
         if (!$buCustomer) {
             $buCustomer = new BUCustomer($this);
         }
-
-//        if ($buCustomer->customerFolderExists($customerID)) {
-//
-//            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($customerID);
-//
-//            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Current Documentation Folder">Current Documentation Folder</a>';
-//        } else {
-//            $currentDocumentsLink = '';
-//        }
-
         return null;
-//        return $currentDocumentsLink;
-
     }
 
+    /**
+     * @throws Exception
+     */
     function displayOpenSrs()
     {
         $this->setMethodName('displayOpenSrs');
 
         $buCustomer = new BUCustomer($this);
+        $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
             $_REQUEST['customerID'],
             $dsCustomer
@@ -3094,7 +3133,7 @@ class CTActivity extends CTCNC
                     'Activity.php',
                     array(
                         'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsContactSrs->getValue('lastCallActivityID'),
+                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
                         'reason'         => $_REQUEST['reason']
                     )
                 );
@@ -3104,24 +3143,26 @@ class CTActivity extends CTCNC
                     'Activity.php',
                     array(
                         'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsContactSrs->getValue('problemID'),
+                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
                         'htmlFmt'   => CT_HTML_FMT_POPUP
                     )
                 );
 
             $this->template->set_var(
                 array(
-                    'contactProblemID'              => $dsContactSrs->getValue("problemID"),
-                    'contactDateRaised'             => Controller::dateYMDtoDMY($dsContactSrs->getValue('dateRaised')),
+                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY(
+                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
+                    ),
                     'contactReason'                 => self::truncate(
-                        $dsContactSrs->getValue("reason"),
+                        $dsContactSrs->getValue(DBEJProblem::reason),
                         100
                     ),
                     'contactLastReason'             => self::truncate(
-                        $dsContactSrs->getValue("lastReason"),
+                        $dsContactSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),
-                    'contactEngineerName'           => $dsContactSrs->getValue("engineerName"),
+                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
                     'createFollowOnLink'            => $dsContactSrs->getValue(
                         DBEJProblem::status
                     ) == 'C' ? '' : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
@@ -3154,7 +3195,7 @@ class CTActivity extends CTCNC
                     'Activity.php',
                     array(
                         'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsActiveSrs->getValue('lastCallActivityID'),
+                        'callActivityID' => $dsActiveSrs->getValue(DBEJProblem::lastCallActivityID),
                         'reason'         => $_REQUEST['reason']
                     )
                 );
@@ -3164,24 +3205,26 @@ class CTActivity extends CTCNC
                     'Activity.php',
                     array(
                         'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsActiveSrs->getValue('problemID'),
+                        'problemID' => $dsActiveSrs->getValue(DBEJProblem::problemID),
                         'htmlFmt'   => CT_HTML_FMT_POPUP
                     )
                 );
 
             $this->template->set_var(
                 array(
-                    'problemID'              => $dsActiveSrs->getValue("problemID"),
-                    'dateRaised'             => Controller::dateYMDtoDMY($dsActiveSrs->getValue('dateRaised')),
+                    'problemID'              => $dsActiveSrs->getValue(DBEJProblem::problemID),
+                    'dateRaised'             => Controller::dateYMDtoDMY(
+                        $dsActiveSrs->getValue(DBEJProblem::dateRaised)
+                    ),
                     'reason'                 => self::truncate(
-                        $dsActiveSrs->getValue("reason"),
+                        $dsActiveSrs->getValue(DBEJProblem::reason),
                         100
                     ),
                     'lastReason'             => self::truncate(
-                        $dsActiveSrs->getValue("lastReason"),
+                        $dsActiveSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),
-                    'engineerName'           => $dsActiveSrs->getValue("engineerName"),
+                    'engineerName'           => $dsActiveSrs->getValue(DBEJProblem::engineerName),
                     'urlCreateFollowOn'      => $urlCreateFollowOn,
                     'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
                     'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
@@ -3224,6 +3267,7 @@ class CTActivity extends CTCNC
     /**
      * Create Service Request
      * @access private
+     * @throws Exception
      */
     function editServiceRequestHeader()
     {
@@ -3233,7 +3277,7 @@ class CTActivity extends CTCNC
             $_SESSION[$this->sessionKey]['reason'] = $_REQUEST['reason'];
         }
 
-
+        $error = [];
         /* validate if this is a POST request */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -3312,7 +3356,7 @@ class CTActivity extends CTCNC
           */
                 if (isset($_FILES['userfile']) && $_FILES['userfile']['name'] != '') {
                     $this->buActivity->uploadDocumentFile(
-                        $dsCallActivity->getValue('problemID'),
+                        $dsCallActivity->getValue(DBEJCallActivity::problemID),
                         $_REQUEST['uploadDescription'],
                         $_FILES['userfile']
                     );
@@ -3341,7 +3385,7 @@ class CTActivity extends CTCNC
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'           => 'createFollowOnActivity',
-                                'callActivityID'   => $dsCallActivity->getValue('callActivityID'),
+                                'callActivityID'   => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
                                 'moveToUsersQueue' => 1
                             )
                         );
@@ -3403,9 +3447,9 @@ class CTActivity extends CTCNC
         );
 
         $this->contactDropdown(
-            'ActivityCreate6',
             $_SESSION[$this->sessionKey]['customerID'],
-            $_SESSION[$this->sessionKey]['contactID']
+            $_SESSION[$this->sessionKey]['contactID'],
+            'ActivityCreate6'
         );
 
 
@@ -3552,9 +3596,14 @@ class CTActivity extends CTCNC
 
     }
 
-    function contactDropdown($templateName = 'ActivityEdit',
-                             $customerID,
-                             $contactID
+    /**
+     * @param $customerID
+     * @param $contactID
+     * @param string $templateName
+     */
+    function contactDropdown($customerID,
+                             $contactID,
+                             $templateName = 'ActivityEdit'
     )
     {
         $dbeContact = new DBEContact($this);
@@ -3572,12 +3621,12 @@ class CTActivity extends CTCNC
             'contacts'
         );
 
-        $lastSiteNo = '';
+        $lastSiteNo = null;
 
         while ($dbeContact->fetchNext()) {
 
             $dataDelegate = "";
-            $contactSelected = ($contactID == $dbeContact->getValue("contactID")) ? CT_SELECTED : '';
+            $contactSelected = ($contactID == $dbeContact->getValue(DBEContact::contactID)) ? CT_SELECTED : '';
 
             if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
                 $startMainContactStyle = '*';
@@ -3596,56 +3645,39 @@ class CTActivity extends CTCNC
 
             $dbeSite->setValue(
                 DBESite::customerID,
-                $dbeContact->getValue("customerID")
+                $dbeContact->getValue(DBEContact::customerID)
             );
             $dbeSite->setValue(
                 DBESite::siteNo,
-                $dbeContact->getValue("siteNo")
+                $dbeContact->getValue(DBEContact::siteNo)
             );
             $dbeSite->getRow();
 
-            $name = $dbeContact->getValue("firstName") . ' ' . $dbeContact->getValue("lastName");
+            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
 
-            if ($dbeContact->getValue("position")) {
-                $name .= ' (' . $dbeContact->getValue("position") . ')';
+            if ($dbeContact->getValue(DBEContact::position)) {
+                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
             }
 
-            /*
-        Option group site
-        */
-
-            if ($dbeContact->getValue('siteNo') != $lastSiteNo) {
-
-                if ($dbeContact->getValue('siteNo') != '') {
-
-                    if ($lastSiteNo !== '') {
-                        $optGroupClose = '</optgroup>';
-                    } else {
-                        $optGroupClose = '';
-
-                    }
-                }
-
+            if ($dbeContact->getValue(DBEContact::siteNo) != $lastSiteNo) {
+                $optGroupClose = '';
                 $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                         DBESite::town
                     ) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
-                $optGroupClose = '';
             } else {
                 $optGroupOpen = '';
-                $optGroupClose = '';
             }
 
-            $lastSiteNo = $dbeContact->getValue('siteNo');
+            $lastSiteNo = $dbeContact->getValue(DBEContact::siteNo);
 
             $this->template->set_var(
                 array(
                     'contactSelected'       => $contactSelected,
-                    'contactID'             => $dbeContact->getValue("contactID"),
+                    'contactID'             => $dbeContact->getValue(DBEContact::contactID),
                     'contactName'           => $name,
                     'startMainContactStyle' => $startMainContactStyle,
                     'endMainContactStyle'   => $endMainContactStyle,
                     'optGroupOpen'          => $optGroupOpen,
-                    'optGroupClose'         => $optGroupClose,
                     'dataDelegate'          => $dataDelegate
                 )
             );
@@ -3658,6 +3690,9 @@ class CTActivity extends CTCNC
 
     }  // end finaliseProblem
 
+    /**
+     * @throws Exception
+     */
     function createTravel()
     {
         $this->buActivity->getActivityByID(
@@ -3711,13 +3746,15 @@ class CTActivity extends CTCNC
 
                 $dbeSalesOrder = new DBEOrdhead($this);
                 if ($dbeSalesOrder->getRow($linkedOrderID)) {
-
+                    $dsActivity = new DataSet($this);
                     $this->buActivity->getActivityByID(
                         $callActivityID,
                         $dsActivity
                     );
 
-                    if ($dsActivity->getValue('customerID') != $dbeSalesOrder->getValue('customerID')) {
+                    if ($dsActivity->getValue(DBEJCallActivity::customerID) != $dbeSalesOrder->getValue(
+                            DBEJOrdhead::customerID
+                        )) {
                         $errorMessage = "Sales Order Not For This Customer";
                     } else {
                         $this->buActivity->updateLinkedSalesOrder(
@@ -3751,7 +3788,6 @@ class CTActivity extends CTCNC
             array(
                 'callActivityID' => $callActivityID,
                 'errorMessage'   => $errorMessage,
-                'urlCancelEdit'  => $urlCancelEdit,
                 'linkedOrderID'  => $linkedOrderID
             )
         );
@@ -3772,14 +3808,14 @@ class CTActivity extends CTCNC
             'ActivityReasonPopup.inc'
         );
 
-        $dsResults = $this->buActivity->getActivitiesByProblemID($_REQUEST['problemID']);
+        $activitiesByProblemID = $this->buActivity->getActivitiesByProblemID($_REQUEST['problemID']);
 
         $dbeProblem = new DBEJProblem($this);
         $dbeProblem->getRow($_REQUEST['problemID']);
 
         $dbeJContract = new DBEJContract($this);
 
-        $this->setPageTitle($_REQUEST['problemID'] . ' - ' . $dbeProblem->getValue('customerName'));
+        $this->setPageTitle($_REQUEST['problemID'] . ' - ' . $dbeProblem->getValue(DBEJProblem::customerName));
 
         $this->template->set_block(
             'ActivityReasonPopup',
@@ -3787,26 +3823,28 @@ class CTActivity extends CTCNC
             'rows'
         );
 
-        while ($dsResults->fetchNext()) {
+        while ($activitiesByProblemID->fetchNext()) {
 
-            if ($dsResults->getValue('hideFromCustomerFlag') == 'Y') {
+            if ($activitiesByProblemID->getValue(DBEJCallActivity::hideFromCustomerFlag) == 'Y') {
                 $activityHiddenText = 'Hidden From Customer';
             } else {
                 $activityHiddenText = '';
             }
             $this->template->set_var(
                 array(
-                    'reason'             => $dsResults->getValue('reason'),
-                    'date'               => Controller::dateYMDtoDMY($dsResults->getValue('date')),
-                    'startTime'          => $dsResults->getValue('startTime'),
-                    'endTime'            => $dsResults->getValue('endTime'),
-                    'activityType'       => $dsResults->getValue('activityType'),
-                    'contactName'        => $dsResults->getValue('contactName'),
+                    'reason'             => $activitiesByProblemID->getValue(DBEJCallActivity::reason),
+                    'date'               => Controller::dateYMDtoDMY(
+                        $activitiesByProblemID->getValue(DBEJCallActivity::date)
+                    ),
+                    'startTime'          => $activitiesByProblemID->getValue(DBEJCallActivity::startTime),
+                    'endTime'            => $activitiesByProblemID->getValue(DBEJCallActivity::endTime),
+                    'activityType'       => $activitiesByProblemID->getValue(DBEJCallActivity::activityType),
+                    'contactName'        => $activitiesByProblemID->getValue(DBEJCallActivity::contactName),
                     'duration'           => number_format(
-                        $dsResults->getValue('durationMinutes') / 60,
+                        $activitiesByProblemID->getValue(DBEJCallActivity::durationMinutes) / 60,
                         2
                     ),
-                    'userName'           => $dsResults->getValue('userName'),
+                    'userName'           => $activitiesByProblemID->getValue(DBEJCallActivity::userName),
                     'activityHiddenText' => $activityHiddenText
                 )
             );
@@ -3819,19 +3857,21 @@ class CTActivity extends CTCNC
 
         }
 
-        if ($dsResults->getValue('contractCustomerItemID')) {
-            $dbeJContract->getRowByContractID($dsResults->getValue('contractCustomerItemID'));
+        if ($activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)) {
+            $dbeJContract->getRowByContractID(
+                $activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)
+            );
 
             $contractDescription =
-                $dbeJContract->getValue('itemDescription') . ' ' . $dbeJContract->getValue(
-                    'adslPhone'
-                ) . $dbeJContract->getValue('postcode');
+                $dbeJContract->getValue(DBEJContract::itemDescription) . ' ' . $dbeJContract->getValue(
+                    DBEJContract::adslPhone
+                ) . $dbeJContract->getValue(DBEJContract::postcode);
         } else {
             $contractDescription = 'No contract selected';
         }
 
 
-        if ($dbeProblem->getValue('hideFromCustomerFlag') == 'Y') {
+        if ($dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'Y') {
             $problemHiddenText = 'Entire SR Hidden From Customer';
         } else {
             $problemHiddenText = '';
@@ -3839,7 +3879,7 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             array(
-                'internalNotes'       => $dbeProblem->getValue('internalNotes'),
+                'internalNotes'       => $dbeProblem->getValue(DBEJProblem::internalNotes),
                 'contractDescription' => $contractDescription,
                 'problemHiddenText'   => $problemHiddenText
             )
@@ -3856,6 +3896,9 @@ class CTActivity extends CTCNC
         exit;
     }    // end allocateAdditionalTime
 
+    /**
+     * @throws Exception
+     */
     function serviceRequestsForContactPopup()
     {
         $this->setTemplateFiles(
@@ -3886,7 +3929,7 @@ class CTActivity extends CTCNC
                     'Activity.php',
                     array(
                         'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsContactSrs->getValue('lastCallActivityID'),
+                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
                         'reason'         => $_REQUEST['reason']
                     )
                 );
@@ -3896,24 +3939,26 @@ class CTActivity extends CTCNC
                     'Activity.php',
                     array(
                         'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsContactSrs->getValue('problemID'),
+                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
                         'htmlFmt'   => CT_HTML_FMT_POPUP
                     )
                 );
 
             $this->template->set_var(
                 array(
-                    'contactProblemID'              => $dsContactSrs->getValue("problemID"),
-                    'contactDateRaised'             => Controller::dateYMDtoDMY($dsContactSrs->getValue('dateRaised')),
+                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY(
+                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
+                    ),
                     'contactReason'                 => self::truncate(
-                        $dsContactSrs->getValue("reason"),
+                        $dsContactSrs->getValue(DBEJProblem::reason),
                         100
                     ),
                     'contactLastReason'             => self::truncate(
-                        $dsContactSrs->getValue("lastReason"),
+                        $dsContactSrs->getValue(DBEJProblem::lastReason),
                         100
                     ),
-                    'contactEngineerName'           => $dsContactSrs->getValue("engineerName"),
+                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
                     'createFollowOnLink'            => $dsContactSrs->getValue(
                         DBEJProblem::status
                     ) == 'C' ? '' : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
@@ -3977,6 +4022,7 @@ class CTActivity extends CTCNC
     /**
      * Edit/Add Activity
      * @access private
+     * @throws Exception
      */
     function editActivity()
     {
@@ -4023,17 +4069,22 @@ class CTActivity extends CTCNC
                     )
                 );
 
-            $callActivityID = $dsCallActivity->getValue('callActivityID');
+            $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
         }
 
-        if (!$this->buActivity->canEdit($dsCallActivity)) {
+        if (!$this->buActivity->canEdit(
+            $dsCallActivity,
+            $this
+        )) {
             $this->raiseError('No permissions to edit this activity');
         }
         if ($this->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
 
             $disabled = ''; // not
 
-            if ($dsCallActivity->getValue('callActTypeID') != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+            if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+                /** @noinspection CheckImageSize */
+                /** @noinspection HtmlDeprecatedAttribute */
                 $setTimeNowLink = '<a href="javascript:;"  onclick="setServerTime(endTime);"><img src="images/clock.gif" alt="Clock" width="24" height="22" hspace="0" vspace="0" border="0" align="absmiddle" title="Set end time now" /></a>';
             }
         } else {
@@ -4045,7 +4096,7 @@ class CTActivity extends CTCNC
         /*
       Only enable the complete date and autocomplete checkbox if Fixed
       */
-        if ($dsCallActivity->getValue('problemStatus') == 'F') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::problemStatus) == 'F') {
             $complete_disabled = '';
         } else {
             $complete_disabled = CTCNC_HTML_DISABLED;
@@ -4072,7 +4123,7 @@ class CTActivity extends CTCNC
         $canChangeInitialDateAndTime = true;
         if (
         in_array(
-            $dsCallActivity->getValue('callActTypeID'),
+            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
             array(
                 CONFIG_INITIAL_ACTIVITY_TYPE_ID,
                 CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
@@ -4090,7 +4141,7 @@ class CTActivity extends CTCNC
 
         }
 
-        $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue('problemID'));
+        $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue(DBEJCallActivity::problemID));
 
         $this->setTemplateFiles(
             array(
@@ -4119,23 +4170,26 @@ class CTActivity extends CTCNC
             );
 
         $buCustomer = new BUCustomer($this);
+        $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
-            $dsCallActivity->getValue('customerID'),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $dsCustomer
         );
         $dsCustomer->fetchNext();
 
-        if ($dsCallActivity->getValue('contactID') != 0 & $dsCallActivity->getValue('siteNo') != '') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::contactID) != 0 & $dsCallActivity->getValue(
+                DBEJCallActivity::siteNo
+            ) != '') {
 
-
+            $dsSite = new DataSet($this);
             $buCustomer->getSiteByCustomerIDSiteNo(
-                $dsCallActivity->getValue('customerID'),
-                $dsCallActivity->getValue('siteNo'),
+                $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                $dsCallActivity->getValue(DBEJCallActivity::siteNo),
                 $dsSite
             );
-
+            $dsContact = new DataSet($this);
             $buCustomer->getContactByID(
-                $dsCallActivity->getValue('contactID'),
+                $dsCallActivity->getValue(DBEJCallActivity::contactID),
                 $dsContact
             );
 
@@ -4146,40 +4200,38 @@ class CTActivity extends CTCNC
                 ', ' . $dsSite->getValue(DBESite::add3) .
                 ', ' . $dsSite->getValue(DBESite::town) .
                 ', ' . $dsSite->getValue(DBESite::postcode) .
-                ', ' . $dsContact->getValue('firstName') . ' ' . $dsContact->getValue(
-                    'lastName'
+                ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
+                    DBEContact::lastName
                 ) . ', <span class="contactPhone">' . $buCustomer->getContactPhoneForHtml(
-                    $dsCallActivity->getValue('contactID')
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ) . '</span>';
 
-            if ($dsContact->getValue('email') != '') {
+            if ($dsContact->getValue(DBEContact::email) != '') {
                 $customerDetails .=
                     ' <A HREF="mailto:' . $dsContact->getValue(
-                        'email'
-                    ) . '?subject=Service Request ' . $dsCallActivity->getValue('problemID') . '"' .
-                    ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
+                        DBEContact::email
+                    ) . '?subject=Service Request ' . $dsCallActivity->getValue(DBEJCallActivity::problemID) . '"' .
+                    ' title="Send email to contact"><img src="images/email.gif" style="border: 0" alt="email"></A>';
             }
-            if ($dsContact->getValue('notes') != '') {
+            if ($dsContact->getValue(DBEContact::notes) != '') {
                 $dsCallActivity->setValue(
-                    'contactNotes',
-                    $dsContact->getValue('notes')
+                    DBEJCallActivity::contactNotes,
+                    $dsContact->getValue(DBEContact::notes)
                 );
             }
             if ($dsCustomer->getValue(DBECustomer::techNotes) != '') {
                 $dsCallActivity->setValue(
-                    'techNotes',
+                    DBEJCallActivity::techNotes,
                     $dsCustomer->getValue(DBECustomer::techNotes)
                 );
             }
         }
 
-        $buCustomerItem = new BUCustomerItem($this);
-
         $currentDocumentsLink = $this->getCurrentDocumentsLink(
-            $dsCallActivity->getValue('customerID'),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $buCustomer
         );
-        $renewalsLink = $this->getRenewalsLink($dsCallActivity->getValue('customerID'));
+        $renewalsLink = $this->getRenewalsLink($dsCallActivity->getValue(DBEJCallActivity::customerID));
 
 
         $dbeProblem = new DBEProblem($this);
@@ -4187,21 +4239,21 @@ class CTActivity extends CTCNC
         $dbeProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
 
         if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y' || $dsCallActivity->getValue(
-                'problemHideFromCustomerFlag'
+                DBEJCallActivity::problemHideFromCustomerFlag
             ) == 'Y') {
             $hideFromCustomerFlag = 'Y';
             $hideFromCustomerDisabled = CTCNC_HTML_DISABLED;
         } else {
-            $hideFromCustomerFlag = $dsCallActivity->getValue('hideFromCustomerFlag');
+            $hideFromCustomerFlag = $dsCallActivity->getValue(DBEJCallActivity::hideFromCustomerFlag);
             $hideFromCustomerDisabled = '';
         }
 
-        $userID = $dsCallActivity->getValue('allocatedUserID');
+        $userID = $dsCallActivity->getValue(DBEJCallActivity::allocatedUserID);
 
         $level = $this->buActivity->getLevelByUserID($userID);
 
 
-        if ($dsCallActivity->getValue('onSiteFlag') == 'Y') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::onSiteFlag) == 'Y') {
             $onSiteFlag = 'Y';
 
         } else {
@@ -4211,15 +4263,13 @@ class CTActivity extends CTCNC
 
         if (isset($_FILES['userfile']) && $_FILES['userfile']['name'] != '') {
             $this->buActivity->uploadDocumentFile(
-                $dsCallActivity->getValue('problemID'),
+                $dsCallActivity->getValue(DBEJCallActivity::problemID),
                 $_REQUEST['uploadDescription'],
                 $_FILES['userfile']
             );
         }
 
-        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
-
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
         $hdUsedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
         $esUsedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
         $imUsedMinutes = $this->buActivity->getIMTeamUsedTime($problemID);
@@ -4274,73 +4324,83 @@ class CTActivity extends CTCNC
             array(
                 'level'                        => $level,
                 'onSiteFlag'                   => $onSiteFlag,
-                'allocatedUserID'              => $dsCallActivity->getValue('allocatedUserID'),
-                'reason'                       => $dsCallActivity->getValue('reason'),
-                'reasonMessage'                => $dsCallActivity->getMessage('reason'),
-                'internalNotes'                => $dsCallActivity->getValue('internalNotes'),
+                'allocatedUserID'              => $dsCallActivity->getValue(DBEJCallActivity::allocatedUserID),
+                'reason'                       => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'reasonMessage'                => $dsCallActivity->getMessage(DBEJCallActivity::reason),
+                'internalNotes'                => $dsCallActivity->getValue(DBEJCallActivity::internalNotes),
                 'callActivityID'               => $callActivityID,
-                'problemStatus'                => $dsCallActivity->getValue('problemStatus'),
-                'problemStatusMessage'         => $dsCallActivity->getMessage('problemStatus'),
-                'problemID'                    => $dsCallActivity->getValue('problemID'),
-                'customerID'                   => $dsCallActivity->getValue('customerID'),
-                'hiddenCallActTypeID'          => $dsCallActivity->getValue('callActTypeID'),
-                'hiddenPriority'               => $dsCallActivity->getValue('priority'),
-                'hiddenContractCustomerItemID' => $dsCallActivity->getValue('contractCustomerItemID'),
+                'problemStatus'                => $dsCallActivity->getValue(DBEJCallActivity::problemStatus),
+                'problemStatusMessage'         => $dsCallActivity->getMessage(DBEJCallActivity::problemStatus),
+                'problemID'                    => $dsCallActivity->getValue(DBEJCallActivity::problemID),
+                'customerID'                   => $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                'hiddenCallActTypeID'          => $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
+                'hiddenPriority'               => $dsCallActivity->getValue(DBEJCallActivity::priority),
+                'hiddenContractCustomerItemID' => $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
                 'customerDetails'              => $customerDetails,
                 'contactPhone'                 => $buCustomer->getContactPhoneForHtml(
-                    $dsCallActivity->getValue('contactID')
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ),
-                'expenseExportFlag'            => $dsCallActivity->getValue('expenseExportFlag'),
+                'expenseExportFlag'            => $dsCallActivity->getValue(DBEJCallActivity::expenseExportFlag),
                 'customerName'                 => Controller::htmlDisplayText(
-                    $dsCallActivity->getValue('customerName')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerName)
                 ),
                 'customerNameDisplayClass'     => $this->getCustomerNameDisplayClass($dsCustomer),
-                'urlCustomer'                  => $this->getCustomerUrl($dsCallActivity->getValue('customerID')),
-                'date'                         => Controller::dateYMDtoDMY($dsCallActivity->getValue('date')),
-                'dateMessage'                  => $dsCallActivity->getMessage('date'),
-                'curValue'                     => $dsCallActivity->getValue('curValue'),
-                'startTime'                    => $dsCallActivity->getValue('startTime'),
-                'startTimeMessage'             => $dsCallActivity->getMessage('startTime'),
-                'endTime'                      => $dsCallActivity->getValue('endTime'),
-                'endTimeMessage'               => $dsCallActivity->getMessage('endTime'),
-                'internalNotesMessage'         => $dsCallActivity->getMessage('internalNotes'),
-                'siteDesc'                     => Controller::htmlInputText($dsCallActivity->getValue('siteDesc')),
-                'siteNoMessage'                => Controller::htmlDisplayText($dsCallActivity->getMessage('siteNo')),
-                'status'                       => $dsCallActivity->getValue('status'),
-                'contactNotes'                 => $dsCallActivity->getValue('contactNotes'),
-                'techNotes'                    => $dsCallActivity->getValue('techNotes'),
-                'userIDMessage'                => Controller::htmlDisplayText($dsCallActivity->getMessage('userID')),
+                'urlCustomer'                  => $this->getCustomerUrl(
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
+                ),
+                'date'                         => Controller::dateYMDtoDMY(
+                    $dsCallActivity->getValue(DBEJCallActivity::date)
+                ),
+                'dateMessage'                  => $dsCallActivity->getMessage(DBEJCallActivity::date),
+                'curValue'                     => $dsCallActivity->getValue(DBEJCallActivity::curValue),
+                'startTime'                    => $dsCallActivity->getValue(DBEJCallActivity::startTime),
+                'startTimeMessage'             => $dsCallActivity->getMessage(DBEJCallActivity::startTime),
+                'endTime'                      => $dsCallActivity->getValue(DBEJCallActivity::endTime),
+                'endTimeMessage'               => $dsCallActivity->getMessage(DBEJCallActivity::endTime),
+                'internalNotesMessage'         => $dsCallActivity->getMessage(DBEJCallActivity::internalNotes),
+                'siteDesc'                     => Controller::htmlInputText(
+                    $dsCallActivity->getValue(DBEJCallActivity::siteDesc)
+                ),
+                'siteNoMessage'                => Controller::htmlDisplayText(
+                    $dsCallActivity->getMessage(DBEJCallActivity::siteNo)
+                ),
+                'status'                       => $dsCallActivity->getValue(DBEJCallActivity::status),
+                'contactNotes'                 => $dsCallActivity->getValue(DBEJCallActivity::contactNotes),
+                'techNotes'                    => $dsCallActivity->getValue(DBEJCallActivity::techNotes),
+                'userIDMessage'                => Controller::htmlDisplayText(
+                    $dsCallActivity->getMessage(DBEJCallActivity::userID)
+                ),
                 'callActTypeIDMessage'         => Controller::htmlDisplayText(
-                    $dsCallActivity->getMessage("callActTypeID")
+                    $dsCallActivity->getMessage(DBEJCallActivity::callActTypeID)
                 ),
                 'urlDisplayActivity'           => $urlDisplayActivity,
                 'urlCancelEdit'                => $urlCancelEdit,
                 'urlUpdateActivity'            => $urlUpdateActivity,
                 'currentDocumentsLink'         => $currentDocumentsLink,
                 'renewalsLink'                 => $renewalsLink,
-                'passwordLink'                 => $this->getPasswordLink($dsCallActivity->getValue('customerID')),
+                'passwordLink'                 => $this->getPasswordLink(
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
+                ),
                 'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
-                    $dsCallActivity->getValue('customerID')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
                 'contactHistoryLink'           => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
-                    $dsCallActivity->getValue('linkedSalesOrderID')
+                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
-                    $dsCallActivity->getValue('problemID')
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 ),
                 'projectLink'                  => BUProject::getCurrentProjectLink(
-                    $dsCallActivity->getValue('customerID')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
                 'contractListPopupLink'        => $this->getContractListPopupLink(
-                    $dsCallActivity->getValue('customerID')
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'javaScript'                   => $javaScript,
-                'bodyTagExtras'                => $bodyTagExtras,
                 'DISABLED'                     => $disabled,
                 'COMPLETE_DISABLED'            => $complete_disabled,
                 'INITIAL_DISABLED'             => $initial_disabled,
@@ -4349,14 +4409,24 @@ class CTActivity extends CTCNC
                 'CONTRACT_DISABLED'            => $contract_disabled,
                 'setTimeNowLink'               => $setTimeNowLink,
                 'calendarLinkDate'             => $calendarLinkDate,
-                'completeDate'                 => Controller::dateYMDtoDMY($dsCallActivity->getValue('completeDate')),
-                'contactIDMessage'             => Controller::htmlDisplayText($dsCallActivity->getMessage('contactID')),
-                'alarmDate'                    => Controller::dateYMDtoDMY($dsCallActivity->getValue('alarmDate')),
+                'completeDate'                 => Controller::dateYMDtoDMY(
+                    $dsCallActivity->getValue(DBEJCallActivity::completeDate)
+                ),
+                'contactIDMessage'             => Controller::htmlDisplayText(
+                    $dsCallActivity->getMessage(DBEJCallActivity::contactID)
+                ),
+                'alarmDate'                    => Controller::dateYMDtoDMY(
+                    $dsCallActivity->getValue(DBEJCallActivity::alarmDate)
+                ),
                 'alarmTime'                    => $dsCallActivity->getValue(
-                    'alarmTime'
-                ) != '00:00:00' ? $dsCallActivity->getValue('alarmTime') : '',
-                'alarmDateMessage'             => Controller::htmlDisplayText($dsCallActivity->getMessage('alarmDate')),
-                'alarmTimeMessage'             => Controller::htmlDisplayText($dsCallActivity->getMessage('alarmTime')),
+                    DBEJCallActivity::alarmTime
+                ) != '00:00:00' ? $dsCallActivity->getValue(DBEJCallActivity::alarmTime) : '',
+                'alarmDateMessage'             => Controller::htmlDisplayText(
+                    $dsCallActivity->getMessage(DBEJCallActivity::alarmDate)
+                ),
+                'alarmTimeMessage'             => Controller::htmlDisplayText(
+                    $dsCallActivity->getMessage(DBEJCallActivity::alarmTime)
+                ),
 
                 'hideFromCustomerFlagChecked' => Controller::htmlChecked($hideFromCustomerFlag),
 
@@ -4383,28 +4453,28 @@ class CTActivity extends CTCNC
 
         $this->documents(
             $callActivityID,
-            $dsCallActivity->getValue('problemID'),
+            $dsCallActivity->getValue(DBEJCallActivity::problemID),
             'ActivityEdit'
         );
 
         $this->rootCauseDropdown(
-            $dsCallActivity->getValue('rootCauseID'),
+            $dsCallActivity->getValue(DBEJCallActivity::rootCauseID),
             'ActivityEdit',
             'rootCauseBlock'
         );
 
-        $this->activityTypeDropdown($dsCallActivity->getValue('callActTypeID'));
+        $this->activityTypeDropdown($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
 
         $this->priorityDropdown(
-            $dsCallActivity->getValue("priority"),
+            $dsCallActivity->getValue(DBEJCallActivity::priority),
             'ActivityEdit'
         );
 
-        if ($dsCallActivity->getValue("siteNo") != '') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::siteNo) != '') {
             $this->contactDropdown(
-                'ActivityEdit',
-                $dsCallActivity->getValue('customerID'),
-                $dsCallActivity->getValue("contactID")
+                $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                $dsCallActivity->getValue(DBEJCallActivity::contactID),
+                'ActivityEdit'
             );
         }
         // user selection
@@ -4419,12 +4489,12 @@ class CTActivity extends CTCNC
 
         while ($dbeUser->fetchNext()) {
 
-            if ($dsCallActivity->getValue("userID") == $dbeUser->getValue("userID")) {
+            if ($dsCallActivity->getValue(DBEJCallActivity::userID) == $dbeUser->getValue(DBEUser::userID)) {
                 $userSelected = CT_SELECTED;
             } else {
                 $userSelected = '';
 
-                if ($dbeUser->getValue('activeFlag') == 'N') {
+                if ($dbeUser->getValue(DBEUser::activeFlag) == 'N') {
                     continue;
                 }
 
@@ -4433,8 +4503,8 @@ class CTActivity extends CTCNC
             $this->template->set_var(
                 array(
                     'userSelected' => $userSelected,
-                    'userID'       => $dbeUser->getValue("userID"),
-                    'userName'     => $dbeUser->getValue("name")
+                    'userID'       => $dbeUser->getValue(DBEUser::userID),
+                    'userName'     => $dbeUser->getValue(DBEUser::name)
                 )
             );
             $this->template->parse(
@@ -4445,16 +4515,16 @@ class CTActivity extends CTCNC
         }
 
         $this->siteDropdown(
-            $dsCallActivity->getValue('customerID'),
-            $dsCallActivity->getValue("siteNo"),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
+            $dsCallActivity->getValue(DBEJCallActivity::siteNo),
             'ActivityEdit',
             'siteBlock'
         );
 
         //Contract selection
         $this->contractDropdown(
-            $dsCallActivity->getValue('customerID'),
-            $dsCallActivity->getValue("contractCustomerItemID"),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
+            $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
             'ActivityEdit',
             'contractBlock'
         );
@@ -4467,11 +4537,11 @@ class CTActivity extends CTCNC
         );
 
         $this->projectDropdown(
-            $dsCallActivity->getValue('projectID'),
-            $dsCallActivity->getValue('customerID'),
+            $dsCallActivity->getValue(DBEJCallActivity::projectID),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
             'ActivityEdit',
-            'projectBlock',
-            $dbeInitialActivity->getValue('date')
+            $dbeInitialActivity->getValue(DBEJCallActivity::date),
+            'projectBlock'
         );
 
         $this->template->parse(
@@ -4514,7 +4584,7 @@ class CTActivity extends CTCNC
         $foundCurrent = false;
         while ($dbeJCallActType->fetchNext()) {
 
-            $activityTypeSelected = ($callActTypeID == $dbeJCallActType->getValue('callActTypeID')
+            $activityTypeSelected = ($callActTypeID == $dbeJCallActType->getValue(DBEJCallActType::callActTypeID)
             ) ? CT_SELECTED : '';
 
             if ($activityTypeSelected == CT_SELECTED) {
@@ -4524,8 +4594,8 @@ class CTActivity extends CTCNC
             $this->template->set_var(
                 array(
                     'activityTypeSelected' => $activityTypeSelected,
-                    'callActTypeID'        => $dbeJCallActType->getValue("callActTypeID"),
-                    'activityTypeDesc'     => $dbeJCallActType->getValue("description")
+                    'callActTypeID'        => $dbeJCallActType->getValue(DBEJCallActType::callActTypeID),
+                    'activityTypeDesc'     => $dbeJCallActType->getValue(DBEJCallActType::description)
                 )
             );
 
@@ -4540,8 +4610,8 @@ class CTActivity extends CTCNC
             $this->template->set_var(
                 array(
                     'activityTypeSelected' => 'selected',
-                    'callActTypeID'        => $current->getValue("callActTypeID"),
-                    'activityTypeDesc'     => $current->getValue("description")
+                    'callActTypeID'        => $current->getValue(DBECallActType::callActTypeID),
+                    'activityTypeDesc'     => $current->getValue(DBECallActType::description)
                 )
             );
 
@@ -4562,13 +4632,13 @@ class CTActivity extends CTCNC
         $projectID,
         $customerID,
         $templateName,
-        $blockName = 'projectBlock',
-        $activityDate
+        $activityDate,
+        $blockName = 'projectBlock'
     )
     {
         // Display list of projects that are current at given activity date
         $buProject = new BUProject($this);
-
+        $dsProject = new DataSet($this);
         $buProject->getProjectsByCustomerID(
             $customerID,
             $dsProject,
@@ -4581,14 +4651,12 @@ class CTActivity extends CTCNC
         );
 
         while ($dsProject->fetchNext()) {
-
-
-            $projectSelected = ($dsProject->getValue("projectID") == $projectID) ? CT_SELECTED : '';
+            $projectSelected = ($dsProject->getValue(DBEProject::projectID) == $projectID) ? CT_SELECTED : '';
 
             $this->template->set_var(
                 array(
-                    'projectID'          => $dsProject->getValue("projectID"),
-                    'projectDescription' => $dsProject->getValue("description"),
+                    'projectID'          => $dsProject->getValue(DBEProject::projectID),
+                    'projectDescription' => $dsProject->getValue(DBEProject::description),
                     'projectSelected'    => $projectSelected,
                 )
             );
@@ -4620,6 +4688,7 @@ class CTActivity extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function deleteCallActivity()
     {
@@ -4628,15 +4697,20 @@ class CTActivity extends CTCNC
             $_REQUEST['callActivityID'],
             $dsCallActivity
         );
-
-        $callActivityID = $dsCallActivity->getValue('callActivityID');
-
         $problemID = $this->buActivity->deleteCallActivity($_REQUEST['callActivityID']);
 
         /*
       if the whole service requested has been removed then redirect to search page
       otherwise display problem
       */
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => 'displayLastActivity',
+                    'problemID' => $problemID
+                )
+            );
         if (!$problemID) {
             $urlNext =
                 Controller::buildLink(
@@ -4645,16 +4719,6 @@ class CTActivity extends CTCNC
                         'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
                     )
                 );
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => 'displayLastActivity',
-                        'problemID' => $problemID
-                    )
-                );
-
         }
         header('Location: ' . $urlNext);
     }  // end finaliseProblem
@@ -4667,11 +4731,12 @@ class CTActivity extends CTCNC
      * man activities page
      *
      * @access private
+     * @throws Exception
      */
     function cancelEdit()
     {
         $this->setMethodName('cancelEdit');
-
+        $dsCallActivity = new DataSet($this);
         if (!$this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsCallActivity
@@ -4680,18 +4745,19 @@ class CTActivity extends CTCNC
             exit;
         }
 
-        if ($dsCallActivity->getValue('callActTypeID') == 0) {                    //delete this activity
+        if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == 0) {                    //delete this activity
 
             $this->buActivity->deleteCallActivity($_REQUEST['callActivityID']);
 
-            if ($dsCallActivity->getValue('problemID') != 0) {
+            if ($dsCallActivity->getValue(DBEJCallActivity::problemID) != 0) {
 
-                $dbeCallActivity = $this->buActivity->getLastActivityInProblem($dsCallActivity->getValue('problemID'));
+                $dbeCallActivity = $this->buActivity->getLastActivityInProblem(
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
+                );
 
-                $this->redirectToDisplay($dbeCallActivity->getValue('callActivityID'));
+                $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
             } else {
-
                 $urlNext =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -4700,19 +4766,16 @@ class CTActivity extends CTCNC
                         )
                     );
                 header('Location: ' . $urlNext);
-
             }
-
         } else {
             $this->redirectToDisplay($_REQUEST['callActivityID']);
-
         }
-
     }
 
     /**
      * Update call activity details
      * @access private
+     * @throws Exception
      */
     function updateCallActivity()
     {
@@ -4720,114 +4783,120 @@ class CTActivity extends CTCNC
         $dsCallActivity = &$this->dsCallActivity;
         $this->formError = (!$this->dsCallActivity->populateFromArray($_REQUEST['callActivity']));
 
-        $callActivityID = $dsCallActivity->getValue('callActivityID');
+        $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
 
         // these names must not be part of an html array as the fckeditor does not work
         $dsCallActivity->setUpdateModeUpdate();
         $dsCallActivity->setValue(
-            'reason',
+            DBEJCallActivity::reason,
             $_POST['reason']
         );
         $dsCallActivity->setValue(
-            'internalNotes',
+            DBEJCallActivity::internalNotes,
             $_POST['internalNotes']
         );
         $dsCallActivity->post();
 
-        if ($dsCallActivity->getValue('callActTypeID') == 0 || $dsCallActivity->getValue('callActTypeID') == '') {
+        if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == 0 || $dsCallActivity->getValue(
+                DBEJCallActivity::callActTypeID
+            ) == '') {
             $this->formError = true;
             $this->dsCallActivity->setMessage(
-                'callActTypeID',
+                DBEJCallActivity::callActTypeID,
                 'Required'
             );
         } else {
 
             $dbeCallActType = new DBEJCallActType($this);
-            $dbeCallActType->getRow($dsCallActivity->getValue('callActTypeID'));
-            if ($dsCallActivity->getValue('siteNo') == '') {
+            $dbeCallActType->getRow($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
+            if ($dsCallActivity->getValue(DBEJCallActivity::siteNo) == '') {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
-                    'siteNo',
+                    DBEJCallActivity::siteNo,
                     'Required'
                 );
             }
 
-            if ($dsCallActivity->getValue('contactID') == '' OR $dsCallActivity->getValue('contactID') == 0) {
+            if ($dsCallActivity->getValue(DBEJCallActivity::contactID) == '' OR $dsCallActivity->getValue(
+                    DBEJCallActivity::contactID
+                ) == 0) {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
-                    'contactID',
+                    DBEJCallActivity::contactID,
                     'Required'
                 );
             } else {
                 if ($this->buActivity->needsTravelHoursAdding(
-                    $dsCallActivity->getValue('callActTypeID'),
-                    $dsCallActivity->getValue('customerID'),
-                    $dsCallActivity->getValue('siteNo')
+                    $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
+                    $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                    $dsCallActivity->getValue(DBEJCallActivity::siteNo)
                 )) {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
-                        'callActTypeID',
+                        DBEJCallActivity::callActTypeID,
                         'Travel hours need entering for this site'
                     );
                 }
 
                 // is the selected contact a nominated support contact?
                 $buCustomer = new BUCustomer($this);
-                if (!$buCustomer->isASupportContact($dsCallActivity->getValue('contactID'))) {
+                if (!$buCustomer->isASupportContact($dsCallActivity->getValue(DBEJCallActivity::contactID))) {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
-                        'contactID',
+                        DBEJCallActivity::contactID,
                         'Not a nominated support contact'
                     );
                 }
             }
 
-            if ($dbeCallActType->getValue('curValueFlag') == 'Y' && $this->dsCallActivity->getValue('curValue') == '') {
+            if ($dbeCallActType->getValue(DBECallActType::curValueFlag) == 'Y' && $this->dsCallActivity->getValue(
+                    DBEJCallActivity::curValue
+                ) == '') {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
-                    'curValue',
+                    DBEJCallActivity::curValue,
                     'Required'
                 );
             } else {  // if no end time set then set to time now
                 if (
                     !isset($_REQUEST['Update']) &&
-                    $dbeCallActType->getValue('requireCheckFlag') == 'N' &&
-                    $dbeCallActType->getValue('onSiteFlag') == 'N' &&
-                    $this->dsCallActivity->getValue('endTime') == ''
+                    $dbeCallActType->getValue(DBECallActType::requireCheckFlag) == 'N' &&
+                    $dbeCallActType->getValue(DBECallActType::onSiteFlag) == 'N' &&
+                    $this->dsCallActivity->getValue(DBEJCallActivity::endTime) == ''
                 ) {
                     $this->dsCallActivity->setValue(
-                        'endTime',
+                        DBEJCallActivity::endTime,
                         date('H:i')
                     );
                 }
                 // required fields
-                if ($dbeCallActType->getValue('reqReasonFlag') == 'Y' && trim(
-                        $this->dsCallActivity->getValue('reason')
+                if ($dbeCallActType->getValue(DBECallActType::reqReasonFlag) == 'Y' && trim(
+                        $this->dsCallActivity->getValue(DBEJCallActivity::reason)
                     ) == '') {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
-                        'reason',
+                        DBEJCallActivity::reason,
                         'Required'
                     );
                 }
 
-                if ($dbeCallActType->getValue('reqReasonFlag') == 'Y' && trim(
-                        $this->dsCallActivity->getValue('reason')
+                if ($dbeCallActType->getValue(DBECallActType::reqReasonFlag) == 'Y' && trim(
+                        $this->dsCallActivity->getValue(DBEJCallActivity::reason)
                     ) == '') {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
-                        'reason',
+                        DBEJCallActivity::reason,
                         'Required'
                     );
                 }
 
 
                 if (
-                    $dsCallActivity->getValue('contractCustomerItemID') &&
-                    $dsCallActivity->getValue('projectID')
+                    $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID) &&
+                    $dsCallActivity->getValue(DBEJCallActivity::projectID)
                 ) {
                     $this->dsCallActivity->setMessage(
-                        'projectID',
+                        DBEJCallActivity::projectID,
                         'Project work must be logged under T&M'
                     );
                     $this->formError = true;
@@ -4835,19 +4904,23 @@ class CTActivity extends CTCNC
                 /*
           Date/time must be after Initial activity
           */
-                if ($dsCallActivity->getValue('callActTypeID') != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+                if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
 
                     $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem(
-                        $this->dsCallActivity->getValue('problemID')
+                        $this->dsCallActivity->getValue(DBEJCallActivity::problemID)
                     );
 
                     if (
-                        $this->dsCallActivity->getValue('date') . $this->dsCallActivity->getValue('startTime') <
-                        $dbeFirstActivity->getValue('date') . $dbeFirstActivity->getValue('startTime')
+                        $this->dsCallActivity->getValue(DBEJCallActivity::date) . $this->dsCallActivity->getValue(
+                            DBEJCallActivity::startTime
+                        ) <
+                        $dbeFirstActivity->getValue(DBEJCallActivity::date) . $dbeFirstActivity->getValue(
+                            DBEJCallActivity::startTime
+                        )
                     ) {
                         $this->formError = true;
                         $this->dsCallActivity->setMessage(
-                            'date',
+                            DBEJCallActivity::date,
                             'Date/time must be after Initial activity'
                         );
                     }
@@ -4855,37 +4928,39 @@ class CTActivity extends CTCNC
 
 
                 // Only require these if the activity is ended
-                if ($this->dsCallActivity->getValue('endTime') != '') {
+                if ($this->dsCallActivity->getValue(DBEJCallActivity::endTime) != '') {
 
-                    if ($this->dsCallActivity->getValue('endTime') < $this->dsCallActivity->getValue('startTime')) {
+                    if ($this->dsCallActivity->getValue(DBEJCallActivity::endTime) < $this->dsCallActivity->getValue(
+                            DBEJCallActivity::startTime
+                        )) {
                         $this->formError = true;
                         $this->dsCallActivity->setMessage(
-                            'endTime',
+                            DBEJCallActivity::endTime,
                             'End time must be after start time!'
                         );
                     }
 
                     $durationHours = common_convertHHMMToDecimal(
-                            $dsCallActivity->getValue('endTime')
-                        ) - common_convertHHMMToDecimal($dsCallActivity->getValue('startTime'));
+                            $dsCallActivity->getValue(DBEJCallActivity::endTime)
+                        ) - common_convertHHMMToDecimal($dsCallActivity->getValue(DBEJCallActivity::startTime));
 
                     $durationMinutes = convertHHMMToMinutes(
-                            $dsCallActivity->getValue('endTime')
-                        ) - convertHHMMToMinutes($dsCallActivity->getValue('startTime'));
+                            $dsCallActivity->getValue(DBEJCallActivity::endTime)
+                        ) - convertHHMMToMinutes($dsCallActivity->getValue(DBEJCallActivity::startTime));
 
 
-                    $activityType = $dsCallActivity->getValue('callActTypeID');
+                    $activityType = $dsCallActivity->getValue(DBEJCallActivity::callActTypeID);
 
                     if (in_array(
                         $activityType,
                         [4, 8, 11, 18]
                     )) {
-                        $problemID = $dsCallActivity->getValue('problemID');
+                        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
                         $userID = $dsCallActivity->getValue(DBEJCallActivity::userID);
                         $dbeUser = new DBEUser($this);
                         $dbeUser->setValue(
-                            'userID',
+                            DBEUser::userID,
                             $userID
                         );
                         $dbeUser->getRow();
@@ -4897,7 +4972,7 @@ class CTActivity extends CTCNC
                         );
                         $dbeProblem->getRow();
 
-                        $teamID = $dbeUser->getValue('teamID');
+                        $teamID = $dbeUser->getValue(DBEUser::teamID);
 
                         if ($teamID <= 4) {
                             $usedTime = 0;
@@ -4930,7 +5005,7 @@ class CTActivity extends CTCNC
                             if ($usedTime + $durationMinutes > $allocatedTime) {
                                 $this->formError = true;
                                 $this->dsCallActivity->setMessage(
-                                    'endTime',
+                                    DBEJCallActivity::endTime,
                                     'You cannot assign more time than left over'
                                 );
                             }
@@ -4939,36 +5014,37 @@ class CTActivity extends CTCNC
                         if (!$_REQUEST['userWarned']) {
 
                             $buHeader = new BUHeader($this);
+                            $dsHeader = new DataSet($this);
                             $buHeader->getHeader($dsHeader);
 
 
                             if (
                                 $dsCallActivity->getValue(
-                                    'callActTypeID'
+                                    DBEJCallActivity::callActTypeID
                                 ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
-                                $durationHours > $dsHeader->getValue('customerContactWarnHours')
+                                $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
                             ) {
                                 $this->formError = true;
                                 $this->userWarned = true;
                                 $this->dsCallActivity->setMessage(
-                                    'endTime',
+                                    DBEJCallActivity::endTime,
                                     'Warning: Duration exceeds ' . $dsHeader->getValue(
-                                        'customerContactWarnHours'
+                                        DBEHeader::customerContactWarnHours
                                     ) . ' hours'
                                 );
 
                             }
 
                             if ($dsCallActivity->getValue(
-                                    'callActTypeID'
+                                    DBEJCallActivity::callActTypeID
                                 ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
-                                if ($durationHours > $dsHeader->getValue('remoteSupportWarnHours')) {
+                                if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
                                     $this->formError = true;
                                     $this->userWarned = true;
                                     $this->dsCallActivity->setMessage(
-                                        'endTime',
+                                        DBEJCallActivity::endTime,
                                         'Warning: Activity duration exceeds ' . $dsHeader->getValue(
-                                            'remoteSupportWarnHours'
+                                            DBEHeader::remoteSupportWarnHours
                                         ) . ' hours'
                                     );
                                 }
@@ -4979,7 +5055,7 @@ class CTActivity extends CTCNC
                                     $this->formError = true;
                                     $this->userWarned = true;
                                     $this->dsCallActivity->setMessage(
-                                        'endTime',
+                                        DBEJCallActivity::endTime,
                                         'Remote support under ' . (floor(
                                             $minHours * 60
                                         )) . ' minutes, should this be Customer Contact instead?”.'
@@ -4993,7 +5069,7 @@ class CTActivity extends CTCNC
                 }
             }
 
-            $problemID = $dsCallActivity->getValue('problemID');
+            $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
             if (isset($_REQUEST['problem']) && isset($_REQUEST['problem'][$problemID]) && isset($_REQUEST['problem'][$problemID]['authorisedBy'])) {
                 $dbeProblem = new DBEProblem($this);
                 $dbeProblem->setValue(
@@ -5013,13 +5089,13 @@ class CTActivity extends CTCNC
             if (isset($_REQUEST['Fixed'])) {
 
                 //try to close all the activities
-                $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue('problemID'));
+                $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue(DBEJCallActivity::problemID));
                 if ($this->buActivity->countOpenActivitiesInRequest(
-                        $dsCallActivity->getValue('problemID'),
-                        $dsCallActivity->getValue('callActivityID')
+                        $dsCallActivity->getValue(DBEJCallActivity::problemID),
+                        $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                     ) > 0) {
                     $this->dsCallActivity->setMessage(
-                        'problemStatus',
+                        DBEJCallActivity::problemStatus,
                         'Can not fix, there are open activities on this request'
                     );
                     $this->formError = true;
@@ -5045,7 +5121,7 @@ class CTActivity extends CTCNC
         } elseif (isset($_REQUEST['CustomerAction'])) {
             $dsCallActivity->setUpdateModeUpdate();
             $dsCallActivity->setValue(
-                'awaitingCustomerResponseFlag',
+                DBEJCallActivity::awaitingCustomerResponseFlag,
                 'Y'
             );
             $dsCallActivity->post();
@@ -5053,7 +5129,7 @@ class CTActivity extends CTCNC
         } elseif (isset($_REQUEST['CncAction'])) {
             $dsCallActivity->setUpdateModeUpdate();
             $dsCallActivity->setValue(
-                'awaitingCustomerResponseFlag',
+                DBEJCallActivity::awaitingCustomerResponseFlag,
                 'N'
             );
             $dsCallActivity->post();
@@ -5064,16 +5140,8 @@ class CTActivity extends CTCNC
         } else {
             $nextStatus = false;
         }
-
-        if ($nextStatus == 'Fixed') {
-            $isFixed = true;
-        } else {
-            $isFixed = false;
-        }
-
         $enteredEndTime = $this->buActivity->updateCallActivity(
-            $this->dsCallActivity,
-            $isFixed
+            $this->dsCallActivity
         );
 
         /*
@@ -5086,25 +5154,25 @@ class CTActivity extends CTCNC
       */
         if (
             $enteredEndTime &&
-            $dbeCallActType->getValue('onSiteFlag') == 'Y' &&
-            $dbeCallActType->getValue('itemSalePrice') > 0
+            $dbeCallActType->getValue(DBECallActType::onSiteFlag) == 'Y' &&
+            $dbeCallActType->getValue(DBEJCallActType::itemSalePrice) > 0
         ) {
             $dbeSite = new DBESite($this);
             $dbeSite->setValue(
                 DBESite::customerID,
-                $this->dsCallActivity->getValue('customerID')
+                $this->dsCallActivity->getValue(DBEJCallActivity::customerID)
             );
             $dbeSite->setValue(
                 DBESite::siteNo,
-                $this->dsCallActivity->getValue('siteNo')
+                $this->dsCallActivity->getValue(DBEJCallActivity::siteNo)
             );
             $dbeSite->getRowByCustomerIDSiteNo();
             if (
                 $this->buActivity->travelActivityForCustomerEngineerTodayExists(
-                    $this->dsCallActivity->getValue('customerID'),
-                    $this->dsCallActivity->getValue('siteNo'),
-                    $this->dsCallActivity->getValue('userID'),
-                    $this->dsCallActivity->getValue('date')
+                    $this->dsCallActivity->getValue(DBEJCallActivity::customerID),
+                    $this->dsCallActivity->getValue(DBEJCallActivity::siteNo),
+                    $this->dsCallActivity->getValue(DBEJCallActivity::userID),
+                    $this->dsCallActivity->getValue(DBEJCallActivity::date)
                 )
                 && $dbeSite->getValue(DBESite::maxTravelHours) > 0    // the site has travel hours
 
@@ -5129,10 +5197,12 @@ class CTActivity extends CTCNC
         if ($nextStatus == 'Fixed') {
 
             //try to close all the activities
-            $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue('problemID'));
-            if ($this->buActivity->countOpenActivitiesInRequest($dsCallActivity->getValue('problemID')) > 0) {
+            $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue(DBEJCallActivity::problemID));
+            if ($this->buActivity->countOpenActivitiesInRequest(
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
+                ) > 0) {
                 $this->dsCallActivity->setMessage(
-                    'problemStatus',
+                    DBEJCallActivity::problemStatus,
                     'Can not fix, there are open activities on this request'
                 );
                 $_REQUEST['callActivityID'] = $callActivityID;
@@ -5163,10 +5233,12 @@ class CTActivity extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function checkActivity()
     {
         $this->setMethodName('checkActivity');
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsCallActivity
@@ -5178,7 +5250,7 @@ class CTActivity extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY,
-                    'callActivityID' => $dsCallActivity->getValue('callActivityID')
+                    'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 )
             );
         header('Location: ' . $urlNext);
@@ -5193,6 +5265,7 @@ class CTActivity extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function createFollowOnActivity()
     {
@@ -5222,6 +5295,9 @@ class CTActivity extends CTCNC
         header('Location: ' . $urlNext);
     }
 
+    /**
+     * @throws Exception
+     */
     function createRequestFromCustomerRequest()
     {
         $customerproblemno = $_REQUEST['cpr_customerproblemno'];
@@ -5246,6 +5322,9 @@ class CTActivity extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     function updateRequestFromCustomerRequest()
     {
         $customerproblemno = $_REQUEST['cpr_customerproblemno'];
@@ -5256,14 +5335,13 @@ class CTActivity extends CTCNC
 
         $callActivityID =
             $this->buActivity->createFollowOnActivity(
-                $dbeCallActivity->getValue('callActivityID'),
+                $dbeCallActivity->getValue(DBEJCallActivity::callActivityID),
                 CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
                 $customerproblem['cpr_contno'],
                 $customerproblem['cpr_reason'],
 
                 false,
-                true,
-                USER_SYSTEM
+                true
             );
 
         $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
@@ -5272,13 +5350,19 @@ class CTActivity extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     function displayServiceRequest()
     {
         $dbeCallActivity = $this->buActivity->getLastActivityInProblem($_REQUEST['problemID']);
-        $this->redirectToDisplay($dbeCallActivity->getValue('callActivityID'));
+        $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
     }
 
+    /**
+     * @throws Exception
+     */
     function setProblemFixed()
     {
 
@@ -5286,12 +5370,21 @@ class CTActivity extends CTCNC
             $this->raiseError('problemID not passed');
             exit;
         }
+        $problemID = $_REQUEST['problemID'];
         if (!isset($_REQUEST['callActivityID'])) {
             $this->raiseError('callActivityID not passed');
             exit;
         }
 
-        $this->buActivity->setProblemToFixed($_REQUEST['problemID']);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+        $this->buActivity->setProblemToFixed(
+            $problemID,
+            USER_SYSTEM,
+            $dbeProblem->getValue(DBEProblem::contractCustomerItemID),
+            $dbeProblem->getValue(DBEProblem::rootCauseID),
+            ""
+        );
 
         $this->redirectToDisplay($_REQUEST['callActivityID']);
 
@@ -5301,6 +5394,7 @@ class CTActivity extends CTCNC
     /**
      * Customer has confirmed this Service Request is completed
      *
+     * @throws Exception
      */
     function setProblemComplete()
     {
@@ -5325,6 +5419,9 @@ class CTActivity extends CTCNC
         header('Location: ' . $urlNext);
     }
 
+    /**
+     * @throws Exception
+     */
     function linkProblems()
     {
         if (!isset($_REQUEST['toCallActivityID'])) {
@@ -5355,126 +5452,13 @@ class CTActivity extends CTCNC
 
         } else {
             $this->redirectToDisplay($_REQUEST['fromCallActivityID']);
-
         }
-
-    }
-
-    /**
-     * Export General Support activities that have not previously been exported to a CSV file
-     * @access private
-     */
-    function gscExportForm($dsResults = false)
-    {
-        $this->setMethodName('gscExportForm');
-        $urlPreview = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITY_ACT_EXPORT_GENERATE,
-                'update' => 0
-            )
-        );
-        $urlExport = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITY_ACT_EXPORT_GENERATE,
-                'update' => 1
-            )
-        );
-        $this->setPageTitle('Export General Support Contract Activities');
-        $this->setTemplateFiles(
-            'GSCExport',
-            'GSCExport.inc'
-        );
-        /*
-      if (!$this->getFormError()){
-      $this->buActivity->initialiseExportDataset($this->dsGSCExport);
-      }
-      */
-        if (!is_object($this->dsGSCExport)) {
-            $this->buActivity->initialiseExportDataset($this->dsGSCExport);
-        }
-        $this->template->set_var(
-            array(
-                'endDate'        => Controller::dateYMDtoDMY($this->dsGSCExport->getValue('endDate')),
-                'endDateMessage' => Controller::dateYMDtoDMY($this->dsGSCExport->getMessage('endDate')),
-                'urlPreview'     => $urlPreview,
-                'urlExport'      => $urlExport
-            )
-        );
-
-        if ($dsResults) {
-            $dsResults->initialise();
-            $this->template->set_block(
-                'GSCExport',
-                'resultBlock',
-                'results'
-            ); // ss avoids naming confict!
-            while ($dsResults->fetchNext()) {
-                $urlStatement =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'         => CTACTIVITY_ACT_EDIT_CALL,
-                            'callActivityID' => $_REQUEST['callActivityID']
-                        )
-                    );
-
-                $this->template->setVar(
-                    array(
-                        'customerName'    => $dsResults->getValue('customerName'),
-                        'previousBalance' => $dsResults->getValue('previousBalance'),
-                        'currentBalance'  => $dsResults->getValue('currentBalance'),
-                        'topUp'           => $dsResults->getValue('topUp'),
-                        'expiryDate'      => $dsResults->getValue('expiryDate'),
-                        'contacts'        => $dsResults->getValue('contacts'),
-                        'contractType'    => $dsResults->getValue('contractType'),
-                        'webFileLink'     => $dsResults->getValue('webFileLink')
-                    )
-                );
-                $this->template->parse(
-                    'results',
-                    'resultBlock',
-                    true
-                );
-            }
-        }
-
-        $this->template->parse(
-            'CONTENTS',
-            'GSCExport',
-            true
-        );
-        $this->parsePage();
-    }
-
-    function gscExportGenerate()
-    {
-        $this->setMethodName('gscExportGenerate');
-        $this->buActivity->initialiseExportDataset($this->dsGSCExport);
-        if (!$this->dsGSCExport->populateFromArray($_REQUEST['gscExport'])) {
-            $this->setFormErrorOn();
-        } else {
-            $dsResults =
-                $this->buActivity->exportPrePayActivities(
-                    $this->dsGSCExport,
-                    $_REQUEST['update']
-                );
-
-            if ($_REQUEST['update']) {
-                if ($dsResults) {
-                    $this->setFormErrorMessage('Export files created');
-                } else {
-                    $this->setFormErrorMessage('No data to export for this date');
-                }
-            }
-        }
-        $this->gscExportForm($dsResults);
     }
 
     /**
      * Add Activity to calendar
      * @access private
+     * @throws Exception
      */
     function addToCalendar()
     {
@@ -5483,25 +5467,26 @@ class CTActivity extends CTCNC
             'page',
             'AddToCalendar.inc.ics'
         );
-
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsCallActivity
         );
 
         $buSite = new BUSite($this);
+        $dsSite = new DataSet($this);
         $buSite->getSiteByID(
-            $dsCallActivity->getValue('customerID'),
-            $dsCallActivity->getValue('siteNo'),
+            $dsCallActivity->getValue(DBEJCallActivity::customerID),
+            $dsCallActivity->getValue(DBEJCallActivity::siteNo),
             $dsSite
         );
         $buCustomer = new BUCustomer($this);
 
-        $callRef = $dsCallActivity->getValue('callActivityID');
-        if ($dsCallActivity->getValue('endTime') == '') {
-            $endTime = $dsCallActivity->getValue('startTime');
+        $callRef = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
+        if ($dsCallActivity->getValue(DBEJCallActivity::endTime) == '') {
+            $endTime = $dsCallActivity->getValue(DBEJCallActivity::startTime);
         } else {
-            $endTime = $dsCallActivity->getValue('endTime');
+            $endTime = $dsCallActivity->getValue(DBEJCallActivity::endTime);
         }
 
         $urlActivity =
@@ -5509,40 +5494,42 @@ class CTActivity extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'callActivityID' => $dsCallActivity->getValue('callActivityID'),
+                    'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
                     'action'         => CTACTIVITY_ACT_DISPLAY_ACTIVITY
                 )
             );
 
-        $notes = 'Details:\n\n' . CTActivity::prepareForICS($dsCallActivity->getValue('reason'));
-        if ($dsCallActivity->getValue('internalNotes')) {
-            $notes .= '\n\nInternal Notes:\n\n' . CTActivity::prepareForICS($dsCallActivity->getValue('internalNotes'));
+        $notes = 'Details:\n\n' . CTActivity::prepareForICS($dsCallActivity->getValue(DBEJCallActivity::reason));
+        if ($dsCallActivity->getValue(DBEJCallActivity::internalNotes)) {
+            $notes .= '\n\nInternal Notes:\n\n' . CTActivity::prepareForICS(
+                    $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
+                );
         }
 
         $this->template->set_var(
             array(
                 'scrRef'       => $callRef,
-                'userName'     => $dsCallActivity->getValue('userName'),
-                'contactName'  => $dsCallActivity->getValue('contactName'),
-                'contactPhone' => $buCustomer->getContactPhone($dsCallActivity->getValue('contactID')),
+                'userName'     => $dsCallActivity->getValue(DBEJCallActivity::userName),
+                'contactName'  => $dsCallActivity->getValue(DBEJCallActivity::contactName),
+                'contactPhone' => $buCustomer->getContactPhone($dsCallActivity->getValue(DBEJCallActivity::contactID)),
                 'dateYYYYMMDD' => str_replace(
                     '-',
                     '',
-                    $dsCallActivity->getValue('date')
+                    $dsCallActivity->getValue(DBEJCallActivity::date)
                 ),
                 'nowYYYYMMDD'  => date('Ymd'),
                 'nowHHMMSS'    => date('His'),
                 'startHHMM'    => str_replace(
                     ':',
                     '',
-                    $dsCallActivity->getValue('startTime')
+                    $dsCallActivity->getValue(DBEJCallActivity::startTime)
                 ),
                 'endHHMM'      => str_replace(
                     ':',
                     '',
                     $endTime
                 ),
-                'customerName' => $dsCallActivity->getValue('customerName'),
+                'customerName' => $dsCallActivity->getValue(DBEJCallActivity::customerName),
                 'notes'        => $notes,
                 'add1'         => $dsSite->getValue(DBESite::add1),
                 'add2'         => $dsSite->getValue(DBESite::add2),
@@ -5619,6 +5606,7 @@ class CTActivity extends CTCNC
     /**
      * Sends a site visit confirmation email to the activity contact
      * @access private
+     * @throws Exception
      */
     private
     function sendVisitEmail()
@@ -5631,6 +5619,7 @@ class CTActivity extends CTCNC
     /**
      * Upload new document from local disk
      * @access private
+     * @throws Exception
      */
     function uploadFile()
     {
@@ -5752,6 +5741,7 @@ class CTActivity extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function deleteFile()
     {
@@ -5795,6 +5785,9 @@ class CTActivity extends CTCNC
         );
     }
 
+    /**
+     * @throws Exception
+     */
     function gatherFixedInformation()
     {
         $this->setMethodName('gatherFixedInformation');
@@ -5807,12 +5800,12 @@ class CTActivity extends CTCNC
         );
 
         $this->setPageTitle("Service Request Fix Summary");
-
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsCallActivity
         );
-
+        $error = [];
         /* validate if this is a POST request */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -5829,10 +5822,10 @@ class CTActivity extends CTCNC
                 $error['rootCauseID'] = 'Required';
             }
 
-            if (count($error) == 0) {
+            if (!count($error)) {
 
                 $this->buActivity->setProblemToFixed(
-                    $dsCallActivity->getValue('problemID'),
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID),
                     false,
                     $_REQUEST['contractCustomerItemID'],
                     $_REQUEST['rootCauseID'],
@@ -5845,7 +5838,7 @@ class CTActivity extends CTCNC
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'problemID' => $dsCallActivity->getValue('problemID'),
+                                'problemID' => $dsCallActivity->getValue(DBEJCallActivity::problemID),
                                 'action'    => 'gatherManagementReviewDetails'
                             )
                         );
@@ -5874,7 +5867,7 @@ class CTActivity extends CTCNC
 
         if (!$errorFile && isset($_FILES['userfile']) && $_FILES['userfile']['name'] != '') {
             $this->buActivity->uploadDocumentFile(
-                $dsCallActivity->getValue('problemID'),
+                $dsCallActivity->getValue(DBEJCallActivity::problemID),
                 $_REQUEST['uploadDescription'],
                 $_FILES['userfile']
             );
@@ -5890,12 +5883,14 @@ class CTActivity extends CTCNC
 
         $this->documents(
             $_REQUEST['callActivityID'],
-            $dsCallActivity->getValue('problemID'),
+            $dsCallActivity->getValue(DBEJCallActivity::problemID),
             'ServiceRequestFixedEdit'
         );
 
         if (!isset($_REQUEST['resolutionSummary'])) {
-            $dbeJCallActivity = $this->buActivity->getActivitiesByProblemID($dsCallActivity->getValue('problemID'));
+            $dbeJCallActivity = $this->buActivity->getActivitiesByProblemID(
+                $dsCallActivity->getValue(DBEJCallActivity::problemID)
+            );
             while ($dbeJCallActivity->fetchNext()) {
                 if ($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID) == 57) {
                     $_REQUEST['resolutionSummary'] = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
@@ -5908,7 +5903,7 @@ class CTActivity extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'gatherFixedInformation',
-                    'problemID'      => $dsCallActivity->getValue('problemID'),
+                    'problemID'      => $dsCallActivity->getValue(DBEJCallActivity::problemID),
                     'callActivityID' => $_REQUEST['callActivityID']
                 )
             );
@@ -5927,21 +5922,23 @@ class CTActivity extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => 'sendSalesRequest',
-                    'problemID' => $dsCallActivity->getValue('problemID'),
+                    'problemID' => $dsCallActivity->getValue(DBEJCallActivity::problemID),
                 )
             );
 
         $this->template->set_var(
             array(
                 'callActivityID'                => $_REQUEST['callActivityID'],
-                'customerID'                    => $dsCallActivity->getValue('customerID'),
-                'customerName'                  => $dsCallActivity->getValue('customerName'),
+                'customerID'                    => $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                'customerName'                  => $dsCallActivity->getValue(DBEJCallActivity::customerName),
                 'resolutionSummary'             => $_REQUEST['resolutionSummary'],
                 'resolutionSummaryMessage'      => $error['resolutionSummary'],
                 'rootCauseIDMessage'            => $error['rootCauseID'],
                 'contractCustomerItemIDMessage' => $error['contractCustomerItemID'],
                 'submitURL'                     => $submitURL,
-                'historyLink'                   => $this->getProblemHistoryLink($dsCallActivity->getValue('problemID')),
+                'historyLink'                   => $this->getProblemHistoryLink(
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
+                ),
                 'uploadErrors'                  => $errorFile,
                 'uploadURL'                     => $uploadURL,
                 'urlMessageToSales'             => $urlMessageToSales,
@@ -5950,6 +5947,7 @@ class CTActivity extends CTCNC
         );
 
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
         $this->rootCauseDropdown(
@@ -5961,23 +5959,25 @@ class CTActivity extends CTCNC
       Whether to allow selection of a contract (otherwise set to T&M)
       */
         if (
-            $dsCallActivity->getValue('priority') < 4 OR
+            $dsCallActivity->getValue(DBEJCallActivity::priority) < 4 OR
             /*
         User in Accounts and priority > 3
         */
-            ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS) && $dsCallActivity->getValue('priority') > 3) OR
+            ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS) && $dsCallActivity->getValue(
+                    DBEJCallActivity::priority
+                ) > 3) OR
 
             /*
         priority > 3 and activity hours greater than system theshold
         */
-            ($dsCallActivity->getValue('priority') > 3 AND $dsCallActivity->getValue(
-                    'totalActivityDurationHours'
-                ) < $dsHeader->getValue('srPromptContractThresholdHours'))
+            ($dsCallActivity->getValue(DBEJCallActivity::priority) > 3 AND $dsCallActivity->getValue(
+                    DBEJCallActivity::totalActivityDurationHours
+                ) < $dsHeader->getValue(DBEHeader::srPromptContractThresholdHours))
 
         ) {
 
             $this->contractDropdown(
-                $dsCallActivity->getValue('customerID'),
+                $dsCallActivity->getValue(DBEJCallActivity::customerID),
                 $_REQUEST['contractCustomerItemID'],
                 'ServiceRequestFixedEditContractDropdown'
             );
@@ -5999,6 +5999,9 @@ class CTActivity extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     function gatherManagementReviewDetails()
     {
         $this->setMethodName('gatherManagementReviewDetails');
@@ -6069,6 +6072,9 @@ class CTActivity extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     function allocateAdditionalTime()
     {
         $this->setMethodName('allocateAdditionalTime');
@@ -6086,11 +6092,7 @@ class CTActivity extends CTCNC
 
         /* validate if this is a POST request */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            $teamLevel = $_REQUEST['teamLevel'];
-
             $minutes = 0;
-
             switch ($_REQUEST['allocatedTimeAmount']) {
                 case 'minutes':
                     $minutes = $_REQUEST['allocatedTimeValue'];
@@ -6129,9 +6131,9 @@ class CTActivity extends CTCNC
             exit;
         }// end IF POST
         else {
-            if ($dbeFirstActivity->getValue('queueNo') == 1) {
+            if ($dbeFirstActivity->getValue(DBEJCallActivity::queueNo) == 1) {
                 $teamLevel = 1;
-            } elseif ($dbeFirstActivity->getValue('queueNo') == 2) {
+            } elseif ($dbeFirstActivity->getValue(DBEJCallActivity::queueNo) == 2) {
                 $teamLevel = 2;
             } else {
                 $teamLevel = 3;           // implementations
@@ -6171,8 +6173,8 @@ class CTActivity extends CTCNC
                 'teamLevel2Selected'     => $teamLevel2Selected,
                 'teamLevel3Selected'     => $teamLevel3Selected,
                 'problemID'              => $_REQUEST['problemID'],
-                'customerID'             => $dbeFirstActivity->getValue('customerID'),
-                'customerName'           => $dbeFirstActivity->getValue('customerName'),
+                'customerID'             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
+                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
                 'submitURL'              => $submitURL,
                 'urlProblemHistoryPopup' => $urlProblemHistoryPopup
             )
@@ -6243,12 +6245,15 @@ class CTActivity extends CTCNC
         );
     }
 
+    /**
+     * @throws Exception
+     */
     function salesRequestReview()
     {
         $this->setMethodName('salesRequestReview');
 
         $callActivityID = $_REQUEST['callActivityID'];
-
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $callActivityID,
             $dsCallActivity
@@ -6265,7 +6270,7 @@ class CTActivity extends CTCNC
             exit;
         }
 
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
         $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
 
@@ -6332,11 +6337,11 @@ class CTActivity extends CTCNC
 
                 'problemID' => $problemID,
 
-                'customerID' => $dbeFirstActivity->getValue('customerID'),
+                'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
 
-                'customerName'           => $dbeFirstActivity->getValue('customerName'),
-                'requestDetails'         => $dsCallActivity->getValue('reason'),
-                'userName'               => $dsCallActivity->getValue('userName'),
+                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
+                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
                 'submitUrl'              => $submitURL,
                 'urlProblemHistoryPopup' => $urlProblemHistoryPopup
             )
@@ -6351,19 +6356,22 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     function changeRequestReview()
     {
 
         $this->setMethodName('changeRequestReview');
 
         $callActivityID = $_REQUEST['callActivityID'];
-
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $callActivityID,
             $dsCallActivity
         );
 
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
         $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
 
@@ -6448,11 +6456,11 @@ class CTActivity extends CTCNC
 
                 'problemID' => $problemID,
 
-                'customerID' => $dbeFirstActivity->getValue('customerID'),
+                'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
 
-                'customerName'           => $dbeFirstActivity->getValue('customerName'),
-                'requestDetails'         => $dsCallActivity->getValue('reason'),
-                'userName'               => $dsCallActivity->getValue('userName'),
+                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
+                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
                 'submitUrl'              => $submitURL,
                 'urlProblemHistoryPopup' => $urlProblemHistoryPopup
             )
@@ -6468,19 +6476,22 @@ class CTActivity extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     function timeRequestReview()
     {
 
         $this->setMethodName('timeRequestReview');
 
         $callActivityID = $_REQUEST['callActivityID'];
-
+        $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $callActivityID,
             $dsCallActivity
         );
 
-        $problemID = $dsCallActivity->getValue('problemID');
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
 
         $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
         $dbeProblem = new DBEProblem($this);
@@ -6596,11 +6607,11 @@ class CTActivity extends CTCNC
 
                 'problemID' => $problemID,
 
-                'customerID' => $dbeFirstActivity->getValue('customerID'),
+                'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
 
-                'customerName'           => $dbeFirstActivity->getValue('customerName'),
-                'requestDetails'         => $dsCallActivity->getValue('reason'),
-                'userName'               => $dsCallActivity->getValue('userName'),
+                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
+                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
                 'submitUrl'              => $submitURL,
                 'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
                 'requesterTeamName'      => $teamName,
@@ -6646,23 +6657,23 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @param $customerID
+     * @param $templateName
+     * @param string $blockName
+     * @throws Exception
+     */
     function displayContracts(
         $customerID,
         $templateName,
         $blockName = 'contractBlock'
     )
     {
-        // Display list of contracts that have linked customer items
-        $includeExpired = false;
-        $onlyWithLinkedItems = false;
-
         $buCustomerItem = new BUCustomerItem($this);
-
+        $dsContract = new DataSet($this);
         $buCustomerItem->getContractsByCustomerID(
             $customerID,
-            $dsContract,
-            $includeExpired,
-            $onlyWithLinkedItems
+            $dsContract
         );
 
         $itemTypes = [];
@@ -6763,6 +6774,7 @@ class CTActivity extends CTCNC
     /**
      * Form to create a new manager comment
      *
+     * @throws Exception
      */
     function managerCommentPopup()
     {
@@ -6779,13 +6791,13 @@ class CTActivity extends CTCNC
                 $this->raiseError('No problemID Passed');
             }
 
-            $record =
-                $this->buActivity->updateManagerComment(
-                    $_REQUEST['problemID'],
-                    $_REQUEST['details']
-                );
 
-            echo '<script language="javascript">window.close()</script>;';
+            $this->buActivity->updateManagerComment(
+                $_REQUEST['problemID'],
+                $_REQUEST['details']
+            );
+
+            echo '<script lang="js">window.close()</script>;';
 
         } else {
             if ($_REQUEST ['problemID']) {
@@ -6849,7 +6861,7 @@ class CTActivity extends CTCNC
                 $message,
                 $type
             );
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return ["status" => "error", "message" => $exception->getMessage()];
         }
         return ["status" => "ok"];
@@ -6870,16 +6882,16 @@ class CTActivity extends CTCNC
     function toggleCriticalFlag()
     {
         if (!$_REQUEST['callActivityID']) {
-
             echo 'callActivityID not passed';
-
         }
+        $dsActivity = new DataSet($this);
+
         $this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsActivity
         );
 
-        $this->buActivity->toggleCriticalFlag($dsActivity->getValue('problemID'));
+        $this->buActivity->toggleCriticalFlag($dsActivity->getValue(DBEJCallActivity::problemID));
 
         $this->redirectToDisplay($_REQUEST['callActivityID']);
     }
@@ -6927,9 +6939,11 @@ class CTActivity extends CTCNC
         while ($dbeWarranty->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'warrantyDescription' => $dbeWarranty->getValue('description'),
-                    'warrantyID'          => $dbeWarranty->getValue('warrantyID'),
-                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue('warrantyID')) ? CT_SELECTED : ''
+                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
+                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
+                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
+                            DBEWarranty::warrantyID
+                        )) ? CT_SELECTED : ''
                 )
             );
             $this->template->parse(
@@ -7002,6 +7016,9 @@ class CTActivity extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     function promptCreateTravel()
     {
 
@@ -7060,41 +7077,10 @@ class CTActivity extends CTCNC
 
     }// end contactDropdown
 
-    function createHTMLOptions($dsSet)
-    {
-        $string = '';
-
-        while ($dsSet->fetchNext()) {
-
-
-            $string .= '<option>' . $dsSet->getValue('description') . '</option>';
-        }
-        return $string;
-    }
-
-    function finaliseProblem($callActivityID = false)
-    {
-
-        if ($callActivityID) {
-            $_REQUEST['callActivityID'] = $callActivityID;
-        }
-        if (!$_REQUEST['callActivityID']) {
-            $this->raiseError('callActivityID not passed');
-        }
-
-        $this->buActivity->finaliseProblem($_REQUEST['callActivityID']);
-
-        $urlNext =
-            Controller::buildLink(
-                'CurrentActivityReport.php',
-                array()
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-
-    }
-
+    /**
+     * @param $callActivityID
+     * @throws Exception
+     */
     function redirectToEdit($callActivityID)
     {
         $urlNext =
@@ -7109,6 +7095,10 @@ class CTActivity extends CTCNC
         exit;
     }
 
+    /**
+     * @param $callActivityID
+     * @throws Exception
+     */
     private
     function redirectToGather($callActivityID
     )
@@ -7125,23 +7115,24 @@ class CTActivity extends CTCNC
         exit;
     }
 
+    /**
+     * @throws Exception
+     */
     private
     function toggleMonitoringFlag()
     {
         if (!$_REQUEST['callActivityID']) {
-
             echo 'callActivityID not passed';
-
         }
+        $dsActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $_REQUEST['callActivityID'],
             $dsActivity
         );
 
-        $this->buActivity->toggleMonitoringFlag($dsActivity->getValue('problemID'));
+        $this->buActivity->toggleMonitoringFlag($dsActivity->getValue(DBEJCallActivity::problemID));
 
         $this->redirectToDisplay($_REQUEST['callActivityID']);
-
     }
 
     private
@@ -7151,6 +7142,9 @@ class CTActivity extends CTCNC
         return $this->buActivity->checkMonitoringFlag($problemID);
     }
 
+    /**
+     * @throws Exception
+     */
     private
     function unhideSR()
     {
@@ -7172,7 +7166,7 @@ class CTActivity extends CTCNC
         $this->buActivity->unhideSR($dsActivity->getValue(DBEJCallActivity::problemID));
 
         $this->buActivity->logOperationalActivity(
-            $dsActivity->getValue('problemID'),
+            $dsActivity->getValue(DBEJCallActivity::problemID),
             $firstName . ' ' . $lastName . " converted this from a hidden SR to a visible SR."
         );
 
@@ -7201,7 +7195,7 @@ class CTActivity extends CTCNC
 
         $lastSiteNo = '';
         while ($dbeContact->fetchNext()) {
-            $contactSelected = ($contactID == $dbeContact->getValue("contactID")) ? CT_SELECTED : '';
+            $contactSelected = ($contactID == $dbeContact->getValue(DBEContact::contactID)) ? CT_SELECTED : '';
 
             if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
                 $startMainContactStyle = '*';
@@ -7215,56 +7209,36 @@ class CTActivity extends CTCNC
 
             $dbeSite->setValue(
                 DBESite::customerID,
-                $dbeContact->getValue("customerID")
+                $dbeContact->getValue(DBEContact::customerID)
             );
             $dbeSite->setValue(
                 DBESite::siteNo,
-                $dbeContact->getValue("siteNo")
+                $dbeContact->getValue(DBEContact::siteNo)
             );
             $dbeSite->getRow();
 
-            $name = $dbeContact->getValue("firstName") . ' ' . $dbeContact->getValue("lastName");
+            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
 
-            if ($dbeContact->getValue("position")) {
-                $name .= ' (' . $dbeContact->getValue("position") . ')';
+            if ($dbeContact->getValue(DBEContact::position)) {
+                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
             }
 
-            /*
-        Option group site
-        */
-
-            if ($dbeContact->getValue('siteNo') != $lastSiteNo) {
-
-                if ($dbeContact->getValue('siteNo') != '') {
-
-                    if ($lastSiteNo !== '') {
-                        $optGroupClose = '</optgroup>';
-                    } else {
-                        $optGroupClose = '';
-
-                    }
-                }
-
+            $optGroupOpen = '';
+            if ($dbeContact->getValue(DBEContact::siteNo) != $lastSiteNo) {
                 $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
                         DBESite::town
                     ) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
-                $optGroupClose = '';
-            } else {
-                $optGroupOpen = '';
-                $optGroupClose = '';
             }
-
-            $lastSiteNo = $dbeContact->getValue('siteNo');
+            $lastSiteNo = $dbeContact->getValue(DBEContact::siteNo);
 
             $this->template->set_var(
                 array(
                     'contactSelected'       => $contactSelected,
-                    'contactID'             => $dbeContact->getValue("contactID"),
+                    'contactID'             => $dbeContact->getValue(DBEContact::contactID),
                     'contactName'           => $name,
                     'startMainContactStyle' => $startMainContactStyle,
                     'endMainContactStyle'   => $endMainContactStyle,
-                    'optGroupOpen'          => $optGroupOpen,
-                    'optGroupClose'         => $optGroupClose
+                    'optGroupOpen'          => $optGroupOpen
                 )
             );
             $this->template->parse(
@@ -7275,6 +7249,10 @@ class CTActivity extends CTCNC
         }
     }
 
+    /**
+     * @return bool|float|int|string
+     * @throws Exception
+     */
     private function getContactNotes()
     {
         $contactId = @$_REQUEST['contactID'];
@@ -7289,6 +7267,11 @@ class CTActivity extends CTCNC
         return $dbeContact->getValue(DBEContact::notes);
     }
 
+    /**
+     * @param $contactID
+     * @return string
+     * @throws Exception
+     */
     private function getServiceRequestForContactLink($contactID)
     {
         $contactHistory =
@@ -7303,6 +7286,10 @@ class CTActivity extends CTCNC
         return '| <a href="#" title="Contact SR History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact SR History</a>';
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     private function getAuthorisingContacts()
     {
 
@@ -7346,13 +7333,15 @@ class CTActivity extends CTCNC
 
         while ($dsContract->fetchNext()) {
 
-            if (!isset($data[$dsContract->getValue('renewalType')])) {
-                $data[$dsContract->getValue('renewalType')] = [];
+            if (!isset($data[$dsContract->getValue(DBEJContract::renewalType)])) {
+                $data[$dsContract->getValue(DBEJContract::renewalType)] = [];
             }
-            $data[$dsContract->getValue('renewalType')][] = [
-                "description" => $dsContract->getValue("itemDescription") . ' ' . $dsContract->getValue(
-                        'adslPhone'
-                    ) . ' ' . $dsContract->getValue('notes') . ' ' . $dsContract->getValue('postcode'),
+            $data[$dsContract->getValue(DBEJContract::renewalType)][] = [
+                "description" => $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
+                        DBEJContract::adslPhone
+                    ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
+                        DBEJContract::postcode
+                    ),
                 "id"          => $dsContract->getValue(DBEJContract::customerItemID)
 
             ];

@@ -641,6 +641,7 @@ class Controller extends BaseObject
      *
      * @access private
      * @returns string $urlString
+     * @throws Exception
      */
     public static function buildLink($args)
     {
@@ -693,6 +694,10 @@ class Controller extends BaseObject
      * Add additional parameters to an existing link
      *
      * @access private
+     * @param $url
+     * @param $parameters
+     * @return string
+     * @throws Exception
      */
     public static function addParametersToLink($url,
                                                $parameters

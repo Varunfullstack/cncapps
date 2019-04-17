@@ -42,8 +42,8 @@ class DBECallActivity extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -53,7 +53,7 @@ class DBECallActivity extends DBEntity
         $this->addColumn(
             self::callActivityID,
             DA_ID,
-            DA_NOT_NULL,
+            DA_ALLOW_NULL,
             "caa_callactivityno"
         );
         $this->addColumn(
@@ -116,6 +116,7 @@ class DBECallActivity extends DBEntity
             DA_STRING,
             DA_NOT_NULL,
             "caa_status"
+
         );
         $this->addColumn(
             self::expenseExportFlag,
@@ -133,11 +134,15 @@ class DBECallActivity extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
+        $this->enableDebugging();
         $this->addColumn(
             self::curValue,
             DA_FLOAT,
-            DA_ALLOW_NULL
+            DA_NOT_NULL,
+            null,
+            '0.00'
         );
+        $this->disableDebugging();
         $this->addColumn(
             self::statementYearMonth,
             DA_STRING,

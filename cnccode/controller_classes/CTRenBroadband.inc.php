@@ -7,7 +7,6 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_dbe'] . '/DBEBroadbandServiceType.inc.php');
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -21,9 +20,9 @@ class CTRenBroadband extends CTCNC
         48,
         60
     ];
-    var $dsRenBroadband = '';
-    var $buRenBroadband = '';
-    var $buCustomerItem = '';
+    public $dsRenBroadband;
+    public $buRenBroadband;
+    public $buCustomerItem;
 
     function __construct($requestMethod,
                          $postVars,
@@ -51,55 +50,11 @@ class CTRenBroadband extends CTCNC
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenBroadband = new DSForm($this);
         $this->dsRenBroadband->copyColumnsFrom($this->buRenBroadband->dbeRenBroadband);
-        $this->dsRenBroadband->addColumn(
-            'customerName',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'siteDesc',
-            DA_ALLOW_NULL,
-            DA_STRING
-        );
-        $this->dsRenBroadband->addColumn(
-            'invoiceFromDate',
-            DA_DATE,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'invoiceToDate',
-            DA_DATE,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'itemID',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'itemDescription',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'siteName',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'costPrice',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsRenBroadband->addColumn(
-            'salePrice',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -134,6 +89,7 @@ class CTRenBroadband extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -142,7 +98,7 @@ class CTRenBroadband extends CTCNC
         $this->setTemplateFiles(
             array('RenBroadbandList' => 'RenBroadbandList.inc')
         );
-
+        $dsRenBroadband = new DataSet($this);
         $this->buRenBroadband->getAll(
             $dsRenBroadband,
             $_REQUEST['orderBy']
@@ -156,7 +112,7 @@ class CTRenBroadband extends CTCNC
             );
             while ($dsRenBroadband->fetchNext()) {
 
-                $customerItemID = $dsRenBroadband->getValue('customerItemID');
+                $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
 
                 $urlEdit =
                     Controller::buildLink(
@@ -177,27 +133,21 @@ class CTRenBroadband extends CTCNC
 
                 $txtEdit = '[edit]';
 
-                $urlDelete =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'delete',
-                            'ID'     => $customerItemID
-                        )
-                    );
-                $txtDelete = '[delete]';
-
                 $this->template->set_var(
                     array(
                         'customerItemID'    => $customerItemID,
-                        'customerName'      => $dsRenBroadband->getValue('customerName'),
-                        'itemDescription'   => $dsRenBroadband->getValue('itemDescription'),
-                        'ispID'             => $dsRenBroadband->getValue('ispID'),
-                        'adslPhone'         => $dsRenBroadband->getValue('adslPhone'),
-                        'salePricePerMonth' => $dsRenBroadband->getValue('salePricePerMonth'),
-                        'costPricePerMonth' => $dsRenBroadband->getValue('costPricePerMonth'),
-                        'invoiceFromDate'   => Controller::dateYMDtoDMY($dsRenBroadband->getValue('invoiceFromDate')),
-                        'invoiceToDate'     => Controller::dateYMDtoDMY($dsRenBroadband->getValue('invoiceToDate')),
+                        'customerName'      => $dsRenBroadband->getValue(DBEJRenBroadband::customerName),
+                        'itemDescription'   => $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
+                        'ispID'             => $dsRenBroadband->getValue(DBEJRenBroadband::ispID),
+                        'adslPhone'         => $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone),
+                        'salePricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth),
+                        'costPricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth),
+                        'invoiceFromDate'   => Controller::dateYMDtoDMY(
+                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate)
+                        ),
+                        'invoiceToDate'     => Controller::dateYMDtoDMY(
+                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceToDate)
+                        ),
                         'urlEdit'           => $urlEdit,
                         'urlList'           => $urlList,
                         'txtEdit'           => $txtEdit
@@ -226,25 +176,26 @@ class CTRenBroadband extends CTCNC
      * renewalCustomerItemID (blank if renewal not created yet
      *
      *
+     * @throws Exception
      */
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-
+        $dsOrdline = new DataSet($this);
         $buSalesOrder->getOrdlineByIDSeqNo(
             $_REQUEST['ordheadID'],
             $_REQUEST['sequenceNo'],
             $dsOrdline
         );
 
-        $renewalCustomerItemID = $dsOrdline->getValue('renewalCustomerItemID');
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
 
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
 
 
             // create a new record first
-
+            $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
                 $_REQUEST['ordheadID'],
                 $dsOrdhead,
@@ -252,10 +203,10 @@ class CTRenBroadband extends CTCNC
             );
 
             $this->buRenBroadband->createNewRenewal(
-                $dsOrdhead->getValue('customerID'),
-                $dsOrdline->getValue('itemID'),
+                $dsOrdhead->getValue(DBEJOrdhead::customerID),
+                $dsOrdline->getValue(DBEJOrdline::itemID),
                 $renewalCustomerItemID,
-                $dsOrdhead->getValue('delSiteNo')                // returned by function
+                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
             );
 
 
@@ -263,17 +214,17 @@ class CTRenBroadband extends CTCNC
             $dbeOrdline = new DBEOrdline($this);
 
             $dbeOrdline->setValue(
-                'ordheadID',
-                $dsOrdline->getValue('ordheadID')
+                DBEJOrdline::ordheadID,
+                $dsOrdline->getValue(DBEJOrdline::ordheadID)
             );
             $dbeOrdline->setValue(
-                'sequenceNo',
-                $dsOrdline->getValue('sequenceNo')
+                DBEJOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
             );
 
             $dbeOrdline->getRow();
             $dbeOrdline->setValue(
-                'renewalCustomerItemID',
+                DBEJOrdline::renewalCustomerItemID,
                 $renewalCustomerItemID
             );
 
@@ -297,13 +248,14 @@ class CTRenBroadband extends CTCNC
     /**
      * Edit/Add Activity
      * @access private
+     * @throws Exception
      */
     function edit()
     {
         $this->setMethodName('edit');
         $dsRenBroadband = &$this->dsRenBroadband; // ref to class var
 
-
+        $customerItemID = null;
         if (!$this->getFormError()) {
             if ($_REQUEST['action'] == 'edit') {
                 $this->buRenBroadband->getRenBroadbandByID(
@@ -314,14 +266,14 @@ class CTRenBroadband extends CTCNC
             } else {                                                                    // creating new
                 $dsRenBroadband->initialise();
                 $dsRenBroadband->setValue(
-                    'customerItemID',
-                    '0'
+                    DBEJRenBroadband::customerItemID,
+                    null
                 );
             }
         } else {                                                                        // form validation error
             $dsRenBroadband->initialise();
             $dsRenBroadband->fetchNext();
-            $customerItemID = $dsRenBroadband->getValue('customerItemID');
+            $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
         }
 
         $urlUpdate =
@@ -353,6 +305,9 @@ class CTRenBroadband extends CTCNC
             array('RenBroadbandEdit' => 'RenBroadbandEdit.inc')
         );
 
+        $disabled = CTCNC_HTML_DISABLED;
+        $readonly = CTCNC_HTML_READONLY;
+
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
             $disabled = ''; // not
             $pricePerMonth =
@@ -360,7 +315,9 @@ class CTRenBroadband extends CTCNC
             <td class="promptText">Sale Price/Month </td>
             <td class="fieldText"><input
               name="renBroadband[1][salePricePerMonth]"
-              type="text" value="' . Controller::htmlInputText($dsRenBroadband->getValue('salePricePerMonth')) . '"
+              type="text" value="' . Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth)
+                ) . '"
               size="10"
               maxlength="10">
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
@@ -371,7 +328,9 @@ class CTRenBroadband extends CTCNC
             <td class="promptText">Cost Price/Month</td>
             <td class="fieldText"><input
               name="renBroadband[1][costPricePerMonth]"
-              type="text" value="' . Controller::htmlInputText($dsRenBroadband->getValue('costPricePerMonth')) . '"
+              type="text" value="' . Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth)
+                ) . '"
               {readonly}
               size="10"
               maxlength="10" />
@@ -404,9 +363,6 @@ class CTRenBroadband extends CTCNC
                     'urlSiteEdit'   => $urlSiteEdit
                 )
             );
-        } else {
-            $disabled = CTCNC_HTML_DISABLED;
-            $readonly = CTCNC_HTML_READONLY;
         }
 
         $this->template->setBlock(
@@ -460,138 +416,152 @@ class CTRenBroadband extends CTCNC
         $this->template->set_var(
             array(
                 'itemDescription'                      => Controller::htmlDisplayText(
-                    $dsRenBroadband->getValue('itemDescription')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription)
                 ),
-                'salePricePerMonth'                    => $dsRenBroadband->getValue('salePricePerMonth'),
-                'costPricePerMonth'                    => $dsRenBroadband->getValue('costPricePerMonth'),
+                'salePricePerMonth'                    => $dsRenBroadband->getValue(
+                    DBEJRenBroadband::salePricePerMonth
+                ),
+                'costPricePerMonth'                    => $dsRenBroadband->getValue(
+                    DBEJRenBroadband::costPricePerMonth
+                ),
                 'customerID'                           => Controller::htmlDisplayText(
-                    $dsRenBroadband->getValue('customerID')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::customerID)
                 ),
                 'siteDesc'                             => Controller::htmlDisplayText(
-                    $dsRenBroadband->getValue('siteName')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::siteName)
                 ),
-                'siteNo'                               => $dsRenBroadband->getValue('siteNo'),
+                'siteNo'                               => $dsRenBroadband->getValue(DBEJRenBroadband::siteNo),
                 'itemID'                               => Controller::htmlDisplayText(
-                    $dsRenBroadband->getValue('itemID')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::itemID)
                 ),
-                'customerItemID'                       => $dsRenBroadband->getValue('customerItemID'),
+                'customerItemID'                       => $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID),
                 'customerName'                         => Controller::htmlDisplayText(
-                    $dsRenBroadband->getValue('customerName')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::customerName)
                 ),
-                'invoiceFromDate'                      => $dsRenBroadband->getValue('invoiceFromDate'),
-                'invoiceToDate'                        => $dsRenBroadband->getValue('invoiceToDate'),
+                'invoiceFromDate'                      => $dsRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate),
+                'invoiceToDate'                        => $dsRenBroadband->getValue(DBEJRenBroadband::invoiceToDate),
                 'months'                               => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('months')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::months)
                 ),
                 'monthsMessage'                        => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('months')
                 ),
                 'invoicePeriodMonths'                  => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('invoicePeriodMonths')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::invoicePeriodMonths)
                 ),
                 'invoicePeriodMonthsMessage'           => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('invoicePeriodMonths')
                 ),
                 'totalInvoiceMonths'                   => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('totalInvoiceMonths')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::totalInvoiceMonths)
                 ),
                 'adslPhone'                            => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('adslPhone')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone)
                 ),
                 'adslPhoneMessage'                     => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('adslPhone')
                 ),
                 'macCode'                              => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('macCode')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::macCode)
                 ),
                 'macCodeMessage'                       => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('macCode')
                 ),
                 'reference'                            => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('reference')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::reference)
                 ),
                 'referenceMessage'                     => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('reference')
                 ),
                 'defaultGateway'                       => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('defaultGateway')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::defaultGateway)
                 ),
                 'defaultGatewayMessage'                => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('defaultGateway')
                 ),
                 'networkAddress'                       => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('networkAddress')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::networkAddress)
                 ),
                 'networkAddressMessage'                => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('networkAddress')
                 ),
                 'subnetMask'                           => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('subnetMask')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::subnetMask)
                 ),
                 'subnetMaskMessage'                    => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('subnetMask')
                 ),
                 'routerIPAddress'                      => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('routerIPAddress')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::routerIPAddress)
                 ),
                 'routerIPAddressMessage'               => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('routerIPAddress')
                 ),
                 'userName'                             => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('userName')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::userName)
                 ),
                 'userNameMessage'                      => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('userName')
                 ),
                 'password'                             => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('password')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::password)
                 ),
                 'etaDate'                              => Controller::dateYMDtoDMY(
-                    $dsRenBroadband->getValue('etaDate')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::etaDate)
                 ),
                 'installationDate'                     => Controller::dateYMDtoDMY(
-                    $dsRenBroadband->getValue('installationDate')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::installationDate)
                 ),
-                'ispID'                                => Controller::htmlInputText($dsRenBroadband->getValue('ispID')),
+                'ispID'                                => Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::ispID)
+                ),
                 'dualBroadbandFlagChecked'             => Controller::htmlChecked(
-                    $dsRenBroadband->getValue('dualBroadbandFlag')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::dualBroadbandFlag)
                 ),
                 'dnsCompany'                           => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('dnsCompany')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::dnsCompany)
                 ),
                 'ipCurrentNo'                          => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('ipCurrentNo')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::ipCurrentNo)
                 ),
-                'mx'                                   => Controller::htmlInputText($dsRenBroadband->getValue('mx')),
+                'mx'                                   => Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::mx)
+                ),
                 'secureServer'                         => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('secureServer')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::secureServer)
                 ),
-                'vpns'                                 => Controller::htmlInputText($dsRenBroadband->getValue('vpns')),
-                'owa'                                  => Controller::htmlInputText($dsRenBroadband->getValue('owa')),
-                'oma'                                  => Controller::htmlInputText($dsRenBroadband->getValue('oma')),
+                'vpns'                                 => Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::vpns)
+                ),
+                'owa'                                  => Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::owa)
+                ),
+                'oma'                                  => Controller::htmlInputText(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::oma)
+                ),
                 'remotePortal'                         => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('remotePortal')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::remotePortal)
                 ),
                 'smartHost'                            => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('smartHost')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::smartHost)
                 ),
                 'preparationRecords'                   => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('preparationRecords')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::preparationRecords)
                 ),
                 'assignedTo'                           => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('assignedTo')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::assignedTo)
                 ),
                 'initialSpeedTest'                     => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('initialSpeedTest')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::initialSpeedTest)
                 ),
                 'preMigrationNotes'                    => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('preMigrationNotes')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::preMigrationNotes)
                 ),
                 'postMigrationNotes'                   => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('postMigrationNotes')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::postMigrationNotes)
                 ),
                 'docsUpdatedAndChecksCompleted'        => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('docsUpdatedAndChecksCompleted')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::docsUpdatedAndChecksCompleted)
                 ),
                 'passwordMessage'                      => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('password')
@@ -651,10 +621,10 @@ class CTRenBroadband extends CTCNC
                     $dsRenBroadband->getMessage('docsUpdatedAndChecksCompleted')
                 ),
                 'declinedFlagChecked'                  => Controller::htmlChecked(
-                    $dsRenBroadband->getValue('declinedFlag')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::declinedFlag)
                 ),
                 'bandwidthAllowance'                   => Controller::htmlInputText(
-                    $dsRenBroadband->getValue('bandwidthAllowance')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::bandwidthAllowance)
                 ),
                 'bandwidthAllowanceMessage'            => Controller::htmlDisplayText(
                     $dsRenBroadband->getMessage('bandwidthAllowance')
@@ -668,12 +638,9 @@ class CTRenBroadband extends CTCNC
                 'urlUpdate'                            => $urlUpdate,
                 'urlItemEdit'                          => $urlItemEdit,
                 'urlItemPopup'                         => $urlItemPopup,
-                'urlEditCustomerItem'                  => $urlEditCustomerItem,
                 'internalNotes'                        => Controller::htmlTextArea(
-                    $dsRenBroadband->getValue('internalNotes')
+                    $dsRenBroadband->getValue(DBEJRenBroadband::internalNotes)
                 ),
-                'urlDelete'                            => $urlDelete,
-                'txtDelete'                            => $txtDelete,
                 'urlDisplayList'                       => $urlDisplayList,
                 'disabled'                             => $disabled,
                 'readonly'                             => $readonly,
@@ -691,39 +658,6 @@ class CTRenBroadband extends CTCNC
                 'clientCheckDirectDebit'               => $isDirectDebitAllowed ? 'true' : 'false'
             )
         );
-
-        /*
-         * build broadband service type dropdown
-         */
-        $dbeBroadbandServiceType = new DBEBroadbandServiceType($this);
-
-        $dbeBroadbandServiceType->getRows();
-
-        $this->template->set_block(
-            'RenBroadbandEdit',
-            'serviceTypeBlock',
-            'serviceTypes'
-        );
-
-        while ($dbeBroadbandServiceType->fetchNext()) {
-
-            $serviceTypeSelected = ($dsRenBroadband->getValue(
-                    'broadbandSericeTypeID'
-                ) == $dbeBroadbandServiceType->getValue('broadbandSericeTypeID')) ? CT_SELECTED : '';
-
-            $this->template->set_var(
-                array(
-                    'serviceTypeSelected'  => $serviceTypeSelected,
-                    'serviceTypeID'        => $key,
-                    'orderTypeDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'serviceTypes',
-                'serviceTypeBlock',
-                true
-            );
-        }
 
         $this->template->set_block(
             'RenBroadbandEdit',
@@ -761,14 +695,16 @@ class CTRenBroadband extends CTCNC
     /**
      * Update call activity type details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsRenBroadband = &$this->dsRenBroadband;
         $this->formError = (!$this->dsRenBroadband->populateFromArray($_REQUEST['renBroadband']));
         if ($this->formError) {
-            if ($this->dsRenBroadband->getValue('customerItemID') == '') {                    // attempt to insert
+            if ($this->dsRenBroadband->getValue(
+                    DBEJRenBroadband::customerItemID
+                ) == '') {                    // attempt to insert
                 $_REQUEST['action'] = 'edit';
             } else {
                 $_REQUEST['action'] = 'create';
@@ -796,7 +732,7 @@ class CTRenBroadband extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
-                        'ID'     => $this->dsRenBroadband->getValue('customerItemID')
+                        'ID'     => $this->dsRenBroadband->getValue(DBEJRenBroadband::customerItemID)
                     )
                 );
 
@@ -810,6 +746,7 @@ class CTRenBroadband extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
@@ -845,6 +782,7 @@ class CTRenBroadband extends CTCNC
     /**
      * Send an email to recipient
      * @access private
+     * @throws Exception
      */
     function emailTo()
     {
@@ -885,5 +823,4 @@ class CTRenBroadband extends CTCNC
             );
         }
     }
-}// end of class
-?>
+}

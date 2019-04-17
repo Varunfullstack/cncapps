@@ -191,11 +191,19 @@ class BUCustomerItem extends Business
         );
     }
 
+    /**
+     * @param $clientID
+     * @return bool
+     */
     function clientHasDirectDebit($clientID)
     {
         return $this->dbeJCustomerItem->getCountCustomerDirectDebitItems($clientID) > 0;
     }
 
+    /**
+     * @param $customerID
+     * @param $dsResults
+     */
     function getContractsByCustomerID($customerID,
                                       &$dsResults
     )

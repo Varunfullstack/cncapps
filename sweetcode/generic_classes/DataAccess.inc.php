@@ -213,6 +213,7 @@ class DataAccess extends BaseObject
     var $_colCount = 0;
     protected $colValidation = [];
     protected $debug;
+    protected $colDefaultValue = [];
 
     function enableDebugging()
     {
@@ -819,43 +820,40 @@ class DataAccess extends BaseObject
 
     /**
      * Add a new column to the object
-     * @param string Column name
-     * @param string type Column type - default is string
-     * @param null Column type - default is string
-     * @access public
+     * @param $name
+     * @param $type
+     * @param $allowNull
+     * @param $defaultValue
+     * @param $validationFunction
      * @return integer New column number or DA_COLUMN_NOT_ADDED
+     * @access public
      */
-    function addColumn($arg)
+    function addColumn($name,
+                       $type,
+                       $allowNull,
+                       $defaultValue = null,
+                       $validationFunction = null
+    )
     {
         // In case the destination dataset doesn't want all of the
         // source dataset's columns
         $ret = DA_COLUMN_NOT_ADDED;
         if ($this->allowAddColumns) {
-            $numArgs = func_num_args();
-            if ($numArgs < 3) {
-                $this->raiseError("AddColumn: Must pass at least three parameters");
-            } else {
-                $name = func_get_arg(0);
-                $type = func_get_arg(1);
-                $null = func_get_arg(2);
-                $validationFunction = null;
-                if ($numArgs > 3) {
-                    $validationFunction = func_get_arg(3);
-                }
-                // add a column name only once
-                $ixColumn = $this->columnExists($name);
-                if ($ixColumn == DA_OUT_OF_RANGE) {
-                    $ixColumn = $this->_colCount;    // Add to end
-                    $this->setNameAndType(
-                        $ixColumn,
-                        $name,
-                        $type,
-                        $null,
-                        $validationFunction
-                    );
-                }
-                $ret = $ixColumn;        // found column
+            // add a column name only once
+            $ixColumn = $this->columnExists($name);
+            if ($ixColumn == DA_OUT_OF_RANGE) {
+                $ixColumn = $this->_colCount;    // Add to end
+                $this->setNameAndType(
+                    $ixColumn,
+                    $name,
+                    $type,
+                    $allowNull,
+                    $defaultValue,
+                    $validationFunction
+                );
             }
+            $ret = $ixColumn;        // found column
+
             $this->_colCount = $this->colCount(); // Added this to avoid overhead of calling colCount()
 //			if ($this->_colCount > DA_SERIAL_LIMIT){ 
 //				$this->setXRef();
@@ -911,6 +909,7 @@ class DataAccess extends BaseObject
      * @param string $name Column name
      * @param integer $type Column type See DA_ constants for values
      * @param integer $null Nulls allowed: DA_ALLOW_NULL DA_NOT_NULL
+     * @param null $defaultValue
      * @param $validationFunction
      * @return bool Success
      */
@@ -918,7 +917,9 @@ class DataAccess extends BaseObject
                             $name,
                             $type,
                             $null,
+                            $defaultValue = null,
                             $validationFunction = null
+
     )
     {
         // Note: Must call setName first to create column
@@ -934,6 +935,12 @@ class DataAccess extends BaseObject
             $ixColumn,
             $null
         );
+
+        $this->setDefaultValue(
+            $ixColumn,
+            $defaultValue
+        );
+
         $this->setValidationFunction(
             $ixColumn,
             $validationFunction
@@ -964,6 +971,7 @@ class DataAccess extends BaseObject
      * @param integer $ixColumn Column number
      * @param string Column name
      * return boolean Success
+     * @return bool
      */
     function setName($ixColumn,
                      $name
@@ -1048,7 +1056,7 @@ class DataAccess extends BaseObject
      * Set column type
      * @access private
      * @param integer $ixColumn Column number
-     * @param integer $nullFlag DA_ALLOW_NULL DA_NOT_NULL
+     * @param $nullflag
      * @return boolean Success
      */
     function setNull($ixColumn,
@@ -1264,7 +1272,7 @@ class DataAccess extends BaseObject
     /**
      * Set column value by name or index
      * @access public
-     * @param string $ixColumn Column number or name
+     * @param $ixPassedColumn
      * @param string $value Value
      * @return boolean Success
      */
@@ -1273,23 +1281,52 @@ class DataAccess extends BaseObject
     )
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($this->debug) {
+            echo '<div> Testing for column existence: ' . $ixPassedColumn . ' - value: ' . $value . '</div>';
+        }
         if ($ixColumn != DA_OUT_OF_RANGE) {
+            if ($this->debug) {
+                echo '<div>The column does exist</div>';
+            }
+
             if (
-                ($this->getNull($ixColumn) == DA_NOT_NULL) &&
-                ($this->colType[$ixColumn] != DA_BOOLEAN) &&
-                ($value == "") &&
-                ($this->getPK() != $ixColumn) &&
-                (!$this->getIgnoreNULL())
+                $this->getNull($ixColumn) == DA_NOT_NULL &&
+                !$this->getDefaultValue($ixColumn) &&
+                $this->colType[$ixColumn] != DA_BOOLEAN &&
+                $value === null &&
+                $this->getPK() != $ixColumn &&
+                !$this->getIgnoreNULL()
             ) {
+
+                if ($this->debug) {
+                    echo '<div>The column does not allow null values, there is no default value set, the column type is 
+not a boolean, the given value is null, column given is not the PK, and there is no flag to ignore null</div>';
+                }
                 $this->raiseError(
                     "Could not set column value because " . $ixPassedColumn . " does not accept NULL values."
                 );
                 return FALSE;
             } else {
+                if ($value === null && $this->getDefaultValue($ixColumn)) {
+                    if ($this->debug) {
+                        echo '<div>The value given is NULL and there is a default value set: ' . $this->getDefaultValue(
+                                $ixColumn
+                            ) . '</div>';
+                    }
+                    return $this->row[$ixColumn] = $this->getDefaultValue($ixColumn);
+                }
+                if ($this->debug) {
+                    echo '<div>The value given is ' . $value . ' and there is not a default value set: ' . $this->getDefaultValue(
+                            $ixColumn
+                        ) . '</div>';
+                }
                 $this->row[$ixColumn] = $value;
                 return TRUE;
             }
         } else {
+            if ($this->debug) {
+                echo '<div> The column does not exist</div>';
+            }
             if ($this->failOutOfRange) {
                 $this->raiseError("Could not set column value because " . $ixPassedColumn . " out of range");
                 return FALSE;
@@ -1506,6 +1543,25 @@ class DataAccess extends BaseObject
         return $value;
     }
 
+    private function setDefaultValue($ixColumn,
+                                     $defaultValue
+    )
+    {
+        if ($this->debug) {
+            echo '<div>Setting default value of column: ' . $ixColumn . ' -> ' . $defaultValue . '</div>';
+        }
+        $ret = FALSE;
+        $ixColumn = $this->columnExists($ixColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+
+            $this->colDefaultValue[$ixColumn] = $defaultValue;
+            $ret = TRUE;
+        } else {
+            $this->raiseError("SetDefaultValue(): Column " . $ixColumn . " out of range");
+        }
+        return $ret;
+    }
+
     private function setValidationFunction($ixColumn,
                                            $validationFunction
     )
@@ -1519,6 +1575,19 @@ class DataAccess extends BaseObject
             $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
         }
         return $ret;
+    }
+
+    protected function getDefaultValue($ixPassedColumn)
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            $ret = $this->colDefaultValue[$ixColumn];
+        } else {
+            $this->raiseError("GetDefaultValue(): Column " . $ixPassedColumn . " out of range");
+            $ret = DA_OUT_OF_RANGE;
+        }
+        return $ret;
+
     }
 
 }
