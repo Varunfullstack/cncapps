@@ -134,7 +134,7 @@ class DBECallActivity extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
-        $this->enableDebugging();
+
         $this->addColumn(
             self::curValue,
             DA_FLOAT,
@@ -142,7 +142,6 @@ class DBECallActivity extends DBEntity
             null,
             '0.00'
         );
-        $this->disableDebugging();
         $this->addColumn(
             self::statementYearMonth,
             DA_STRING,

@@ -1,4 +1,6 @@
 <?php
+/** @noinspection HtmlDeprecatedAttribute */
+
 /**
  * Call activity business class
  *
@@ -465,6 +467,10 @@ class BUActivity extends Business
 
     /**
      * Send an email alert to the internal email address against given further action type
+     * @param $callActivityID
+     * @param $engineerName
+     * @param $dateCreated
+     * @param bool $emailBody
      */
     function sendPartsUsedEmail(
         $callActivityID,
@@ -904,6 +910,7 @@ class BUActivity extends Business
     /**
      * Create an operational activity using passed description
      *
+     * @param $problemID
      * @param mixed $description
      */
     function logOperationalActivity($problemID,
@@ -1061,7 +1068,7 @@ class BUActivity extends Business
      * @param $problemID
      * @param $category
      * @param $subCategory
-     * @param null $forcedUserID
+     * @param null $callActivityID
      * @throws Exception
      */
     function sendEmailToCustomer(
@@ -1120,6 +1127,8 @@ class BUActivity extends Business
         } else {
             $rootCause = 'Unknown';
         }
+        $selfFlagName = null;
+        $othersFlagName = null;
         switch ($category) {
             case  self::InitialCustomerEmailCategory:
 
@@ -1527,6 +1536,7 @@ class BUActivity extends Business
         $this->setMethodName('updateCallActivity');
         $dbeCallActivity = new DBECallActivity($this);
         $oldEndTime = null; // new activity
+        $newReason = null;
         if ($dsCallActivity->getValue(DBEJCallActivity::callActivityID) != 0) {
             $dbeCallActivity->getRow($dsCallActivity->getValue(DBEJCallActivity::callActivityID));
             $oldEndTime = $dbeCallActivity->getValue(DBEJCallActivity::endTime);
@@ -2159,7 +2169,7 @@ class BUActivity extends Business
     /**
      * Sends email to service desk managers when activity logged against  customer
      *
-     * @param mixed $activityID
+     * @param $callActivityID
      */
     function sendSpecialAttentionEmail($callActivityID)
     {
@@ -2367,7 +2377,7 @@ class BUActivity extends Business
     /**
      * Sends email to sales when future on-site activity logged
      *
-     * @param mixed $activityID
+     * @param $callActivityID
      */
     function sendFutureVisitEmail($callActivityID)
     {
@@ -2606,6 +2616,13 @@ class BUActivity extends Business
 
     }
 
+    /**
+     * @param $callActivityID
+     * @param $userID
+     * @param $response
+     * @param $comments
+     * @throws Exception
+     */
     public function salesRequestProcess($callActivityID,
                                         $userID,
                                         $response,
@@ -2628,6 +2645,8 @@ class BUActivity extends Business
         $approval = false;
         $problem = new DBEProblem($this);
         $problem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
+        $subject = null;
+        $reason = null;
         switch ($response) {
 
             case 'A':
@@ -2649,6 +2668,8 @@ class BUActivity extends Business
                 );
 
                 break;
+            default:
+                throw new Exception('Invalid response value');
         }
 
         $problem->setValue(
@@ -2757,6 +2778,13 @@ class BUActivity extends Business
         $dbeCallActivity->post();
     }
 
+    /**
+     * @param $callActivityID
+     * @param $userID
+     * @param $response
+     * @param $comments
+     * @throws Exception
+     */
     public function changeRequestProcess($callActivityID,
                                          $userID,
                                          $response,
@@ -2775,33 +2803,26 @@ class BUActivity extends Business
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
         $status = $dsCallActivity->getValue(DBEJCallActivity::status);
+        $subject = null;
         switch ($response) {
 
             case 'A':
                 $reason = '<p>The following change request has been approved by ' . $userName . '</p>';
-
                 $subject = 'Change Request approved';
-
                 $status = 'C';
-
                 break;
-
             case 'D':
                 $reason = '<p>The following change request has been denied by ' . $userName . '</p>';
-
                 $subject = 'Change Request denied';
-
                 $status = 'C';
-
                 break;
-
             case 'I':
-                $reason = '<p>Further details/discusssion requested by ' . $userName . '</p>';
-
+                $reason = '<p>Further details/discussion requested by ' . $userName . '</p>';
                 $subject = 'More information/discussion required for change request';
-
                 $status = 'O';
                 break;
+            default:
+                throw new Exception('Invalid response');
         }
 
         $dbeCallActivity = new DBECallActivity($this);
@@ -2964,6 +2985,7 @@ class BUActivity extends Business
      * @param DataAccess $dbeCallActivity
      * @param string $subject
      * @param string|int $requestingUserID
+     * @param bool $approval
      */
     private function sendSalesRequestReplyEmail($dbeCallActivity,
                                                 $subject,
@@ -3297,8 +3319,8 @@ class BUActivity extends Business
     /**
      * Create travel activities using site maxTravelHours field from address
      *
-     * 1: starttime - maxTravelTime
-     * 2: endtime + maxTravelTime
+     * 1: startTime - maxTravelTime
+     * 2: endTime + maxTravelTime
      *
      * GL:
      * "The travel activity start time will be the on-site activity start time less the agreed travel time and the end time as per the on-site start time
@@ -3306,6 +3328,7 @@ class BUActivity extends Business
      * Updated 15/4/2009:
      * zero is now a valid travel time and means that a travel activity is not created
      * -1 now means the travel time has not been set for this site and blocks the creation of an on-site activity
+     * @param $callActivityID
      */
     function createTravelActivity($callActivityID)
     {
@@ -3503,7 +3526,7 @@ class BUActivity extends Business
                     ) == 'Y') ? 'Customer' : 'CNC',
                 'dateRaisedDMY'  => $dbeJProblem->getValue(DBEJProblem::dateRaisedDMY),
                 'timeRaised'     => $dbeJProblem->getValue(DBEJProblem::timeRaised),
-                'repondedHours'  => common_convertDecimalToHHMM($dbeJProblem->getValue(DBEJProblem::respondedHours)),
+                'respondedHours' => common_convertDecimalToHHMM($dbeJProblem->getValue(DBEJProblem::respondedHours)),
                 'workingHours'   => common_convertDecimalToHHMM($dbeJProblem->getValue(DBEJProblem::workingHours)),
                 'engineerName'   => $dbeJProblem->getValue(DBEJProblem::engineerName),
                 'removedByUser'  => $this->dbeUser->getValue(DBEUser::name),
@@ -3794,7 +3817,7 @@ class BUActivity extends Business
             $activityIDArray
         );
         /*
-    Get a list of the associated problemnos
+    Get a list of the associated problem id's
     */
         $select =
             "SELECT
@@ -3805,7 +3828,7 @@ class BUActivity extends Business
         caa_callactivityno IN( $activityIDsAsString )";
 
         $db->query($select);
-
+        $problemIDArray = [];
         while ($db->next_record()) {
 
             $problemIDArray[] = $db->Record['caa_problemno'];
@@ -3829,7 +3852,7 @@ class BUActivity extends Business
         AND pro_contract_cuino = 0";
 
         $db->query($select);
-
+        $finalActivityIDArray = [];
         while ($db->next_record()) {
 
             $finalActivityIDArray[] = $db->Record['caa_callactivityno'];
@@ -3854,6 +3877,7 @@ class BUActivity extends Business
         $lastUserID = false;
         $lastDate = false;
         $consultantName = null;
+        $sequenceNo = null;
 
         while ($dbeJCallActivity->fetchNext()) {
 
@@ -4334,10 +4358,6 @@ class BUActivity extends Business
             " AND cui_expiry_date >= now()" . // and is not expired
             " AND  cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND  renewalStatus  <> 'D'";
 
-// The following code is used when there has been a crash to exclude already processed custs
-//    $queryString .= " AND cus_custno NOT IN( 1000, 823, 820, 520 , 203, 117)";
-
-
         $db->query($queryString);
         while ($db->next_record()) {
             $validContracts [$db->Record ['cui_cuino']] = 0; // initialise to no activity
@@ -4396,9 +4416,6 @@ class BUActivity extends Business
             " AND  cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND  renewalStatus  <> 'D'" . // not declined
             " AND  caa_callacttypeno  <> " . CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . " AND  caa_callacttypeno  <> " . CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID .  // not declined
             " AND pro_status = 'C'";     // only completed problems
-// The following code is used when there has been a crash to exclude already processed custs
-//    $queryString .= " AND cus_custno NOT IN( 1000, 823, 820, 520 , 203, 117)";
-
         $queryString .= " ORDER BY pro_custno, caa_date, caa_starttime";
 
         $db->query($queryString);
@@ -4457,7 +4474,7 @@ class BUActivity extends Business
             if ($db->Record ['custno'] != $last_custno) {
 
                 if ($last_custno != '9999') {
-                    $topupValue = $this->doTopUp(
+                    $topUpValue = $this->doTopUp(
                         $lastRecord,
                         $update
                     );
@@ -4487,7 +4504,7 @@ class BUActivity extends Business
                         $dsResults,
                         $dsStatementContact,
                         $newBalance,
-                        $topupValue,
+                        $topUpValue,
                         $dsData->getValue('endDate')
                     );
 
@@ -4499,7 +4516,7 @@ class BUActivity extends Business
                             $dsStatementContact,
                             $newBalance,
                             $dsData->getValue('endDate'),
-                            $topupValue
+                            $topUpValue
                         );
                     }
                     fclose($csvFileHandle); // close previous csv file
@@ -4697,7 +4714,7 @@ class BUActivity extends Business
         if ($ret == TRUE) {
             fclose($csvFileHandle);
 
-            $topupValue = $this->doTopUp(
+            $topUpValue = $this->doTopUp(
                 $lastRecord,
                 $update
             );
@@ -4725,7 +4742,7 @@ class BUActivity extends Business
                 $dsResults,
                 $dsStatementContact,
                 $newBalance,
-                $topupValue,
+                $topUpValue,
                 $dsData->getValue('endDate')
             );
 
@@ -4736,7 +4753,7 @@ class BUActivity extends Business
                     $dsStatementContact,
                     $newBalance,
                     $dsData->getValue('endDate'),
-                    $topupValue
+                    $topUpValue
                 );
             }
         }
@@ -4767,8 +4784,6 @@ class BUActivity extends Business
             JOIN itemtype ON ity_itemtypeno = itm_itemtypeno
           WHERE
             cui_cuino = " . $key . " AND  cus_custno <> 2511" . " AND  renewalStatus  <> 'D'";
-// The following code is used when there has been a crash to exclude already processed custs
-//    $queryString .= " AND cus_custno NOT IN( 1000, 823, 820, 520 , 203, 117)";
 
                 $db->query($queryString);
                 $db->next_record();
@@ -4873,7 +4888,7 @@ class BUActivity extends Business
                 fclose($htmlFileHandle);
 
                 $dsStatementContact->initialise();
-                $topupValue = $this->doTopUp(
+                $topUpValue = $this->doTopUp(
                     $db->Record,
                     $update
                 );
@@ -4883,7 +4898,7 @@ class BUActivity extends Business
                     $dsResults,
                     $dsStatementContact,
                     $db->Record ['curGSCBalance'],
-                    $topupValue,
+                    $topUpValue,
                     $dsData->getValue('endDate')
                 );
 
@@ -4893,7 +4908,7 @@ class BUActivity extends Business
                         $dsStatementContact,
                         $db->Record ['curGSCBalance'],
                         $dsData->getValue('endDate'),
-                        $topupValue
+                        $topUpValue
                     );
                 }
             }
@@ -4930,26 +4945,31 @@ class BUActivity extends Business
 
         if ($newBalance < 0) {
             // value of the top-up activity is the GSC item price plus amount required to clear balance
-            $topupValue = (0 - $newBalance) + $Record ['gscTopUpAmount'];
+            $topUpValue = (0 - $newBalance) + $Record ['gscTopUpAmount'];
         } else {
-            $topupValue = $Record ['gscTopUpAmount']; // just the top-up amount
+            $topUpValue = $Record ['gscTopUpAmount']; // just the top-up amount
         }
         //   Create sales order
         if ($update) {
-            $this->createTopupSalesOrder(
+            $this->createTopUpSalesOrder(
                 $Record,
-                $topupValue
+                $topUpValue
             );
         }
 
-        return $topupValue;
+        return $topUpValue;
     }
 
-    function createTopupSalesOrder(&$Record,
-                                   $topupValue
+    /**
+     * @param $Record
+     * @param $topUpValue
+     * @return bool|float|int|string
+     */
+    function createTopUpSalesOrder(&$Record,
+                                   $topUpValue
     )
     {
-        $this->setMethodName('createTopupSalesOrder');
+        $this->setMethodName('createTopUpSalesOrder');
 
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
@@ -4999,7 +5019,7 @@ class BUActivity extends Business
         $ordheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
         $sequenceNo = 1;
 
-        // get topup item details
+        // get topUp item details
         $dbeItem = new DBEItem($this);
         $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
 
@@ -5059,11 +5079,11 @@ class BUActivity extends Business
         );
         $dbeOrdline->setValue(
             DBEJOrdline::curUnitSale,
-            $topupValue
+            $topUpValue
         );
         $dbeOrdline->setValue(
             DBEJOrdline::curTotalSale,
-            $topupValue
+            $topUpValue
         );
         $dbeOrdline->setValue(
             DBEJOrdline::description,
@@ -5078,14 +5098,14 @@ class BUActivity extends Business
      * @param DataSet $dsResults
      * @param DataSet $dsStatementContact
      * @param $newBalance
-     * @param $topupAmount
+     * @param $topUpAmount
      * @param $endDate
      */
     function postRowToSummaryFile(&$Record,
                                   &$dsResults,
                                   &$dsStatementContact,
                                   $newBalance,
-                                  $topupAmount,
+                                  $topUpAmount,
                                   $endDate
     )
     {
@@ -5100,7 +5120,7 @@ class BUActivity extends Business
             $this->csvSummaryFileHandle,
             '"' . $Record ['cus_name'] . '",' . '"' . $Record ['curGSCBalance'] . '",' . // previous balance
             '"' . common_numberFormat($newBalance) . '",' . // hours
-            '"' . common_numberFormat($topupAmount) . '"' . // value
+            '"' . common_numberFormat($topUpAmount) . '"' . // value
             "\r\n"
         );
         $webFileLink = 'export/PP_' . substr(
@@ -5128,7 +5148,7 @@ class BUActivity extends Business
         );
         $dsResults->setValue(
             self::exportPrePayActivitiesFormTopUp,
-            common_numberFormat($topupAmount)
+            common_numberFormat($topUpAmount)
         );
         $dsResults->setValue(
             self::exportPrePayActivitiesFormContacts,
@@ -5150,13 +5170,13 @@ class BUActivity extends Business
      * @param DataSet $dsContact
      * @param $balance
      * @param $date
-     * @param $topupValue
+     * @param $topUpValue
      */
     function sendGSCStatement($statementFilepath,
                               &$dsContact,
                               $balance,
                               $date,
-                              $topupValue
+                              $topUpValue
     )
     {
 
@@ -5171,9 +5191,9 @@ class BUActivity extends Business
         //    $buMail->mime_boundary = "----=_NextPart_" . md5(time());
         while ($dsContact->fetchNext()) {
             // Send email with attachment
-            $message = '<body><p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message = '<body><p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy" ><span style=\'font-size:10.0pt;color:black\'>';
             $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
-            $message .= '<o:p></o:p></span></font></p>';
+            $message .= '<!--suppress CheckTagEmptyBody --><o:p></o:p></span></p>';
             $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
             // Temporary:
             $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
@@ -5181,19 +5201,19 @@ is currently a balance of ';
             $message .= '&pound;' . common_numberFormat($balance) . ' + VAT.';
             $message .= '</p>';
 
-            $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= '<p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy"><span style=\'font-size:10.0pt;color:black\'>';
             $message .= 'If you have any queries relating to any of the items detailed on this statement, then please notify us within 7 days so that we can make any adjustments if applicable.';
             $message .= '</p>';
 
             if ($balance <= 100) {
-                $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+                $message .= '<p class=MsoNormal"  style="font: normal 2px Arial, sans-serif ;color: navy"><span style=\'font-size:10.0pt;color:black\'>';
                 $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat(
-                        $topupValue * (1 + ($this->standardVatRate / 100))
+                        $topUpValue * (1 + ($this->standardVatRate / 100))
                     ) . ' Inc VAT.';
                 $message .= '</p>';
             }
 
-            $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= '<p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy"><span style=\'font-size:10.0pt;color:black\'>';
             $message .= 'Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in the purchase of a support contract?  Please call us for further information.';
             $message .= '</p>';
 
@@ -5295,7 +5315,7 @@ is currently a balance of ';
             "\r\n"
         );
 
-        if ($timeFrameFlag == 'M') { // Monetary value like topup
+        if ($timeFrameFlag == 'M') { // Monetary value like topUp
             $contacts = '';
             $postcode = '';
             $activityRef = '';
@@ -5351,7 +5371,7 @@ is currently a balance of ';
 
         $dbeCustomerItem = new DBECustomerItem($this);
         if ($dbeCustomerItem->getGSCRow($customerID)) {
-            // set fields to topup
+            // set fields to topUp
             $dbeCallActivity = new DBECallActivity($this);
             $dbeCallActivity->getRow($callActivityID);
             $dbeCallActivity->setValue(
@@ -5658,12 +5678,11 @@ is currently a balance of ';
             DBEJCallActivity::serverGuard,
             $_SESSION [$sessionKey] ['serverGuard']
         );
-        $dsCallActivity->enableDebugging();
+
         $dsCallActivity->setValue(
             DBEJCallActivity::curValue,
             $_SESSION [$sessionKey] ['curValue']
         );
-        $dsCallActivity->disableDebugging();
         $dsCallActivity->setValue(
             DBEJCallActivity::statementYearMonth,
             null
@@ -5729,6 +5748,7 @@ is currently a balance of ';
      *
      * @param mixed $callActTypeID
      * @param mixed $startTime Optional. If false then use current time
+     * @return string
      * @throws Exception
      */
     function getEndtime($callActTypeID,
@@ -6225,14 +6245,14 @@ is currently a balance of ';
         $followingIDIsNextID = false;
 
         $rowCount = 0;
-
+        $thisID = null;
         while ($dsCallActivity->fetchNext()) {
 
             $rowCount++;
 
             $thisID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
 
-            if (!$lastID) { // first actvivity in set
+            if (!$lastID) { // first activity in set
 
 
                 $navigateLinksArray ['first'] = $thisID;
@@ -6317,42 +6337,33 @@ is currently a balance of ';
 
         $dbeCallActivity = new DBECallActivity($this);
 
+        $fromProblemID = null;
+        $toProblemID = null;
+
         if (!$dbeCallActivity->getRow($fromCallActivityID)) {
-
             $this->raiseError('link to activity ' . $fromCallActivityID . ' does not exist');
-
         } else {
-
             $toProblemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
         }
 
         if (!$dbeCallActivity->getRow($toCallActivityID)) {
             $this->raiseError('activity ' . $toCallActivityID . ' does not exist');
-
         } else {
-
             $fromProblemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
         }
         if ($wholeProblem) { // move all the activities in this problem
-
-
             $dbeCallActivity->changeProblemID(
                 $fromProblemID,
                 $toProblemID
             );
 
         } else { // just the one activity
-
-
             $dbeCallActivity->setValue(
                 DBEJCallActivity::problemID,
                 $toProblemID
             );
 
             $dbeCallActivity->updateRow();
-
         }
 
     }
@@ -6413,18 +6424,17 @@ is currently a balance of ';
     )
     {
         if ($ctActivity->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
-            $ret = true;
+            return true;
         }
-
-        if (  // status is NOT Authorised AND NOT Checked
-            $dsCallActivity->getValue(DBEJCallActivity::status) != 'A' AND $dsCallActivity->getValue(
+        // status is NOT Authorised AND NOT Checked
+        if ($dsCallActivity->getValue(DBEJCallActivity::status) != 'A' && $dsCallActivity->getValue(
                 DBEJCallActivity::status
             ) != 'C'
         ) {
-            $ret = true;
+            return true;
         }
 
-        return $ret;
+        return false;
 
     }
 
@@ -8492,7 +8502,7 @@ is currently a balance of ';
 
             $dbeTeam = new DBETeam($this);
             $dbeTeam->getRow($this->dbeUser->getValue(DBEJUser::teamID));
-            $ret = $dbeTeam->getValue(DBETeam::Level);
+            $ret = $dbeTeam->getValue(DBETeam::level);
         } else {
             $ret = 0;
         }
@@ -9619,8 +9629,12 @@ is currently a balance of ';
     /**
      * New 2ndSite validation error request
      *
-     * @param mixed $record
-     * @param mixed $contact
+     * @param $customerID
+     * @param $serverName
+     * @param $serverCustomerItemID
+     * @param $contractCustomerItemID
+     * @param $missingLetters
+     * @param $missingImages
      * @throws Exception
      */
     function raiseSecondSiteMissingImageRequest(

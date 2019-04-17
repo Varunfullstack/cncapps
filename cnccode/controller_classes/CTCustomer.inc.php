@@ -1948,6 +1948,7 @@ ORDER BY cus_name ASC  ";
     /**
      * Form for editing customer details
      * @access private
+     * @throws Exception
      */
     function displayEditForm()
     {
@@ -2891,7 +2892,6 @@ ORDER BY cus_name ASC  ";
             if ($this->dsContact->getValue(DBEContact::contactID) == 0) { // New contact so no delete link
                 $deleteContactURL = '';
                 $deleteContactLink = '';
-                $clientFormURL = '';
             } else {
                 $deleteContactURL =
                     Controller::buildLink(
@@ -2903,18 +2903,6 @@ ORDER BY cus_name ASC  ";
                     );
                 $deleteContactLink =
                     '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
-                $clientFormURL =
-                    Controller::buildLink(
-                        'ClientInformationForm.php',
-                        array(
-                            'contactID'   => $this->dsContact->getValue(DBEContact::contactID),
-                            'contactName' => $this->dsContact->getValue(
-                                    DBEContact::firstName
-                                ) . ' ' . $this->dsContact->getValue(
-                                    DBEContact::lastName
-                                )
-                        )
-                    );
                 $dearJohnURL =
                     Controller::buildLink(
                         'DearJohnForm.php',
@@ -3046,10 +3034,8 @@ ORDER BY cus_name ASC  ";
                     'topUpValidation'                      => $this->buCustomer->hasPrepayContract(
                         DBEContact::customerID
                     ) ? 'data-validation="atLeastOne"' : '',
-                    'clientFormURL'                        => $clientFormURL,
                     'dearJohnURL'                          => $dearJohnURL,
                     'dmLetterURL'                          => $dmLetterURL,
-                    'customLetter1URL'                     => $customLetter1URL,
                     'deleteContactLink'                    => $deleteContactLink
                 )
             );
@@ -3182,6 +3168,7 @@ ORDER BY cus_name ASC  ";
     /**
      * Delete customer and associated sites/contacts
      * @access private
+     * @throws Exception
      */
     function deleteCustomer()
     {

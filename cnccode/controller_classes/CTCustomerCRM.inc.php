@@ -1984,16 +1984,6 @@ class CTCustomerCRM extends CTCustomer
                     );
                 $deleteContactLink =
                     '<a href="' . $deleteContactURL . '"><img align=middle border=0 hspace=2 src="images/icondelete.gif" alt="Delete contact" onClick="if(!confirm(\'Are you sure you want to delete this contact?\')) return(false)"></a>';
-                $clientFormURL =
-                    Controller::buildLink(
-                        'ClientInformationForm.php',
-                        array(
-                            'contactID'   => $this->dsContact->getValue(DBEContact::contactID),
-                            'contactName' => $this->dsContact->getValue(
-                                    DBEContact::firstName
-                                ) . ' ' . $this->dsContact->getValue(DBEContact::lastName)
-                        )
-                    );
                 $dearJohnURL =
                     Controller::buildLink(
                         'DearJohnForm.php',

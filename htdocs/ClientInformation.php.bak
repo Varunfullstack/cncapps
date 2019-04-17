@@ -31,11 +31,13 @@ $buCustomer->getContactByID(
 );
 $dsContact->fetchNext();
 
+$dsCustomer = new DataSet($thing);
 $buCustomer->getCustomerByID(
     $dsContact->getValue(DBEContact::customerID),
     $dsCustomer
 );
 $dsCustomer->fetchNext();
+$dsSite = new DataSet($thing);
 $buCustomer->getSiteByCustomerIDSiteNo(
     $dsContact->getValue(DBEContact::customerID),
     $dsContact->getValue(DBEContact::siteNo),
@@ -45,14 +47,14 @@ $dsContact->fetchNext();
 
 $dbeUser = new DBEUser($thing);
 $dbeUser->setValue(
-    'userID',
+    DBEUser::userID,
     $GLOBALS['auth']->is_authenticated()
 );
 $dbeUser->getRow();
 
 $dbeAttendeeUser = new DBEUser($thing);
 $dbeAttendeeUser->setValue(
-    'userID',
+    DBEUser::userID,
     $_REQUEST['attendeeUserID']
 );
 $dbeAttendeeUser->getRow();
@@ -69,9 +71,8 @@ if ($dsContact->getValue(DBEContact::mobilePhone) != '') {
 $newClient = ($dsCustomer->getValue(DBECustomer::prospectFlag) == 'Y');
 
 if (isset($_REQUEST['Confirmation'])) {
-    require('ClientInformationEmail.php.bak');                // the confirm button was clicked so include the email template
+    require('ClientInformationEmail.php');                // the confirm button was clicked so include the email template
 } else {
-    require('ClientInformationReport.php.bak');                // the generate report button was clicked so include the report template
+    require('ClientInformationReport.php');                // the generate report button was clicked so include the report template
 }
 page_close();
-?>

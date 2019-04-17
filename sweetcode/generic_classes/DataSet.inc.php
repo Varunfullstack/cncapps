@@ -708,21 +708,4 @@ class DataSet extends DataAccess
         return $colString;
     }
 
-    /**
-     * @param $ixPassedColumn
-     * @return Callable
-     */
-    private function getValidationFunction($ixPassedColumn)
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            $ret = $this->colValidation[$ixColumn];
-        } else {
-            $this->raiseError("GetValidationFunction(): Column " . $ixPassedColumn . " out of range");
-            $ret = DA_OUT_OF_RANGE;
-        }
-        return $ret;
-
-    }
-
 }

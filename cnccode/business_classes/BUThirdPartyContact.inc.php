@@ -9,12 +9,14 @@ require_once($cfg ["path_dbe"] . "/DBEThirdPartyContact.inc.php");
 
 class BUThirdPartyContact extends Business
 {
+    const searchFormCustomerID = 'customerID';
     /** @var DBEThirdPartyContact */
     private $dbeThirdPartyContact;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -45,8 +47,7 @@ class BUThirdPartyContact extends Business
     }
 
     function getRowsByCustomerID($customerID,
-                                 &$dsResults,
-                                 $orderBy = false
+                                 &$dsResults
     )
     {
         $this->dbeThirdPartyContact->setValue(
@@ -72,15 +73,14 @@ class BUThirdPartyContact extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'customerID',
-            ''
+            self::searchFormCustomerID,
+            null
         );
     }
 
-} // End of class
-?>
+}

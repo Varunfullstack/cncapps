@@ -15,6 +15,14 @@ require_once($cfg['path_dbe'] . '/DBEStandardText.inc.php');
 
 class CTBookSalesVisit extends CTCNC
 {
+
+    const searchFormCustomerID = 'customerID';
+    const searchFormAttendees = 'attendees';
+    const searchFormTypeOfMeetingID = 'typeOfMeetingID';
+    const searchFormContactID = 'contactID';
+    const searchFormMeetingDate = 'meetingDate';
+    const searchFormMeetingTime = 'meetingTime';
+
     const ACTION_BOOK_SALES_VISIT = 'bookSalesVisit';
     /** @var DSForm */
     private $dsSearchForm;
@@ -36,33 +44,33 @@ class CTBookSalesVisit extends CTCNC
 
         $this->dsSearchForm = new DSForm($this);
         $this->dsSearchForm->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_ID,
             DA_NOT_NULL
         );
 
         $this->dsSearchForm->addColumn(
-            'attendees',
+            self::searchFormAttendees,
             DA_ARRAY,
             DA_NOT_NULL
         );
         $this->dsSearchForm->addColumn(
-            'typeOfMeetingID',
+            self::searchFormTypeOfMeetingID,
             DA_ID,
             DA_NOT_NULL
         );
         $this->dsSearchForm->addColumn(
-            'contactID',
+            self::searchFormContactID,
             DA_ID,
             DA_NOT_NULL
         );
         $this->dsSearchForm->addColumn(
-            'meetingDate',
+            self::searchFormMeetingDate,
             DA_DATE,
             DA_NOT_NULL
         );
         $this->dsSearchForm->addColumn(
-            'meetingTime',
+            self::searchFormMeetingTime,
             DA_TIME,
             DA_NOT_NULL
         );
@@ -77,6 +85,9 @@ class CTBookSalesVisit extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function defaultAction()
     {
         switch ($_REQUEST['action']) {
@@ -90,8 +101,13 @@ class CTBookSalesVisit extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function showForm()
     {
+        $customerString = null;
+        $urlCustomerPopup = null;
         $dsSearchForm = &$this->dsSearchForm; // ref to global
         $bookedActivity = null;
         if (isset($_REQUEST['booked'])) {
@@ -121,18 +137,19 @@ class CTBookSalesVisit extends CTCNC
             )
         );
         $this->setPageTitle('Create Sales Meeting Booking ');
-        if ($dsSearchForm->getValue('customerID') != 0) {
+        if ($dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue('customerID'),
+                $dsSearchForm->getValue(self::searchFormCustomerID),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
         $contactString = '';
-        if ($dsSearchForm->getValue('contactID')) {
+        if ($dsSearchForm->getValue(self::searchFormContactID)) {
             $dbeContact = new DBEContact($this);
-            $dbeContact->getRow($dsSearchForm->getValue('contactID'));
+            $dbeContact->getRow($dsSearchForm->getValue(self::searchFormContactID));
             $contactString = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
                     DBEContact::lastName
                 );
@@ -151,18 +168,18 @@ class CTBookSalesVisit extends CTCNC
         $this->template->set_var(
             array(
                 'formError'              => $this->formError,
-                'customerID'             => $this->dsSearchForm->getValue('customerID'),
-                'customerIDMessage'      => $this->dsSearchForm->getMessage('customerID'),
-                'attendees'              => $this->dsSearchForm->getValue('attendees'),
-                'attendeesMessage'       => $this->dsSearchForm->getMessage('attendees'),
-                'typeOfMeetingIDMessage' => $this->dsSearchForm->getMessage('typeOfMeetingID'),
-                'contactID'              => $this->dsSearchForm->getValue('contactID'),
-                'contactIDMessage'       => $this->dsSearchForm->getMessage('contactID'),
+                'customerID'             => $this->dsSearchForm->getValue(self::searchFormCustomerID),
+                'customerIDMessage'      => $this->dsSearchForm->getMessage(self::searchFormCustomerID),
+                'attendees'              => $this->dsSearchForm->getValue(self::searchFormAttendees),
+                'attendeesMessage'       => $this->dsSearchForm->getMessage(self::searchFormAttendees),
+                'typeOfMeetingIDMessage' => $this->dsSearchForm->getMessage(self::searchFormTypeOfMeetingID),
+                'contactID'              => $this->dsSearchForm->getValue(self::searchFormContactID),
+                'contactIDMessage'       => $this->dsSearchForm->getMessage(self::searchFormContactID),
                 'contactString'          => $contactString,
-                'meetingDate'            => $this->dsSearchForm->getValue('meetingDate'),
-                'meetingDateMessage'     => $this->dsSearchForm->getMessage('meetingDate'),
-                'meetingTime'            => $this->dsSearchForm->getValue('meetingTime'),
-                'meetingTimeMessage'     => $this->dsSearchForm->getMessage('meetingTime'),
+                'meetingDate'            => $this->dsSearchForm->getValue(self::searchFormMeetingDate),
+                'meetingDateMessage'     => $this->dsSearchForm->getMessage(self::searchFormMeetingDate),
+                'meetingTime'            => $this->dsSearchForm->getValue(self::searchFormMeetingTime),
+                'meetingTimeMessage'     => $this->dsSearchForm->getMessage(self::searchFormMeetingTime),
                 'customerString'         => $customerString,
                 'urlCustomerPopup'       => $urlCustomerPopup,
                 'urlSubmit'              => $urlSubmit,
@@ -183,9 +200,9 @@ class CTBookSalesVisit extends CTCNC
 
         $selectedAttendees = [];
 
-        if ($this->dsSearchForm->getValue('attendees')) {
+        if ($this->dsSearchForm->getValue(self::searchFormAttendees)) {
             $selectedAttendees = json_decode(
-                $this->dsSearchForm->getValue('attendees')
+                $this->dsSearchForm->getValue(self::searchFormAttendees)
             );
         }
 
@@ -232,7 +249,7 @@ class CTBookSalesVisit extends CTCNC
 
         while ($DBEStandardText->fetchNext()) {
 
-            $selected = $this->dsSearchForm->getValue('typeOfMeetingID') == $DBEStandardText->getValue(
+            $selected = $this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID) == $DBEStandardText->getValue(
                     DBEStandardText::stt_standardtextno
                 );
             $this->template->setVar(
@@ -259,6 +276,9 @@ class CTBookSalesVisit extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     private function bookSalesVisit()
     {
 
@@ -273,49 +293,49 @@ class CTBookSalesVisit extends CTCNC
 
         $dsSearchForm = &$this->dsSearchForm; // ref to global
 
-        if (!$dsSearchForm->getValue('customerID')) {
+        if (!$dsSearchForm->getValue(self::searchFormCustomerID)) {
             $dsSearchForm->setMessage(
-                'customerID',
+                self::searchFormCustomerID,
                 'Customer ID is missing, please select a customer'
             );
             $this->formError = true;
         }
 
-        if (!$dsSearchForm->getValue('attendees')) {
+        if (!$dsSearchForm->getValue(self::searchFormAttendees)) {
             $dsSearchForm->setMessage(
-                'attendees',
+                self::searchFormAttendees,
                 'Attendees is mandatory'
             );
             $this->formError = true;
         }
 
-        if (!$dsSearchForm->getValue('typeOfMeetingID')) {
+        if (!$dsSearchForm->getValue(self::searchFormTypeOfMeetingID)) {
             $dsSearchForm->setMessage(
-                'typeOfMeetingID',
+                self::searchFormTypeOfMeetingID,
                 'Type of Meeting is mandatory'
             );
             $this->formError = true;
         }
 
-        if (!$dsSearchForm->getValue('contactID')) {
+        if (!$dsSearchForm->getValue(self::searchFormContactID)) {
             $dsSearchForm->setMessage(
-                'contactID',
+                self::searchFormContactID,
                 'Contact is mandatory, please select a contact'
             );
             $this->formError = true;
         }
 
-        if (!$dsSearchForm->getValue('meetingDate')) {
+        if (!$dsSearchForm->getValue(self::searchFormMeetingDate)) {
             $dsSearchForm->setMessage(
-                'meetingDate',
+                self::searchFormMeetingDate,
                 'Meeting date is mandatory'
             );
             $this->formError = true;
         }
 
-        if (!$dsSearchForm->getValue('meetingTime')) {
+        if (!$dsSearchForm->getValue(self::searchFormMeetingTime)) {
             $dsSearchForm->setMessage(
-                'meetingTime',
+                self::searchFormMeetingTime,
                 'meeting time is mandatory'
             );
             $this->formError = true;
@@ -330,10 +350,10 @@ class CTBookSalesVisit extends CTCNC
 
         $dbeContact = new DBEContact($this);
 
-        $dbeContact->getRow($dsSearchForm->getValue('contactID'));
+        $dbeContact->getRow($dsSearchForm->getValue(self::searchFormContactID));
 
         $dbeProblem = new DBEProblem($this);
-        $customerID = $dsSearchForm->getValue('customerID');
+        $customerID = $dsSearchForm->getValue(self::searchFormCustomerID);
 
         $siteNo = $dbeContact->getValue(DBEContact::siteNo);
 
@@ -445,7 +465,7 @@ class CTBookSalesVisit extends CTCNC
 
         $standardText = new DBEStandardText($this);
 
-        $standardText->getRow($this->dsSearchForm->getValue('typeOfMeetingID'));
+        $standardText->getRow($this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID));
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
@@ -461,7 +481,7 @@ class CTBookSalesVisit extends CTCNC
         );
         $dbeCallActivity->insertRow();
 
-        $attendeesJSON = $dsSearchForm->getValue('attendees');
+        $attendeesJSON = $dsSearchForm->getValue(self::searchFormAttendees);
 
         $attendees = json_decode($attendeesJSON);
 
@@ -486,12 +506,12 @@ class CTBookSalesVisit extends CTCNC
             );
             $dbeCallActivity->setValue(
                 DBEJCallActivity::date,
-                $dsSearchForm->getValue('meetingDate')
+                $dsSearchForm->getValue(self::searchFormMeetingDate)
             );
 
             $dbeCallActivity->setValue(
                 DBEJCallActivity::startTime,
-                $dsSearchForm->getValue('meetingTime')
+                $dsSearchForm->getValue(self::searchFormMeetingTime)
             );
 
             $dbeCallActivity->setValue(
@@ -510,7 +530,7 @@ class CTBookSalesVisit extends CTCNC
 
             $standardText = new DBEStandardText($this);
 
-            $standardText->getRow($this->dsSearchForm->getValue('typeOfMeetingID'));
+            $standardText->getRow($this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID));
 
             $dbeCallActivity->setValue(
                 DBEJCallActivity::reason,

@@ -50,7 +50,7 @@ if ($dsRenBroadband->rowCount()) {
         'rows'
     );
     while ($dsRenBroadband->fetchNext()) {
-        $customerItemID = $dsRenBroadband->getValue('customerItemID');
+        $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
 
         $template->set_var(
             array(
@@ -124,6 +124,3 @@ if ($dsRenBroadband->rowCount()) {
         );
     }
 }
-
-
-?>

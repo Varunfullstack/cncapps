@@ -15,7 +15,8 @@ require_once($cfg['path_dbe'] . '/DBEThirdPartyContact.inc.php');
 
 class CTThirdPartyContact extends CTCNC
 {
-    var $buThirdPartyContact = '';
+    /** @var BUThirdPartyContact */
+    public $buThirdPartyContact;
 
     function __construct($requestMethod,
                          $postVars,
@@ -44,6 +45,7 @@ class CTThirdPartyContact extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -64,18 +66,20 @@ class CTThirdPartyContact extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
-
         $this->setMethodName('search');
-
+        $dsSearchForm = new DSForm($this);
         $this->buThirdPartyContact->initialiseSearchForm($dsSearchForm);
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
             } else {
-                $customerID = $dsSearchForm->getValue('customerID');
-                $report = $this->displayList($customerID);
+                $customerID = $dsSearchForm->getValue(BUThirdPartyContact::searchFormCustomerID);
+                $this->displayList($customerID);
                 exit;
             }
 
@@ -96,11 +100,12 @@ class CTThirdPartyContact extends CTCNC
 
 
         $this->setPageTitle('Third Party Contacts');
-
-        if ($dsSearchForm->getValue('customerID')) {
+        $customerString = null;
+        if ($dsSearchForm->getValue(BUThirdPartyContact::searchFormCustomerID)) {
             $buCustomer = new BUCustomer ($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue('customerID'),
+                $dsSearchForm->getValue(BUThirdPartyContact::searchFormCustomerID),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
@@ -118,8 +123,8 @@ class CTThirdPartyContact extends CTCNC
         $this->template->set_var(
             array(
                 'formError'         => $this->formError,
-                'customerID'        => $dsSearchForm->getValue('customerID'),
-                'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
+                'customerID'        => $dsSearchForm->getValue(BUThirdPartyContact::searchFormCustomerID),
+                'customerIDMessage' => $dsSearchForm->getMessage(BUThirdPartyContact::searchFormCustomerID),
                 'customerString'    => $customerString,
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'urlSubmit'         => $urlSubmit
@@ -139,6 +144,8 @@ class CTThirdPartyContact extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @param bool $customerID
+     * @throws Exception
      */
     function displayList($customerID = false)
     {
@@ -161,7 +168,7 @@ class CTThirdPartyContact extends CTCNC
         );
 
         $dbeCustomer->getRow($customerID);
-
+        $dsThirdPartyContact = new DataSet($this);
         $this->buThirdPartyContact->getRowsByCustomerID(
             $customerID,
             $dsThirdPartyContact
@@ -203,15 +210,6 @@ class CTThirdPartyContact extends CTCNC
                 )
             );
 
-            $urlCustomerPopup = Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-
             $this->template->set_block(
                 'ThirdPartyContactList',
                 'thirdPartyContactBlock',
@@ -224,7 +222,9 @@ class CTThirdPartyContact extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'              => 'edit',
-                            'thirdPartyContactID' => $dsThirdPartyContact->getValue('thirdPartyContactID')
+                            'thirdPartyContactID' => $dsThirdPartyContact->getValue(
+                                DBEThirdPartyContact::thirdPartyContactID
+                            )
                         )
                     );
                 $urlDelete =
@@ -232,7 +232,9 @@ class CTThirdPartyContact extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'              => 'delete',
-                            'thirdPartyContactID' => $dsThirdPartyContact->getValue('thirdPartyContactID')
+                            'thirdPartyContactID' => $dsThirdPartyContact->getValue(
+                                DBEThirdPartyContact::thirdPartyContactID
+                            )
                         )
                     );
 
@@ -292,6 +294,7 @@ class CTThirdPartyContact extends CTCNC
      * renewalCustomerItemID (blank if renewal not created yet
      *
      *
+     * @throws Exception
      */
     function edit()
     {
@@ -312,7 +315,7 @@ class CTThirdPartyContact extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => 'list',
-                            'customerID' => $dsThirdPartyContact->getValue('customerID')
+                            'customerID' => $dsThirdPartyContact->getValue(DBEThirdPartyContact::customerID)
                         )
                     );
 
@@ -327,25 +330,16 @@ class CTThirdPartyContact extends CTCNC
                 );
             } else {                                               // create new record
                 $dsThirdPartyContact->setValue(
-                    'thirdPartyContactID',
-                    0
+                    DBEThirdPartyContact::thirdPartyContactID,
+                    null
                 );
                 $dsThirdPartyContact->setValue(
-                    'customerID',
+                    DBEThirdPartyContact::customerID,
                     $_REQUEST['customerID']
                 );
             }
         }
 
-        $urlEdit =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => 'edit',
-                    'ordheadID'  => $thirdPartyContactID,
-                    'customerID' => $customerID
-                )
-            );
         $this->setPageTitle('Edit ThirdPartyContact');
 
         $this->setTemplateFiles(array('ThirdPartyContactEdit' => 'ThirdPartyContactEdit.inc'));
@@ -358,8 +352,7 @@ class CTThirdPartyContact extends CTCNC
                 'vendor'              => $dsThirdPartyContact->getValue(DBEThirdPartyContact::vendor),
                 'phone'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::phone),
                 'email'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::email),
-                'notes'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::notes),
-                'urlEdit'             => $urlEdit
+                'notes'               => $dsThirdPartyContact->getValue(DBEThirdPartyContact::notes)
             )
         );
 
@@ -373,10 +366,13 @@ class CTThirdPartyContact extends CTCNC
     }
 
 
+    /**
+     * @throws Exception
+     */
     function delete()
     {
         $this->setMethodName('delete');
-
+        $dsThirdPartyContact = new DataSet($this);
         if (!$this->buThirdPartyContact->getThirdPartyContactByID(
             $_REQUEST['thirdPartyContactID'],
             $dsThirdPartyContact
@@ -391,42 +387,11 @@ class CTThirdPartyContact extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'     => 'list',
-                    'customerID' => $dsThirdPartyContact->getValue('customerID')
+                    'customerID' => $dsThirdPartyContact->getValue(DBEThirdPartyContact::customerID)
                 )
             );
 
         header('Location: ' . $urlNext);
         exit;
     }
-
-    /**
-     * generate a thirdPartyContact
-     *
-     */
-    function generate()
-    {
-        $this->setMethodName('generate');
-
-        $this->setPageTitle('New ThirdPartyContact');
-
-        $thirdPartyContact = $this->buThirdPartyContact->generateThirdPartyContact();
-
-        $this->setTemplateFiles(array('ThirdPartyContactGenerate' => 'ThirdPartyContactGenerate.inc'));
-
-        $this->template->set_var(
-            array(
-                'thirdPartyContact' => $thirdPartyContact
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'ThirdPartyContactGenerate',
-            true
-        );
-        $this->parsePage();
-
-    }
-
-}// end of class
-?>
+}

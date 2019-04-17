@@ -317,6 +317,26 @@
         <dropNotNullConstraint columnName="curGSCBalance" tableName="custitem" columnDataType="decimal(8,2)"/>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-44">
+        <sql>delete
+             from calldocument
+             where problemID = 0
+               and callActivityID = 0</sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-45">
+        <dropNotNullConstraint columnName="problemID" tableName="calldocument" columnDataType="int(11)"/>
+        <dropNotNullConstraint tableName="calldocument" columnName="callActivityID" columnDataType="int(11)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-46">
+        <sql>
+            update calldocument
+            set problemID      = if(problemID = 0, null, problemID),
+                callActivityID = if(callActivityID = 0, null, callActivityID)
+        </sql>
+        <rollback/>
+    </changeSet>
 
 
 </databaseChangeLog>

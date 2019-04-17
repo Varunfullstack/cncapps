@@ -19,56 +19,25 @@ class CTSecondSiteReplication extends CTSecondSite
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "technical",
-            "reports"
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
+
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "technical",
+                "reports"
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
         }
         $this->buSecondsite = new BUSecondsiteReplication($this);
-        $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
-    }
-
-    /**
-     * Route to function based upon action passed
-     */
-    function defaultAction()
-    {
-        switch ($_REQUEST['action']) {
-            case 'edit':
-            case 'add':
-                $this->edit();
-                break;
-
-            case 'delete':
-                $this->delete();
-                break;
-
-            case 'update':
-                $this->update();
-                break;
-
-            case 'run':
-                $this->run();
-                break;
-
-            case 'failureAnalysis':
-                $this->failureAnalysis();
-                break;
-
-            case 'listAll':
-            default:
-                $this->listAll();
-                break;
-        }
     }
 
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -85,11 +54,11 @@ class CTSecondSiteReplication extends CTSecondSite
             } else {                                                                    // creating new
                 $dsSecondsiteImage->initialise();
                 $dsSecondsiteImage->setValue(
-                    'secondsiteImageID',
+                    DBESecondSiteImage::secondsiteImageID,
                     '0'
                 );
                 $dsSecondsiteImage->setValue(
-                    'customerItemID',
+                    DBESecondSiteImage::customerItemID,
                     $_REQUEST['customerItemID']
                 );
                 $secondsiteImageID = '0';
@@ -97,7 +66,7 @@ class CTSecondSiteReplication extends CTSecondSite
         } else {                                                                        // form validation error
             $dsSecondsiteImage->initialise();
             $dsSecondsiteImage->fetchNext();
-            $secondsiteImageID = $dsSecondsiteImage->getValue('secondsiteImageID');
+            $secondsiteImageID = $dsSecondsiteImage->getValue(DBESecondSiteImage::secondsiteImageID);
         }
 
         $urlUpdate =
@@ -112,7 +81,7 @@ class CTSecondSiteReplication extends CTSecondSite
             Controller::buildLink(
                 'CustomerItem.php',
                 array(
-                    'customerItemID' => $this->dsSecondsiteImage->getValue('customerItemID'),
+                    'customerItemID' => $this->dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID),
                     'action'         => 'displayCI'
                 )
             );
@@ -124,16 +93,20 @@ class CTSecondSiteReplication extends CTSecondSite
 
         $this->template->set_var(
             array(
-                'customerItemID'         => $dsSecondsiteImage->getValue('customerItemID'),
+                'customerItemID'         => $dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID),
                 'secondsiteImageID'      => $secondsiteImageID,
-                'imageName'              => Controller::htmlInputText($dsSecondsiteImage->getValue('imageName')),
-                'imageNameMessage'       => Controller::htmlDisplayText($dsSecondsiteImage->getMessage('imageName')),
-                'status'                 => $dsSecondsiteImage->getValue('status'),
-                'imagePath'              => $dsSecondsiteImage->getValue('imagePath'),
-                'imageTime'              => $dsSecondsiteImage->getValue('imageTime'),
-                'replicationStatus'      => $dsSecondsiteImage->getValue('replicationStatus'),
-                'replicationImagePath'   => $dsSecondsiteImage->getValue('replicationImagePath'),
-                'replicationImageTime'   => $dsSecondsiteImage->getValue('replicationImageTime'),
+                'imageName'              => Controller::htmlInputText(
+                    $dsSecondsiteImage->getValue(DBESecondSiteImage::imageName)
+                ),
+                'imageNameMessage'       => Controller::htmlDisplayText(
+                    $dsSecondsiteImage->getMessage(DBESecondSiteImage::imageName)
+                ),
+                'status'                 => $dsSecondsiteImage->getValue(DBESecondSiteImage::status),
+                'imagePath'              => $dsSecondsiteImage->getValue(DBESecondSiteImage::imagePath),
+                'imageTime'              => $dsSecondsiteImage->getValue(DBESecondSiteImage::imageTime),
+                'replicationStatus'      => $dsSecondsiteImage->getValue(DBESecondSiteImage::replicationStatus),
+                'replicationImagePath'   => $dsSecondsiteImage->getValue(DBESecondSiteImage::replicationImagePath),
+                'replicationImageTime'   => $dsSecondsiteImage->getValue(DBESecondSiteImage::replicationImageTime),
                 'urlUpdate'              => $urlUpdate,
                 'urlDisplayCustomerItem' => $urlDisplayCustomerItem
             )
@@ -148,6 +121,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
     /**
      * List all second site servers with status
+     * @throws Exception
      */
     function listAll()
     {
@@ -321,9 +295,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 );
             } else {
                 $imageTime = 'No Image';
-
-                $imageAgeDays = '';
-
+                $imageAgeDays = null;
             }
             if ($record['secondsiteValidationSuspendUntilDate']) {
                 $suspendedUntil = strftime(
@@ -404,6 +376,7 @@ class CTSecondSiteReplication extends CTSecondSite
     /**
      * Run validation
      *
+     * @throws Exception
      */
     function run()
     {
@@ -418,6 +391,11 @@ class CTSecondSiteReplication extends CTSecondSite
         exit;
     }
 
+    /**
+     * @param $server_cuino
+     * @return mixed|string
+     * @throws Exception
+     */
     function getRunUrl($server_cuino)
     {
         $ret =
@@ -431,195 +409,4 @@ class CTSecondSiteReplication extends CTSecondSite
 
         return $ret;
     }
-
-    function getEditUrl($server_cuino)
-    {
-        $ret =
-            Controller::buildLink(
-                'CustomerItem.php',
-                array(
-                    'action'         => 'displayCI',
-                    'customerItemID' => $server_cuino
-                )
-            );
-
-        return $ret;
-    }
-
-    /*
-    Report of second site validation falures for given customer/date range
-    */
-    function failureAnalysis()
-    {
-        global $cfg;
-
-        $this->setMethodName('failureAnalysis');
-
-        $dsSearchForm = new DSForm ($this);
-        $this->buSecondsite->initialiseSearchForm($dsSearchForm);
-
-        $this->setTemplateFiles(array('SecondsiteFailureAnalysisReport' => 'SecondsiteFailureAnalysisReport.inc'));
-
-        if (isset($_REQUEST ['searchForm'])) {
-
-            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-                $this->setFormErrorOn();
-            } else {
-                set_time_limit(240);
-
-                if ($results = $this->buSecondsite->getResults($dsSearchForm)) {
-
-                    if ($_REQUEST['Search'] == 'Generate CSV') {
-
-                        $template = new Template (
-                            $cfg["path_templates"],
-                            "remove"
-                        );
-
-                        $template->set_file(
-                            'page',
-                            'SecondsiteFailureAnalysisReport.inc.csv'
-                        );
-
-                        $template->set_block(
-                            'page',
-                            'rowsBlock',
-                            'rows'
-                        );
-
-                        foreach ($results as $row) {
-                            $template->set_var(
-                                array(
-                                    'customerName' => $row['customerName'],
-                                    'serverName'   => $row['serverName'],
-                                    'period'       => $row['period'],
-                                    'errors'       => $row['errors']
-                                )
-                            );
-                            $template->parse(
-                                'rows',
-                                'rowsBlock',
-                                true
-                            );
-                        }
-                        $template->parse(
-                            'output',
-                            'page',
-                            true
-                        );
-
-                        $output = $template->get_var('output');
-
-                        Header('Content-type: text/plain');
-                        Header('Content-Disposition: attachment; filename=SecondsiteFailureAnalysisReport.csv');
-                        echo $output;
-                        exit;
-                    } else { // Screen Report
-
-                        $this->template->set_block(
-                            'SecondsiteFailureAnalysisReport',
-                            'rowsBlock',
-                            'rows'
-                        );
-
-                        if (isset($_REQUEST['orderBy'])) {
-                            foreach ($results as $key => $row) {
-                                $customerName[$key] = $row['customerName'];
-                                $serverName[$key] = $row['serverName'];
-                                $period[$key] = $row['period'];
-                                $errors[$key] = $row['errors'];
-                            }
-
-                            if ($_SESSION['secondsiteSortDirection'] == SORT_DESC) {
-                                $_SESSION['secondsiteSortDirection'] = SORT_ASC;
-                            } else {
-                                $_SESSION['secondsiteSortDirection'] = SORT_DESC;
-
-                            }
-
-                            array_multisort(
-                                $$_REQUEST['orderBy'],
-                                $_SESSION['secondsiteSortDirection'],
-                                $results
-                            );
-                        }
-                        foreach ($results as $key => $row) {
-
-                            $reportUrl =
-                                Controller::buildLink(
-                                    'SecondSite.php',
-                                    array(
-                                        'action'                        => 'failureAnalysis',
-                                        'searchForm[1][customerID]'     => $_REQUEST ['searchForm'][1]['customerID'],
-                                        'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
-                                        'searchForm[1][endYearMonth]'   => $_REQUEST ['searchForm'][1]['endYearMonth'],
-                                    )
-                                );
-
-                            $this->template->set_var(
-                                array(
-                                    'customerName' => $row['customerName'],
-                                    'serverName'   => $row['serverName'],
-                                    'period'       => $row['period'],
-                                    'errors'       => $row['errors'],
-                                    'reportUrl'    => $reportUrl
-                                )
-                            );
-                            $this->template->parse(
-                                'rows',
-                                'rowsBlock',
-                                true
-                            );
-                        }
-
-                    }
-
-                }// if searchForm
-
-            }
-
-        }
-        $urlCustomerPopup = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
-        );
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => 'failureAnalysis')
-        );
-
-        $this->setPageTitle('Second Site Failure Analysis Report');
-
-        if ($dsSearchForm->getValue('customerID') != 0) {
-            $buCustomer = new BUCustomer ($this);
-            $dsCustomer = new DataSet($this);
-            $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue('customerID'),
-                $dsCustomer
-            );
-            $customerString = $dsCustomer->getValue(DBECustomer::name);
-        }
-
-        $this->template->set_var(
-            array(
-                'formError'        => $this->formError,
-                'customerID'       => $dsSearchForm->getValue('customerID'),
-                'customerString'   => $customerString,
-                'startYearMonth'   => $dsSearchForm->getValue('startYearMonth'),
-                'endYearMonth'     => $dsSearchForm->getValue('endYearMonth'),
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit'        => $urlSubmit,
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'SecondsiteFailureAnalysisReport',
-            true
-        );
-        $this->parsePage();
-
-    }
-}// end of class
-?>
+}

@@ -76,5 +76,3 @@ class DBEStaffAppraisalQuestion extends DBEntity
         $this->getRows();
     }
 }
-
-?>

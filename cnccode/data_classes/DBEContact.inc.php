@@ -393,6 +393,7 @@ class DBEContact extends DBCNCEntity
         }
         $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
 
+        var_dump($query);
         $this->setQueryString($query);
 
         return (parent::getRows());

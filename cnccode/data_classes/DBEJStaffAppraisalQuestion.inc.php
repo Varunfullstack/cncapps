@@ -32,6 +32,7 @@ class DBEJStaffAppraisalQuestion extends DBEStaffAppraisalQuestion
     /**
      * Return rows by ordheadID
      * @access public
+     * @param $questionnaireID
      * @return bool Success
      */
     function getRowsByQuestionnaireID($questionnaireID)
@@ -49,5 +50,3 @@ class DBEJStaffAppraisalQuestion extends DBEStaffAppraisalQuestion
         return (parent::getRows());
     }
 }
-
-?>

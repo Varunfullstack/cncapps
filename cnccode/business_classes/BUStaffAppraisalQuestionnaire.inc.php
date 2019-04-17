@@ -22,6 +22,10 @@ class BUStaffAppraisalQuestionnaire extends Business
     public $dbeAnswerType;
     /** @var DBEStaffAppraisalQuestionAnswer */
     public $dbeAnswer;
+    /**
+     * @var DBEJStaffAppraisalQuestion
+     */
+    public $dbeJQuestion;
 
     /**
      * Constructor
@@ -83,30 +87,17 @@ class BUStaffAppraisalQuestionnaire extends Business
     /**
      *    canDeleteQuestionnaire
      * Only allowed if this questionnaire has no answers
+     * @param $ID
+     * @return bool
      */
-    function canDelete($ID)
+    function canDeleteQuestionnaire($ID)
     {
-
         $dbeQuestion = new DBEStaffAppraisalQuestion($this);
-
         $dbeQuestion->setValue(
-            'questionnaireID',
+            DBEStaffAppraisalQuestion::questionnaireID,
             $ID
         );
-
-        if ($dbeQuestion->countRowsByColumn('questionnaireID') < 1) {
-
-            $ret = false;
-
-
-        } else {
-
-            $ret = FALSE;
-
-        }
-
-        return $ret;
-
+        return false;
     }
 
     function updateQuestion(&$dsData)
@@ -156,30 +147,19 @@ class BUStaffAppraisalQuestionnaire extends Business
     /**
      *  canDeleteQuestion
      * Only allowed if this question has no answers
+     * @param $ID
+     * @return bool
      */
     function canDeleteQuestion($ID)
     {
-
         $dbeAnswer = new DBEStaffAppraisalQuestionAnswer($this);
 
         $dbeAnswer->setValue(
-            'questionID',
+            DBEStaffAppraisalQuestionAnswer::questionID,
             $ID
         );
 
-        if ($dbeAnswer->countRowsByColumn('questionID') < 1) {
-
-            $ret = false;
-
-
-        } else {
-
-            $ret = FALSE;
-
-        }
-
-        return $ret;
-
+        return !$dbeAnswer->countRowsByColumn(DBEStaffAppraisalQuestionAnswer::questionID);
     }
 
     public function getStats($managerID)
@@ -263,5 +243,4 @@ WHERE test.status = '$type' order by firstName, lastName"
         };
         return $stats;
     }
-}// End of class
-?>
+}

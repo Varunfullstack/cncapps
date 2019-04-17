@@ -28,4 +28,3 @@ $ctAwaitingCompletion = new CTBookSalesVisit(
 );
 $ctAwaitingCompletion->execute();
 page_close();
-?>
