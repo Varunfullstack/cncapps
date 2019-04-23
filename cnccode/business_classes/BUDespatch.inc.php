@@ -37,6 +37,9 @@ class BUDespatch extends Business
      * Get ordhead rows whose names match the search string or, if the string is numeric, try to select by customerID
      * @parameter String $nameSearchString String to match against or numeric customerID
      * @parameter DataSet &$dsResults results
+     * @param $customerID
+     * @param $ordheadID
+     * @param $dsResults
      * @return bool : One or more rows
      * @access public
      */
@@ -48,7 +51,7 @@ class BUDespatch extends Business
     {
         $this->setMethodName('search');
         $dbeJOrdhead = new DBEJOrdhead($this);
-        if ($ordheadID != '') {
+        if ($ordheadID) {
             $ret = $dbeJOrdhead->getDespatchRowByOrdheadID($ordheadID);
         } else {
             $ret = $dbeJOrdhead->getDespatchRows($customerID);
@@ -60,13 +63,18 @@ class BUDespatch extends Business
         return $ret;
     }
 
+    /**
+     * @param $ordheadID
+     * @param DataSet $dsOrdline
+     * @return bool
+     */
     function getLinesByID($ordheadID,
                           &$dsOrdline
     )
     {
         $this->setMethodName('getLinesByID');
         $ret = FALSE;
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         } else {
             $dbeJOrdline = new DBEJOrdline($this);
@@ -86,6 +94,9 @@ class BUDespatch extends Business
 
     /**
      * Return a dataset of despatch qtys for this set of order lines
+     * @param DataSet $dsOrdline
+     * @param DSForm $dsDespatch
+     * @return bool
      */
     function getInitialDespatchQtys(&$dsOrdline,
                                     &$dsDespatch
@@ -135,6 +146,13 @@ class BUDespatch extends Business
         ));
     }
 
+    /**
+     * @param $ordheadID
+     * @param $deliveryMethodID
+     * @param DSForm $dsDespatch
+     * @param bool $onlyCreateDespatchNote
+     * @return bool|String
+     */
     function despatch($ordheadID,
                       $deliveryMethodID,
                       &$dsDespatch,
@@ -145,11 +163,13 @@ class BUDespatch extends Business
         $this->dbeOrdline = new DBEOrdline($this);
         $dsDespatch->initialise();
         $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdhead = new DataSet($this);
         $buSalesOrder->getOrdheadByID(
             $ordheadID,
             $dsOrdhead
         );
         $partInvoice = ($dsOrdhead->getValue(DBEJOrdhead::partInvoice) == 'Y');
+        $dsOrdline = new DataSet($this);
         $this->getLinesByID(
             $ordheadID,
             $dsOrdline
@@ -175,7 +195,7 @@ class BUDespatch extends Business
         $ordlineUpdated = FALSE;
         $dsDespatch->initialise();
         $dsOrdline->initialise();
-
+        $invheadID = null;
         while ($dsDespatch->fetchNext()) {
 
             $dsOrdline->fetchNext();
@@ -203,7 +223,7 @@ class BUDespatch extends Business
         }
         /*
         * update order status and create invoices(optionally) if order updated and we are not
-        * just creating a despactch note.
+        * just creating a despatch note.
         */
         if (!$onlyCreateDespatchNote && $ordlineUpdated) {
 
@@ -253,7 +273,7 @@ class BUDespatch extends Business
         } // !$onlyCreateDespatchNote && $ordlineUpdated
 
         /*
-        * If the item despatched is a GSC contract/topup then update the GSC balance on the customer table
+        * If the item despatched is a GSC contract/topUp then update the GSC balance on the customer table
         */
         if (
             !$onlyCreateDespatchNote &&
@@ -272,6 +292,7 @@ class BUDespatch extends Business
         }
 
         $dbeDeliveryMethod = new DBEDeliveryMethod($this);
+        $dsDeliveryMethod = new DataSet($this);
         $this->getDatasetByPK(
             $deliveryMethodID,
             $dbeDeliveryMethod,
@@ -305,6 +326,15 @@ class BUDespatch extends Business
         return $deliveryNoteFile;
     }
 
+    /**
+     * @param DataSet|DBEJOrdhead $dsOrdhead
+     * @param DataSet|DBEJOrdline $dsOrdline
+     * @param DSForm $dsDespatch
+     * @param DataSet|DBEContact $dsContact
+     * @param DataSet|DBEDeliveryMethod $dsDeliveryMethod
+     * @param $fullyDespatched
+     * @return String
+     */
     function createDeliveryNote(
         &$dsOrdhead,
         &$dsOrdline,
@@ -349,6 +379,11 @@ class BUDespatch extends Business
         return ($buPDFDeliveryNote->generateFile()); // the file path is returned
     }
 
+    /**
+     * @param $ordheadID
+     * @param DataSet|DBEJOrdline $dsOrdline
+     * @param DSForm $dsDespatch
+     */
     function updateOrdline($ordheadID,
                            &$dsOrdline,
                            &$dsDespatch
@@ -379,13 +414,17 @@ class BUDespatch extends Business
         $dbeOrdline->updateRow();
     }
 
+    /**
+     * @param $ordheadID
+     * @param DataSet $dsDeliveryNote
+     * @return bool
+     */
     function getDeliveryNotesByOrdheadID($ordheadID,
                                          &$dsDeliveryNote
     )
     {
         $this->setMethodName('getDeliveryNotesByOrdheadID');
-        $ret = FALSE;
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
         $dbeDeliveryNote = new DBEDeliveryNote($this);
@@ -399,7 +438,7 @@ class BUDespatch extends Business
             $dsDeliveryNote
         ));
         $dsDeliveryNote->columnSort(
-            'dateTime',
+            DBEDeliveryNote::dateTime,
             SORT_DESC
         );
         return $ret;
@@ -410,7 +449,7 @@ class BUDespatch extends Business
     )
     {
         $this->setMethodName('getDeliveryNoteByID');
-        if ($ID == '') {
+        if (!$ID) {
             $this->raiseError('deliveryNoteID not passed');
         }
         $dbeDeliveryNote = new DBEDeliveryNote($this);
@@ -421,12 +460,11 @@ class BUDespatch extends Business
         ));
     }
 
-    function countNonReceievedPOsByOrdheadID($ID)
+    function countNonReceivedPOsByOrdheadID($ID)
     {
         $dbePorhead = new DBEPorhead($this);
         require_once($GLOBALS["cfg"]["path_dbe"] . "/DBEPorhead.inc.php");
         return $dbePorhead->countNonReceievedRowsByOrdheadID($ID);
     }
 
-}// End of class
-?>
+}

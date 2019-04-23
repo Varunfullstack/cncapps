@@ -7,6 +7,14 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use setasign\Fpdi\Fpdi;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\Filter\FilterException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use setasign\Fpdi\PdfReader\PdfReaderException;
 use Signable\ApiClient;
 use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
@@ -32,9 +40,10 @@ require_once($cfg ['path_bu'] . '/BUStandardText.inc.php');
 class CTRenewalReport extends CTCNC
 {
 
-    var $dsActivtyEngineer = '';
-    var $dsSearchForm = '';
-    var $page = '';
+    const searchFormCustomerID = 'customerID';
+    public $dsActivityEngineer;
+    public $dsSearchForm;
+    public $page;
 
     function __construct($requestMethod,
                          $postVars,
@@ -60,19 +69,20 @@ class CTRenewalReport extends CTCNC
         }
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $this->dsSearchForm->setValue(
-            'customerID',
-            ''
+            self::searchFormCustomerID,
+            null
         );
 
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -124,11 +134,21 @@ class CTRenewalReport extends CTCNC
         }
     }
 
+    /**
+     * @param $customerID
+     * @param $contractsIDs
+     * @return mixed|string
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws PdfReaderException
+     */
     function generatePDFContract($customerID,
                                  $contractsIDs
     )
     {
-        $mainPDF = new \setasign\Fpdi\Fpdi();
+        $mainPDF = new Fpdi();
         $this->addPages(
             $mainPDF,
             $contractsIDs
@@ -175,137 +195,16 @@ class CTRenewalReport extends CTCNC
         return $fileName;
     }
 
-    function runIt($customerID,
-                   $firstName,
-                   $lastName,
-                   $emailAddress,
-                   $sendToSignable = false
-    )
-    {
-
-        $buCustomerItem = new BUCustomerItem($this);
-
-// Start contracts
-        $dbeJRenContract = new DBEJRenContract($this);
-        $dbeJRenContract->getRowsByCustomerID($customerID);
-        // broadband
-        $dbeJRenBroadband = new DBEJRenBroadband($this);
-        $dbeJRenBroadband->getRowsByCustomerID($customerID);
-// Hosting
-        $dbeJRenHosting = new DBEJRenHosting($this);
-        $dbeJRenHosting->getRowsByCustomerID($customerID);
-
-        $contracts = array_merge(
-            [],
-            $this->extractValidContracts($dbeJRenContract),
-            $this->extractValidContracts($dbeJRenBroadband),
-            $this->extractValidContracts($dbeJRenHosting)
-        );
-
-
-        uasort(
-            $contracts,
-            function ($a,
-                      $b
-            ) {
-                if (strcmp(
-                        $a['itemTypeDescription'],
-                        $b['itemTypeDescription']
-                    ) === 0) {
-                    return strcmp(
-                        $a['itemDescription'],
-                        $b['itemDescription']
-                    );
-                }
-                return strcmp(
-                    $a['itemTypeDescription'],
-                    $b['itemTypeDescription']
-                );
-            }
-        );
-
-
-        if ($sendToSignable) {
-
-            $buMail = new BUMail($this);
-
-            $toEmail = $emailAddress;
-
-            $hdrs = array(
-                'From'         => 'support@cnc-ltd.co.uk',
-                'To'           => $toEmail,
-                'Subject'      => "General Data Protection Regulations - Action Required",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            // add name to top of email
-            $thisBody = "<div style='font-family: Arial, sans-serif; font-size: 10pt'>
-<p>Dear $firstName,</p>
-<p>Following on with our recent communication regarding compliance with the new General Data Protection Regulations that are coming into force on the 25th May 2018, CNC have made some changes to our terms of conditions.</p>
-<p>
-We are therefore re-issuing new contract schedules and terms and conditions to all customers that must be signed and in place ready for this new legislation.
-</p>
-<p>
-It is important that you or someone with the authority within your company to sign the attached documents does so before the above date to allow us to continue to provide the key services to your organisation.  We’ve now provided this using an e-sign option to make this process as simple as possible.
-</p>
-<p>
-These new terms and conditions include a specific section in relation to data protection and reflect the current CNC product and service offerings as well as general changes in the market place since our last issue in 2014.
-</p>
- <p>
-If you have any questions then please do not hesitate to contact us.
-</p>
-<p>
-Many thanks. 
-</p>
-</div>
-";
-
-            $buMail->mime->setHTMLBody($thisBody);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $thisBody = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->send(
-                $emailAddress,
-                $hdrs,
-                $thisBody
-            );
-
-            $this->generateEnvelope(
-                $fileName,
-                $firstName,
-                $lastName,
-                $emailAddress,
-                $customerID
-            );
-        }
-
-        ?>
-        <div>
-            First Name: <?= $firstName ?>
-        </div>
-        <div>
-            Last Name: <?= $lastName ?>
-        </div>
-        <div>
-            Email: <?= $emailAddress ?>
-        </div>
-
-        <a href="<?= $fileName ?>">Link</a>
-        <?php
-    }
-
-
-    function addPages(\setasign\Fpdi\Fpdi $mainPDF,
+    /**
+     * @param Fpdi $mainPDF
+     * @param $contractsIDs
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfReaderException
+     * @throws PdfTypeException
+     */
+    function addPages(Fpdi $mainPDF,
                       $contractsIDs
     )
     {
@@ -314,6 +213,7 @@ Many thanks.
             // Validation and setting of variables
 
             $buCustomerItem = new BUCustomerItem($this);
+            $dsContract = new DataSet($this);
             $buCustomerItem->getCustomerItemByID(
                 $contractID,
                 $dsContract
@@ -327,16 +227,16 @@ Many thanks.
             $buActivity = new BUActivity($this);
             $buCustomer = new BUCustomer($this);
             $buCustomer->getCustomerByID(
-                $dsContract->getValue('customerID'),
+                $dsContract->getValue(DBEJCustomerItem::customerID),
                 $dsCustomer
             );
             $buSite->getSiteByID(
-                $dsContract->getValue('customerID'),
-                $dsContract->getValue('siteNo'),
+                $dsContract->getValue(DBEJCustomerItem::customerID),
+                $dsContract->getValue(DBEJCustomerItem::siteNo),
                 $dsSite
             );
             $customerHasServiceDeskContract = $buCustomerItem->customerHasServiceDeskContract(
-                $dsContract->getValue('customerID')
+                $dsContract->getValue(DBEJCustomerItem::customerID)
             );
 
             $buPDFSupportContract =
@@ -448,13 +348,13 @@ Many thanks.
             );
 
             $buStandardText = new BUStandardText($this);
-            $dsResults = new DataSet($this);
+            $standardTexts = new DataSet($this);
             $buStandardText->getStandardTextByID(
                 $templateID,
-                $dsResults
+                $standardTexts
             );
 
-            $body = $dsResults->getValue("stt_text");
+            $body = $standardTexts->getValue(DBEStandardText::stt_text);
 
             $body = str_replace(
                 "[%contactFirstName%]",
@@ -504,23 +404,21 @@ Many thanks.
         return false;
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
         $this->setMethodName('search');
-
+        $report = null;
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
-
             if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-
-
             } else {
-                if (!$this->dsSearchForm->getValue('customerID')) {
-
+                if (!$this->dsSearchForm->getValue(self::searchFormCustomerID)) {
                     $this->setFormErrorOn();
-
                 } else {
-                    $customerID = $this->dsSearchForm->getValue('customerID');
+                    $customerID = $this->dsSearchForm->getValue(self::searchFormCustomerID);
                     $report = $this->produceReport($customerID);
                 }
 
@@ -543,12 +441,12 @@ Many thanks.
 
 
         $this->setPageTitle('Renewal Report');
-
-        if ($this->dsSearchForm->getValue('customerID') != 0) {
+        $customerString = null;
+        if ($this->dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer ($this);
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $this->dsSearchForm->getValue('customerID'),
+                $this->dsSearchForm->getValue(self::searchFormCustomerID),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
@@ -564,8 +462,8 @@ Many thanks.
         $this->template->set_var(
             array(
                 'formError'         => $this->formError,
-                'customerID'        => $this->dsSearchForm->getValue('customerID'),
-                'customerIDMessage' => $this->dsSearchForm->getMessage('customerID'),
+                'customerID'        => $this->dsSearchForm->getValue(self::searchFormCustomerID),
+                'customerIDMessage' => $this->dsSearchForm->getMessage(self::searchFormCustomerID),
                 'customerString'    => $customerString,
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'urlSubmit'         => $urlSubmit,
@@ -588,6 +486,7 @@ Many thanks.
      * @param bool $customerID
      * @param bool $createPdf
      * @return mixed
+     * @throws Exception
      */
     function produceReport($customerID = false,
                            $createPdf = false
@@ -652,10 +551,9 @@ Many thanks.
 
         foreach ($items as $item) {
 
+            $itemTypeHeader = null;
             if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
                 $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
-            } else {
-                $itemTypeHeader = '';
             }
 
             $this->template->set_var(
@@ -666,12 +564,10 @@ Many thanks.
 
             $lastItemTypeDescription = $item['itemTypeDescription'];
 
-            $coveredItemsString = '';
+            $coveredItemsString = null;
 
             if (count($item['coveredItems']) > 0) {
-
                 foreach ($item['coveredItems'] as $coveredItem) {
-
                     $coveredItemsString .= '<br/>' . $coveredItem;
                     $this->template->set_var(
                         array(
@@ -680,20 +576,14 @@ Many thanks.
                     );
                 }
             }
-
-            if (is_null($item['customerItemID'])) {
-                $itemClass = 'externalItem';
-                $salePrice = '';
-                $costPrice = '';
-            } else {
-                $itemClass = '';
-
+            $itemClass = 'externalItem';
+            $salePrice = null;
+            $costPrice = null;
+            if (!is_null($item['customerItemID'])) {
+                $itemClass = null;
                 $salePrice = Controller::formatNumber($item['salePrice']);
-
                 $costPrice = Controller::formatNumber($item['costPrice']);
-
                 $totalCostPrice += $item['costPrice'];
-
                 $totalSalePrice += $item['salePrice'];
             }
             $buCustomer = new BUCustomer($this);
@@ -721,10 +611,10 @@ Many thanks.
             }
 
             $BUStandardText = new BUStandardText($this);
-            $dsResults = new DataSet($this);
+            $standardText = new DataSet($this);
             $BUStandardText->getStandardTextByTypeID(
                 BUStandardText::SignableContractsEmailType,
-                $dsResults
+                $standardText
             );
             $this->template->set_block(
                 'RenewalReport',
@@ -732,11 +622,11 @@ Many thanks.
                 'templates'
             );
 
-            while ($dsResults->fetchNext()) {
+            while ($standardText->fetchNext()) {
                 $this->template->set_var(
                     array(
-                        'templateID'   => $dsResults->getValue("stt_standardtextno"),
-                        'templateDesc' => $dsResults->getValue("stt_desc")
+                        'templateID'   => $standardText->getValue(DBEStandardText::stt_standardtextno),
+                        'templateDesc' => $standardText->getValue(DBEStandardText::stt_desc)
                     )
                 );
                 $this->template->parse(
@@ -755,18 +645,18 @@ Many thanks.
 
             $this->template->set_var(
                 array(
-                    'linkURL'             => $item['linkURL'],
-                    'notes'               => $item['notes'],
-                    'description'         => Controller::htmlDisplayText($item['description']),
-                    'itemTypeDescription' => Controller::htmlDisplayText($item['itemTypeDescription']),
-                    'expiryDate'          => Controller::htmlDisplayText($item['expiryDate']),
-                    'salePrice'           => $salePrice,
-                    'costPrice'           => $costPrice,
-                    'customerItemID'      => $item['customerItemID'],
-                    'coveredItemsString'  => $coveredItemsString,
-                    'itemClass'           => $itemClass,
-                    'customerID'          => $customerID,
-                    'checkbox'            => $checkbox,
+                    'linkURL'              => $item['linkURL'],
+                    'notes'                => $item['notes'],
+                    'description'          => Controller::htmlDisplayText($item['description']),
+                    'itemTypeDescription'  => Controller::htmlDisplayText($item['itemTypeDescription']),
+                    'expiryDate'           => Controller::htmlDisplayText($item['expiryDate']),
+                    'salePrice'            => $salePrice,
+                    'costPrice'            => $costPrice,
+                    'customerItemID'       => $item['customerItemID'],
+                    'coveredItemsString'   => $coveredItemsString,
+                    'itemClass'            => $itemClass,
+                    'customerID'           => $customerID,
+                    'checkbox'             => $checkbox,
                     'calculatedExpiryDate' => $item['calculatedExpiryDate'],
                 )
             );
@@ -829,15 +719,12 @@ Many thanks.
 
             require_once BASE_DRIVE . '/vendor/autoload.php';
 
-            $options = new \Dompdf\Options();
+            $options = new Options();
             $options->set(
                 'isRemoteEnabled',
                 true
             );
-            $dompdf = new \Dompdf\Dompdf($options);
-
-
-            /* @todo: set template dir */
+            $dompdf = new Dompdf($options);
             $dompdf->setBasePath(BASE_DRIVE . '/htdocs');   // so we can get the images and css
 
             $dompdf->loadHtml($output);
@@ -892,5 +779,4 @@ Many thanks.
         return true;
     }
 
-}// end of class
-?>
+}

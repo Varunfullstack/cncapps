@@ -7,8 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
-use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\Style\TablePosition;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\Settings;
+use PhpOffice\PhpWord\SimpleType\JcTable;
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -40,6 +41,11 @@ define(
 
 class CTProject extends CTCNC
 {
+    const inHoursQuantity = "inHoursQuantity";
+    const inHoursMeasure = "inHoursMeasure";
+    const outOfHoursQuantity = "outOfHoursQuantity";
+    const outOfHoursMeasure = "outOfHoursMeasure";
+
     const UPLOAD_PROJECT_PLAN = "uploadProjectPlan";
     const DOWNLOAD_PROJECT_PLAN = "downloadProjectPlan";
     const CALCULATE_BUDGET = "calculateBudget";
@@ -82,25 +88,25 @@ class CTProject extends CTCNC
         $this->dsProject->copyColumnsFrom($this->buProject->dbeProject);
         $this->dsProject->setAddColumnsOn();
         $this->dsProject->addColumn(
-            "inHoursQuantity",
+            self::inHoursQuantity,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
 
         $this->dsProject->addColumn(
-            "inHoursMeasure",
+            self::inHoursMeasure,
             DA_STRING,
             DA_ALLOW_NULL
         );
 
         $this->dsProject->addColumn(
-            "outOfHoursQuantity",
+            self::outOfHoursQuantity,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
 
         $this->dsProject->addColumn(
-            "outOfHoursMeasure",
+            self::outOfHoursMeasure,
             DA_STRING,
             DA_ALLOW_NULL
         );
@@ -110,6 +116,7 @@ class CTProject extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -200,6 +207,7 @@ class CTProject extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -278,23 +286,20 @@ class CTProject extends CTCNC
         );
 
         $row = $result->fetch_assoc();
-
+        $formattedDate = null;
         if ($row['createdAt']) {
-
             $updateDate = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $row['createdAt']
             );
-
             $formattedDate = $updateDate->format('d/m/Y H:i');
         }
-
 
         $historyPopupURL = Controller::buildLink(
             'Project.php',
             array(
                 'action'    => 'historyPopup',
-                'projectID' => $dsProject->getValue('projectID'),
+                'projectID' => $dsProject->getValue(DBEProject::projectID),
                 'htmlFmt'   => CT_HTML_FMT_POPUP
             )
         );
@@ -343,7 +348,7 @@ class CTProject extends CTCNC
                 array(
                     'action'    => 'editLinkedSalesOrder',
                     'htmlFmt'   => CT_HTML_FMT_POPUP,
-                    'projectID' => $dsProject->getValue('projectID')
+                    'projectID' => $dsProject->getValue(DBEProject::projectID)
                 )
             );
 
@@ -379,10 +384,9 @@ class CTProject extends CTCNC
                 ]
             );
 
+        $projectCalculateBudgetClass = null;
         $projectCalculateBudgetURL = "href='$projectCalculateBudgetURL'";
-
         $projectCalculateBudgetLinkClick = "onclick='return confirm(\"Are you sure? You can only do this once.\")'";
-
         $isProjectManager = $this->dbeUser->getValue(DBEUser::projectManagementFlag) === 'Y';
 
         if ($dsProject->getValue(DBEProject::calculatedBudget) == 'Y' || !$isProjectManager) {
@@ -461,6 +465,11 @@ class CTProject extends CTCNC
         $this->parsePage();
     }// end function editFurther Action()
 
+    /**
+     * @param $linkedOrdheadID
+     * @return string
+     * @throws Exception
+     */
     function getSalesOrderLink($linkedOrdheadID)
     {
         if ($linkedOrdheadID) {
@@ -482,12 +491,11 @@ class CTProject extends CTCNC
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsProject = &$this->dsProject;
-
         $buHeader = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);
@@ -501,7 +509,7 @@ class CTProject extends CTCNC
 
         $this->formError = (!$this->dsProject->populateFromArray($_REQUEST['project']));
         if ($this->formError) {
-            if ($this->dsProject->getValue('projectID') == '') {                    // attempt to insert
+            if ($this->dsProject->getValue(DBEProject::projectID) == '') {                    // attempt to insert
                 $_REQUEST['action'] = CTPROJECT_ACT_EDIT;
             } else {
                 $_REQUEST['action'] = CTPROJECT_ACT_ACT;
@@ -510,16 +518,17 @@ class CTProject extends CTCNC
             exit;
         }
 
-        if ($this->dsProject->getValue("inHoursQuantity")) {
+        if ($this->dsProject->getValue(self::inHoursQuantity)) {
+            $toAddDays = null;
             // we need to add the amount of hours or days to the in hours budget
             $currentDays = (float)$this->dsProject->getValue(DBEProject::inHoursBudgetDays);
-            switch ($this->dsProject->getValue('inHoursMeasure')) {
+            switch ($this->dsProject->getValue(self::inHoursMeasure)) {
                 case 'hours':
-                    $toAddMinutes = (int)$this->dsProject->getValue("inHoursQuantity") * 60;
+                    $toAddMinutes = (int)$this->dsProject->getValue(self::inHoursQuantity) * 60;
                     $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
                     break;
                 case 'days':
-                    $toAddDays = (float)$this->dsProject->getValue('inHoursQuantity');
+                    $toAddDays = (float)$this->dsProject->getValue(self::inHoursQuantity);
             }
 
             $this->dsProject->setValue(
@@ -530,16 +539,17 @@ class CTProject extends CTCNC
             $this->dsProject->post();
         }
 
-        if ($this->dsProject->getValue("outOfHoursQuantity")) {
+        if ($this->dsProject->getValue(self::outOfHoursQuantity)) {
+            $toAddDays = null;
             // we need to add the amount of hours or days to the in hours budget
             $currentDays = (float)$this->dsProject->getValue(DBEProject::outOfHoursBudgetDays);
-            switch ($this->dsProject->getValue('outOfHoursMeasure')) {
+            switch ($this->dsProject->getValue(self::outOfHoursMeasure)) {
                 case'hours':
-                    $toAddMinutes = (int)$this->dsProject->getValue("outOfHoursQuantity") * 60;
+                    $toAddMinutes = (int)$this->dsProject->getValue(self::outOfHoursQuantity) * 60;
                     $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
                     break;
                 case 'days':
-                    $toAddDays = (float)$this->dsProject->getValue('outOfHoursQuantity');
+                    $toAddDays = (float)$this->dsProject->getValue(self::outOfHoursQuantity);
             }
 
             $this->dsProject->setValue(
@@ -566,7 +576,7 @@ class CTProject extends CTCNC
                 ],
                 [
                     'type'  => 'i',
-                    'value' => (int)$this->dsProject->getValue('projectID')
+                    'value' => (int)$this->dsProject->getValue(DBEProject::projectID)
                 ],
                 [
                     'type'  => 's',
@@ -596,11 +606,12 @@ class CTProject extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
         $this->setMethodName('delete');
-
+        $dsProject = new DataSet($this);
         $this->buProject->getProjectByID(
             $_REQUEST['projectID'],
             $dsProject
@@ -614,7 +625,7 @@ class CTProject extends CTCNC
                 Controller::buildLink(
                     'Customer.php',
                     array(
-                        'customerID' => $dsProject->getValue('customerID'),
+                        'customerID' => $dsProject->getValue(DBEProject::customerID),
                         'action'     => CTCNC_ACT_DISP_EDIT
                     )
                 );
@@ -623,21 +634,25 @@ class CTProject extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function popup()
     {
+        $dsProject = new DataSet($this);
         $this->buProject->getProjectByID(
             $_REQUEST['projectID'],
             $dsProject
         );
-        $this->setPageTitle('Project: ' . Controller::htmlDisplayText($dsProject->getValue('description')));
+        $this->setPageTitle('Project: ' . Controller::htmlDisplayText($dsProject->getValue(DBEProject::description)));
         $this->setTemplateFiles(
             array('ProjectPopup' => 'ProjectPopup.inc')
         );
         $this->template->set_var(
             array(
-                'notes'      => $dsProject->getValue('notes'),
-                'startDate'  => Controller::dateYMDtoDMY($dsProject->getValue('startDate')),
-                'expiryDate' => Controller::dateYMDtoDMY($dsProject->getValue('expiryDate')),
+                'notes'      => $dsProject->getValue(DBEProject::notes),
+                'startDate'  => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
+                'expiryDate' => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::completedDate)),
             )
         );
         $this->template->parse(
@@ -684,6 +699,10 @@ class CTProject extends CTCNC
         }
     }
 
+    /**
+     * @param bool $lastUpdateOnly
+     * @throws Exception
+     */
     private function historyPopup($lastUpdateOnly = false)
     {
         $this->setPageTitle('Project Updates History');
@@ -741,6 +760,9 @@ class CTProject extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     function editLinkedSalesOrder()
     {
         $this->setMethodName('editLinkedSalesOrder');
@@ -748,15 +770,14 @@ class CTProject extends CTCNC
         $this->setPageTitle('Linked Sales Order');
 
         $errorMessage = '';
-
+        $projectID = null;
+        $linkedOrderID = null;
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($_POST['linkedOrderID']) {
                 $projectID = $_POST['projectID'];
                 $linkedOrderID = $_POST['linkedOrderID'];
-
                 try {
-
                     $this->buProject->updateLinkedSalesOrder(
                         $projectID,
                         $linkedOrderID
@@ -765,11 +786,9 @@ class CTProject extends CTCNC
                 } catch (Exception $exception) {
                     $errorMessage = $exception->getMessage();
                 }
-
             } else {
                 $errorMessage = "Sales Order ID Required";
             }
-
         } else {
             $projectID = $_REQUEST['projectID'];
             $linkedOrderID = '';
@@ -800,6 +819,9 @@ class CTProject extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     private function uploadProjectPlan()
     {
         if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
@@ -837,6 +859,9 @@ class CTProject extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     private function calculateBudget()
     {
         $projectID = @$_REQUEST['projectID'];
@@ -870,6 +895,7 @@ class CTProject extends CTCNC
         );
 
         $BUHeader = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
         $BUHeader->getHeader($dbeHeader);
         $minutesInADay = $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
@@ -1031,6 +1057,10 @@ GROUP BY caa_callacttypeno,
         return $data;
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     private function fetchBudgetData()
     {
         if (!isset($_REQUEST['projectID'])) {
@@ -1079,6 +1109,9 @@ GROUP BY caa_callacttypeno,
         return $data;
     }
 
+    /**
+     * @throws Exception
+     */
     private function showList()
     {
 
@@ -1116,8 +1149,8 @@ GROUP BY caa_callacttypeno,
             $historyPopupURL = Controller::buildLink(
                 'Project.php',
                 array(
-                    'action'  => 'historyPopup',
-                    'htmlFmt' => CT_HTML_FMT_POPUP,
+                    'action'    => 'historyPopup',
+                    'htmlFmt'   => CT_HTML_FMT_POPUP,
                     'projectID' => $project['projectID']
                 )
             );
@@ -1237,12 +1270,15 @@ GROUP BY caa_callacttypeno,
         return $data;
     }
 
+    /**
+     * @throws Exception
+     */
     private function currentProjectReport()
     {
         $dbeProject = new DBEProject($this);
         $currentProjects = $dbeProject->getCurrentProjects();
-        \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        Settings::setOutputEscapingEnabled(true);
+        $phpWord = new PhpWord();
 
         $phpWord->setDefaultFontName('Arial');
         $phpWord->setDefaultFontSize(8);
@@ -1250,15 +1286,14 @@ GROUP BY caa_callacttypeno,
         $sectionStyle = ["orientation" => 'landscape', "marginLeft" => 500];
         $section = $phpWord->addSection($sectionStyle);
         $fancyTableStyleName = 'Fancy Table';
-        $tableStyle = new \PhpOffice\PhpWord\Style\Table;
-
         $fancyTableStyle = array(
             'borderSize'  => 6,
             'borderColor' => '006699',
             'cellMargin'  => 80,
-            'alignment'   => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+            'alignment'   => JcTable::CENTER,
             'cellSpacing' => 50,
         );
+        /** @noinspection SpellCheckingInspection */
         $fancyTableFirstRowStyle = array(
             'borderBottomSize'  => 18,
             'borderBottomColor' => '0000FF',
@@ -1469,6 +1504,4 @@ GROUP BY caa_callacttypeno,
     }
 
 
-}// end of class
-
-?>
+}

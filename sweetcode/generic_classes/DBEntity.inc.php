@@ -1,7 +1,8 @@
-<?php /**
+<?php /** @noinspection PhpMissingBreakStatementInspection */
+/**
  * Database entity access class
  *
- * All database access classes to be derived from this including tables, views and stored procs
+ * All database access classes to be derived from this including tables, views and stored procedures
  *
  * Future super-iImprovement:
  *
@@ -42,17 +43,18 @@ define(
 
 class DBEntity extends DataAccess
 {
-    var $pkdb = "";        // a new database connection purely for nextid function.
-    var $db = "";            // Initialised PHPLib database object
-    var $queryString = "";// SQL query statement
-    var $tableName = "";    // RDBMS table name
-    var $showSQL = false;    // For debug puposes - TRUE causes all SQL statements to be output
-    // MUST be N in production systems!!!
-    var $logSQL = false;    // For debug puposes - TRUE causes all SQL statements to be output
-    var $rowBefore = '';        // For comparison during update
-    var $arrayRowBefore = '';    // For comparison during update
-    var $rowCount = 0;
-    var $dbColName = array();
+    /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
+    public $pkdb;        // a new database connection purely for nextid function.
+    /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
+    public $db;            // Initialised PHPLib database object
+    public $queryString = "";// SQL query statement
+    public $tableName = "";    // RDBMS table name
+    public $showSQL = false;    // For debug purposes - TRUE causes all SQL statements to be output
+    public $logSQL = false;    // For debug purposes - TRUE causes all SQL statements to be output
+    public $rowBefore;        // For comparison during update
+    public $arrayRowBefore;    // For comparison during update
+    public $rowCount = 0;
+    public $dbColName = [];
 
     // Array of database column names
 
@@ -66,7 +68,7 @@ class DBEntity extends DataAccess
         } else {
             $this->db = clone $db;            // creates a copy of the global connection
             $this->db->connect();
-            $this->pkdb = clone $db;            // COPIES the global connetion to a NEW VARIABLE
+            $this->pkdb = clone $db;            // COPIES the global connection to a NEW VARIABLE
             $this->pkdb->connect();
         }
         $this->setShowSQLOff();
@@ -153,6 +155,7 @@ class DBEntity extends DataAccess
     /**
      * Set current database table name
      * @access public
+     * @param $tableName
      * @return void
      */
     function setTableName($tableName)
@@ -242,11 +245,8 @@ class DBEntity extends DataAccess
     function fetchNext()
     {
         parent::fetchNext();
-        // We don't actually use dbrow
-
         if ($this->db->next_record()) {
             $this->eof = FALSE;
-//			$this->copyColumnsFromDB();
             return TRUE;
         } else {
             $this->eof = TRUE;
@@ -350,7 +350,7 @@ class DBEntity extends DataAccess
     /**
      * Copy columns from current DB cursor row into current object row
      * @access private
-     * @return boolean Success
+     * @return void Success
      */
     function copyColumnsFromDB()
     {
@@ -366,6 +366,7 @@ class DBEntity extends DataAccess
     /**
      * Get DB column value
      * @access private
+     * @param $ixCol
      * @return boolean Success
      */
     function getDBColumnValue($ixCol)
@@ -398,7 +399,7 @@ class DBEntity extends DataAccess
     /**
      * Get DB Column Name
      * @access public
-     * @param integer $ixColumn Column number
+     * @param $ixColumnPassed
      * @return string Database column name.
      */
     function getDBColumnName($ixColumnPassed)
@@ -434,7 +435,7 @@ class DBEntity extends DataAccess
     /**
      * Record the row before the update operation
      * @access public
-     * @return bool Success
+     * @return void Success
      */
     function setRowBefore()
     {
@@ -463,6 +464,7 @@ class DBEntity extends DataAccess
     /**
      * Set the SQL statement. Setting it this way will allow validation etc
      * @access public
+     * @param $queryString
      */
     function setQueryString($queryString)
     {
@@ -531,9 +533,9 @@ class DBEntity extends DataAccess
     {
         if ($this->getPK() == DA_PK_NOT_SET) {
             $this->raiseError('getPKWhere(): No Primary Key Defined');
-        } else {
-            return ($this->getPKDBName() . "=" . $this->getFormattedValue($this->getPK()));
+            return null;
         }
+        return ($this->getPKDBName() . "=" . $this->getFormattedValue($this->getPK()));
     }
 
     /**
@@ -801,17 +803,7 @@ class DBEntity extends DataAccess
     function clearRows()
     {
         $this->setMethodName("clearRows");
-        $ret = parent::clearRows();
-        // I no longer like the idea of this so not supported!
-        /*
-                if (is_object($this->db)){ // for call from constructor (aviods
-                    $this->setQueryString("DELETE FROM ". $this->getTableName());
-                    $ret=$this->runQuery();
-                    $this->resetQueryString();
-                }
-                return $ret;
-        */
-        return TRUE;
+        return parent::clearRows();
     }
 
     /**
@@ -831,6 +823,7 @@ class DBEntity extends DataAccess
     /**
      * Get formatted column value for SQL LIKE: no quotes around it
      * @access public
+     * @param $ixColumn
      * @return string Formatted Column value
      */
     function getFormattedLikeValue($ixColumn)
@@ -843,6 +836,7 @@ class DBEntity extends DataAccess
     /**
      * Get formatted column value(quoted, if string)
      * @access public
+     * @param $ixColumn
      * @return string Formatted Column value
      */
     function getFormattedValue($ixColumn)
@@ -861,9 +855,7 @@ class DBEntity extends DataAccess
         $this->setMethodName('getValue');
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
-            error_reporting(E_ERROR | E_PARSE);
             return $this->db->Record[$ixColumn];
-            error_reporting(E_ERROR | E_WARNING | E_PARSE);
         } else {
             $this->raiseError("column " . $ixPassedColumn . " out of range");
             return DA_OUT_OF_RANGE;
@@ -983,6 +975,7 @@ class DBEntity extends DataAccess
     /**
      * count rows on table by column value
      * @access public
+     * @param $column
      * @return bool Success
      */
     function countRowsByColumn($column)
@@ -1008,6 +1001,7 @@ class DBEntity extends DataAccess
                 return ($this->getDBColumnValue(0));
             }
         }
+        return false;
     }
 
     /**
@@ -1023,7 +1017,7 @@ class DBEntity extends DataAccess
     /**
      * Ensure empty DA_YN flag fields are set to N
      * @access public
-     * @return integer Number of rows
+     * @return void Number of rows
      */
     function setYNFlags()
     {
@@ -1081,5 +1075,3 @@ class DBEntity extends DataAccess
 
     }
 }
-
-?>

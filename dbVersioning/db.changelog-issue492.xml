@@ -337,6 +337,8 @@
         </sql>
         <rollback/>
     </changeSet>
-
-
+    <changeSet author="pavwebdev" id="1554199133-47">
+        <dropTable tableName="arecord"/>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

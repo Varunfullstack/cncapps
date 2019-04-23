@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpMissingBreakStatementInspection */
+
 /**
  * Base data access class.
  * Must be extended to be useful
@@ -119,7 +120,7 @@ define(
     "DA_QUOTE_DOUBLE",
     "\""
 );
-// Classnames - are returned as lower-case by PHP
+// Class names - are returned as lower-case by PHP
 define(
     "DA_CLASSNAME_DBENTITY",
     "dbentity"
@@ -184,33 +185,33 @@ class DataAccess extends BaseObject
 
 // Instance variables
 
-    protected $eof = FALSE;                                    // End of file flag(TRUE/FALSE)
-    protected $colName = array();                                // Array of column names
-    protected $colNameInverse = array();                // Array of column names
-    protected $colType = array();                                // Array of column types
-    protected $colNull = array();                                // Array of column null flags
-    protected $row = array();                                // Current row values array
-    protected $updateMode = DA_MODE_NONE;    // insert, delete or update
-    protected $pk = DA_PK_NOT_SET;                    // Primary key column
-    protected $allowAddColumns = TRUE;        // Add columns allowed?
-    protected $clearRowsBeforeReplicate = FALSE;
-    protected $firstRowFetched = FALSE;
-    protected $beforePostObject = "";
-    protected $beforePostMethod = "";            // Happens just before each data row is posted to destination
-    protected $afterPostObject = "";
-    protected $afterPostMethod = "";            // Happens just after each data row is posted to destination
-    protected $afterColumnsCreatedObject = "";
-    protected $afterColumnsCreatedMethod = "";// Happens just after the columns have been created on dest
-    protected $postRow = "";                                // Flag to indicate whether row is posted to destination
-    protected $quoteForColumnValues = DA_QUOTE_DOUBLE;
-    protected $allowUpdate = FALSE;            // Flag to indicate whether row is posted to destination
-    protected $ignoreNULL = FALSE;            // Flag to indicate allow NULL rule is enforced
-    protected $newRowValue = 0;                    // This value in a primary key column indicates to INSERT a new row into a Data Access object
-    protected $failOutOfRange = TRUE;
-    protected $_colCount = 0;
-    protected $colValidation = [];
-    protected $debug;
-    protected $colDefaultValue = [];
+    public $eof = FALSE;                                    // End of file flag(TRUE/FALSE)
+    public $colName = array();                                // Array of column names
+    public $colNameInverse = array();                // Array of column names
+    public $colType = array();                                // Array of column types
+    public $colNull = array();                                // Array of column null flags
+    public $row = array();                                // Current row values array
+    public $updateMode = DA_MODE_NONE;    // insert, delete or update
+    public $pk = DA_PK_NOT_SET;                    // Primary key column
+    public $allowAddColumns = TRUE;        // Add columns allowed?
+    public $clearRowsBeforeReplicate = FALSE;
+    public $firstRowFetched = FALSE;
+    public $beforePostObject = "";
+    public $beforePostMethod = "";            // Happens just before each data row is posted to destination
+    public $afterPostObject = "";
+    public $afterPostMethod = "";            // Happens just after each data row is posted to destination
+    public $afterColumnsCreatedObject = "";
+    public $afterColumnsCreatedMethod = "";// Happens just after the columns have been created on dest
+    public $postRow = "";                                // Flag to indicate whether row is posted to destination
+    public $quoteForColumnValues = DA_QUOTE_DOUBLE;
+    public $allowUpdate = FALSE;            // Flag to indicate whether row is posted to destination
+    public $ignoreNULL = FALSE;            // Flag to indicate allow NULL rule is enforced
+    public $newRowValue = 0;                    // This value in a primary key column indicates to INSERT a new row into a Data Access object
+    public $failOutOfRange = TRUE;
+    public $_colCount = 0;
+    public $colValidation = [];
+    public $debug;
+    public $colDefaultValue = [];
 
     function enableDebugging()
     {
@@ -280,6 +281,7 @@ class DataAccess extends BaseObject
      *<BR/>
      * @parameter DataAccess &$data reference to DataAccess object from which to copy
      * @access public
+     * @param DataSet $data
      * @return boolean Returns TRUE if any rows have been posted to the target
      */
     function replicate(&$data)
@@ -292,7 +294,7 @@ class DataAccess extends BaseObject
             DA_CLASSNAME_DATAACCESS
         ))
             $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
-        // For safty's sake, at the moment we do not allow replicate to delete all rows from Tdobase
+        // For safety's sake, at the moment we do not allow replicate to delete all rows from database
         // objects.
         if (
             is_subclass_of(
@@ -305,7 +307,7 @@ class DataAccess extends BaseObject
                 $this->clearRows();
             }
         }
-        if (        // Only relevant to reset row pointer on tdataset classes
+        if (        // Only relevant to reset row pointer on dataset classes
             is_subclass_of(
                 $data,
                 DA_CLASSNAME_DATASET
@@ -361,7 +363,7 @@ class DataAccess extends BaseObject
             $this->setUpdateModeInsert();    // Default data set operation is insert
             /*
             Set mode to update if we are allowed to and data has a pk value.
-            NOTE: do not set a PK on Tdataset
+            NOTE: do not set a PK on dataset
             objects unless you really intend to update their rows!
             You will just end up with an empty dataset.
             */
@@ -383,7 +385,7 @@ class DataAccess extends BaseObject
                 );
             }
             // Replaced use of composeRow because ot was far too slow with it's column name lookups
-            // Using the new $crossRef array to resolve column numbers accross dataaccess objects
+            // Using the new $crossRef array to resolve column numbers across dataaccess objects
             if ($this->postRow) {
                 for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
                     $this->setValueNoCheckByColumnNumber(
@@ -433,6 +435,9 @@ class DataAccess extends BaseObject
         return $ret;
     }
 
+    /**
+     * @param DataAccess $data
+     */
     function composeRow(&$data)
     {
         for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) { // Only add data column exists
@@ -450,7 +455,7 @@ class DataAccess extends BaseObject
      * @access public
      * @param integer $methodType DA_AFTER_COLUMNS_CREATED DA_BEFORE_POST DA_AFTER_POST
      * @param BaseObject $object Reference to callback object
-     * @param string $methodname Name of the method on the callback object
+     * @param $methodName
      * @return  bool
      */
     function setCallbackMethod($methodType,
@@ -518,7 +523,7 @@ class DataAccess extends BaseObject
      *    Notes: Builds and executes the appropriate PHP code dynamically. To speed things up, we assume
      * that all validation has been done when callback object and methods were assigned!
      * @access private
-     * @param integer $method DA_AFTER_COLUMNS_CREATED DA_BEFORE_POST DA_AFTER_POST
+     * @param $methodType
      * @param DataAccess &$data Reference of source dataaccess object to be passed back
      * @return  bool
      */
@@ -656,6 +661,7 @@ class DataAccess extends BaseObject
     /**
      * Set the primary key column (name or column number)
      * @access public
+     * @param $ixPassedColumn
      * @return bool Success: TRUE or FALSE
      */
     function setPK($ixPassedColumn)
@@ -704,9 +710,9 @@ class DataAccess extends BaseObject
     {
         if ($this->getPK() == DA_PK_NOT_SET) {
             $this->raiseError("No PK set");
-        } else {
-            return $this->getValue($this->getPK());
+            return false;
         }
+        return $this->getValue($this->getPK());
     }
 
     /**
@@ -790,9 +796,10 @@ class DataAccess extends BaseObject
         $columnNo = $this->columnExists($ixColumn);
         if ($columnNo == DA_OUT_OF_RANGE) {
             $this->raiseError(DA_MSG_COLUMN_DOES_NOT_EXIST);
-        } else {
-            return $columnNo;
+            return false;
         }
+        return $columnNo;
+
     }
 
     /**
@@ -852,29 +859,12 @@ class DataAccess extends BaseObject
             $ret = $ixColumn;        // found column
 
             $this->_colCount = $this->colCount(); // Added this to avoid overhead of calling colCount()
-//			if ($this->_colCount > DA_SERIAL_LIMIT){ 
-//				$this->setXRef();
-//			}
         }                                            // between index(column no) and name
         return $ret;
     }
-    /*
-        function setXRef(){
-            // columnExists need to do a fast binary search but this requires some buggering about!
-            // We need to asort the column names array to retain association between name and col no
-            // So... we need a new array to Xref the each of the column names to an ordinal representing
-            // their position in the sorted array
-            asort($this->colName); 					// Sort the names array and maintain association
-            reset($this->colName);
-            // Add a new key, order, to each element for use in columnexists binary search:
-            $this->colNameXRef=array();				// clear down
-            foreach ($this->colName as $key => $value) {
-               $this->colNameXRef[]=$key;
-            }
-        }
-    */
+
     /**
-     * Add a new column to the object without checking whether it exists (for performance puposes)
+     * Add a new column to the object without checking whether it exists (for performance purposes)
      * @param $name
      * @param $type
      * @param $null
@@ -986,7 +976,7 @@ class DataAccess extends BaseObject
     /**
      * Get column type
      * @access public
-     * @param integer $ixColumn Column number
+     * @param $ixPassedColumn
      * @return string Column type. See constants for list.
      */
     function getType($ixPassedColumn)
@@ -1014,7 +1004,7 @@ class DataAccess extends BaseObject
     /**
      * Set column type
      * @access private
-     * @param integer $ixColumn Column number
+     * @param $ixPassedColumn
      * @param integer $type Column type. See constants for list.
      * @return boolean Success
      */
@@ -1036,20 +1026,17 @@ class DataAccess extends BaseObject
     /**
      * Get column null status
      * @access public
-     * @param integer $ixColumn Column number
+     * @param $ixPassedColumn
      * @return integer Nulls allowed: DA_ALLOW_NULL DA_NOT_NULL or DA_OUT_OF_RANGE
      */
     function getNull($ixPassedColumn)
     {
-        $ret = FALSE;
         $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            $ret = $this->colNull[$ixColumn];
-        } else {
+        if ($ixColumn == DA_OUT_OF_RANGE) {
             $this->raiseError("GetNull(): Column " . $ixPassedColumn . " out of range");
-            $ret = DA_OUT_OF_RANGE;
+            return DA_OUT_OF_RANGE;
         }
-        return $ret;
+        return $this->colNull[$ixColumn];
     }
 
     /**
@@ -1078,7 +1065,6 @@ class DataAccess extends BaseObject
      * Set column to allow empty values
      * @access private
      * @param integer $ixColumn Column number
-     * @param integer $nullFlag DA_ALLOW_NULL DA_NOT_NULL
      * @return boolean Success
      */
     function setAllowEmpty($ixColumn)
@@ -1093,7 +1079,6 @@ class DataAccess extends BaseObject
      * Set column to NOT allow empty values
      * @access private
      * @param integer $ixColumn Column number
-     * @param integer $nullFlag DA_ALLOW_NULL DA_NOT_NULL
      * @return boolean Success
      */
     function setNotAllowEmpty($ixColumn)
@@ -1202,18 +1187,19 @@ class DataAccess extends BaseObject
      * fetch next row in result set. Must be overriden and called first in the
      * overriden method. Make sure you set the return parameter with EOF value in your extended class
      * @access public
-     * @return boolean EOF
+     * @return boolean
      */
     function fetchNext()
     {
         $this->eof = FALSE;
         $this->firstRowFetched = TRUE;
+        return false;
     }
 
     /**
      * Get column value by name or column number
      * @access public
-     * @param string $ixColumn
+     * @param $ixPassedColumn
      * @return string|int|float|bool Column value
      */
     function getValue($ixPassedColumn)
@@ -1231,8 +1217,8 @@ class DataAccess extends BaseObject
     /**
      * Alias for getValueNoCheckByColumnNumber
      * @access public
-     * @param string $ixColumn
-     * @return variant Column value
+     * @param $ixColumnNumber
+     * @return mixed Column value
      */
     function getValueByColumnNumber($ixColumnNumber)
     {
@@ -1242,13 +1228,12 @@ class DataAccess extends BaseObject
     /**
      * Get column value by name or column number without any error trapping
      * @access public
-     * @param string $ixColumn
-     * @return variant Column value
+     * @param $ixColumnNumber
+     * @return mixed Column value
      */
     function getValueNoCheckByColumnNumber($ixColumnNumber)
     {
         $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
-//		if (($type==DA_ID)|($type==DA_INTEGER)){ //I changed this for CNC numeric form checking
         if ($type == DA_ID) {
             return (int)$this->row[$ixColumnNumber];
         } else {
@@ -1353,9 +1338,9 @@ not a boolean, the given value is null, column given is not the PK, and there is
     /**
      * Set column value by index without any error checking
      * @access public
-     * @param string $ixColumn Column number
+     * @param $ixPassedColumn
      * @param string $value Value
-     * @return boolean Success
+     * @return void Success
      */
     function setValueNoCheckByColumnNumber($ixPassedColumn,
                                            $value
@@ -1473,6 +1458,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
     /**
      * Copy columns from given dataset
      * @access public
+     * @param $data
      * @return boolean Success
      */
     function copyColumnsFrom(&$data)
@@ -1506,14 +1492,13 @@ not a boolean, the given value is null, column given is not the PK, and there is
     {
         $ixThisColumn = $this->columnExists($data->getName($ixCol));
         if (($ixThisColumn == -1) & ($this->allowAddColumns)) {
-            $ixThisColumn =
-                $this->addColumnNoCheck(
-                    $data->getName($ixCol),
-                    $data->getType($ixCol),
-                    $data->getNull($ixCol),
-                    $data->getDefaultValue($ixCol),
-                    $data->getValidationFunction($ixCol)
-                );
+            $this->addColumnNoCheck(
+                $data->getName($ixCol),
+                $data->getType($ixCol),
+                $data->getNull($ixCol),
+                $data->getDefaultValue($ixCol),
+                $data->getValidationFunction($ixCol)
+            );
         }
     }
 
@@ -1550,7 +1535,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
             "\r\n",
             " ",
             $value
-        );            // remove carrage returns
+        );            // remove carriage returns
         $value = str_replace(
             "\"",
             "",
@@ -1627,6 +1612,11 @@ not a boolean, the given value is null, column given is not the PK, and there is
 
     }
 
+    /**
+     * @param $colIdx
+     * @param $value
+     * @return int|null
+     */
     function prepareValue($colIdx,
                           $value
     )

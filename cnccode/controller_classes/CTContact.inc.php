@@ -171,9 +171,9 @@ class CTContact extends CTCNC
         } else {
             $this->buContact->getCustomerContactsByNameMatch(
                 $_REQUEST['customerID'],
-                $_REQUEST['siteNo'],
                 $_REQUEST['contactName'],
-                $this->dsContact
+                $this->dsContact,
+                $_REQUEST['siteNo']
             );
         }
         if ($this->dsContact->rowCount() == 1) {

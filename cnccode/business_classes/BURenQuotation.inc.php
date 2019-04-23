@@ -24,6 +24,7 @@ class BURenQuotation extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -66,38 +67,24 @@ class BURenQuotation extends Business
         ));
     }
 
-    function deleteRenQuotation($ID)
-    {
-        $this->setMethodName('deleteRenQuotation');
-        if ($this->canDeleteRenQuotation($ID)) {
-            return $this->dbeRenQuotation->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
-    }
-
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
         &$customerItemID,
         $salePrice,
         $costPrice,
-        $qty
+        $qty,
+        $siteNo = 0
     )
     {
         // create a customer item
         $dbeCustomerItem = new DBECustomerItem ($this);
-
         $dsCustomerItem = new DataSet ($this);
-
         $dsCustomerItem->copyColumnsFrom($dbeCustomerItem);
-
         $dsCustomerItem->setUpdateModeInsert();
-
         $dsCustomerItem->setValue(
             DBECustomerItem::customerItemID,
-            0
+            null
         );
         $dsCustomerItem->setValue(
             DBECustomerItem::customerID,
@@ -124,10 +111,6 @@ class BURenQuotation extends Business
         $this->dbeRenQuotation->setValue(
             DBEJRenQuotation::customerItemID,
             $customerItemID
-        );
-        $this->dbeRenQuotation->setValue(
-            DBEJRenQuotation::renQuotationTypeID,
-            $renQuotationTypeID
         );
         $this->dbeRenQuotation->setValue(
             DBEJRenQuotation::startDate,
@@ -172,17 +155,18 @@ class BURenQuotation extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
-                <td bgcolor="#999999">Customer</td>
-                <td bgcolor="#999999">Service</td>
+                <td style="background-color: #999999">Customer</td>
+                <td style="background-color: #999999">Service</td>
             </tr>
             <?php while ($this->dbeJRenQuotation->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -231,17 +215,18 @@ class BURenQuotation extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
-                <td bgcolor="#999999">Customer</td>
-                <td bgcolor="#999999">Service</td>
+                <td style="background-color: #999999">Customer</td>
+                <td style="background-color: #999999">Service</td>
             </tr>
             <?php while ($this->dbeJRenQuotation->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -281,14 +266,9 @@ class BURenQuotation extends Business
         $dbeRenQuotationUpdate = new DBECustomerItem($this);
 
         $this->dbeJRenQuotation->getRenewalsDueRows();
-
-
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
-
         $dbeOrdline = new DBEOrdline ($this);
-
         $dbeOrdhead = new DBEOrdhead($this);
-
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;
@@ -296,6 +276,8 @@ class BURenQuotation extends Business
 
         $custItemsSharingSalesOrder = [];
         $previousOrdHeadID = null;
+        $line = 0;
+        $dsOrdhead = new DataSet($this);
         while ($this->dbeJRenQuotation->fetchNext()) {
             ?>
             quotation
@@ -334,7 +316,7 @@ class BURenQuotation extends Business
                         $dbeCustomer,
                         $dsCustomer
                     );
-
+                    $dsOrdline = new DataSet($this);
                     $buSalesOrder->initialiseQuote(
                         $dsOrdhead,
                         $dsOrdline,
@@ -468,6 +450,7 @@ class BURenQuotation extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
                     $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem

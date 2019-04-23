@@ -7,7 +7,6 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_bu'] . '/BUItem.inc.php');
-//require_once($cfg['path_bu'].'/BUNotepad.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEWarranty.inc.php');
@@ -51,13 +50,12 @@ define(
 
 class CTItem extends CTCNC
 {
+    /** @var DSForm */
+    public $dsItem;
     /**
-     * Dataset for item record storage.
-     *
-     * @var     DSForm
-     * @access  private
+     * @var BUItem
      */
-    var $dsItem = '';
+    private $buItem;
 
     function __construct($requestMethod,
                          $postVars,
@@ -88,6 +86,7 @@ class CTItem extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -134,6 +133,7 @@ class CTItem extends CTCNC
     /**
      * Display the popup selector form
      * @access private
+     * @throws Exception
      */
     function displayItemSelectPopup()
     {
@@ -161,6 +161,7 @@ class CTItem extends CTCNC
             header('Location: ' . $urlCreate);
             exit;
         }
+        $dsItem = new DataSet($this);
         $this->buItem->getItemsByNameMatch(
             $_REQUEST['itemDescription'],
             $dsItem,
@@ -182,26 +183,26 @@ class CTItem extends CTCNC
             // This template runs a javascript function NOT inside HTML and so must use stripslashes()
             $this->template->set_var(
                 array(
-                    'submitDescription' => addslashes($dsItem->getValue("description")),
+                    'submitDescription' => addslashes($dsItem->getValue(DBEItem::description)),
                     // for javascript
-                    'itemID'            => $dsItem->getValue("itemID"),
+                    'itemID'            => $dsItem->getValue(DBEItem::itemID),
                     'curUnitCost'       => number_format(
-                        $dsItem->getValue("curUnitCost"),
+                        $dsItem->getValue(DBEItem::curUnitCost),
                         2,
                         '.',
                         ''
                     ),
                     'curUnitSale'       => number_format(
-                        $dsItem->getValue("curUnitSale"),
+                        $dsItem->getValue(DBEItem::curUnitSale),
                         2,
                         '.',
                         ''
                     ),
-                    'qtyOrdered'        => $dsItem->getValue("salesStockQty"),
+                    'qtyOrdered'        => $dsItem->getValue(DBEItem::salesStockQty),
                     // to indicate number in stock
-                    'slaResponseHours'  => $dsItem->getValue("contractResponseTime"),
-                    'partNo'            => $dsItem->getValue("partNo"),
-                    'allowDirectDebit' => $dsItem->getValue(DBEItem::allowDirectDebit) =='Y' ? 'true': 'false'
+                    'slaResponseHours'  => $dsItem->getValue(DBEItem::contractResponseTime),
+                    'partNo'            => $dsItem->getValue(DBEItem::partNo),
+                    'allowDirectDebit'  => $dsItem->getValue(DBEItem::allowDirectDebit) == 'Y' ? 'true' : 'false'
                 )
             );
         } else {
@@ -252,29 +253,31 @@ class CTItem extends CTCNC
                 while ($dsItem->fetchNext()) {
                     $this->template->set_var(
                         array(
-                            'itemDescription'   => Controller::htmlDisplayText($dsItem->getValue("description")),
+                            'itemDescription'   => Controller::htmlDisplayText($dsItem->getValue(DBEItem::description)),
                             // this complicated thing is to cope with Javascript quote problems!
                             'submitDescription' => Controller::htmlInputText(
-                                addslashes($dsItem->getValue("description"))
+                                addslashes($dsItem->getValue(DBEItem::description))
                             ),
-                            'itemID'            => $dsItem->getValue("itemID"),
+                            'itemID'            => $dsItem->getValue(DBEItem::itemID),
                             'curUnitCost'       => number_format(
-                                $dsItem->getValue("curUnitCost"),
+                                $dsItem->getValue(DBEItem::curUnitCost),
                                 2,
                                 '.',
                                 ''
                             ),
                             'curUnitSale'       => number_format(
-                                $dsItem->getValue("curUnitSale"),
+                                $dsItem->getValue(DBEItem::curUnitSale),
                                 2,
                                 '.',
                                 ''
                             ),
-                            'qtyOrdered'        => $dsItem->getValue("salesStockQty"),
+                            'qtyOrdered'        => $dsItem->getValue(DBEItem::salesStockQty),
                             // to indicate number in stock
-                            'partNo'            => $dsItem->getValue("partNo"),
-                            'slaResponseHours'  => $dsItem->getValue("contractResponseTime"),
-                            'allowDirectDebit' => $dsItem->getValue(DBEItem::allowDirectDebit) =='Y' ? 'true': 'false'
+                            'partNo'            => $dsItem->getValue(DBEItem::partNo),
+                            'slaResponseHours'  => $dsItem->getValue(DBEItem::contractResponseTime),
+                            'allowDirectDebit'  => $dsItem->getValue(
+                                DBEItem::allowDirectDebit
+                            ) == 'Y' ? 'true' : 'false'
                         )
                     );
                     $this->template->parse(
@@ -298,6 +301,7 @@ class CTItem extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function itemForm()
     {
@@ -332,12 +336,11 @@ class CTItem extends CTCNC
                 )
             );
 
-        if ($this->dsItem->getValue('manufacturerID')) {
+        $manufacturerName = null;
+        if ($this->dsItem->getValue(DBEItem::manufacturerID)) {
             $dbeManufacturer = new DBEManufacturer($this);
-            $dbeManufacturer->getRow($this->dsItem->getValue('manufacturerID'));
-            $manufacturerName = $dbeManufacturer->getValue('name');
-        } else {
-            $manufacturerName = '';
+            $dbeManufacturer->getRow($this->dsItem->getValue(DBEItem::manufacturerID));
+            $manufacturerName = $dbeManufacturer->getValue(DBEManufacturer::name);
         }
 
         // template
@@ -347,7 +350,7 @@ class CTItem extends CTCNC
         );
         $this->template->set_var(
             array(
-                'itemID'                  => $this->dsItem->getValue('itemID'),
+                'itemID'                  => $this->dsItem->getValue(DBEItem::itemID),
                 'description'             => Controller::htmlInputText($this->dsItem->getValue(DBEItem::description)),
                 'descriptionMessage'      => Controller::htmlDisplayText(
                     $this->dsItem->getMessage(DBEItem::description)
@@ -375,13 +378,12 @@ class CTItem extends CTCNC
                 'manufacturerID'          => $this->dsItem->getValue(DBEItem::manufacturerID),
                 'manufacturerName'        => $manufacturerName,
                 'urlSubmit'               => $urlSubmit,
-                'urlCancel'               => $urlCancel,
                 'allowDirectDebitChecked' => Controller::htmlChecked($this->dsItem->getValue(DBEItem::allowDirectDebit))
             )
         );
-        $this->parseItemTypeSelector($this->dsItem->getValue('itemTypeID'));
-        $this->parseRenewalTypeSelector($this->dsItem->getValue('renewalTypeID'));
-        $this->parseWarrantySelector($this->dsItem->getValue('warrantyID'));
+        $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
+        $this->parseRenewalTypeSelector($this->dsItem->getValue(DBEItem::renewalTypeID));
+        $this->parseWarrantySelector($this->dsItem->getValue(DBEItem::warrantyID));
         $this->template->parse(
             'CONTENTS',
             'ItemEdit',
@@ -395,6 +397,9 @@ class CTItem extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @param bool $renewalTypeID
+     * @return mixed|string
+     * @throws Exception
      */
     function itemFormPrepareAdd($renewalTypeID = false)
     {
@@ -422,6 +427,7 @@ class CTItem extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function itemFormPrepareEdit()
     {
@@ -451,7 +457,7 @@ class CTItem extends CTCNC
 
     function parseItemTypeSelector($itemTypeID)
     {
-        // Item type selector
+        $dsItemType = new DataSet($this);
         $this->buItem->getAllItemTypes($dsItemType);
         $this->template->set_block(
             'ItemEdit',
@@ -461,9 +467,11 @@ class CTItem extends CTCNC
         while ($dsItemType->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'itemTypeDescription' => $dsItemType->getValue('description'),
-                    'itemTypeID'          => $dsItemType->getValue('itemTypeID'),
-                    'itemTypeSelected'    => ($itemTypeID == $dsItemType->getValue('itemTypeID')) ? CT_SELECTED : ''
+                    'itemTypeDescription' => $dsItemType->getValue(DBEItemType::description),
+                    'itemTypeID'          => $dsItemType->getValue(DBEItemType::itemTypeID),
+                    'itemTypeSelected'    => ($itemTypeID == $dsItemType->getValue(
+                            DBEItemType::itemTypeID
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -476,7 +484,7 @@ class CTItem extends CTCNC
 
     function parseManufacturerSelector($manufacturerID)
     {
-        // Manufacturer selector
+        $dsManufacturer = new DataSet($this);
         $this->buItem->getAllManufacturers($dsManufacturer);
         $this->template->set_block(
             'ItemEdit',
@@ -486,11 +494,11 @@ class CTItem extends CTCNC
         while ($dsManufacturer->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'manufacturerName'     => $dsManufacturer->getValue('name'),
-                    'manufacturerID'       => $dsManufacturer->getValue('manufacturerID'),
+                    'manufacturerName'     => $dsManufacturer->getValue(DBEManufacturer::name),
+                    'manufacturerID'       => $dsManufacturer->getValue(DBEManufacturer::manufacturerID),
                     'manufacturerSelected' => ($manufacturerID == $dsManufacturer->getValue(
-                            'manufacturerID'
-                        )) ? CT_SELECTED : ''
+                            DBEManufacturer::manufacturerID
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -514,9 +522,11 @@ class CTItem extends CTCNC
         while ($dbeWarranty->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'warrantyDescription' => $dbeWarranty->getValue('description'),
-                    'warrantyID'          => $dbeWarranty->getValue('warrantyID'),
-                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue('warrantyID')) ? CT_SELECTED : ''
+                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
+                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
+                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
+                            DBEWarranty::warrantyID
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -543,15 +553,15 @@ class CTItem extends CTCNC
         while ($dbeRenewalType->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'renewalTypeDescription'   => $dbeRenewalType->getValue('description'),
-                    'renewalTypeID'            => $dbeRenewalType->getValue('renewalTypeID'),
+                    'renewalTypeDescription'   => $dbeRenewalType->getValue(DBERenewalType::description),
+                    'renewalTypeID'            => $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
                     'renewalAllowsDirectDebit' => in_array(
-                        $dbeRenewalType->getValue('renewalTypeID'),
+                        $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
                         $allowedDirectDebitRenewals
                     ) ? 'data-allows-direct-debit="true"' : null,
                     'renewalTypeSelected'      => ($renewalTypeID == $dbeRenewalType->getValue(
-                            'renewalTypeID'
-                        )) ? CT_SELECTED : ''
+                            DBERenewalType::renewalTypeID
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -565,6 +575,7 @@ class CTItem extends CTCNC
     /**
      * Update item record
      * @access private
+     * @throws Exception
      */
     function itemUpdate()
     {
@@ -582,7 +593,7 @@ class CTItem extends CTCNC
             } else {
                 $_REQUEST['action'] = CTCNC_ACT_ITEM_EDIT;
             }
-            $_REQUEST['itemID'] = $this->dsItem->getValue('itemID');
+            $_REQUEST['itemID'] = $this->dsItem->getValue(DBEItem::itemID);
             $this->itemForm();
             exit;
         }
@@ -613,5 +624,4 @@ class CTItem extends CTCNC
         }
         header('Location: ' . $_REQUEST['returnTo']);
     }
-}// end of class
-?>
+}

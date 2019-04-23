@@ -57,11 +57,14 @@ class CTServiceRequestReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
         $this->setMethodName('search');
-
+        $dsSearchForm = new DSForm($this);
         $this->buServiceRequestReport->initialiseSearchForm($dsSearchForm);
 
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
@@ -70,11 +73,11 @@ class CTServiceRequestReport extends CTCNC
 
             } else {
 
-                if ($dsSearchForm->getValue('fromDate') == '') {
+                if (!$dsSearchForm->getValue(BUServiceRequestReport::searchFormFromDate)) {
 
                     $dsSearchForm->setUpdateModeUpdate();
                     $dsSearchForm->setValue(
-                        'fromDate',
+                        BUServiceRequestReport::searchFormFromDate,
                         date(
                             'Y-m-d',
                             strtotime("-1 year")
@@ -83,10 +86,10 @@ class CTServiceRequestReport extends CTCNC
                     $dsSearchForm->post();
                 }
 
-                if (!$dsSearchForm->getValue('toDate')) {
+                if (!$dsSearchForm->getValue(BUServiceRequestReport::searchFormToDate)) {
                     $dsSearchForm->setUpdateModeUpdate();
                     $dsSearchForm->setValue(
-                        'toDate',
+                        BUServiceRequestReport::searchFormToDate,
                         date('Y-m-d')
                     );
                     $dsSearchForm->post();
@@ -146,12 +149,15 @@ class CTServiceRequestReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'customerID'       => $dsSearchForm->getValue('customerID'),
-                'customerString'   => $customerString,
-                'fromDate'         => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage'  => $dsSearchForm->getMessage('fromDate'),
-                'toDate'           => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage'    => $dsSearchForm->getMessage('toDate'),
+                'customerID'       => $dsSearchForm->getValue(BUServiceRequestReport::searchFormCustomerID),
+                'fromDate'         => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUServiceRequestReport::searchFormFromDate)
+                ),
+                'fromDateMessage'  => $dsSearchForm->getMessage(BUServiceRequestReport::searchFormFromDate),
+                'toDate'           => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUServiceRequestReport::searchFormToDate)
+                ),
+                'toDateMessage'    => $dsSearchForm->getMessage(BUServiceRequestReport::searchFormToDate),
                 'urlCustomerPopup' => $urlCustomerPopup
             )
         );
@@ -165,5 +171,4 @@ class CTServiceRequestReport extends CTCNC
 
     } // end function displaySearchForm
 
-} // end of class
-?>
+}

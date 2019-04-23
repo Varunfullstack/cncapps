@@ -81,18 +81,18 @@ class CTCurrentActivityReport extends CTCNC
 
             $userRow =
                 array(
-                    'userID'   => $dbeUser->getValue('userID'),
-                    'userName' => $dbeUser->getValue('name'),
-                    'fullName' => $dbeUser->getValue('firstName') . ' ' . $dbeUser->getValue(
-                            'lastName'
+                    'userID'   => $dbeUser->getValue(DBEUser::userID),
+                    'userName' => $dbeUser->getValue(DBEUser::name),
+                    'fullName' => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
+                            DBEUser::lastName
                         )
                 );
 
-            $this->allocatedUser[$dbeUser->getValue('userID')] = $userRow;
+            $this->allocatedUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
 
-            if ($dbeUser->getValue('appearInQueueFlag') == 'Y') {
+            if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
 
-                $this->filterUser[$dbeUser->getValue('userID')] = $userRow;
+                $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
             }
         }
 
@@ -311,7 +311,7 @@ class CTCurrentActivityReport extends CTCNC
     {
         $dbeUser = new DBEUser ($this);
         $dbeUser->setValue(
-            'userID',
+            DBEUser::userID,
             $this->userID
         );
         $dbeUser->getRow();
@@ -836,23 +836,24 @@ class CTCurrentActivityReport extends CTCNC
      */
     private function renderQueue($queueNo)
     {
-        $dsResults = new DataSet($this);
+        /** @var DBEProblem|DataSet $serviceRequests */
+        $serviceRequests = new DataSet($this);
         if ($queueNo == 6) {
             /* fixed awaiting closure */
             $this->buActivity->getProblemsByStatus(
                 'F',
-                $dsResults,
+                $serviceRequests,
                 false
             );
 
         } elseif ($queueNo == 7) {
             /* future dated */
-            $this->buActivity->getFutureProblems($dsResults);
+            $this->buActivity->getFutureProblems($serviceRequests);
 
         } else {
             $this->buActivity->getProblemsByQueueNo(
                 $queueNo,
-                $dsResults
+                $serviceRequests
             );
 
         }
@@ -878,13 +879,13 @@ class CTCurrentActivityReport extends CTCNC
 
         $rowCount = 0;
 
-        while ($dsResults->fetchNext()) {
+        while ($serviceRequests->fetchNext()) {
             $linkAllocateAdditionalTime = null;
-            $this->customerFilterList[$dsResults->getValue('customerID')] = $dsResults->getValue('customerName');
+            $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(DBEJProblem::customerName);
 
             if (
             !in_array(
-                $dsResults->getValue('priority'),
+                $serviceRequests->getValue(DBEJProblem::priority),
                 $_SESSION['priorityFilter']
             )
             ) {
@@ -892,16 +893,16 @@ class CTCurrentActivityReport extends CTCNC
             }
 
 
-            if ($_SESSION['selectedCustomerID'] && $_SESSION['selectedCustomerID'] != $dsResults->getValue(
-                    'customerID'
+            if ($_SESSION['selectedCustomerID'] && $_SESSION['selectedCustomerID'] != $serviceRequests->getValue(
+                    DBEJProblem::customerID
                 )) {
                 continue;
             }
 
             if (
-                ($_SESSION['selectedUserID'] && $_SESSION['selectedUserID'] != $dsResults->getValue('userID')) AND
+                ($_SESSION['selectedUserID'] && $_SESSION['selectedUserID'] != $serviceRequests->getValue(DBEJProblem::userID)) AND
 
-                $dsResults->getValue('userID') != '0'        // always show Unallocated
+                $serviceRequests->getValue(DBEJProblem::userID) != '0'        // always show Unallocated
             ) {
                 continue;
             }
@@ -913,7 +914,7 @@ class CTCurrentActivityReport extends CTCNC
                     'Activity.php',
                     array(
                         'action'    => 'displayLastActivity',
-                        'problemID' => $dsResults->getValue('problemID')
+                        'problemID' => $serviceRequests->getValue(DBEJProblem::problemID)
                     )
                 );
 
@@ -924,7 +925,7 @@ class CTCurrentActivityReport extends CTCNC
                         'Activity.php',
                         array(
                             'action'    => 'allocateAdditionalTime',
-                            'problemID' => $dsResults->getValue('problemID')
+                            'problemID' => $serviceRequests->getValue(DBEJProblem::problemID)
                         )
                     );
 
@@ -932,30 +933,30 @@ class CTCurrentActivityReport extends CTCNC
             }
 
             $bgColour = $this->getResponseColour(
-                $dsResults->getValue('status'),
-                $dsResults->getValue('priority'),
-                $dsResults->getValue('slaResponseHours'),
-                $dsResults->getValue('workingHours'),
-                $dsResults->getValue('respondedHours')
+                $serviceRequests->getValue(DBEJProblem::status),
+                $serviceRequests->getValue(DBEJProblem::priority),
+                $serviceRequests->getValue(DBEJProblem::slaResponseHours),
+                $serviceRequests->getValue(DBEJProblem::workingHours),
+                $serviceRequests->getValue(DBEJProblem::respondedHours)
             );
             /*
             Updated by another user?
             */
             if (
-                $dsResults->getValue('userID') &&
-                $dsResults->getValue('userID') != $dsResults->getValue('lastUserID')
+                $serviceRequests->getValue(DBEJProblem::userID) &&
+                $serviceRequests->getValue(DBEJProblem::userID) != $serviceRequests->getValue(DBEJProblem::lastUserID)
             ) {
                 $updatedBgColor = self::PURPLE;
             } else {
                 $updatedBgColor = self::CONTENT;
             }
 
-            if ($dsResults->getValue('respondedHours') == 0 && $dsResults->getValue('status') == 'I') {
+            if ($serviceRequests->getValue(DBEJProblem::respondedHours) == 0 && $serviceRequests->getValue(DBEJProblem::status) == 'I') {
                 /*
                 Initial SRs that have not yet been responded to
                 */
                 $hoursRemainingBgColor = self::AMBER;
-            } elseif ($dsResults->getValue('awaitingCustomerResponseFlag') == 'Y') {
+            } elseif ($serviceRequests->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y') {
                 $hoursRemainingBgColor = self::GREEN;
             } else {
                 $hoursRemainingBgColor = self::BLUE;
@@ -966,19 +967,19 @@ class CTCurrentActivityReport extends CTCNC
                 'SalesOrder.php',
                 array(
                     'action'     => 'search',
-                    'customerID' => $dsResults->getValue('customerID')
+                    'customerID' => $serviceRequests->getValue(DBEJProblem::customerID)
                 )
             );
             $alarmDateTimeDisplay = null;
-            if ($dsResults->getValue(DBEProblem::alarmDate)) {
+            if ($serviceRequests->getValue(DBEProblem::alarmDate)) {
                 $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
-                        $dsResults->getValue(DBEProblem::alarmDate)
-                    ) . ' ' . $dsResults->getValue(DBEProblem::alarmTime);
+                        $serviceRequests->getValue(DBEProblem::alarmDate)
+                    ) . ' ' . $serviceRequests->getValue(DBEProblem::alarmTime);
 
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
                 */
-                if ($dsResults->getValue('alarmDate') <= date(CONFIG_MYSQL_DATE)) {
+                if ($serviceRequests->getValue(DBEJProblem::alarmDate) <= date(CONFIG_MYSQL_DATE)) {
                     $updatedBgColor = self::PURPLE;
                 }
 
@@ -988,7 +989,7 @@ class CTCurrentActivityReport extends CTCNC
             Activity edit
             */
             if (
-                $dsResults->getValue('lastCallActTypeID') == 0
+                $serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == 0
             ) {
                 $workBgColor = self::GREEN; // green = in progress
                 $workOnClick = "alert( 'Another user is currently working on this SR' ); return false";
@@ -1002,7 +1003,7 @@ class CTCurrentActivityReport extends CTCNC
                             'Activity.php',
                             array(
                                 'action'         => 'createFollowOnActivity',
-                                'callActivityID' => $dsResults->getValue('callActivityID')
+                                'callActivityID' => $serviceRequests->getValue(DBEJProblem::callActivityID)
                             )
 
                         );
@@ -1019,7 +1020,7 @@ class CTCurrentActivityReport extends CTCNC
                             'CurrentActivityReport.php',
                             array(
                                 'action'             => 'setFilter',
-                                'selectedCustomerID' => $dsResults->getValue('customerID'),
+                                'selectedCustomerID' => $serviceRequests->getValue(DBEJProblem::customerID),
                                 'selectedUserID'     => null
                             )
                         );
@@ -1028,14 +1029,14 @@ class CTCurrentActivityReport extends CTCNC
                 }
             }
 
-            if ($dsResults->getValue('priority') == 1) {
+            if ($serviceRequests->getValue(DBEJProblem::priority) == 1) {
                 $priorityBgColor = self::ORANGE;
             } else {
                 $priorityBgColor = self::CONTENT;
             }
 
 
-            $problemID = $dsResults->getValue('problemID');
+            $problemID = $serviceRequests->getValue(DBEJProblem::problemID);
             $buActivity = new BUActivity($this);
 
             $hdUsedMinutes = $buActivity->getHDTeamUsedTime($problemID);
@@ -1059,10 +1060,10 @@ class CTCurrentActivityReport extends CTCNC
 
 
             $hoursRemaining = number_format(
-                $dsResults->getValue('workingHours') - $dsResults->getValue('slaResponseHours'),
+                $serviceRequests->getValue(DBEJProblem::workingHours) - $serviceRequests->getValue(DBEJProblem::slaResponseHours),
                 1
             );
-            $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
+            $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
 
             $this->template->set_var(
 
@@ -1081,32 +1082,32 @@ class CTCurrentActivityReport extends CTCNC
                     'esColor'                    => $this->pickColor($esRemaining),
                     'imColor'                    => $this->pickColor($imRemaining),
                     'urlCustomer'                => $urlCustomer,
-                    'time'                       => $dsResults->getValue('lastStartTime'),
-                    'date'                       => Controller::dateYMDtoDMY($dsResults->getValue('lastDate')),
-                    'problemID'                  => $dsResults->getValue('problemID'),
+                    'time'                       => $serviceRequests->getValue(DBEJProblem::lastStartTime),
+                    'date'                       => Controller::dateYMDtoDMY($serviceRequests->getValue(DBEJProblem::lastDate)),
+                    'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
                     'reason'                     => CTCurrentActivityReport::truncate(
-                        $dsResults->getValue('reason'),
+                        $serviceRequests->getValue(DBEJProblem::reason),
                         150
                     ),
-                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink($dsResults->getValue('problemID')),
+                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink($serviceRequests->getValue(DBEJProblem::problemID)),
                     'engineerDropDown'           => $this->getAllocatedUserDropdown(
-                        $dsResults->getValue('problemID'),
-                        $dsResults->getValue('userID')
+                        $serviceRequests->getValue(DBEJProblem::problemID),
+                        $serviceRequests->getValue(DBEJProblem::userID)
                     ),
-                    'engineerName'               => $dsResults->getValue('engineerName'),
-                    'customerName'               => $dsResults->getValue('customerName'),
+                    'engineerName'               => $serviceRequests->getValue(DBEJProblem::engineerName),
+                    'customerName'               => $serviceRequests->getValue(DBEJProblem::customerName),
                     'customerNameDisplayClass'   => $this->getCustomerNameDisplayClass(
-                        $dsResults->getValue('specialAttentionFlag'),
-                        $dsResults->getValue('specialAttentionEndDate'),
-                        $dsResults->getValue(DBEJProblem::specialAttentionContactFlag)
+                        $serviceRequests->getValue(DBEJProblem::specialAttentionFlag),
+                        $serviceRequests->getValue(DBEJProblem::specialAttentionEndDate),
+                        $serviceRequests->getValue(DBEJProblem::specialAttentionContactFlag)
                     ),
                     'urlViewActivity'            => $urlViewActivity,
                     'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours'           => number_format(
-                        $dsResults->getValue('slaResponseHours'),
+                        $serviceRequests->getValue(DBEJProblem::slaResponseHours),
                         1
                     ),
-                    'priority'                   => Controller::htmlDisplayText($dsResults->getValue('priority')),
+                    'priority'                   => Controller::htmlDisplayText($serviceRequests->getValue(DBEJProblem::priority)),
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor

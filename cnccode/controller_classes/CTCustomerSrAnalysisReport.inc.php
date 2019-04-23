@@ -13,9 +13,14 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerSrAnalysisReport extends CTCNC
 {
-    var $dsPrintRange = '';
-    var $dsSearchForm = '';
-    var $dsResults = '';
+
+    public $dsPrintRange;
+    public $dsSearchForm;
+    public $dsResults;
+    /**
+     * @var BUCustomerSrAnalysisReport
+     */
+    private $buCustomerSrAnalysisReport;
 
     function __construct($requestMethod,
                          $postVars,
@@ -45,6 +50,7 @@ class CTCustomerSrAnalysisReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -56,24 +62,24 @@ class CTCustomerSrAnalysisReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
         $this->setMethodName('search');
-
+        $dsSearchForm = new DSForm($this);
         $this->buCustomerSrAnalysisReport->initialiseSearchForm($dsSearchForm);
 
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
-
             } else {
-
-                if ($dsSearchForm->getValue('fromDate') == '') {
-
+                if (!$dsSearchForm->getValue(BUCustomerSrAnalysisReport::searchFormFromDate)) {
                     $dsSearchForm->setUpdateModeUpdate();
                     $dsSearchForm->setValue(
-                        'fromDate',
+                        BUCustomerSrAnalysisReport::searchFormFromDate,
                         date(
                             'Y-m-d',
                             strtotime("-1 year")
@@ -82,10 +88,10 @@ class CTCustomerSrAnalysisReport extends CTCNC
                     $dsSearchForm->post();
                 }
 
-                if (!$dsSearchForm->getValue('toDate')) {
+                if (!$dsSearchForm->getValue(BUCustomerSrAnalysisReport::searchFormToDate)) {
                     $dsSearchForm->setUpdateModeUpdate();
                     $dsSearchForm->setValue(
-                        'toDate',
+                        BUCustomerSrAnalysisReport::searchFormToDate,
                         date('Y-m-d')
                     );
                     $dsSearchForm->post();
@@ -156,12 +162,15 @@ class CTCustomerSrAnalysisReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'customerID'       => $dsSearchForm->getValue('customerID'),
-                'customerString'   => $customerString,
-                'fromDate'         => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage'  => $dsSearchForm->getMessage('fromDate'),
-                'toDate'           => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage'    => $dsSearchForm->getMessage('toDate'),
+                'customerID'       => $dsSearchForm->getValue(BUCustomerSrAnalysisReport::searchFormCustomerID),
+                'fromDate'         => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUCustomerSrAnalysisReport::searchFormFromDate)
+                ),
+                'fromDateMessage'  => $dsSearchForm->getMessage(BUCustomerSrAnalysisReport::searchFormFromDate),
+                'toDate'           => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUCustomerSrAnalysisReport::searchFormToDate)
+                ),
+                'toDateMessage'    => $dsSearchForm->getMessage(BUCustomerSrAnalysisReport::searchFormToDate),
                 'urlCustomerPopup' => $urlCustomerPopup
             )
         );
@@ -175,5 +184,4 @@ class CTCustomerSrAnalysisReport extends CTCNC
 
     } // end function displaySearchForm
 
-} // end of class
-?>
+}

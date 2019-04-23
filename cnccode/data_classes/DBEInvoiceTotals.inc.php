@@ -7,6 +7,10 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEInvoiceTotals extends DBEntity
 {
+    const count = "count";
+    const costValue = "costValue";
+    const saleValue = "saleValue";
+
     /**
      * calls constructor()
      * @access public
@@ -19,17 +23,17 @@ class DBEInvoiceTotals extends DBEntity
         parent::__construct($owner);
         $this->setTableName("invhead");
         $this->addColumn(
-            "count",
+            self::count,
             DA_INTEGER,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "costValue",
+            self::costValue,
             DA_FLOAT,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "saleValue",
+            self::saleValue,
             DA_FLOAT,
             DA_NOT_NULL
         );
@@ -109,5 +113,3 @@ class DBEInvoiceTotals extends DBEntity
         return (parent::getRow());
     }
 }
-
-?>

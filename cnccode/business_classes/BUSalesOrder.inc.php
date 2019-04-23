@@ -10,7 +10,7 @@ require_once($cfg["path_dbe"] . "/DBEJOrdhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdline.inc.php");
 require_once($cfg["path_dbe"] . "/DBEOrdhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEOrdline.inc.php");
-require_once($cfg["path_dbe"] . "/DBEOrdlinePO.inc.php"); // for Puchase orders
+require_once($cfg["path_dbe"] . "/DBEOrdlinePO.inc.php"); // for Purchase orders
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBEVat.inc.php");
@@ -26,9 +26,10 @@ class BUSalesOrder extends Business
 {
 
     const DBEOrdheadCustomerName = "customerName";
-
-    var $dbeQuotation = "";
-    var $dbeJQuotation = "";
+    /** @var DBEQuotation */
+    public $dbeQuotation;
+    /** @var DBEJQuotation */
+    public $dbeJQuotation;
 
     /**
      * Constructor
@@ -452,7 +453,7 @@ class BUSalesOrder extends Business
     }
 
     /**
-     * Initialse fields for new order
+     * Initialise fields for new order
      * @parameter integer $customerID
      * @param DataSet $dsOrdhead
      * @param $dsOrdline
@@ -483,7 +484,7 @@ class BUSalesOrder extends Business
     }
 
     /**
-     * Initialse fields for new quote
+     * Initialise fields for new quote
      * @parameter integer $customerID
      * @param DataSet $dsOrdhead
      * @param DataSet $dsOrdline
@@ -1501,7 +1502,7 @@ class BUSalesOrder extends Business
         $buCustomer->setProspectFlagOff($dsOrdhead->getValue(DBEOrdhead::customerID));
 
         /*
-         * Now we need to go through the lines looking for any quotation or domain renwals
+         * Now we need to go through the lines looking for any quotation or domain renewals
          * If found, update the renewal record accordingly.
          */
         $this->getOrderByOrdheadID(
@@ -1583,7 +1584,7 @@ class BUSalesOrder extends Business
 
     /**
      * Create a duplicate quotation from an existing sales order
-     * NOTE: The name of this function is missleading and has NOTHING to do with renewals!
+     * NOTE: The name of this function is misleading and has NOTHING to do with renewals!
      * @param $ordheadID
      * @return bool|float|int|string
      */
@@ -2052,7 +2053,7 @@ class BUSalesOrder extends Business
     {
         $db = $GLOBALS['db'];
         /*
-        Get a list of existing ordlinenos
+        Get a list of existing order line numbers
         */
         $statement =
             "SELECT GROUP_CONCAT(`odl_ordlineno`) AS ordlinenos

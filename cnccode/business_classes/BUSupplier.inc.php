@@ -11,8 +11,10 @@ define('BUSUPPLIER_MATCH_STR_NT_PASD', 'No match string passed');
 
 class BUSupplier extends Business
 {
-    var $dbeSupplier = "";
-    var $dbeJSupplier = "";
+    /** @var DBESupplier */
+    public $dbeSupplier;
+    /** @var DBEJSupplier */
+    public $dbeJSupplier;
 
     /**
      * Constructor
@@ -30,10 +32,13 @@ class BUSupplier extends Business
      * Get Supplier rows whose names match the search string or, if the string is numeric, try to select by customerID
      * @parameter String $nameSearchString String to match against or numeric supplierID
      * @parameter DataSet &$dsResults results
+     * @param $matchString
+     * @param $dsResults
+     * @param string $address
      * @return bool : One or more rows
      * @access public
      */
-    function getSuppliersByNameMatch($matchString, &$dsResults, $address = '')
+    function getSuppliersByNameMatch($matchString, &$dsResults, $address = null)
     {
         $this->setMethodName('getSuppliersByNameMatch');
         $ret = FALSE;
@@ -52,6 +57,8 @@ class BUSupplier extends Business
      * Get supplier row by supplierID
      * @parameter integer $supplierID
      * @parameter DataSet &$dsResults results
+     * @param $ID
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -64,6 +71,7 @@ class BUSupplier extends Business
     /**
      * Get all payment type rows
      * @parameter DataSet &$dsResults results
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -78,6 +86,7 @@ class BUSupplier extends Business
     /**
      * Create a new dataset containing defaults for new supplier row
      * @parameter DataSet &$dsResults results
+     * @param DataSet $dsResults
      * @return bool : Success
      * @access public
      */
@@ -88,7 +97,7 @@ class BUSupplier extends Business
         //	$dsResults = new DSForm($this);
         $dsResults->copyColumnsFrom($this->dbeJSupplier);
         $dsResults->setUpdateModeInsert();
-        $dsResults->setValue('supplierID', 0);
+        $dsResults->setValue(DBEJSupplier::supplierID, null);
         $dsResults->post();
         return TRUE;
     }
@@ -98,6 +107,7 @@ class BUSupplier extends Business
      *    Only handles one row in dataset.
      *
      * @parameter DataSet &$dsResults results
+     * @param $dsSupplier
      * @return bool : Success
      * @access public
      */
@@ -106,5 +116,4 @@ class BUSupplier extends Business
         $this->setMethodName('updateSupplier');
         return ($this->updateDataAccessObject($dsSupplier, $this->dbeSupplier));
     }
-}// End of class
-?>
+}

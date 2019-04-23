@@ -45,16 +45,16 @@ class BUInvoice extends Business
     }
 
 
-    const customerID = 'customerID';
-    const startDate = 'startDate';
-    const endDate = 'endDate';
-    const startInvheadID = 'startInvheadID';
-    const endInvheadID = 'endInvheadID';
-    const printedFlag = 'printedFlag';
-    const invheadID = 'invheadID';
-    const ordheadID = 'ordheadID';
-    const customerName = 'customerName';
-    const invoiceType = 'invoiceType';
+    const searchFormCustomerID = 'customerID';
+    const searchFormStartDate = 'startDate';
+    const searchFormEndDate = 'endDate';
+    const searchFormStartInvheadID = 'startInvheadID';
+    const searchFormEndInvheadID = 'endInvheadID';
+    const searchFormPrintedFlag = 'printedFlag';
+    const searchFormInvheadID = 'invheadID';
+    const searchFormOrdheadID = 'ordheadID';
+    const searchFormCustomerName = 'customerName';
+    const searchFormInvoiceType = 'invoiceType';
 
     /**
      * initialise values for input of date range
@@ -67,27 +67,27 @@ class BUInvoice extends Business
         $this->setMethodName('initialiseDataset');
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            self::customerID,
+            self::searchFormCustomerID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::startDate,
+            self::searchFormStartDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::endDate,
+            self::searchFormEndDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::startInvheadID,
+            self::searchFormStartInvheadID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::endInvheadID,
+            self::searchFormEndInvheadID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
@@ -97,47 +97,47 @@ class BUInvoice extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            self::printedFlag,
+            self::searchFormPrintedFlag,
             DA_YN,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::startDate,
+            self::searchFormStartDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::endDate,
+            self::searchFormEndDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::invheadID,
+            self::searchFormInvheadID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::ordheadID,
+            self::searchFormOrdheadID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::customerID,
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::customerName,
+            self::searchFormCustomerName,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            self::invoiceType,
+            self::searchFormInvoiceType,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            self::printedFlag,
+            self::searchFormPrintedFlag,
             'N'
         );
     }
@@ -152,20 +152,20 @@ class BUInvoice extends Business
     {
         $dsSearchForm->initialise();
         $dsSearchForm->fetchNext();
-        if ($dsSearchForm->getValue(self::invheadID)) {
+        if ($dsSearchForm->getValue(self::searchFormInvheadID)) {
             $this->getDatasetByPK(
-                $dsSearchForm->getValue(self::invheadID),
+                $dsSearchForm->getValue(self::searchFormInvheadID),
                 $this->dbeJInvhead,
                 $dsResults
             );
         } else {
             $this->dbeJInvhead->getRowsBySearchCriteria(
-                trim($dsSearchForm->getValue(self::customerID)),
-                trim($dsSearchForm->getValue(self::ordheadID)),
-                trim($dsSearchForm->getValue(self::printedFlag)),
-                trim($dsSearchForm->getValue(self::startDate)),
-                trim($dsSearchForm->getValue(self::endDate)),
-                trim($dsSearchForm->getValue(self::invoiceType))
+                trim($dsSearchForm->getValue(self::searchFormCustomerID)),
+                trim($dsSearchForm->getValue(self::searchFormOrdheadID)),
+                trim($dsSearchForm->getValue(self::searchFormPrintedFlag)),
+                trim($dsSearchForm->getValue(self::searchFormStartDate)),
+                trim($dsSearchForm->getValue(self::searchFormEndDate)),
+                trim($dsSearchForm->getValue(self::searchFormInvoiceType))
             );
             $this->dbeJInvhead->initialise();
             $dsResults = $this->dbeJInvhead;

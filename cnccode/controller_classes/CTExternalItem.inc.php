@@ -34,8 +34,8 @@ define(
 
 class CTExternalItem extends CTCNC
 {
-    var $dsExternalItem = '';
-    var $buExternalItem = '';
+    public $dsExternalItem;
+    public $buExternalItem;
 
     function __construct($requestMethod,
                          $postVars,
@@ -66,6 +66,7 @@ class CTExternalItem extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -89,6 +90,7 @@ class CTExternalItem extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -105,11 +107,11 @@ class CTExternalItem extends CTCNC
             } else {                                                                    // creating new
                 $dsExternalItem->initialise();
                 $dsExternalItem->setValue(
-                    'externalItemID',
-                    '0'
+                    DBEExternalItem::externalItemID,
+                    null
                 );
                 $dsExternalItem->setValue(
-                    'customerID',
+                    DBEExternalItem::customerID,
                     $_REQUEST['customerID']
                 );
                 $externalItemID = '0';
@@ -117,8 +119,11 @@ class CTExternalItem extends CTCNC
         } else {                                                                        // form validation error
             $dsExternalItem->initialise();
             $dsExternalItem->fetchNext();
-            $externalItemID = $dsExternalItem->getValue('externalItemID');
+            $externalItemID = $dsExternalItem->getValue(DBEExternalItem::externalItemID);
         }
+        $urlDelete = null;
+        $txtDelete = null;
+
         if ($_REQUEST['action'] == CREXTERNALITEM_ACT_EDIT && $this->buExternalItem->canDelete(
                 $_REQUEST['externalItemID']
             )) {
@@ -131,9 +136,6 @@ class CTExternalItem extends CTCNC
                     )
                 );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
@@ -147,7 +149,7 @@ class CTExternalItem extends CTCNC
             Controller::buildLink(
                 'RenewalReport.php',
                 array(
-                    'customerID' => $this->dsExternalItem->getValue('customerID'),
+                    'customerID' => $this->dsExternalItem->getValue(DBEExternalItem::customerID),
                     'action'     => 'produceReport'
                 )
             );
@@ -157,17 +159,25 @@ class CTExternalItem extends CTCNC
         );
         $this->template->set_var(
             array(
-                'customerID'                => $dsExternalItem->getValue('customerID'),
+                'customerID'                => $dsExternalItem->getValue(DBEExternalItem::customerID),
                 'externalItemID'            => $externalItemID,
-                'description'               => Controller::htmlInputText($dsExternalItem->getValue('description')),
-                'descriptionMessage'        => Controller::htmlDisplayText($dsExternalItem->getMessage('description')),
-                'notes'                     => Controller::htmlInputText($dsExternalItem->getValue('notes')),
-                'notesMessage'              => Controller::htmlDisplayText($dsExternalItem->getMessage('notes')),
+                'description'               => Controller::htmlInputText(
+                    $dsExternalItem->getValue(DBEExternalItem::description)
+                ),
+                'descriptionMessage'        => Controller::htmlDisplayText(
+                    $dsExternalItem->getMessage(DBEExternalItem::description)
+                ),
+                'notes'                     => Controller::htmlInputText(
+                    $dsExternalItem->getValue(DBEExternalItem::notes)
+                ),
+                'notesMessage'              => Controller::htmlDisplayText(
+                    $dsExternalItem->getMessage(DBEExternalItem::notes)
+                ),
                 'licenceRenewalDate'        => Controller::dateYMDtoDMY(
-                    $dsExternalItem->getValue('licenceRenewalDate')
+                    $dsExternalItem->getValue(DBEExternalItem::licenceRenewalDate)
                 ),
                 'licenceRenewalDateMessage' => Controller::htmlDisplayText(
-                    $dsExternalItem->getMessage('licenceRenewalDate')
+                    $dsExternalItem->getMessage(DBEExternalItem::licenceRenewalDate)
                 ),
                 'urlUpdate'                 => $urlUpdate,
                 'urlDelete'                 => $urlDelete,
@@ -177,7 +187,7 @@ class CTExternalItem extends CTCNC
         );
         $this->itemTypeDropdown(
             'ExternalItemEdit',
-            $dsExternalItem->getValue('itemTypeID')
+            $dsExternalItem->getValue(DBEExternalItem::itemTypeID)
         );
 
         $this->template->parse(
@@ -191,17 +201,18 @@ class CTExternalItem extends CTCNC
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsExternalItem = &$this->dsExternalItem;
         $this->formError = (!$this->dsExternalItem->populateFromArray($_REQUEST['externalItem']));
         if ($this->formError) {
-            if ($this->dsExternalItem->getValue('externalItemID') == '') {                    // attempt to insert
+            $_REQUEST['action'] = CREXTERNALITEM_ACT_ACT;
+            if (!$this->dsExternalItem->getValue(
+                DBEExternalItem::externalItemID
+            )) {                    // attempt to insert
                 $_REQUEST['action'] = CREXTERNALITEM_ACT_EDIT;
-            } else {
-                $_REQUEST['action'] = CREXTERNALITEM_ACT_ACT;
             }
             $this->edit();
             exit;
@@ -213,7 +224,7 @@ class CTExternalItem extends CTCNC
             Controller::buildLink(
                 'RenewalReport.php',
                 array(
-                    'customerID' => $this->dsExternalItem->getValue('customerID'),
+                    'customerID' => $this->dsExternalItem->getValue(DBEExternalItem::customerID),
                     'action'     => 'produceReport'
                 )
             );
@@ -225,11 +236,12 @@ class CTExternalItem extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
         $this->setMethodName('delete');
-
+        $dsExternalItem = new DataSet($this);
         $this->buExternalItem->getExternalItemByID(
             $_REQUEST['externalItemID'],
             $dsExternalItem
@@ -243,7 +255,7 @@ class CTExternalItem extends CTCNC
                 Controller::buildLink(
                     'RenewalReport.php',
                     array(
-                        'customerID' => $dsExternalItem->getValue('customerID'),
+                        'customerID' => $dsExternalItem->getValue(DBEExternalItem::customerID),
                         'action'     => 'produceReport'
                     )
                 );
@@ -266,13 +278,13 @@ class CTExternalItem extends CTCNC
         );
 
         while ($dbeItemType->fetchNext()) {
-            $selected = ($itemTypeID == $dbeItemType->getValue("itemTypeID")) ? CT_SELECTED : '';
+            $selected = ($itemTypeID == $dbeItemType->getValue(DBEItemType::itemTypeID)) ? CT_SELECTED : null;
 
             $this->template->set_var(
                 array(
                     'itemTypeSelected'    => $selected,
-                    'itemTypeID'          => $dbeItemType->getValue("itemTypeID"),
-                    'itemTypeDescription' => $dbeItemType->getValue("description")
+                    'itemTypeID'          => $dbeItemType->getValue(DBEItemType::itemTypeID),
+                    'itemTypeDescription' => $dbeItemType->getValue(DBEItemType::description)
                 )
             );
             $this->template->parse(
@@ -283,23 +295,31 @@ class CTExternalItem extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function popup()
     {
+        $dsExternalItem = new DataSet($this);
         $this->buExternalItem->getExternalItemByID(
             $_REQUEST['externalItemID'],
             $dsExternalItem
         );
-        $this->setPageTitle('ExternalItem: ' . Controller::htmlDisplayText($dsExternalItem->getValue('description')));
+        $this->setPageTitle(
+            'ExternalItem: ' . Controller::htmlDisplayText($dsExternalItem->getValue(DBEExternalItem::description))
+        );
         $this->setTemplateFiles(
             array('ExternalItemPopup' => 'ExternalItemPopup.inc')
         );
         $this->template->set_var(
             array(
                 'notes'              => Controller::htmlDisplayText(
-                    $dsExternalItem->getValue('notes'),
+                    $dsExternalItem->getValue(DBEExternalItem::notes),
                     1
                 ),
-                'licenceRenewalDate' => Controller::dateYMDtoDMY($dsExternalItem->getValue('licenceRenewalDate')),
+                'licenceRenewalDate' => Controller::dateYMDtoDMY(
+                    $dsExternalItem->getValue(DBEExternalItem::licenceRenewalDate)
+                ),
             )
         );
         $this->template->parse(
@@ -310,5 +330,4 @@ class CTExternalItem extends CTCNC
         $this->parsePage();
 
     }
-}// end of class
-?>
+}

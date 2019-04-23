@@ -9,19 +9,22 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESalesOrderTotals extends DBEntity
 {
+    const costValue = 'costValue';
+    const saleValue = 'saleValue';
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct($owner)
     {
         parent::__construct($owner);
         $this->setTableName("ordhead");
-        $this->addColumn("costValue", DA_FLOAT, DA_NOT_NULL);
-        $this->addColumn("saleValue", DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::costValue, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::saleValue, DA_FLOAT, DA_NOT_NULL);
         $this->setAddColumnsOff();
     }
 
@@ -45,5 +48,3 @@ class DBESalesOrderTotals extends DBEntity
         return (parent::getRow());
     }
 }
-
-?>

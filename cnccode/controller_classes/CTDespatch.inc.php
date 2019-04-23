@@ -63,12 +63,14 @@ define(
 
 class CTDespatch extends CTCNC
 {
-    var $buSalesOrder = '';
-    var $dsOrdhead = '';
-    var $dsOrdline = '';
-    var $dsDespatch = '';
-    var $deliveryMethodID = '';
-    var $orderTypeArray = array(
+    public $buSalesOrder;
+    public $dsOrdhead;
+    /** @var DSForm */
+    public $dsOrdline;
+    /** @var DSForm */
+    public $dsDespatch;
+    public $deliveryMethodID;
+    public $orderTypeArray = array(
         "I" => "Initial",
         "Q" => "Quotation",
         "P" => "Part",
@@ -101,18 +103,9 @@ class CTDespatch extends CTCNC
         $this->dsDespatch = new DSForm($this);
     }
 
-    function setDeliveryMethodID($ID)
-    {
-        $this->deliveryMethodID = $ID;
-    }
-
-    function getDeliveryMethodID()
-    {
-        return $this->deliveryMethodID;
-    }
-
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -140,9 +133,240 @@ class CTDespatch extends CTCNC
     }
 
     /**
+     * Display the results of order search
+     * @access private
+     * @throws Exception
+     */
+    function displayDespatch()
+    {
+        $this->setMethodName('displayDespatch');
+        $buDespatch = new BUDespatch($this);
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdhead = &$this->dsOrdhead;
+        $dsOrdline = &$this->dsOrdline;
+        if ($_REQUEST['ordheadID'] == '') {
+            $this->displayFatalError(CTDESPATCH_MSG_ORDHEADID_NOT_PASSED);
+            return;
+        }
+        $buSalesOrder->getOrdheadByID(
+            $_REQUEST['ordheadID'],
+            $dsOrdhead
+        );
+        $dsOrdhead->fetchNext();
+        $buDespatch->getLinesByID(
+            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+            $dsOrdline
+        );
+        if (!$this->getFormError()) {
+            $buDespatch->getInitialDespatchQtys(
+                $dsOrdline,
+                $this->dsDespatch
+            );
+        }
+        $ordheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
+        $this->setPageTitle('Sales Order Despatch');
+        $this->setTemplateFiles(
+            array(
+                'DespatchDisplay'      => 'DespatchDisplay.inc',
+                'DespatchDisplayNotes' => 'DespatchDisplayNotes.inc'
+            )
+        );
+        $urlDespatch =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => CTDESPATCH_ACT_DESPATCH,
+                    'ordheadID' => $ordheadID
+                )
+            );
+        $urlHome =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTDESPATCH_ACT_DISP_SEARCH
+                )                                                                                                                    // remaining POs for SO
+            );
+        $urlSalesOrder =
+            Controller::buildLink(
+                CTCNC_PAGE_SALESORDER,
+                array(
+                    'action'    => CTCNC_ACT_DISP_SALESORDER,
+                    'ordheadID' => $ordheadID
+                )                                                                                                                    // remaining POs for SO
+            );
+
+        if ($buDespatch->countNonReceivedPOsByOrdheadID($ordheadID)) {
+            $this->template->set_var(
+                'poNotRecd',
+                'WARNING: Not all of the purchase orders have been received'
+            );
+        }
+        $this->template->set_var(
+            array(
+                'ordheadID'     => $ordheadID,
+                'urlDespatch'   => $urlDespatch,
+                'urlSalesOrder' => $urlSalesOrder,
+                'urlHome'       => $urlHome
+            )
+        );
+        // despatch method
+        $dsDeliveryMethod = new DataSet($this);
+        $buDespatch->getAllDeliveryMethods($dsDeliveryMethod);
+        $this->template->set_block(
+            'DespatchDisplay',
+            'deliveryMethodBlock',
+            'deliveryMethods'
+        );
+
+        $buRenewal = null;
+        while ($dsDeliveryMethod->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    'deliveryMethodDescription' => $dsDeliveryMethod->getValue(DBEDeliveryMethod::description),
+                    'deliveryMethodID'          => $dsDeliveryMethod->getValue(DBEDeliveryMethod::deliveryMethodID),
+                    'deliveryMethodSelected'    => ($this->getDeliveryMethodID() == $dsDeliveryMethod->getValue(
+                            DBEDeliveryMethod::deliveryMethodID
+                        )) ? CT_SELECTED : ''
+                )
+            );
+            $this->template->parse(
+                'deliveryMethods',
+                'deliveryMethodBlock',
+                true
+            );
+        }
+
+        $this->template->set_var(
+            array(
+                'deliveryMethodDescription' => $dsDeliveryMethod->getValue(DBEDeliveryMethod::description)
+            )
+        );
+
+        $dsOrdline->initialise();
+        $this->dsDespatch->initialise();
+
+        if ($dsOrdline->rowCount() > 0) {
+            $this->template->set_block(
+                'DespatchDisplay',
+                'orderLineBlock',
+                'orderLines'
+            );
+            while ($dsOrdline->fetchNext()) {
+                $this->dsDespatch->fetchNext();
+                $renewalLink = null;
+                if ($dsOrdline->getValue(DBEJOrdline::renewalTypeID)) {
+                    if (!$buRenewal) {
+                        $buRenewal = new BURenewal($this);
+                    }
+
+                    $buRenewal->getRenewalBusinessObject(
+                        $dsOrdline->getValue(DBEJOrdline::renewalTypeID),
+                        $page
+                    );
+
+                    $urlEditRenewal =
+                        Controller::buildLink(
+                            $page,
+                            array(
+                                'action'     => 'editFromSalesOrder',
+                                'ordheadID'  => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+                                'sequenceNo' => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                            )
+                        );
+
+                    /** @noinspection HtmlDeprecatedAttribute */
+                    $renewalLink =
+                        '<A HREF="' . $urlEditRenewal . ' " target="_BLANK" title="Edit renewal information"><IMG src="images/renew_new.png" height="15" border="0"></A>';
+                }
+
+                $this->template->set_var(
+                    array(
+                        'description' => Controller::htmlDisplayText($dsOrdline->getValue(DBEOrdline::description)),
+                        'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                    )
+                );
+                if ($dsOrdline->getValue(DBEOrdline::lineType) != "I") {                    // Comment line
+                    $this->template->set_var(
+                        array(
+                            'stockcat'           => '',
+                            'qtyOrdered'         => '',
+                            'qtyOutstanding'     => '',
+                            'renewalLink'        => '',
+                            'qtyOutstandingHide' => '1.0',
+                            'qtyToDespatch'      => $this->dsDespatch->getValue(BUDespatch::despatchQtyToDespatch),
+                            'orderLineClass'     => CTDESPATCH_CLS_ORDER_LINE_COMMENT
+                        )
+                    );
+                } else {
+                    // Item line
+                    $this->template->set_var(
+                        array(
+                            'stockcat'           => $dsOrdline->getValue(DBEOrdline::stockcat),
+                            'qtyOrdered'         => number_format(
+                                $dsOrdline->getValue(DBEOrdline::qtyOrdered),
+                                2,
+                                '.',
+                                ''
+                            ),
+                            'qtyOutstanding'     => number_format(
+                                $dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(
+                                    DBEOrdline::qtyDespatched
+                                ),
+                                2,
+                                '.',
+                                ''
+                            ),
+                            'qtyOutstandingHide' => number_format(
+                                $dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(
+                                    DBEOrdline::qtyDespatched
+                                ),
+                                2,
+                                '.',
+                                ''
+                            ),
+                            'qtyToDespatch'      => 0,
+                            'renewalLink'        => $renewalLink,
+                            'orderLineClass'     => CTDESPATCH_CLS_ORDER_LINE_ITEM
+                        )
+                    );
+                }
+                $this->template->parse(
+                    'orderLines',
+                    'orderLineBlock',
+                    true
+                );
+            }
+        }
+        $ctDeliveryNotes = new CTDeliveryNotes(
+            $this,
+            $ordheadID,
+            $buDespatch
+        );
+        $ctDeliveryNotes->execute();
+
+        $this->template->parse(
+            'CONTENTS',
+            'DespatchDisplay',
+            true
+        );
+        $this->parsePage();
+    }
+
+    function getDeliveryMethodID()
+    {
+        return $this->deliveryMethodID;
+    }
+
+    function setDeliveryMethodID($ID)
+    {
+        $this->deliveryMethodID = $ID;
+    }
+
+    /**
      * Run search based upon passed parameters
      * Display search form with results
      * @access private
+     * @throws Exception
      */
     function search()
     {
@@ -169,7 +393,7 @@ class CTDespatch extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
-                        'ordheadID' => $this->dsOrdhead->getValue('ordheadID')
+                        'ordheadID' => $this->dsOrdhead->getValue(DBEOrdhead::ordheadID)
                     )
                 );
             header('Location: ' . $urlNext);
@@ -183,6 +407,7 @@ class CTDespatch extends CTCNC
     /**
      * Display the results of order search
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -216,12 +441,11 @@ class CTDespatch extends CTCNC
                 'orderBlock',
                 'orders'
             );
-            $typeCol = $this->dsOrdhead->columnExists('type');
-            $customerNameCol = $this->dsOrdhead->columnExists('customerName');
-            $ordheadIDCol = $this->dsOrdhead->columnExists('ordheadID');
-            $quotationOrdheadIDCol = $this->dsOrdhead->columnExists('quotationOrdheadID');
-            $custPORefCol = $this->dsOrdhead->columnExists('custPORef');
-            $dateCol = $this->dsOrdhead->columnExists('date');
+            $typeCol = $this->dsOrdhead->columnExists(DBEOrdhead::type);
+            $customerNameCol = $this->dsOrdhead->columnExists(DBEJOrdhead::customerName);
+            $ordheadIDCol = $this->dsOrdhead->columnExists(DBEOrdhead::ordheadID);
+            $custPORefCol = $this->dsOrdhead->columnExists(DBEOrdhead::custPORef);
+            $dateCol = $this->dsOrdhead->columnExists(DBEOrdhead::date);
             while ($this->dsOrdhead->fetchNext()) {
                 $orderURL =
                     Controller::buildLink(
@@ -249,9 +473,11 @@ class CTDespatch extends CTCNC
                 );
             }
         }
-// search parameter section
-        if ($_REQUEST['customerID'] != '') {
+
+        $customerString = null;
+        if (isset($_REQUEST['customerID']) && $_REQUEST['customerID']) {
             $buCustomer = new BUCustomer($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
                 $_REQUEST['customerID'],
                 $dsCustomer
@@ -277,246 +503,9 @@ class CTDespatch extends CTCNC
     }
 
     /**
-     * Display the results of order search
-     * @access private
-     */
-    function displayDespatch()
-    {
-        $this->setMethodName('displayDespatch');
-        $buDespatch = new BUDespatch($this);
-        $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdhead = &$this->dsOrdhead;
-        $dsOrdline = &$this->dsOrdline;
-        if ($_REQUEST['ordheadID'] == '') {
-            $this->displayFatalError(CTDESPATCH_MSG_ORDHEADID_NOT_PASSED);
-            return;
-        }
-        $buSalesOrder->getOrdheadByID(
-            $_REQUEST['ordheadID'],
-            $dsOrdhead
-        );
-        $dsOrdhead->fetchNext();
-        $buDespatch->getLinesByID(
-            $dsOrdhead->getValue('ordheadID'),
-            $dsOrdline
-        );
-        if (!$this->getFormError()) {
-            $buDespatch->getInitialDespatchQtys(
-                $dsOrdline,
-                $this->dsDespatch
-            );
-        }
-        $ordheadID = $dsOrdhead->getValue('ordheadID');
-        $orderType = $dsOrdhead->getValue('type');
-        $this->setPageTitle('Sales Order Despatch');
-        $this->setTemplateFiles(
-            array(
-                'DespatchDisplay'      => 'DespatchDisplay.inc',
-                'DespatchDisplayNotes' => 'DespatchDisplayNotes.inc'
-            )
-        );
-        // this is for handling F5 Toggle
-        //$this->template->set_var('onKeyPress', 'onKeyPress="keyPressHandler();"');
-        $urlDespatch =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTDESPATCH_ACT_DESPATCH,
-                    'ordheadID' => $ordheadID
-                )
-            );
-        $urlHome =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTDESPATCH_ACT_DISP_SEARCH
-                )                                                                                                                    // remaining POs for SO
-            );
-        $urlSalesOrder =
-            Controller::buildLink(
-                CTCNC_PAGE_SALESORDER,
-                array(
-                    'action'    => CTCNC_ACT_DISP_SALESORDER,
-                    'ordheadID' => $ordheadID
-                )                                                                                                                    // remaining POs for SO
-            );
-
-        if ($buDespatch->countNonReceievedPOsByOrdheadID($ordheadID) > 0) {
-            $this->template->set_var(
-                'poNotRecd',
-                'WARNING: Not all of the purchase orders have been receieved'
-            );
-        }
-
-        /*
-                if ( $countRenewalLines > 0 ){
-
-                    $renewalsButton = '<input type="submit" name="Renewals" value="Renewals">';
-
-                }
-                else{
-                    $renewalsButton = '';
-                }
-        */
-        $this->template->set_var(
-            array(
-                'ordheadID'     => $ordheadID,
-                'urlDespatch'   => $urlDespatch,
-                'urlSalesOrder' => $urlSalesOrder,
-                'urlHome'       => $urlHome//,
-                //				'renewalsButton' => $renewalsButton
-            )
-        );
-        // despatch method
-        $buDespatch->getAllDeliveryMethods($dsDeliveryMethod);
-        $this->template->set_block(
-            'DespatchDisplay',
-            'deliveryMethodBlock',
-            'deliveryMethods'
-        );
-        while ($dsDeliveryMethod->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'deliveryMethodDescription' => $dsDeliveryMethod->getValue('description'),
-                    'deliveryMethodID'          => $dsDeliveryMethod->getValue('deliveryMethodID'),
-                    'deliveryMethodSelected'    => ($this->getDeliveryMethodID() == $dsDeliveryMethod->getValue(
-                            'deliveryMethodID'
-                        )) ? CT_SELECTED : ''
-                )
-            );
-            $this->template->parse(
-                'deliveryMethods',
-                'deliveryMethodBlock',
-                true
-            );
-        }
-
-        $this->template->set_var(
-            array(
-                'deliveryMethodDescription' => $dsDeliveryMethod->getValue('description')
-            )
-        );
-
-        $dsOrdline->initialise();
-        $this->dsDespatch->initialise();
-
-        if ($dsOrdline->rowCount() > 0) {
-            $this->template->set_block(
-                'DespatchDisplay',
-                'orderLineBlock',
-                'orderLines'
-            );
-            while ($dsOrdline->fetchNext()) {
-                $this->dsDespatch->fetchNext();
-
-                /*
-                 * renewals edit icon
-                 */
-                if ($dsOrdline->getValue('renewalTypeID')) {
-
-                    if (!$buRenewal) {
-
-                        $buRenewal = new BURenewal($this);
-
-                    }
-
-                    $buRenewalObject =
-                        $buRenewal->getRenewalBusinessObject(
-                            $dsOrdline->getValue('renewalTypeID'),
-                            $page
-                        );
-
-
-                    $urlEditRenewal =
-                        Controller::buildLink(
-                            $page,
-                            array(
-                                'action'     => 'editFromSalesOrder',
-                                'ordheadID'  => $dsOrdhead->getValue('ordheadID'),
-                                'sequenceNo' => $dsOrdline->getValue("sequenceNo")
-                            )
-                        );
-
-                    $renewalLink =
-                        '<A HREF="' . $urlEditRenewal . ' " target="_BLANK" title="Edit renewal information"><IMG src="images/renew_new.png" height="15" border="0"></A>';
-
-                } else {
-                    $renewalLink = '';
-                }
-
-                $this->template->set_var(
-                    array(
-                        'description' => Controller::htmlDisplayText($dsOrdline->getValue("description")),
-                        'sequenceNo'  => $dsOrdline->getValue('sequenceNo')
-                    )
-                );
-                if ($dsOrdline->getValue("lineType") != "I") {                    // Comment line
-                    $this->template->set_var(
-                        array(
-                            'stockcat'           => '',
-                            'qtyOrdered'         => '',
-                            'qtyOutstanding'     => '',
-                            'renewalLink'        => '',
-                            'qtyOutstandingHide' => '1.0',
-                            'qtyToDespatch'      => $this->dsDespatch->getValue("qtyToDespatch"),
-                            'orderLineClass'     => CTDESPATCH_CLS_ORDER_LINE_COMMENT
-                        )
-                    );
-                } else {
-                    // Item line
-                    $this->template->set_var(
-                        array(
-                            'stockcat'           => $dsOrdline->getValue("stockcat"),
-                            'qtyOrdered'         => number_format(
-                                $dsOrdline->getValue("qtyOrdered"),
-                                2,
-                                '.',
-                                ''
-                            ),
-                            'qtyOutstanding'     => number_format(
-                                $dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"),
-                                2,
-                                '.',
-                                ''
-                            ),
-                            'qtyOutstandingHide' => number_format(
-                                $dsOrdline->getValue("qtyOrdered") - $dsOrdline->getValue("qtyDespatched"),
-                                2,
-                                '.',
-                                ''
-                            ),
-                            'qtyToDespatch'      => 0,
-                            'renewalLink'        => $renewalLink,
-                            'orderLineClass'     => CTDESPATCH_CLS_ORDER_LINE_ITEM
-                        )
-                    );
-                }
-                $this->template->parse(
-                    'orderLines',
-                    'orderLineBlock',
-                    true
-                );
-            }
-        }
-        $ctDeliveryNotes = new CTDeliveryNotes(
-            $this,
-            $ordheadID,
-            $buDespatch
-        );
-        $ctDeliveryNotes->execute();
-
-        $this->template->parse(
-            'CONTENTS',
-            'DespatchDisplay',
-            true
-        );
-        $this->parsePage();
-    }
-
-
-    /**
      * Perform despatch
      * @access private
+     * @throws Exception
      */
     function despatch()
     {
@@ -532,49 +521,49 @@ class CTDespatch extends CTCNC
         $buDespatch->initialiseDespatchDataset($dsDespatch);
 
         if (!$dsDespatch->populateFromArray($_REQUEST['despatch'])) {
-            $this->setFormErrorMessage('Quantitites entered must be numeric');
+            $this->setFormErrorMessage('Quantities entered must be numeric');
         }
 //		$hasRenewalsLines = false;
         $forciblyCreateNote = isset($_REQUEST['forciblyCreateNote']);
 
         $dsDespatch->initialise();
+        $buRenewal = null;
         while ($dsDespatch->fetchNext()) {
+            $dsOrdline = new DataSet($this);
             $buSalesOrder->getOrdlineByIDSeqNo(
                 $_REQUEST['ordheadID'],
-                $dsDespatch->getValue('sequenceNo'),
+                $dsDespatch->getValue(BUDespatch::despatchSequenceNo),
                 $dsOrdline
             );
-            if ($dsOrdline->getValue('lineType') != 'C') {
+            if ($dsOrdline->getValue(DBEOrdline::lineType) != 'C') {
                 if (
-                    $dsDespatch->getValue('qtyToDespatch') >
-                    ($dsOrdline->getValue('qtyOrdered') - $dsOrdline->getValue('qtyDespatched'))
+                    $dsDespatch->getValue(BUDespatch::despatchQtyToDespatch) >
+                    ($dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(DBEOrdline::qtyDespatched))
                 ) {
-                    $this->setFormErrorMessage('Quantitites must not exceed outstanding');
+                    $this->setFormErrorMessage('Quantities must not exceed outstanding');
                 }
             }
             /*
              * Validate that renewals have been created and minimum information has been entered
              */
-            if ($dsOrdline->getValue('renewalTypeID') > 0) {
+            if ($dsOrdline->getValue(DBEJOrdline::renewalTypeID) > 0) {
 
-                if (!$forciblyCreateNote && !$dsOrdline->getValue('renewalCustomerItemID')) {
+                if (!$forciblyCreateNote && !$dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)) {
 
                     $this->setFormErrorMessage('You have not created all of the renewals');
 
                 } else {
                     if (!$buRenewal) {
-
                         $buRenewal = new BURenewal($this);
-
                     }
                     $buRenewalObject =
                         $buRenewal->getRenewalBusinessObject(
-                            $dsOrdline->getValue('renewalTypeID'),
+                            $dsOrdline->getValue(DBEJOrdline::renewalTypeID),
                             $page
                         );
 
                     if (!$forciblyCreateNote && !$buRenewalObject->isCompleted(
-                            $dsOrdline->getValue('renewalCustomerItemID')
+                            $dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)
                         )) {
 
                         $this->setFormErrorMessage('You have not completed all of the renewal information required');
@@ -584,31 +573,23 @@ class CTDespatch extends CTCNC
                 } // end else
 
             } // end if is a renewal line
-
-
         }
 
         if ($this->getformError()) {
             $this->displayDespatch();
             exit;
-        } else {
-            $deliveryNoteFile = $buDespatch->despatch(
-                $_REQUEST['ordheadID'],
-                $_REQUEST['deliveryMethodID'],
-                $dsDespatch,
-                $_REQUEST['onlyCreateDespatchNote']
-            );
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
-                        'ordheadID' => $_REQUEST['ordheadID']
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
         }
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
+                    'ordheadID' => $_REQUEST['ordheadID']
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+
     }
 
     /**
@@ -622,12 +603,15 @@ class CTDespatch extends CTCNC
             return;
         }
         $buDespatch = new BUDespatch($this);
+        $dsDeliveryNote = new DataSet($this);
         $buDespatch->getDeliveryNoteByID(
             $_REQUEST['deliveryNoteID'],
             $dsDeliveryNote
         );
         $dsDeliveryNote->fetchNext();
-        $fileName = $dsDeliveryNote->getValue('ordheadID') . '_' . $dsDeliveryNote->getValue('noteNo') . '.pdf';
+        $fileName = $dsDeliveryNote->getValue(DBEDeliveryNote::ordheadID) . '_' . $dsDeliveryNote->getValue(
+                DBEDeliveryNote::noteNo
+            ) . '.pdf';
         $pdfFile = DELIVERY_NOTES_DIR . '/' . $fileName;
         header("Pragma: public");
         header("Expires: 0");
@@ -639,5 +623,4 @@ class CTDespatch extends CTCNC
         readfile($pdfFile);
         exit();
     }
-}// end of class
-?>
+}

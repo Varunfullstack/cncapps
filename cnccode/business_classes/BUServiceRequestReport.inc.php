@@ -12,6 +12,10 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUServiceRequestReport extends Business
 {
+    const searchFormCustomerID = "customerID";
+    const searchFormFromDate = "fromDate";
+    const searchFormToDate = "toDate";
+
     /**
      * Constructor
      * @access Public
@@ -24,10 +28,10 @@ class BUServiceRequestReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');
+        $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormFromDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormToDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormCustomerID, null);
     }
 
     function search(&$dsSearchForm)

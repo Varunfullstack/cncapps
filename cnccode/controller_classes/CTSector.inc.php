@@ -31,7 +31,7 @@ define(
     'updateSector'
 );
 
-class CTSECTOR extends CTCNC
+class CTSector extends CTCNC
 {
     public $dsSector;
     public $buSector;
@@ -135,7 +135,7 @@ class CTSECTOR extends CTCNC
 
             while ($dsSector->fetchNext()) {
 
-                $sectorID = $dsSector->getValue('sectorID');
+                $sectorID = $dsSector->getValue(DBESector::sectorID);
 
                 $urlEdit =
                     Controller::buildLink(
@@ -147,6 +147,8 @@ class CTSECTOR extends CTCNC
                     );
                 $txtEdit = '[edit]';
 
+                $urlDelete = null;
+                $txtDelete = null;
                 if ($this->buSector->canDelete($sectorID)) {
                     $urlDelete =
                         Controller::buildLink(
@@ -157,15 +159,12 @@ class CTSECTOR extends CTCNC
                             )
                         );
                     $txtDelete = '[delete]';
-                } else {
-                    $urlDelete = '';
-                    $txtDelete = '';
                 }
 
                 $this->template->set_var(
                     array(
                         'sectorID'    => $sectorID,
-                        'description' => Controller::htmlDisplayText($dsSector->getValue('description')),
+                        'description' => Controller::htmlDisplayText($dsSector->getValue(DBESector::description)),
                         'urlEdit'     => $urlEdit,
                         'urlDelete'   => $urlDelete,
                         'txtEdit'     => $txtEdit,
@@ -209,16 +208,18 @@ class CTSECTOR extends CTCNC
             } else {                                                                    // creating new
                 $dsSector->initialise();
                 $dsSector->setValue(
-                    'sectorID',
-                    '0'
+                    DBESector::sectorID,
+                    null
                 );
-                $sectorID = '0';
+                $sectorID = null;
             }
         } else {                                                                        // form validation error
             $dsSector->initialise();
             $dsSector->fetchNext();
-            $sectorID = $dsSector->getValue('sectorID');
+            $sectorID = $dsSector->getValue(DBESector::sectorID);
         }
+        $urlDelete = null;
+        $txtDelete = null;
         if ($_REQUEST['action'] == CTSECTOR_ACT_EDIT && $this->buSector->canDelete($_REQUEST['sectorID'])) {
             $urlDelete =
                 Controller::buildLink(
@@ -229,9 +230,6 @@ class CTSECTOR extends CTCNC
                     )
                 );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
@@ -255,8 +253,8 @@ class CTSECTOR extends CTCNC
         $this->template->set_var(
             array(
                 'sectorID'           => $sectorID,
-                'description'        => Controller::htmlInputText($dsSector->getValue('description')),
-                'descriptionMessage' => Controller::htmlDisplayText($dsSector->getMessage('description')),
+                'description'        => Controller::htmlInputText($dsSector->getValue(DBESector::description)),
+                'descriptionMessage' => Controller::htmlDisplayText($dsSector->getMessage(DBESector::description)),
                 'urlUpdate'          => $urlUpdate,
                 'urlDelete'          => $urlDelete,
                 'txtDelete'          => $txtDelete,
@@ -281,7 +279,7 @@ class CTSECTOR extends CTCNC
         $this->setMethodName('update');
         $this->formError = (!$this->dsSector->populateFromArray($_REQUEST['sector']));
         if ($this->formError) {
-            if ($this->dsSector->getValue('sectorID') == '') {                    // attempt to insert
+            if (!$this->dsSector->getValue(DBESector::sectorID)) {
                 $_REQUEST['action'] = CTSECTOR_ACT_EDIT;
             } else {
                 $_REQUEST['action'] = CTSECTOR_ACT_CREATE;
@@ -296,7 +294,7 @@ class CTSECTOR extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'sectorID' => $this->dsSector->getValue('sectorID'),
+                    'sectorID' => $this->dsSector->getValue(DBESector::sectorID),
                     'action'   => CTCNC_ACT_VIEW
                 )
             );
@@ -357,5 +355,4 @@ class CTSECTOR extends CTCNC
             $this->parsePage();
         }
     }
-}// end of class
-?>
+}

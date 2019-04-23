@@ -25,9 +25,14 @@ class CTHome extends CTCNC
     const getFirstTimeFixData = "getFirstTimeFixData";
     const getFixedAndReopenData = "getFixedAndReopenData";
     const getUpcomingVisitsData = "getUpcomingVisitsData";
-
-    private $dsHeader = '';
+    /** @var DataSet|DBEHeader */
+    private $dsHeader;
+    /** @var BUUser */
     private $buUser;
+    /**
+     * @var BUCustomer
+     */
+    private $buCustomer;
 
     function __construct($requestMethod,
                          $postVars,
@@ -50,15 +55,12 @@ class CTHome extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         switch ($_REQUEST['action']) {
-            case 'updateServiceDetails':
-                $this->updateServiceDetails();
-                break;
             case 'lastWeekHelpDesk':
-
                 $days = $_REQUEST['days'];
                 if (!$days) {
                     $days = 30;
@@ -116,6 +118,9 @@ class CTHome extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function display()
     {
         /**
@@ -183,6 +188,10 @@ class CTHome extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     function displayFixedAndReopen()
     {
 
@@ -235,44 +244,58 @@ class CTHome extends CTCNC
         $dbeSalesOrderTotals = new DBESalesOrderTotals($this);
 
         $dbeSalesOrderTotals->getRow();
-        $profit = $dbeSalesOrderTotals->getValue('saleValue') - $dbeSalesOrderTotals->getValue('costValue');
+        $profit = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue) - $dbeSalesOrderTotals->getValue(
+                DBESalesOrderTotals::costValue
+            );
         $this->template->set_var(
             array(
-                'soSale'   => Controller::formatNumber($dbeSalesOrderTotals->getValue('saleValue')),
-                'soCost'   => Controller::formatNumber($dbeSalesOrderTotals->getValue('costValue')),
+                'soSale'   => Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue)),
+                'soCost'   => Controller::formatNumber($dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue)),
                 'soProfit' => Controller::formatNumber($profit)
             )
         );
         $profitTotal = $profit;
-        $saleTotal = $dbeSalesOrderTotals->getValue('saleValue');
-        $costTotal = $dbeSalesOrderTotals->getValue('costValue');
+        $saleTotal = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::saleValue);
+        $costTotal = $dbeSalesOrderTotals->getValue(DBESalesOrderTotals::costValue);
 
         $dbeInvoiceTotals = new DBEInvoiceTotals($this);
         $dbeInvoiceTotals->getCurrentMonthTotals();
-        $profit = $dbeInvoiceTotals->getValue('saleValue') - $dbeInvoiceTotals->getValue('costValue');
+        $profit = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue) - $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::costValue
+            );
         $this->template->set_var(
             array(
-                'invPrintedSale'   => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
-                'invPrintedCost'   => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
+                'invPrintedSale'   => Controller::formatNumber(
+                    $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
+                ),
+                'invPrintedCost'   => Controller::formatNumber(
+                    $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
+                ),
                 'invPrintedProfit' => Controller::formatNumber($profit)
             )
         );
         $profitTotal += $profit;
-        $saleTotal += $dbeInvoiceTotals->getValue('saleValue');
-        $costTotal += $dbeInvoiceTotals->getValue('costValue');
+        $saleTotal += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $costTotal += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
 
         $dbeInvoiceTotals->getUnprintedTotals();
-        $profit = $dbeInvoiceTotals->getValue('saleValue') - $dbeInvoiceTotals->getValue('costValue');
+        $profit = $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue) - $dbeInvoiceTotals->getValue(
+                DBEInvoiceTotals::costValue
+            );
         $this->template->set_var(
             array(
-                'invUnprintedSale'   => Controller::formatNumber($dbeInvoiceTotals->getValue('saleValue')),
-                'invUnprintedCost'   => Controller::formatNumber($dbeInvoiceTotals->getValue('costValue')),
+                'invUnprintedSale'   => Controller::formatNumber(
+                    $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue)
+                ),
+                'invUnprintedCost'   => Controller::formatNumber(
+                    $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue)
+                ),
                 'invUnprintedProfit' => Controller::formatNumber($profit)
             )
         );
         $profitTotal += $profit;
-        $saleTotal += $dbeInvoiceTotals->getValue('saleValue');
-        $costTotal += $dbeInvoiceTotals->getValue('costValue');
+        $saleTotal += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::saleValue);
+        $costTotal += $dbeInvoiceTotals->getValue(DBEInvoiceTotals::costValue);
 
         $this->template->set_var(
             array(
@@ -294,6 +317,7 @@ class CTHome extends CTCNC
     /**
      * Displays list of customers to review
      *
+     * @throws Exception
      */
     function displayReviewList()
     {
@@ -312,7 +336,7 @@ class CTHome extends CTCNC
         );
 
         $this->buCustomer = new BUCustomer($this);
-
+        $dsCustomer = new DataSet($this);
         if ($this->buCustomer->getDailyCallList($dsCustomer)) {
 
 
@@ -328,11 +352,12 @@ class CTHome extends CTCNC
                     );
 
                 if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
+                    $dsUser = new DataSet($this);
                     $this->buUser->getUserByID(
                         $dsCustomer->getValue(DBECustomer::reviewUserID),
                         $dsUser
                     );
-                    $user = $dsUser->getValue('name');
+                    $user = $dsUser->getValue(DBEUser::name);
                 } else {
                     $user = false;
                 }
@@ -365,6 +390,9 @@ class CTHome extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function displayProjects()
     {
         $this->setTemplateFiles(
@@ -396,7 +424,7 @@ class CTHome extends CTCNC
                     ]
                 );
 
-            $downloadProjectPlanClass = $hasProjectPlan ? '' : 'class="redText"';
+            $downloadProjectPlanClass = $hasProjectPlan ? null : 'class="redText"';
             $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
             $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
 
@@ -431,6 +459,8 @@ class CTHome extends CTCNC
                             'backToHome' => true
                         )
                     );
+                /** @noinspection JSUnresolvedFunction */
+                /** @noinspection BadExpressionStatementJS */
                 $lastUpdated = '<a href="#" onclick="showLastUpdatedPopup(' . $project['projectID'] . ')" >Status</a>';
             }
 
@@ -452,7 +482,7 @@ class CTHome extends CTCNC
                     'commenceDate'    => $project['commenceDate'] ? strftime(
                         "%d/%m/%Y",
                         strtotime($project['commenceDate'])
-                    ) : '',
+                    ) : null,
                     'urlEdit'         => $editProjectLink,
                     'engineerName'    => $project['engineerName'],
                     'lastUpdatePopup' => $lastUpdated,
@@ -488,17 +518,17 @@ class CTHome extends CTCNC
 
         $this->template->set_var(
             array(
-                'esTeamTargetSlaPercentage' => $this->dsHeader->getValue('esTeamTargetSlaPercentage'),
-                'esTeamTargetFixHours'      => $this->dsHeader->getValue('esTeamTargetFixHours'),
-                'esTeamTargetFixQty'        => $this->dsHeader->getValue('esTeamTargetFixQtyPerMonth') * 3,
+                'esTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::esTeamTargetSlaPercentage),
+                'esTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::esTeamTargetFixHours),
+                'esTeamTargetFixQty'        => $this->dsHeader->getValue(DBEHeader::esTeamTargetFixQtyPerMonth) * 3,
 
-                'imTeamTargetSlaPercentage' => $this->dsHeader->getValue('imTeamTargetSlaPercentage'),
-                'imTeamTargetFixHours'      => $this->dsHeader->getValue('imTeamTargetFixHours'),
-                'imTeamTargetFixQty'        => $this->dsHeader->getValue('imTeamTargetFixQtyPerMonth') * 3,
+                'imTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::imTeamTargetSlaPercentage),
+                'imTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::imTeamTargetFixHours),
+                'imTeamTargetFixQty'        => $this->dsHeader->getValue(DBEHeader::imTeamTargetFixQtyPerMonth) * 3,
 
-                'hdTeamTargetSlaPercentage' => $this->dsHeader->getValue('hdTeamTargetSlaPercentage'),
-                'hdTeamTargetFixHours'      => $this->dsHeader->getValue('hdTeamTargetFixHours'),
-                'hdTeamTargetFixQty'        => $this->dsHeader->getValue('hdTeamTargetFixQtyPerMonth') * 3
+                'hdTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::hdTeamTargetSlaPercentage),
+                'hdTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours),
+                'hdTeamTargetFixQty'        => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixQtyPerMonth) * 3
             )
         );
 
@@ -685,9 +715,9 @@ class CTHome extends CTCNC
         $teamLevel = $this->buUser->getLevelByUserID($this->userID);
 
         if ($teamLevel == 1) {
-            $targetLogPercentage = $this->dsHeader->getValue('hdTeamTargetLogPercentage');
+            $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
         } else {
-            $targetLogPercentage = $this->dsHeader->getValue('esTeamTargetLogPercentage');
+            $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
 
         }
 
@@ -759,11 +789,11 @@ class CTHome extends CTCNC
             'DashboardAllUsersPerformanceReport.inc'
         );
 
-        $hdTeamTargetLogPercentage = $this->dsHeader->getValue('hdTeamTargetLogPercentage');
+        $hdTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
 
-        $esTeamTargetLogPercentage = $this->dsHeader->getValue('esTeamTargetLogPercentage');
+        $esTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
 
-        $imTeamTargetLogPercentage = $this->dsHeader->getValue('imTeamTargetLogPercentage');
+        $imTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
 
         $hdUsers = $this->buUser->getUsersByTeamLevel(1);
 
@@ -795,7 +825,7 @@ class CTHome extends CTCNC
                 30
             );
 
-            $weeklyPercentageClass = '';
+            $weeklyPercentageClass = null;
 
             if ($weekly['performancePercentage'] < $hdTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
@@ -805,7 +835,7 @@ class CTHome extends CTCNC
                 $weeklyPercentageClass = 'performance-green';
             }
 
-            $monthlyPercentageClass = '';
+            $monthlyPercentageClass = null;
 
             if ($monthly['performancePercentage'] < $hdTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
@@ -871,9 +901,8 @@ class CTHome extends CTCNC
                 30
             );
 
-            $weeklyPercentageClass = '';
+            $weeklyPercentageClass = null;
             if ($weekly['performancePercentage'] < $esTeamTargetLogPercentage) {
-
                 $weeklyPercentageClass = 'performance-warn';
             }
 
@@ -881,10 +910,9 @@ class CTHome extends CTCNC
                 $weeklyPercentageClass = 'performance-green';
             }
 
-            $monthlyPercentageClass = '';
+            $monthlyPercentageClass = null;
 
             if ($monthly['performancePercentage'] < $esTeamTargetLogPercentage) {
-
                 $monthlyPercentageClass = 'performance-warn';
             }
             if ($monthly['performancePercentage'] >= $esTeamTargetLogPercentage) {
@@ -951,7 +979,7 @@ class CTHome extends CTCNC
             );
 
 
-            $weeklyPercentageClass = '';
+            $weeklyPercentageClass = null;
 
             if ($weekly['performancePercentage'] < $imTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
@@ -961,7 +989,7 @@ class CTHome extends CTCNC
                 $weeklyPercentageClass = 'performance-green';
             }
 
-            $monthlyPercentageClass = '';
+            $monthlyPercentageClass = null;
             if ($monthly['performancePercentage'] < $imTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
             }
@@ -1038,6 +1066,12 @@ class CTHome extends CTCNC
 
     }
 
+    /**
+     * @param $team
+     * @param $days
+     * @return array
+     * @throws Exception
+     */
     private function showLastWeekHelpDeskData($team,
                                               $days
     )
@@ -1053,26 +1087,10 @@ class CTHome extends CTCNC
         }
         $dbeUser = $this->getDbeUser();
         $dbeUser->setValue(
-            'userID',
+            DBEUser::userID,
             $this->userID
         );
         $dbeUser->getRow();
-
-        $target = null;
-        switch ($team) {
-            case 1:
-                $target = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
-                break;
-            case 2:
-                $target = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
-                break;
-            case 3:
-                $target = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
-                break;
-            default:
-                throw new Exception('Team not valid');
-        }
-
 
         $graphs = [];
 
@@ -1115,7 +1133,7 @@ class CTHome extends CTCNC
             $cell = [
                 "c" =>
                     [
-                        ["v" => (new \DateTime($result['loggedDate']))->format(DATE_ISO8601)],
+                        ["v" => (new DateTime($result['loggedDate']))->format(DATE_ISO8601)],
                         ["v" => $result['loggedHours']]
                     ]
             ];
@@ -1147,6 +1165,12 @@ class CTHome extends CTCNC
         return $toReturn;
     }
 
+    /**
+     * @param $engineerID
+     * @param $startDate
+     * @param $endDate
+     * @throws Exception
+     */
     private function showDetailCharts($engineerID,
                                       $startDate,
                                       $endDate
@@ -1196,6 +1220,13 @@ class CTHome extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @param $engineerID
+     * @param $startDate
+     * @param $endDate
+     * @return array
+     * @throws Exception
+     */
     private function getDetailedChartsData($engineerID,
                                            $startDate,
                                            $endDate
@@ -1218,6 +1249,10 @@ class CTHome extends CTCNC
 
     }
 
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     private function displayFirstTimeFixFigures()
     {
         $this->setTemplateFiles(
@@ -1265,6 +1300,9 @@ class CTHome extends CTCNC
         return $db->Record['upcomingVisitsData'];
     }
 
+    /**
+     * @throws Exception
+     */
     private function displayUpcomingVisits()
     {
         $this->setTemplateFiles(
@@ -1290,5 +1328,4 @@ class CTHome extends CTCNC
         );
     }
 
-}// end of class
-?>
+}

@@ -10,13 +10,13 @@ require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEOrdline.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJRenDomain.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEArecord.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenDomain extends Business
 {
-    var $dbeRenDomain = "";
-    var $dbeArecord = "";
+    /** @var DBECustomerItem */
+    public $dbeRenDomain;
+    /** @var DBEJRenDomain */
     private $dbeJRenDomain;
 
     /**
@@ -28,7 +28,6 @@ class BURenDomain extends Business
     {
         parent::__construct($owner);
         $this->dbeRenDomain = new DBECustomerItem ($this);
-        $this->dbeArecord = new DBEArecord($this);
         $this->dbeJRenDomain = new DBEJRenDomain ($this);
     }
 
@@ -41,33 +40,6 @@ class BURenDomain extends Business
         );
 
         return TRUE;
-    }
-
-    function getArecordById($ID,
-                            &$dsResults
-    )
-    {
-        $this->dbeArecord->getRow($ID);
-        return ($this->getData(
-            $this->dbeArecord,
-            $dsResults
-        ));
-    }
-
-    function updateArecord(&$dsData)
-    {
-        $this->setMethodName('updateArecord');
-        $this->updateDataAccessObject(
-            $dsData,
-            $this->dbeArecord
-        );
-
-        return TRUE;
-    }
-
-    function deleteArecord($arecordID)
-    {
-        $this->dbeArecord->deleteRow($arecordID);
     }
 
     function getRenDomainByID($ID,
@@ -93,21 +65,11 @@ class BURenDomain extends Business
         ));
     }
 
-    function deleteRenDomain($ID)
-    {
-        $this->setMethodName('deleteRenDomain');
-        if ($this->canDeleteRenDomain($ID)) {
-            return $this->dbeRenDomain->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
-    }
-
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
-        &$customerItemID
+        &$customerItemID,
+        $siteNo = 0
     )
     {
         // create a customer item
@@ -121,7 +83,7 @@ class BURenDomain extends Business
 
         $dsCustomerItem->setValue(
             DBEJCustomerItem::customerItemID,
-            0
+            null
         );
         $dsCustomerItem->setValue(
             DBEJCustomerItem::customerID,
@@ -155,7 +117,7 @@ class BURenDomain extends Business
             DBEJRenDomain::customerItemID,
             $customerItemID
         );
-        $this->dbeRenDomain->getRowsByColumn('customerItemID');
+        $this->dbeRenDomain->getRowsByColumn(DBEJRenDomain::customerItemID);
         $this->dbeRenDomain->fetchNext();
 
         return ($this->dbeRenDomain->getPKValue());
@@ -179,14 +141,15 @@ class BURenDomain extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
-                <td bgcolor="#999999">Customer</td>
-                <td bgcolor="#999999">Service</td>
-                <td bgcolor="#999999">Domain</td>
-                <td bgcolor="#999999">Expires</td>
+                <td style="background-color: #999999">Customer</td>
+                <td style="background-color: #999999">Service</td>
+                <td style="background-color: #999999">Domain</td>
+                <td style="background-color: #999999">Expires</td>
             </tr>
             <?php while ($this->dbeJRenDomain->fetchNext()) { ?>
                 <tr>
@@ -241,9 +204,10 @@ class BURenDomain extends Business
         $dbeCustomer = new DBECustomer ($this);
 
         $dbeOrdline = new DBEOrdline ($this);
+        /** @var DataSet $dsOrdhead */
         $dsOrdhead = null;
         $dsOrdline = new DataSet($this);
-
+        $line = 0;
         $previousCustomerID = 99999;
 
         $generateInvoice = false;
@@ -555,24 +519,20 @@ class BURenDomain extends Business
         $ID = $this->getRenewalIDByCustomerItemID($customerItemID);
 
         if ($ID) {
-
             $this->dbeRenDomain->getRow($ID);
-
         } else {
             $this->raiseError('Renewal row not found');
         }
 
         if
         (
-            $this->dbeRenDomain->getValue(DBEJRenDomain::installationDate) &&
-            $this->dbeRenDomain->getValue(DBEJRenDomain::invoicePeriodMonths)
+            !$this->dbeRenDomain->getValue(DBEJRenDomain::installationDate) || !$this->dbeRenDomain->getValue(
+                DBEJRenDomain::invoicePeriodMonths
+            )
         ) {
-            $ret = true;
-
+            return false;
         }
-
-        return $ret;
-
+        return true;
     }
 } // End of class
 ?>

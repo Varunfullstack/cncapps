@@ -12,7 +12,9 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTEscalationReport extends CTCNC
 {
-    private $dsPrintRange = '';
+    const searchFormFromDate = 'fromDate';
+    const searchFormToDate = 'toDate';
+
     private $dsSearchForm = '';
     private $buEscalationReport;
 
@@ -45,12 +47,12 @@ class CTEscalationReport extends CTCNC
 
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
-            'fromDate',
+            self::searchFormFromDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $this->dsSearchForm->addColumn(
-            'toDate',
+            self::searchFormToDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
@@ -58,34 +60,35 @@ class CTEscalationReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->search();
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
         $this->setMethodName('search');
-
+        $teamReport = null;
+        $technicianReport = null;
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
-
             if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-
                 $this->setFormErrorOn();
-
             } else {
                 $teamReport = $this->buEscalationReport->getTeamReport($this->dsSearchForm);
                 $technicianReport = $this->buEscalationReport->getTechnicianReport($this->dsSearchForm);
             }
-
         }
 
-        if ($this->dsSearchForm->getValue('fromDate') == '') {
+        if ($this->dsSearchForm->getValue(self::searchFormFromDate) == '') {
             $this->dsSearchForm->setUpdateModeUpdate();
             $this->dsSearchForm->setValue(
-                'fromDate',
+                self::searchFormFromDate,
                 date(
                     'Y-m-d',
                     strtotime("-1 month")
@@ -93,10 +96,10 @@ class CTEscalationReport extends CTCNC
             );
             $this->dsSearchForm->post();
         }
-        if (!$this->dsSearchForm->getValue('toDate')) {
+        if (!$this->dsSearchForm->getValue(self::searchFormToDate)) {
             $this->dsSearchForm->setUpdateModeUpdate();
             $this->dsSearchForm->setValue(
-                'toDate',
+                self::searchFormToDate,
                 date('Y-m-d')
             );
             $this->dsSearchForm->post();
@@ -121,10 +124,10 @@ class CTEscalationReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'fromDate'         => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('fromDate')),
-                'fromDateMessage'  => $this->dsSearchForm->getMessage('fromDate'),
-                'toDate'           => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('toDate')),
-                'toDateMessage'    => $this->dsSearchForm->getMessage('toDate'),
+                'fromDate'         => Controller::dateYMDtoDMY($this->dsSearchForm->getValue(self::searchFormFromDate)),
+                'fromDateMessage'  => $this->dsSearchForm->getMessage(self::searchFormFromDate),
+                'toDate'           => Controller::dateYMDtoDMY($this->dsSearchForm->getValue(self::searchFormToDate)),
+                'toDateMessage'    => $this->dsSearchForm->getMessage(self::searchFormToDate),
                 'urlSubmit'        => $urlSubmit,
                 'teamReport'       => $teamReport,
                 'technicianReport' => $technicianReport
@@ -141,5 +144,4 @@ class CTEscalationReport extends CTCNC
 
     } // end function displaySearchForm
 
-} // end of class
-?>
+}
